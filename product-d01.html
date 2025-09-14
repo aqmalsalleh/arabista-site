@@ -93,8 +93,17 @@
     <section class="max-w-screen-xl mx-auto px-4 sm:px-6 grid lg:grid-cols-2 gap-8 items-start" id="gallery">
       <!-- Gallery -->
       <div>
-        <div class="aspect-[3/4] bg-black/30 rounded-2xl overflow-auto">
+        <div class="aspect-[3/4] bg-black/30 rounded-2xl overflow-auto relative">
           <img id="mainImg" src="images/d01-1.jpg" alt="Dahlia D01 Abaya — front view" class="w-full h-full object-cover">
+    <button id="imgPrev" type="button" aria-label="Previous image"
+      class="absolute z-10 left-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 rounded-full w-10 h-10 flex items-center justify-center">
+      <span aria-hidden="true" class="text-white text-2xl leading-none select-none">‹</span>
+    </button>
+    <button id="imgNext" type="button" aria-label="Next image"
+      class="absolute z-10 right-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 rounded-full w-10 h-10 flex items-center justify-center">
+      <span aria-hidden="true" class="text-white text-2xl leading-none select-none">›</span>
+    </button>
+
         </div>
         <div class="mt-3 grid grid-cols-4 gap-2">
           <button class="thumb-active rounded-xl overflow-hidden" data-src="images/d01-1.jpg"><img src="images/d01-1-thumb.jpg" class="w-full h-20 object-cover" alt=""></button>
@@ -377,7 +386,7 @@
         document.querySelectorAll('[data-src]').forEach(b=>b.classList.remove('thumb-active'));
         btn.classList.add('thumb-active'); 
         mainImg.src=btn.dataset.src;
-        document.getElementById('gallery').scrollIntoView({behavior:'smooth', block:'center'});
+        
       });
     });
 
@@ -396,7 +405,7 @@
         selectedSize = matched.dataset.size || sz;
         document.getElementById('sizeChosen').textContent='Size: '+selectedSize;
         updateWA();
-        window.scrollTo({top: matched.getBoundingClientRect().top + window.scrollY - 180, behavior:'smooth'});
+        
       }
     }
     document.querySelectorAll('.size-btn').forEach(b=>{
@@ -665,7 +674,7 @@
   thumbs.forEach((btn, i) => {
     btn.addEventListener('click', () => {
       show(i);
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      
     }, { passive: true });
   });
 
@@ -674,11 +683,66 @@
   const next = document.getElementById('imgNext');
   if (prev) prev.addEventListener('click', () => {
     show(currentIndex - 1);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    
   }, { passive: true });
   if (next) next.addEventListener('click', () => {
     show(currentIndex + 1);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    
+  }, { passive: true });
+})();
+</script>
+
+
+<script>
+(() => {
+  const main = document.getElementById('mainImg');
+  if (!main) return;
+
+  const thumbs = Array.from(document.querySelectorAll('#gallery [data-src]'));
+  let currentIndex = Math.max(0, thumbs.findIndex(b => b.classList.contains('thumb-active')));
+  if (currentIndex < 0) currentIndex = 0;
+
+  function show(i) {
+    if (!thumbs.length) return;
+    if (i < 0) i = thumbs.length - 1;
+    if (i >= thumbs.length) i = 0;
+    currentIndex = i;
+    const src = thumbs[i].getAttribute('data-src');
+    if (src) main.src = src;
+    thumbs.forEach(btn => btn.classList.remove('thumb-active'));
+    thumbs[i].classList.add('thumb-active');
+  }
+
+  // Thumbnails: update image only (no scrolling)
+  thumbs.forEach((btn, i) => {
+    btn.addEventListener('click', () => show(i), { passive: true });
+  });
+
+  // Arrow buttons
+  const prev = document.getElementById('imgPrev');
+  const next = document.getElementById('imgNext');
+  if (prev) prev.addEventListener('click', () => show(currentIndex - 1));
+  if (next) next.addEventListener('click', () => show(currentIndex + 1));
+
+  // Swipe support on the main image
+  let startX = 0, startY = 0, active = false;
+  const H_THRESHOLD = 32;   // px horizontal distance to count as swipe
+  const V_TOLERANCE = 80;   // px vertical tolerance
+
+  main.addEventListener('touchstart', (e) => {
+    const t = e.changedTouches[0];
+    startX = t.pageX; startY = t.pageY; active = true;
+  }, { passive: true });
+
+  main.addEventListener('touchend', (e) => {
+    if (!active) return;
+    const t = e.changedTouches[0];
+    const dx = t.pageX - startX;
+    const dy = t.pageY - startY;
+    active = false;
+    if (Math.abs(dx) > H_THRESHOLD && Math.abs(dy) < V_TOLERANCE) {
+      if (dx < 0) show(currentIndex + 1); else show(currentIndex - 1);
+    }
   }, { passive: true });
 })();
 </script>
