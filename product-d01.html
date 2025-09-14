@@ -93,7 +93,7 @@
     <section class="max-w-screen-xl mx-auto px-4 sm:px-6 grid lg:grid-cols-2 gap-8 items-start" id="gallery">
       <!-- Gallery -->
       <div>
-        <div class="aspect-[3/4] bg-black/30 rounded-2xl overflow-hidden">
+        <div class="aspect-[3/4] bg-black/30 rounded-2xl overflow-auto">
           <img id="mainImg" src="images/d01-1.jpg" alt="Dahlia D01 Abaya — front view" class="w-full h-full object-cover">
         </div>
         <div class="mt-3 grid grid-cols-4 gap-2">
@@ -377,7 +377,7 @@
         document.querySelectorAll('[data-src]').forEach(b=>b.classList.remove('thumb-active'));
         btn.classList.add('thumb-active'); 
         mainImg.src=btn.dataset.src;
-        document.getElementById('gallery').scrollIntoView({behavior:'smooth', block:'start'});
+        document.getElementById('gallery').scrollIntoView({behavior:'smooth', block:'center'});
       });
     });
 
@@ -641,5 +641,47 @@
     renderPage(current);
   })();
   </script>
+
+<script>
+(() => {
+  const main = document.getElementById('mainImg');
+  if (!main) return;
+  const thumbs = Array.from(document.querySelectorAll('#gallery [data-src]'));
+  let currentIndex = Math.max(0, thumbs.findIndex(b => b.classList.contains('thumb-active')));
+  if (currentIndex < 0) currentIndex = 0;
+
+  function show(i) {
+    if (!thumbs.length) return;
+    if (i < 0) i = thumbs.length - 1;
+    if (i >= thumbs.length) i = 0;
+    currentIndex = i;
+    const src = thumbs[i].getAttribute('data-src');
+    if (src) main.src = src;
+    thumbs.forEach(btn => btn.classList.remove('thumb-active'));
+    thumbs[i].classList.add('thumb-active');
+  }
+
+  // Ensure clicking thumbnails scrolls to the TOP of the page
+  thumbs.forEach((btn, i) => {
+    btn.addEventListener('click', () => {
+      show(i);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }, { passive: true });
+  });
+
+  // Arrow buttons for main image
+  const prev = document.getElementById('imgPrev');
+  const next = document.getElementById('imgNext');
+  if (prev) prev.addEventListener('click', () => {
+    show(currentIndex - 1);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, { passive: true });
+  if (next) next.addEventListener('click', () => {
+    show(currentIndex + 1);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, { passive: true });
+})();
+</script>
+
 </body>
 </html>
