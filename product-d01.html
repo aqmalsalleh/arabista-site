@@ -94,16 +94,18 @@
       <!-- Gallery -->
       <div>
         <div class="aspect-[3/4] bg-black/30 rounded-2xl overflow-auto relative">
-          <img id="mainImg" src="images/d01-1.jpg" alt="Dahlia D01 Abaya — front view" class="w-full h-full object-cover">
-    <button id="imgPrev" type="button" aria-label="Previous image"
-      class="absolute z-10 left-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 rounded-full w-10 h-10 flex items-center justify-center">
-      <span aria-hidden="true" class="text-white text-2xl leading-none select-none">‹</span>
-    </button>
-    <button id="imgNext" type="button" aria-label="Next image"
-      class="absolute z-10 right-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 rounded-full w-10 h-10 flex items-center justify-center">
-      <span aria-hidden="true" class="text-white text-2xl leading-none select-none">›</span>
-    </button>
-
+          <!-- NEW: Autoplaying hero video (initial) -->
+          <video id="mainVideo" src="images/d01-hero.mp4" autoplay muted loop playsinline class="w-full h-full object-cover"></video>
+          <!-- Existing main image (hidden until a thumbnail/arrow is used) -->
+          <img id="mainImg" src="images/d01-1.jpg" alt="Dahlia D01 Abaya — front view" class="w-full h-full object-cover" style="display:none;">
+          <button id="imgPrev" type="button" aria-label="Previous image"
+            class="absolute z-10 left-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 rounded-full w-10 h-10 flex items-center justify-center">
+            <span aria-hidden="true" class="text-white text-2xl leading-none select-none">‹</span>
+          </button>
+          <button id="imgNext" type="button" aria-label="Next image"
+            class="absolute z-10 right-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 rounded-full w-10 h-10 flex items-center justify-center">
+            <span aria-hidden="true" class="text-white text-2xl leading-none select-none">›</span>
+          </button>
         </div>
         <div class="mt-3 grid grid-cols-4 gap-2">
           <button class="thumb-active rounded-xl overflow-hidden" data-src="images/d01-1.jpg"><img src="images/d01-1-thumb.jpg" class="w-full h-20 object-cover" alt=""></button>
@@ -385,8 +387,11 @@
       btn.addEventListener('click',()=>{
         document.querySelectorAll('[data-src]').forEach(b=>b.classList.remove('thumb-active'));
         btn.classList.add('thumb-active'); 
+        // Switch off hero video on first thumbnail click
+        const v=document.getElementById('mainVideo');
+        if(v){ try{ v.pause(); }catch(e){} v.style.display='none'; if(mainImg) mainImg.style.display='block'; }
         mainImg.src=btn.dataset.src;
-        
+
       });
     });
 
@@ -405,7 +410,7 @@
         selectedSize = matched.dataset.size || sz;
         document.getElementById('sizeChosen').textContent='Size: '+selectedSize;
         updateWA();
-        
+
       }
     }
     document.querySelectorAll('.size-btn').forEach(b=>{
@@ -655,9 +660,18 @@
 (() => {
   const main = document.getElementById('mainImg');
   if (!main) return;
+  const video = document.getElementById('mainVideo');
   const thumbs = Array.from(document.querySelectorAll('#gallery [data-src]'));
   let currentIndex = Math.max(0, thumbs.findIndex(b => b.classList.contains('thumb-active')));
   if (currentIndex < 0) currentIndex = 0;
+
+  function killVideo(){
+    if (video && video.style.display !== 'none') {
+      try { video.pause(); } catch(e){}
+      video.style.display = 'none';
+      main.style.display = 'block';
+    }
+  }
 
   function show(i) {
     if (!thumbs.length) return;
@@ -670,24 +684,27 @@
     thumbs[i].classList.add('thumb-active');
   }
 
-  // Ensure clicking thumbnails scrolls to the TOP of the page
+  // Ensure clicking thumbnails switches off video and shows image
   thumbs.forEach((btn, i) => {
     btn.addEventListener('click', () => {
+      killVideo();
       show(i);
-      
+
     }, { passive: true });
   });
 
-  // Arrow buttons for main image
+  // Arrow buttons for main image/video (arrows should switch off video first)
   const prev = document.getElementById('imgPrev');
   const next = document.getElementById('imgNext');
   if (prev) prev.addEventListener('click', () => {
+    killVideo();
     show(currentIndex - 1);
-    
+
   }, { passive: true });
   if (next) next.addEventListener('click', () => {
+    killVideo();
     show(currentIndex + 1);
-    
+
   }, { passive: true });
 })();
 </script>
@@ -698,9 +715,18 @@
   const main = document.getElementById('mainImg');
   if (!main) return;
 
+  const video = document.getElementById('mainVideo');
   const thumbs = Array.from(document.querySelectorAll('#gallery [data-src]'));
   let currentIndex = Math.max(0, thumbs.findIndex(b => b.classList.contains('thumb-active')));
   if (currentIndex < 0) currentIndex = 0;
+
+  function killVideo(){
+    if (video && video.style.display !== 'none') {
+      try { video.pause(); } catch(e){}
+      video.style.display = 'none';
+      main.style.display = 'block';
+    }
+  }
 
   function show(i) {
     if (!thumbs.length) return;
@@ -713,18 +739,18 @@
     thumbs[i].classList.add('thumb-active');
   }
 
-  // Thumbnails: update image only (no scrolling)
+  // Thumbnails: update image only (no scrolling) — but ensure video is off
   thumbs.forEach((btn, i) => {
-    btn.addEventListener('click', () => show(i), { passive: true });
+    btn.addEventListener('click', () => { killVideo(); show(i); }, { passive: true });
   });
 
   // Arrow buttons
   const prev = document.getElementById('imgPrev');
   const next = document.getElementById('imgNext');
-  if (prev) prev.addEventListener('click', () => show(currentIndex - 1));
-  if (next) next.addEventListener('click', () => show(currentIndex + 1));
+  if (prev) prev.addEventListener('click', () => { killVideo(); show(currentIndex - 1); });
+  if (next) next.addEventListener('click', () => { killVideo(); show(currentIndex + 1); });
 
-  // Swipe support on the main image
+  // Swipe support on the main image (works only when image is active)
   let startX = 0, startY = 0, active = false;
   const H_THRESHOLD = 32;   // px horizontal distance to count as swipe
   const V_TOLERANCE = 80;   // px vertical tolerance
@@ -741,7 +767,7 @@
     const dy = t.pageY - startY;
     active = false;
     if (Math.abs(dx) > H_THRESHOLD && Math.abs(dy) < V_TOLERANCE) {
-      if (dx < 0) show(currentIndex + 1); else show(currentIndex - 1);
+      if (dx < 0) { killVideo(); show(currentIndex + 1); } else { killVideo(); show(currentIndex - 1); }
     }
   }, { passive: true });
 })();
