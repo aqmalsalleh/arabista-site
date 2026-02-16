@@ -31,14 +31,17 @@
   
   <style>
     body { background-color: #0F0F10; color: white; }
-    .fade-in { animation: fadeIn 0.5s ease-in-out forwards; }
+    .fade-in { animation: fadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     
-    /* Scrollbar styling for the hub list */
-    .scrollbar-thin::-webkit-scrollbar { width: 6px; }
-    .scrollbar-thin::-webkit-scrollbar-track { background: rgba(255,255,255,0.05); }
+    .step-line { position: absolute; left: 15px; top: 40px; bottom: -20px; width: 1px; background: rgba(255,255,255,0.1); z-index: 0; }
+    .step-active .step-line { background: rgba(192,160,98,0.5); }
+    .last-step .step-line { display: none; }
+    
+    /* Scrollbar */
+    .scrollbar-thin::-webkit-scrollbar { width: 4px; }
+    .scrollbar-thin::-webkit-scrollbar-track { background: transparent; }
     .scrollbar-thin::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 10px; }
-    .scrollbar-thin::-webkit-scrollbar-thumb:hover { background: rgba(192,160,98,0.5); }
   </style>
 </head>
 <body class="antialiased selection:bg-luxe selection:text-brand">
@@ -59,373 +62,398 @@
     </div>
   </header>
 
-  <main class="pt-24 pb-12 max-w-screen-md mx-auto px-4 sm:px-6 min-h-screen">
+  <main class="pt-24 pb-20 max-w-screen-md mx-auto px-4 sm:px-6 min-h-screen">
     
     <div class="text-center mb-10">
       <h1 class="font-display text-3xl sm:text-5xl mb-3">Alteration & Care</h1>
       <p class="text-white/60 text-sm sm:text-base">Give your Abaya the perfect fit.</p>
     </div>
 
-    <div id="step-identify" class="bg-white/5 border border-white/10 rounded-2xl p-6 sm:p-10 text-center fade-in">
-      <h3 class="text-xl font-display mb-6">How would you like to proceed?</h3>
-      
-      <div class="grid sm:grid-cols-2 gap-4">
-        <button onclick="simulateScan()" class="group flex flex-col items-center justify-center p-6 rounded-xl border border-white/10 hover:border-luxe hover:bg-white/5 transition h-full min-h-[160px]">
-            <div class="w-12 h-12 mb-3 rounded-full bg-white/10 flex items-center justify-center group-hover:bg-luxe group-hover:text-brand transition">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" /></svg>
-            </div>
-            <span class="font-medium">Scan Order QR</span>
-            <span class="text-xs text-white/50 mt-1">Extracts address from order</span>
-        </button>
+    <div class="space-y-0 relative">
 
-        <button onclick="useLocation()" class="group flex flex-col items-center justify-center p-6 rounded-xl border border-white/10 hover:border-luxe hover:bg-white/5 transition h-full min-h-[160px]">
-            <div class="w-12 h-12 mb-3 rounded-full bg-white/10 flex items-center justify-center group-hover:bg-luxe group-hover:text-brand transition">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
-            </div>
-            <span class="font-medium">Use Current Location</span>
-            <span class="text-xs text-white/50 mt-1">Find nearest hub via GPS</span>
-        </button>
-      </div>
-    </div>
-
-    <div id="step-options" class="hidden space-y-6">
-      
-      <div class="bg-luxe/10 border border-luxe/20 rounded-xl p-4 flex items-start gap-3 fade-in">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-luxe mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
-        <div>
-            <p class="text-xs text-luxe uppercase tracking-widest font-semibold">Your Location</p>
-            <p class="text-sm text-white/90" id="customer-address">Loading...</p>
-        </div>
-        <button onclick="location.reload()" class="ml-auto text-xs text-white/50 hover:text-white underline">Change</button>
-      </div>
-
-      <div class="fade-in">
-        <h3 class="font-display text-xl mb-4">Nearest Alteration Points</h3>
-        <div id="hub-list" class="space-y-3 max-h-[400px] overflow-y-auto pr-2 scrollbar-thin">
-            </div>
-      </div>
-
-      <div class="fade-in">
-        <h3 class="font-display text-xl mb-4">Select Service</h3>
+      <div id="step-1" class="relative pl-10 pb-10 step-active">
+        <div class="step-line"></div>
+        <div class="absolute left-0 top-0 w-8 h-8 rounded-full border border-luxe bg-brand text-luxe flex items-center justify-center text-sm font-bold z-10">1</div>
         
-        <div class="grid gap-3">
-          <label class="flex items-center justify-between p-4 rounded-xl border border-white/10 hover:border-luxe/50 hover:bg-white/5 cursor-pointer transition group" id="opt-1">
-            <div class="flex items-center gap-3">
-              <input type="checkbox" id="cb-10" name="service" value="10" class="w-5 h-5 rounded border-white/30 text-luxe focus:ring-luxe bg-transparent" onchange="calculateTotal()">
-              <span class="text-sm sm:text-base group-hover:text-white transition">Potong Labuh Jubah</span>
-            </div>
-            <span class="text-luxe font-display text-lg">RM 10</span>
-          </label>
+        <div class="fade-in">
+          <h2 class="text-xl font-display mb-4 text-white">Identify Order</h2>
+          
+          <div id="step-1-content" class="grid sm:grid-cols-2 gap-4">
+            <button onclick="simulateScan()" class="group flex flex-col items-center justify-center p-6 rounded-xl border border-white/10 hover:border-luxe hover:bg-white/5 transition h-full min-h-[140px]">
+                <div class="w-10 h-10 mb-3 rounded-full bg-white/10 flex items-center justify-center group-hover:bg-luxe group-hover:text-brand transition">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" /></svg>
+                </div>
+                <span class="font-medium text-sm">Scan QR Code</span>
+            </button>
 
-          <label class="flex items-center justify-between p-4 rounded-xl border border-white/10 hover:border-luxe/50 hover:bg-white/5 cursor-pointer transition group" id="opt-2">
-            <div class="flex items-center gap-3">
-              <input type="checkbox" id="cb-15" name="service" value="15" class="w-5 h-5 rounded border-white/30 text-luxe focus:ring-luxe bg-transparent" onchange="calculateTotal()">
-              <span class="text-sm sm:text-base group-hover:text-white transition">Potong Labuh Lengan</span>
-            </div>
-            <span class="text-luxe font-display text-lg">RM 15</span>
-          </label>
+            <button onclick="useLocation()" class="group flex flex-col items-center justify-center p-6 rounded-xl border border-white/10 hover:border-luxe hover:bg-white/5 transition h-full min-h-[140px]">
+                <div class="w-10 h-10 mb-3 rounded-full bg-white/10 flex items-center justify-center group-hover:bg-luxe group-hover:text-brand transition">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                </div>
+                <span class="font-medium text-sm">Use My Location</span>
+            </button>
+          </div>
 
-          <label class="flex items-center justify-between p-4 rounded-xl border border-white/10 hover:border-luxe/50 hover:bg-white/5 cursor-pointer transition group border-luxe/30 bg-luxe/5">
-            <div class="flex items-center gap-3">
-              <input type="checkbox" id="cb-30" name="service" value="30" class="w-5 h-5 rounded border-white/30 text-luxe focus:ring-luxe bg-transparent" onchange="toggleResize(this)">
-              <div>
-                  <span class="text-sm sm:text-base font-medium text-white transition">Kecikkan / Besarkan Saiz</span>
-                  <p class="text-[10px] text-luxe">Includes all other services</p>
-              </div>
-            </div>
-            <span class="text-luxe font-display text-lg">RM 30</span>
-          </label>
+          <div id="step-1-summary" class="hidden mt-2 p-3 bg-white/5 border border-white/10 rounded-lg flex justify-between items-center">
+             <div>
+               <p class="text-xs text-white/50 uppercase tracking-widest">Customer Location</p>
+               <p class="text-sm text-white" id="customer-address">...</p>
+             </div>
+             <button onclick="resetAll()" class="text-xs text-luxe underline">Change</button>
+          </div>
         </div>
       </div>
 
-      <div class="fade-in">
-        <h3 class="font-display text-xl mb-4">Logistics</h3>
-        <div class="grid grid-cols-2 gap-3">
+      <div id="step-2" class="relative pl-10 pb-10 opacity-30 pointer-events-none transition-opacity duration-500">
+        <div class="step-line"></div>
+        <div class="absolute left-0 top-0 w-8 h-8 rounded-full border border-white/20 bg-brand text-white/50 flex items-center justify-center text-sm font-bold z-10" id="badge-2">2</div>
+        
+        <div>
+          <h2 class="text-xl font-display mb-4 text-white">Select Alteration Point</h2>
+          <div id="hub-list" class="space-y-3 max-h-[300px] overflow-y-auto pr-2 scrollbar-thin hidden">
+            </div>
+          <div id="hub-summary" class="hidden mt-2 p-3 bg-luxe/10 border border-luxe/30 rounded-lg flex justify-between items-center">
+             <div>
+               <p class="text-xs text-luxe uppercase tracking-widest">Selected Point</p>
+               <p class="text-sm text-white" id="selected-hub-name">...</p>
+             </div>
+             <button onclick="reopenStep(2)" class="text-xs text-white/50 underline">Change</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="step-3" class="relative pl-10 pb-10 opacity-30 pointer-events-none transition-opacity duration-500">
+        <div class="step-line"></div>
+        <div class="absolute left-0 top-0 w-8 h-8 rounded-full border border-white/20 bg-brand text-white/50 flex items-center justify-center text-sm font-bold z-10" id="badge-3">3</div>
+        
+        <div>
+          <h2 class="text-xl font-display mb-4 text-white">Select Service</h2>
+          <div id="service-options" class="hidden grid gap-3">
+             <label class="flex items-center justify-between p-4 rounded-xl border border-white/10 hover:border-luxe/50 hover:bg-white/5 cursor-pointer transition group" id="opt-1">
+                <div class="flex items-center gap-3">
+                  <input type="checkbox" id="cb-10" name="service" value="10" class="w-5 h-5 rounded border-white/30 text-luxe focus:ring-luxe bg-transparent" onchange="validateStep3()">
+                  <span class="text-sm group-hover:text-white transition">Potong Labuh Jubah</span>
+                </div>
+                <span class="text-luxe font-display">RM 10</span>
+              </label>
+
+              <label class="flex items-center justify-between p-4 rounded-xl border border-white/10 hover:border-luxe/50 hover:bg-white/5 cursor-pointer transition group" id="opt-2">
+                <div class="flex items-center gap-3">
+                  <input type="checkbox" id="cb-15" name="service" value="15" class="w-5 h-5 rounded border-white/30 text-luxe focus:ring-luxe bg-transparent" onchange="validateStep3()">
+                  <span class="text-sm group-hover:text-white transition">Potong Labuh Lengan</span>
+                </div>
+                <span class="text-luxe font-display">RM 15</span>
+              </label>
+
+              <label class="flex items-center justify-between p-4 rounded-xl border border-white/10 hover:border-luxe/50 hover:bg-white/5 cursor-pointer transition group border-luxe/30 bg-luxe/5">
+                <div class="flex items-center gap-3">
+                  <input type="checkbox" id="cb-30" name="service" value="30" class="w-5 h-5 rounded border-white/30 text-luxe focus:ring-luxe bg-transparent" onchange="toggleResize(this)">
+                  <div>
+                      <span class="text-sm font-medium text-white transition">Kecikkan / Besarkan Saiz</span>
+                      <p class="text-[10px] text-luxe">Includes all other services</p>
+                  </div>
+                </div>
+                <span class="text-luxe font-display">RM 30</span>
+              </label>
+          </div>
+        </div>
+      </div>
+
+      <div id="step-4" class="relative pl-10 last-step opacity-30 pointer-events-none transition-opacity duration-500">
+        <div class="step-line"></div>
+        <div class="absolute left-0 top-0 w-8 h-8 rounded-full border border-white/20 bg-brand text-white/50 flex items-center justify-center text-sm font-bold z-10" id="badge-4">4</div>
+        
+        <div class="hidden" id="logistics-content">
+          <h2 class="text-xl font-display mb-4 text-white">Logistics</h2>
+          
+          <div class="grid grid-cols-2 gap-3 mb-4">
             <button id="btn-walkin" onclick="setMode('walkin')" class="p-4 rounded-xl border border-luxe bg-luxe/10 text-white text-sm font-medium transition">
-                Walk-in (Self Drop)
+                Walk-in
             </button>
             <button id="btn-lalamove" onclick="setMode('lalamove')" class="p-4 rounded-xl border border-white/10 hover:bg-white/5 text-white/70 text-sm font-medium transition relative overflow-hidden">
-                Lalamove Pickup
+                Lalamove
                 <div class="absolute top-0 right-0 bg-orange-500 text-[10px] text-white px-2 py-0.5 font-bold">FAST</div>
             </button>
-        </div>
-        
-        <div id="walkin-panel" class="mt-4 p-5 bg-white/5 border border-white/10 rounded-xl">
-             <div class="flex items-center justify-between mb-3">
-                <span class="text-sm text-white/80">Available Time Slots (Today/Tomorrow)</span>
-             </div>
-             <div class="grid grid-cols-3 sm:grid-cols-4 gap-2" id="slot-container">
-                 </div>
-             <p class="text-[10px] text-white/40 mt-3">*Please arrive within 15 mins of your slot.</p>
-        </div>
+          </div>
 
-        <div id="lalamove-panel" class="hidden mt-4 p-4 bg-orange-500/10 border border-orange-500/20 rounded-xl text-orange-200 text-sm">
-            <div class="flex justify-between items-center mb-2">
-                <span>Motorcycle Delivery (Est.)</span>
+          <div id="walkin-panel" class="mb-6 p-4 bg-white/5 border border-white/10 rounded-xl fade-in">
+             <span class="text-xs text-white/60 block mb-3">Select Time Slot:</span>
+             <div class="grid grid-cols-3 sm:grid-cols-4 gap-2" id="slot-container"></div>
+          </div>
+
+          <div id="lalamove-panel" class="hidden mb-6 p-4 bg-orange-500/10 border border-orange-500/20 rounded-xl text-orange-200 text-sm fade-in">
+             <div class="flex justify-between items-center mb-1">
+                <span>Delivery Fee (Est.)</span>
                 <span class="font-bold text-white" id="delivery-price">RM 0.00</span>
-            </div>
-            <p class="text-xs opacity-70">Based on <span id="dist-display">0</span>km distance to selected hub.</p>
-        </div>
-      </div>
+             </div>
+             <p class="text-xs opacity-70">Distance: <span id="dist-display">0</span> km</p>
+          </div>
 
-      <div class="pt-6 border-t border-white/10 fade-in">
-        <div class="flex justify-between items-end mb-6">
-            <span class="text-white/50 text-sm">Total Estimate</span>
-            <span class="font-display text-4xl text-white" id="grand-total">RM 0</span>
+          <div class="pt-6 border-t border-white/10">
+            <div class="flex justify-between items-end mb-4">
+                <span class="text-white/50 text-sm">Total Estimate</span>
+                <span class="font-display text-4xl text-white" id="grand-total">RM 0</span>
+            </div>
+            <button onclick="submitOrder()" class="w-full bg-white text-brand font-bold py-4 rounded-xl hover:bg-luxe hover:text-white transition shadow-soft">
+                Confirm Booking
+            </button>
+          </div>
         </div>
-        <button onclick="submitOrder()" class="w-full bg-white text-brand font-bold py-4 rounded-xl hover:bg-luxe hover:text-white transition shadow-soft">
-            Confirm Booking
-        </button>
       </div>
 
     </div>
   </main>
 
   <script>
-    // --- 1. EXPANDED MOCK DATA ---
+    // --- DATA ---
+    // Note: No HQ badge anymore. Just simple objects.
     const hubs = [
-      { id: 1, name: "Arabista HQ (Damai Perdana)", address: "15, Jalan Damai Perdana 1/8b, Bandar Damai Perdana", lat: 3.0370, lng: 101.7424, type: "HQ" },
-      { id: 2, name: "Tailor Kak Bedah (Shah Alam)", address: "Jalan Plumbum 7/99, Seksyen 7, Shah Alam", lat: 3.0655, lng: 101.4830, type: "Partner" },
-      { id: 3, name: "Tailor Sarah (Wangsa Maju)", address: "Jalan Wangsa Delima, Wangsa Maju", lat: 3.2000, lng: 101.7400, type: "Partner" },
-      { id: 4, name: "Butik Jahitan (Bangi)", address: "Seksyen 9, Bandar Baru Bangi", lat: 2.9587, lng: 101.7554, type: "Partner" },
-      { id: 5, name: "Alteration Pro (TTDI)", address: "Jalan Tun Mohd Fuad, TTDI, KL", lat: 3.1412, lng: 101.6293, type: "Partner" },
-      { id: 6, name: "Tailor Auntie Lim (Puchong)", address: "Bandar Puteri Puchong", lat: 3.0245, lng: 101.6166, type: "Partner" },
-      { id: 7, name: "Klang Tailoring (Bukit Tinggi)", address: "Lorong Batu Nilam, Bandar Bukit Tinggi", lat: 3.0076, lng: 101.4398, type: "Partner" },
-      { id: 8, name: "PJ Alterations (SS2)", address: "Jalan SS2/61, Petaling Jaya", lat: 3.1187, lng: 101.6212, type: "Partner" },
-      { id: 9, name: "Cyberjaya Stitch (DPulze)", address: "Persiaran Multimedia, Cyberjaya", lat: 2.9221, lng: 101.6506, type: "Partner" },
-      { id: 10, name: "Gombak Sew (Near IIUM)", address: "Jalan Gombak, Batu 6", lat: 3.2324, lng: 101.7300, type: "Partner" },
-      { id: 11, name: "Ampang Point Tailor", address: "Jalan Mamanda, Ampang", lat: 3.1593, lng: 101.7497, type: "Partner" },
-      { id: 12, name: "Setia Alam Alterations", address: "Jalan Setia Prima, Setia Alam", lat: 3.1090, lng: 101.4452, type: "Partner" },
-      { id: 13, name: "Cheras Maluri Hub", address: "Jalan Jejaka, Taman Maluri", lat: 3.1250, lng: 101.7300, type: "Partner" },
-      { id: 14, name: "Subang Jaya Tailor (SS15)", address: "Jalan SS15/4, Subang Jaya", lat: 3.0754, lng: 101.5890, type: "Partner" },
-      { id: 15, name: "Kajang Prima Sew", address: "Jalan KP 1/1, Kajang Prima", lat: 2.9775, lng: 101.8055, type: "Partner" }
+      { id: 1, name: "Arabista Damai Perdana", address: "15, Jalan Damai Perdana 1/8b", lat: 3.0370, lng: 101.7424 },
+      { id: 2, name: "Tailor Kak Bedah (Shah Alam)", address: "Jalan Plumbum 7/99, Seksyen 7", lat: 3.0655, lng: 101.4830 },
+      { id: 3, name: "Tailor Sarah (Wangsa Maju)", address: "Jalan Wangsa Delima, Wangsa Maju", lat: 3.2000, lng: 101.7400 },
+      { id: 4, name: "Butik Jahitan (Bangi)", address: "Seksyen 9, Bandar Baru Bangi", lat: 2.9587, lng: 101.7554 },
+      { id: 5, name: "Alteration Pro (TTDI)", address: "Jalan Tun Mohd Fuad, TTDI", lat: 3.1412, lng: 101.6293 },
+      { id: 6, name: "Tailor Auntie Lim (Puchong)", address: "Bandar Puteri Puchong", lat: 3.0245, lng: 101.6166 },
+      { id: 7, name: "Klang Tailoring", address: "Bandar Bukit Tinggi, Klang", lat: 3.0076, lng: 101.4398 },
+      { id: 8, name: "PJ Alterations (SS2)", address: "Jalan SS2/61, Petaling Jaya", lat: 3.1187, lng: 101.6212 },
+      { id: 9, name: "Cyberjaya Stitch", address: "DPulze Shopping Centre", lat: 2.9221, lng: 101.6506 },
+      { id: 10, name: "Gombak Sew", address: "Jalan Gombak, Batu 6", lat: 3.2324, lng: 101.7300 },
+      { id: 11, name: "Ampang Point Tailor", address: "Jalan Mamanda, Ampang", lat: 3.1593, lng: 101.7497 },
+      { id: 12, name: "Setia Alam Alterations", address: "Jalan Setia Prima, Setia Alam", lat: 3.1090, lng: 101.4452 },
+      { id: 13, name: "Cheras Maluri Hub", address: "Jalan Jejaka, Taman Maluri", lat: 3.1250, lng: 101.7300 },
+      { id: 14, name: "Subang Jaya Tailor (SS15)", address: "Jalan SS15/4, Subang Jaya", lat: 3.0754, lng: 101.5890 },
+      { id: 15, name: "Kajang Prima Sew", address: "Jalan KP 1/1, Kajang Prima", lat: 2.9775, lng: 101.8055 }
     ];
 
-    const timeSlots = ["10:00 AM", "11:00 AM", "12:30 PM", "2:00 PM", "3:30 PM", "5:00 PM", "8:00 PM"];
+    const timeSlots = ["10:00", "11:00", "12:30", "14:00", "15:30", "17:00", "20:00"];
 
-    let customerLat = 3.0300; 
-    let customerLng = 101.7600;
-    let currentMode = 'walkin';
-    let selectedHubId = null;
-    let selectedSlot = null; // New state for time slot
-    let deliveryCost = 0;
-    let serviceCost = 0;
-
-    // --- 2. LOGIC FUNCTIONS ---
-
-    // Initialize
-    window.onload = () => {
-        renderTimeSlots();
+    // State
+    let state = {
+        lat: 3.0300, lng: 101.7600, // Default Cheras
+        address: "",
+        hubId: null,
+        mode: 'walkin',
+        slot: null,
+        services: [],
+        deliveryCost: 0
     };
 
+    window.onload = () => renderTimeSlots();
+
+    // --- STEP 1: IDENTIFY ---
     function simulateScan() {
-        showLoading("Scanning QR...", () => {
-            document.getElementById('customer-address').innerText = "Jalan Suakasih, Tun Hussein Onn, 43200 Cheras (From QR)";
-            customerLat = 3.0300;
-            customerLng = 101.7600;
-            renderHubs();
-            revealNextStep();
-        });
+        startLoadingStep1("Scanning QR...");
+        setTimeout(() => {
+            state.lat = 3.0300; 
+            state.lng = 101.7600;
+            state.address = "Jalan Suakasih, Cheras (From QR)";
+            completeStep1();
+        }, 1000);
     }
 
     function useLocation() {
-        if (!navigator.geolocation) {
-            alert("Geolocation is not supported by your browser.");
-            return;
-        }
-
-        showLoading("Locating you...", () => {
-            navigator.geolocation.getCurrentPosition(
-                (position) => {
-                    customerLat = position.coords.latitude;
-                    customerLng = position.coords.longitude;
-                    document.getElementById('customer-address').innerText = `Current GPS: ${customerLat.toFixed(4)}, ${customerLng.toFixed(4)}`;
-                    renderHubs();
-                    revealNextStep();
-                },
-                (error) => {
-                    alert("Unable to retrieve location. Using demo location (Cheras).");
-                    simulateScan(); 
-                }
-            );
-        });
+        if (!navigator.geolocation) return alert("Geo not supported");
+        startLoadingStep1("Locating...");
+        navigator.geolocation.getCurrentPosition(
+            (pos) => {
+                state.lat = pos.coords.latitude;
+                state.lng = pos.coords.longitude;
+                state.address = `GPS: ${state.lat.toFixed(4)}, ${state.lng.toFixed(4)}`;
+                completeStep1();
+            },
+            () => { alert("Location failed. Using Demo."); simulateScan(); }
+        );
     }
 
-    function showLoading(msg, callback) {
-        const step1 = document.getElementById('step-identify');
-        step1.innerHTML = `<div class="py-12"><div class="animate-spin rounded-full h-10 w-10 border-b-2 border-luxe mx-auto mb-4"></div><p>${msg}</p></div>`;
-        setTimeout(callback, 1200);
+    function startLoadingStep1(msg) {
+        document.getElementById('step-1-content').innerHTML = `<div class="py-8 text-center"><div class="animate-spin rounded-full h-8 w-8 border-b-2 border-luxe mx-auto mb-2"></div><p class="text-sm text-white/50">${msg}</p></div>`;
     }
 
-    function revealNextStep() {
-        document.getElementById('step-identify').style.display = 'none';
-        document.getElementById('step-options').classList.remove('hidden');
+    function completeStep1() {
+        // UI Update
+        document.getElementById('step-1-content').classList.add('hidden');
+        document.getElementById('step-1-summary').classList.remove('hidden');
+        document.getElementById('customer-address').innerText = state.address;
+        
+        // Unlock Step 2
+        unlockStep(2);
+        renderHubs();
     }
 
+    function resetAll() { location.reload(); }
+
+    // --- STEP 2: HUBS ---
     function renderHubs() {
-        hubs.forEach(hub => {
-            hub.distance = getDistanceFromLatLonInKm(customerLat, customerLng, hub.lat, hub.lng);
-        });
+        // Sort by distance
+        hubs.forEach(h => h.distance = getDist(state.lat, state.lng, h.lat, h.lng));
         hubs.sort((a, b) => a.distance - b.distance);
-        selectedHubId = hubs[0].id;
 
-        const container = document.getElementById('hub-list');
-        container.innerHTML = '';
+        const list = document.getElementById('hub-list');
+        list.innerHTML = '';
+        list.classList.remove('hidden');
 
-        hubs.forEach((hub, index) => {
-            const isSelected = index === 0;
-            const activeClass = isSelected ? 'border-luxe bg-white/5 ring-1 ring-luxe/20' : 'border-white/10 opacity-60 hover:opacity-100';
-            const badge = hub.type === 'HQ' ? '<span class="ml-2 text-[10px] bg-luxe text-brand px-1.5 py-0.5 rounded font-bold">HQ</span>' : '';
-            
-            const html = `
-                <div onclick="selectHub(${hub.id})" id="hub-${hub.id}" class="p-3 rounded-xl border ${activeClass} cursor-pointer transition relative group flex justify-between items-center">
+        hubs.forEach(h => {
+            list.innerHTML += `
+                <div onclick="selectHub(${h.id})" class="p-3 rounded-xl border border-white/10 hover:border-luxe/50 hover:bg-white/5 cursor-pointer transition flex justify-between items-center group">
                     <div>
-                        <h4 class="font-medium text-white text-sm">${hub.name} ${badge}</h4>
-                        <p class="text-xs text-white/50 mt-0.5 max-w-[200px] truncate">${hub.address}</p>
+                        <h4 class="font-medium text-white text-sm group-hover:text-luxe transition">${h.name}</h4>
+                        <p class="text-xs text-white/50">${h.address}</p>
                     </div>
-                    <div class="text-right pl-2">
-                        <span class="block text-luxe font-bold text-sm">${hub.distance.toFixed(1)} km</span>
-                    </div>
+                    <span class="text-xs font-bold text-white/40 group-hover:text-white">${h.distance.toFixed(1)} km</span>
                 </div>
             `;
-            container.innerHTML += html;
         });
-        updateLogistics();
     }
 
     function selectHub(id) {
-        selectedHubId = id;
-        hubs.forEach(hub => {
-            const el = document.getElementById(`hub-${hub.id}`);
-            if(hub.id === id) {
-                el.className = "p-3 rounded-xl border border-luxe bg-white/5 ring-1 ring-luxe/20 cursor-pointer transition relative group flex justify-between items-center";
-            } else {
-                el.className = "p-3 rounded-xl border border-white/10 opacity-60 hover:opacity-100 cursor-pointer transition relative group flex justify-between items-center";
-            }
-        });
-        updateLogistics();
+        state.hubId = id;
+        const hub = hubs.find(h => h.id === id);
+        
+        // Collapse List, Show Summary
+        document.getElementById('hub-list').classList.add('hidden');
+        const summary = document.getElementById('hub-summary');
+        summary.classList.remove('hidden');
+        document.getElementById('selected-hub-name').innerText = `${hub.name} (${hub.distance.toFixed(1)} km)`;
+        
+        // Update Logistics Pricing silently
+        updateLogisticsPrice();
+
+        // Unlock Step 3
+        unlockStep(3);
+        document.getElementById('service-options').classList.remove('hidden');
+        document.getElementById('service-options').classList.add('fade-in');
     }
 
-    // --- TIME SLOT LOGIC ---
-    function renderTimeSlots() {
-        const container = document.getElementById('slot-container');
-        container.innerHTML = '';
-        timeSlots.forEach(slot => {
-            container.innerHTML += `
-                <button onclick="selectSlot('${slot}')" id="slot-${slot.replace(/ |:/g,'')}" class="text-xs py-2 px-1 rounded-lg border border-white/10 text-white/70 hover:bg-white/10 transition">
-                    ${slot}
-                </button>
-            `;
-        });
+    function reopenStep(step) {
+        if(step === 2) {
+            document.getElementById('hub-list').classList.remove('hidden');
+            document.getElementById('hub-summary').classList.add('hidden');
+            // Hide subsequent steps
+            lockStep(3);
+            lockStep(4);
+        }
     }
 
-    function selectSlot(time) {
-        selectedSlot = time;
-        // Reset all visuals
-        timeSlots.forEach(slot => {
-             const btn = document.getElementById(`slot-${slot.replace(/ |:/g,'')}`);
-             btn.className = "text-xs py-2 px-1 rounded-lg border border-white/10 text-white/70 hover:bg-white/10 transition";
-        });
-        // Highlight selected
-        const activeBtn = document.getElementById(`slot-${time.replace(/ |:/g,'')}`);
-        activeBtn.className = "text-xs py-2 px-1 rounded-lg border border-luxe bg-luxe text-brand font-bold shadow-lg transition transform scale-105";
-    }
-
-    function toggleResize(checkbox) {
-        const cb10 = document.getElementById('cb-10');
-        const cb15 = document.getElementById('cb-15');
-        if (checkbox.checked) {
-            cb10.checked = false;
-            cb15.checked = false;
-            cb10.disabled = true;
-            cb15.disabled = true;
+    // --- STEP 3: SERVICES ---
+    function validateStep3() {
+        const cbs = document.querySelectorAll('input[name="service"]:checked');
+        state.services = Array.from(cbs).map(cb => parseInt(cb.value));
+        
+        // Logic: Only unlock Step 4 if at least one service selected
+        if(state.services.length > 0) {
+            unlockStep(4);
+            document.getElementById('logistics-content').classList.remove('hidden');
+            document.getElementById('logistics-content').classList.add('fade-in');
         } else {
-            cb10.disabled = false;
-            cb15.disabled = false;
+            // If they uncheck everything, lock step 4 again
+            lockStep(4);
         }
         calculateTotal();
     }
 
+    function toggleResize(cb) {
+        const otherCbs = [document.getElementById('cb-10'), document.getElementById('cb-15')];
+        if (cb.checked) {
+            otherCbs.forEach(c => { c.checked = false; c.disabled = true; });
+        } else {
+            otherCbs.forEach(c => { c.disabled = false; });
+        }
+        validateStep3();
+    }
+
+    // --- STEP 4: LOGISTICS ---
     function setMode(mode) {
-        currentMode = mode;
+        state.mode = mode;
         const btnWalk = document.getElementById('btn-walkin');
         const btnLala = document.getElementById('btn-lalamove');
-        const panelLala = document.getElementById('lalamove-panel');
         const panelWalk = document.getElementById('walkin-panel');
+        const panelLala = document.getElementById('lalamove-panel');
 
-        if(mode === 'walkin') {
-            btnWalk.className = "p-4 rounded-xl border border-luxe bg-luxe/10 text-white text-sm font-medium transition";
-            btnLala.className = "p-4 rounded-xl border border-white/10 hover:bg-white/5 text-white/70 text-sm font-medium transition relative overflow-hidden";
-            panelLala.classList.add('hidden');
+        if (mode === 'walkin') {
+            btnWalk.classList.replace('border-white/10', 'border-luxe');
+            btnWalk.classList.replace('text-white/70', 'text-white');
+            btnWalk.classList.add('bg-luxe/10');
+            
+            btnLala.classList.replace('border-orange-500', 'border-white/10');
+            btnLala.classList.replace('bg-orange-500/10', 'hover:bg-white/5');
+            
             panelWalk.classList.remove('hidden');
-            deliveryCost = 0;
+            panelLala.classList.add('hidden');
+            state.deliveryCost = 0;
         } else {
-            btnLala.className = "p-4 rounded-xl border border-orange-500 bg-orange-500/10 text-white text-sm font-medium transition relative overflow-hidden";
-            btnWalk.className = "p-4 rounded-xl border border-white/10 hover:bg-white/5 text-white/70 text-sm font-medium transition";
-            panelLala.classList.remove('hidden');
+            btnLala.classList.replace('border-white/10', 'border-orange-500');
+            btnLala.classList.add('bg-orange-500/10');
+            
+            btnWalk.classList.replace('border-luxe', 'border-white/10');
+            btnWalk.classList.replace('text-white', 'text-white/70');
+            btnWalk.classList.remove('bg-luxe/10');
+
             panelWalk.classList.add('hidden');
-            updateLogistics();
+            panelLala.classList.remove('hidden');
+            updateLogisticsPrice();
         }
         calculateTotal();
     }
 
-    function updateLogistics() {
-        if(currentMode !== 'lalamove') return;
-        const hub = hubs.find(h => h.id === selectedHubId);
-        const dist = hub.distance;
-        const price = 5 + (dist * 1.0); 
-        deliveryCost = Math.ceil(price);
-        document.getElementById('dist-display').innerText = dist.toFixed(1);
-        document.getElementById('delivery-price').innerText = "RM " + deliveryCost.toFixed(2);
-        calculateTotal();
+    function updateLogisticsPrice() {
+        if(state.mode !== 'lalamove' || !state.hubId) return;
+        const hub = hubs.find(h => h.id === state.hubId);
+        const price = 5 + (hub.distance * 1.0);
+        state.deliveryCost = Math.ceil(price);
+        document.getElementById('dist-display').innerText = hub.distance.toFixed(1);
+        document.getElementById('delivery-price').innerText = "RM " + state.deliveryCost.toFixed(2);
+    }
+
+    function renderTimeSlots() {
+        const div = document.getElementById('slot-container');
+        timeSlots.forEach(t => {
+            div.innerHTML += `<button onclick="selectSlot('${t}')" id="slot-${t.replace(':','')}" class="text-xs py-2 rounded border border-white/10 hover:bg-white/10">${t}</button>`;
+        });
+    }
+
+    function selectSlot(t) {
+        state.slot = t;
+        document.querySelectorAll('#slot-container button').forEach(b => b.className = "text-xs py-2 rounded border border-white/10 hover:bg-white/10");
+        document.getElementById(`slot-${t.replace(':','')}`).className = "text-xs py-2 rounded border border-luxe bg-luxe text-brand font-bold";
     }
 
     function calculateTotal() {
-        const checkboxes = document.querySelectorAll('input[name="service"]:checked');
-        serviceCost = 0;
-        checkboxes.forEach((cb) => {
-            serviceCost += parseInt(cb.value);
-        });
-        const total = serviceCost + deliveryCost;
-        document.getElementById('grand-total').innerText = "RM " + total;
+        const serviceTotal = state.services.reduce((a, b) => a + b, 0);
+        document.getElementById('grand-total').innerText = "RM " + (serviceTotal + state.deliveryCost);
     }
 
+    // --- HELPER: UNLOCKING STEPS ---
+    function unlockStep(num) {
+        const el = document.getElementById(`step-${num}`);
+        el.classList.remove('opacity-30', 'pointer-events-none');
+        document.getElementById(`badge-${num}`).classList.replace('border-white/20', 'border-luxe');
+        document.getElementById(`badge-${num}`).classList.replace('text-white/50', 'text-luxe');
+    }
+
+    function lockStep(num) {
+        const el = document.getElementById(`step-${num}`);
+        el.classList.add('opacity-30', 'pointer-events-none');
+        // Hide content if needed
+        if(num === 4) document.getElementById('logistics-content').classList.add('hidden');
+    }
+
+    // --- SUBMIT ---
     function submitOrder() {
-        if(serviceCost === 0) {
-            alert("Please select at least one alteration service.");
-            return;
-        }
+        if(state.mode === 'walkin' && !state.slot) return alert("Select a time slot.");
         
-        // Walk-in Validation
-        if(currentMode === 'walkin' && !selectedSlot) {
-            alert("Please select a time slot for your walk-in appointment.");
-            return;
-        }
-
-        const hub = hubs.find(h => h.id === selectedHubId);
-        const trackingID = "ARB-" + Math.floor(Math.random() * 10000);
+        const hub = hubs.find(h => h.id === state.hubId);
+        const total = state.services.reduce((a,b)=>a+b,0) + state.deliveryCost;
         
-        let msg = `Success! \n\nOrder #${trackingID} Created.\nLocation: ${hub.name}\nMode: ${currentMode.toUpperCase()}`;
-        
-        if(currentMode === 'walkin') {
-            msg += `\nTime Slot: ${selectedSlot}`;
-        }
-        
-        msg += `\nTotal: RM ${serviceCost + deliveryCost}`;
-        
-        alert(msg);
+        alert(`ORDER CONFIRMED\n\nID: ARB-${Math.floor(Math.random()*9000)}\nLoc: ${hub.name}\nService: RM ${state.services.reduce((a,b)=>a+b,0)}\nDelivery: RM ${state.deliveryCost}\nTotal: RM ${total}`);
     }
 
-    function getDistanceFromLatLonInKm(lat1,lon1,lat2,lon2) {
-        var R = 6371; 
-        var dLat = deg2rad(lat2-lat1);
-        var dLon = deg2rad(lon2-lon1); 
-        var a = Math.sin(dLat/2) * Math.sin(dLat/2) + Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * Math.sin(dLon/2) * Math.sin(dLon/2); 
-        var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
-        var d = R * c; 
-        return d;
+    // Math
+    function getDist(lat1,lon1,lat2,lon2) {
+        var R=6371, dLat=d2r(lat2-lat1), dLon=d2r(lon2-lon1);
+        var a=Math.sin(dLat/2)*Math.sin(dLat/2)+Math.cos(d2r(lat1))*Math.cos(d2r(lat2))*Math.sin(dLon/2)*Math.sin(dLon/2);
+        return R*(2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a)));
     }
-    function deg2rad(deg) { return deg * (Math.PI/180) }
+    function d2r(d){return d*(Math.PI/180)}
   </script>
 </body>
 </html>
