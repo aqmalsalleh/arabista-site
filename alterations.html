@@ -21,7 +21,6 @@
           },
           colors: {
             brand: { DEFAULT: '#0F0F10' },
-            ink: { DEFAULT: '#111213' },
             luxe: { DEFAULT: '#C0A062' },
           },
           boxShadow: { soft: '0 10px 30px rgba(0,0,0,0.08)' },
@@ -31,10 +30,12 @@
   </script>
   
   <style>
-    /* Custom styles to match main site */
     body { background-color: #0F0F10; color: white; }
     .fade-in { animation: fadeIn 0.5s ease-in-out forwards; }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    
+    /* Disabled input style */
+    input:disabled ~ span { opacity: 0.5; text-decoration: line-through; }
   </style>
 </head>
 <body class="antialiased selection:bg-luxe selection:text-brand">
@@ -59,27 +60,29 @@
     
     <div class="text-center mb-10">
       <h1 class="font-display text-3xl sm:text-5xl mb-3">Alteration & Care</h1>
-      <p class="text-white/60 text-sm sm:text-base">Give your Abaya the perfect fit. Scan your order to begin.</p>
+      <p class="text-white/60 text-sm sm:text-base">Give your Abaya the perfect fit.</p>
     </div>
 
-    <div id="step-scan" class="bg-white/5 border border-white/10 rounded-2xl p-6 sm:p-10 text-center fade-in">
-      <div class="mb-6 flex justify-center">
-        <div class="w-16 h-16 rounded-xl bg-white/10 flex items-center justify-center">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white/70" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" /></svg>
-        </div>
-      </div>
-      <h3 class="text-xl font-display mb-2">Scan Order QR Code</h3>
-      <p class="text-white/50 text-sm mb-6">Upload the QR image from your order confirmation email.</p>
+    <div id="step-identify" class="bg-white/5 border border-white/10 rounded-2xl p-6 sm:p-10 text-center fade-in">
+      <h3 class="text-xl font-display mb-6">How would you like to proceed?</h3>
       
-      <div class="flex flex-col sm:flex-row gap-3 justify-center">
-        <button onclick="simulateScan()" class="bg-luxe text-brand font-medium px-6 py-3 rounded-xl hover:bg-white transition shadow-[0_0_20px_rgba(192,160,98,0.3)]">
-          Simulate Scan (Demo)
+      <div class="grid sm:grid-cols-2 gap-4">
+        <button onclick="simulateScan()" class="group flex flex-col items-center justify-center p-6 rounded-xl border border-white/10 hover:border-luxe hover:bg-white/5 transition h-full min-h-[160px]">
+            <div class="w-12 h-12 mb-3 rounded-full bg-white/10 flex items-center justify-center group-hover:bg-luxe group-hover:text-brand transition">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" /></svg>
+            </div>
+            <span class="font-medium">Scan Order QR</span>
+            <span class="text-xs text-white/50 mt-1">Extracts address from order</span>
         </button>
-        <button class="px-6 py-3 rounded-xl border border-white/20 hover:bg-white/5 text-white/70 transition">
-          Upload Image
+
+        <button onclick="useLocation()" class="group flex flex-col items-center justify-center p-6 rounded-xl border border-white/10 hover:border-luxe hover:bg-white/5 transition h-full min-h-[160px]">
+            <div class="w-12 h-12 mb-3 rounded-full bg-white/10 flex items-center justify-center group-hover:bg-luxe group-hover:text-brand transition">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+            </div>
+            <span class="font-medium">Use Current Location</span>
+            <span class="text-xs text-white/50 mt-1">Find nearest hub via GPS</span>
         </button>
       </div>
-      <p class="mt-4 text-xs text-white/30">*For this demo, clicking "Simulate" will auto-load a customer in Cheras.</p>
     </div>
 
     <div id="step-options" class="hidden space-y-6">
@@ -87,40 +90,46 @@
       <div class="bg-luxe/10 border border-luxe/20 rounded-xl p-4 flex items-start gap-3 fade-in">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-luxe mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
         <div>
-            <p class="text-xs text-luxe uppercase tracking-widest font-semibold">Customer Location</p>
+            <p class="text-xs text-luxe uppercase tracking-widest font-semibold">Your Location</p>
             <p class="text-sm text-white/90" id="customer-address">Loading...</p>
         </div>
+        <button onclick="location.reload()" class="ml-auto text-xs text-white/50 hover:text-white underline">Change</button>
       </div>
 
       <div class="fade-in">
         <h3 class="font-display text-xl mb-4">Nearest Alteration Points</h3>
-        <div id="hub-list" class="space-y-3">
+        <div id="hub-list" class="space-y-3 max-h-[400px] overflow-y-auto pr-2 scrollbar-thin">
             </div>
       </div>
 
       <div class="fade-in">
         <h3 class="font-display text-xl mb-4">Select Service</h3>
+        <p class="text-xs text-white/50 mb-3">*Select "Resize" for full service (includes length cutting).</p>
+        
         <div class="grid gap-3">
-          <label class="flex items-center justify-between p-4 rounded-xl border border-white/10 hover:border-luxe/50 hover:bg-white/5 cursor-pointer transition group">
+          <label class="flex items-center justify-between p-4 rounded-xl border border-white/10 hover:border-luxe/50 hover:bg-white/5 cursor-pointer transition group" id="opt-1">
             <div class="flex items-center gap-3">
-              <input type="checkbox" name="service" value="10" class="w-5 h-5 rounded border-white/30 text-luxe focus:ring-luxe bg-transparent" onchange="calculateTotal()">
+              <input type="checkbox" id="cb-10" name="service" value="10" class="w-5 h-5 rounded border-white/30 text-luxe focus:ring-luxe bg-transparent" onchange="calculateTotal()">
               <span class="text-sm sm:text-base group-hover:text-white transition">Potong Labuh Jubah</span>
             </div>
             <span class="text-luxe font-display text-lg">RM 10</span>
           </label>
 
-          <label class="flex items-center justify-between p-4 rounded-xl border border-white/10 hover:border-luxe/50 hover:bg-white/5 cursor-pointer transition group">
+          <label class="flex items-center justify-between p-4 rounded-xl border border-white/10 hover:border-luxe/50 hover:bg-white/5 cursor-pointer transition group" id="opt-2">
             <div class="flex items-center gap-3">
-              <input type="checkbox" name="service" value="15" class="w-5 h-5 rounded border-white/30 text-luxe focus:ring-luxe bg-transparent" onchange="calculateTotal()">
+              <input type="checkbox" id="cb-15" name="service" value="15" class="w-5 h-5 rounded border-white/30 text-luxe focus:ring-luxe bg-transparent" onchange="calculateTotal()">
               <span class="text-sm sm:text-base group-hover:text-white transition">Potong Labuh Lengan</span>
             </div>
             <span class="text-luxe font-display text-lg">RM 15</span>
           </label>
 
-          <label class="flex items-center justify-between p-4 rounded-xl border border-white/10 hover:border-luxe/50 hover:bg-white/5 cursor-pointer transition group">
+          <label class="flex items-center justify-between p-4 rounded-xl border border-white/10 hover:border-luxe/50 hover:bg-white/5 cursor-pointer transition group border-luxe/30 bg-luxe/5">
             <div class="flex items-center gap-3">
-              <input type="checkbox" name="service" value="30" class="w-5 h-5 rounded border-white/30 text-luxe focus:ring-luxe bg-transparent" onchange="calculateTotal()">
-              <span class="text-sm sm:text-base group-hover:text-white transition">Kecikkan / Besarkan Saiz</span>
+              <input type="checkbox" id="cb-30" name="service" value="30" class="w-5 h-5 rounded border-white/30 text-luxe focus:ring-luxe bg-transparent" onchange="toggleResize(this)">
+              <div>
+                  <span class="text-sm sm:text-base font-medium text-white transition">Kecikkan / Besarkan Saiz</span>
+                  <p class="text-[10px] text-luxe">Includes all other services</p>
+              </div>
             </div>
             <span class="text-luxe font-display text-lg">RM 30</span>
           </label>
@@ -162,40 +171,31 @@
   </main>
 
   <script>
-    // --- 1. MOCK DATA ---
-    
-    // Our Shops
+    // --- 1. EXPANDED MOCK DATA (KL & SELANGOR) ---
     const hubs = [
-      { 
-        id: 1, 
-        name: "Arabista Hub (Damai Perdana)", 
-        address: "15, Jalan Damai Perdana 1/8b, Bandar Damai Perdana, 56100 KL",
-        lat: 3.0370, 
-        lng: 101.7424 
-      },
-      { 
-        id: 2, 
-        name: "Arabista Partner (Shah Alam)", 
-        address: "Jalan Plumbum 7/99, Seksyen 7, 40000 Shah Alam",
-        lat: 3.0655, 
-        lng: 101.4830 
-      },
-      { 
-        id: 3, 
-        name: "Arabista Partner (Wangsa Maju)", 
-        address: "Jalan Wangsa Delima, Wangsa Maju, 53300 KL",
-        lat: 3.2000, 
-        lng: 101.7400 
-      }
+      // Primary Hub
+      { id: 1, name: "Arabista HQ (Damai Perdana)", address: "15, Jalan Damai Perdana 1/8b, Bandar Damai Perdana", lat: 3.0370, lng: 101.7424, type: "HQ" },
+      
+      // Partners (Scattered)
+      { id: 2, name: "Tailor Kak Bedah (Shah Alam)", address: "Jalan Plumbum 7/99, Seksyen 7, Shah Alam", lat: 3.0655, lng: 101.4830, type: "Partner" },
+      { id: 3, name: "Tailor Sarah (Wangsa Maju)", address: "Jalan Wangsa Delima, Wangsa Maju", lat: 3.2000, lng: 101.7400, type: "Partner" },
+      { id: 4, name: "Butik Jahitan (Bangi)", address: "Seksyen 9, Bandar Baru Bangi", lat: 2.9587, lng: 101.7554, type: "Partner" },
+      { id: 5, name: "Alteration Pro (TTDI)", address: "Jalan Tun Mohd Fuad, TTDI, KL", lat: 3.1412, lng: 101.6293, type: "Partner" },
+      { id: 6, name: "Tailor Auntie Lim (Puchong)", address: "Bandar Puteri Puchong", lat: 3.0245, lng: 101.6166, type: "Partner" },
+      { id: 7, name: "Klang Tailoring (Bukit Tinggi)", address: "Lorong Batu Nilam, Bandar Bukit Tinggi", lat: 3.0076, lng: 101.4398, type: "Partner" },
+      { id: 8, name: "PJ Alterations (SS2)", address: "Jalan SS2/61, Petaling Jaya", lat: 3.1187, lng: 101.6212, type: "Partner" },
+      { id: 9, name: "Cyberjaya Stitch (DPulze)", address: "Persiaran Multimedia, Cyberjaya", lat: 2.9221, lng: 101.6506, type: "Partner" },
+      { id: 10, name: "Gombak Sew (Near IIUM)", address: "Jalan Gombak, Batu 6", lat: 3.2324, lng: 101.7300, type: "Partner" },
+      { id: 11, name: "Ampang Point Tailor", address: "Jalan Mamanda, Ampang", lat: 3.1593, lng: 101.7497, type: "Partner" },
+      { id: 12, name: "Setia Alam Alterations", address: "Jalan Setia Prima, Setia Alam", lat: 3.1090, lng: 101.4452, type: "Partner" },
+      { id: 13, name: "Cheras Maluri Hub", address: "Jalan Jejaka, Taman Maluri", lat: 3.1250, lng: 101.7300, type: "Partner" },
+      { id: 14, name: "Subang Jaya Tailor (SS15)", address: "Jalan SS15/4, Subang Jaya", lat: 3.0754, lng: 101.5890, type: "Partner" },
+      { id: 15, name: "Kajang Prima Sew", address: "Jalan KP 1/1, Kajang Prima", lat: 2.9775, lng: 101.8055, type: "Partner" }
     ];
 
-    // Mock Customer (Cheras Area - close to Damai Perdana)
-    const mockCustomer = {
-        name: "Siti Aishah",
-        address: "Jalan Suakasih, Tun Hussein Onn, 43200 Cheras",
-        lat: 3.0300, 
-        lng: 101.7600
-    };
+    // Default Customer (Fallback if GPS fails)
+    let customerLat = 3.0300; // Cheras area
+    let customerLng = 101.7600;
 
     // Global State
     let currentMode = 'walkin';
@@ -205,28 +205,59 @@
 
     // --- 2. LOGIC FUNCTIONS ---
 
-    // A. Simulate Scanning
+    // A. Option 1: Simulate QR Scan
     function simulateScan() {
-        const step1 = document.getElementById('step-scan');
-        const step2 = document.getElementById('step-options');
-        
-        // Visual transition
-        step1.classList.add('opacity-50', 'pointer-events-none');
-        setTimeout(() => {
-            step1.style.display = 'none';
-            step2.classList.remove('hidden');
-            
-            // Populate Data
-            document.getElementById('customer-address').innerText = mockCustomer.address;
+        showLoading("Scanning QR...", () => {
+            // Mock Data from QR
+            document.getElementById('customer-address').innerText = "Jalan Suakasih, Tun Hussein Onn, 43200 Cheras (From QR)";
+            customerLat = 3.0300;
+            customerLng = 101.7600;
             renderHubs();
-        }, 800);
+            revealNextStep();
+        });
     }
 
-    // B. Render Hubs sorted by distance
+    // B. Option 2: Use Real Browser Geolocation
+    function useLocation() {
+        if (!navigator.geolocation) {
+            alert("Geolocation is not supported by your browser.");
+            return;
+        }
+
+        showLoading("Locating you...", () => {
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    customerLat = position.coords.latitude;
+                    customerLng = position.coords.longitude;
+                    document.getElementById('customer-address').innerText = `Current GPS: ${customerLat.toFixed(4)}, ${customerLng.toFixed(4)}`;
+                    renderHubs();
+                    revealNextStep();
+                },
+                (error) => {
+                    alert("Unable to retrieve location. Using demo location (Cheras).");
+                    simulateScan(); // Fallback
+                }
+            );
+        });
+    }
+
+    // Helper: Transition Effect
+    function showLoading(msg, callback) {
+        const step1 = document.getElementById('step-identify');
+        step1.innerHTML = `<div class="py-12"><div class="animate-spin rounded-full h-10 w-10 border-b-2 border-luxe mx-auto mb-4"></div><p>${msg}</p></div>`;
+        setTimeout(callback, 1200);
+    }
+
+    function revealNextStep() {
+        document.getElementById('step-identify').style.display = 'none';
+        document.getElementById('step-options').classList.remove('hidden');
+    }
+
+    // C. Render Hubs sorted by distance
     function renderHubs() {
         // Calculate distance for each hub
         hubs.forEach(hub => {
-            hub.distance = getDistanceFromLatLonInKm(mockCustomer.lat, mockCustomer.lng, hub.lat, hub.lng);
+            hub.distance = getDistanceFromLatLonInKm(customerLat, customerLng, hub.lat, hub.lng);
         });
 
         // Sort: Nearest first
@@ -239,22 +270,19 @@
         container.innerHTML = '';
 
         hubs.forEach((hub, index) => {
-            const isSelected = index === 0; // Select first by default
+            const isSelected = index === 0;
             const activeClass = isSelected ? 'border-luxe bg-white/5 ring-1 ring-luxe/20' : 'border-white/10 opacity-60 hover:opacity-100';
+            const badge = hub.type === 'HQ' ? '<span class="ml-2 text-[10px] bg-luxe text-brand px-1.5 py-0.5 rounded font-bold">HQ</span>' : '';
             
             const html = `
-                <div onclick="selectHub(${hub.id})" id="hub-${hub.id}" class="p-4 rounded-xl border ${activeClass} cursor-pointer transition relative group">
-                    <div class="flex justify-between items-start">
-                        <div>
-                            <h4 class="font-medium text-white">${hub.name}</h4>
-                            <p class="text-xs text-white/50 mt-1 max-w-[80%]">${hub.address}</p>
-                        </div>
-                        <div class="text-right">
-                            <span class="block text-luxe font-bold text-sm">${hub.distance.toFixed(1)} km</span>
-                            <span class="text-[10px] text-white/40">away</span>
-                        </div>
+                <div onclick="selectHub(${hub.id})" id="hub-${hub.id}" class="p-3 rounded-xl border ${activeClass} cursor-pointer transition relative group flex justify-between items-center">
+                    <div>
+                        <h4 class="font-medium text-white text-sm">${hub.name} ${badge}</h4>
+                        <p class="text-xs text-white/50 mt-0.5 max-w-[200px] truncate">${hub.address}</p>
                     </div>
-                    ${isSelected ? '<div class="absolute -top-2 -right-2 bg-luxe text-brand text-[10px] font-bold px-2 py-1 rounded shadow-lg">NEAREST</div>' : ''}
+                    <div class="text-right pl-2">
+                        <span class="block text-luxe font-bold text-sm">${hub.distance.toFixed(1)} km</span>
+                    </div>
                 </div>
             `;
             container.innerHTML += html;
@@ -264,22 +292,40 @@
         updateLogistics();
     }
 
-    // C. Select Hub
+    // D. Select Hub
     function selectHub(id) {
         selectedHubId = id;
-        // Update UI visuals
         hubs.forEach(hub => {
             const el = document.getElementById(`hub-${hub.id}`);
             if(hub.id === id) {
-                el.className = "p-4 rounded-xl border border-luxe bg-white/5 ring-1 ring-luxe/20 cursor-pointer transition relative group";
+                el.className = "p-3 rounded-xl border border-luxe bg-white/5 ring-1 ring-luxe/20 cursor-pointer transition relative group flex justify-between items-center";
             } else {
-                el.className = "p-4 rounded-xl border border-white/10 opacity-60 hover:opacity-100 cursor-pointer transition relative group";
+                el.className = "p-3 rounded-xl border border-white/10 opacity-60 hover:opacity-100 cursor-pointer transition relative group flex justify-between items-center";
             }
         });
         updateLogistics();
     }
 
-    // D. Logistics Mode Switch
+    // E. Service Logic (Resize Override)
+    function toggleResize(checkbox) {
+        const cb10 = document.getElementById('cb-10');
+        const cb15 = document.getElementById('cb-15');
+        
+        if (checkbox.checked) {
+            // Uncheck and disable others
+            cb10.checked = false;
+            cb15.checked = false;
+            cb10.disabled = true;
+            cb15.disabled = true;
+        } else {
+            // Re-enable others
+            cb10.disabled = false;
+            cb15.disabled = false;
+        }
+        calculateTotal();
+    }
+
+    // F. Logistics Mode Switch
     function setMode(mode) {
         currentMode = mode;
         const btnWalk = document.getElementById('btn-walkin');
@@ -295,12 +341,12 @@
             btnLala.className = "p-4 rounded-xl border border-orange-500 bg-orange-500/10 text-white text-sm font-medium transition relative overflow-hidden";
             btnWalk.className = "p-4 rounded-xl border border-white/10 hover:bg-white/5 text-white/70 text-sm font-medium transition";
             panel.classList.remove('hidden');
-            updateLogistics(); // Calc price
+            updateLogistics();
         }
         calculateTotal();
     }
 
-    // E. Update Lalamove Price (Mock Formula)
+    // G. Update Lalamove Price (Mock Formula)
     function updateLogistics() {
         if(currentMode !== 'lalamove') return;
 
@@ -310,14 +356,14 @@
         // Formula: Base RM5 + RM1 per KM
         const price = 5 + (dist * 1.0); 
         
-        deliveryCost = Math.ceil(price); // Round up for clean numbers
+        deliveryCost = Math.ceil(price);
         
         document.getElementById('dist-display').innerText = dist.toFixed(1);
         document.getElementById('delivery-price').innerText = "RM " + deliveryCost.toFixed(2);
         calculateTotal();
     }
 
-    // F. Calculate Grand Total
+    // H. Calculate Grand Total
     function calculateTotal() {
         const checkboxes = document.querySelectorAll('input[name="service"]:checked');
         serviceCost = 0;
@@ -329,7 +375,7 @@
         document.getElementById('grand-total').innerText = "RM " + total;
     }
 
-    // G. Submit Order
+    // I. Submit Order
     function submitOrder() {
         if(serviceCost === 0) {
             alert("Please select at least one alteration service.");
@@ -338,10 +384,10 @@
         const hub = hubs.find(h => h.id === selectedHubId);
         const trackingID = "ARB-" + Math.floor(Math.random() * 10000);
         
-        alert(`Success! \n\nOrder #${trackingID} Created.\nLocation: ${hub.name}\nMode: ${currentMode.toUpperCase()}\nTotal: RM ${serviceCost + deliveryCost}\n\n(This is a demo. No payment taken.)`);
+        alert(`Success! \n\nOrder #${trackingID} Created.\nLocation: ${hub.name}\nMode: ${currentMode.toUpperCase()}\nTotal: RM ${serviceCost + deliveryCost}`);
     }
 
-    // H. Helper: Haversine Distance
+    // J. Helper: Haversine Distance
     function getDistanceFromLatLonInKm(lat1,lon1,lat2,lon2) {
         var R = 6371; // Radius of the earth in km
         var dLat = deg2rad(lat2-lat1);
