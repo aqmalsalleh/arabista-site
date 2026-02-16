@@ -1,0 +1,362 @@
+<!doctype html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Arabista — Alterations & Care</title>
+  <meta name="theme-color" content="#0F0F10" />
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            display: ['"Cormorant Garamond"', 'serif'],
+            sans: ['Inter', 'ui-sans-serif', 'system-ui'],
+          },
+          colors: {
+            brand: { DEFAULT: '#0F0F10' },
+            ink: { DEFAULT: '#111213' },
+            luxe: { DEFAULT: '#C0A062' },
+          },
+          boxShadow: { soft: '0 10px 30px rgba(0,0,0,0.08)' },
+        },
+      },
+    }
+  </script>
+  
+  <style>
+    /* Custom styles to match main site */
+    body { background-color: #0F0F10; color: white; }
+    .fade-in { animation: fadeIn 0.5s ease-in-out forwards; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+  </style>
+</head>
+<body class="antialiased selection:bg-luxe selection:text-brand">
+
+  <header class="fixed top-0 inset-x-0 z-50 backdrop-blur bg-brand/80 border-b border-white/10">
+    <div class="max-w-screen-xl mx-auto px-4 sm:px-6">
+      <div class="h-14 grid grid-cols-3 items-center">
+        <div class="col-span-1 flex items-center">
+          <a href="index.html" class="font-display tracking-[0.18em] text-[14px] leading-none hover:text-luxe transition">ARABISTA</a>
+        </div>
+        <div class="col-span-1 flex items-center justify-center">
+           <span class="font-display text-xl">A</span>
+        </div>
+        <div class="col-span-1 flex items-center justify-end gap-3 text-sm">
+           <a href="index.html" class="hover:text-luxe transition text-xs sm:text-sm">Back to Home</a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="pt-24 pb-12 max-w-screen-md mx-auto px-4 sm:px-6 min-h-screen">
+    
+    <div class="text-center mb-10">
+      <h1 class="font-display text-3xl sm:text-5xl mb-3">Alteration & Care</h1>
+      <p class="text-white/60 text-sm sm:text-base">Give your Abaya the perfect fit. Scan your order to begin.</p>
+    </div>
+
+    <div id="step-scan" class="bg-white/5 border border-white/10 rounded-2xl p-6 sm:p-10 text-center fade-in">
+      <div class="mb-6 flex justify-center">
+        <div class="w-16 h-16 rounded-xl bg-white/10 flex items-center justify-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white/70" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" /></svg>
+        </div>
+      </div>
+      <h3 class="text-xl font-display mb-2">Scan Order QR Code</h3>
+      <p class="text-white/50 text-sm mb-6">Upload the QR image from your order confirmation email.</p>
+      
+      <div class="flex flex-col sm:flex-row gap-3 justify-center">
+        <button onclick="simulateScan()" class="bg-luxe text-brand font-medium px-6 py-3 rounded-xl hover:bg-white transition shadow-[0_0_20px_rgba(192,160,98,0.3)]">
+          Simulate Scan (Demo)
+        </button>
+        <button class="px-6 py-3 rounded-xl border border-white/20 hover:bg-white/5 text-white/70 transition">
+          Upload Image
+        </button>
+      </div>
+      <p class="mt-4 text-xs text-white/30">*For this demo, clicking "Simulate" will auto-load a customer in Cheras.</p>
+    </div>
+
+    <div id="step-options" class="hidden space-y-6">
+      
+      <div class="bg-luxe/10 border border-luxe/20 rounded-xl p-4 flex items-start gap-3 fade-in">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-luxe mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+        <div>
+            <p class="text-xs text-luxe uppercase tracking-widest font-semibold">Customer Location</p>
+            <p class="text-sm text-white/90" id="customer-address">Loading...</p>
+        </div>
+      </div>
+
+      <div class="fade-in">
+        <h3 class="font-display text-xl mb-4">Nearest Alteration Points</h3>
+        <div id="hub-list" class="space-y-3">
+            </div>
+      </div>
+
+      <div class="fade-in">
+        <h3 class="font-display text-xl mb-4">Select Service</h3>
+        <div class="grid gap-3">
+          <label class="flex items-center justify-between p-4 rounded-xl border border-white/10 hover:border-luxe/50 hover:bg-white/5 cursor-pointer transition group">
+            <div class="flex items-center gap-3">
+              <input type="checkbox" name="service" value="10" class="w-5 h-5 rounded border-white/30 text-luxe focus:ring-luxe bg-transparent" onchange="calculateTotal()">
+              <span class="text-sm sm:text-base group-hover:text-white transition">Potong Labuh Jubah</span>
+            </div>
+            <span class="text-luxe font-display text-lg">RM 10</span>
+          </label>
+
+          <label class="flex items-center justify-between p-4 rounded-xl border border-white/10 hover:border-luxe/50 hover:bg-white/5 cursor-pointer transition group">
+            <div class="flex items-center gap-3">
+              <input type="checkbox" name="service" value="15" class="w-5 h-5 rounded border-white/30 text-luxe focus:ring-luxe bg-transparent" onchange="calculateTotal()">
+              <span class="text-sm sm:text-base group-hover:text-white transition">Potong Labuh Lengan</span>
+            </div>
+            <span class="text-luxe font-display text-lg">RM 15</span>
+          </label>
+
+          <label class="flex items-center justify-between p-4 rounded-xl border border-white/10 hover:border-luxe/50 hover:bg-white/5 cursor-pointer transition group">
+            <div class="flex items-center gap-3">
+              <input type="checkbox" name="service" value="30" class="w-5 h-5 rounded border-white/30 text-luxe focus:ring-luxe bg-transparent" onchange="calculateTotal()">
+              <span class="text-sm sm:text-base group-hover:text-white transition">Kecikkan / Besarkan Saiz</span>
+            </div>
+            <span class="text-luxe font-display text-lg">RM 30</span>
+          </label>
+        </div>
+      </div>
+
+      <div class="fade-in">
+        <h3 class="font-display text-xl mb-4">Logistics</h3>
+        <div class="grid grid-cols-2 gap-3">
+            <button id="btn-walkin" onclick="setMode('walkin')" class="p-4 rounded-xl border border-luxe bg-luxe/10 text-white text-sm font-medium transition">
+                Walk-in (Self Drop)
+            </button>
+            <button id="btn-lalamove" onclick="setMode('lalamove')" class="p-4 rounded-xl border border-white/10 hover:bg-white/5 text-white/70 text-sm font-medium transition relative overflow-hidden">
+                Lalamove Pickup
+                <div class="absolute top-0 right-0 bg-orange-500 text-[10px] text-white px-2 py-0.5 font-bold">FAST</div>
+            </button>
+        </div>
+        
+        <div id="lalamove-panel" class="hidden mt-3 p-4 bg-orange-500/10 border border-orange-500/20 rounded-xl text-orange-200 text-sm">
+            <div class="flex justify-between items-center mb-2">
+                <span>Motorcycle Delivery (Est.)</span>
+                <span class="font-bold text-white" id="delivery-price">RM 0.00</span>
+            </div>
+            <p class="text-xs opacity-70">Based on <span id="dist-display">0</span>km distance to selected hub.</p>
+        </div>
+      </div>
+
+      <div class="pt-6 border-t border-white/10 fade-in">
+        <div class="flex justify-between items-end mb-6">
+            <span class="text-white/50 text-sm">Total Estimate</span>
+            <span class="font-display text-4xl text-white" id="grand-total">RM 0</span>
+        </div>
+        <button onclick="submitOrder()" class="w-full bg-white text-brand font-bold py-4 rounded-xl hover:bg-luxe hover:text-white transition shadow-soft">
+            Confirm Booking
+        </button>
+      </div>
+
+    </div>
+  </main>
+
+  <script>
+    // --- 1. MOCK DATA ---
+    
+    // Our Shops
+    const hubs = [
+      { 
+        id: 1, 
+        name: "Arabista Hub (Damai Perdana)", 
+        address: "15, Jalan Damai Perdana 1/8b, Bandar Damai Perdana, 56100 KL",
+        lat: 3.0370, 
+        lng: 101.7424 
+      },
+      { 
+        id: 2, 
+        name: "Arabista Partner (Shah Alam)", 
+        address: "Jalan Plumbum 7/99, Seksyen 7, 40000 Shah Alam",
+        lat: 3.0655, 
+        lng: 101.4830 
+      },
+      { 
+        id: 3, 
+        name: "Arabista Partner (Wangsa Maju)", 
+        address: "Jalan Wangsa Delima, Wangsa Maju, 53300 KL",
+        lat: 3.2000, 
+        lng: 101.7400 
+      }
+    ];
+
+    // Mock Customer (Cheras Area - close to Damai Perdana)
+    const mockCustomer = {
+        name: "Siti Aishah",
+        address: "Jalan Suakasih, Tun Hussein Onn, 43200 Cheras",
+        lat: 3.0300, 
+        lng: 101.7600
+    };
+
+    // Global State
+    let currentMode = 'walkin';
+    let selectedHubId = null;
+    let deliveryCost = 0;
+    let serviceCost = 0;
+
+    // --- 2. LOGIC FUNCTIONS ---
+
+    // A. Simulate Scanning
+    function simulateScan() {
+        const step1 = document.getElementById('step-scan');
+        const step2 = document.getElementById('step-options');
+        
+        // Visual transition
+        step1.classList.add('opacity-50', 'pointer-events-none');
+        setTimeout(() => {
+            step1.style.display = 'none';
+            step2.classList.remove('hidden');
+            
+            // Populate Data
+            document.getElementById('customer-address').innerText = mockCustomer.address;
+            renderHubs();
+        }, 800);
+    }
+
+    // B. Render Hubs sorted by distance
+    function renderHubs() {
+        // Calculate distance for each hub
+        hubs.forEach(hub => {
+            hub.distance = getDistanceFromLatLonInKm(mockCustomer.lat, mockCustomer.lng, hub.lat, hub.lng);
+        });
+
+        // Sort: Nearest first
+        hubs.sort((a, b) => a.distance - b.distance);
+
+        // Auto-select the first (nearest)
+        selectedHubId = hubs[0].id;
+
+        const container = document.getElementById('hub-list');
+        container.innerHTML = '';
+
+        hubs.forEach((hub, index) => {
+            const isSelected = index === 0; // Select first by default
+            const activeClass = isSelected ? 'border-luxe bg-white/5 ring-1 ring-luxe/20' : 'border-white/10 opacity-60 hover:opacity-100';
+            
+            const html = `
+                <div onclick="selectHub(${hub.id})" id="hub-${hub.id}" class="p-4 rounded-xl border ${activeClass} cursor-pointer transition relative group">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <h4 class="font-medium text-white">${hub.name}</h4>
+                            <p class="text-xs text-white/50 mt-1 max-w-[80%]">${hub.address}</p>
+                        </div>
+                        <div class="text-right">
+                            <span class="block text-luxe font-bold text-sm">${hub.distance.toFixed(1)} km</span>
+                            <span class="text-[10px] text-white/40">away</span>
+                        </div>
+                    </div>
+                    ${isSelected ? '<div class="absolute -top-2 -right-2 bg-luxe text-brand text-[10px] font-bold px-2 py-1 rounded shadow-lg">NEAREST</div>' : ''}
+                </div>
+            `;
+            container.innerHTML += html;
+        });
+        
+        // Recalculate Logic
+        updateLogistics();
+    }
+
+    // C. Select Hub
+    function selectHub(id) {
+        selectedHubId = id;
+        // Update UI visuals
+        hubs.forEach(hub => {
+            const el = document.getElementById(`hub-${hub.id}`);
+            if(hub.id === id) {
+                el.className = "p-4 rounded-xl border border-luxe bg-white/5 ring-1 ring-luxe/20 cursor-pointer transition relative group";
+            } else {
+                el.className = "p-4 rounded-xl border border-white/10 opacity-60 hover:opacity-100 cursor-pointer transition relative group";
+            }
+        });
+        updateLogistics();
+    }
+
+    // D. Logistics Mode Switch
+    function setMode(mode) {
+        currentMode = mode;
+        const btnWalk = document.getElementById('btn-walkin');
+        const btnLala = document.getElementById('btn-lalamove');
+        const panel = document.getElementById('lalamove-panel');
+
+        if(mode === 'walkin') {
+            btnWalk.className = "p-4 rounded-xl border border-luxe bg-luxe/10 text-white text-sm font-medium transition";
+            btnLala.className = "p-4 rounded-xl border border-white/10 hover:bg-white/5 text-white/70 text-sm font-medium transition relative overflow-hidden";
+            panel.classList.add('hidden');
+            deliveryCost = 0;
+        } else {
+            btnLala.className = "p-4 rounded-xl border border-orange-500 bg-orange-500/10 text-white text-sm font-medium transition relative overflow-hidden";
+            btnWalk.className = "p-4 rounded-xl border border-white/10 hover:bg-white/5 text-white/70 text-sm font-medium transition";
+            panel.classList.remove('hidden');
+            updateLogistics(); // Calc price
+        }
+        calculateTotal();
+    }
+
+    // E. Update Lalamove Price (Mock Formula)
+    function updateLogistics() {
+        if(currentMode !== 'lalamove') return;
+
+        const hub = hubs.find(h => h.id === selectedHubId);
+        const dist = hub.distance;
+        
+        // Formula: Base RM5 + RM1 per KM
+        const price = 5 + (dist * 1.0); 
+        
+        deliveryCost = Math.ceil(price); // Round up for clean numbers
+        
+        document.getElementById('dist-display').innerText = dist.toFixed(1);
+        document.getElementById('delivery-price').innerText = "RM " + deliveryCost.toFixed(2);
+        calculateTotal();
+    }
+
+    // F. Calculate Grand Total
+    function calculateTotal() {
+        const checkboxes = document.querySelectorAll('input[name="service"]:checked');
+        serviceCost = 0;
+        checkboxes.forEach((cb) => {
+            serviceCost += parseInt(cb.value);
+        });
+
+        const total = serviceCost + deliveryCost;
+        document.getElementById('grand-total').innerText = "RM " + total;
+    }
+
+    // G. Submit Order
+    function submitOrder() {
+        if(serviceCost === 0) {
+            alert("Please select at least one alteration service.");
+            return;
+        }
+        const hub = hubs.find(h => h.id === selectedHubId);
+        const trackingID = "ARB-" + Math.floor(Math.random() * 10000);
+        
+        alert(`Success! \n\nOrder #${trackingID} Created.\nLocation: ${hub.name}\nMode: ${currentMode.toUpperCase()}\nTotal: RM ${serviceCost + deliveryCost}\n\n(This is a demo. No payment taken.)`);
+    }
+
+    // H. Helper: Haversine Distance
+    function getDistanceFromLatLonInKm(lat1,lon1,lat2,lon2) {
+        var R = 6371; // Radius of the earth in km
+        var dLat = deg2rad(lat2-lat1);
+        var dLon = deg2rad(lon2-lon1); 
+        var a = 
+            Math.sin(dLat/2) * Math.sin(dLat/2) +
+            Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * Math.sin(dLon/2) * Math.sin(dLon/2); 
+        var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
+        var d = R * c; // Distance in km
+        return d;
+    }
+
+    function deg2rad(deg) {
+        return deg * (Math.PI/180)
+    }
+  </script>
+</body>
+</html>
