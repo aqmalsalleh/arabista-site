@@ -34,8 +34,11 @@
     .fade-in { animation: fadeIn 0.5s ease-in-out forwards; }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     
-    /* Disabled input style */
-    input:disabled ~ span { opacity: 0.5; text-decoration: line-through; }
+    /* Scrollbar styling for the hub list */
+    .scrollbar-thin::-webkit-scrollbar { width: 6px; }
+    .scrollbar-thin::-webkit-scrollbar-track { background: rgba(255,255,255,0.05); }
+    .scrollbar-thin::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 10px; }
+    .scrollbar-thin::-webkit-scrollbar-thumb:hover { background: rgba(192,160,98,0.5); }
   </style>
 </head>
 <body class="antialiased selection:bg-luxe selection:text-brand">
@@ -69,7 +72,7 @@
       <div class="grid sm:grid-cols-2 gap-4">
         <button onclick="simulateScan()" class="group flex flex-col items-center justify-center p-6 rounded-xl border border-white/10 hover:border-luxe hover:bg-white/5 transition h-full min-h-[160px]">
             <div class="w-12 h-12 mb-3 rounded-full bg-white/10 flex items-center justify-center group-hover:bg-luxe group-hover:text-brand transition">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" /></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" /></svg>
             </div>
             <span class="font-medium">Scan Order QR</span>
             <span class="text-xs text-white/50 mt-1">Extracts address from order</span>
@@ -104,7 +107,6 @@
 
       <div class="fade-in">
         <h3 class="font-display text-xl mb-4">Select Service</h3>
-        <p class="text-xs text-white/50 mb-3">*Select "Resize" for full service (includes length cutting).</p>
         
         <div class="grid gap-3">
           <label class="flex items-center justify-between p-4 rounded-xl border border-white/10 hover:border-luxe/50 hover:bg-white/5 cursor-pointer transition group" id="opt-1">
@@ -148,7 +150,16 @@
             </button>
         </div>
         
-        <div id="lalamove-panel" class="hidden mt-3 p-4 bg-orange-500/10 border border-orange-500/20 rounded-xl text-orange-200 text-sm">
+        <div id="walkin-panel" class="mt-4 p-5 bg-white/5 border border-white/10 rounded-xl">
+             <div class="flex items-center justify-between mb-3">
+                <span class="text-sm text-white/80">Available Time Slots (Today/Tomorrow)</span>
+             </div>
+             <div class="grid grid-cols-3 sm:grid-cols-4 gap-2" id="slot-container">
+                 </div>
+             <p class="text-[10px] text-white/40 mt-3">*Please arrive within 15 mins of your slot.</p>
+        </div>
+
+        <div id="lalamove-panel" class="hidden mt-4 p-4 bg-orange-500/10 border border-orange-500/20 rounded-xl text-orange-200 text-sm">
             <div class="flex justify-between items-center mb-2">
                 <span>Motorcycle Delivery (Est.)</span>
                 <span class="font-bold text-white" id="delivery-price">RM 0.00</span>
@@ -171,12 +182,9 @@
   </main>
 
   <script>
-    // --- 1. EXPANDED MOCK DATA (KL & SELANGOR) ---
+    // --- 1. EXPANDED MOCK DATA ---
     const hubs = [
-      // Primary Hub
       { id: 1, name: "Arabista HQ (Damai Perdana)", address: "15, Jalan Damai Perdana 1/8b, Bandar Damai Perdana", lat: 3.0370, lng: 101.7424, type: "HQ" },
-      
-      // Partners (Scattered)
       { id: 2, name: "Tailor Kak Bedah (Shah Alam)", address: "Jalan Plumbum 7/99, Seksyen 7, Shah Alam", lat: 3.0655, lng: 101.4830, type: "Partner" },
       { id: 3, name: "Tailor Sarah (Wangsa Maju)", address: "Jalan Wangsa Delima, Wangsa Maju", lat: 3.2000, lng: 101.7400, type: "Partner" },
       { id: 4, name: "Butik Jahitan (Bangi)", address: "Seksyen 9, Bandar Baru Bangi", lat: 2.9587, lng: 101.7554, type: "Partner" },
@@ -193,22 +201,25 @@
       { id: 15, name: "Kajang Prima Sew", address: "Jalan KP 1/1, Kajang Prima", lat: 2.9775, lng: 101.8055, type: "Partner" }
     ];
 
-    // Default Customer (Fallback if GPS fails)
-    let customerLat = 3.0300; // Cheras area
-    let customerLng = 101.7600;
+    const timeSlots = ["10:00 AM", "11:00 AM", "12:30 PM", "2:00 PM", "3:30 PM", "5:00 PM", "8:00 PM"];
 
-    // Global State
+    let customerLat = 3.0300; 
+    let customerLng = 101.7600;
     let currentMode = 'walkin';
     let selectedHubId = null;
+    let selectedSlot = null; // New state for time slot
     let deliveryCost = 0;
     let serviceCost = 0;
 
     // --- 2. LOGIC FUNCTIONS ---
 
-    // A. Option 1: Simulate QR Scan
+    // Initialize
+    window.onload = () => {
+        renderTimeSlots();
+    };
+
     function simulateScan() {
         showLoading("Scanning QR...", () => {
-            // Mock Data from QR
             document.getElementById('customer-address').innerText = "Jalan Suakasih, Tun Hussein Onn, 43200 Cheras (From QR)";
             customerLat = 3.0300;
             customerLng = 101.7600;
@@ -217,7 +228,6 @@
         });
     }
 
-    // B. Option 2: Use Real Browser Geolocation
     function useLocation() {
         if (!navigator.geolocation) {
             alert("Geolocation is not supported by your browser.");
@@ -235,13 +245,12 @@
                 },
                 (error) => {
                     alert("Unable to retrieve location. Using demo location (Cheras).");
-                    simulateScan(); // Fallback
+                    simulateScan(); 
                 }
             );
         });
     }
 
-    // Helper: Transition Effect
     function showLoading(msg, callback) {
         const step1 = document.getElementById('step-identify');
         step1.innerHTML = `<div class="py-12"><div class="animate-spin rounded-full h-10 w-10 border-b-2 border-luxe mx-auto mb-4"></div><p>${msg}</p></div>`;
@@ -253,17 +262,11 @@
         document.getElementById('step-options').classList.remove('hidden');
     }
 
-    // C. Render Hubs sorted by distance
     function renderHubs() {
-        // Calculate distance for each hub
         hubs.forEach(hub => {
             hub.distance = getDistanceFromLatLonInKm(customerLat, customerLng, hub.lat, hub.lng);
         });
-
-        // Sort: Nearest first
         hubs.sort((a, b) => a.distance - b.distance);
-
-        // Auto-select the first (nearest)
         selectedHubId = hubs[0].id;
 
         const container = document.getElementById('hub-list');
@@ -287,12 +290,9 @@
             `;
             container.innerHTML += html;
         });
-        
-        // Recalculate Logic
         updateLogistics();
     }
 
-    // D. Select Hub
     function selectHub(id) {
         selectedHubId = id;
         hubs.forEach(hub => {
@@ -306,103 +306,126 @@
         updateLogistics();
     }
 
-    // E. Service Logic (Resize Override)
+    // --- TIME SLOT LOGIC ---
+    function renderTimeSlots() {
+        const container = document.getElementById('slot-container');
+        container.innerHTML = '';
+        timeSlots.forEach(slot => {
+            container.innerHTML += `
+                <button onclick="selectSlot('${slot}')" id="slot-${slot.replace(/ |:/g,'')}" class="text-xs py-2 px-1 rounded-lg border border-white/10 text-white/70 hover:bg-white/10 transition">
+                    ${slot}
+                </button>
+            `;
+        });
+    }
+
+    function selectSlot(time) {
+        selectedSlot = time;
+        // Reset all visuals
+        timeSlots.forEach(slot => {
+             const btn = document.getElementById(`slot-${slot.replace(/ |:/g,'')}`);
+             btn.className = "text-xs py-2 px-1 rounded-lg border border-white/10 text-white/70 hover:bg-white/10 transition";
+        });
+        // Highlight selected
+        const activeBtn = document.getElementById(`slot-${time.replace(/ |:/g,'')}`);
+        activeBtn.className = "text-xs py-2 px-1 rounded-lg border border-luxe bg-luxe text-brand font-bold shadow-lg transition transform scale-105";
+    }
+
     function toggleResize(checkbox) {
         const cb10 = document.getElementById('cb-10');
         const cb15 = document.getElementById('cb-15');
-        
         if (checkbox.checked) {
-            // Uncheck and disable others
             cb10.checked = false;
             cb15.checked = false;
             cb10.disabled = true;
             cb15.disabled = true;
         } else {
-            // Re-enable others
             cb10.disabled = false;
             cb15.disabled = false;
         }
         calculateTotal();
     }
 
-    // F. Logistics Mode Switch
     function setMode(mode) {
         currentMode = mode;
         const btnWalk = document.getElementById('btn-walkin');
         const btnLala = document.getElementById('btn-lalamove');
-        const panel = document.getElementById('lalamove-panel');
+        const panelLala = document.getElementById('lalamove-panel');
+        const panelWalk = document.getElementById('walkin-panel');
 
         if(mode === 'walkin') {
             btnWalk.className = "p-4 rounded-xl border border-luxe bg-luxe/10 text-white text-sm font-medium transition";
             btnLala.className = "p-4 rounded-xl border border-white/10 hover:bg-white/5 text-white/70 text-sm font-medium transition relative overflow-hidden";
-            panel.classList.add('hidden');
+            panelLala.classList.add('hidden');
+            panelWalk.classList.remove('hidden');
             deliveryCost = 0;
         } else {
             btnLala.className = "p-4 rounded-xl border border-orange-500 bg-orange-500/10 text-white text-sm font-medium transition relative overflow-hidden";
             btnWalk.className = "p-4 rounded-xl border border-white/10 hover:bg-white/5 text-white/70 text-sm font-medium transition";
-            panel.classList.remove('hidden');
+            panelLala.classList.remove('hidden');
+            panelWalk.classList.add('hidden');
             updateLogistics();
         }
         calculateTotal();
     }
 
-    // G. Update Lalamove Price (Mock Formula)
     function updateLogistics() {
         if(currentMode !== 'lalamove') return;
-
         const hub = hubs.find(h => h.id === selectedHubId);
         const dist = hub.distance;
-        
-        // Formula: Base RM5 + RM1 per KM
         const price = 5 + (dist * 1.0); 
-        
         deliveryCost = Math.ceil(price);
-        
         document.getElementById('dist-display').innerText = dist.toFixed(1);
         document.getElementById('delivery-price').innerText = "RM " + deliveryCost.toFixed(2);
         calculateTotal();
     }
 
-    // H. Calculate Grand Total
     function calculateTotal() {
         const checkboxes = document.querySelectorAll('input[name="service"]:checked');
         serviceCost = 0;
         checkboxes.forEach((cb) => {
             serviceCost += parseInt(cb.value);
         });
-
         const total = serviceCost + deliveryCost;
         document.getElementById('grand-total').innerText = "RM " + total;
     }
 
-    // I. Submit Order
     function submitOrder() {
         if(serviceCost === 0) {
             alert("Please select at least one alteration service.");
             return;
         }
+        
+        // Walk-in Validation
+        if(currentMode === 'walkin' && !selectedSlot) {
+            alert("Please select a time slot for your walk-in appointment.");
+            return;
+        }
+
         const hub = hubs.find(h => h.id === selectedHubId);
         const trackingID = "ARB-" + Math.floor(Math.random() * 10000);
         
-        alert(`Success! \n\nOrder #${trackingID} Created.\nLocation: ${hub.name}\nMode: ${currentMode.toUpperCase()}\nTotal: RM ${serviceCost + deliveryCost}`);
+        let msg = `Success! \n\nOrder #${trackingID} Created.\nLocation: ${hub.name}\nMode: ${currentMode.toUpperCase()}`;
+        
+        if(currentMode === 'walkin') {
+            msg += `\nTime Slot: ${selectedSlot}`;
+        }
+        
+        msg += `\nTotal: RM ${serviceCost + deliveryCost}`;
+        
+        alert(msg);
     }
 
-    // J. Helper: Haversine Distance
     function getDistanceFromLatLonInKm(lat1,lon1,lat2,lon2) {
-        var R = 6371; // Radius of the earth in km
+        var R = 6371; 
         var dLat = deg2rad(lat2-lat1);
         var dLon = deg2rad(lon2-lon1); 
-        var a = 
-            Math.sin(dLat/2) * Math.sin(dLat/2) +
-            Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * Math.sin(dLon/2) * Math.sin(dLon/2); 
+        var a = Math.sin(dLat/2) * Math.sin(dLat/2) + Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * Math.sin(dLon/2) * Math.sin(dLon/2); 
         var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
-        var d = R * c; // Distance in km
+        var d = R * c; 
         return d;
     }
-
-    function deg2rad(deg) {
-        return deg * (Math.PI/180)
-    }
+    function deg2rad(deg) { return deg * (Math.PI/180) }
   </script>
 </body>
 </html>
