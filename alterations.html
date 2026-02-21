@@ -38,17 +38,15 @@
     .step-active .step-line { background: rgba(192,160,98,0.5); }
     .last-step .step-line { display: none; }
     
-    /* Pricing Strike-through animation */
-    .strike-price { position: relative; display: inline-block; }
-    .strike-price::after {
-        content: ''; position: absolute; left: 0; top: 50%; width: 100%; height: 1px;
-        background: #ef4444; transform: rotate(-10deg);
-    }
-    
-    /* Scrollbar */
     .scrollbar-thin::-webkit-scrollbar { width: 4px; }
     .scrollbar-thin::-webkit-scrollbar-track { background: transparent; }
     .scrollbar-thin::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 10px; }
+
+    /* Input styles for measurements */
+    input[type="number"] { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); color: white; border-radius: 6px; padding: 4px 8px; width: 80px; text-align: center; }
+    input[type="number"]:focus { outline: none; border-color: #C0A062; }
+    /* Hide arrows in number inputs */
+    input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
   </style>
 </head>
 <body class="antialiased selection:bg-luxe selection:text-brand">
@@ -77,7 +75,7 @@
     
     <div class="text-center mb-10">
       <h1 class="font-display text-3xl sm:text-5xl mb-3" data-t="page_title">Alteration & Care</h1>
-      <p class="text-white/60 text-sm sm:text-base" data-t="page_subtitle">Premium after-sales service for your Arabista Abaya.</p>
+      <p class="text-white/60 text-sm sm:text-base" data-t="page_subtitle">Select items from your order to alter.</p>
     </div>
 
     <div class="space-y-0 relative">
@@ -87,68 +85,60 @@
         <div class="absolute left-0 top-0 w-8 h-8 rounded-full border border-luxe bg-brand text-luxe flex items-center justify-center text-sm font-bold z-10">1</div>
         
         <div class="fade-in">
-          <h2 class="text-xl font-display mb-4 text-white" data-t="step1_title">Order Details</h2>
+          <h2 class="text-xl font-display mb-4 text-white" data-t="step1_title">Select Items to Alter</h2>
+          <p class="text-xs text-white/50 mb-4">Order #ORD-2026-8821</p>
           
-          <div class="bg-white/5 border border-white/10 rounded-xl p-5 relative overflow-hidden">
-             <div class="absolute top-0 right-0 bg-luxe text-brand text-[10px] font-bold px-3 py-1 rounded-bl-lg">
-                VERIFIED
-             </div>
+          <div class="grid gap-3" id="order-items-list">
+             <label class="flex items-center gap-4 p-4 border border-white/10 rounded-xl hover:bg-white/5 cursor-pointer transition">
+                <input type="checkbox" name="order-item" value="1" class="w-5 h-5 rounded border-white/30 text-luxe focus:ring-luxe bg-transparent">
+                <div class="w-12 h-16 bg-white/5 rounded overflow-hidden shrink-0">
+                    <img src="images/product-dahlia.png" onerror="this.src='https://via.placeholder.com/48x64?text=Abaya'" class="w-full h-full object-cover opacity-80">
+                </div>
+                <div>
+                    <h3 class="font-display text-lg text-white">Dahlia Series (Black)</h3>
+                    <p class="text-xs text-white/50">Size: XL &bull; Ref: D01</p>
+                </div>
+             </label>
 
-             <div class="flex items-start gap-4 mb-4">
-                <div class="w-16 h-20 bg-white/5 rounded-lg overflow-hidden shrink-0">
-                    <img src="images/product-dahlia.png" onerror="this.src='https://via.placeholder.com/64x80?text=Abaya'" class="w-full h-full object-cover opacity-80">
+             <label class="flex items-center gap-4 p-4 border border-white/10 rounded-xl hover:bg-white/5 cursor-pointer transition">
+                <input type="checkbox" name="order-item" value="2" class="w-5 h-5 rounded border-white/30 text-luxe focus:ring-luxe bg-transparent">
+                <div class="w-12 h-16 bg-white/5 rounded overflow-hidden shrink-0">
+                    <img src="images/product-zahra.png" onerror="this.src='https://via.placeholder.com/48x64?text=Abaya'" class="w-full h-full object-cover opacity-80">
                 </div>
                 <div>
-                    <h3 class="font-display text-lg leading-tight">Dahlia Series (Black)</h3>
-                    <p class="text-sm text-white/60 mt-1">Size: <span class="text-white">XL</span> &bull; Qty: 1</p>
-                    <p class="text-xs text-white/40 mt-0.5">Order ID: #ORD-2026-8821</p>
+                    <h3 class="font-display text-lg text-white">Zahra Nude</h3>
+                    <p class="text-xs text-white/50">Size: M &bull; Ref: Z02</p>
                 </div>
-             </div>
-             
-             <div class="border-t border-white/10 pt-3 grid grid-cols-2 gap-4 text-sm">
-                <div>
-                    <p class="text-xs text-white/40 uppercase tracking-widest mb-1" data-t="label_customer">Customer</p>
-                    <p class="font-medium">Siti Aishah</p>
-                    <p class="text-white/60 text-xs">+6012-345 6789</p>
-                </div>
-                <div>
-                    <p class="text-xs text-white/40 uppercase tracking-widest mb-1" data-t="label_address">Order Address</p>
-                    <p class="text-xs text-white/70 leading-relaxed">No 12, Jalan Suakasih 3/2, Tun Hussein Onn, 43200 Cheras, Selangor.</p>
-                </div>
-             </div>
+             </label>
           </div>
 
           <div class="mt-4 flex justify-end">
-             <button onclick="confirmOrder()" class="bg-luxe text-brand font-bold text-sm px-6 py-2 rounded-lg hover:bg-white transition" data-t="btn_proceed_loc">
-                Proceed to Location
+             <button onclick="confirmItems()" class="bg-luxe text-brand font-bold text-sm px-6 py-2 rounded-lg hover:bg-white transition" data-t="btn_next_loc">
+                Next: Location
              </button>
           </div>
         </div>
       </div>
-
 
       <div id="step-2" class="relative pl-10 pb-12 opacity-30 pointer-events-none transition-opacity duration-500">
         <div class="step-line"></div>
         <div class="absolute left-0 top-0 w-8 h-8 rounded-full border border-white/20 bg-brand text-white/50 flex items-center justify-center text-sm font-bold z-10" id="badge-2">2</div>
         
         <div>
-          <h2 class="text-xl font-display mb-4 text-white" data-t="step2_title">Verify Pickup Location</h2>
-          
+          <h2 class="text-xl font-display mb-4 text-white" data-t="step2_title">Verify Location</h2>
           <div class="grid sm:grid-cols-2 gap-3" id="loc-buttons">
             <button onclick="useOrderAddress()" class="p-4 rounded-xl border border-white/10 hover:border-luxe hover:bg-white/5 transition text-left group">
                 <span class="block text-sm font-bold text-white mb-1 group-hover:text-luxe" data-t="btn_use_order_addr">Use Order Address</span>
                 <span class="block text-xs text-white/50">Tun Hussein Onn, Cheras</span>
             </button>
-
             <button onclick="useGPS()" class="p-4 rounded-xl border border-white/10 hover:border-luxe hover:bg-white/5 transition text-left group">
                 <span class="block text-sm font-bold text-white mb-1 group-hover:text-luxe" data-t="btn_use_gps">Use Current GPS</span>
                 <span class="block text-xs text-white/50" data-t="txt_detecting">Detecting location...</span>
             </button>
           </div>
-          
           <div id="validated-loc" class="hidden mt-2 p-3 bg-luxe/10 border border-luxe/30 rounded-lg flex justify-between items-center">
              <div>
-               <p class="text-xs text-luxe uppercase tracking-widest">Pickup From</p>
+               <p class="text-xs text-luxe uppercase tracking-widest">Base Location</p>
                <p class="text-sm text-white" id="final-address">...</p>
              </div>
              <button onclick="resetLoc()" class="text-xs text-white/50 underline" data-t="btn_change">Change</button>
@@ -156,128 +146,60 @@
         </div>
       </div>
 
-
       <div id="step-3" class="relative pl-10 pb-12 opacity-30 pointer-events-none transition-opacity duration-500">
         <div class="step-line"></div>
         <div class="absolute left-0 top-0 w-8 h-8 rounded-full border border-white/20 bg-brand text-white/50 flex items-center justify-center text-sm font-bold z-10" id="badge-3">3</div>
         
         <div>
-          <h2 class="text-xl font-display mb-4 text-white" data-t="step3_title">Select Services</h2>
+          <h2 class="text-xl font-display mb-4 text-white" data-t="step3_title">Choose Logistics</h2>
           
-          <div class="grid gap-3">
-            
-            <label class="relative overflow-hidden p-5 rounded-xl border border-luxe/50 bg-gradient-to-br from-luxe/20 to-brand cursor-pointer transition hover:border-luxe group">
-                <div class="absolute top-0 right-0 bg-luxe text-brand text-[10px] font-bold px-2 py-1" data-t="badge_best_value">BEST VALUE</div>
-                
-                <div class="flex items-start gap-4">
-                  <div class="pt-1">
-                      <input type="checkbox" id="cb-full" value="45" class="w-5 h-5 rounded border-luxe text-luxe focus:ring-luxe bg-transparent" onchange="toggleFullService(this)">
-                  </div>
-                  <div class="w-full">
-                      <div class="flex justify-between items-center mb-1">
-                          <span class="font-display text-lg text-white" data-t="srv_full_name">Full Resizing Package</span>
-                          <span class="font-display text-xl text-luxe">RM 45</span>
-                      </div>
-                      <p class="text-xs text-white/70 mb-3 pr-8" data-t="srv_full_desc">Complete resizing for perfect fit. Includes all essential alterations.</p>
-                      
-                      <div class="bg-black/40 rounded-lg p-3 text-xs space-y-1 border border-white/5">
-                          <p class="text-white/40 uppercase tracking-widest mb-2" data-t="txt_includes">Includes:</p>
-                          <div class="flex justify-between text-white/60"><span data-t="srv_hem">Shorten Hem</span> <span>RM 15</span></div>
-                          <div class="flex justify-between text-white/60"><span data-t="srv_sleeve">Shorten Sleeves</span> <span>RM 15</span></div>
-                          <div class="flex justify-between text-white/60"><span data-t="srv_width">Take-in Width (Body)</span> <span>RM 25</span></div>
-                          <div class="border-t border-white/10 mt-2 pt-2 flex justify-between font-bold text-luxe">
-                              <span data-t="txt_you_save">You Save</span>
-                              <span>RM 10.00</span>
-                          </div>
-                      </div>
-                  </div>
-                </div>
-            </label>
-
-            <div id="single-services" class="space-y-3 opacity-100 transition-opacity duration-300">
-                <p class="text-xs text-white/40 uppercase tracking-widest mt-2" data-t="label_individual">Or Select Individually</p>
-                
-                <label class="flex items-center justify-between p-4 rounded-xl border border-white/10 hover:bg-white/5 cursor-pointer transition">
-                    <div class="flex items-center gap-3">
-                        <input type="checkbox" name="single" value="15" class="w-5 h-5 rounded border-white/30 text-luxe bg-transparent" onchange="calcTotal()">
-                        <span class="text-sm" data-t="srv_hem">Shorten Hem</span>
-                    </div>
-                    <span class="text-white/60 font-display">RM 15</span>
-                </label>
-
-                <label class="flex items-center justify-between p-4 rounded-xl border border-white/10 hover:bg-white/5 cursor-pointer transition">
-                    <div class="flex items-center gap-3">
-                        <input type="checkbox" name="single" value="15" class="w-5 h-5 rounded border-white/30 text-luxe bg-transparent" onchange="calcTotal()">
-                        <span class="text-sm" data-t="srv_sleeve">Shorten Sleeves</span>
-                    </div>
-                    <span class="text-white/60 font-display">RM 15</span>
-                </label>
-
-                <label class="flex items-center justify-between p-4 rounded-xl border border-white/10 hover:bg-white/5 cursor-pointer transition">
-                    <div class="flex items-center gap-3">
-                        <input type="checkbox" name="single" value="25" class="w-5 h-5 rounded border-white/30 text-luxe bg-transparent" onchange="calcTotal()">
-                        <span class="text-sm" data-t="srv_zipper">Replace Zipper (YKK)</span>
-                    </div>
-                    <span class="text-white/60 font-display">RM 25</span>
-                </label>
-
-                <label class="flex items-center justify-between p-4 rounded-xl border border-white/10 hover:bg-white/5 cursor-pointer transition">
-                    <div class="flex items-center gap-3">
-                        <input type="checkbox" name="single" value="10" class="w-5 h-5 rounded border-white/30 text-luxe bg-transparent" onchange="calcTotal()">
-                        <span class="text-sm" data-t="srv_steam">Steam Ironing</span>
-                    </div>
-                    <span class="text-white/60 font-display">RM 10</span>
-                </label>
-            </div>
+          <div class="grid grid-cols-2 gap-3 mb-4">
+            <button id="btn-walkin" onclick="setMode('walkin')" class="p-4 rounded-xl border border-luxe bg-luxe/10 text-white text-sm font-medium transition" data-t="mode_walkin">Walk-in</button>
+            <button id="btn-lalamove" onclick="setMode('lalamove')" class="p-4 rounded-xl border border-white/10 hover:bg-white/5 text-white/70 text-sm font-medium transition relative overflow-hidden">
+                <span data-t="mode_lalamove">Lalamove</span>
+                <div class="absolute top-0 right-0 bg-orange-500 text-[10px] text-white px-2 py-0.5 font-bold">FAST</div>
+            </button>
           </div>
-          
-          <div class="mt-4 text-right">
-             <button onclick="confirmServices()" class="text-sm font-bold text-white/50 hover:text-white underline" id="btn-srv-next" disabled data-t="btn_next_hub">Select Hub &rarr;</button>
+
+          <div id="hub-list" class="space-y-2 max-h-[200px] overflow-y-auto pr-2 scrollbar-thin mb-4"></div>
+
+          <div id="walkin-panel" class="mb-4 p-4 bg-white/5 border border-white/10 rounded-xl fade-in">
+             <span class="text-xs text-white/60 block mb-3" data-t="label_timeslot">Select Time Slot:</span>
+             <div class="grid grid-cols-4 gap-2" id="slot-container"></div>
+          </div>
+          <div id="lalamove-panel" class="hidden mb-4 p-3 bg-orange-500/10 border border-orange-500/20 rounded-lg flex justify-between items-center fade-in">
+              <span class="text-sm text-orange-200" data-t="label_del_fee">Delivery Fee</span>
+              <span class="font-bold text-white" id="del-price">RM 0.00</span>
+          </div>
+
+          <div class="flex justify-end mt-4">
+              <button onclick="confirmLogistics()" class="text-sm font-bold text-white/50 hover:text-white underline" id="btn-logistics-next" disabled data-t="btn_next_srv">Next: Services &rarr;</button>
           </div>
         </div>
       </div>
-
 
       <div id="step-4" class="relative pl-10 last-step opacity-30 pointer-events-none transition-opacity duration-500">
         <div class="step-line"></div>
         <div class="absolute left-0 top-0 w-8 h-8 rounded-full border border-white/20 bg-brand text-white/50 flex items-center justify-center text-sm font-bold z-10" id="badge-4">4</div>
         
         <div>
-          <h2 class="text-xl font-display mb-4 text-white" data-t="step4_title">Choose Point & Logistics</h2>
+          <h2 class="text-xl font-display mb-1 text-white" data-t="step4_title">Services per Item</h2>
+          <p class="text-xs text-white/50 mb-6" id="measure-instruction" data-t="txt_measure_instruction">Walk-in selected. No measurements needed.</p>
           
-          <div id="hub-list" class="space-y-2 max-h-[250px] overflow-y-auto pr-2 scrollbar-thin mb-6">
-            </div>
-
-          <div id="logistics-panel" class="hidden fade-in">
-              <div class="grid grid-cols-2 gap-3 mb-4">
-                <button id="btn-walkin" onclick="setMode('walkin')" class="p-4 rounded-xl border border-luxe bg-luxe/10 text-white text-sm font-medium transition" data-t="mode_walkin">Walk-in</button>
-                <button id="btn-lalamove" onclick="setMode('lalamove')" class="p-4 rounded-xl border border-white/10 hover:bg-white/5 text-white/70 text-sm font-medium transition relative overflow-hidden">
-                    <span data-t="mode_lalamove">Lalamove</span>
-                    <div class="absolute top-0 right-0 bg-orange-500 text-[10px] text-white px-2 py-0.5 font-bold">FAST</div>
-                </button>
-              </div>
-
-              <div id="walkin-content" class="mb-4">
-                  <p class="text-xs text-white/50 mb-2" data-t="label_timeslot">Select Time Slot:</p>
-                  <div class="grid grid-cols-4 gap-2" id="slot-container"></div>
-              </div>
-              
-              <div id="lalamove-content" class="hidden mb-4 p-3 bg-orange-500/10 border border-orange-500/20 rounded-lg flex justify-between items-center">
-                  <span class="text-sm text-orange-200" data-t="label_del_fee">Delivery Fee</span>
-                  <span class="font-bold text-white" id="del-price">RM 0.00</span>
-              </div>
-          </div>
+          <div id="services-container" class="space-y-6"></div>
 
           <div class="border-t border-white/10 pt-6 mt-6">
               <div class="flex justify-between items-end mb-4">
                   <span class="text-white/50 text-sm" data-t="label_total_est">Total Estimate</span>
-                  <span class="font-display text-4xl text-white" id="grand-total">RM 0</span>
+                  <div class="text-right">
+                      <p class="text-xs text-white/40 mb-1" id="breakdown-text">Delivery: RM0 | Services: RM0</p>
+                      <span class="font-display text-4xl text-white" id="grand-total">RM 0</span>
+                  </div>
               </div>
               <button onclick="submitOrder()" class="w-full bg-white text-brand font-bold py-4 rounded-xl hover:bg-luxe hover:text-white transition shadow-soft" data-t="btn_confirm">
                   Confirm Booking
               </button>
           </div>
-
         </div>
       </div>
 
@@ -285,259 +207,153 @@
   </main>
 
   <script>
-    // --- 1. TRANSLATION ENGINE ---
-    const translations = {
+    // --- TRANSLATIONS ---
+    const t = {
         en: {
-            page_title: "Alteration & Care",
-            page_subtitle: "Premium after-sales service for your Arabista Abaya.",
-            step1_title: "Order Details",
-            label_customer: "Customer",
-            label_address: "Order Address",
-            btn_proceed_loc: "Proceed to Location",
-            step2_title: "Verify Pickup Location",
-            btn_use_order_addr: "Use Order Address",
-            btn_use_gps: "Use Current GPS",
-            txt_detecting: "Detecting location...",
-            btn_change: "Change",
-            step3_title: "Select Services",
-            badge_best_value: "BEST VALUE",
-            srv_full_name: "Full Resizing Package",
-            srv_full_desc: "Complete resizing for perfect fit. Includes all essential alterations.",
-            txt_includes: "Includes:",
-            txt_you_save: "You Save",
-            label_individual: "Or Select Individually",
-            srv_hem: "Shorten Hem",
-            srv_sleeve: "Shorten Sleeves",
-            srv_width: "Take-in Width (Body)",
-            srv_zipper: "Replace Zipper (YKK)",
-            srv_steam: "Steam Ironing",
-            btn_next_hub: "Select Hub &rarr;",
-            step4_title: "Choose Point & Logistics",
-            mode_walkin: "Walk-in",
-            mode_lalamove: "Lalamove",
-            label_timeslot: "Select Time Slot:",
-            label_del_fee: "Delivery Fee",
-            label_total_est: "Total Estimate",
-            btn_confirm: "Confirm Booking"
+            page_title: "Alteration & Care", page_subtitle: "Select items from your order to alter.",
+            step1_title: "Select Items to Alter", btn_next_loc: "Next: Location",
+            step2_title: "Verify Location", btn_use_order_addr: "Use Order Address", btn_use_gps: "Use Current GPS", txt_detecting: "Detecting...", btn_change: "Change",
+            step3_title: "Choose Logistics", mode_walkin: "Walk-in", mode_lalamove: "Lalamove", label_timeslot: "Select Time Slot:", label_del_fee: "Delivery Fee", btn_next_srv: "Next: Services &rarr;",
+            step4_title: "Services & Measurements", txt_measure_walkin: "Walk-in selected. We will measure you in-store.", txt_measure_lala: "Lalamove selected. Please provide measurements below.",
+            srv_full: "Full Body Alteration", srv_hem: "Shorten Hem", srv_sleeve: "Shorten Sleeves", srv_shoulder: "Take-in Shoulders", srv_pads: "Add Shoulder Pads",
+            lbl_length: "Length (inches)", lbl_sleeve: "Sleeves (inches)", lbl_shoulder: "Shoulders (inches)", lbl_pads: "Shoulder Pads (Yes/No)",
+            label_total_est: "Total Estimate", btn_confirm: "Confirm Booking",
+            alert_no_items: "Please select at least one item.", alert_no_hub: "Please select a location.", alert_no_slot: "Please select a time slot.", alert_measure: "Please fill in all required measurements."
         },
         bm: {
-            page_title: "Alterasi & Penjagaan",
-            page_subtitle: "Servis selepas jualan premium untuk Abaya Arabista anda.",
-            step1_title: "Butiran Tempahan",
-            label_customer: "Pelanggan",
-            label_address: "Alamat Tempahan",
-            btn_proceed_loc: "Teruskan ke Lokasi",
-            step2_title: "Sahkan Lokasi Pengambilan",
-            btn_use_order_addr: "Guna Alamat Tempahan",
-            btn_use_gps: "Guna GPS Semasa",
-            txt_detecting: "Mengesan lokasi...",
-            btn_change: "Tukar",
-            step3_title: "Pilih Servis",
-            badge_best_value: "NILAI TERBAIK",
-            srv_full_name: "Pakej Ubah Saiz Penuh",
-            srv_full_desc: "Ubah saiz lengkap untuk keselesaan. Termasuk semua alterasi asas.",
-            txt_includes: "Termasuk:",
-            txt_you_save: "Anda Jimat",
-            label_individual: "Atau Pilih Berasingan",
-            srv_hem: "Potong Labuh Jubah",
-            srv_sleeve: "Potong Labuh Lengan",
-            srv_width: "Kecikkan Badan (Width)",
-            srv_zipper: "Tukar Zip (YKK)",
-            srv_steam: "Servis Gosok Stim",
-            btn_next_hub: "Pilih Lokasi &rarr;",
-            step4_title: "Pilih Lokasi & Logistik",
-            mode_walkin: "Walk-in (Hantar Sendiri)",
-            mode_lalamove: "Lalamove",
-            label_timeslot: "Pilih Masa:",
-            label_del_fee: "Caj Penghantaran",
-            label_total_est: "Anggaran Jumlah",
-            btn_confirm: "Sahkan Tempahan"
+            page_title: "Alterasi & Penjagaan", page_subtitle: "Pilih item dari pesanan anda untuk dialter.",
+            step1_title: "Pilih Item", btn_next_loc: "Seterusnya: Lokasi",
+            step2_title: "Sahkan Lokasi", btn_use_order_addr: "Guna Alamat Tempahan", btn_use_gps: "Guna GPS Semasa", txt_detecting: "Mengesan...", btn_change: "Tukar",
+            step3_title: "Pilih Logistik", mode_walkin: "Walk-in", mode_lalamove: "Lalamove", label_timeslot: "Pilih Masa:", label_del_fee: "Caj Penghantaran", btn_next_srv: "Seterusnya: Servis &rarr;",
+            step4_title: "Servis & Ukuran", txt_measure_walkin: "Walk-in dipilih. Ukuran akan diambil di butik.", txt_measure_lala: "Lalamove dipilih. Sila masukkan ukuran di bawah.",
+            srv_full: "Alter Keseluruhan Baju", srv_hem: "Potong Labuh", srv_sleeve: "Pendekkan Lengan", srv_shoulder: "Kecikkan Bahu", srv_pads: "Tambah Span Bahu",
+            lbl_length: "Labuh (inci)", lbl_sleeve: "Lengan (inci)", lbl_shoulder: "Bahu (inci)", lbl_pads: "Span Bahu (Ya/Tidak)",
+            label_total_est: "Anggaran Jumlah", btn_confirm: "Sahkan Tempahan",
+            alert_no_items: "Sila pilih sekurang-kurangnya satu item.", alert_no_hub: "Sila pilih lokasi.", alert_no_slot: "Sila pilih masa.", alert_measure: "Sila lengkapkan semua ukuran yang diperlukan."
         }
     };
+    let currentLang = 'en';
 
     function setLang(lang) {
-        const t = translations[lang];
+        currentLang = lang;
         document.querySelectorAll('[data-t]').forEach(el => {
             const key = el.getAttribute('data-t');
-            if(t[key]) el.innerText = t[key];
+            if(t[lang][key]) el.innerText = t[lang][key];
         });
         
-        // Update toggle UI
-        const enBtn = document.getElementById('lang-en');
-        const bmBtn = document.getElementById('lang-bm');
-        if(lang === 'en') {
-            enBtn.className = "text-xs font-bold text-luxe";
-            bmBtn.className = "text-xs text-white/50 hover:text-white";
-        } else {
-            bmBtn.className = "text-xs font-bold text-luxe";
-            enBtn.className = "text-xs text-white/50 hover:text-white";
-        }
+        document.getElementById('lang-en').className = lang === 'en' ? "text-xs font-bold text-luxe" : "text-xs text-white/50 hover:text-white";
+        document.getElementById('lang-bm').className = lang === 'bm' ? "text-xs font-bold text-luxe" : "text-xs text-white/50 hover:text-white";
+        
+        updateMeasurementInstruction();
+        renderServices(); // Re-render to update inner labels
     }
 
-    // --- 2. DATA & STATE ---
+    // --- STATE ---
     const hubs = [
       { id: 1, name: "Arabista Damai Perdana", lat: 3.0370, lng: 101.7424 },
       { id: 2, name: "Tailor Kak Bedah (Shah Alam)", lat: 3.0655, lng: 101.4830 },
-      { id: 3, name: "Tailor Sarah (Wangsa Maju)", lat: 3.2000, lng: 101.7400 },
-      { id: 4, name: "Butik Jahitan (Bangi)", lat: 2.9587, lng: 101.7554 },
-      { id: 5, name: "Cyberjaya Stitch", lat: 2.9221, lng: 101.6506 },
-      { id: 6, name: "PJ Alterations (SS2)", lat: 3.1187, lng: 101.6212 },
-      { id: 7, name: "Klang Tailoring", lat: 3.0076, lng: 101.4398 },
-      { id: 8, name: "Gombak Sew", lat: 3.2324, lng: 101.7300 },
-      { id: 9, name: "Ampang Point Tailor", lat: 3.1593, lng: 101.7497 },
-      { id: 10, name: "Subang Jaya (SS15)", lat: 3.0754, lng: 101.5890 }
+      { id: 3, name: "Tailor Sarah (Wangsa Maju)", lat: 3.2000, lng: 101.7400 }
     ];
-
     const timeSlots = ["10:00", "11:30", "14:00", "15:30", "17:00", "20:00"];
     
-    let state = {
-        lat: 0, lng: 0,
-        servicesTotal: 0,
-        deliveryCost: 0,
-        hubId: null,
-        mode: 'walkin',
-        slot: null
+    // Services Definition
+    const servicesDict = {
+        'full': { price: 30, req: ['length', 'sleeve', 'shoulder', 'pads'] },
+        'hem': { price: 12, req: ['length'] },
+        'sleeve': { price: 12, req: ['sleeve'] },
+        'shoulder': { price: 10, req: ['shoulder'] },
+        'pads': { price: 6, req: [] }
     };
 
-    // --- 3. FLOW LOGIC ---
+    let state = {
+        selectedItems: [], // Array of objects: {id, name}
+        lat: 0, lng: 0,
+        mode: 'walkin',
+        hubId: null, hubDist: 0,
+        slot: null,
+        deliveryCost: 0,
+        servicesTotal: 0
+    };
 
-    // STEP 1: Confirm
-    function confirmOrder() {
+    // --- LOGIC ---
+
+    // STEP 1
+    function confirmItems() {
+        const checked = document.querySelectorAll('input[name="order-item"]:checked');
+        if(checked.length === 0) return alert(t[currentLang].alert_no_items);
+        
+        state.selectedItems = [];
+        checked.forEach(cb => {
+            const name = cb.parentElement.querySelector('h3').innerText;
+            state.selectedItems.push({ id: cb.value, name: name });
+        });
+        
         unlockStep(2);
-        // Auto scroll
         document.getElementById('step-2').scrollIntoView({behavior: 'smooth', block: 'center'});
     }
 
-    // STEP 2: Location
-    function useOrderAddress() {
-        state.lat = 3.0300; // Mock Cheras
-        state.lng = 101.7600;
-        showLocSuccess("Tun Hussein Onn, Cheras");
-    }
-
+    // STEP 2
+    function useOrderAddress() { state.lat = 3.0300; state.lng = 101.7600; showLocSuccess("Tun Hussein Onn, Cheras"); }
     function useGPS() {
         if(!navigator.geolocation) return alert("Geo not supported");
         navigator.geolocation.getCurrentPosition(
-            (pos) => {
-                state.lat = pos.coords.latitude;
-                state.lng = pos.coords.longitude;
-                showLocSuccess(`GPS: ${state.lat.toFixed(4)}, ${state.lng.toFixed(4)}`);
-            },
+            (pos) => { state.lat = pos.coords.latitude; state.lng = pos.coords.longitude; showLocSuccess(`GPS: ${state.lat.toFixed(4)}, ${state.lng.toFixed(4)}`); },
             () => { alert("Failed. Using Order Address."); useOrderAddress(); }
         );
     }
-
     function showLocSuccess(addr) {
         document.getElementById('loc-buttons').classList.add('hidden');
         document.getElementById('validated-loc').classList.remove('hidden');
         document.getElementById('final-address').innerText = addr;
         unlockStep(3);
+        renderHubs(); renderSlots();
     }
-
     function resetLoc() {
         document.getElementById('loc-buttons').classList.remove('hidden');
         document.getElementById('validated-loc').classList.add('hidden');
         lockStep(3); lockStep(4);
     }
 
-    // STEP 3: Services
-    function toggleFullService(cb) {
-        const singles = document.getElementsByName('single');
-        const container = document.getElementById('single-services');
-        
-        if(cb.checked) {
-            container.classList.add('opacity-50', 'pointer-events-none');
-            singles.forEach(s => s.checked = false);
-            state.servicesTotal = 45;
-        } else {
-            container.classList.remove('opacity-50', 'pointer-events-none');
-            state.servicesTotal = 0;
-        }
-        updateSrvUI();
-    }
-
-    function calcTotal() {
-        const singles = document.getElementsByName('single');
-        let total = 0;
-        singles.forEach(s => { if(s.checked) total += parseInt(s.value); });
-        state.servicesTotal = total;
-        updateSrvUI();
-    }
-
-    function updateSrvUI() {
-        const btn = document.getElementById('btn-srv-next');
-        if(state.servicesTotal > 0) {
-            btn.disabled = false;
-            btn.classList.replace('text-white/50', 'text-luxe');
-        } else {
-            btn.disabled = true;
-            btn.classList.replace('text-luxe', 'text-white/50');
-        }
-        updateGrandTotal();
-    }
-
-    function confirmServices() {
-        renderHubs();
-        unlockStep(4);
-    }
-
-    // STEP 4: Hubs & Logistics
+    // STEP 3
     function renderHubs() {
         hubs.forEach(h => h.dist = getDist(state.lat, state.lng, h.lat, h.lng));
         hubs.sort((a,b) => a.dist - b.dist);
-        
         const list = document.getElementById('hub-list');
         list.innerHTML = '';
-        
         hubs.forEach(h => {
             list.innerHTML += `
-            <div onclick="selectHub(${h.id}, ${h.dist})" id="hub-${h.id}" class="p-3 rounded-lg border border-white/10 hover:bg-white/5 cursor-pointer flex justify-between items-center group transition">
-                <span class="text-sm text-white/80 group-hover:text-white">${h.name}</span>
+            <div onclick="selectHub(${h.id}, ${h.dist})" id="hub-${h.id}" class="p-3 rounded-lg border border-white/10 hover:bg-white/5 cursor-pointer flex justify-between items-center transition">
+                <span class="text-sm text-white/80">${h.name}</span>
                 <span class="text-xs font-bold text-luxe">${h.dist.toFixed(1)} km</span>
             </div>`;
         });
     }
-
     function selectHub(id, dist) {
-        state.hubId = id;
-        state.hubDist = dist;
-        
-        // Highlight logic
+        state.hubId = id; state.hubDist = dist;
         hubs.forEach(h => {
-            const el = document.getElementById(`hub-${h.id}`);
-            el.className = (h.id === id) 
+            document.getElementById(`hub-${h.id}`).className = (h.id === id) 
                 ? "p-3 rounded-lg border border-luxe bg-luxe/10 flex justify-between items-center transition"
                 : "p-3 rounded-lg border border-white/10 opacity-50 flex justify-between items-center transition";
         });
-
-        document.getElementById('logistics-panel').classList.remove('hidden');
-        renderSlots();
-        updateLogisticsCost();
+        updateLogisticsCost(); checkStep3Complete();
     }
-
     function renderSlots() {
         const div = document.getElementById('slot-container');
-        if(div.innerHTML !== "") return; // Don't re-render
-        timeSlots.forEach(t => {
-            div.innerHTML += `<button onclick="setSlot('${t}')" id="slot-${t.replace(':','')}" class="text-xs py-2 border border-white/10 rounded hover:bg-white/10 text-white/60">${t}</button>`;
+        if(div.innerHTML !== "") return;
+        timeSlots.forEach(time => {
+            div.innerHTML += `<button onclick="setSlot('${time}')" id="slot-${time.replace(':','')}" class="text-xs py-2 border border-white/10 rounded hover:bg-white/10 text-white/60">${time}</button>`;
         });
     }
-
-    function setSlot(t) {
-        state.slot = t;
-        timeSlots.forEach(s => {
-             document.getElementById(`slot-${s.replace(':','')}`).className = "text-xs py-2 border border-white/10 rounded hover:bg-white/10 text-white/60";
-        });
-        document.getElementById(`slot-${t.replace(':','')}`).className = "text-xs py-2 border border-luxe bg-luxe text-brand font-bold rounded";
+    function setSlot(time) {
+        state.slot = time;
+        timeSlots.forEach(s => document.getElementById(`slot-${s.replace(':','')}`).className = "text-xs py-2 border border-white/10 rounded hover:bg-white/10 text-white/60");
+        document.getElementById(`slot-${time.replace(':','')}`).className = "text-xs py-2 border border-luxe bg-luxe text-brand font-bold rounded";
+        checkStep3Complete();
     }
-
     function setMode(m) {
         state.mode = m;
-        const w = document.getElementById('btn-walkin');
-        const l = document.getElementById('btn-lalamove');
-        const wc = document.getElementById('walkin-content');
-        const lc = document.getElementById('lalamove-content');
-
+        const w = document.getElementById('btn-walkin'); const l = document.getElementById('btn-lalamove');
+        const wc = document.getElementById('walkin-panel'); const lc = document.getElementById('lalamove-panel');
         if(m === 'walkin') {
             w.classList.replace('border-white/10', 'border-luxe'); w.classList.add('bg-luxe/10');
             l.classList.replace('border-orange-500', 'border-white/10'); l.classList.remove('bg-orange-500/10');
@@ -549,22 +365,176 @@
             lc.classList.remove('hidden'); wc.classList.add('hidden');
             updateLogisticsCost();
         }
-        updateGrandTotal();
+        updateMeasurementInstruction();
+        renderServices(); // Re-render step 4 based on mode
+        checkStep3Complete(); calculateTotal();
     }
-
     function updateLogisticsCost() {
-        if(state.mode === 'lalamove' && state.hubDist) {
-            const price = 5 + (state.hubDist * 1.0);
-            state.deliveryCost = Math.ceil(price);
+        if(state.mode === 'lalamove' && state.hubId) {
+            state.deliveryCost = Math.ceil(5 + (state.hubDist * 1.0));
             document.getElementById('del-price').innerText = "RM " + state.deliveryCost.toFixed(2);
+        } else { state.deliveryCost = 0; }
+        calculateTotal();
+    }
+    function checkStep3Complete() {
+        const btn = document.getElementById('btn-logistics-next');
+        if(state.hubId && (state.mode === 'lalamove' || (state.mode === 'walkin' && state.slot))) {
+            btn.disabled = false; btn.classList.replace('text-white/50', 'text-luxe');
         } else {
-            state.deliveryCost = 0;
+            btn.disabled = true; btn.classList.replace('text-luxe', 'text-white/50');
         }
-        updateGrandTotal();
+    }
+    function confirmLogistics() {
+        updateMeasurementInstruction();
+        renderServices();
+        unlockStep(4);
+        document.getElementById('step-4').scrollIntoView({behavior: 'smooth', block: 'start'});
     }
 
-    function updateGrandTotal() {
+    // STEP 4 - DYNAMIC PER-ITEM SERVICES
+    function updateMeasurementInstruction() {
+        const el = document.getElementById('measure-instruction');
+        el.innerText = state.mode === 'walkin' ? t[currentLang].txt_measure_walkin : t[currentLang].txt_measure_lala;
+        if(state.mode === 'lalamove') el.classList.replace('text-white/50', 'text-luxe');
+        else el.classList.replace('text-luxe', 'text-white/50');
+    }
+
+    function renderServices() {
+        const container = document.getElementById('services-container');
+        // Only generate HTML if empty, to preserve user selections when toggling lang
+        if(container.innerHTML !== "" && !container.dataset.needsRender) {
+             // Just update text via data-t if already rendered
+             return; 
+        }
+        
+        container.innerHTML = '';
+        state.selectedItems.forEach(item => {
+            const block = document.createElement('div');
+            block.className = "bg-white/5 border border-white/10 rounded-xl overflow-hidden";
+            
+            // Header
+            const header = `<div class="bg-black/20 p-4 border-b border-white/5 font-display text-lg">${item.name}</div>`;
+            
+            // Body
+            const body = `
+            <div class="p-4 space-y-3">
+                <div class="border border-white/10 rounded-lg p-3 hover:border-luxe/50 transition">
+                    <label class="flex items-start gap-3 cursor-pointer mb-2">
+                        <input type="checkbox" id="cb-${item.id}-full" value="30" class="mt-1 w-4 h-4 rounded border-white/30 text-luxe bg-transparent srv-cb" onchange="handleSrvCheck('${item.id}', 'full')">
+                        <div class="flex-1 flex justify-between">
+                            <span class="text-sm font-medium" data-t="srv_full">${t[currentLang].srv_full}</span>
+                            <span class="text-luxe font-bold">RM 30</span>
+                        </div>
+                    </label>
+                    <div id="meas-${item.id}-full" class="hidden pl-7 pt-2 grid grid-cols-2 gap-2 text-xs">
+                        <input type="number" placeholder="${t[currentLang].lbl_length}" class="req-${item.id}-full">
+                        <input type="number" placeholder="${t[currentLang].lbl_sleeve}" class="req-${item.id}-full">
+                        <input type="number" placeholder="${t[currentLang].lbl_shoulder}" class="req-${item.id}-full">
+                        <select class="req-${item.id}-full bg-white/5 border border-white/20 rounded p-1 text-white"><option value="">${t[currentLang].lbl_pads}</option><option>Yes</option><option>No</option></select>
+                    </div>
+                </div>
+                <div class="border border-white/10 rounded-lg p-3 hover:border-luxe/50 transition opacity-100" id="wrap-${item.id}-hem">
+                    <label class="flex items-start gap-3 cursor-pointer">
+                        <input type="checkbox" id="cb-${item.id}-hem" value="12" class="mt-1 w-4 h-4 rounded border-white/30 text-luxe bg-transparent srv-cb" onchange="handleSrvCheck('${item.id}', 'hem')">
+                        <div class="flex-1 flex justify-between">
+                            <span class="text-sm" data-t="srv_hem">${t[currentLang].srv_hem}</span>
+                            <span class="text-white/60">RM 12</span>
+                        </div>
+                    </label>
+                    <div id="meas-${item.id}-hem" class="hidden pl-7 pt-2"><input type="number" placeholder="${t[currentLang].lbl_length}" class="req-${item.id}-hem text-xs w-full"></div>
+                </div>
+                <div class="border border-white/10 rounded-lg p-3 hover:border-luxe/50 transition" id="wrap-${item.id}-sleeve">
+                    <label class="flex items-start gap-3 cursor-pointer">
+                        <input type="checkbox" id="cb-${item.id}-sleeve" value="12" class="mt-1 w-4 h-4 rounded border-white/30 text-luxe bg-transparent srv-cb" onchange="handleSrvCheck('${item.id}', 'sleeve')">
+                        <div class="flex-1 flex justify-between">
+                            <span class="text-sm" data-t="srv_sleeve">${t[currentLang].srv_sleeve}</span>
+                            <span class="text-white/60">RM 12</span>
+                        </div>
+                    </label>
+                    <div id="meas-${item.id}-sleeve" class="hidden pl-7 pt-2"><input type="number" placeholder="${t[currentLang].lbl_sleeve}" class="req-${item.id}-sleeve text-xs w-full"></div>
+                </div>
+                <div class="border border-white/10 rounded-lg p-3 hover:border-luxe/50 transition" id="wrap-${item.id}-shoulder">
+                    <label class="flex items-start gap-3 cursor-pointer">
+                        <input type="checkbox" id="cb-${item.id}-shoulder" value="10" class="mt-1 w-4 h-4 rounded border-white/30 text-luxe bg-transparent srv-cb" onchange="handleSrvCheck('${item.id}', 'shoulder')">
+                        <div class="flex-1 flex justify-between">
+                            <span class="text-sm" data-t="srv_shoulder">${t[currentLang].srv_shoulder}</span>
+                            <span class="text-white/60">RM 10</span>
+                        </div>
+                    </label>
+                    <div id="meas-${item.id}-shoulder" class="hidden pl-7 pt-2"><input type="number" placeholder="${t[currentLang].lbl_shoulder}" class="req-${item.id}-shoulder text-xs w-full"></div>
+                </div>
+                <div class="border border-white/10 rounded-lg p-3 hover:border-luxe/50 transition">
+                    <label class="flex items-start gap-3 cursor-pointer">
+                        <input type="checkbox" id="cb-${item.id}-pads" value="6" class="mt-1 w-4 h-4 rounded border-white/30 text-luxe bg-transparent srv-cb" onchange="handleSrvCheck('${item.id}', 'pads')">
+                        <div class="flex-1 flex justify-between">
+                            <span class="text-sm" data-t="srv_pads">${t[currentLang].srv_pads}</span>
+                            <span class="text-white/60">RM 6</span>
+                        </div>
+                    </label>
+                </div>
+            </div>`;
+            block.innerHTML = header + body;
+            container.appendChild(block);
+        });
+        container.dataset.needsRender = false;
+    }
+
+    function handleSrvCheck(itemId, srvId) {
+        const cb = document.getElementById(`cb-${itemId}-${srvId}`);
+        const measDiv = document.getElementById(`meas-${itemId}-${srvId}`);
+        
+        // Show/Hide measurements if Lalamove
+        if(measDiv) {
+            if(cb.checked && state.mode === 'lalamove') measDiv.classList.remove('hidden');
+            else measDiv.classList.add('hidden');
+        }
+
+        // Logic: Full body disables sub-parts
+        if(srvId === 'full') {
+            ['hem', 'sleeve', 'shoulder'].forEach(sub => {
+                const subCb = document.getElementById(`cb-${itemId}-${sub}`);
+                const subWrap = document.getElementById(`wrap-${itemId}-${sub}`);
+                if(cb.checked) {
+                    subCb.checked = false; subCb.disabled = true;
+                    subWrap.classList.add('opacity-40', 'pointer-events-none');
+                    document.getElementById(`meas-${itemId}-${sub}`)?.classList.add('hidden');
+                } else {
+                    subCb.disabled = false;
+                    subWrap.classList.remove('opacity-40', 'pointer-events-none');
+                }
+            });
+        }
+        calculateTotal();
+    }
+
+    function calculateTotal() {
+        state.servicesTotal = 0;
+        document.querySelectorAll('.srv-cb:checked').forEach(cb => {
+            state.servicesTotal += parseInt(cb.value);
+        });
+        document.getElementById('breakdown-text').innerText = `Delivery: RM ${state.deliveryCost} | Services: RM ${state.servicesTotal}`;
         document.getElementById('grand-total').innerText = "RM " + (state.servicesTotal + state.deliveryCost);
+    }
+
+    function submitOrder() {
+        if(!state.hubId) return alert(t[currentLang].alert_no_hub);
+        if(state.servicesTotal === 0) return alert("Please select at least one service.");
+        
+        // Validate measurements if Lalamove
+        if(state.mode === 'lalamove') {
+            let valid = true;
+            document.querySelectorAll('.srv-cb:checked').forEach(cb => {
+                const parts = cb.id.split('-'); // cb-1-full
+                const itemId = parts[1]; const srvId = parts[2];
+                const inputs = document.querySelectorAll(`.req-${itemId}-${srvId}`);
+                inputs.forEach(input => {
+                    if(input.value.trim() === '') valid = false;
+                });
+            });
+            if(!valid) return alert(t[currentLang].alert_measure);
+        }
+
+        alert(t[currentLang].btn_confirm + "!\nTotal: RM " + (state.servicesTotal + state.deliveryCost));
     }
 
     // --- HELPERS ---
@@ -574,19 +544,18 @@
         document.getElementById(`badge-${n}`).classList.replace('border-white/20', 'border-luxe');
         document.getElementById(`badge-${n}`).classList.replace('text-white/50', 'text-luxe');
     }
-    function lockStep(n) {
-        document.getElementById(`step-${n}`).classList.add('opacity-30', 'pointer-events-none');
-    }
-    function submitOrder() {
-        if(!state.hubId) return alert("Select a location");
-        alert("Booking Confirmed! \nTotal: RM " + (state.servicesTotal + state.deliveryCost));
-    }
+    function lockStep(n) { document.getElementById(`step-${n}`).classList.add('opacity-30', 'pointer-events-none'); }
     function getDist(lat1,lon1,lat2,lon2) {
         var R=6371, dLat=d2r(lat2-lat1), dLon=d2r(lon2-lon1);
         var a=Math.sin(dLat/2)*Math.sin(dLat/2)+Math.cos(d2r(lat1))*Math.cos(d2r(lat2))*Math.sin(dLon/2)*Math.sin(dLon/2);
         return R*(2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a)));
     }
     function d2r(d){return d*(Math.PI/180)}
+
+    // Ensure state render on toggle if step 4 is active
+    document.getElementById('lang-en').addEventListener('click', () => { if(!document.getElementById('step-4').classList.contains('opacity-30')){ document.getElementById('services-container').dataset.needsRender = true; renderServices(); } });
+    document.getElementById('lang-bm').addEventListener('click', () => { if(!document.getElementById('step-4').classList.contains('opacity-30')){ document.getElementById('services-container').dataset.needsRender = true; renderServices(); } });
+
   </script>
 </body>
 </html>
