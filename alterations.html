@@ -837,10 +837,11 @@
         closeModal();
     }
 
-    function submitOrder() {
+    async function submitOrder() {
         if(!state.hubId) return alert(t[currentLang].alert_no_hub);
         if(state.servicesTotal === 0) return alert("Please select at least one service.");
         
+        // 1. Validation Logic
         if(state.mode === 'lalamove') {
             let valid = true;
             state.selectedItems.forEach(item => {
@@ -854,7 +855,71 @@
             if(!valid) return alert(t[currentLang].alert_measure);
         }
 
-        alert(t[currentLang].btn_confirm + " Successful!\nTotal: RM " + (state.servicesTotal + state.deliveryCost));
+        // Change button to show loading state
+        const btn = document.querySelector('button[onclick="submitOrder()"]');
+        const originalText = btn.innerText;
+        btn.innerText = "Processing...";
+        btn.disabled = true;
+
+        // 2. Format the Item Details for the spreadsheet
+        let itemDetailsStr = "";
+        state.selectedItems.forEach(item => {
+            let servicesArr = [];
+            const m = state.measurements[item.id];
+            
+            if(document.getElementById(`cb-${item.id}-full`)?.checked) {
+                servicesArr.push(`Full Body (L:${m.length || '-'} S:${m.sleeve || '-'} Sh:${m.shoulder || '-'} Pads:${m.pads || '-'})`);
+            } else {
+                if(document.getElementById(`cb-${item.id}-hem`)?.checked) servicesArr.push(`Hem (L:${m.length})`);
+                if(document.getElementById(`cb-${item.id}-sleeve`)?.checked) servicesArr.push(`Sleeves (S:${m.sleeve})`);
+                if(document.getElementById(`cb-${item.id}-shoulder`)?.checked) servicesArr.push(`Shoulders (Sh:${m.shoulder})`);
+                if(document.getElementById(`cb-${item.id}-pads`)?.checked) servicesArr.push(`Pads`);
+            }
+            itemDetailsStr += `[${item.name} | Size: ${item.size}] -> ${servicesArr.join(', ')}\n`;
+        });
+
+        // 3. Package the payload exactly matching the Google Sheet columns
+        const hubData = hubs.find(h => h.id === state.hubId);
+        
+        const payload = {
+            Order_Type: state.path === 'A' ? "Website" : "Public",
+            Order_Ref: state.path === 'A' ? document.getElementById('order-id-display').innerText : "Manual",
+            Customer_Name: state.path === 'A' ? "Online Customer (System DB)" : document.getElementById('manual-cust-name').value.trim(),
+            Phone_No: state.path === 'A' ? "Online Customer (System DB)" : document.getElementById('manual-cust-phone').value.trim(),
+            Base_Location: document.getElementById('final-address').innerText,
+            Logistics_Mode: state.mode === 'walkin' ? "Walk-in" : "Lalamove",
+            Hub_Name: hubData.name,
+            Time_Slot: state.mode === 'walkin' ? state.slot : "N/A",
+            Delivery_Fee: "RM " + state.deliveryCost,
+            Services_Total: "RM " + state.servicesTotal,
+            Grand_Total: "RM " + (state.servicesTotal + state.deliveryCost),
+            Item_Details: itemDetailsStr.trim()
+        };
+
+        // 4. Send to Google Apps Script
+        // !--- PASTE YOUR WEB APP URL BELOW ---!
+        const scriptURL = 'https://script.google.com/macros/s/AKfycbyrJFfuCrhAbdwzAj8uP4sSvFuzRzzzEFV5CHOCBSOK6OGlIXPtsf7-XEfjLHGnFZiyvw/exec'; 
+
+        try {
+            const response = await fetch(scriptURL, {
+                method: 'POST',
+                // Using no-cors avoids browser security blocks when sending to Google Apps Script
+                mode: 'no-cors', 
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            alert(t[currentLang].btn_confirm + " Successful!\nWe have received your alteration request.");
+            
+            // Reload page to reset state after successful submission
+            window.location.reload();
+
+        } catch (error) {
+            console.error('Error!', error.message);
+            alert("Connection error. Please try again.");
+            btn.innerText = originalText;
+            btn.disabled = false;
+        }
     }
 
     function unlockStep(n) { document.getElementById(`step-${n}`).classList.remove('opacity-30', 'pointer-events-none'); document.getElementById(`badge-${n}`).classList.replace('border-white/20', 'border-luxe'); document.getElementById(`badge-${n}`).classList.replace('text-white/50', 'text-luxe'); }
