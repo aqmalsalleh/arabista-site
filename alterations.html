@@ -88,7 +88,7 @@
           
           <div class="grid gap-3" id="order-items-list">
              <label class="flex items-center gap-4 p-4 border border-white/10 rounded-xl hover:bg-white/5 cursor-pointer transition">
-                <input type="checkbox" name="order-item" value="1" class="w-5 h-5 rounded border-white/30 text-luxe focus:ring-luxe bg-transparent">
+                <input type="checkbox" name="order-item" value="1" onchange="syncItems()" class="w-5 h-5 rounded border-white/30 text-luxe focus:ring-luxe bg-transparent">
                 <div class="w-12 h-16 bg-white/5 rounded overflow-hidden shrink-0">
                     <img src="images/product-dahlia.png" onerror="this.src='https://via.placeholder.com/48x64?text=Abaya'" class="w-full h-full object-cover opacity-80">
                 </div>
@@ -99,7 +99,7 @@
              </label>
 
              <label class="flex items-center gap-4 p-4 border border-white/10 rounded-xl hover:bg-white/5 cursor-pointer transition">
-                <input type="checkbox" name="order-item" value="2" class="w-5 h-5 rounded border-white/30 text-luxe focus:ring-luxe bg-transparent">
+                <input type="checkbox" name="order-item" value="2" onchange="syncItems()" class="w-5 h-5 rounded border-white/30 text-luxe focus:ring-luxe bg-transparent">
                 <div class="w-12 h-16 bg-white/5 rounded overflow-hidden shrink-0">
                     <img src="images/product-zahra.png" onerror="this.src='https://via.placeholder.com/48x64?text=Abaya'" class="w-full h-full object-cover opacity-80">
                 </div>
@@ -230,13 +230,14 @@
             step2_title: "Verify Location", btn_use_order_addr: "Use Order Address", btn_use_gps: "Use Current GPS", txt_detecting: "Detecting...", btn_change: "Change",
             step3_title: "Choose Logistics", mode_walkin: "Walk-in", mode_lalamove: "Lalamove", label_timeslot: "Select Time Slot:", label_del_fee: "Delivery Fee", btn_next_srv: "Next: Services",
             step4_title: "Services & Measurements", txt_measure_walkin: "Walk-in selected. We will measure you in-store.", txt_measure_lala: "Lalamove selected. Please provide measurements.",
-            srv_full: "Full Body Alteration", srv_hem: "Shorten Hem", srv_sleeve: "Shorten Sleeves", srv_shoulder: "Take-in Shoulders", srv_pads: "Add Shoulder Pads",
+            srv_full: "Full Body Alteration", srv_hem: "Alter Length", srv_sleeve: "Alter Sleeves", srv_shoulder: "Alter Shoulders", srv_pads: "Add Shoulder Pads",
             lbl_length: "Length (inches)", lbl_sleeve: "Sleeves (inches)", lbl_shoulder: "Shoulders (inches)", lbl_pads: "Shoulder Pads",
             label_total_est: "Total Estimate", btn_confirm: "Confirm Booking",
             txt_value: "Value", txt_yousave: "You Save",
             btn_add_meas: "Add Measurements (Required)", btn_edit_meas: "Measurements Saved (Edit)",
             modal_title: "Provide Measurements", btn_cancel: "Cancel", btn_save: "Save",
-            alert_no_items: "Please select at least one item.", alert_no_hub: "Please select a location.", alert_no_slot: "Please select a time slot.", alert_measure: "Please fill in measurements for all required items."
+            alert_no_items: "Please select at least one item.", alert_no_hub: "Please select a location.", alert_no_slot: "Please select a time slot.", alert_measure: "Please fill in measurements for all required items.",
+            alert_max: "must be strictly less than original size"
         },
         bm: {
             page_title: "Alterasi & Penjagaan", page_subtitle: "Pilih item dari pesanan anda untuk dialter.",
@@ -244,13 +245,14 @@
             step2_title: "Sahkan Lokasi", btn_use_order_addr: "Guna Alamat Tempahan", btn_use_gps: "Guna GPS Semasa", txt_detecting: "Mengesan...", btn_change: "Tukar",
             step3_title: "Pilih Logistik", mode_walkin: "Walk-in", mode_lalamove: "Lalamove", label_timeslot: "Pilih Masa:", label_del_fee: "Caj Penghantaran", btn_next_srv: "Seterusnya: Servis",
             step4_title: "Servis & Ukuran", txt_measure_walkin: "Walk-in dipilih. Ukuran akan diambil di butik.", txt_measure_lala: "Lalamove dipilih. Sila masukkan ukuran.",
-            srv_full: "Alter Keseluruhan Baju", srv_hem: "Potong Labuh", srv_sleeve: "Pendekkan Lengan", srv_shoulder: "Kecikkan Bahu", srv_pads: "Tambah Span Bahu",
+            srv_full: "Alter Keseluruhan Baju", srv_hem: "Alter Labuh", srv_sleeve: "Alter Lengan", srv_shoulder: "Alter Bahu", srv_pads: "Tambah Span Bahu",
             lbl_length: "Labuh (inci)", lbl_sleeve: "Lengan (inci)", lbl_shoulder: "Bahu (inci)", lbl_pads: "Span Bahu",
             label_total_est: "Anggaran Jumlah", btn_confirm: "Sahkan Tempahan",
             txt_value: "Nilai", txt_yousave: "Anda Jimat",
             btn_add_meas: "Masukkan Ukuran (Wajib)", btn_edit_meas: "Ukuran Disimpan (Ubah)",
             modal_title: "Masukkan Ukuran", btn_cancel: "Batal", btn_save: "Simpan",
-            alert_no_items: "Sila pilih sekurang-kurangnya satu item.", alert_no_hub: "Sila pilih lokasi.", alert_no_slot: "Sila pilih masa.", alert_measure: "Sila lengkapkan semua ukuran yang diperlukan."
+            alert_no_items: "Sila pilih sekurang-kurangnya satu item.", alert_no_hub: "Sila pilih lokasi.", alert_no_slot: "Sila pilih masa.", alert_measure: "Sila lengkapkan semua ukuran yang diperlukan.",
+            alert_max: "mesti kurang dari saiz asal"
         }
     };
     let currentLang = 'en';
@@ -269,7 +271,17 @@
         }
     }
 
-    // --- STATE ---
+    // --- STATE & SIZE CHART ---
+    const sizeChart = {
+        'XS': { length: 55, sleeve: 22, shoulder: 14 },
+        'S': { length: 55, sleeve: 22, shoulder: 15 },
+        'M': { length: 57, sleeve: 23, shoulder: 16 },
+        'L': { length: 60, sleeve: 23.5, shoulder: 16.5 },
+        'XL': { length: 60, sleeve: 23.5, shoulder: 17.5 },
+        'XXL': { length: 60, sleeve: 23.5, shoulder: 18 },
+        'XXXL': { length: 60, sleeve: 23.5, shoulder: 19 }
+    };
+
     const hubs = [
       { id: 1, name: "Arabista Damai Perdana", lat: 3.0370, lng: 101.7424 },
       { id: 2, name: "Tailor Kak Bedah (Shah Alam)", lat: 3.0655, lng: 101.4830 },
@@ -287,16 +299,37 @@
 
     // --- LOGIC ---
 
-    // STEP 1
-    function confirmItems() {
+    // STEP 1: Sync dynamic changes instantly
+    function syncItems() {
         const checked = document.querySelectorAll('input[name="order-item"]:checked');
-        if(checked.length === 0) return alert(t[currentLang].alert_no_items);
-        state.selectedItems = [];
+        const newSelected = [];
+        
         checked.forEach(cb => {
             const name = cb.parentElement.querySelector('h3').innerText;
-            state.selectedItems.push({ id: cb.value, name: name });
+            const sizeStr = cb.parentElement.querySelector('p').innerText;
+            const sizeMatch = sizeStr.match(/Size:\s*([A-Z]+)/i);
+            const size = sizeMatch ? sizeMatch[1].toUpperCase() : 'M';
+            
+            newSelected.push({ id: cb.value, name: name, size: size });
             if(!state.measurements[cb.value]) state.measurements[cb.value] = { length:'', sleeve:'', shoulder:'', pads:'' };
         });
+        
+        state.selectedItems = newSelected;
+        
+        // If Step 4 is already active, instantly update it
+        if(!document.getElementById('step-4').classList.contains('opacity-30')) {
+            document.getElementById('services-container').dataset.needsRender = "true";
+            renderServices();
+            if(state.selectedItems.length === 0) {
+                document.getElementById('services-container').innerHTML = '<p class="text-white/50 text-sm py-4">No items selected. Please select items in Step 1.</p>';
+            }
+            calculateTotal();
+        }
+    }
+
+    function confirmItems() {
+        syncItems();
+        if(state.selectedItems.length === 0) return alert(t[currentLang].alert_no_items);
         unlockStep(2); document.getElementById('step-2').scrollIntoView({behavior: 'smooth', block: 'center'});
     }
 
@@ -384,17 +417,17 @@
     function renderServices() {
         const container = document.getElementById('services-container');
         if(container.innerHTML !== "" && !container.dataset.needsRender) return; 
+        if(state.selectedItems.length === 0) return;
         
         container.innerHTML = '';
         state.selectedItems.forEach(item => {
             const block = document.createElement('div');
             block.className = "bg-white/5 border border-white/10 rounded-xl overflow-hidden relative";
             
-            const header = `<div class="bg-black/30 p-4 border-b border-white/5 font-display text-lg">${item.name}</div>`;
+            const header = `<div class="bg-black/30 p-4 border-b border-white/5 font-display text-lg flex justify-between"><span class="text-white">${item.name}</span><span class="text-xs font-sans text-luxe border border-luxe/30 px-2 py-0.5 rounded">Size: ${item.size}</span></div>`;
             
             const body = `
             <div class="p-4 space-y-3">
-                
                 <div class="border border-luxe/50 rounded-lg p-4 bg-gradient-to-br from-luxe/10 to-transparent hover:border-luxe transition relative group">
                     <div class="absolute -top-2.5 right-4 bg-luxe text-brand text-[9px] font-bold px-2 py-0.5 rounded shadow-lg uppercase tracking-wider" data-t="txt_value">${t[currentLang].txt_value} RM 40 | ${t[currentLang].txt_yousave} RM 10</div>
                     <label class="flex items-start gap-3 cursor-pointer">
@@ -444,8 +477,6 @@
             </div>`;
             block.innerHTML = header + body;
             container.appendChild(block);
-            
-            // Re-run checks to maintain visual state if re-rendered
             handleSrvCheck(item.id, 'init', true);
         });
         container.dataset.needsRender = false;
@@ -453,9 +484,8 @@
 
     function handleSrvCheck(itemId, srvId, isInit = false) {
         const fullCb = document.getElementById(`cb-${itemId}-full`);
-        if(!fullCb) return; // safety
+        if(!fullCb) return; 
         
-        // Full Body disables everything else
         ['hem', 'sleeve', 'shoulder', 'pads'].forEach(sub => {
             const subCb = document.getElementById(`cb-${itemId}-${sub}`);
             const subWrap = document.getElementById(`wrap-${itemId}-${sub}`);
@@ -476,7 +506,7 @@
         const btnContainer = document.getElementById(`btn-container-${itemId}`);
         if(state.mode !== 'lalamove') { btnContainer.classList.add('hidden'); return; }
 
-        const cbs = ['full', 'hem', 'sleeve', 'shoulder']; // pads alone doesn't need measure
+        const cbs = ['full', 'hem', 'sleeve', 'shoulder']; 
         const needsMeas = cbs.some(id => document.getElementById(`cb-${itemId}-${id}`)?.checked);
 
         if(needsMeas) {
@@ -507,42 +537,43 @@
         document.getElementById('grand-total').innerText = "RM " + (state.servicesTotal + state.deliveryCost);
     }
 
-    // --- MODAL LOGIC ---
+    // --- MODAL LOGIC WITH VALIDATION ---
     function openModal(itemId) {
         editingItemId = itemId;
         const item = state.selectedItems.find(i => i.id === itemId);
-        document.getElementById('modal-subtitle').innerText = `${item.name}`;
+        const limit = sizeChart[item.size] || sizeChart['M'];
+        
+        document.getElementById('modal-subtitle').innerText = `${item.name} (Size: ${item.size})`;
         
         const fieldsDiv = document.getElementById('modal-fields');
         fieldsDiv.innerHTML = '';
         const m = state.measurements[itemId];
         const isFull = document.getElementById(`cb-${itemId}-full`).checked;
 
-        const buildInput = (key, labelKey, type="number", imgTag="") => {
+        const buildInput = (key, labelKey, maxVal, type="number", imgPlaceholder="") => {
+            const labelText = t[currentLang][labelKey] + (maxVal ? ` (Max: ${maxVal}")` : '');
             return `<div>
-                      <label class="block text-sm text-white/70 mb-2">${t[currentLang][labelKey]}</label>
-                      ${imgTag ? `<div class="mb-3 rounded-lg overflow-hidden border border-white/10 opacity-70">${imgTag}</div>` : ''}
+                      <label class="block text-sm text-white/70 mb-2">${labelText}</label>
+                      ${imgPlaceholder ? `<div class="mb-3 rounded-lg overflow-hidden border border-white/10 opacity-70 p-4 text-center text-xs text-white/40 bg-white/5">${imgPlaceholder}</div>` : ''}
                       ${type === 'select' 
-                        ? `<select id="mod-${key}"><option value="">Select...</option><option value="Yes" ${m[key]==='Yes'?'selected':''}>Yes</option><option value="No" ${m[key]==='No'?'selected':''}>No</option></select>`
-                        : `<input type="number" id="mod-${key}" value="${m[key]}" placeholder="E.g. 52">`
+                        ? `<select id="mod-${key}"><option value="" class="text-black">Select...</option><option value="Yes" class="text-black" ${m[key]==='Yes'?'selected':''}>Yes</option><option value="No" class="text-black" ${m[key]==='No'?'selected':''}>No</option></select>`
+                        : `<input type="number" id="mod-${key}" value="${m[key]}" placeholder="${maxVal ? '< '+maxVal : ''}">`
                       }
                     </div>`;
         };
 
         if(isFull || document.getElementById(`cb-${itemId}-hem`)?.checked) 
-            fieldsDiv.innerHTML += buildInput('length', 'lbl_length', 'number', '');
+            fieldsDiv.innerHTML += buildInput('length', 'lbl_length', limit.length, 'number', '[Image showing how to measure abaya length]');
         if(isFull || document.getElementById(`cb-${itemId}-sleeve`)?.checked) 
-            fieldsDiv.innerHTML += buildInput('sleeve', 'lbl_sleeve', 'number', '');
+            fieldsDiv.innerHTML += buildInput('sleeve', 'lbl_sleeve', limit.sleeve, 'number');
         if(isFull || document.getElementById(`cb-${itemId}-shoulder`)?.checked) 
-            fieldsDiv.innerHTML += buildInput('shoulder', 'lbl_shoulder', 'number', '');
+            fieldsDiv.innerHTML += buildInput('shoulder', 'lbl_shoulder', limit.shoulder, 'number');
         if(isFull) 
-            fieldsDiv.innerHTML += buildInput('pads', 'lbl_pads', 'select');
+            fieldsDiv.innerHTML += buildInput('pads', 'lbl_pads', null, 'select');
 
-        // Show Modal
         const modal = document.getElementById('measurement-modal');
         const box = document.getElementById('modal-content-box');
         modal.classList.remove('hidden');
-        // trigger animation
         setTimeout(() => { modal.classList.remove('opacity-0'); box.classList.remove('scale-95'); }, 10);
     }
 
@@ -555,11 +586,33 @@
 
     function saveMeasurements() {
         if(!editingItemId) return;
+        const item = state.selectedItems.find(i => i.id === editingItemId);
+        const limit = sizeChart[item.size] || sizeChart['M'];
+        
         const m = state.measurements[editingItemId];
-        if(document.getElementById('mod-length')) m.length = document.getElementById('mod-length').value;
-        if(document.getElementById('mod-sleeve')) m.sleeve = document.getElementById('mod-sleeve').value;
-        if(document.getElementById('mod-shoulder')) m.shoulder = document.getElementById('mod-shoulder').value;
-        if(document.getElementById('mod-pads')) m.pads = document.getElementById('mod-pads').value;
+        const lenEl = document.getElementById('mod-length');
+        const slvEl = document.getElementById('mod-sleeve');
+        const shdEl = document.getElementById('mod-shoulder');
+        const padEl = document.getElementById('mod-pads');
+        
+        // Size Validation Logic
+        let errorMsg = "";
+        if(lenEl && lenEl.value && parseFloat(lenEl.value) >= limit.length) 
+            errorMsg += `- ${t[currentLang].lbl_length} ${t[currentLang].alert_max} (${limit.length}").\n`;
+        if(slvEl && slvEl.value && parseFloat(slvEl.value) >= limit.sleeve) 
+            errorMsg += `- ${t[currentLang].lbl_sleeve} ${t[currentLang].alert_max} (${limit.sleeve}").\n`;
+        if(shdEl && shdEl.value && parseFloat(shdEl.value) >= limit.shoulder) 
+            errorMsg += `- ${t[currentLang].lbl_shoulder} ${t[currentLang].alert_max} (${limit.shoulder}").\n`;
+        
+        if(errorMsg !== "") {
+            alert(errorMsg);
+            return;
+        }
+
+        if(lenEl) m.length = lenEl.value;
+        if(slvEl) m.sleeve = slvEl.value;
+        if(shdEl) m.shoulder = shdEl.value;
+        if(padEl) m.pads = padEl.value;
         
         updateMeasurementBtn(editingItemId);
         closeModal();
@@ -585,7 +638,6 @@
         alert(t[currentLang].btn_confirm + " Successful!\nTotal: RM " + (state.servicesTotal + state.deliveryCost));
     }
 
-    // --- HELPERS ---
     function unlockStep(n) { document.getElementById(`step-${n}`).classList.remove('opacity-30', 'pointer-events-none'); document.getElementById(`badge-${n}`).classList.replace('border-white/20', 'border-luxe'); document.getElementById(`badge-${n}`).classList.replace('text-white/50', 'text-luxe'); }
     function lockStep(n) { document.getElementById(`step-${n}`).classList.add('opacity-30', 'pointer-events-none'); }
     function getDist(lat1,lon1,lat2,lon2) { var R=6371, dLat=d2r(lat2-lat1), dLon=d2r(lon2-lon1); var a=Math.sin(dLat/2)*Math.sin(dLat/2)+Math.cos(d2r(lat1))*Math.cos(d2r(lat2))*Math.sin(dLon/2)*Math.sin(dLon/2); return R*(2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a))); }
