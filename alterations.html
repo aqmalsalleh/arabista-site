@@ -152,10 +152,15 @@
           <h2 class="text-xl font-display mb-4 text-white" data-t="step3_title">Choose Logistics</h2>
           
           <div class="grid grid-cols-2 gap-3 mb-4">
-            <button id="btn-walkin" onclick="setMode('walkin')" class="p-4 rounded-xl border border-luxe bg-luxe/10 text-white text-sm font-medium transition" data-t="mode_walkin">Walk-in</button>
-            <button id="btn-lalamove" onclick="setMode('lalamove')" class="p-4 rounded-xl border border-white/10 hover:bg-white/5 text-white/70 text-sm font-medium transition relative overflow-hidden">
+            <button id="btn-walkin" onclick="setMode('walkin')" class="p-4 rounded-xl border border-luxe bg-luxe/10 text-white text-sm font-medium transition relative overflow-hidden flex flex-col justify-center items-center h-full min-h-[72px]">
+                <span data-t="mode_walkin">Walk-in</span>
+                <span class="text-[10px] opacity-70 mt-0.5 font-normal" data-t="txt_new_buyer">Ideal for new customers</span>
+                <div class="absolute top-0 right-0 bg-luxe text-brand text-[9px] px-2 py-0.5 font-bold uppercase tracking-wider" data-t="badge_recommended">Recommended</div>
+            </button>
+            
+            <button id="btn-lalamove" onclick="setMode('lalamove')" class="p-4 rounded-xl border border-white/10 hover:bg-white/5 text-white/70 text-sm font-medium transition relative overflow-hidden flex flex-col justify-center items-center h-full min-h-[72px]">
                 <span data-t="mode_lalamove">Lalamove</span>
-                <div class="absolute top-0 right-0 bg-orange-500 text-[10px] text-white px-2 py-0.5 font-bold">FAST</div>
+                <div class="absolute top-0 right-0 bg-orange-500 text-[10px] text-white px-2 py-0.5 font-bold uppercase tracking-wider">FAST</div>
             </button>
           </div>
 
@@ -229,7 +234,8 @@
             step1_title: "Select Items to Alter", btn_next_loc: "Next: Location",
             step2_title: "Verify Location", btn_use_order_addr: "Use Order Address", btn_use_gps: "Use Current GPS", txt_detecting: "Detecting...", btn_change: "Change",
             step3_title: "Choose Logistics", mode_walkin: "Walk-in", mode_lalamove: "Lalamove", label_timeslot: "Select Time Slot:", label_del_fee: "Delivery Fee", btn_next_srv: "Next: Services",
-            badge_free_return: "Free Return Delivery", txt_return_paid: "Return delivery paid to rider",
+            badge_recommended: "Recommended", txt_new_buyer: "Ideal for new customers",
+            badge_free_return: "Free Return Delivery", txt_return_paid: "Return fee paid to rider or self-pickup",
             step4_title: "Services & Measurements", txt_measure_walkin: "Walk-in selected. We will measure you in-store.", txt_measure_lala: "Lalamove selected. Please provide measurements.",
             srv_full: "Full Body Alteration", srv_hem: "Alter Length", srv_sleeve: "Alter Sleeves", srv_shoulder: "Alter Shoulders", srv_pads: "Add Shoulder Pads",
             lbl_length: "Length (inches)", lbl_sleeve: "Sleeves (inches)", lbl_shoulder: "Shoulders (inches)", lbl_pads: "Shoulder Pads",
@@ -245,7 +251,8 @@
             step1_title: "Pilih Item", btn_next_loc: "Seterusnya: Lokasi",
             step2_title: "Sahkan Lokasi", btn_use_order_addr: "Guna Alamat Tempahan", btn_use_gps: "Guna GPS Semasa", txt_detecting: "Mengesan...", btn_change: "Tukar",
             step3_title: "Pilih Logistik", mode_walkin: "Walk-in", mode_lalamove: "Lalamove", label_timeslot: "Pilih Masa:", label_del_fee: "Caj Penghantaran", btn_next_srv: "Seterusnya: Servis",
-            badge_free_return: "Penghantaran Pulang Percuma", txt_return_paid: "Caj pulang dibayar kepada rider",
+            badge_recommended: "Disyorkan", txt_new_buyer: "Sesuai untuk pelanggan baru",
+            badge_free_return: "Penghantaran Pulang Percuma", txt_return_paid: "Caj pulang dibayar kepada rider atau ambil sendiri",
             step4_title: "Servis & Ukuran", txt_measure_walkin: "Walk-in dipilih. Ukuran akan diambil di butik.", txt_measure_lala: "Lalamove dipilih. Sila masukkan ukuran.",
             srv_full: "Alter Keseluruhan Baju", srv_hem: "Alter Labuh", srv_sleeve: "Alter Lengan", srv_shoulder: "Alter Bahu", srv_pads: "Tambah Span Bahu",
             lbl_length: "Labuh (inci)", lbl_sleeve: "Lengan (inci)", lbl_shoulder: "Bahu (inci)", lbl_pads: "Span Bahu",
@@ -269,7 +276,6 @@
         document.getElementById('lang-bm').className = lang === 'bm' ? "text-xs font-bold text-luxe" : "text-xs text-white/50 hover:text-white";
         updateMeasurementInstruction();
         
-        // Re-render hubs text if Lalamove is active
         if(document.getElementById('hub-list').innerHTML !== "") renderHubs();
 
         if(document.getElementById('services-container').innerHTML !== "") {
@@ -396,7 +402,7 @@
 
     function selectHub(id, dist, fee) {
         state.hubId = id; state.hubDist = dist;
-        renderHubs(); // Re-render to easily manage selected states and complex HTML content
+        renderHubs(); 
         updateLogisticsCost(); checkStep3Complete();
     }
 
@@ -409,22 +415,29 @@
         document.getElementById(`slot-${time.replace(':','')}`).className = "text-xs py-2 border border-luxe bg-luxe text-brand font-bold rounded";
         checkStep3Complete();
     }
+    
     function setMode(m) {
         state.mode = m;
         const w = document.getElementById('btn-walkin'); const l = document.getElementById('btn-lalamove');
         const wc = document.getElementById('walkin-panel'); const lc = document.getElementById('lalamove-panel');
+        
         if(m === 'walkin') {
             w.classList.replace('border-white/10', 'border-luxe'); w.classList.add('bg-luxe/10');
+            w.classList.replace('text-white/70', 'text-white');
             l.classList.replace('border-orange-500', 'border-white/10'); l.classList.remove('bg-orange-500/10');
+            l.classList.replace('text-white', 'text-white/70');
             wc.classList.remove('hidden'); lc.classList.add('hidden'); state.deliveryCost = 0;
         } else {
             l.classList.replace('border-white/10', 'border-orange-500'); l.classList.add('bg-orange-500/10');
+            l.classList.replace('text-white/70', 'text-white');
             w.classList.replace('border-luxe', 'border-white/10'); w.classList.remove('bg-luxe/10');
+            w.classList.replace('text-white', 'text-white/70');
             lc.classList.remove('hidden'); wc.classList.add('hidden'); updateLogisticsCost();
         }
-        renderHubs(); // Refresh badges
+        renderHubs(); 
         updateMeasurementInstruction(); renderServices(); checkStep3Complete(); calculateTotal();
     }
+    
     function updateLogisticsCost() {
         if(state.mode === 'lalamove' && state.hubId) {
             state.deliveryCost = Math.ceil(5 + (state.hubDist * 1.0));
