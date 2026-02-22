@@ -79,30 +79,21 @@
         <div class="fade-in">
           <h2 class="text-xl font-display mb-4 text-white" data-t="step1_title">Select Items to Alter</h2>
           
-          <div id="path-a-container" class="hidden">
-              <p class="text-xs text-white/50 mb-4">Order <span id="order-id-display"></span></p>
-              <div class="grid gap-3" id="order-items-list">
-                 <label class="flex items-center gap-4 p-4 border border-white/10 rounded-xl hover:bg-white/5 cursor-pointer transition">
-                    <input type="checkbox" name="order-item" value="1" onchange="syncItemsA()" class="w-5 h-5 rounded border-white/30 text-luxe focus:ring-luxe bg-transparent">
-                    <div class="w-12 h-16 bg-white/5 rounded overflow-hidden shrink-0">
-                        <img src="images/product-dahlia.png" onerror="this.src='https://via.placeholder.com/48x64?text=Abaya'" class="w-full h-full object-cover opacity-80">
-                    </div>
-                    <div>
-                        <h3 class="font-display text-lg text-white">Dahlia Series (Black)</h3>
-                        <p class="text-xs text-white/50">Size: XL &bull; Ref: D01</p>
-                    </div>
-                 </label>
-                 <label class="flex items-center gap-4 p-4 border border-white/10 rounded-xl hover:bg-white/5 cursor-pointer transition">
-                    <input type="checkbox" name="order-item" value="2" onchange="syncItemsA()" class="w-5 h-5 rounded border-white/30 text-luxe focus:ring-luxe bg-transparent">
-                    <div class="w-12 h-16 bg-white/5 rounded overflow-hidden shrink-0">
-                        <img src="images/product-zahra.png" onerror="this.src='https://via.placeholder.com/48x64?text=Abaya'" class="w-full h-full object-cover opacity-80">
-                    </div>
-                    <div>
-                        <h3 class="font-display text-lg text-white">Zahra Nude</h3>
-                        <p class="text-xs text-white/50">Size: M &bull; Ref: Z02</p>
-                    </div>
-                 </label>
+          <div id="path-a-container" class="hidden space-y-5 bg-white/5 border border-white/10 rounded-xl p-5">
+              <p class="text-xs text-white/50 mb-2">Order <span id="order-id-display"></span></p>
+              
+              <div>
+                  <label class="block text-sm text-white/70 mb-2" data-t="lbl_cust_name">Customer Name</label>
+                  <input type="text" id="auto-cust-name" class="w-full bg-white/10 text-white/50 cursor-not-allowed" readonly>
               </div>
+              <div>
+                  <label class="block text-sm text-white/70 mb-2" data-t="lbl_phone">Telephone No.</label>
+                  <input type="tel" id="auto-cust-phone" class="w-full bg-white/10 text-white/50 cursor-not-allowed" readonly>
+              </div>
+              
+              <p class="text-sm text-white/70 mt-4 mb-2">Select Items to Alter:</p>
+              <div class="grid gap-3" id="auto-items-list">
+                 </div>
           </div>
 
           <div id="path-b-container" class="hidden space-y-5 bg-white/5 border border-white/10 rounded-xl p-5">
@@ -139,7 +130,7 @@
           <div class="grid sm:grid-cols-2 gap-3" id="loc-buttons">
             <button id="btn-use-order-addr" onclick="useOrderAddress()" class="p-4 rounded-xl border border-white/10 hover:border-luxe hover:bg-white/5 transition text-left group">
                 <span class="block text-sm font-bold text-white mb-1 group-hover:text-luxe" data-t="btn_use_order_addr">Use Order Address</span>
-                <span class="block text-xs text-white/50">Tun Hussein Onn, Cheras</span>
+                <span class="block text-[10px] text-white/50 mt-1 truncate" id="order-addr-display">...</span>
             </button>
             <button onclick="useGPS()" class="p-4 rounded-xl border border-white/10 hover:border-luxe hover:bg-white/5 transition text-left group">
                 <span class="block text-sm font-bold text-white mb-1 group-hover:text-luxe" data-t="btn_use_gps">Use Current GPS</span>
@@ -159,11 +150,11 @@
           </div>
 
           <div id="validated-loc" class="hidden mt-2 p-3 bg-luxe/10 border border-luxe/30 rounded-lg flex justify-between items-center">
-             <div>
+             <div class="flex-1 overflow-hidden pr-4">
                <p class="text-xs text-luxe uppercase tracking-widest">Base Location</p>
-               <p class="text-sm text-white mt-0.5" id="final-address">...</p>
+               <p class="text-sm text-white mt-0.5 truncate" id="final-address">...</p>
              </div>
-             <button onclick="resetLoc()" class="text-xs text-white/50 underline pl-4" data-t="btn_change">Change</button>
+             <button onclick="resetLoc()" class="text-xs text-white/50 underline" data-t="btn_change">Change</button>
           </div>
         </div>
       </div>
@@ -307,23 +298,77 @@
 
         const urlParams = new URLSearchParams(window.location.search);
         const orderId = urlParams.get('order');
-        if(orderId) {
-            state.path = 'A'; document.getElementById('path-a-container').classList.remove('hidden'); document.getElementById('order-id-display').innerText = "#" + orderId;
-        } else {
-            state.path = 'B'; document.getElementById('path-b-container').classList.remove('hidden'); document.getElementById('btn-use-order-addr').classList.add('hidden');
-            document.getElementById('loc-buttons').classList.remove('sm:grid-cols-2'); document.getElementById('loc-buttons').classList.add('grid-cols-1'); addManualItem(); 
-        }
-
+        
         document.getElementById('hub-list-loading').classList.remove('hidden');
+        
         try {
-            const res = await fetch(scriptURL);
+            // Send API call. Pass orderId if it exists to fetch both Hubs & Order Data
+            const fetchUrl = orderId ? `${scriptURL}?order=${orderId}` : scriptURL;
+            const res = await fetch(fetchUrl);
             const data = await res.json();
+            
             if (data.error) throw new Error(data.error);
-            hubs = Array.isArray(data) ? data : [];
+            
+            hubs = Array.isArray(data.hubs) ? data.hubs : [];
+            
+            if (orderId && data.orderData) {
+                // PATH A Setup
+                state.path = 'A';
+                document.getElementById('path-a-container').classList.remove('hidden');
+                document.getElementById('order-id-display').innerText = "#" + data.orderData.orderRef;
+                
+                // Pre-fill read-only info
+                document.getElementById('auto-cust-name').value = data.orderData.name;
+                document.getElementById('auto-cust-phone').value = data.orderData.phone;
+                
+                // Set Order Address for Step 2
+                state.orderAddress = data.orderData.address;
+                document.getElementById('order-addr-display').innerText = state.orderAddress;
+                
+                // Dynamically build the item checklist
+                const itemsList = document.getElementById('auto-items-list');
+                itemsList.innerHTML = '';
+                const rawItems = data.orderData.itemsRaw.split(',');
+                let itemIdx = 0;
+                
+                rawItems.forEach(itemStr => {
+                    const parts = itemStr.trim().split('|');
+                    if(parts.length >= 2) {
+                        const design = parts[0].trim();
+                        const size = parts[1].trim();
+                        const qty = parseInt(parts[2]) || 1;
+                        
+                        // If qty is 2, it loops twice and creates 2 identical checkboxes with unique IDs
+                        for(let q=0; q < qty; q++) {
+                            itemsList.innerHTML += `
+                            <label class="flex items-center gap-4 p-4 border border-white/10 rounded-xl hover:bg-white/5 cursor-pointer transition">
+                                <input type="checkbox" name="order-item" value="a-${itemIdx}" data-design="${design}" data-size="${size}" onchange="syncItemsA()" class="w-5 h-5 rounded border-white/30 text-luxe focus:ring-luxe bg-transparent">
+                                <div>
+                                    <h3 class="font-display text-lg text-white">Design ${design}</h3>
+                                    <p class="text-xs text-white/50">Size: ${size}</p>
+                                </div>
+                            </label>`;
+                            itemIdx++;
+                        }
+                    }
+                });
+                
+            } else {
+                // PATH B Setup (or if order ID failed)
+                state.path = 'B'; 
+                if (orderId) alert("Order #" + orderId + " not found. Proceeding with manual entry.");
+                document.getElementById('path-b-container').classList.remove('hidden'); 
+                document.getElementById('btn-use-order-addr').classList.add('hidden');
+                document.getElementById('loc-buttons').classList.remove('sm:grid-cols-2'); 
+                document.getElementById('loc-buttons').classList.add('grid-cols-1'); 
+                addManualItem(); 
+            }
+            
             document.getElementById('hub-list-loading').classList.add('hidden');
+            
         } catch(e) {
             console.error("API error", e);
-            document.getElementById('hub-list-loading').innerText = "Database Error: " + e.message + " (Please ensure your Apps Script is deployed as a 'New Version')";
+            document.getElementById('hub-list-loading').innerText = "Database Error: " + e.message;
         }
     });
 
@@ -331,7 +376,7 @@
     const sizes = ['XS', 'S', 'M', 'L', 'XL', 'XXL', 'XXXL'];
     const sizeChart = { 'XS': { length: 55, sleeve: 22, shoulder: 14 }, 'S': { length: 55, sleeve: 22, shoulder: 15 }, 'M': { length: 57, sleeve: 23, shoulder: 16 }, 'L': { length: 60, sleeve: 23.5, shoulder: 16.5 }, 'XL': { length: 60, sleeve: 23.5, shoulder: 17.5 }, 'XXL': { length: 60, sleeve: 23.5, shoulder: 18 }, 'XXXL': { length: 60, sleeve: 23.5, shoulder: 19 } };
     
-    let state = { path: 'A', selectedItems: [], lat: 0, lng: 0, unitNo: '', mode: 'walkin', hubId: null, hubDist: 0, deliveryCost: 0, servicesTotal: 0, measurements: {}, logisticsSchedule: '' };
+    let state = { path: 'A', selectedItems: [], lat: 0, lng: 0, unitNo: '', orderAddress: '', mode: 'walkin', hubId: null, hubDist: 0, deliveryCost: 0, servicesTotal: 0, measurements: {}, logisticsSchedule: '' };
     let editingItemId = null;
 
     // STEP 1
@@ -343,15 +388,18 @@
         row.innerHTML = `<div class="flex-1"><select class="design-select w-full" onchange="syncItemsB()">${designOpts}</select></div><div class="w-24"><select class="size-select w-full" onchange="syncItemsB()">${sizeOpts}</select></div>${idx > 0 ? `<button onclick="this.parentElement.remove(); syncItemsB();" class="text-red-400 hover:text-red-300 p-2 ml-1"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg></button>` : `<div class="w-9"></div>`}`;
         list.appendChild(row);
     }
+    
     function syncItemsA() {
         const newSelected = [];
         document.querySelectorAll('input[name="order-item"]:checked').forEach(cb => {
-            const sizeStr = cb.parentElement.querySelector('p').innerText; const sizeMatch = sizeStr.match(/Size:\s*([A-Z]+)/i);
-            newSelected.push({ id: cb.value, name: cb.parentElement.querySelector('h3').innerText, size: sizeMatch ? sizeMatch[1].toUpperCase() : 'M' });
+            const design = cb.getAttribute('data-design');
+            const size = cb.getAttribute('data-size');
+            newSelected.push({ id: cb.value, name: "Design " + design, size: size });
             if(!state.measurements[cb.value]) state.measurements[cb.value] = { length:'', sleeve:'', shoulder:'', pads:'' };
         });
         state.selectedItems = newSelected; refreshStep4Live();
     }
+    
     function syncItemsB() {
         const newSelected = [];
         document.querySelectorAll('.manual-item-row').forEach((row, idx) => {
@@ -368,17 +416,23 @@
         }
     }
     function confirmItems() {
-        if(state.path === 'A') { syncItemsA(); if(state.selectedItems.length === 0) return alert(t[currentLang].alert_no_items); } 
-        else {
+        if(state.path === 'A') { 
+            syncItemsA(); 
+            if(state.selectedItems.length === 0) return alert(t[currentLang].alert_no_items); 
+        } else {
             if(!document.getElementById('manual-cust-name').value.trim()) return alert(t[currentLang].alert_name);
             if(!document.getElementById('manual-cust-phone').value.trim()) return alert(t[currentLang].alert_phone);
-            syncItemsB(); if(state.selectedItems.length === 0) return alert(t[currentLang].alert_item_detail);
+            syncItemsB(); 
+            if(state.selectedItems.length === 0) return alert(t[currentLang].alert_item_detail);
         }
         unlockStep(2); document.getElementById('step-2').scrollIntoView({behavior: 'smooth', block: 'center'});
     }
 
     // STEP 2
-    function useOrderAddress() { state.unitNo = "Tun Hussein Onn, Cheras"; state.lat = ""; state.lng = ""; showLocSuccess(state.unitNo); }
+    function useOrderAddress() { 
+        state.unitNo = state.orderAddress || "Database Address"; 
+        state.lat = ""; state.lng = ""; showLocSuccess(state.unitNo); 
+    }
     function useGPS() {
         if(!navigator.geolocation) return alert("Geo not supported");
         const desc = document.getElementById('gps-desc'); desc.innerText = t[currentLang].txt_locating_fresh;
@@ -502,7 +556,6 @@
         const fullCb = document.getElementById(`cb-${itemId}-full`); if(!fullCb) return; 
         const m = state.measurements[itemId];
         
-        // BUG FIX: State Leak Wipe. Clear saved measurements if an option is unchecked.
         if (!isInit) {
             if (srvId === 'full' && !fullCb.checked) { m.length = ''; m.sleeve = ''; m.shoulder = ''; m.pads = ''; }
             else if (srvId === 'hem' && !document.getElementById(`cb-${itemId}-hem`).checked) m.length = '';
@@ -536,7 +589,6 @@
         editingItemId = itemId; const item = state.selectedItems.find(i => i.id === itemId); const limit = sizeChart[item.size] || sizeChart['M']; document.getElementById('modal-subtitle').innerText = `${item.name} (Size: ${item.size})`;
         const fieldsDiv = document.getElementById('modal-fields'); fieldsDiv.innerHTML = ''; const m = state.measurements[itemId]; const isFull = document.getElementById(`cb-${itemId}-full`).checked;
         
-        // BUG FIX: Dynamic placeholders showing '<=' or '<' based on context.
         const buildInput = (key, labelKey, maxVal, type="number") => {
             const op = isFull ? '<=' : '<';
             return `<div><label class="block text-sm text-white/70 mb-2">${t[currentLang][labelKey] + (maxVal ? ` (Max: ${maxVal}")` : '')}</label>${type === 'select' ? `<select id="mod-${key}"><option value="" class="text-black">Select...</option><option value="Yes" class="text-black" ${m[key]==='Yes'?'selected':''}>Yes</option><option value="No" class="text-black" ${m[key]==='No'?'selected':''}>No</option></select>` : `<input type="number" id="mod-${key}" value="${m[key]}" placeholder="${maxVal ? op+' '+maxVal : ''}">`}</div>`;
@@ -558,28 +610,19 @@
         
         let errorMsg = "";
         
-        // Validation Logic
         if (isFull) {
             let isAllEqual = true;
-            
-            // Allow <= limit. Only throw error if > limit.
             if(lenEl && lenEl.value) { if(parseFloat(lenEl.value) > limit.length) errorMsg += `- ${t[currentLang].lbl_length} ${t[currentLang].alert_max_full} (${limit.length}").\n`; if(parseFloat(lenEl.value) < limit.length) isAllEqual = false; }
             if(slvEl && slvEl.value) { if(parseFloat(slvEl.value) > limit.sleeve) errorMsg += `- ${t[currentLang].lbl_sleeve} ${t[currentLang].alert_max_full} (${limit.sleeve}").\n`; if(parseFloat(slvEl.value) < limit.sleeve) isAllEqual = false; }
             if(shdEl && shdEl.value) { if(parseFloat(shdEl.value) > limit.shoulder) errorMsg += `- ${t[currentLang].lbl_shoulder} ${t[currentLang].alert_max_full} (${limit.shoulder}").\n`; if(parseFloat(shdEl.value) < limit.shoulder) isAllEqual = false; }
-            
-            // Check if all fields are filled, valid, but NONE were reduced.
-            if (errorMsg === "" && isAllEqual && lenEl && lenEl.value && slvEl && slvEl.value && shdEl && shdEl.value) {
-                errorMsg += t[currentLang].alert_full_equal + "\n";
-            }
+            if (errorMsg === "" && isAllEqual && lenEl && lenEl.value && slvEl && slvEl.value && shdEl && shdEl.value) errorMsg += t[currentLang].alert_full_equal + "\n";
         } else {
-            // Strictly enforce < limit
             if(lenEl && lenEl.value && parseFloat(lenEl.value) >= limit.length) errorMsg += `- ${t[currentLang].lbl_length} ${t[currentLang].alert_max} (${limit.length}").\n`;
             if(slvEl && slvEl.value && parseFloat(slvEl.value) >= limit.sleeve) errorMsg += `- ${t[currentLang].lbl_sleeve} ${t[currentLang].alert_max} (${limit.sleeve}").\n`;
             if(shdEl && shdEl.value && parseFloat(shdEl.value) >= limit.shoulder) errorMsg += `- ${t[currentLang].lbl_shoulder} ${t[currentLang].alert_max} (${limit.shoulder}").\n`;
         }
 
         if(errorMsg !== "") return alert(errorMsg);
-        
         if(lenEl) m.length = lenEl.value; if(slvEl) m.sleeve = slvEl.value; if(shdEl) m.shoulder = shdEl.value; if(padEl) m.pads = padEl.value;
         updateMeasurementBtn(editingItemId); closeModal();
     }
@@ -615,12 +658,17 @@
         });
 
         const hubData = hubs.find(h => h.id === state.hubId);
+        
+        // Dynamically grab customer details based on path
+        const custName = state.path === 'A' ? document.getElementById('auto-cust-name').value : document.getElementById('manual-cust-name').value.trim();
+        const custPhone = state.path === 'A' ? document.getElementById('auto-cust-phone').value : document.getElementById('manual-cust-phone').value.trim();
+
         const payload = {
             Order_Type: state.path === 'A' ? "Website" : "Public",
-            Order_Ref: state.path === 'A' ? document.getElementById('order-id-display').innerText : "Manual",
-            Customer_Name: state.path === 'A' ? "Online Customer (System DB)" : document.getElementById('manual-cust-name').value.trim(),
-            Phone_No: state.path === 'A' ? "Online Customer (System DB)" : document.getElementById('manual-cust-phone').value.trim(),
-            Address_Details: state.unitNo || "Order Address (System DB)",
+            Order_Ref: state.path === 'A' ? document.getElementById('order-id-display').innerText.replace('#', '') : "Manual",
+            Customer_Name: custName,
+            Phone_No: custPhone,
+            Address_Details: state.unitNo,
             Customer_Lat: state.lat || "",
             Customer_Lng: state.lng || "",
             Logistics_Mode: state.mode === 'walkin' ? "Walk-in" : "Lalamove",
