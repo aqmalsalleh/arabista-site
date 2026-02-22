@@ -43,4 +43,653 @@
     .scrollbar-thin::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 10px; }
 
     input[type="number"], select { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); color: white; border-radius: 8px; padding: 10px 14px; width: 100%; transition: all 0.2s; }
-    input[type="number"]:focus, select:focus { outline: none; border-color: #C0A062; background: rgba(192
+    input[type="number"]:focus, select:focus { outline: none; border-color: #C0A062; background: rgba(192,160,98,0.05); }
+    input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+  </style>
+</head>
+<body class="antialiased selection:bg-luxe selection:text-brand">
+
+  <header class="fixed top-0 inset-x-0 z-50 backdrop-blur bg-brand/80 border-b border-white/10">
+    <div class="max-w-screen-xl mx-auto px-4 sm:px-6">
+      <div class="h-14 grid grid-cols-3 items-center">
+        <div class="col-span-1 flex items-center">
+          <a href="index.html" class="font-display tracking-[0.18em] text-[14px] leading-none hover:text-luxe transition">ARABISTA</a>
+        </div>
+        <div class="col-span-1 flex items-center justify-center">
+           <span class="font-display text-xl">A</span>
+        </div>
+        <div class="col-span-1 flex items-center justify-end gap-4 text-sm">
+           <div class="flex items-center gap-2 border border-white/20 rounded-lg px-2 py-1">
+             <button onclick="setLang('en')" id="lang-en" class="text-xs font-bold text-luxe">EN</button>
+             <span class="text-white/20">|</span>
+             <button onclick="setLang('bm')" id="lang-bm" class="text-xs text-white/50 hover:text-white">BM</button>
+           </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="pt-24 pb-20 max-w-screen-md mx-auto px-4 sm:px-6 min-h-screen">
+    
+    <div class="text-center mb-10">
+      <h1 class="font-display text-3xl sm:text-5xl mb-3" data-t="page_title">Alteration & Care</h1>
+      <p class="text-white/60 text-sm sm:text-base" data-t="page_subtitle">Select items from your order to alter.</p>
+    </div>
+
+    <div class="space-y-0 relative">
+
+      <div id="step-1" class="relative pl-10 pb-12 step-active">
+        <div class="step-line"></div>
+        <div class="absolute left-0 top-0 w-8 h-8 rounded-full border border-luxe bg-brand text-luxe flex items-center justify-center text-sm font-bold z-10">1</div>
+        
+        <div class="fade-in">
+          <h2 class="text-xl font-display mb-4 text-white" data-t="step1_title">Select Items to Alter</h2>
+          <p class="text-xs text-white/50 mb-4">Order #ORD-2026-8821</p>
+          
+          <div class="grid gap-3" id="order-items-list">
+             <label class="flex items-center gap-4 p-4 border border-white/10 rounded-xl hover:bg-white/5 cursor-pointer transition">
+                <input type="checkbox" name="order-item" value="1" onchange="syncItems()" class="w-5 h-5 rounded border-white/30 text-luxe focus:ring-luxe bg-transparent">
+                <div class="w-12 h-16 bg-white/5 rounded overflow-hidden shrink-0">
+                    <img src="images/product-dahlia.png" onerror="this.src='https://via.placeholder.com/48x64?text=Abaya'" class="w-full h-full object-cover opacity-80">
+                </div>
+                <div>
+                    <h3 class="font-display text-lg text-white">Dahlia Series (Black)</h3>
+                    <p class="text-xs text-white/50">Size: XL &bull; Ref: D01</p>
+                </div>
+             </label>
+
+             <label class="flex items-center gap-4 p-4 border border-white/10 rounded-xl hover:bg-white/5 cursor-pointer transition">
+                <input type="checkbox" name="order-item" value="2" onchange="syncItems()" class="w-5 h-5 rounded border-white/30 text-luxe focus:ring-luxe bg-transparent">
+                <div class="w-12 h-16 bg-white/5 rounded overflow-hidden shrink-0">
+                    <img src="images/product-zahra.png" onerror="this.src='https://via.placeholder.com/48x64?text=Abaya'" class="w-full h-full object-cover opacity-80">
+                </div>
+                <div>
+                    <h3 class="font-display text-lg text-white">Zahra Nude</h3>
+                    <p class="text-xs text-white/50">Size: M &bull; Ref: Z02</p>
+                </div>
+             </label>
+          </div>
+
+          <div class="mt-4 flex justify-end">
+             <button onclick="confirmItems()" class="bg-luxe text-brand font-bold text-sm px-6 py-2 rounded-lg hover:bg-white transition" data-t="btn_next_loc">
+                Next: Location
+             </button>
+          </div>
+        </div>
+      </div>
+
+      <div id="step-2" class="relative pl-10 pb-12 opacity-30 pointer-events-none transition-opacity duration-500">
+        <div class="step-line"></div>
+        <div class="absolute left-0 top-0 w-8 h-8 rounded-full border border-white/20 bg-brand text-white/50 flex items-center justify-center text-sm font-bold z-10" id="badge-2">2</div>
+        
+        <div>
+          <h2 class="text-xl font-display mb-4 text-white" data-t="step2_title">Verify Location</h2>
+          <div class="grid sm:grid-cols-2 gap-3" id="loc-buttons">
+            <button onclick="useOrderAddress()" class="p-4 rounded-xl border border-white/10 hover:border-luxe hover:bg-white/5 transition text-left group">
+                <span class="block text-sm font-bold text-white mb-1 group-hover:text-luxe" data-t="btn_use_order_addr">Use Order Address</span>
+                <span class="block text-xs text-white/50">Tun Hussein Onn, Cheras</span>
+            </button>
+            <button onclick="useGPS()" class="p-4 rounded-xl border border-white/10 hover:border-luxe hover:bg-white/5 transition text-left group">
+                <span class="block text-sm font-bold text-white mb-1 group-hover:text-luxe" data-t="btn_use_gps">Use Current GPS</span>
+                <span class="block text-xs text-white/50" data-t="txt_detecting">Detecting location...</span>
+            </button>
+          </div>
+          <div id="validated-loc" class="hidden mt-2 p-3 bg-luxe/10 border border-luxe/30 rounded-lg flex justify-between items-center">
+             <div>
+               <p class="text-xs text-luxe uppercase tracking-widest">Base Location</p>
+               <p class="text-sm text-white" id="final-address">...</p>
+             </div>
+             <button onclick="resetLoc()" class="text-xs text-white/50 underline" data-t="btn_change">Change</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="step-3" class="relative pl-10 pb-12 opacity-30 pointer-events-none transition-opacity duration-500">
+        <div class="step-line"></div>
+        <div class="absolute left-0 top-0 w-8 h-8 rounded-full border border-white/20 bg-brand text-white/50 flex items-center justify-center text-sm font-bold z-10" id="badge-3">3</div>
+        
+        <div>
+          <h2 class="text-xl font-display mb-4 text-white" data-t="step3_title">Choose Logistics</h2>
+          
+          <div class="grid grid-cols-2 gap-3 mb-4">
+            <button id="btn-walkin" onclick="setMode('walkin')" class="p-4 rounded-xl border border-luxe bg-luxe/10 text-white text-sm font-medium transition relative overflow-hidden flex flex-col justify-center items-center h-full min-h-[72px]">
+                <span data-t="mode_walkin">Walk-in</span>
+                <span class="text-[10px] opacity-70 mt-0.5 font-normal" data-t="txt_new_buyer">Ideal for new customers</span>
+            </button>
+            
+            <button id="btn-lalamove" onclick="setMode('lalamove')" class="p-4 rounded-xl border border-white/10 hover:bg-white/5 text-white/70 text-sm font-medium transition relative overflow-hidden flex flex-col justify-center items-center h-full min-h-[72px]">
+                <span data-t="mode_lalamove">Lalamove</span>
+                <div class="absolute top-0 right-0 bg-orange-500 text-[10px] text-white px-2 py-0.5 font-bold uppercase tracking-wider">FAST</div>
+            </button>
+          </div>
+
+          <div id="hub-list" class="space-y-2 max-h-[250px] overflow-y-auto pr-2 scrollbar-thin mb-4"></div>
+
+          <div id="walkin-panel" class="mb-4 p-4 bg-white/5 border border-white/10 rounded-xl fade-in">
+             <span class="text-xs text-white/60 block mb-3" data-t="label_timeslot">Select Time Slot:</span>
+             <div class="grid grid-cols-4 gap-2" id="slot-container"></div>
+          </div>
+          <div id="lalamove-panel" class="hidden mb-4 p-3 bg-orange-500/10 border border-orange-500/20 rounded-lg flex justify-between items-center fade-in">
+              <span class="text-sm text-orange-200" data-t="label_del_fee">Delivery Fee</span>
+              <span class="font-bold text-white" id="del-price">RM 0.00</span>
+          </div>
+
+          <div class="flex justify-end mt-4">
+              <button onclick="confirmLogistics()" class="bg-white/10 text-white/40 font-bold text-sm px-6 py-2 rounded-lg transition disabled:cursor-not-allowed" id="btn-logistics-next" disabled data-t="btn_next_srv">
+                 Next: Services
+              </button>
+          </div>
+        </div>
+      </div>
+
+      <div id="step-4" class="relative pl-10 last-step opacity-30 pointer-events-none transition-opacity duration-500">
+        <div class="step-line"></div>
+        <div class="absolute left-0 top-0 w-8 h-8 rounded-full border border-white/20 bg-brand text-white/50 flex items-center justify-center text-sm font-bold z-10" id="badge-4">4</div>
+        
+        <div>
+          <h2 class="text-xl font-display mb-1 text-white" data-t="step4_title">Services per Item</h2>
+          <p class="text-xs text-white/50 mb-6" id="measure-instruction" data-t="txt_measure_walkin">Walk-in selected. No measurements needed.</p>
+          
+          <div id="services-container" class="space-y-6"></div>
+
+          <div class="border-t border-white/10 pt-6 mt-6">
+              <div class="flex justify-between items-end mb-4">
+                  <span class="text-white/50 text-sm" data-t="label_total_est">Total Estimate</span>
+                  <div class="text-right">
+                      <p class="text-xs text-white/40 mb-1" id="breakdown-text">Delivery: RM0 | Services: RM0</p>
+                      <span class="font-display text-4xl text-white" id="grand-total">RM 0</span>
+                  </div>
+              </div>
+              <button onclick="submitOrder()" class="w-full bg-white text-brand font-bold py-4 rounded-xl hover:bg-luxe hover:text-white transition shadow-soft" data-t="btn_confirm">
+                  Confirm Booking
+              </button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <div id="measurement-modal" class="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm hidden opacity-0 transition-opacity duration-300">
+    <div class="bg-[#111213] border border-white/10 rounded-2xl w-full max-w-md p-6 max-h-[90vh] overflow-y-auto scrollbar-thin transform scale-95 transition-transform duration-300" id="modal-content-box">
+        <h3 class="font-display text-2xl text-white mb-1" data-t="modal_title">Measurements</h3>
+        <p class="text-xs text-white/50 mb-6" id="modal-subtitle">Provide your measurements for</p>
+        
+        <div id="modal-fields" class="space-y-5">
+            </div>
+
+        <div class="mt-8 flex gap-3">
+            <button onclick="closeModal()" class="flex-1 px-4 py-3 rounded-xl border border-white/10 hover:bg-white/5 text-white/70 transition text-sm font-bold" data-t="btn_cancel">Cancel</button>
+            <button onclick="saveMeasurements()" class="flex-1 px-4 py-3 rounded-xl bg-luxe text-brand hover:bg-white transition text-sm font-bold shadow-[0_0_15px_rgba(192,160,98,0.3)]" data-t="btn_save">Save Measurements</button>
+        </div>
+    </div>
+  </div>
+
+  <script>
+    // --- TRANSLATIONS ---
+    const t = {
+        en: {
+            page_title: "Alteration & Care", page_subtitle: "Select items from your order to alter.",
+            step1_title: "Select Items to Alter", btn_next_loc: "Next: Location",
+            step2_title: "Verify Location", btn_use_order_addr: "Use Order Address", btn_use_gps: "Use Current GPS", txt_detecting: "Detecting...", btn_change: "Change",
+            step3_title: "Choose Logistics", mode_walkin: "Walk-in", mode_lalamove: "Lalamove", label_timeslot: "Select Time Slot:", label_del_fee: "Delivery Fee", btn_next_srv: "Next: Services",
+            txt_new_buyer: "Ideal for new customers",
+            badge_free_return: "Free Return Delivery", txt_return_paid: "Return fee paid to rider or self-pickup",
+            step4_title: "Services & Measurements", txt_measure_walkin: "Walk-in selected. We will measure you in-store.", txt_measure_lala: "Lalamove selected. Please provide measurements.",
+            srv_full: "Full Body Alteration", srv_hem: "Alter Length", srv_sleeve: "Alter Sleeves", srv_shoulder: "Alter Shoulders", srv_pads: "Add Shoulder Pads",
+            lbl_length: "Length (inches)", lbl_sleeve: "Sleeves (inches)", lbl_shoulder: "Shoulders (inches)", lbl_pads: "Shoulder Pads",
+            label_total_est: "Total Estimate", btn_confirm: "Confirm Booking",
+            txt_value: "Value", txt_yousave: "You Save",
+            btn_add_meas: "Add Measurements (Required)", btn_edit_meas: "Measurements Saved (Edit)",
+            modal_title: "Provide Measurements", btn_cancel: "Cancel", btn_save: "Save",
+            alert_no_items: "Please select at least one item.", alert_no_hub: "Please select a location.", alert_no_slot: "Please select a time slot.", alert_measure: "Please fill in measurements for all required items.",
+            alert_max: "must be strictly less than original size"
+        },
+        bm: {
+            page_title: "Alterasi & Penjagaan", page_subtitle: "Pilih item dari pesanan anda untuk dialter.",
+            step1_title: "Pilih Item", btn_next_loc: "Seterusnya: Lokasi",
+            step2_title: "Sahkan Lokasi", btn_use_order_addr: "Guna Alamat Tempahan", btn_use_gps: "Guna GPS Semasa", txt_detecting: "Mengesan...", btn_change: "Tukar",
+            step3_title: "Pilih Logistik", mode_walkin: "Walk-in", mode_lalamove: "Lalamove", label_timeslot: "Pilih Masa:", label_del_fee: "Caj Penghantaran", btn_next_srv: "Seterusnya: Servis",
+            txt_new_buyer: "Sesuai untuk pelanggan baru",
+            badge_free_return: "Penghantaran Pulang Percuma", txt_return_paid: "Caj pulang dibayar kepada rider atau ambil sendiri",
+            step4_title: "Servis & Ukuran", txt_measure_walkin: "Walk-in dipilih. Ukuran akan diambil di butik.", txt_measure_lala: "Lalamove dipilih. Sila masukkan ukuran.",
+            srv_full: "Alter Keseluruhan Baju", srv_hem: "Alter Labuh", srv_sleeve: "Alter Lengan", srv_shoulder: "Alter Bahu", srv_pads: "Tambah Span Bahu",
+            lbl_length: "Labuh (inci)", lbl_sleeve: "Lengan (inci)", lbl_shoulder: "Bahu (inci)", lbl_pads: "Span Bahu",
+            label_total_est: "Anggaran Jumlah", btn_confirm: "Sahkan Tempahan",
+            txt_value: "Nilai", txt_yousave: "Anda Jimat",
+            btn_add_meas: "Masukkan Ukuran (Wajib)", btn_edit_meas: "Ukuran Disimpan (Ubah)",
+            modal_title: "Masukkan Ukuran", btn_cancel: "Batal", btn_save: "Simpan",
+            alert_no_items: "Sila pilih sekurang-kurangnya satu item.", alert_no_hub: "Sila pilih lokasi.", alert_no_slot: "Sila pilih masa.", alert_measure: "Sila lengkapkan semua ukuran yang diperlukan.",
+            alert_max: "mesti kurang dari saiz asal"
+        }
+    };
+    let currentLang = 'en';
+
+    function setLang(lang) {
+        currentLang = lang;
+        document.querySelectorAll('[data-t]').forEach(el => {
+            const key = el.getAttribute('data-t');
+            if(t[lang][key]) el.innerText = t[lang][key];
+        });
+        document.getElementById('lang-en').className = lang === 'en' ? "text-xs font-bold text-luxe" : "text-xs text-white/50 hover:text-white";
+        document.getElementById('lang-bm').className = lang === 'bm' ? "text-xs font-bold text-luxe" : "text-xs text-white/50 hover:text-white";
+        updateMeasurementInstruction();
+        
+        if(document.getElementById('hub-list').innerHTML !== "") renderHubs();
+
+        if(document.getElementById('services-container').innerHTML !== "") {
+            document.getElementById('services-container').dataset.needsRender = "true"; renderServices(); 
+        }
+    }
+
+    // --- STATE & SIZE CHART ---
+    const sizeChart = {
+        'XS': { length: 55, sleeve: 22, shoulder: 14 },
+        'S': { length: 55, sleeve: 22, shoulder: 15 },
+        'M': { length: 57, sleeve: 23, shoulder: 16 },
+        'L': { length: 60, sleeve: 23.5, shoulder: 16.5 },
+        'XL': { length: 60, sleeve: 23.5, shoulder: 17.5 },
+        'XXL': { length: 60, sleeve: 23.5, shoulder: 18 },
+        'XXXL': { length: 60, sleeve: 23.5, shoulder: 19 }
+    };
+
+    const hubs = [
+      { id: 1, name: "Arabista Damai Perdana", lat: 3.0370, lng: 101.7424 },
+      { id: 2, name: "Alteration BTHO (Cheras)", lat: 3.0450, lng: 101.7550 },
+      { id: 3, name: "Butik Jahit (Balakong)", lat: 3.0280, lng: 101.7450 },
+      { id: 4, name: "Tailor Kak Bedah (Shah Alam)", lat: 3.0655, lng: 101.4830 },
+      { id: 5, name: "Tailor Sarah (Wangsa Maju)", lat: 3.2000, lng: 101.7400 },
+      { id: 6, name: "Tukang Jahit (Kajang)", lat: 2.9935, lng: 101.7874 }
+    ];
+
+    const timeSlots = ["10:00", "11:30", "14:00", "15:30", "17:00", "20:00"];
+    
+    let state = {
+        selectedItems: [], 
+        lat: 0, lng: 0, mode: 'walkin', hubId: null, hubDist: 0, slot: null,
+        deliveryCost: 0, servicesTotal: 0,
+        measurements: {} 
+    };
+    let editingItemId = null;
+
+    // --- LOGIC ---
+
+    // STEP 1: Sync dynamic changes instantly
+    function syncItems() {
+        const checked = document.querySelectorAll('input[name="order-item"]:checked');
+        const newSelected = [];
+        
+        checked.forEach(cb => {
+            const name = cb.parentElement.querySelector('h3').innerText;
+            const sizeStr = cb.parentElement.querySelector('p').innerText;
+            const sizeMatch = sizeStr.match(/Size:\s*([A-Z]+)/i);
+            const size = sizeMatch ? sizeMatch[1].toUpperCase() : 'M';
+            
+            newSelected.push({ id: cb.value, name: name, size: size });
+            if(!state.measurements[cb.value]) state.measurements[cb.value] = { length:'', sleeve:'', shoulder:'', pads:'' };
+        });
+        
+        state.selectedItems = newSelected;
+        
+        if(!document.getElementById('step-4').classList.contains('opacity-30')) {
+            document.getElementById('services-container').dataset.needsRender = "true";
+            renderServices();
+            if(state.selectedItems.length === 0) {
+                document.getElementById('services-container').innerHTML = '<p class="text-white/50 text-sm py-4">No items selected. Please select items in Step 1.</p>';
+            }
+            calculateTotal();
+        }
+    }
+
+    function confirmItems() {
+        syncItems();
+        if(state.selectedItems.length === 0) return alert(t[currentLang].alert_no_items);
+        unlockStep(2); document.getElementById('step-2').scrollIntoView({behavior: 'smooth', block: 'center'});
+    }
+
+    // STEP 2
+    function useOrderAddress() { state.lat = 3.0300; state.lng = 101.7600; showLocSuccess("Tun Hussein Onn, Cheras"); }
+    function useGPS() {
+        if(!navigator.geolocation) return alert("Geo not supported");
+        navigator.geolocation.getCurrentPosition(
+            pos => { state.lat = pos.coords.latitude; state.lng = pos.coords.longitude; showLocSuccess(`GPS: ${state.lat.toFixed(4)}, ${state.lng.toFixed(4)}`); },
+            () => { alert("Failed. Using Order Address."); useOrderAddress(); }
+        );
+    }
+    function showLocSuccess(addr) {
+        document.getElementById('loc-buttons').classList.add('hidden'); document.getElementById('validated-loc').classList.remove('hidden');
+        document.getElementById('final-address').innerText = addr; unlockStep(3); renderHubs(); renderSlots();
+    }
+    function resetLoc() {
+        document.getElementById('loc-buttons').classList.remove('hidden'); document.getElementById('validated-loc').classList.add('hidden');
+        lockStep(3); lockStep(4);
+    }
+
+    // STEP 3
+    function renderHubs() {
+        hubs.forEach(h => {
+            h.dist = getDist(state.lat, state.lng, h.lat, h.lng);
+            h.fee = Math.ceil(5 + (h.dist * 1.0));
+        });
+        hubs.sort((a,b) => a.dist - b.dist);
+        
+        const list = document.getElementById('hub-list'); 
+        list.innerHTML = '';
+        
+        hubs.forEach(h => {
+            const isSelected = state.hubId === h.id;
+            let lalamoveHtml = '';
+            
+            if(state.mode === 'lalamove') {
+                if(h.fee < 10) {
+                    lalamoveHtml = `<div class="mt-1 text-[10px] font-bold text-green-400 bg-green-500/10 inline-block px-1.5 py-0.5 rounded border border-green-500/20" data-t="badge_free_return">${t[currentLang].badge_free_return}</div>`;
+                } else {
+                    lalamoveHtml = `<div class="mt-1 text-[10px] text-white/40" data-t="txt_return_paid">${t[currentLang].txt_return_paid}</div>`;
+                }
+            }
+
+            list.innerHTML += `
+            <div onclick="selectHub(${h.id}, ${h.dist}, ${h.fee})" id="hub-${h.id}" class="p-3 rounded-lg border ${isSelected ? 'border-luxe bg-luxe/10' : 'border-white/10 opacity-70'} hover:bg-white/5 cursor-pointer flex justify-between items-center transition">
+                <div>
+                    <span class="text-sm text-white/90 font-medium block">${h.name}</span>
+                    ${lalamoveHtml}
+                </div>
+                <span class="text-xs font-bold text-luxe">${h.dist.toFixed(1)} km</span>
+            </div>`;
+        });
+    }
+
+    function selectHub(id, dist, fee) {
+        state.hubId = id; state.hubDist = dist;
+        renderHubs(); 
+        updateLogisticsCost(); checkStep3Complete();
+    }
+
+    function renderSlots() {
+        const div = document.getElementById('slot-container'); if(div.innerHTML !== "") return;
+        timeSlots.forEach(time => div.innerHTML += `<button onclick="setSlot('${time}')" id="slot-${time.replace(':','')}" class="text-xs py-2 border border-white/10 rounded hover:bg-white/10 text-white/60">${time}</button>`);
+    }
+    function setSlot(time) {
+        state.slot = time; timeSlots.forEach(s => document.getElementById(`slot-${s.replace(':','')}`).className = "text-xs py-2 border border-white/10 rounded hover:bg-white/10 text-white/60");
+        document.getElementById(`slot-${time.replace(':','')}`).className = "text-xs py-2 border border-luxe bg-luxe text-brand font-bold rounded";
+        checkStep3Complete();
+    }
+    
+    function setMode(m) {
+        state.mode = m;
+        const w = document.getElementById('btn-walkin'); const l = document.getElementById('btn-lalamove');
+        const wc = document.getElementById('walkin-panel'); const lc = document.getElementById('lalamove-panel');
+        
+        if(m === 'walkin') {
+            w.classList.replace('border-white/10', 'border-luxe'); w.classList.add('bg-luxe/10');
+            w.classList.replace('text-white/70', 'text-white');
+            l.classList.replace('border-orange-500', 'border-white/10'); l.classList.remove('bg-orange-500/10');
+            l.classList.replace('text-white', 'text-white/70');
+            wc.classList.remove('hidden'); lc.classList.add('hidden'); state.deliveryCost = 0;
+        } else {
+            l.classList.replace('border-white/10', 'border-orange-500'); l.classList.add('bg-orange-500/10');
+            l.classList.replace('text-white/70', 'text-white');
+            w.classList.replace('border-luxe', 'border-white/10'); w.classList.remove('bg-luxe/10');
+            w.classList.replace('text-white', 'text-white/70');
+            lc.classList.remove('hidden'); wc.classList.add('hidden'); updateLogisticsCost();
+        }
+        renderHubs(); 
+        updateMeasurementInstruction(); renderServices(); checkStep3Complete(); calculateTotal();
+    }
+    
+    function updateLogisticsCost() {
+        if(state.mode === 'lalamove' && state.hubId) {
+            state.deliveryCost = Math.ceil(5 + (state.hubDist * 1.0));
+            document.getElementById('del-price').innerText = "RM " + state.deliveryCost.toFixed(2);
+        } else state.deliveryCost = 0;
+        calculateTotal();
+    }
+    function checkStep3Complete() {
+        const btn = document.getElementById('btn-logistics-next');
+        if(state.hubId && (state.mode === 'lalamove' || (state.mode === 'walkin' && state.slot))) {
+            btn.disabled = false; btn.classList.replace('bg-white/10', 'bg-luxe'); btn.classList.replace('text-white/40', 'text-brand');
+        } else {
+            btn.disabled = true; btn.classList.replace('bg-luxe', 'bg-white/10'); btn.classList.replace('text-brand', 'text-white/40');
+        }
+    }
+    function confirmLogistics() {
+        updateMeasurementInstruction(); renderServices(); unlockStep(4); document.getElementById('step-4').scrollIntoView({behavior: 'smooth', block: 'start'});
+    }
+
+    // STEP 4
+    function updateMeasurementInstruction() {
+        const el = document.getElementById('measure-instruction');
+        el.innerText = state.mode === 'walkin' ? t[currentLang].txt_measure_walkin : t[currentLang].txt_measure_lala;
+        if(state.mode === 'lalamove') el.classList.replace('text-white/50', 'text-luxe'); else el.classList.replace('text-luxe', 'text-white/50');
+    }
+
+    function renderServices() {
+        const container = document.getElementById('services-container');
+        if(container.innerHTML !== "" && !container.dataset.needsRender) return; 
+        if(state.selectedItems.length === 0) return;
+        
+        container.innerHTML = '';
+        state.selectedItems.forEach(item => {
+            const block = document.createElement('div');
+            block.className = "bg-white/5 border border-white/10 rounded-xl overflow-hidden relative";
+            
+            const header = `<div class="bg-black/30 p-4 border-b border-white/5 font-display text-lg flex justify-between"><span class="text-white">${item.name}</span><span class="text-xs font-sans text-luxe border border-luxe/30 px-2 py-0.5 rounded">Size: ${item.size}</span></div>`;
+            
+            const body = `
+            <div class="p-4 space-y-3">
+                <div class="border border-luxe/50 rounded-lg p-4 bg-gradient-to-br from-luxe/10 to-transparent hover:border-luxe transition relative group">
+                    <div class="absolute -top-2.5 right-4 bg-luxe text-brand text-[9px] font-bold px-2 py-0.5 rounded shadow-lg uppercase tracking-wider" data-t="txt_value">${t[currentLang].txt_value} RM 40 | ${t[currentLang].txt_yousave} RM 10</div>
+                    <label class="flex items-start gap-3 cursor-pointer">
+                        <input type="checkbox" id="cb-${item.id}-full" value="30" class="mt-1.5 w-5 h-5 rounded border-luxe/50 text-luxe focus:ring-luxe bg-transparent srv-cb transition" onchange="handleSrvCheck('${item.id}', 'full')">
+                        <div class="flex-1">
+                            <div class="flex justify-between items-center mb-1">
+                                <span class="text-base font-medium text-white group-hover:text-luxe transition" data-t="srv_full">${t[currentLang].srv_full}</span>
+                                <span class="text-luxe font-bold text-lg">RM 30</span>
+                            </div>
+                        </div>
+                    </label>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3 pt-2">
+                    <div class="border border-white/10 rounded-lg p-3 hover:border-luxe/50 transition" id="wrap-${item.id}-hem">
+                        <label class="flex items-center gap-3 cursor-pointer">
+                            <input type="checkbox" id="cb-${item.id}-hem" value="12" class="w-4 h-4 rounded border-white/30 text-luxe bg-transparent srv-cb" onchange="handleSrvCheck('${item.id}', 'hem')">
+                            <div class="flex-1 flex justify-between text-sm"><span data-t="srv_hem">${t[currentLang].srv_hem}</span> <span class="text-white/50">RM12</span></div>
+                        </label>
+                    </div>
+                    <div class="border border-white/10 rounded-lg p-3 hover:border-luxe/50 transition" id="wrap-${item.id}-sleeve">
+                        <label class="flex items-center gap-3 cursor-pointer">
+                            <input type="checkbox" id="cb-${item.id}-sleeve" value="12" class="w-4 h-4 rounded border-white/30 text-luxe bg-transparent srv-cb" onchange="handleSrvCheck('${item.id}', 'sleeve')">
+                            <div class="flex-1 flex justify-between text-sm"><span data-t="srv_sleeve">${t[currentLang].srv_sleeve}</span> <span class="text-white/50">RM12</span></div>
+                        </label>
+                    </div>
+                    <div class="border border-white/10 rounded-lg p-3 hover:border-luxe/50 transition" id="wrap-${item.id}-shoulder">
+                        <label class="flex items-center gap-3 cursor-pointer">
+                            <input type="checkbox" id="cb-${item.id}-shoulder" value="10" class="w-4 h-4 rounded border-white/30 text-luxe bg-transparent srv-cb" onchange="handleSrvCheck('${item.id}', 'shoulder')">
+                            <div class="flex-1 flex justify-between text-sm"><span data-t="srv_shoulder">${t[currentLang].srv_shoulder}</span> <span class="text-white/50">RM10</span></div>
+                        </label>
+                    </div>
+                    <div class="border border-white/10 rounded-lg p-3 hover:border-luxe/50 transition" id="wrap-${item.id}-pads">
+                        <label class="flex items-center gap-3 cursor-pointer">
+                            <input type="checkbox" id="cb-${item.id}-pads" value="6" class="w-4 h-4 rounded border-white/30 text-luxe bg-transparent srv-cb" onchange="handleSrvCheck('${item.id}', 'pads')">
+                            <div class="flex-1 flex justify-between text-sm"><span data-t="srv_pads">${t[currentLang].srv_pads}</span> <span class="text-white/50">RM6</span></div>
+                        </label>
+                    </div>
+                </div>
+
+                <div id="btn-container-${item.id}" class="hidden pt-4 border-t border-white/10 mt-4">
+                    <button onclick="openModal('${item.id}')" id="meas-btn-${item.id}" class="w-full py-3 rounded-xl border border-luxe bg-luxe/10 text-luxe text-sm font-bold flex justify-center items-center gap-2 hover:bg-luxe hover:text-brand transition">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
+                        <span data-t="btn_add_meas">${t[currentLang].btn_add_meas}</span>
+                    </button>
+                </div>
+            </div>`;
+            block.innerHTML = header + body;
+            container.appendChild(block);
+            handleSrvCheck(item.id, 'init', true);
+        });
+        container.dataset.needsRender = false;
+    }
+
+    function handleSrvCheck(itemId, srvId, isInit = false) {
+        const fullCb = document.getElementById(`cb-${itemId}-full`);
+        if(!fullCb) return; 
+        
+        ['hem', 'sleeve', 'shoulder', 'pads'].forEach(sub => {
+            const subCb = document.getElementById(`cb-${itemId}-${sub}`);
+            const subWrap = document.getElementById(`wrap-${itemId}-${sub}`);
+            if(fullCb.checked) {
+                if(subCb) { subCb.checked = false; subCb.disabled = true; }
+                if(subWrap) { subWrap.classList.add('opacity-40', 'pointer-events-none'); subWrap.style.textDecoration = 'line-through'; }
+            } else {
+                if(subCb) subCb.disabled = false;
+                if(subWrap) { subWrap.classList.remove('opacity-40', 'pointer-events-none'); subWrap.style.textDecoration = 'none'; }
+            }
+        });
+
+        if(!isInit) calculateTotal();
+        updateMeasurementBtn(itemId);
+    }
+
+    function updateMeasurementBtn(itemId) {
+        const btnContainer = document.getElementById(`btn-container-${itemId}`);
+        if(state.mode !== 'lalamove') { btnContainer.classList.add('hidden'); return; }
+
+        const cbs = ['full', 'hem', 'sleeve', 'shoulder']; 
+        const needsMeas = cbs.some(id => document.getElementById(`cb-${itemId}-${id}`)?.checked);
+
+        if(needsMeas) {
+            btnContainer.classList.remove('hidden');
+            const btn = document.getElementById(`meas-btn-${itemId}`);
+            const data = state.measurements[itemId];
+            const isFilled = (document.getElementById(`cb-${itemId}-full`)?.checked && data.length && data.sleeve && data.shoulder) ||
+                             (document.getElementById(`cb-${itemId}-hem`)?.checked && data.length) ||
+                             (document.getElementById(`cb-${itemId}-sleeve`)?.checked && data.sleeve) ||
+                             (document.getElementById(`cb-${itemId}-shoulder`)?.checked && data.shoulder);
+            
+            if(isFilled) {
+                btn.className = "w-full py-3 rounded-xl border border-green-500/50 bg-green-500/10 text-green-400 text-sm font-bold flex justify-center items-center gap-2 hover:bg-green-500/20 transition";
+                btn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" /></svg> <span data-t="btn_edit_meas">${t[currentLang].btn_edit_meas}</span>`;
+            } else {
+                btn.className = "w-full py-3 rounded-xl border border-luxe bg-luxe text-brand text-sm font-bold flex justify-center items-center gap-2 hover:bg-white transition shadow-[0_0_15px_rgba(192,160,98,0.3)]";
+                btn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg> <span data-t="btn_add_meas">${t[currentLang].btn_add_meas}</span>`;
+            }
+        } else {
+            btnContainer.classList.add('hidden');
+        }
+    }
+
+    function calculateTotal() {
+        state.servicesTotal = 0;
+        document.querySelectorAll('.srv-cb:checked').forEach(cb => state.servicesTotal += parseInt(cb.value));
+        document.getElementById('breakdown-text').innerText = `Delivery: RM ${state.deliveryCost} | Services: RM ${state.servicesTotal}`;
+        document.getElementById('grand-total').innerText = "RM " + (state.servicesTotal + state.deliveryCost);
+    }
+
+    // --- MODAL LOGIC WITH VALIDATION ---
+    function openModal(itemId) {
+        editingItemId = itemId;
+        const item = state.selectedItems.find(i => i.id === itemId);
+        const limit = sizeChart[item.size] || sizeChart['M'];
+        
+        document.getElementById('modal-subtitle').innerText = `${item.name} (Size: ${item.size})`;
+        
+        const fieldsDiv = document.getElementById('modal-fields');
+        fieldsDiv.innerHTML = '';
+        const m = state.measurements[itemId];
+        const isFull = document.getElementById(`cb-${itemId}-full`).checked;
+
+        const buildInput = (key, labelKey, maxVal, type="number") => {
+            const labelText = t[currentLang][labelKey] + (maxVal ? ` (Max: ${maxVal}")` : '');
+            return `<div>
+                      <label class="block text-sm text-white/70 mb-2">${labelText}</label>
+                      ${type === 'select' 
+                        ? `<select id="mod-${key}"><option value="" class="text-black">Select...</option><option value="Yes" class="text-black" ${m[key]==='Yes'?'selected':''}>Yes</option><option value="No" class="text-black" ${m[key]==='No'?'selected':''}>No</option></select>`
+                        : `<input type="number" id="mod-${key}" value="${m[key]}" placeholder="${maxVal ? '< '+maxVal : ''}">`
+                      }
+                    </div>`;
+        };
+
+        if(isFull || document.getElementById(`cb-${itemId}-hem`)?.checked) 
+            fieldsDiv.innerHTML += buildInput('length', 'lbl_length', limit.length, 'number');
+        if(isFull || document.getElementById(`cb-${itemId}-sleeve`)?.checked) 
+            fieldsDiv.innerHTML += buildInput('sleeve', 'lbl_sleeve', limit.sleeve, 'number');
+        if(isFull || document.getElementById(`cb-${itemId}-shoulder`)?.checked) 
+            fieldsDiv.innerHTML += buildInput('shoulder', 'lbl_shoulder', limit.shoulder, 'number');
+        if(isFull) 
+            fieldsDiv.innerHTML += buildInput('pads', 'lbl_pads', null, 'select');
+
+        const modal = document.getElementById('measurement-modal');
+        const box = document.getElementById('modal-content-box');
+        modal.classList.remove('hidden');
+        setTimeout(() => { modal.classList.remove('opacity-0'); box.classList.remove('scale-95'); }, 10);
+    }
+
+    function closeModal() {
+        const modal = document.getElementById('measurement-modal');
+        const box = document.getElementById('modal-content-box');
+        modal.classList.add('opacity-0'); box.classList.add('scale-95');
+        setTimeout(() => { modal.classList.add('hidden'); }, 300);
+    }
+
+    function saveMeasurements() {
+        if(!editingItemId) return;
+        const item = state.selectedItems.find(i => i.id === editingItemId);
+        const limit = sizeChart[item.size] || sizeChart['M'];
+        
+        const m = state.measurements[editingItemId];
+        const lenEl = document.getElementById('mod-length');
+        const slvEl = document.getElementById('mod-sleeve');
+        const shdEl = document.getElementById('mod-shoulder');
+        const padEl = document.getElementById('mod-pads');
+        
+        let errorMsg = "";
+        if(lenEl && lenEl.value && parseFloat(lenEl.value) >= limit.length) 
+            errorMsg += `- ${t[currentLang].lbl_length} ${t[currentLang].alert_max} (${limit.length}").\n`;
+        if(slvEl && slvEl.value && parseFloat(slvEl.value) >= limit.sleeve) 
+            errorMsg += `- ${t[currentLang].lbl_sleeve} ${t[currentLang].alert_max} (${limit.sleeve}").\n`;
+        if(shdEl && shdEl.value && parseFloat(shdEl.value) >= limit.shoulder) 
+            errorMsg += `- ${t[currentLang].lbl_shoulder} ${t[currentLang].alert_max} (${limit.shoulder}").\n`;
+        
+        if(errorMsg !== "") {
+            alert(errorMsg);
+            return;
+        }
+
+        if(lenEl) m.length = lenEl.value;
+        if(slvEl) m.sleeve = slvEl.value;
+        if(shdEl) m.shoulder = shdEl.value;
+        if(padEl) m.pads = padEl.value;
+        
+        updateMeasurementBtn(editingItemId);
+        closeModal();
+    }
+
+    function submitOrder() {
+        if(!state.hubId) return alert(t[currentLang].alert_no_hub);
+        if(state.servicesTotal === 0) return alert("Please select at least one service.");
+        
+        if(state.mode === 'lalamove') {
+            let valid = true;
+            state.selectedItems.forEach(item => {
+                const id = item.id;
+                const m = state.measurements[id];
+                if(document.getElementById(`cb-${id}-full`)?.checked && (!m.length || !m.sleeve || !m.shoulder || !m.pads)) valid = false;
+                if(document.getElementById(`cb-${id}-hem`)?.checked && !m.length) valid = false;
+                if(document.getElementById(`cb-${id}-sleeve`)?.checked && !m.sleeve) valid = false;
+                if(document.getElementById(`cb-${id}-shoulder`)?.checked && !m.shoulder) valid = false;
+            });
+            if(!valid) return alert(t[currentLang].alert_measure);
+        }
+
+        alert(t[currentLang].btn_confirm + " Successful!\nTotal: RM " + (state.servicesTotal + state.deliveryCost));
+    }
+
+    function unlockStep(n) { document.getElementById(`step-${n}`).classList.remove('opacity-30', 'pointer-events-none'); document.getElementById(`badge-${n}`).classList.replace('border-white/20', 'border-luxe'); document.getElementById(`badge-${n}`).classList.replace('text-white/50', 'text-luxe'); }
+    function lockStep(n) { document.getElementById(`step-${n}`).classList.add('opacity-30', 'pointer-events-none'); }
+    function getDist(lat1,lon1,lat2,lon2) { var R=6371, dLat=d2r(lat2-lat1), dLon=d2r(lon2-lon1); var a=Math.sin(dLat/2)*Math.sin(dLat/2)+Math.cos(d2r(lat1))*Math.cos(d2r(lat2))*Math.sin(dLon/2)*Math.sin(dLon/2); return R*(2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a))); }
+    function d2r(d){return d*(Math.PI/180)}
+
+  </script>
+</body>
+</html>
