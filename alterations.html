@@ -258,7 +258,7 @@
             label_total_est: "Total Estimate", btn_confirm: "Confirm Booking", txt_value: "Value", txt_yousave: "You Save",
             btn_add_meas: "Add Measurements (Required)", btn_edit_meas: "Measurements Saved (Edit)", modal_title: "Provide Measurements", btn_save: "Save",
             alert_no_items: "Please select at least one item.", alert_no_hub: "Please select an Alteration Point.", alert_measure: "Please fill in measurements for all required items.",
-            alert_max: "must be strictly less than original size", txt_no_items_step4: "No items selected. Please select items in Step 1."
+            alert_max: "must be strictly less than original size", alert_max_full: "must be less than or equal to original size", alert_full_equal: "At least one measurement must be reduced for a Full Body alteration.", txt_no_items_step4: "No items selected. Please select items in Step 1."
         },
         bm: {
             page_title: "Servis Alterasi", page_subtitle: "Pilih item untuk dialter.",
@@ -280,7 +280,7 @@
             label_total_est: "Anggaran Jumlah", btn_confirm: "Sahkan Tempahan", txt_value: "Nilai", txt_yousave: "Anda Jimat",
             btn_add_meas: "Masukkan Ukuran (Wajib)", btn_edit_meas: "Ukuran Disimpan (Ubah)", modal_title: "Masukkan Ukuran", btn_save: "Simpan",
             alert_no_items: "Sila pilih sekurang-kurangnya satu item.", alert_no_hub: "Sila pilih Pusat Alterasi.", alert_measure: "Sila lengkapkan semua ukuran yang diperlukan.",
-            alert_max: "mesti kurang dari saiz asal", txt_no_items_step4: "Tiada item dipilih. Sila pilih item di Langkah 1."
+            alert_max: "mesti kurang dari saiz asal", alert_max_full: "mesti kurang dari atau sama dengan saiz asal", alert_full_equal: "Sekurang-kurangnya satu ukuran mesti dikurangkan untuk Alter Keseluruhan Baju.", txt_no_items_step4: "Tiada item dipilih. Sila pilih item di Langkah 1."
         }
     };
     let currentLang = 'en';
@@ -423,7 +423,6 @@
             let lalamoveHtml = '';
             if(state.mode === 'lalamove') lalamoveHtml = h.fee < 10 ? `<div class="mt-1 text-[10px] font-bold text-green-400 bg-green-500/10 inline-block px-1.5 py-0.5 rounded border border-green-500/20" data-t="badge_free_return">${t[currentLang].badge_free_return}</div>` : `<div class="mt-1 text-[10px] text-white/40" data-t="txt_return_paid">${t[currentLang].txt_return_paid}</div>`;
             
-            // Re-structured layout to include the Call button on the right edge
             list.innerHTML += `
             <div onclick="selectHub(${h.id}, ${h.dist}, ${h.fee})" class="p-3 rounded-lg border ${isSelected ? 'border-luxe bg-luxe/10' : 'border-white/10 opacity-70'} hover:bg-white/5 cursor-pointer flex justify-between items-center transition gap-3">
                 <div class="flex-1">
@@ -444,18 +443,9 @@
     }
     
     function selectHub(id, dist, fee) { 
-        state.hubId = id; 
-        state.hubDist = dist; 
-        
-        // BUG FIX: Ensure the delivery cost updates instantly when a new hub is clicked
-        if (state.mode === 'lalamove') {
-            state.deliveryCost = fee;
-        }
-        
-        renderHubs(); 
-        updateDispatchUI(); 
-        calculateTotal(); // Update the Grand Total instantly
-        checkStep3Complete(); 
+        state.hubId = id; state.hubDist = dist; 
+        if (state.mode === 'lalamove') state.deliveryCost = fee;
+        renderHubs(); updateDispatchUI(); calculateTotal(); checkStep3Complete(); 
     }
     
     function setMode(m) {
@@ -507,8 +497,20 @@
             block.innerHTML = header + body; container.appendChild(block); handleSrvCheck(item.id, 'init', true);
         }); container.dataset.needsRender = false;
     }
+    
     function handleSrvCheck(itemId, srvId, isInit = false) {
         const fullCb = document.getElementById(`cb-${itemId}-full`); if(!fullCb) return; 
+        const m = state.measurements[itemId];
+        
+        // BUG FIX: State Leak Wipe. Clear saved measurements if an option is unchecked.
+        if (!isInit) {
+            if (srvId === 'full' && !fullCb.checked) { m.length = ''; m.sleeve = ''; m.shoulder = ''; m.pads = ''; }
+            else if (srvId === 'hem' && !document.getElementById(`cb-${itemId}-hem`).checked) m.length = '';
+            else if (srvId === 'sleeve' && !document.getElementById(`cb-${itemId}-sleeve`).checked) m.sleeve = '';
+            else if (srvId === 'shoulder' && !document.getElementById(`cb-${itemId}-shoulder`).checked) m.shoulder = '';
+            else if (srvId === 'pads' && !document.getElementById(`cb-${itemId}-pads`).checked) m.pads = '';
+        }
+
         ['hem', 'sleeve', 'shoulder', 'pads'].forEach(sub => {
             const subCb = document.getElementById(`cb-${itemId}-${sub}`); const subWrap = document.getElementById(`wrap-${itemId}-${sub}`);
             if(fullCb.checked) { if(subCb) { subCb.checked = false; subCb.disabled = true; } if(subWrap) { subWrap.classList.add('opacity-40', 'pointer-events-none'); subWrap.style.textDecoration = 'line-through'; } } 
@@ -516,6 +518,7 @@
         });
         if(!isInit) calculateTotal(); updateMeasurementBtn(itemId);
     }
+    
     function updateMeasurementBtn(itemId) {
         const btnContainer = document.getElementById(`btn-container-${itemId}`); if(state.mode !== 'lalamove') { btnContainer.classList.add('hidden'); return; }
         const needsMeas = ['full', 'hem', 'sleeve', 'shoulder'].some(id => document.getElementById(`cb-${itemId}-${id}`)?.checked);
@@ -532,22 +535,51 @@
     function openModal(itemId) {
         editingItemId = itemId; const item = state.selectedItems.find(i => i.id === itemId); const limit = sizeChart[item.size] || sizeChart['M']; document.getElementById('modal-subtitle').innerText = `${item.name} (Size: ${item.size})`;
         const fieldsDiv = document.getElementById('modal-fields'); fieldsDiv.innerHTML = ''; const m = state.measurements[itemId]; const isFull = document.getElementById(`cb-${itemId}-full`).checked;
-        const buildInput = (key, labelKey, maxVal, type="number") => `<div><label class="block text-sm text-white/70 mb-2">${t[currentLang][labelKey] + (maxVal ? ` (Max: ${maxVal}")` : '')}</label>${type === 'select' ? `<select id="mod-${key}"><option value="" class="text-black">Select...</option><option value="Yes" class="text-black" ${m[key]==='Yes'?'selected':''}>Yes</option><option value="No" class="text-black" ${m[key]==='No'?'selected':''}>No</option></select>` : `<input type="number" id="mod-${key}" value="${m[key]}" placeholder="${maxVal ? '< '+maxVal : ''}">`}</div>`;
+        
+        // BUG FIX: Dynamic placeholders showing '<=' or '<' based on context.
+        const buildInput = (key, labelKey, maxVal, type="number") => {
+            const op = isFull ? '<=' : '<';
+            return `<div><label class="block text-sm text-white/70 mb-2">${t[currentLang][labelKey] + (maxVal ? ` (Max: ${maxVal}")` : '')}</label>${type === 'select' ? `<select id="mod-${key}"><option value="" class="text-black">Select...</option><option value="Yes" class="text-black" ${m[key]==='Yes'?'selected':''}>Yes</option><option value="No" class="text-black" ${m[key]==='No'?'selected':''}>No</option></select>` : `<input type="number" id="mod-${key}" value="${m[key]}" placeholder="${maxVal ? op+' '+maxVal : ''}">`}</div>`;
+        };
+
         if(isFull || document.getElementById(`cb-${itemId}-hem`)?.checked) fieldsDiv.innerHTML += buildInput('length', 'lbl_length', limit.length, 'number');
         if(isFull || document.getElementById(`cb-${itemId}-sleeve`)?.checked) fieldsDiv.innerHTML += buildInput('sleeve', 'lbl_sleeve', limit.sleeve, 'number');
         if(isFull || document.getElementById(`cb-${itemId}-shoulder`)?.checked) fieldsDiv.innerHTML += buildInput('shoulder', 'lbl_shoulder', limit.shoulder, 'number');
         if(isFull) fieldsDiv.innerHTML += buildInput('pads', 'lbl_pads', null, 'select');
         const modal = document.getElementById('measurement-modal'); const box = document.getElementById('modal-content-box'); modal.classList.remove('hidden'); setTimeout(() => { modal.classList.remove('opacity-0'); box.classList.remove('scale-95'); }, 10);
     }
+    
     function closeModal() { const modal = document.getElementById('measurement-modal'); const box = document.getElementById('modal-content-box'); modal.classList.add('opacity-0'); box.classList.add('scale-95'); setTimeout(() => { modal.classList.add('hidden'); }, 300); }
+    
     function saveMeasurements() {
         if(!editingItemId) return; const item = state.selectedItems.find(i => i.id === editingItemId); const limit = sizeChart[item.size] || sizeChart['M']; const m = state.measurements[editingItemId];
         const lenEl = document.getElementById('mod-length'); const slvEl = document.getElementById('mod-sleeve'); const shdEl = document.getElementById('mod-shoulder'); const padEl = document.getElementById('mod-pads');
+        const isFull = document.getElementById(`cb-${editingItemId}-full`).checked;
+        
         let errorMsg = "";
-        if(lenEl && lenEl.value && parseFloat(lenEl.value) >= limit.length) errorMsg += `- ${t[currentLang].lbl_length} ${t[currentLang].alert_max} (${limit.length}").\n`;
-        if(slvEl && slvEl.value && parseFloat(slvEl.value) >= limit.sleeve) errorMsg += `- ${t[currentLang].lbl_sleeve} ${t[currentLang].alert_max} (${limit.sleeve}").\n`;
-        if(shdEl && shdEl.value && parseFloat(shdEl.value) >= limit.shoulder) errorMsg += `- ${t[currentLang].lbl_shoulder} ${t[currentLang].alert_max} (${limit.shoulder}").\n`;
+        
+        // Validation Logic
+        if (isFull) {
+            let isAllEqual = true;
+            
+            // Allow <= limit. Only throw error if > limit.
+            if(lenEl && lenEl.value) { if(parseFloat(lenEl.value) > limit.length) errorMsg += `- ${t[currentLang].lbl_length} ${t[currentLang].alert_max_full} (${limit.length}").\n`; if(parseFloat(lenEl.value) < limit.length) isAllEqual = false; }
+            if(slvEl && slvEl.value) { if(parseFloat(slvEl.value) > limit.sleeve) errorMsg += `- ${t[currentLang].lbl_sleeve} ${t[currentLang].alert_max_full} (${limit.sleeve}").\n`; if(parseFloat(slvEl.value) < limit.sleeve) isAllEqual = false; }
+            if(shdEl && shdEl.value) { if(parseFloat(shdEl.value) > limit.shoulder) errorMsg += `- ${t[currentLang].lbl_shoulder} ${t[currentLang].alert_max_full} (${limit.shoulder}").\n`; if(parseFloat(shdEl.value) < limit.shoulder) isAllEqual = false; }
+            
+            // Check if all fields are filled, valid, but NONE were reduced.
+            if (errorMsg === "" && isAllEqual && lenEl && lenEl.value && slvEl && slvEl.value && shdEl && shdEl.value) {
+                errorMsg += t[currentLang].alert_full_equal + "\n";
+            }
+        } else {
+            // Strictly enforce < limit
+            if(lenEl && lenEl.value && parseFloat(lenEl.value) >= limit.length) errorMsg += `- ${t[currentLang].lbl_length} ${t[currentLang].alert_max} (${limit.length}").\n`;
+            if(slvEl && slvEl.value && parseFloat(slvEl.value) >= limit.sleeve) errorMsg += `- ${t[currentLang].lbl_sleeve} ${t[currentLang].alert_max} (${limit.sleeve}").\n`;
+            if(shdEl && shdEl.value && parseFloat(shdEl.value) >= limit.shoulder) errorMsg += `- ${t[currentLang].lbl_shoulder} ${t[currentLang].alert_max} (${limit.shoulder}").\n`;
+        }
+
         if(errorMsg !== "") return alert(errorMsg);
+        
         if(lenEl) m.length = lenEl.value; if(slvEl) m.sleeve = slvEl.value; if(shdEl) m.shoulder = shdEl.value; if(padEl) m.pads = padEl.value;
         updateMeasurementBtn(editingItemId); closeModal();
     }
