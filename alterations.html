@@ -339,12 +339,11 @@
                 rawItems.forEach(itemStr => {
                     const parts = itemStr.trim().split('|');
                     if(parts.length >= 2) {
-                        const design = parts[0].trim(); // Extract exact design code
+                        const design = parts[0].trim();
                         const size = parts[1].trim();
                         const qty = parseInt(parts[2]) || 1;
                         
                         for(let q=0; q < qty; q++) {
-                            // Fixed: Removed the word "Design" from the h3 tag
                             itemsList.innerHTML += `
                             <label class="flex items-center gap-4 p-4 border border-white/10 rounded-xl hover:bg-white/5 cursor-pointer transition">
                                 <input type="checkbox" name="order-item" value="a-${itemIdx}" data-design="${design}" data-size="${size}" onchange="syncItemsA()" class="w-5 h-5 rounded border-white/30 text-luxe focus:ring-luxe bg-transparent">
@@ -402,7 +401,6 @@
         document.querySelectorAll('input[name="order-item"]:checked').forEach(cb => {
             const design = cb.getAttribute('data-design');
             const size = cb.getAttribute('data-size');
-            // Fixed: Push raw design code without appending "Design "
             newSelected.push({ id: cb.value, name: design, size: size });
             if(!state.measurements[cb.value]) state.measurements[cb.value] = { length:'', sleeve:'', shoulder:'', pads:'' };
         });
@@ -413,7 +411,6 @@
         const newSelected = [];
         document.querySelectorAll('.manual-item-row').forEach((row, idx) => {
             const design = row.querySelector('.design-select').value; const size = row.querySelector('.size-select').value;
-            // Fixed: Push raw design code without appending "Design "
             if(design && size) { newSelected.push({ id: 'm' + idx, name: design, size: size }); if(!state.measurements['m'+idx]) state.measurements['m'+idx] = { length:'', sleeve:'', shoulder:'', pads:'' }; }
         });
         state.selectedItems = newSelected; refreshStep4Live();
@@ -477,7 +474,6 @@
             state.lng = coords.lng;
             
             document.getElementById('loc-buttons').classList.add('hidden');
-            // Fixed: Display exactly the 6-decimal GPS Coordinates
             document.getElementById('gps-detected-text').innerText = `GPS: ${state.lat.toFixed(6)}, ${state.lng.toFixed(6)}`; 
             document.getElementById('gps-details-panel').classList.remove('hidden');
             btnText.innerText = originalText;
@@ -563,8 +559,14 @@
     function renderHubs() {
         if(hubs.length === 0) return;
         
+        // Apply 1.4x Urban Multiplier to straight-line distance to protect driving distance delivery margins
         hubs.forEach(h => { 
-            h.dist = (state.lat !== "" && state.lng !== "") ? getDist(state.lat, state.lng, h.lat, h.lng) : 5.0; 
+            if (state.lat !== "" && state.lng !== "") {
+                const straightLine = getDist(state.lat, state.lng, h.lat, h.lng);
+                h.dist = straightLine * 1.4; 
+            } else {
+                h.dist = 5.0; // Default fallback
+            }
             h.fee = Math.ceil(5 + (h.dist * 1.0)); 
         });
         
@@ -585,7 +587,6 @@
             let lalamoveHtml = '';
             if(state.mode === 'lalamove') lalamoveHtml = h.fee < 10 ? `<div class="mt-1 text-[10px] font-bold text-green-400 bg-green-500/10 inline-block px-1.5 py-0.5 rounded border border-green-500/20" data-t="badge_free_return">${t[currentLang].badge_free_return}</div>` : `<div class="mt-1 text-[10px] text-white/40" data-t="txt_return_paid">${t[currentLang].txt_return_paid}</div>`;
             
-            // Fixed: Dropped the Open/Close badge block below the Hub Name
             list.innerHTML += `
             <div onclick="selectHub(${h.id}, ${h.dist}, ${h.fee})" class="p-3 rounded-lg border ${isSelected ? 'border-luxe bg-luxe/10' : 'border-white/10 opacity-70'} hover:bg-white/5 cursor-pointer flex justify-between items-center transition gap-3">
                 <div class="flex-1">
@@ -656,7 +657,6 @@
         container.innerHTML = '';
         state.selectedItems.forEach(item => {
             const block = document.createElement('div'); block.className = "bg-white/5 border border-white/10 rounded-xl overflow-hidden relative";
-            // Fixed: Header automatically injects pure item.name without "Design" prepended
             const header = `<div class="bg-black/30 p-4 border-b border-white/5 font-display text-lg flex justify-between"><span class="text-white">${item.name}</span><span class="text-xs font-sans text-luxe border border-luxe/30 px-2 py-0.5 rounded">Size: ${item.size}</span></div>`;
             const body = `<div class="p-4 space-y-3"><div class="border border-luxe/50 rounded-lg p-4 bg-gradient-to-br from-luxe/10 to-transparent hover:border-luxe transition relative group"><div class="absolute -top-2.5 right-4 bg-luxe text-brand text-[9px] font-bold px-2 py-0.5 rounded shadow-lg uppercase tracking-wider" data-t="txt_value">${t[currentLang].txt_value} RM 40 | ${t[currentLang].txt_yousave} RM 10</div><label class="flex items-start gap-3 cursor-pointer"><input type="checkbox" id="cb-${item.id}-full" value="30" class="mt-1.5 w-5 h-5 rounded border-luxe/50 text-luxe focus:ring-luxe bg-transparent srv-cb transition" onchange="handleSrvCheck('${item.id}', 'full')"><div class="flex-1"><div class="flex justify-between items-center mb-1"><span class="text-base font-medium text-white group-hover:text-luxe transition" data-t="srv_full">${t[currentLang].srv_full}</span><span class="text-luxe font-bold text-lg">RM 30</span></div></div></label></div><div class="grid grid-cols-2 gap-3 pt-2"><div class="border border-white/10 rounded-lg p-3 hover:border-luxe/50 transition" id="wrap-${item.id}-hem"><label class="flex items-center gap-3 cursor-pointer"><input type="checkbox" id="cb-${item.id}-hem" value="12" class="w-4 h-4 rounded border-white/30 text-luxe bg-transparent srv-cb" onchange="handleSrvCheck('${item.id}', 'hem')"><div class="flex-1 flex justify-between text-sm"><span data-t="srv_hem">${t[currentLang].srv_hem}</span> <span class="text-white/50">RM12</span></div></label></div><div class="border border-white/10 rounded-lg p-3 hover:border-luxe/50 transition" id="wrap-${item.id}-sleeve"><label class="flex items-center gap-3 cursor-pointer"><input type="checkbox" id="cb-${item.id}-sleeve" value="12" class="w-4 h-4 rounded border-white/30 text-luxe bg-transparent srv-cb" onchange="handleSrvCheck('${item.id}', 'sleeve')"><div class="flex-1 flex justify-between text-sm"><span data-t="srv_sleeve">${t[currentLang].srv_sleeve}</span> <span class="text-white/50">RM12</span></div></label></div><div class="border border-white/10 rounded-lg p-3 hover:border-luxe/50 transition" id="wrap-${item.id}-shoulder"><label class="flex items-center gap-3 cursor-pointer"><input type="checkbox" id="cb-${item.id}-shoulder" value="10" class="w-4 h-4 rounded border-white/30 text-luxe bg-transparent srv-cb" onchange="handleSrvCheck('${item.id}', 'shoulder')"><div class="flex-1 flex justify-between text-sm"><span data-t="srv_shoulder">${t[currentLang].srv_shoulder}</span> <span class="text-white/50">RM10</span></div></label></div><div class="border border-white/10 rounded-lg p-3 hover:border-luxe/50 transition" id="wrap-${item.id}-pads"><label class="flex items-center gap-3 cursor-pointer"><input type="checkbox" id="cb-${item.id}-pads" value="6" class="w-4 h-4 rounded border-white/30 text-luxe bg-transparent srv-cb" onchange="handleSrvCheck('${item.id}', 'pads')"><div class="flex-1 flex justify-between text-sm"><span data-t="srv_pads">${t[currentLang].srv_pads}</span> <span class="text-white/50">RM6</span></div></label></div></div><div id="btn-container-${item.id}" class="hidden pt-4 border-t border-white/10 mt-4"><button onclick="openModal('${item.id}')" id="meas-btn-${item.id}" class="w-full py-3 rounded-xl border border-luxe bg-luxe/10 text-luxe text-sm font-bold flex justify-center items-center gap-2 hover:bg-luxe hover:text-brand transition"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg><span data-t="btn_add_meas">${t[currentLang].btn_add_meas}</span></button></div></div>`;
             block.innerHTML = header + body; container.appendChild(block); handleSrvCheck(item.id, 'init', true);
