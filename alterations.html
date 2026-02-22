@@ -131,7 +131,7 @@
             </button>
             <button onclick="useGPS()" class="p-4 rounded-xl border border-white/10 hover:border-luxe hover:bg-white/5 transition text-left group">
                 <span class="block text-sm font-bold text-white mb-1 group-hover:text-luxe" data-t="btn_use_gps">Use Current GPS</span>
-                <span class="block text-xs text-white/50" data-t="txt_detecting">Detecting location...</span>
+                <span class="block text-xs text-white/50" id="gps-desc" data-t="txt_detecting">Detecting location...</span>
             </button>
           </div>
           <div id="validated-loc" class="hidden mt-2 p-3 bg-luxe/10 border border-luxe/30 rounded-lg flex justify-between items-center">
@@ -231,7 +231,7 @@
         en: {
             page_title: "Alteration & Care", page_subtitle: "Select items from your order to alter.",
             step1_title: "Select Items to Alter", btn_next_loc: "Next: Location",
-            step2_title: "Verify Location", btn_use_order_addr: "Use Order Address", btn_use_gps: "Use Current GPS", txt_detecting: "Detecting...", btn_change: "Change",
+            step2_title: "Verify Location", btn_use_order_addr: "Use Order Address", btn_use_gps: "Use Current GPS", txt_detecting: "Detecting location...", txt_locating_fresh: "Acquiring fresh GPS...", btn_change: "Change",
             step3_title: "Choose Logistics", mode_walkin: "Walk-in", mode_lalamove: "Lalamove", label_timeslot: "Select Time Slot:", label_del_fee: "Delivery Fee", btn_next_srv: "Next: Services",
             txt_new_buyer: "Ideal for new customers",
             badge_free_return: "Free Return Delivery", txt_return_paid: "Return fee paid to rider or self-pickup",
@@ -248,7 +248,7 @@
         bm: {
             page_title: "Alterasi & Penjagaan", page_subtitle: "Pilih item dari pesanan anda untuk dialter.",
             step1_title: "Pilih Item", btn_next_loc: "Seterusnya: Lokasi",
-            step2_title: "Sahkan Lokasi", btn_use_order_addr: "Guna Alamat Tempahan", btn_use_gps: "Guna GPS Semasa", txt_detecting: "Mengesan...", btn_change: "Tukar",
+            step2_title: "Sahkan Lokasi", btn_use_order_addr: "Guna Alamat Tempahan", btn_use_gps: "Guna GPS Semasa", txt_detecting: "Mengesan lokasi...", txt_locating_fresh: "Mendapatkan isyarat GPS baru...", btn_change: "Tukar",
             step3_title: "Pilih Logistik", mode_walkin: "Walk-in", mode_lalamove: "Lalamove", label_timeslot: "Pilih Masa:", label_del_fee: "Caj Penghantaran", btn_next_srv: "Seterusnya: Servis",
             txt_new_buyer: "Sesuai untuk pelanggan baru",
             badge_free_return: "Penghantaran Pulang Percuma", txt_return_paid: "Caj pulang dibayar kepada rider atau ambil sendiri",
@@ -349,13 +349,29 @@
 
     // STEP 2
     function useOrderAddress() { state.lat = 3.0300; state.lng = 101.7600; showLocSuccess("Tun Hussein Onn, Cheras"); }
+    
     function useGPS() {
         if(!navigator.geolocation) return alert("Geo not supported");
+        
+        const desc = document.getElementById('gps-desc');
+        desc.innerText = t[currentLang].txt_locating_fresh;
+        
         navigator.geolocation.getCurrentPosition(
-            pos => { state.lat = pos.coords.latitude; state.lng = pos.coords.longitude; showLocSuccess(`GPS: ${state.lat.toFixed(4)}, ${state.lng.toFixed(4)}`); },
-            () => { alert("Failed. Using Order Address."); useOrderAddress(); }
+            pos => { 
+                state.lat = pos.coords.latitude; 
+                state.lng = pos.coords.longitude; 
+                desc.innerText = t[currentLang].txt_detecting;
+                showLocSuccess(`GPS: ${state.lat.toFixed(4)}, ${state.lng.toFixed(4)}`); 
+            },
+            () => { 
+                desc.innerText = t[currentLang].txt_detecting;
+                alert("Failed. Using Order Address."); 
+                useOrderAddress(); 
+            },
+            { enableHighAccuracy: true, maximumAge: 0, timeout: 10000 } // Force fresh, un-cached ping
         );
     }
+    
     function showLocSuccess(addr) {
         document.getElementById('loc-buttons').classList.add('hidden'); document.getElementById('validated-loc').classList.remove('hidden');
         document.getElementById('final-address').innerText = addr; unlockStep(3); renderHubs(); renderSlots();
