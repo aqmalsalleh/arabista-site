@@ -31,7 +31,7 @@
   
   <style>
     body { background-color: #0F0F10; color: white; }
-    .fade-in { animation: fadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+    .fade-in { animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     
     .step-line { position: absolute; left: 15px; top: 40px; bottom: -20px; width: 1px; background: rgba(255,255,255,0.1); z-index: 0; }
@@ -42,10 +42,8 @@
     .scrollbar-thin::-webkit-scrollbar-track { background: transparent; }
     .scrollbar-thin::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 10px; }
 
-    /* Input styles for measurements */
-    input[type="number"] { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); color: white; border-radius: 6px; padding: 4px 8px; width: 80px; text-align: center; }
-    input[type="number"]:focus { outline: none; border-color: #C0A062; }
-    /* Hide arrows in number inputs */
+    input[type="number"], select { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); color: white; border-radius: 8px; padding: 10px 14px; width: 100%; transition: all 0.2s; }
+    input[type="number"]:focus, select:focus { outline: none; border-color: #C0A062; background: rgba(192,160,98,0.05); }
     input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
   </style>
 </head>
@@ -173,7 +171,9 @@
           </div>
 
           <div class="flex justify-end mt-4">
-              <button onclick="confirmLogistics()" class="text-sm font-bold text-white/50 hover:text-white underline" id="btn-logistics-next" disabled data-t="btn_next_srv">Next: Services &rarr;</button>
+              <button onclick="confirmLogistics()" class="bg-white/10 text-white/40 font-bold text-sm px-6 py-2 rounded-lg transition disabled:cursor-not-allowed" id="btn-logistics-next" disabled data-t="btn_next_srv">
+                 Next: Services
+              </button>
           </div>
         </div>
       </div>
@@ -184,7 +184,7 @@
         
         <div>
           <h2 class="text-xl font-display mb-1 text-white" data-t="step4_title">Services per Item</h2>
-          <p class="text-xs text-white/50 mb-6" id="measure-instruction" data-t="txt_measure_instruction">Walk-in selected. No measurements needed.</p>
+          <p class="text-xs text-white/50 mb-6" id="measure-instruction" data-t="txt_measure_walkin">Walk-in selected. No measurements needed.</p>
           
           <div id="services-container" class="space-y-6"></div>
 
@@ -206,6 +206,21 @@
     </div>
   </main>
 
+  <div id="measurement-modal" class="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm hidden opacity-0 transition-opacity duration-300">
+    <div class="bg-[#111213] border border-white/10 rounded-2xl w-full max-w-md p-6 max-h-[90vh] overflow-y-auto scrollbar-thin transform scale-95 transition-transform duration-300" id="modal-content-box">
+        <h3 class="font-display text-2xl text-white mb-1" data-t="modal_title">Measurements</h3>
+        <p class="text-xs text-white/50 mb-6" id="modal-subtitle">Provide your measurements for</p>
+        
+        <div id="modal-fields" class="space-y-5">
+            </div>
+
+        <div class="mt-8 flex gap-3">
+            <button onclick="closeModal()" class="flex-1 px-4 py-3 rounded-xl border border-white/10 hover:bg-white/5 text-white/70 transition text-sm font-bold" data-t="btn_cancel">Cancel</button>
+            <button onclick="saveMeasurements()" class="flex-1 px-4 py-3 rounded-xl bg-luxe text-brand hover:bg-white transition text-sm font-bold shadow-[0_0_15px_rgba(192,160,98,0.3)]" data-t="btn_save">Save Measurements</button>
+        </div>
+    </div>
+  </div>
+
   <script>
     // --- TRANSLATIONS ---
     const t = {
@@ -213,22 +228,28 @@
             page_title: "Alteration & Care", page_subtitle: "Select items from your order to alter.",
             step1_title: "Select Items to Alter", btn_next_loc: "Next: Location",
             step2_title: "Verify Location", btn_use_order_addr: "Use Order Address", btn_use_gps: "Use Current GPS", txt_detecting: "Detecting...", btn_change: "Change",
-            step3_title: "Choose Logistics", mode_walkin: "Walk-in", mode_lalamove: "Lalamove", label_timeslot: "Select Time Slot:", label_del_fee: "Delivery Fee", btn_next_srv: "Next: Services &rarr;",
-            step4_title: "Services & Measurements", txt_measure_walkin: "Walk-in selected. We will measure you in-store.", txt_measure_lala: "Lalamove selected. Please provide measurements below.",
+            step3_title: "Choose Logistics", mode_walkin: "Walk-in", mode_lalamove: "Lalamove", label_timeslot: "Select Time Slot:", label_del_fee: "Delivery Fee", btn_next_srv: "Next: Services",
+            step4_title: "Services & Measurements", txt_measure_walkin: "Walk-in selected. We will measure you in-store.", txt_measure_lala: "Lalamove selected. Please provide measurements.",
             srv_full: "Full Body Alteration", srv_hem: "Shorten Hem", srv_sleeve: "Shorten Sleeves", srv_shoulder: "Take-in Shoulders", srv_pads: "Add Shoulder Pads",
-            lbl_length: "Length (inches)", lbl_sleeve: "Sleeves (inches)", lbl_shoulder: "Shoulders (inches)", lbl_pads: "Shoulder Pads (Yes/No)",
+            lbl_length: "Length (inches)", lbl_sleeve: "Sleeves (inches)", lbl_shoulder: "Shoulders (inches)", lbl_pads: "Shoulder Pads",
             label_total_est: "Total Estimate", btn_confirm: "Confirm Booking",
-            alert_no_items: "Please select at least one item.", alert_no_hub: "Please select a location.", alert_no_slot: "Please select a time slot.", alert_measure: "Please fill in all required measurements."
+            txt_value: "Value", txt_yousave: "You Save",
+            btn_add_meas: "Add Measurements (Required)", btn_edit_meas: "Measurements Saved (Edit)",
+            modal_title: "Provide Measurements", btn_cancel: "Cancel", btn_save: "Save",
+            alert_no_items: "Please select at least one item.", alert_no_hub: "Please select a location.", alert_no_slot: "Please select a time slot.", alert_measure: "Please fill in measurements for all required items."
         },
         bm: {
             page_title: "Alterasi & Penjagaan", page_subtitle: "Pilih item dari pesanan anda untuk dialter.",
             step1_title: "Pilih Item", btn_next_loc: "Seterusnya: Lokasi",
             step2_title: "Sahkan Lokasi", btn_use_order_addr: "Guna Alamat Tempahan", btn_use_gps: "Guna GPS Semasa", txt_detecting: "Mengesan...", btn_change: "Tukar",
-            step3_title: "Pilih Logistik", mode_walkin: "Walk-in", mode_lalamove: "Lalamove", label_timeslot: "Pilih Masa:", label_del_fee: "Caj Penghantaran", btn_next_srv: "Seterusnya: Servis &rarr;",
-            step4_title: "Servis & Ukuran", txt_measure_walkin: "Walk-in dipilih. Ukuran akan diambil di butik.", txt_measure_lala: "Lalamove dipilih. Sila masukkan ukuran di bawah.",
+            step3_title: "Pilih Logistik", mode_walkin: "Walk-in", mode_lalamove: "Lalamove", label_timeslot: "Pilih Masa:", label_del_fee: "Caj Penghantaran", btn_next_srv: "Seterusnya: Servis",
+            step4_title: "Servis & Ukuran", txt_measure_walkin: "Walk-in dipilih. Ukuran akan diambil di butik.", txt_measure_lala: "Lalamove dipilih. Sila masukkan ukuran.",
             srv_full: "Alter Keseluruhan Baju", srv_hem: "Potong Labuh", srv_sleeve: "Pendekkan Lengan", srv_shoulder: "Kecikkan Bahu", srv_pads: "Tambah Span Bahu",
-            lbl_length: "Labuh (inci)", lbl_sleeve: "Lengan (inci)", lbl_shoulder: "Bahu (inci)", lbl_pads: "Span Bahu (Ya/Tidak)",
+            lbl_length: "Labuh (inci)", lbl_sleeve: "Lengan (inci)", lbl_shoulder: "Bahu (inci)", lbl_pads: "Span Bahu",
             label_total_est: "Anggaran Jumlah", btn_confirm: "Sahkan Tempahan",
+            txt_value: "Nilai", txt_yousave: "Anda Jimat",
+            btn_add_meas: "Masukkan Ukuran (Wajib)", btn_edit_meas: "Ukuran Disimpan (Ubah)",
+            modal_title: "Masukkan Ukuran", btn_cancel: "Batal", btn_save: "Simpan",
             alert_no_items: "Sila pilih sekurang-kurangnya satu item.", alert_no_hub: "Sila pilih lokasi.", alert_no_slot: "Sila pilih masa.", alert_measure: "Sila lengkapkan semua ukuran yang diperlukan."
         }
     };
@@ -240,12 +261,12 @@
             const key = el.getAttribute('data-t');
             if(t[lang][key]) el.innerText = t[lang][key];
         });
-        
         document.getElementById('lang-en').className = lang === 'en' ? "text-xs font-bold text-luxe" : "text-xs text-white/50 hover:text-white";
         document.getElementById('lang-bm').className = lang === 'bm' ? "text-xs font-bold text-luxe" : "text-xs text-white/50 hover:text-white";
-        
         updateMeasurementInstruction();
-        renderServices(); // Re-render to update inner labels
+        if(document.getElementById('services-container').innerHTML !== "") {
+            document.getElementById('services-container').dataset.needsRender = "true"; renderServices(); 
+        }
     }
 
     // --- STATE ---
@@ -256,24 +277,13 @@
     ];
     const timeSlots = ["10:00", "11:30", "14:00", "15:30", "17:00", "20:00"];
     
-    // Services Definition
-    const servicesDict = {
-        'full': { price: 30, req: ['length', 'sleeve', 'shoulder', 'pads'] },
-        'hem': { price: 12, req: ['length'] },
-        'sleeve': { price: 12, req: ['sleeve'] },
-        'shoulder': { price: 10, req: ['shoulder'] },
-        'pads': { price: 6, req: [] }
-    };
-
     let state = {
-        selectedItems: [], // Array of objects: {id, name}
-        lat: 0, lng: 0,
-        mode: 'walkin',
-        hubId: null, hubDist: 0,
-        slot: null,
-        deliveryCost: 0,
-        servicesTotal: 0
+        selectedItems: [], 
+        lat: 0, lng: 0, mode: 'walkin', hubId: null, hubDist: 0, slot: null,
+        deliveryCost: 0, servicesTotal: 0,
+        measurements: {} // itemId: { length, sleeve, shoulder, pads }
     };
+    let editingItemId = null;
 
     // --- LOGIC ---
 
@@ -281,15 +291,13 @@
     function confirmItems() {
         const checked = document.querySelectorAll('input[name="order-item"]:checked');
         if(checked.length === 0) return alert(t[currentLang].alert_no_items);
-        
         state.selectedItems = [];
         checked.forEach(cb => {
             const name = cb.parentElement.querySelector('h3').innerText;
             state.selectedItems.push({ id: cb.value, name: name });
+            if(!state.measurements[cb.value]) state.measurements[cb.value] = { length:'', sleeve:'', shoulder:'', pads:'' };
         });
-        
-        unlockStep(2);
-        document.getElementById('step-2').scrollIntoView({behavior: 'smooth', block: 'center'});
+        unlockStep(2); document.getElementById('step-2').scrollIntoView({behavior: 'smooth', block: 'center'});
     }
 
     // STEP 2
@@ -297,56 +305,38 @@
     function useGPS() {
         if(!navigator.geolocation) return alert("Geo not supported");
         navigator.geolocation.getCurrentPosition(
-            (pos) => { state.lat = pos.coords.latitude; state.lng = pos.coords.longitude; showLocSuccess(`GPS: ${state.lat.toFixed(4)}, ${state.lng.toFixed(4)}`); },
+            pos => { state.lat = pos.coords.latitude; state.lng = pos.coords.longitude; showLocSuccess(`GPS: ${state.lat.toFixed(4)}, ${state.lng.toFixed(4)}`); },
             () => { alert("Failed. Using Order Address."); useOrderAddress(); }
         );
     }
     function showLocSuccess(addr) {
-        document.getElementById('loc-buttons').classList.add('hidden');
-        document.getElementById('validated-loc').classList.remove('hidden');
-        document.getElementById('final-address').innerText = addr;
-        unlockStep(3);
-        renderHubs(); renderSlots();
+        document.getElementById('loc-buttons').classList.add('hidden'); document.getElementById('validated-loc').classList.remove('hidden');
+        document.getElementById('final-address').innerText = addr; unlockStep(3); renderHubs(); renderSlots();
     }
     function resetLoc() {
-        document.getElementById('loc-buttons').classList.remove('hidden');
-        document.getElementById('validated-loc').classList.add('hidden');
+        document.getElementById('loc-buttons').classList.remove('hidden'); document.getElementById('validated-loc').classList.add('hidden');
         lockStep(3); lockStep(4);
     }
 
     // STEP 3
     function renderHubs() {
-        hubs.forEach(h => h.dist = getDist(state.lat, state.lng, h.lat, h.lng));
-        hubs.sort((a,b) => a.dist - b.dist);
-        const list = document.getElementById('hub-list');
-        list.innerHTML = '';
+        hubs.forEach(h => h.dist = getDist(state.lat, state.lng, h.lat, h.lng)); hubs.sort((a,b) => a.dist - b.dist);
+        const list = document.getElementById('hub-list'); list.innerHTML = '';
         hubs.forEach(h => {
-            list.innerHTML += `
-            <div onclick="selectHub(${h.id}, ${h.dist})" id="hub-${h.id}" class="p-3 rounded-lg border border-white/10 hover:bg-white/5 cursor-pointer flex justify-between items-center transition">
-                <span class="text-sm text-white/80">${h.name}</span>
-                <span class="text-xs font-bold text-luxe">${h.dist.toFixed(1)} km</span>
-            </div>`;
+            list.innerHTML += `<div onclick="selectHub(${h.id}, ${h.dist})" id="hub-${h.id}" class="p-3 rounded-lg border border-white/10 hover:bg-white/5 cursor-pointer flex justify-between items-center transition"><span class="text-sm text-white/80">${h.name}</span><span class="text-xs font-bold text-luxe">${h.dist.toFixed(1)} km</span></div>`;
         });
     }
     function selectHub(id, dist) {
         state.hubId = id; state.hubDist = dist;
-        hubs.forEach(h => {
-            document.getElementById(`hub-${h.id}`).className = (h.id === id) 
-                ? "p-3 rounded-lg border border-luxe bg-luxe/10 flex justify-between items-center transition"
-                : "p-3 rounded-lg border border-white/10 opacity-50 flex justify-between items-center transition";
-        });
+        hubs.forEach(h => document.getElementById(`hub-${h.id}`).className = (h.id === id) ? "p-3 rounded-lg border border-luxe bg-luxe/10 flex justify-between items-center transition" : "p-3 rounded-lg border border-white/10 opacity-50 flex justify-between items-center transition");
         updateLogisticsCost(); checkStep3Complete();
     }
     function renderSlots() {
-        const div = document.getElementById('slot-container');
-        if(div.innerHTML !== "") return;
-        timeSlots.forEach(time => {
-            div.innerHTML += `<button onclick="setSlot('${time}')" id="slot-${time.replace(':','')}" class="text-xs py-2 border border-white/10 rounded hover:bg-white/10 text-white/60">${time}</button>`;
-        });
+        const div = document.getElementById('slot-container'); if(div.innerHTML !== "") return;
+        timeSlots.forEach(time => div.innerHTML += `<button onclick="setSlot('${time}')" id="slot-${time.replace(':','')}" class="text-xs py-2 border border-white/10 rounded hover:bg-white/10 text-white/60">${time}</button>`);
     }
     function setSlot(time) {
-        state.slot = time;
-        timeSlots.forEach(s => document.getElementById(`slot-${s.replace(':','')}`).className = "text-xs py-2 border border-white/10 rounded hover:bg-white/10 text-white/60");
+        state.slot = time; timeSlots.forEach(s => document.getElementById(`slot-${s.replace(':','')}`).className = "text-xs py-2 border border-white/10 rounded hover:bg-white/10 text-white/60");
         document.getElementById(`slot-${time.replace(':','')}`).className = "text-xs py-2 border border-luxe bg-luxe text-brand font-bold rounded";
         checkStep3Complete();
     }
@@ -357,204 +347,249 @@
         if(m === 'walkin') {
             w.classList.replace('border-white/10', 'border-luxe'); w.classList.add('bg-luxe/10');
             l.classList.replace('border-orange-500', 'border-white/10'); l.classList.remove('bg-orange-500/10');
-            wc.classList.remove('hidden'); lc.classList.add('hidden');
-            state.deliveryCost = 0;
+            wc.classList.remove('hidden'); lc.classList.add('hidden'); state.deliveryCost = 0;
         } else {
             l.classList.replace('border-white/10', 'border-orange-500'); l.classList.add('bg-orange-500/10');
             w.classList.replace('border-luxe', 'border-white/10'); w.classList.remove('bg-luxe/10');
-            lc.classList.remove('hidden'); wc.classList.add('hidden');
-            updateLogisticsCost();
+            lc.classList.remove('hidden'); wc.classList.add('hidden'); updateLogisticsCost();
         }
-        updateMeasurementInstruction();
-        renderServices(); // Re-render step 4 based on mode
-        checkStep3Complete(); calculateTotal();
+        updateMeasurementInstruction(); renderServices(); checkStep3Complete(); calculateTotal();
     }
     function updateLogisticsCost() {
         if(state.mode === 'lalamove' && state.hubId) {
             state.deliveryCost = Math.ceil(5 + (state.hubDist * 1.0));
             document.getElementById('del-price').innerText = "RM " + state.deliveryCost.toFixed(2);
-        } else { state.deliveryCost = 0; }
+        } else state.deliveryCost = 0;
         calculateTotal();
     }
     function checkStep3Complete() {
         const btn = document.getElementById('btn-logistics-next');
         if(state.hubId && (state.mode === 'lalamove' || (state.mode === 'walkin' && state.slot))) {
-            btn.disabled = false; btn.classList.replace('text-white/50', 'text-luxe');
+            btn.disabled = false; btn.classList.replace('bg-white/10', 'bg-luxe'); btn.classList.replace('text-white/40', 'text-brand');
         } else {
-            btn.disabled = true; btn.classList.replace('text-luxe', 'text-white/50');
+            btn.disabled = true; btn.classList.replace('bg-luxe', 'bg-white/10'); btn.classList.replace('text-brand', 'text-white/40');
         }
     }
     function confirmLogistics() {
-        updateMeasurementInstruction();
-        renderServices();
-        unlockStep(4);
-        document.getElementById('step-4').scrollIntoView({behavior: 'smooth', block: 'start'});
+        updateMeasurementInstruction(); renderServices(); unlockStep(4); document.getElementById('step-4').scrollIntoView({behavior: 'smooth', block: 'start'});
     }
 
-    // STEP 4 - DYNAMIC PER-ITEM SERVICES
+    // STEP 4
     function updateMeasurementInstruction() {
         const el = document.getElementById('measure-instruction');
         el.innerText = state.mode === 'walkin' ? t[currentLang].txt_measure_walkin : t[currentLang].txt_measure_lala;
-        if(state.mode === 'lalamove') el.classList.replace('text-white/50', 'text-luxe');
-        else el.classList.replace('text-luxe', 'text-white/50');
+        if(state.mode === 'lalamove') el.classList.replace('text-white/50', 'text-luxe'); else el.classList.replace('text-luxe', 'text-white/50');
     }
 
     function renderServices() {
         const container = document.getElementById('services-container');
-        // Only generate HTML if empty, to preserve user selections when toggling lang
-        if(container.innerHTML !== "" && !container.dataset.needsRender) {
-             // Just update text via data-t if already rendered
-             return; 
-        }
+        if(container.innerHTML !== "" && !container.dataset.needsRender) return; 
         
         container.innerHTML = '';
         state.selectedItems.forEach(item => {
             const block = document.createElement('div');
-            block.className = "bg-white/5 border border-white/10 rounded-xl overflow-hidden";
+            block.className = "bg-white/5 border border-white/10 rounded-xl overflow-hidden relative";
             
-            // Header
-            const header = `<div class="bg-black/20 p-4 border-b border-white/5 font-display text-lg">${item.name}</div>`;
+            const header = `<div class="bg-black/30 p-4 border-b border-white/5 font-display text-lg">${item.name}</div>`;
             
-            // Body
             const body = `
             <div class="p-4 space-y-3">
-                <div class="border border-white/10 rounded-lg p-3 hover:border-luxe/50 transition">
-                    <label class="flex items-start gap-3 cursor-pointer mb-2">
-                        <input type="checkbox" id="cb-${item.id}-full" value="30" class="mt-1 w-4 h-4 rounded border-white/30 text-luxe bg-transparent srv-cb" onchange="handleSrvCheck('${item.id}', 'full')">
-                        <div class="flex-1 flex justify-between">
-                            <span class="text-sm font-medium" data-t="srv_full">${t[currentLang].srv_full}</span>
-                            <span class="text-luxe font-bold">RM 30</span>
+                
+                <div class="border border-luxe/50 rounded-lg p-4 bg-gradient-to-br from-luxe/10 to-transparent hover:border-luxe transition relative group">
+                    <div class="absolute -top-2.5 right-4 bg-luxe text-brand text-[9px] font-bold px-2 py-0.5 rounded shadow-lg uppercase tracking-wider" data-t="txt_value">${t[currentLang].txt_value} RM 40 | ${t[currentLang].txt_yousave} RM 10</div>
+                    <label class="flex items-start gap-3 cursor-pointer">
+                        <input type="checkbox" id="cb-${item.id}-full" value="30" class="mt-1.5 w-5 h-5 rounded border-luxe/50 text-luxe focus:ring-luxe bg-transparent srv-cb transition" onchange="handleSrvCheck('${item.id}', 'full')">
+                        <div class="flex-1">
+                            <div class="flex justify-between items-center mb-1">
+                                <span class="text-base font-medium text-white group-hover:text-luxe transition" data-t="srv_full">${t[currentLang].srv_full}</span>
+                                <span class="text-luxe font-bold text-lg">RM 30</span>
+                            </div>
                         </div>
                     </label>
-                    <div id="meas-${item.id}-full" class="hidden pl-7 pt-2 grid grid-cols-2 gap-2 text-xs">
-                        <input type="number" placeholder="${t[currentLang].lbl_length}" class="req-${item.id}-full">
-                        <input type="number" placeholder="${t[currentLang].lbl_sleeve}" class="req-${item.id}-full">
-                        <input type="number" placeholder="${t[currentLang].lbl_shoulder}" class="req-${item.id}-full">
-                        <select class="req-${item.id}-full bg-white/5 border border-white/20 rounded p-1 text-white"><option value="">${t[currentLang].lbl_pads}</option><option>Yes</option><option>No</option></select>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3 pt-2">
+                    <div class="border border-white/10 rounded-lg p-3 hover:border-luxe/50 transition" id="wrap-${item.id}-hem">
+                        <label class="flex items-center gap-3 cursor-pointer">
+                            <input type="checkbox" id="cb-${item.id}-hem" value="12" class="w-4 h-4 rounded border-white/30 text-luxe bg-transparent srv-cb" onchange="handleSrvCheck('${item.id}', 'hem')">
+                            <div class="flex-1 flex justify-between text-sm"><span data-t="srv_hem">${t[currentLang].srv_hem}</span> <span class="text-white/50">RM12</span></div>
+                        </label>
+                    </div>
+                    <div class="border border-white/10 rounded-lg p-3 hover:border-luxe/50 transition" id="wrap-${item.id}-sleeve">
+                        <label class="flex items-center gap-3 cursor-pointer">
+                            <input type="checkbox" id="cb-${item.id}-sleeve" value="12" class="w-4 h-4 rounded border-white/30 text-luxe bg-transparent srv-cb" onchange="handleSrvCheck('${item.id}', 'sleeve')">
+                            <div class="flex-1 flex justify-between text-sm"><span data-t="srv_sleeve">${t[currentLang].srv_sleeve}</span> <span class="text-white/50">RM12</span></div>
+                        </label>
+                    </div>
+                    <div class="border border-white/10 rounded-lg p-3 hover:border-luxe/50 transition" id="wrap-${item.id}-shoulder">
+                        <label class="flex items-center gap-3 cursor-pointer">
+                            <input type="checkbox" id="cb-${item.id}-shoulder" value="10" class="w-4 h-4 rounded border-white/30 text-luxe bg-transparent srv-cb" onchange="handleSrvCheck('${item.id}', 'shoulder')">
+                            <div class="flex-1 flex justify-between text-sm"><span data-t="srv_shoulder">${t[currentLang].srv_shoulder}</span> <span class="text-white/50">RM10</span></div>
+                        </label>
+                    </div>
+                    <div class="border border-white/10 rounded-lg p-3 hover:border-luxe/50 transition" id="wrap-${item.id}-pads">
+                        <label class="flex items-center gap-3 cursor-pointer">
+                            <input type="checkbox" id="cb-${item.id}-pads" value="6" class="w-4 h-4 rounded border-white/30 text-luxe bg-transparent srv-cb" onchange="handleSrvCheck('${item.id}', 'pads')">
+                            <div class="flex-1 flex justify-between text-sm"><span data-t="srv_pads">${t[currentLang].srv_pads}</span> <span class="text-white/50">RM6</span></div>
+                        </label>
                     </div>
                 </div>
-                <div class="border border-white/10 rounded-lg p-3 hover:border-luxe/50 transition opacity-100" id="wrap-${item.id}-hem">
-                    <label class="flex items-start gap-3 cursor-pointer">
-                        <input type="checkbox" id="cb-${item.id}-hem" value="12" class="mt-1 w-4 h-4 rounded border-white/30 text-luxe bg-transparent srv-cb" onchange="handleSrvCheck('${item.id}', 'hem')">
-                        <div class="flex-1 flex justify-between">
-                            <span class="text-sm" data-t="srv_hem">${t[currentLang].srv_hem}</span>
-                            <span class="text-white/60">RM 12</span>
-                        </div>
-                    </label>
-                    <div id="meas-${item.id}-hem" class="hidden pl-7 pt-2"><input type="number" placeholder="${t[currentLang].lbl_length}" class="req-${item.id}-hem text-xs w-full"></div>
-                </div>
-                <div class="border border-white/10 rounded-lg p-3 hover:border-luxe/50 transition" id="wrap-${item.id}-sleeve">
-                    <label class="flex items-start gap-3 cursor-pointer">
-                        <input type="checkbox" id="cb-${item.id}-sleeve" value="12" class="mt-1 w-4 h-4 rounded border-white/30 text-luxe bg-transparent srv-cb" onchange="handleSrvCheck('${item.id}', 'sleeve')">
-                        <div class="flex-1 flex justify-between">
-                            <span class="text-sm" data-t="srv_sleeve">${t[currentLang].srv_sleeve}</span>
-                            <span class="text-white/60">RM 12</span>
-                        </div>
-                    </label>
-                    <div id="meas-${item.id}-sleeve" class="hidden pl-7 pt-2"><input type="number" placeholder="${t[currentLang].lbl_sleeve}" class="req-${item.id}-sleeve text-xs w-full"></div>
-                </div>
-                <div class="border border-white/10 rounded-lg p-3 hover:border-luxe/50 transition" id="wrap-${item.id}-shoulder">
-                    <label class="flex items-start gap-3 cursor-pointer">
-                        <input type="checkbox" id="cb-${item.id}-shoulder" value="10" class="mt-1 w-4 h-4 rounded border-white/30 text-luxe bg-transparent srv-cb" onchange="handleSrvCheck('${item.id}', 'shoulder')">
-                        <div class="flex-1 flex justify-between">
-                            <span class="text-sm" data-t="srv_shoulder">${t[currentLang].srv_shoulder}</span>
-                            <span class="text-white/60">RM 10</span>
-                        </div>
-                    </label>
-                    <div id="meas-${item.id}-shoulder" class="hidden pl-7 pt-2"><input type="number" placeholder="${t[currentLang].lbl_shoulder}" class="req-${item.id}-shoulder text-xs w-full"></div>
-                </div>
-                <div class="border border-white/10 rounded-lg p-3 hover:border-luxe/50 transition">
-                    <label class="flex items-start gap-3 cursor-pointer">
-                        <input type="checkbox" id="cb-${item.id}-pads" value="6" class="mt-1 w-4 h-4 rounded border-white/30 text-luxe bg-transparent srv-cb" onchange="handleSrvCheck('${item.id}', 'pads')">
-                        <div class="flex-1 flex justify-between">
-                            <span class="text-sm" data-t="srv_pads">${t[currentLang].srv_pads}</span>
-                            <span class="text-white/60">RM 6</span>
-                        </div>
-                    </label>
+
+                <div id="btn-container-${item.id}" class="hidden pt-4 border-t border-white/10 mt-4">
+                    <button onclick="openModal('${item.id}')" id="meas-btn-${item.id}" class="w-full py-3 rounded-xl border border-luxe bg-luxe/10 text-luxe text-sm font-bold flex justify-center items-center gap-2 hover:bg-luxe hover:text-brand transition">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
+                        <span data-t="btn_add_meas">${t[currentLang].btn_add_meas}</span>
+                    </button>
                 </div>
             </div>`;
             block.innerHTML = header + body;
             container.appendChild(block);
+            
+            // Re-run checks to maintain visual state if re-rendered
+            handleSrvCheck(item.id, 'init', true);
         });
         container.dataset.needsRender = false;
     }
 
-    function handleSrvCheck(itemId, srvId) {
-        const cb = document.getElementById(`cb-${itemId}-${srvId}`);
-        const measDiv = document.getElementById(`meas-${itemId}-${srvId}`);
+    function handleSrvCheck(itemId, srvId, isInit = false) {
+        const fullCb = document.getElementById(`cb-${itemId}-full`);
+        if(!fullCb) return; // safety
         
-        // Show/Hide measurements if Lalamove
-        if(measDiv) {
-            if(cb.checked && state.mode === 'lalamove') measDiv.classList.remove('hidden');
-            else measDiv.classList.add('hidden');
-        }
+        // Full Body disables everything else
+        ['hem', 'sleeve', 'shoulder', 'pads'].forEach(sub => {
+            const subCb = document.getElementById(`cb-${itemId}-${sub}`);
+            const subWrap = document.getElementById(`wrap-${itemId}-${sub}`);
+            if(fullCb.checked) {
+                if(subCb) { subCb.checked = false; subCb.disabled = true; }
+                if(subWrap) { subWrap.classList.add('opacity-40', 'pointer-events-none'); subWrap.style.textDecoration = 'line-through'; }
+            } else {
+                if(subCb) subCb.disabled = false;
+                if(subWrap) { subWrap.classList.remove('opacity-40', 'pointer-events-none'); subWrap.style.textDecoration = 'none'; }
+            }
+        });
 
-        // Logic: Full body disables sub-parts
-        if(srvId === 'full') {
-            ['hem', 'sleeve', 'shoulder'].forEach(sub => {
-                const subCb = document.getElementById(`cb-${itemId}-${sub}`);
-                const subWrap = document.getElementById(`wrap-${itemId}-${sub}`);
-                if(cb.checked) {
-                    subCb.checked = false; subCb.disabled = true;
-                    subWrap.classList.add('opacity-40', 'pointer-events-none');
-                    document.getElementById(`meas-${itemId}-${sub}`)?.classList.add('hidden');
-                } else {
-                    subCb.disabled = false;
-                    subWrap.classList.remove('opacity-40', 'pointer-events-none');
-                }
-            });
+        if(!isInit) calculateTotal();
+        updateMeasurementBtn(itemId);
+    }
+
+    function updateMeasurementBtn(itemId) {
+        const btnContainer = document.getElementById(`btn-container-${itemId}`);
+        if(state.mode !== 'lalamove') { btnContainer.classList.add('hidden'); return; }
+
+        const cbs = ['full', 'hem', 'sleeve', 'shoulder']; // pads alone doesn't need measure
+        const needsMeas = cbs.some(id => document.getElementById(`cb-${itemId}-${id}`)?.checked);
+
+        if(needsMeas) {
+            btnContainer.classList.remove('hidden');
+            const btn = document.getElementById(`meas-btn-${itemId}`);
+            const data = state.measurements[itemId];
+            const isFilled = (document.getElementById(`cb-${itemId}-full`)?.checked && data.length && data.sleeve && data.shoulder) ||
+                             (document.getElementById(`cb-${itemId}-hem`)?.checked && data.length) ||
+                             (document.getElementById(`cb-${itemId}-sleeve`)?.checked && data.sleeve) ||
+                             (document.getElementById(`cb-${itemId}-shoulder`)?.checked && data.shoulder);
+            
+            if(isFilled) {
+                btn.className = "w-full py-3 rounded-xl border border-green-500/50 bg-green-500/10 text-green-400 text-sm font-bold flex justify-center items-center gap-2 hover:bg-green-500/20 transition";
+                btn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" /></svg> <span data-t="btn_edit_meas">${t[currentLang].btn_edit_meas}</span>`;
+            } else {
+                btn.className = "w-full py-3 rounded-xl border border-luxe bg-luxe text-brand text-sm font-bold flex justify-center items-center gap-2 hover:bg-white transition shadow-[0_0_15px_rgba(192,160,98,0.3)]";
+                btn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg> <span data-t="btn_add_meas">${t[currentLang].btn_add_meas}</span>`;
+            }
+        } else {
+            btnContainer.classList.add('hidden');
         }
-        calculateTotal();
     }
 
     function calculateTotal() {
         state.servicesTotal = 0;
-        document.querySelectorAll('.srv-cb:checked').forEach(cb => {
-            state.servicesTotal += parseInt(cb.value);
-        });
+        document.querySelectorAll('.srv-cb:checked').forEach(cb => state.servicesTotal += parseInt(cb.value));
         document.getElementById('breakdown-text').innerText = `Delivery: RM ${state.deliveryCost} | Services: RM ${state.servicesTotal}`;
         document.getElementById('grand-total').innerText = "RM " + (state.servicesTotal + state.deliveryCost);
+    }
+
+    // --- MODAL LOGIC ---
+    function openModal(itemId) {
+        editingItemId = itemId;
+        const item = state.selectedItems.find(i => i.id === itemId);
+        document.getElementById('modal-subtitle').innerText = `${item.name}`;
+        
+        const fieldsDiv = document.getElementById('modal-fields');
+        fieldsDiv.innerHTML = '';
+        const m = state.measurements[itemId];
+        const isFull = document.getElementById(`cb-${itemId}-full`).checked;
+
+        const buildInput = (key, labelKey, type="number", imgTag="") => {
+            return `<div>
+                      <label class="block text-sm text-white/70 mb-2">${t[currentLang][labelKey]}</label>
+                      ${imgTag ? `<div class="mb-3 rounded-lg overflow-hidden border border-white/10 opacity-70">${imgTag}</div>` : ''}
+                      ${type === 'select' 
+                        ? `<select id="mod-${key}"><option value="">Select...</option><option value="Yes" ${m[key]==='Yes'?'selected':''}>Yes</option><option value="No" ${m[key]==='No'?'selected':''}>No</option></select>`
+                        : `<input type="number" id="mod-${key}" value="${m[key]}" placeholder="E.g. 52">`
+                      }
+                    </div>`;
+        };
+
+        if(isFull || document.getElementById(`cb-${itemId}-hem`)?.checked) 
+            fieldsDiv.innerHTML += buildInput('length', 'lbl_length', 'number', '');
+        if(isFull || document.getElementById(`cb-${itemId}-sleeve`)?.checked) 
+            fieldsDiv.innerHTML += buildInput('sleeve', 'lbl_sleeve', 'number', '');
+        if(isFull || document.getElementById(`cb-${itemId}-shoulder`)?.checked) 
+            fieldsDiv.innerHTML += buildInput('shoulder', 'lbl_shoulder', 'number', '');
+        if(isFull) 
+            fieldsDiv.innerHTML += buildInput('pads', 'lbl_pads', 'select');
+
+        // Show Modal
+        const modal = document.getElementById('measurement-modal');
+        const box = document.getElementById('modal-content-box');
+        modal.classList.remove('hidden');
+        // trigger animation
+        setTimeout(() => { modal.classList.remove('opacity-0'); box.classList.remove('scale-95'); }, 10);
+    }
+
+    function closeModal() {
+        const modal = document.getElementById('measurement-modal');
+        const box = document.getElementById('modal-content-box');
+        modal.classList.add('opacity-0'); box.classList.add('scale-95');
+        setTimeout(() => { modal.classList.add('hidden'); }, 300);
+    }
+
+    function saveMeasurements() {
+        if(!editingItemId) return;
+        const m = state.measurements[editingItemId];
+        if(document.getElementById('mod-length')) m.length = document.getElementById('mod-length').value;
+        if(document.getElementById('mod-sleeve')) m.sleeve = document.getElementById('mod-sleeve').value;
+        if(document.getElementById('mod-shoulder')) m.shoulder = document.getElementById('mod-shoulder').value;
+        if(document.getElementById('mod-pads')) m.pads = document.getElementById('mod-pads').value;
+        
+        updateMeasurementBtn(editingItemId);
+        closeModal();
     }
 
     function submitOrder() {
         if(!state.hubId) return alert(t[currentLang].alert_no_hub);
         if(state.servicesTotal === 0) return alert("Please select at least one service.");
         
-        // Validate measurements if Lalamove
         if(state.mode === 'lalamove') {
             let valid = true;
-            document.querySelectorAll('.srv-cb:checked').forEach(cb => {
-                const parts = cb.id.split('-'); // cb-1-full
-                const itemId = parts[1]; const srvId = parts[2];
-                const inputs = document.querySelectorAll(`.req-${itemId}-${srvId}`);
-                inputs.forEach(input => {
-                    if(input.value.trim() === '') valid = false;
-                });
+            state.selectedItems.forEach(item => {
+                const id = item.id;
+                const m = state.measurements[id];
+                if(document.getElementById(`cb-${id}-full`)?.checked && (!m.length || !m.sleeve || !m.shoulder || !m.pads)) valid = false;
+                if(document.getElementById(`cb-${id}-hem`)?.checked && !m.length) valid = false;
+                if(document.getElementById(`cb-${id}-sleeve`)?.checked && !m.sleeve) valid = false;
+                if(document.getElementById(`cb-${id}-shoulder`)?.checked && !m.shoulder) valid = false;
             });
             if(!valid) return alert(t[currentLang].alert_measure);
         }
 
-        alert(t[currentLang].btn_confirm + "!\nTotal: RM " + (state.servicesTotal + state.deliveryCost));
+        alert(t[currentLang].btn_confirm + " Successful!\nTotal: RM " + (state.servicesTotal + state.deliveryCost));
     }
 
     // --- HELPERS ---
-    function unlockStep(n) {
-        const el = document.getElementById(`step-${n}`);
-        el.classList.remove('opacity-30', 'pointer-events-none');
-        document.getElementById(`badge-${n}`).classList.replace('border-white/20', 'border-luxe');
-        document.getElementById(`badge-${n}`).classList.replace('text-white/50', 'text-luxe');
-    }
+    function unlockStep(n) { document.getElementById(`step-${n}`).classList.remove('opacity-30', 'pointer-events-none'); document.getElementById(`badge-${n}`).classList.replace('border-white/20', 'border-luxe'); document.getElementById(`badge-${n}`).classList.replace('text-white/50', 'text-luxe'); }
     function lockStep(n) { document.getElementById(`step-${n}`).classList.add('opacity-30', 'pointer-events-none'); }
-    function getDist(lat1,lon1,lat2,lon2) {
-        var R=6371, dLat=d2r(lat2-lat1), dLon=d2r(lon2-lon1);
-        var a=Math.sin(dLat/2)*Math.sin(dLat/2)+Math.cos(d2r(lat1))*Math.cos(d2r(lat2))*Math.sin(dLon/2)*Math.sin(dLon/2);
-        return R*(2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a)));
-    }
+    function getDist(lat1,lon1,lat2,lon2) { var R=6371, dLat=d2r(lat2-lat1), dLon=d2r(lon2-lon1); var a=Math.sin(dLat/2)*Math.sin(dLat/2)+Math.cos(d2r(lat1))*Math.cos(d2r(lat2))*Math.sin(dLon/2)*Math.sin(dLon/2); return R*(2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a))); }
     function d2r(d){return d*(Math.PI/180)}
-
-    // Ensure state render on toggle if step 4 is active
-    document.getElementById('lang-en').addEventListener('click', () => { if(!document.getElementById('step-4').classList.contains('opacity-30')){ document.getElementById('services-container').dataset.needsRender = true; renderServices(); } });
-    document.getElementById('lang-bm').addEventListener('click', () => { if(!document.getElementById('step-4').classList.contains('opacity-30')){ document.getElementById('services-container').dataset.needsRender = true; renderServices(); } });
 
   </script>
 </body>
