@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Arabista — Alterations & Care</title>
+  <title>Arabista — Alteration Service</title>
   <meta name="theme-color" content="#0F0F10" />
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -56,7 +56,7 @@
           <a href="index.html" class="font-display tracking-[0.18em] text-[14px] leading-none hover:text-luxe transition">ARABISTA</a>
         </div>
         <div class="col-span-1 flex items-center justify-center">
-           <span class="font-display text-xl">A</span>
+           <a href="index.html"><img src="images/logo-88.webp" alt="Arabista logo" class="h-11 w-auto" width="88" height="88"></a>
         </div>
         <div class="col-span-1 flex items-center justify-end gap-4 text-sm">
            <div class="flex items-center gap-2 border border-white/20 rounded-lg px-2 py-1">
@@ -72,7 +72,7 @@
   <main class="pt-24 pb-20 max-w-screen-md mx-auto px-4 sm:px-6 min-h-screen">
     
     <div class="text-center mb-10">
-      <h1 class="font-display text-3xl sm:text-5xl mb-3" data-t="page_title">Alteration & Care</h1>
+      <h1 class="font-display text-3xl sm:text-5xl mb-3" data-t="page_title">Alteration Service</h1>
       <p class="text-white/60 text-sm sm:text-base" data-t="page_subtitle">Select items from your order to alter.</p>
     </div>
 
@@ -229,7 +229,7 @@
     // --- TRANSLATIONS ---
     const t = {
         en: {
-            page_title: "Alteration & Care", page_subtitle: "Select items from your order to alter.",
+            page_title: "Alteration Service", page_subtitle: "Select items from your order to alter.",
             step1_title: "Select Items to Alter", btn_next_loc: "Next: Location",
             step2_title: "Verify Location", btn_use_order_addr: "Use Order Address", btn_use_gps: "Use Current GPS", txt_detecting: "Detecting location...", txt_locating_fresh: "Acquiring fresh GPS...", btn_change: "Change",
             step3_title: "Choose Logistics", mode_walkin: "Walk-in", mode_lalamove: "Lalamove", label_timeslot: "Select Time Slot:", label_del_fee: "Delivery Fee", btn_next_srv: "Next: Services",
@@ -246,7 +246,7 @@
             alert_max: "must be strictly less than original size"
         },
         bm: {
-            page_title: "Alterasi & Penjagaan", page_subtitle: "Pilih item dari pesanan anda untuk dialter.",
+            page_title: "Servis Alterasi", page_subtitle: "Pilih item dari pesanan anda untuk dialter.",
             step1_title: "Pilih Item", btn_next_loc: "Seterusnya: Lokasi",
             step2_title: "Sahkan Lokasi", btn_use_order_addr: "Guna Alamat Tempahan", btn_use_gps: "Guna GPS Semasa", txt_detecting: "Mengesan lokasi...", txt_locating_fresh: "Mendapatkan isyarat GPS baru...", btn_change: "Tukar",
             step3_title: "Pilih Logistik", mode_walkin: "Walk-in", mode_lalamove: "Lalamove", label_timeslot: "Pilih Masa:", label_del_fee: "Caj Penghantaran", btn_next_srv: "Seterusnya: Servis",
@@ -281,6 +281,16 @@
             document.getElementById('services-container').dataset.needsRender = "true"; renderServices(); 
         }
     }
+
+    // Auto-detect browser language on load
+    document.addEventListener('DOMContentLoaded', () => {
+        const userLang = navigator.language || navigator.userLanguage;
+        if (userLang && userLang.toLowerCase().startsWith('ms')) {
+            setLang('bm');
+        } else {
+            setLang('en');
+        }
+    });
 
     // --- STATE & SIZE CHART ---
     const sizeChart = {
@@ -371,7 +381,7 @@
                 alert("Failed. Using Order Address."); 
                 useOrderAddress(); 
             },
-            { enableHighAccuracy: true, maximumAge: 0, timeout: 10000 } // Force fresh, un-cached ping
+            { enableHighAccuracy: true, maximumAge: 0, timeout: 10000 } 
         );
     }
     
