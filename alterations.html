@@ -79,9 +79,9 @@
         <div class="fade-in">
           <h2 class="text-xl font-display mb-4 text-white" data-t="step1_title">Select Items to Alter</h2>
           
-          <div id="step1-loading" class="hidden text-sm text-white/50 animate-pulse py-4 flex items-center gap-3">
+          <div id="step1-loading" class="text-sm text-white/50 animate-pulse py-4 flex items-center gap-3">
               <svg class="animate-spin h-4 w-4 text-luxe" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-              <span data-t="txt_fetching_order">Fetching order details...</span>
+              <span data-t="txt_loading_system">Loading system...</span>
           </div>
 
           <div id="path-a-container" class="hidden space-y-5 bg-white/5 border border-white/10 rounded-xl p-5">
@@ -133,14 +133,14 @@
           <h2 class="text-xl font-display mb-4 text-white" data-t="step2_title">Verify Location</h2>
           
           <div class="grid sm:grid-cols-2 gap-3" id="loc-buttons">
-            <button id="btn-use-order-addr" onclick="useOrderAddress()" class="p-4 rounded-xl border border-white/10 hover:border-luxe hover:bg-white/5 transition text-left group">
-                <span class="block text-sm font-bold text-white mb-1 group-hover:text-luxe" data-t="btn_use_order_addr">Use Order Address</span>
-                <span class="block text-[10px] text-white/50 mt-1 truncate" id="order-addr-display">...</span>
-            </button>
             <button onclick="useGPS()" class="relative p-4 rounded-xl border border-white/10 hover:border-luxe hover:bg-white/5 transition text-left group overflow-hidden">
-                <div class="absolute top-0 right-0 bg-luxe text-brand text-[9px] font-bold px-2 py-0.5 rounded-bl-lg uppercase tracking-wider shadow-md" data-t="txt_recommended">Recommended</div>
+                <div id="badge-recommended" class="absolute top-0 right-0 bg-luxe text-brand text-[9px] font-bold px-2 py-0.5 rounded-bl-lg uppercase tracking-wider shadow-md" data-t="txt_recommended">Recommended</div>
                 <span class="block text-sm font-bold text-white mb-1 group-hover:text-luxe" data-t="btn_use_gps">Use Current GPS</span>
                 <span class="block text-xs text-white/50" id="gps-desc" data-t="txt_detecting">Detecting location...</span>
+            </button>
+            <button id="btn-use-order-addr" onclick="useOrderAddress()" class="p-4 rounded-xl border border-white/10 hover:border-luxe hover:bg-white/5 transition text-left group">
+                <span class="block text-sm font-bold text-white mb-1 group-hover:text-luxe" data-t="btn_use_order_addr">Use Order Address</span>
+                <span class="block text-[11px] text-white/50 mt-1 whitespace-normal break-words" id="order-addr-display">...</span>
             </button>
           </div>
 
@@ -242,7 +242,7 @@
             lbl_design_code: "Design Code", lbl_size: "Size", btn_add_item: "Add Another Item",
             alert_name: "Please enter your name.", alert_phone: "Please enter your telephone number.", alert_item_detail: "Please select Design Code and Size for all items.",
             step2_title: "Verify Location", btn_use_order_addr: "Use Order Address", btn_use_gps: "Use Current GPS", txt_detecting: "Detecting location...", txt_locating_fresh: "Acquiring fresh GPS...", txt_recommended: "Recommended",
-            txt_fetching_order: "Fetching order details...", txt_pinpointing: "Mapping Google coordinates...", alert_geocode_fail: "Unable to map this address automatically. Please use 'Use Current GPS' for accurate delivery fees.",
+            txt_loading_system: "Loading system...", txt_pinpointing: "Mapping Google coordinates...", alert_geocode_fail: "Unable to map this address automatically. Please use 'Use Current GPS' for accurate delivery fees.",
             txt_detected_gps: "Detected Location:", label_unit: "Unit / House / Lot No.", placeholder_unit: "e.g. Unit 15-1 or House 42", btn_confirm_loc: "Confirm Location", btn_cancel: "Cancel", btn_change: "Change",
             alert_unit: "Please enter your Unit/House No.",
             step3_title: "Choose Logistics", mode_walkin: "Walk-in", mode_lalamove: "Lalamove", label_del_fee: "Delivery Fee", btn_next_srv: "Next: Services",
@@ -265,7 +265,7 @@
             lbl_design_code: "Kod Rekaan", lbl_size: "Saiz", btn_add_item: "Tambah Item Lain",
             alert_name: "Sila masukkan nama anda.", alert_phone: "Sila masukkan no. telefon anda.", alert_item_detail: "Sila pilih Kod Rekaan dan Saiz untuk semua item.",
             step2_title: "Sahkan Lokasi", btn_use_order_addr: "Guna Alamat Tempahan", btn_use_gps: "Guna GPS Semasa", txt_detecting: "Mengesan lokasi...", txt_locating_fresh: "Mendapatkan isyarat GPS baru...", txt_recommended: "Disyorkan",
-            txt_fetching_order: "Sedang mendapatkan butiran tempahan...", txt_pinpointing: "Memetakan koordinat Google...", alert_geocode_fail: "Gagal memetakan alamat secara automatik. Sila guna 'Guna GPS Semasa' untuk caj penghantaran yang tepat.",
+            txt_loading_system: "Memuatkan sistem...", txt_pinpointing: "Memetakan koordinat Google...", alert_geocode_fail: "Gagal memetakan alamat secara automatik. Sila guna 'Guna GPS Semasa' untuk caj penghantaran yang tepat.",
             txt_detected_gps: "Lokasi Dikesan:", label_unit: "No. Unit / Rumah / Lot", placeholder_unit: "cth. Unit 15-1 atau Rumah 42", btn_confirm_loc: "Sahkan Lokasi", btn_cancel: "Batal", btn_change: "Tukar",
             alert_unit: "Sila masukkan No. Unit/Rumah anda.",
             step3_title: "Pilih Logistik", mode_walkin: "Walk-in", mode_lalamove: "Lalamove", label_del_fee: "Caj Penghantaran", btn_next_srv: "Seterusnya: Servis",
@@ -307,10 +307,7 @@
         const urlParams = new URLSearchParams(window.location.search);
         const orderId = urlParams.get('order');
         
-        if (orderId) {
-            document.getElementById('step1-loading').classList.remove('hidden');
-        }
-        
+        document.getElementById('step1-loading').classList.remove('hidden');
         document.getElementById('hub-list-loading').classList.remove('hidden');
         
         try {
@@ -367,14 +364,18 @@
                 document.getElementById('btn-use-order-addr').classList.add('hidden');
                 document.getElementById('loc-buttons').classList.remove('sm:grid-cols-2'); 
                 document.getElementById('loc-buttons').classList.add('grid-cols-1'); 
+                
+                document.getElementById('badge-recommended').classList.add('hidden');
+                
                 addManualItem(); 
             }
             
+            document.getElementById('step1-loading').classList.add('hidden');
             document.getElementById('hub-list-loading').classList.add('hidden');
             
         } catch(e) {
             console.error("API error", e);
-            document.getElementById('hub-list-loading').innerText = "Database Error: " + e.message;
+            document.getElementById('step1-loading').innerText = "Database Error: " + e.message;
         }
     });
 
@@ -382,7 +383,7 @@
     const sizes = ['XS', 'S', 'M', 'L', 'XL', 'XXL', 'XXXL'];
     const sizeChart = { 'XS': { length: 55, sleeve: 22, shoulder: 14 }, 'S': { length: 55, sleeve: 22, shoulder: 15 }, 'M': { length: 57, sleeve: 23, shoulder: 16 }, 'L': { length: 60, sleeve: 23.5, shoulder: 16.5 }, 'XL': { length: 60, sleeve: 23.5, shoulder: 17.5 }, 'XXL': { length: 60, sleeve: 23.5, shoulder: 18 }, 'XXXL': { length: 60, sleeve: 23.5, shoulder: 19 } };
     
-    let state = { path: 'A', selectedItems: [], lat: 0, lng: 0, unitNo: '', orderAddress: '', mode: 'walkin', hubId: null, hubDist: 0, deliveryCost: 0, servicesTotal: 0, measurements: {}, logisticsSchedule: '' };
+    let state = { path: 'A', selectedItems: [], lat: "", lng: "", unitNo: '', orderAddress: '', mode: 'walkin', hubId: null, hubDist: 0, deliveryCost: 0, servicesTotal: 0, measurements: {}, logisticsSchedule: '', gpsWatchId: null };
     let editingItemId = null;
 
     // STEP 1
@@ -437,12 +438,10 @@
     // STEP 2 - GEOCODING VIA PRIVATE APPS SCRIPT
     async function geocodeAddress(address) {
         try {
-            // First Attempt: Exact address using Google Maps via our Apps Script
             let res = await fetch(`${scriptURL}?action=geocode&address=${encodeURIComponent(address)}`);
             let data = await res.json();
             if(data && data.lat && data.lng) return data;
             
-            // Second Attempt: Strip the first part (often a unit/house number) to find the building/street
             const parts = address.split(',');
             if(parts.length > 1) {
                 const broaderAddress = parts.slice(1).join(',').trim();
@@ -451,7 +450,6 @@
                 if(data && data.lat && data.lng) return data;
             }
             
-            // Third Attempt: Strip first two parts (Aggressive fallback)
             if(parts.length > 2) {
                 const evenBroader = parts.slice(2).join(',').trim();
                 res = await fetch(`${scriptURL}?action=geocode&address=${encodeURIComponent(evenBroader)}`);
@@ -463,7 +461,7 @@
     }
 
     async function useOrderAddress() { 
-        if(!state.orderAddress) state.orderAddress = "Kuala Lumpur, Malaysia"; // absolute fallback
+        if(!state.orderAddress) state.orderAddress = "Kuala Lumpur, Malaysia"; // fallback
         
         const btnText = document.getElementById('order-addr-display');
         const originalText = btnText.innerText;
@@ -476,7 +474,6 @@
             state.lng = coords.lng;
             
             document.getElementById('loc-buttons').classList.add('hidden');
-            // Show the actual address string instead of raw GPS coordinates for UX clarity
             document.getElementById('gps-detected-text').innerText = state.orderAddress; 
             document.getElementById('gps-details-panel').classList.remove('hidden');
             btnText.innerText = originalText;
@@ -489,12 +486,30 @@
     function useGPS() {
         if(!navigator.geolocation) return alert("Geo not supported");
         const desc = document.getElementById('gps-desc'); desc.innerText = t[currentLang].txt_locating_fresh;
-        navigator.geolocation.getCurrentPosition(
+        
+        // Clear any stuck watch states
+        if (state.gpsWatchId) navigator.geolocation.clearWatch(state.gpsWatchId);
+        
+        // Use watchPosition to force device to bypass cached locations and ping the satellite
+        state.gpsWatchId = navigator.geolocation.watchPosition(
             pos => { 
-                state.lat = pos.coords.latitude; state.lng = pos.coords.longitude; desc.innerText = t[currentLang].txt_detecting;
-                document.getElementById('loc-buttons').classList.add('hidden'); document.getElementById('gps-detected-text').innerText = `GPS: ${state.lat.toFixed(4)}, ${state.lng.toFixed(4)}`; document.getElementById('gps-details-panel').classList.remove('hidden');
+                // Immediately clear the watch once we get a solid hit to save battery
+                navigator.geolocation.clearWatch(state.gpsWatchId);
+                state.gpsWatchId = null;
+                
+                state.lat = pos.coords.latitude; 
+                state.lng = pos.coords.longitude; 
+                desc.innerText = t[currentLang].txt_detecting;
+                
+                document.getElementById('loc-buttons').classList.add('hidden'); 
+                document.getElementById('gps-detected-text').innerText = `GPS: ${state.lat.toFixed(6)}, ${state.lng.toFixed(6)}`; 
+                document.getElementById('gps-details-panel').classList.remove('hidden');
             },
-            () => { desc.innerText = t[currentLang].txt_detecting; alert("Failed to detect GPS location."); }, { enableHighAccuracy: true, maximumAge: 0, timeout: 10000 } 
+            () => { 
+                desc.innerText = t[currentLang].txt_detecting; 
+                alert("Failed to detect GPS location. Please ensure location services are enabled on your device."); 
+            }, 
+            { enableHighAccuracy: true, maximumAge: 0, timeout: 15000 } 
         );
     }
     
@@ -503,16 +518,30 @@
         if(!state.unitNo) return alert(t[currentLang].alert_unit);
         
         document.getElementById('gps-details-panel').classList.add('hidden'); 
-        
         const baseText = document.getElementById('gps-detected-text').innerText;
-        const displayAddr = `${state.unitNo}, ${baseText}`;
-        showLocSuccess(displayAddr);
+        showLocSuccess(`${state.unitNo}, ${baseText}`);
     }
     
     function showLocSuccess(addr) { document.getElementById('loc-buttons').classList.add('hidden'); document.getElementById('gps-details-panel').classList.add('hidden'); document.getElementById('validated-loc').classList.remove('hidden'); document.getElementById('final-address').innerText = addr; unlockStep(3); renderHubs(); }
-    function resetLoc() { document.getElementById('loc-buttons').classList.remove('hidden'); document.getElementById('gps-details-panel').classList.add('hidden'); document.getElementById('gps-unit-input').value = ''; document.getElementById('validated-loc').classList.add('hidden'); lockStep(3); lockStep(4); }
+    
+    function resetLoc() { 
+        // Hard reset coordinates so a new GPS ping is forced
+        state.lat = ""; 
+        state.lng = "";
+        state.unitNo = "";
+        if (state.gpsWatchId) {
+            navigator.geolocation.clearWatch(state.gpsWatchId);
+            state.gpsWatchId = null;
+        }
+        
+        document.getElementById('loc-buttons').classList.remove('hidden'); 
+        document.getElementById('gps-details-panel').classList.add('hidden'); 
+        document.getElementById('gps-unit-input').value = ''; 
+        document.getElementById('validated-loc').classList.add('hidden'); 
+        lockStep(3); lockStep(4); 
+    }
 
-    // STEP 3 
+    // STEP 3 - SMART RENDERING LOGIC
     function formatTime(timeStr) {
         if(!timeStr) return "";
         let [h, m] = timeStr.split(':'); let hours = parseInt(h); const ampm = hours >= 12 ? 'PM' : 'AM';
@@ -526,12 +555,27 @@
         const isOpen = operatingDays.includes(currentDay) && currentTimeNum >= openTimeNum && currentTimeNum < closeTimeNum;
         return { isOpen, text: isOpen ? `${t[currentLang].txt_open} (${t[currentLang].txt_closes_at} ${formatTime(hub.close)})` : `${t[currentLang].txt_closed} (${t[currentLang].txt_opens_at} ${formatTime(hub.open)})` };
     }
+    
     function renderHubs() {
         if(hubs.length === 0) return;
-        hubs.forEach(h => { h.dist = (state.lat && state.lng) ? getDist(state.lat, state.lng, h.lat, h.lng) : 5.0; h.fee = Math.ceil(5 + (h.dist * 1.0)); });
+        
+        hubs.forEach(h => { 
+            h.dist = (state.lat !== "" && state.lng !== "") ? getDist(state.lat, state.lng, h.lat, h.lng) : 5.0; 
+            h.fee = Math.ceil(5 + (h.dist * 1.0)); 
+        });
+        
         hubs.sort((a,b) => a.dist - b.dist);
+        
+        let filteredHubs = hubs.filter(h => h.dist <= 20);
+        if (filteredHubs.length === 0) {
+            filteredHubs = hubs.slice(0, 3);
+        } else {
+            filteredHubs = filteredHubs.slice(0, 10);
+        }
+
         const list = document.getElementById('hub-list'); list.innerHTML = '';
-        hubs.forEach(h => {
+        
+        filteredHubs.forEach(h => {
             const isSelected = state.hubId === h.id; const status = checkHubStatus(h);
             const badgeCls = status.isOpen ? "text-green-400 bg-green-500/10" : "text-red-400 bg-red-500/10";
             let lalamoveHtml = '';
