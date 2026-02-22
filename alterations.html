@@ -234,7 +234,7 @@
   </div>
 
   <script>
-    // --- APP SCRIPT URL (Replace with your actual URL) ---
+    // --- APP SCRIPT URL ---
     const scriptURL = 'https://script.google.com/macros/s/AKfycbyrJFfuCrhAbdwzAj8uP4sSvFuzRzzzEFV5CHOCBSOK6OGlIXPtsf7-XEfjLHGnFZiyvw/exec'; 
 
     const t = {
@@ -314,16 +314,25 @@
             document.getElementById('loc-buttons').classList.remove('sm:grid-cols-2'); document.getElementById('loc-buttons').classList.add('grid-cols-1'); addManualItem(); 
         }
 
-        // Fetch Live Hubs
+        // Fetch Live Hubs (with advanced error handling)
         document.getElementById('hub-list-loading').classList.remove('hidden');
         try {
             const res = await fetch(scriptURL);
-            hubs = await res.json();
+            const data = await res.json();
+            
+            if (data.error) {
+                throw new Error(data.error);
+            }
+            
+            // Ensure we successfully received an array of tailors
+            hubs = Array.isArray(data) ? data : [];
+            document.getElementById('hub-list-loading').classList.add('hidden');
+            
         } catch(e) {
             console.error("API error", e);
-            document.getElementById('hub-list-loading').innerText = "Failed to load Alteration Points. Please refresh.";
+            document.getElementById('hub-list-loading').innerText = "Database Error: " + e.message + " (Please ensure your Apps Script is deployed as a 'New Version')";
+            // We intentionally leave the loading text visible so you can read the exact error.
         }
-        document.getElementById('hub-list-loading').classList.add('hidden');
     });
 
     const designCodes = ['D01', 'D02', 'D03', 'D04', 'D05', 'D06', 'D07', 'W01', 'W02', 'W03', 'W04', 'W05', 'W06', 'Z01', 'Z02', 'Z03', 'Z04', 'Z05', 'Z06', 'Z07', 'Z08', 'M01', 'M02', 'M03'];
