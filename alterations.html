@@ -42,8 +42,8 @@
     .scrollbar-thin::-webkit-scrollbar-track { background: transparent; }
     .scrollbar-thin::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 10px; }
 
-    input[type="number"], select { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); color: white; border-radius: 8px; padding: 10px 14px; width: 100%; transition: all 0.2s; }
-    input[type="number"]:focus, select:focus { outline: none; border-color: #C0A062; background: rgba(192,160,98,0.05); }
+    input[type="number"], input[type="text"], select { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); color: white; border-radius: 8px; padding: 10px 14px; width: 100%; transition: all 0.2s; }
+    input[type="number"]:focus, input[type="text"]:focus, select:focus { outline: none; border-color: #C0A062; background: rgba(192,160,98,0.05); }
     input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
   </style>
 </head>
@@ -124,6 +124,7 @@
         
         <div>
           <h2 class="text-xl font-display mb-4 text-white" data-t="step2_title">Verify Location</h2>
+          
           <div class="grid sm:grid-cols-2 gap-3" id="loc-buttons">
             <button onclick="useOrderAddress()" class="p-4 rounded-xl border border-white/10 hover:border-luxe hover:bg-white/5 transition text-left group">
                 <span class="block text-sm font-bold text-white mb-1 group-hover:text-luxe" data-t="btn_use_order_addr">Use Order Address</span>
@@ -134,12 +135,26 @@
                 <span class="block text-xs text-white/50" id="gps-desc" data-t="txt_detecting">Detecting location...</span>
             </button>
           </div>
+
+          <div id="gps-details-panel" class="hidden fade-in bg-white/5 border border-white/10 rounded-xl p-5 mb-2">
+              <p class="text-xs text-white/50 uppercase tracking-widest mb-1" data-t="txt_detected_gps">Detected Location:</p>
+              <p class="text-sm text-white font-medium mb-5" id="gps-detected-text">...</p>
+              
+              <label class="block text-sm text-white/70 mb-2" data-t="label_unit">Unit / House / Lot No.</label>
+              <input type="text" id="gps-unit-input" class="w-full mb-5" placeholder="e.g. Unit 15-1" data-t-placeholder="placeholder_unit">
+              
+              <div class="flex gap-3">
+                  <button onclick="resetLoc()" class="px-5 py-2.5 rounded-lg border border-white/10 text-white/70 text-sm font-bold hover:bg-white/5 transition" data-t="btn_cancel">Cancel</button>
+                  <button onclick="confirmGPSDetails()" class="flex-1 px-5 py-2.5 rounded-lg bg-luxe text-brand text-sm font-bold hover:bg-white transition shadow-[0_0_15px_rgba(192,160,98,0.3)]" data-t="btn_confirm_loc">Confirm Location</button>
+              </div>
+          </div>
+
           <div id="validated-loc" class="hidden mt-2 p-3 bg-luxe/10 border border-luxe/30 rounded-lg flex justify-between items-center">
              <div>
                <p class="text-xs text-luxe uppercase tracking-widest">Base Location</p>
-               <p class="text-sm text-white" id="final-address">...</p>
+               <p class="text-sm text-white mt-0.5" id="final-address">...</p>
              </div>
-             <button onclick="resetLoc()" class="text-xs text-white/50 underline" data-t="btn_change">Change</button>
+             <button onclick="resetLoc()" class="text-xs text-white/50 underline pl-4" data-t="btn_change">Change</button>
           </div>
         </div>
       </div>
@@ -231,7 +246,9 @@
         en: {
             page_title: "Alteration Service", page_subtitle: "Select items from your order to alter.",
             step1_title: "Select Items to Alter", btn_next_loc: "Next: Location",
-            step2_title: "Verify Location", btn_use_order_addr: "Use Order Address", btn_use_gps: "Use Current GPS", txt_detecting: "Detecting location...", txt_locating_fresh: "Acquiring fresh GPS...", btn_change: "Change",
+            step2_title: "Verify Location", btn_use_order_addr: "Use Order Address", btn_use_gps: "Use Current GPS", txt_detecting: "Detecting location...", txt_locating_fresh: "Acquiring fresh GPS...", 
+            txt_detected_gps: "Detected Location:", label_unit: "Unit / House / Lot No.", placeholder_unit: "e.g. Unit 15-1 or House 42", btn_confirm_loc: "Confirm Location", btn_cancel: "Cancel", btn_change: "Change",
+            alert_unit: "Please enter your Unit/House No.",
             step3_title: "Choose Logistics", mode_walkin: "Walk-in", mode_lalamove: "Lalamove", label_timeslot: "Select Time Slot:", label_del_fee: "Delivery Fee", btn_next_srv: "Next: Services",
             txt_new_buyer: "Ideal for new customers",
             badge_free_return: "Free Return Delivery", txt_return_paid: "Return fee paid to rider or self-pickup",
@@ -241,14 +258,16 @@
             label_total_est: "Total Estimate", btn_confirm: "Confirm Booking",
             txt_value: "Value", txt_yousave: "You Save",
             btn_add_meas: "Add Measurements (Required)", btn_edit_meas: "Measurements Saved (Edit)",
-            modal_title: "Provide Measurements", btn_cancel: "Cancel", btn_save: "Save",
+            modal_title: "Provide Measurements", btn_save: "Save",
             alert_no_items: "Please select at least one item.", alert_no_hub: "Please select a location.", alert_no_slot: "Please select a time slot.", alert_measure: "Please fill in measurements for all required items.",
             alert_max: "must be strictly less than original size"
         },
         bm: {
             page_title: "Servis Alterasi", page_subtitle: "Pilih item dari pesanan anda untuk dialter.",
             step1_title: "Pilih Item", btn_next_loc: "Seterusnya: Lokasi",
-            step2_title: "Sahkan Lokasi", btn_use_order_addr: "Guna Alamat Tempahan", btn_use_gps: "Guna GPS Semasa", txt_detecting: "Mengesan lokasi...", txt_locating_fresh: "Mendapatkan isyarat GPS baru...", btn_change: "Tukar",
+            step2_title: "Sahkan Lokasi", btn_use_order_addr: "Guna Alamat Tempahan", btn_use_gps: "Guna GPS Semasa", txt_detecting: "Mengesan lokasi...", txt_locating_fresh: "Mendapatkan isyarat GPS baru...",
+            txt_detected_gps: "Lokasi Dikesan:", label_unit: "No. Unit / Rumah / Lot", placeholder_unit: "cth. Unit 15-1 atau Rumah 42", btn_confirm_loc: "Sahkan Lokasi", btn_cancel: "Batal", btn_change: "Tukar",
+            alert_unit: "Sila masukkan No. Unit/Rumah anda.",
             step3_title: "Pilih Logistik", mode_walkin: "Walk-in", mode_lalamove: "Lalamove", label_timeslot: "Pilih Masa:", label_del_fee: "Caj Penghantaran", btn_next_srv: "Seterusnya: Servis",
             txt_new_buyer: "Sesuai untuk pelanggan baru",
             badge_free_return: "Penghantaran Pulang Percuma", txt_return_paid: "Caj pulang dibayar kepada rider atau ambil sendiri",
@@ -258,7 +277,7 @@
             label_total_est: "Anggaran Jumlah", btn_confirm: "Sahkan Tempahan",
             txt_value: "Nilai", txt_yousave: "Anda Jimat",
             btn_add_meas: "Masukkan Ukuran (Wajib)", btn_edit_meas: "Ukuran Disimpan (Ubah)",
-            modal_title: "Masukkan Ukuran", btn_cancel: "Batal", btn_save: "Simpan",
+            modal_title: "Masukkan Ukuran", btn_save: "Simpan",
             alert_no_items: "Sila pilih sekurang-kurangnya satu item.", alert_no_hub: "Sila pilih lokasi.", alert_no_slot: "Sila pilih masa.", alert_measure: "Sila lengkapkan semua ukuran yang diperlukan.",
             alert_max: "mesti kurang dari saiz asal"
         }
@@ -267,16 +286,25 @@
 
     function setLang(lang) {
         currentLang = lang;
+        
+        // Update Inner Text
         document.querySelectorAll('[data-t]').forEach(el => {
             const key = el.getAttribute('data-t');
             if(t[lang][key]) el.innerText = t[lang][key];
         });
+        
+        // Update Placeholders
+        document.querySelectorAll('[data-t-placeholder]').forEach(el => {
+            const key = el.getAttribute('data-t-placeholder');
+            if(t[lang][key]) el.placeholder = t[lang][key];
+        });
+
+        // Update Toggle Buttons
         document.getElementById('lang-en').className = lang === 'en' ? "text-xs font-bold text-luxe" : "text-xs text-white/50 hover:text-white";
         document.getElementById('lang-bm').className = lang === 'bm' ? "text-xs font-bold text-luxe" : "text-xs text-white/50 hover:text-white";
-        updateMeasurementInstruction();
         
+        updateMeasurementInstruction();
         if(document.getElementById('hub-list').innerHTML !== "") renderHubs();
-
         if(document.getElementById('services-container').innerHTML !== "") {
             document.getElementById('services-container').dataset.needsRender = "true"; renderServices(); 
         }
@@ -327,7 +355,7 @@
 
     // --- LOGIC ---
 
-    // STEP 1: Sync dynamic changes instantly
+    // STEP 1
     function syncItems() {
         const checked = document.querySelectorAll('input[name="order-item"]:checked');
         const newSelected = [];
@@ -374,7 +402,11 @@
                 state.lat = pos.coords.latitude; 
                 state.lng = pos.coords.longitude; 
                 desc.innerText = t[currentLang].txt_detecting;
-                showLocSuccess(`GPS: ${state.lat.toFixed(4)}, ${state.lng.toFixed(4)}`); 
+                
+                // Show Unit Input Panel
+                document.getElementById('loc-buttons').classList.add('hidden');
+                document.getElementById('gps-detected-text').innerText = `GPS: ${state.lat.toFixed(4)}, ${state.lng.toFixed(4)}`;
+                document.getElementById('gps-details-panel').classList.remove('hidden');
             },
             () => { 
                 desc.innerText = t[currentLang].txt_detecting;
@@ -385,12 +417,30 @@
         );
     }
     
-    function showLocSuccess(addr) {
-        document.getElementById('loc-buttons').classList.add('hidden'); document.getElementById('validated-loc').classList.remove('hidden');
-        document.getElementById('final-address').innerText = addr; unlockStep(3); renderHubs(); renderSlots();
+    function confirmGPSDetails() {
+        const unit = document.getElementById('gps-unit-input').value.trim();
+        if(!unit) {
+            alert(t[currentLang].alert_unit);
+            return;
+        }
+        const combinedAddr = `${unit}, GPS: ${state.lat.toFixed(4)}, ${state.lng.toFixed(4)}`;
+        document.getElementById('gps-details-panel').classList.add('hidden');
+        showLocSuccess(combinedAddr);
     }
+
+    function showLocSuccess(addr) {
+        document.getElementById('loc-buttons').classList.add('hidden'); 
+        document.getElementById('gps-details-panel').classList.add('hidden');
+        document.getElementById('validated-loc').classList.remove('hidden');
+        document.getElementById('final-address').innerText = addr; 
+        unlockStep(3); renderHubs(); renderSlots();
+    }
+
     function resetLoc() {
-        document.getElementById('loc-buttons').classList.remove('hidden'); document.getElementById('validated-loc').classList.add('hidden');
+        document.getElementById('loc-buttons').classList.remove('hidden'); 
+        document.getElementById('gps-details-panel').classList.add('hidden');
+        document.getElementById('gps-unit-input').value = '';
+        document.getElementById('validated-loc').classList.add('hidden');
         lockStep(3); lockStep(4);
     }
 
