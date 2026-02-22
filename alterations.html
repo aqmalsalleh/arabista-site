@@ -79,6 +79,11 @@
         <div class="fade-in">
           <h2 class="text-xl font-display mb-4 text-white" data-t="step1_title">Select Items to Alter</h2>
           
+          <div id="step1-loading" class="hidden text-sm text-white/50 animate-pulse py-4 flex items-center gap-3">
+              <svg class="animate-spin h-4 w-4 text-luxe" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+              <span data-t="txt_fetching_order">Fetching order details...</span>
+          </div>
+
           <div id="path-a-container" class="hidden space-y-5 bg-white/5 border border-white/10 rounded-xl p-5">
               <p class="text-xs text-white/50 mb-2">Order <span id="order-id-display"></span></p>
               
@@ -236,6 +241,7 @@
             lbl_design_code: "Design Code", lbl_size: "Size", btn_add_item: "Add Another Item",
             alert_name: "Please enter your name.", alert_phone: "Please enter your telephone number.", alert_item_detail: "Please select Design Code and Size for all items.",
             step2_title: "Verify Location", btn_use_order_addr: "Use Order Address", btn_use_gps: "Use Current GPS", txt_detecting: "Detecting location...", txt_locating_fresh: "Acquiring fresh GPS...", 
+            txt_fetching_order: "Fetching order details...", txt_pinpointing: "Pinpointing on map...", alert_geocode_fail: "Unable to map this address automatically. Please use 'Use Current GPS' for accurate delivery fees.",
             txt_detected_gps: "Detected Location:", label_unit: "Unit / House / Lot No.", placeholder_unit: "e.g. Unit 15-1 or House 42", btn_confirm_loc: "Confirm Location", btn_cancel: "Cancel", btn_change: "Change",
             alert_unit: "Please enter your Unit/House No.",
             step3_title: "Choose Logistics", mode_walkin: "Walk-in", mode_lalamove: "Lalamove", label_del_fee: "Delivery Fee", btn_next_srv: "Next: Services",
@@ -258,6 +264,7 @@
             lbl_design_code: "Kod Rekaan", lbl_size: "Saiz", btn_add_item: "Tambah Item Lain",
             alert_name: "Sila masukkan nama anda.", alert_phone: "Sila masukkan no. telefon anda.", alert_item_detail: "Sila pilih Kod Rekaan dan Saiz untuk semua item.",
             step2_title: "Sahkan Lokasi", btn_use_order_addr: "Guna Alamat Tempahan", btn_use_gps: "Guna GPS Semasa", txt_detecting: "Mengesan lokasi...", txt_locating_fresh: "Mendapatkan isyarat GPS baru...",
+            txt_fetching_order: "Sedang mendapatkan butiran tempahan...", txt_pinpointing: "Memetakan alamat...", alert_geocode_fail: "Gagal memetakan alamat secara automatik. Sila guna 'Guna GPS Semasa' untuk caj penghantaran yang tepat.",
             txt_detected_gps: "Lokasi Dikesan:", label_unit: "No. Unit / Rumah / Lot", placeholder_unit: "cth. Unit 15-1 atau Rumah 42", btn_confirm_loc: "Sahkan Lokasi", btn_cancel: "Batal", btn_change: "Tukar",
             alert_unit: "Sila masukkan No. Unit/Rumah anda.",
             step3_title: "Pilih Logistik", mode_walkin: "Walk-in", mode_lalamove: "Lalamove", label_del_fee: "Caj Penghantaran", btn_next_srv: "Seterusnya: Servis",
@@ -299,10 +306,13 @@
         const urlParams = new URLSearchParams(window.location.search);
         const orderId = urlParams.get('order');
         
+        if (orderId) {
+            document.getElementById('step1-loading').classList.remove('hidden');
+        }
+        
         document.getElementById('hub-list-loading').classList.remove('hidden');
         
         try {
-            // Send API call. Pass orderId if it exists to fetch both Hubs & Order Data
             const fetchUrl = orderId ? `${scriptURL}?order=${orderId}` : scriptURL;
             const res = await fetch(fetchUrl);
             const data = await res.json();
@@ -312,20 +322,17 @@
             hubs = Array.isArray(data.hubs) ? data.hubs : [];
             
             if (orderId && data.orderData) {
-                // PATH A Setup
                 state.path = 'A';
+                document.getElementById('step1-loading').classList.add('hidden');
                 document.getElementById('path-a-container').classList.remove('hidden');
                 document.getElementById('order-id-display').innerText = "#" + data.orderData.orderRef;
                 
-                // Pre-fill read-only info
                 document.getElementById('auto-cust-name').value = data.orderData.name;
                 document.getElementById('auto-cust-phone').value = data.orderData.phone;
                 
-                // Set Order Address for Step 2
                 state.orderAddress = data.orderData.address;
                 document.getElementById('order-addr-display').innerText = state.orderAddress;
                 
-                // Dynamically build the item checklist
                 const itemsList = document.getElementById('auto-items-list');
                 itemsList.innerHTML = '';
                 const rawItems = data.orderData.itemsRaw.split(',');
@@ -338,7 +345,6 @@
                         const size = parts[1].trim();
                         const qty = parseInt(parts[2]) || 1;
                         
-                        // If qty is 2, it loops twice and creates 2 identical checkboxes with unique IDs
                         for(let q=0; q < qty; q++) {
                             itemsList.innerHTML += `
                             <label class="flex items-center gap-4 p-4 border border-white/10 rounded-xl hover:bg-white/5 cursor-pointer transition">
@@ -354,7 +360,6 @@
                 });
                 
             } else {
-                // PATH B Setup (or if order ID failed)
                 state.path = 'B'; 
                 if (orderId) alert("Order #" + orderId + " not found. Proceeding with manual entry.");
                 document.getElementById('path-b-container').classList.remove('hidden'); 
@@ -428,11 +433,50 @@
         unlockStep(2); document.getElementById('step-2').scrollIntoView({behavior: 'smooth', block: 'center'});
     }
 
-    // STEP 2
-    function useOrderAddress() { 
-        state.unitNo = state.orderAddress || "Database Address"; 
-        state.lat = ""; state.lng = ""; showLocSuccess(state.unitNo); 
+    // STEP 2 - GEOCODING
+    async function geocodeAddress(address) {
+        try {
+            // First Attempt: Exact address
+            let res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&limit=1&q=${encodeURIComponent(address)}`);
+            let data = await res.json();
+            if(data && data.length > 0) return { lat: parseFloat(data[0].lat), lng: parseFloat(data[0].lon) };
+            
+            // Second Attempt: Strip the first part (often a house number that trips up the system) to find the street/area
+            const parts = address.split(',');
+            if(parts.length > 1) {
+                const broaderAddress = parts.slice(1).join(',').trim();
+                res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&limit=1&q=${encodeURIComponent(broaderAddress)}`);
+                data = await res.json();
+                if(data && data.length > 0) return { lat: parseFloat(data[0].lat), lng: parseFloat(data[0].lon) };
+            }
+        } catch(e) { console.error("Geocoding failed", e); }
+        return null;
     }
+
+    async function useOrderAddress() { 
+        if(!state.orderAddress) state.orderAddress = "Kuala Lumpur, Malaysia"; // absolute fallback
+        
+        const btnText = document.getElementById('order-addr-display');
+        const originalText = btnText.innerText;
+        btnText.innerText = t[currentLang].txt_pinpointing;
+        
+        const coords = await geocodeAddress(state.orderAddress);
+        
+        if(coords) {
+            state.lat = coords.lat;
+            state.lng = coords.lng;
+            
+            document.getElementById('loc-buttons').classList.add('hidden');
+            // Show the actual address string instead of raw GPS coordinates for UX clarity
+            document.getElementById('gps-detected-text').innerText = state.orderAddress; 
+            document.getElementById('gps-details-panel').classList.remove('hidden');
+            btnText.innerText = originalText;
+        } else {
+            alert(t[currentLang].alert_geocode_fail);
+            btnText.innerText = originalText;
+        }
+    }
+    
     function useGPS() {
         if(!navigator.geolocation) return alert("Geo not supported");
         const desc = document.getElementById('gps-desc'); desc.innerText = t[currentLang].txt_locating_fresh;
@@ -444,11 +488,18 @@
             () => { desc.innerText = t[currentLang].txt_detecting; alert("Failed to detect GPS location."); }, { enableHighAccuracy: true, maximumAge: 0, timeout: 10000 } 
         );
     }
+    
     function confirmGPSDetails() {
         state.unitNo = document.getElementById('gps-unit-input').value.trim();
         if(!state.unitNo) return alert(t[currentLang].alert_unit);
-        document.getElementById('gps-details-panel').classList.add('hidden'); showLocSuccess(`${state.unitNo}, GPS: ${state.lat.toFixed(4)}, ${state.lng.toFixed(4)}`);
+        
+        document.getElementById('gps-details-panel').classList.add('hidden'); 
+        
+        const baseText = document.getElementById('gps-detected-text').innerText;
+        const displayAddr = `${state.unitNo}, ${baseText}`;
+        showLocSuccess(displayAddr);
     }
+    
     function showLocSuccess(addr) { document.getElementById('loc-buttons').classList.add('hidden'); document.getElementById('gps-details-panel').classList.add('hidden'); document.getElementById('validated-loc').classList.remove('hidden'); document.getElementById('final-address').innerText = addr; unlockStep(3); renderHubs(); }
     function resetLoc() { document.getElementById('loc-buttons').classList.remove('hidden'); document.getElementById('gps-details-panel').classList.add('hidden'); document.getElementById('gps-unit-input').value = ''; document.getElementById('validated-loc').classList.add('hidden'); lockStep(3); lockStep(4); }
 
@@ -659,7 +710,6 @@
 
         const hubData = hubs.find(h => h.id === state.hubId);
         
-        // Dynamically grab customer details based on path
         const custName = state.path === 'A' ? document.getElementById('auto-cust-name').value : document.getElementById('manual-cust-name').value.trim();
         const custPhone = state.path === 'A' ? document.getElementById('auto-cust-phone').value : document.getElementById('manual-cust-phone').value.trim();
 
