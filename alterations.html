@@ -159,7 +159,7 @@
             </button>
           </div>
 
-          <div id="hub-list" class="space-y-2 max-h-[200px] overflow-y-auto pr-2 scrollbar-thin mb-4"></div>
+          <div id="hub-list" class="space-y-2 max-h-[250px] overflow-y-auto pr-2 scrollbar-thin mb-4"></div>
 
           <div id="walkin-panel" class="mb-4 p-4 bg-white/5 border border-white/10 rounded-xl fade-in">
              <span class="text-xs text-white/60 block mb-3" data-t="label_timeslot">Select Time Slot:</span>
@@ -229,6 +229,7 @@
             step1_title: "Select Items to Alter", btn_next_loc: "Next: Location",
             step2_title: "Verify Location", btn_use_order_addr: "Use Order Address", btn_use_gps: "Use Current GPS", txt_detecting: "Detecting...", btn_change: "Change",
             step3_title: "Choose Logistics", mode_walkin: "Walk-in", mode_lalamove: "Lalamove", label_timeslot: "Select Time Slot:", label_del_fee: "Delivery Fee", btn_next_srv: "Next: Services",
+            badge_free_return: "Free Return Delivery", txt_return_paid: "Return delivery paid to rider",
             step4_title: "Services & Measurements", txt_measure_walkin: "Walk-in selected. We will measure you in-store.", txt_measure_lala: "Lalamove selected. Please provide measurements.",
             srv_full: "Full Body Alteration", srv_hem: "Alter Length", srv_sleeve: "Alter Sleeves", srv_shoulder: "Alter Shoulders", srv_pads: "Add Shoulder Pads",
             lbl_length: "Length (inches)", lbl_sleeve: "Sleeves (inches)", lbl_shoulder: "Shoulders (inches)", lbl_pads: "Shoulder Pads",
@@ -244,6 +245,7 @@
             step1_title: "Pilih Item", btn_next_loc: "Seterusnya: Lokasi",
             step2_title: "Sahkan Lokasi", btn_use_order_addr: "Guna Alamat Tempahan", btn_use_gps: "Guna GPS Semasa", txt_detecting: "Mengesan...", btn_change: "Tukar",
             step3_title: "Pilih Logistik", mode_walkin: "Walk-in", mode_lalamove: "Lalamove", label_timeslot: "Pilih Masa:", label_del_fee: "Caj Penghantaran", btn_next_srv: "Seterusnya: Servis",
+            badge_free_return: "Penghantaran Pulang Percuma", txt_return_paid: "Caj pulang dibayar kepada rider",
             step4_title: "Servis & Ukuran", txt_measure_walkin: "Walk-in dipilih. Ukuran akan diambil di butik.", txt_measure_lala: "Lalamove dipilih. Sila masukkan ukuran.",
             srv_full: "Alter Keseluruhan Baju", srv_hem: "Alter Labuh", srv_sleeve: "Alter Lengan", srv_shoulder: "Alter Bahu", srv_pads: "Tambah Span Bahu",
             lbl_length: "Labuh (inci)", lbl_sleeve: "Lengan (inci)", lbl_shoulder: "Bahu (inci)", lbl_pads: "Span Bahu",
@@ -266,6 +268,10 @@
         document.getElementById('lang-en').className = lang === 'en' ? "text-xs font-bold text-luxe" : "text-xs text-white/50 hover:text-white";
         document.getElementById('lang-bm').className = lang === 'bm' ? "text-xs font-bold text-luxe" : "text-xs text-white/50 hover:text-white";
         updateMeasurementInstruction();
+        
+        // Re-render hubs text if Lalamove is active
+        if(document.getElementById('hub-list').innerHTML !== "") renderHubs();
+
         if(document.getElementById('services-container').innerHTML !== "") {
             document.getElementById('services-container').dataset.needsRender = "true"; renderServices(); 
         }
@@ -284,16 +290,20 @@
 
     const hubs = [
       { id: 1, name: "Arabista Damai Perdana", lat: 3.0370, lng: 101.7424 },
-      { id: 2, name: "Tailor Kak Bedah (Shah Alam)", lat: 3.0655, lng: 101.4830 },
-      { id: 3, name: "Tailor Sarah (Wangsa Maju)", lat: 3.2000, lng: 101.7400 }
+      { id: 2, name: "Alteration BTHO (Cheras)", lat: 3.0450, lng: 101.7550 },
+      { id: 3, name: "Butik Jahit (Balakong)", lat: 3.0280, lng: 101.7450 },
+      { id: 4, name: "Tailor Kak Bedah (Shah Alam)", lat: 3.0655, lng: 101.4830 },
+      { id: 5, name: "Tailor Sarah (Wangsa Maju)", lat: 3.2000, lng: 101.7400 },
+      { id: 6, name: "Tukang Jahit (Kajang)", lat: 2.9935, lng: 101.7874 }
     ];
+
     const timeSlots = ["10:00", "11:30", "14:00", "15:30", "17:00", "20:00"];
     
     let state = {
         selectedItems: [], 
         lat: 0, lng: 0, mode: 'walkin', hubId: null, hubDist: 0, slot: null,
         deliveryCost: 0, servicesTotal: 0,
-        measurements: {} // itemId: { length, sleeve, shoulder, pads }
+        measurements: {} 
     };
     let editingItemId = null;
 
@@ -316,7 +326,6 @@
         
         state.selectedItems = newSelected;
         
-        // If Step 4 is already active, instantly update it
         if(!document.getElementById('step-4').classList.contains('opacity-30')) {
             document.getElementById('services-container').dataset.needsRender = "true";
             renderServices();
@@ -353,17 +362,44 @@
 
     // STEP 3
     function renderHubs() {
-        hubs.forEach(h => h.dist = getDist(state.lat, state.lng, h.lat, h.lng)); hubs.sort((a,b) => a.dist - b.dist);
-        const list = document.getElementById('hub-list'); list.innerHTML = '';
         hubs.forEach(h => {
-            list.innerHTML += `<div onclick="selectHub(${h.id}, ${h.dist})" id="hub-${h.id}" class="p-3 rounded-lg border border-white/10 hover:bg-white/5 cursor-pointer flex justify-between items-center transition"><span class="text-sm text-white/80">${h.name}</span><span class="text-xs font-bold text-luxe">${h.dist.toFixed(1)} km</span></div>`;
+            h.dist = getDist(state.lat, state.lng, h.lat, h.lng);
+            h.fee = Math.ceil(5 + (h.dist * 1.0));
+        });
+        hubs.sort((a,b) => a.dist - b.dist);
+        
+        const list = document.getElementById('hub-list'); 
+        list.innerHTML = '';
+        
+        hubs.forEach(h => {
+            const isSelected = state.hubId === h.id;
+            let lalamoveHtml = '';
+            
+            if(state.mode === 'lalamove') {
+                if(h.fee < 10) {
+                    lalamoveHtml = `<div class="mt-1 text-[10px] font-bold text-green-400 bg-green-500/10 inline-block px-1.5 py-0.5 rounded border border-green-500/20" data-t="badge_free_return">${t[currentLang].badge_free_return}</div>`;
+                } else {
+                    lalamoveHtml = `<div class="mt-1 text-[10px] text-white/40" data-t="txt_return_paid">${t[currentLang].txt_return_paid}</div>`;
+                }
+            }
+
+            list.innerHTML += `
+            <div onclick="selectHub(${h.id}, ${h.dist}, ${h.fee})" id="hub-${h.id}" class="p-3 rounded-lg border ${isSelected ? 'border-luxe bg-luxe/10' : 'border-white/10 opacity-70'} hover:bg-white/5 cursor-pointer flex justify-between items-center transition">
+                <div>
+                    <span class="text-sm text-white/90 font-medium block">${h.name}</span>
+                    ${lalamoveHtml}
+                </div>
+                <span class="text-xs font-bold text-luxe">${h.dist.toFixed(1)} km</span>
+            </div>`;
         });
     }
-    function selectHub(id, dist) {
+
+    function selectHub(id, dist, fee) {
         state.hubId = id; state.hubDist = dist;
-        hubs.forEach(h => document.getElementById(`hub-${h.id}`).className = (h.id === id) ? "p-3 rounded-lg border border-luxe bg-luxe/10 flex justify-between items-center transition" : "p-3 rounded-lg border border-white/10 opacity-50 flex justify-between items-center transition");
+        renderHubs(); // Re-render to easily manage selected states and complex HTML content
         updateLogisticsCost(); checkStep3Complete();
     }
+
     function renderSlots() {
         const div = document.getElementById('slot-container'); if(div.innerHTML !== "") return;
         timeSlots.forEach(time => div.innerHTML += `<button onclick="setSlot('${time}')" id="slot-${time.replace(':','')}" class="text-xs py-2 border border-white/10 rounded hover:bg-white/10 text-white/60">${time}</button>`);
@@ -386,6 +422,7 @@
             w.classList.replace('border-luxe', 'border-white/10'); w.classList.remove('bg-luxe/10');
             lc.classList.remove('hidden'); wc.classList.add('hidden'); updateLogisticsCost();
         }
+        renderHubs(); // Refresh badges
         updateMeasurementInstruction(); renderServices(); checkStep3Complete(); calculateTotal();
     }
     function updateLogisticsCost() {
@@ -550,11 +587,10 @@
         const m = state.measurements[itemId];
         const isFull = document.getElementById(`cb-${itemId}-full`).checked;
 
-        const buildInput = (key, labelKey, maxVal, type="number", imgPlaceholder="") => {
+        const buildInput = (key, labelKey, maxVal, type="number") => {
             const labelText = t[currentLang][labelKey] + (maxVal ? ` (Max: ${maxVal}")` : '');
             return `<div>
                       <label class="block text-sm text-white/70 mb-2">${labelText}</label>
-                      ${imgPlaceholder ? `<div class="mb-3 rounded-lg overflow-hidden border border-white/10 opacity-70 p-4 text-center text-xs text-white/40 bg-white/5">${imgPlaceholder}</div>` : ''}
                       ${type === 'select' 
                         ? `<select id="mod-${key}"><option value="" class="text-black">Select...</option><option value="Yes" class="text-black" ${m[key]==='Yes'?'selected':''}>Yes</option><option value="No" class="text-black" ${m[key]==='No'?'selected':''}>No</option></select>`
                         : `<input type="number" id="mod-${key}" value="${m[key]}" placeholder="${maxVal ? '< '+maxVal : ''}">`
@@ -563,7 +599,7 @@
         };
 
         if(isFull || document.getElementById(`cb-${itemId}-hem`)?.checked) 
-            fieldsDiv.innerHTML += buildInput('length', 'lbl_length', limit.length, 'number', '[Image showing how to measure abaya length]');
+            fieldsDiv.innerHTML += buildInput('length', 'lbl_length', limit.length, 'number');
         if(isFull || document.getElementById(`cb-${itemId}-sleeve`)?.checked) 
             fieldsDiv.innerHTML += buildInput('sleeve', 'lbl_sleeve', limit.sleeve, 'number');
         if(isFull || document.getElementById(`cb-${itemId}-shoulder`)?.checked) 
@@ -595,7 +631,6 @@
         const shdEl = document.getElementById('mod-shoulder');
         const padEl = document.getElementById('mod-pads');
         
-        // Size Validation Logic
         let errorMsg = "";
         if(lenEl && lenEl.value && parseFloat(lenEl.value) >= limit.length) 
             errorMsg += `- ${t[currentLang].lbl_length} ${t[currentLang].alert_max} (${limit.length}").\n`;
