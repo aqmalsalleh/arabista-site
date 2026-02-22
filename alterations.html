@@ -42,8 +42,8 @@
     .scrollbar-thin::-webkit-scrollbar-track { background: transparent; }
     .scrollbar-thin::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 10px; }
 
-    input[type="number"], input[type="text"], select { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); color: white; border-radius: 8px; padding: 10px 14px; width: 100%; transition: all 0.2s; }
-    input[type="number"]:focus, input[type="text"]:focus, select:focus { outline: none; border-color: #C0A062; background: rgba(192,160,98,0.05); }
+    input[type="number"], input[type="text"], input[type="tel"], select { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); color: white; border-radius: 8px; padding: 10px 14px; width: 100%; transition: all 0.2s; }
+    input[type="number"]:focus, input[type="text"]:focus, input[type="tel"]:focus, select:focus { outline: none; border-color: #C0A062; background: rgba(192,160,98,0.05); }
     input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
   </style>
 </head>
@@ -119,7 +119,12 @@
                   <input type="text" id="manual-cust-name" class="w-full" placeholder="e.g. Siti Aishah" data-t-placeholder="placeholder_name">
               </div>
               
-              <div id="manual-items-list" class="space-y-3">
+              <div>
+                  <label class="block text-sm text-white/70 mb-2" data-t="lbl_phone">Telephone No.</label>
+                  <input type="tel" id="manual-cust-phone" class="w-full" placeholder="e.g. 0123456789" data-t-placeholder="placeholder_phone">
+              </div>
+              
+              <div id="manual-items-list" class="space-y-3 pt-2">
                   </div>
               
               <button onclick="addManualItem()" class="text-luxe text-sm font-bold flex items-center gap-2 hover:text-white transition group">
@@ -265,8 +270,10 @@
         en: {
             page_title: "Alteration Service", page_subtitle: "Select items to alter.",
             step1_title: "Select Items to Alter", btn_next_loc: "Next: Location",
-            lbl_cust_name: "Customer Name", placeholder_name: "e.g. Siti Aishah", lbl_design_code: "Design Code", lbl_size: "Size", btn_add_item: "Add Another Item",
-            alert_name: "Please enter your name.", alert_item_detail: "Please select Design Code and Size for all items.",
+            lbl_cust_name: "Customer Name", placeholder_name: "e.g. Siti Aishah", 
+            lbl_phone: "Telephone No.", placeholder_phone: "e.g. 0123456789",
+            lbl_design_code: "Design Code", lbl_size: "Size", btn_add_item: "Add Another Item",
+            alert_name: "Please enter your name.", alert_phone: "Please enter your telephone number.", alert_item_detail: "Please select Design Code and Size for all items.",
             step2_title: "Verify Location", btn_use_order_addr: "Use Order Address", btn_use_gps: "Use Current GPS", txt_detecting: "Detecting location...", txt_locating_fresh: "Acquiring fresh GPS...", 
             txt_detected_gps: "Detected Location:", label_unit: "Unit / House / Lot No.", placeholder_unit: "e.g. Unit 15-1 or House 42", btn_confirm_loc: "Confirm Location", btn_cancel: "Cancel", btn_change: "Change",
             alert_unit: "Please enter your Unit/House No.",
@@ -286,8 +293,10 @@
         bm: {
             page_title: "Servis Alterasi", page_subtitle: "Pilih item untuk dialter.",
             step1_title: "Pilih Item", btn_next_loc: "Seterusnya: Lokasi",
-            lbl_cust_name: "Nama Pelanggan", placeholder_name: "cth. Siti Aishah", lbl_design_code: "Kod Rekaan", lbl_size: "Saiz", btn_add_item: "Tambah Item Lain",
-            alert_name: "Sila masukkan nama anda.", alert_item_detail: "Sila pilih Kod Rekaan dan Saiz untuk semua item.",
+            lbl_cust_name: "Nama Pelanggan", placeholder_name: "cth. Siti Aishah", 
+            lbl_phone: "No. Telefon", placeholder_phone: "cth. 0123456789",
+            lbl_design_code: "Kod Rekaan", lbl_size: "Saiz", btn_add_item: "Tambah Item Lain",
+            alert_name: "Sila masukkan nama anda.", alert_phone: "Sila masukkan no. telefon anda.", alert_item_detail: "Sila pilih Kod Rekaan dan Saiz untuk semua item.",
             step2_title: "Sahkan Lokasi", btn_use_order_addr: "Guna Alamat Tempahan", btn_use_gps: "Guna GPS Semasa", txt_detecting: "Mengesan lokasi...", txt_locating_fresh: "Mendapatkan isyarat GPS baru...",
             txt_detected_gps: "Lokasi Dikesan:", label_unit: "No. Unit / Rumah / Lot", placeholder_unit: "cth. Unit 15-1 atau Rumah 42", btn_confirm_loc: "Sahkan Lokasi", btn_cancel: "Batal", btn_change: "Tukar",
             alert_unit: "Sila masukkan No. Unit/Rumah anda.",
@@ -320,7 +329,6 @@
             if(t[lang][key]) el.placeholder = t[lang][key];
         });
 
-        // Update Dynamic Form Dropdown Labels
         document.querySelectorAll('.design-select option:first-child').forEach(opt => opt.innerText = t[lang].lbl_design_code);
         document.querySelectorAll('.size-select option:first-child').forEach(opt => opt.innerText = t[lang].lbl_size);
 
@@ -333,6 +341,26 @@
             document.getElementById('services-container').dataset.needsRender = "true"; renderServices(); 
         }
     }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const userLang = navigator.language || navigator.userLanguage;
+        if (userLang && userLang.toLowerCase().startsWith('ms')) setLang('bm'); else setLang('en');
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const orderId = urlParams.get('order');
+        if(orderId) {
+            state.path = 'A';
+            document.getElementById('path-a-container').classList.remove('hidden');
+            document.getElementById('order-id-display').innerText = "#" + orderId;
+        } else {
+            state.path = 'B';
+            document.getElementById('path-b-container').classList.remove('hidden');
+            document.getElementById('btn-use-order-addr').classList.add('hidden');
+            document.getElementById('loc-buttons').classList.remove('sm:grid-cols-2');
+            document.getElementById('loc-buttons').classList.add('grid-cols-1');
+            addManualItem(); 
+        }
+    });
 
     // --- DATA ---
     const designCodes = ['D01', 'D02', 'D03', 'D04', 'D05', 'D06', 'D07', 'W01', 'W02', 'W03', 'W04', 'W05', 'W06', 'Z01', 'Z02', 'Z03', 'Z04', 'Z05', 'Z06', 'Z07', 'Z08', 'M01', 'M02', 'M03'];
@@ -363,35 +391,12 @@
     const timeSlots = ["10:00", "11:30", "14:00", "15:30", "17:00", "20:00"];
     
     let state = {
-        path: 'A', // 'A' = Unique Link, 'B' = Public Link
+        path: 'A', 
         selectedItems: [], 
         lat: 0, lng: 0, mode: 'walkin', hubId: null, hubDist: 0, slot: null,
         deliveryCost: 0, servicesTotal: 0, measurements: {} 
     };
     let editingItemId = null;
-
-    // --- INITIALIZATION ---
-    document.addEventListener('DOMContentLoaded', () => {
-        // Auto-detect Language
-        const userLang = navigator.language || navigator.userLanguage;
-        if (userLang && userLang.toLowerCase().startsWith('ms')) setLang('bm'); else setLang('en');
-
-        // URL Pathing Logic
-        const urlParams = new URLSearchParams(window.location.search);
-        const orderId = urlParams.get('order');
-        if(orderId) {
-            state.path = 'A';
-            document.getElementById('path-a-container').classList.remove('hidden');
-            document.getElementById('order-id-display').innerText = "#" + orderId;
-        } else {
-            state.path = 'B';
-            document.getElementById('path-b-container').classList.remove('hidden');
-            document.getElementById('btn-use-order-addr').classList.add('hidden');
-            document.getElementById('loc-buttons').classList.remove('sm:grid-cols-2');
-            document.getElementById('loc-buttons').classList.add('grid-cols-1');
-            addManualItem(); // Add first blank row
-        }
-    });
 
     // --- LOGIC ---
 
@@ -464,7 +469,9 @@
             if(state.selectedItems.length === 0) return alert(t[currentLang].alert_no_items);
         } else {
             const name = document.getElementById('manual-cust-name').value.trim();
+            const phone = document.getElementById('manual-cust-phone').value.trim();
             if(!name) return alert(t[currentLang].alert_name);
+            if(!phone) return alert(t[currentLang].alert_phone);
             syncItemsB();
             if(state.selectedItems.length === 0) return alert(t[currentLang].alert_item_detail);
         }
