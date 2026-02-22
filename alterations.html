@@ -137,7 +137,8 @@
                 <span class="block text-sm font-bold text-white mb-1 group-hover:text-luxe" data-t="btn_use_order_addr">Use Order Address</span>
                 <span class="block text-[10px] text-white/50 mt-1 truncate" id="order-addr-display">...</span>
             </button>
-            <button onclick="useGPS()" class="p-4 rounded-xl border border-white/10 hover:border-luxe hover:bg-white/5 transition text-left group">
+            <button onclick="useGPS()" class="relative p-4 rounded-xl border border-white/10 hover:border-luxe hover:bg-white/5 transition text-left group overflow-hidden">
+                <div class="absolute top-0 right-0 bg-luxe text-brand text-[9px] font-bold px-2 py-0.5 rounded-bl-lg uppercase tracking-wider shadow-md" data-t="txt_recommended">Recommended</div>
                 <span class="block text-sm font-bold text-white mb-1 group-hover:text-luxe" data-t="btn_use_gps">Use Current GPS</span>
                 <span class="block text-xs text-white/50" id="gps-desc" data-t="txt_detecting">Detecting location...</span>
             </button>
@@ -240,8 +241,8 @@
             lbl_cust_name: "Customer Name", placeholder_name: "e.g. Siti Aishah", lbl_phone: "Telephone No.", placeholder_phone: "e.g. 0123456789",
             lbl_design_code: "Design Code", lbl_size: "Size", btn_add_item: "Add Another Item",
             alert_name: "Please enter your name.", alert_phone: "Please enter your telephone number.", alert_item_detail: "Please select Design Code and Size for all items.",
-            step2_title: "Verify Location", btn_use_order_addr: "Use Order Address", btn_use_gps: "Use Current GPS", txt_detecting: "Detecting location...", txt_locating_fresh: "Acquiring fresh GPS...", 
-            txt_fetching_order: "Fetching order details...", txt_pinpointing: "Pinpointing on map...", alert_geocode_fail: "Unable to map this address automatically. Please use 'Use Current GPS' for accurate delivery fees.",
+            step2_title: "Verify Location", btn_use_order_addr: "Use Order Address", btn_use_gps: "Use Current GPS", txt_detecting: "Detecting location...", txt_locating_fresh: "Acquiring fresh GPS...", txt_recommended: "Recommended",
+            txt_fetching_order: "Fetching order details...", txt_pinpointing: "Mapping Google coordinates...", alert_geocode_fail: "Unable to map this address automatically. Please use 'Use Current GPS' for accurate delivery fees.",
             txt_detected_gps: "Detected Location:", label_unit: "Unit / House / Lot No.", placeholder_unit: "e.g. Unit 15-1 or House 42", btn_confirm_loc: "Confirm Location", btn_cancel: "Cancel", btn_change: "Change",
             alert_unit: "Please enter your Unit/House No.",
             step3_title: "Choose Logistics", mode_walkin: "Walk-in", mode_lalamove: "Lalamove", label_del_fee: "Delivery Fee", btn_next_srv: "Next: Services",
@@ -263,8 +264,8 @@
             lbl_cust_name: "Nama Pelanggan", placeholder_name: "cth. Siti Aishah", lbl_phone: "No. Telefon", placeholder_phone: "cth. 0123456789",
             lbl_design_code: "Kod Rekaan", lbl_size: "Saiz", btn_add_item: "Tambah Item Lain",
             alert_name: "Sila masukkan nama anda.", alert_phone: "Sila masukkan no. telefon anda.", alert_item_detail: "Sila pilih Kod Rekaan dan Saiz untuk semua item.",
-            step2_title: "Sahkan Lokasi", btn_use_order_addr: "Guna Alamat Tempahan", btn_use_gps: "Guna GPS Semasa", txt_detecting: "Mengesan lokasi...", txt_locating_fresh: "Mendapatkan isyarat GPS baru...",
-            txt_fetching_order: "Sedang mendapatkan butiran tempahan...", txt_pinpointing: "Memetakan alamat...", alert_geocode_fail: "Gagal memetakan alamat secara automatik. Sila guna 'Guna GPS Semasa' untuk caj penghantaran yang tepat.",
+            step2_title: "Sahkan Lokasi", btn_use_order_addr: "Guna Alamat Tempahan", btn_use_gps: "Guna GPS Semasa", txt_detecting: "Mengesan lokasi...", txt_locating_fresh: "Mendapatkan isyarat GPS baru...", txt_recommended: "Disyorkan",
+            txt_fetching_order: "Sedang mendapatkan butiran tempahan...", txt_pinpointing: "Memetakan koordinat Google...", alert_geocode_fail: "Gagal memetakan alamat secara automatik. Sila guna 'Guna GPS Semasa' untuk caj penghantaran yang tepat.",
             txt_detected_gps: "Lokasi Dikesan:", label_unit: "No. Unit / Rumah / Lot", placeholder_unit: "cth. Unit 15-1 atau Rumah 42", btn_confirm_loc: "Sahkan Lokasi", btn_cancel: "Batal", btn_change: "Tukar",
             alert_unit: "Sila masukkan No. Unit/Rumah anda.",
             step3_title: "Pilih Logistik", mode_walkin: "Walk-in", mode_lalamove: "Lalamove", label_del_fee: "Caj Penghantaran", btn_next_srv: "Seterusnya: Servis",
@@ -433,21 +434,29 @@
         unlockStep(2); document.getElementById('step-2').scrollIntoView({behavior: 'smooth', block: 'center'});
     }
 
-    // STEP 2 - GEOCODING
+    // STEP 2 - GEOCODING VIA PRIVATE APPS SCRIPT
     async function geocodeAddress(address) {
         try {
-            // First Attempt: Exact address
-            let res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&limit=1&q=${encodeURIComponent(address)}`);
+            // First Attempt: Exact address using Google Maps via our Apps Script
+            let res = await fetch(`${scriptURL}?action=geocode&address=${encodeURIComponent(address)}`);
             let data = await res.json();
-            if(data && data.length > 0) return { lat: parseFloat(data[0].lat), lng: parseFloat(data[0].lon) };
+            if(data && data.lat && data.lng) return data;
             
-            // Second Attempt: Strip the first part (often a house number that trips up the system) to find the street/area
+            // Second Attempt: Strip the first part (often a unit/house number) to find the building/street
             const parts = address.split(',');
             if(parts.length > 1) {
                 const broaderAddress = parts.slice(1).join(',').trim();
-                res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&limit=1&q=${encodeURIComponent(broaderAddress)}`);
+                res = await fetch(`${scriptURL}?action=geocode&address=${encodeURIComponent(broaderAddress)}`);
                 data = await res.json();
-                if(data && data.length > 0) return { lat: parseFloat(data[0].lat), lng: parseFloat(data[0].lon) };
+                if(data && data.lat && data.lng) return data;
+            }
+            
+            // Third Attempt: Strip first two parts (Aggressive fallback)
+            if(parts.length > 2) {
+                const evenBroader = parts.slice(2).join(',').trim();
+                res = await fetch(`${scriptURL}?action=geocode&address=${encodeURIComponent(evenBroader)}`);
+                data = await res.json();
+                if(data && data.lat && data.lng) return data;
             }
         } catch(e) { console.error("Geocoding failed", e); }
         return null;
