@@ -84,30 +84,50 @@
         
         <div class="fade-in">
           <h2 class="text-xl font-display mb-4 text-white" data-t="step1_title">Select Items to Alter</h2>
-          <p class="text-xs text-white/50 mb-4">Order #ORD-2026-8821</p>
           
-          <div class="grid gap-3" id="order-items-list">
-             <label class="flex items-center gap-4 p-4 border border-white/10 rounded-xl hover:bg-white/5 cursor-pointer transition">
-                <input type="checkbox" name="order-item" value="1" onchange="syncItems()" class="w-5 h-5 rounded border-white/30 text-luxe focus:ring-luxe bg-transparent">
-                <div class="w-12 h-16 bg-white/5 rounded overflow-hidden shrink-0">
-                    <img src="images/product-dahlia.png" onerror="this.src='https://via.placeholder.com/48x64?text=Abaya'" class="w-full h-full object-cover opacity-80">
-                </div>
-                <div>
-                    <h3 class="font-display text-lg text-white">Dahlia Series (Black)</h3>
-                    <p class="text-xs text-white/50">Size: XL &bull; Ref: D01</p>
-                </div>
-             </label>
+          <div id="path-a-container" class="hidden">
+              <p class="text-xs text-white/50 mb-4">Order <span id="order-id-display"></span></p>
+              
+              <div class="grid gap-3" id="order-items-list">
+                 <label class="flex items-center gap-4 p-4 border border-white/10 rounded-xl hover:bg-white/5 cursor-pointer transition">
+                    <input type="checkbox" name="order-item" value="1" onchange="syncItemsA()" class="w-5 h-5 rounded border-white/30 text-luxe focus:ring-luxe bg-transparent">
+                    <div class="w-12 h-16 bg-white/5 rounded overflow-hidden shrink-0">
+                        <img src="images/product-dahlia.png" onerror="this.src='https://via.placeholder.com/48x64?text=Abaya'" class="w-full h-full object-cover opacity-80">
+                    </div>
+                    <div>
+                        <h3 class="font-display text-lg text-white">Dahlia Series (Black)</h3>
+                        <p class="text-xs text-white/50">Size: XL &bull; Ref: D01</p>
+                    </div>
+                 </label>
 
-             <label class="flex items-center gap-4 p-4 border border-white/10 rounded-xl hover:bg-white/5 cursor-pointer transition">
-                <input type="checkbox" name="order-item" value="2" onchange="syncItems()" class="w-5 h-5 rounded border-white/30 text-luxe focus:ring-luxe bg-transparent">
-                <div class="w-12 h-16 bg-white/5 rounded overflow-hidden shrink-0">
-                    <img src="images/product-zahra.png" onerror="this.src='https://via.placeholder.com/48x64?text=Abaya'" class="w-full h-full object-cover opacity-80">
-                </div>
-                <div>
-                    <h3 class="font-display text-lg text-white">Zahra Nude</h3>
-                    <p class="text-xs text-white/50">Size: M &bull; Ref: Z02</p>
-                </div>
-             </label>
+                 <label class="flex items-center gap-4 p-4 border border-white/10 rounded-xl hover:bg-white/5 cursor-pointer transition">
+                    <input type="checkbox" name="order-item" value="2" onchange="syncItemsA()" class="w-5 h-5 rounded border-white/30 text-luxe focus:ring-luxe bg-transparent">
+                    <div class="w-12 h-16 bg-white/5 rounded overflow-hidden shrink-0">
+                        <img src="images/product-zahra.png" onerror="this.src='https://via.placeholder.com/48x64?text=Abaya'" class="w-full h-full object-cover opacity-80">
+                    </div>
+                    <div>
+                        <h3 class="font-display text-lg text-white">Zahra Nude</h3>
+                        <p class="text-xs text-white/50">Size: M &bull; Ref: Z02</p>
+                    </div>
+                 </label>
+              </div>
+          </div>
+
+          <div id="path-b-container" class="hidden space-y-5 bg-white/5 border border-white/10 rounded-xl p-5">
+              <div>
+                  <label class="block text-sm text-white/70 mb-2" data-t="lbl_cust_name">Customer Name</label>
+                  <input type="text" id="manual-cust-name" class="w-full" placeholder="e.g. Siti Aishah" data-t-placeholder="placeholder_name">
+              </div>
+              
+              <div id="manual-items-list" class="space-y-3">
+                  </div>
+              
+              <button onclick="addManualItem()" class="text-luxe text-sm font-bold flex items-center gap-2 hover:text-white transition group">
+                  <span class="bg-luxe/10 p-1.5 rounded-md group-hover:bg-white/10 transition">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
+                  </span>
+                  <span data-t="btn_add_item">Add Another Item</span>
+              </button>
           </div>
 
           <div class="mt-4 flex justify-end">
@@ -126,7 +146,7 @@
           <h2 class="text-xl font-display mb-4 text-white" data-t="step2_title">Verify Location</h2>
           
           <div class="grid sm:grid-cols-2 gap-3" id="loc-buttons">
-            <button onclick="useOrderAddress()" class="p-4 rounded-xl border border-white/10 hover:border-luxe hover:bg-white/5 transition text-left group">
+            <button id="btn-use-order-addr" onclick="useOrderAddress()" class="p-4 rounded-xl border border-white/10 hover:border-luxe hover:bg-white/5 transition text-left group">
                 <span class="block text-sm font-bold text-white mb-1 group-hover:text-luxe" data-t="btn_use_order_addr">Use Order Address</span>
                 <span class="block text-xs text-white/50">Tun Hussein Onn, Cheras</span>
             </button>
@@ -141,7 +161,7 @@
               <p class="text-sm text-white font-medium mb-5" id="gps-detected-text">...</p>
               
               <label class="block text-sm text-white/70 mb-2" data-t="label_unit">Unit / House / Lot No.</label>
-              <input type="text" id="gps-unit-input" class="w-full mb-5" placeholder="e.g. Unit 15-1" data-t-placeholder="placeholder_unit">
+              <input type="text" id="gps-unit-input" class="w-full mb-5" placeholder="e.g. Unit 15-1 or House 42" data-t-placeholder="placeholder_unit">
               
               <div class="flex gap-3">
                   <button onclick="resetLoc()" class="px-5 py-2.5 rounded-lg border border-white/10 text-white/70 text-sm font-bold hover:bg-white/5 transition" data-t="btn_cancel">Cancel</button>
@@ -171,7 +191,6 @@
                 <span data-t="mode_walkin">Walk-in</span>
                 <span class="text-[10px] opacity-70 mt-0.5 font-normal" data-t="txt_new_buyer">Ideal for new customers</span>
             </button>
-            
             <button id="btn-lalamove" onclick="setMode('lalamove')" class="p-4 rounded-xl border border-white/10 hover:bg-white/5 text-white/70 text-sm font-medium transition relative overflow-hidden flex flex-col justify-center items-center h-full min-h-[72px]">
                 <span data-t="mode_lalamove">Lalamove</span>
                 <div class="absolute top-0 right-0 bg-orange-500 text-[10px] text-white px-2 py-0.5 font-bold uppercase tracking-wider">FAST</div>
@@ -244,15 +263,17 @@
     // --- TRANSLATIONS ---
     const t = {
         en: {
-            page_title: "Alteration Service", page_subtitle: "Select items from your order to alter.",
+            page_title: "Alteration Service", page_subtitle: "Select items to alter.",
             step1_title: "Select Items to Alter", btn_next_loc: "Next: Location",
+            lbl_cust_name: "Customer Name", placeholder_name: "e.g. Siti Aishah", lbl_design_code: "Design Code", lbl_size: "Size", btn_add_item: "Add Another Item",
+            alert_name: "Please enter your name.", alert_item_detail: "Please select Design Code and Size for all items.",
             step2_title: "Verify Location", btn_use_order_addr: "Use Order Address", btn_use_gps: "Use Current GPS", txt_detecting: "Detecting location...", txt_locating_fresh: "Acquiring fresh GPS...", 
             txt_detected_gps: "Detected Location:", label_unit: "Unit / House / Lot No.", placeholder_unit: "e.g. Unit 15-1 or House 42", btn_confirm_loc: "Confirm Location", btn_cancel: "Cancel", btn_change: "Change",
             alert_unit: "Please enter your Unit/House No.",
             step3_title: "Choose Logistics", mode_walkin: "Walk-in", mode_lalamove: "Lalamove", label_timeslot: "Select Time Slot:", label_del_fee: "Delivery Fee", btn_next_srv: "Next: Services",
             txt_new_buyer: "Ideal for new customers",
             badge_free_return: "Free Return Delivery", txt_return_paid: "Return fee paid to rider or self-pickup",
-            step4_title: "Services & Measurements", txt_measure_walkin: "Walk-in selected. We will measure you in-store.", txt_measure_lala: "Lalamove selected. Please provide measurements.",
+            step4_title: "Services per Item", txt_measure_walkin: "Walk-in selected. No measurements needed.", txt_measure_lala: "Lalamove selected. Please provide measurements.",
             srv_full: "Full Body Alteration", srv_hem: "Alter Length", srv_sleeve: "Alter Sleeves", srv_shoulder: "Alter Shoulders", srv_pads: "Add Shoulder Pads",
             lbl_length: "Length (inches)", lbl_sleeve: "Sleeves (inches)", lbl_shoulder: "Shoulders (inches)", lbl_pads: "Shoulder Pads",
             label_total_est: "Total Estimate", btn_confirm: "Confirm Booking",
@@ -260,18 +281,20 @@
             btn_add_meas: "Add Measurements (Required)", btn_edit_meas: "Measurements Saved (Edit)",
             modal_title: "Provide Measurements", btn_save: "Save",
             alert_no_items: "Please select at least one item.", alert_no_hub: "Please select a location.", alert_no_slot: "Please select a time slot.", alert_measure: "Please fill in measurements for all required items.",
-            alert_max: "must be strictly less than original size"
+            alert_max: "must be strictly less than original size", txt_no_items_step4: "No items selected. Please select items in Step 1."
         },
         bm: {
-            page_title: "Servis Alterasi", page_subtitle: "Pilih item dari pesanan anda untuk dialter.",
+            page_title: "Servis Alterasi", page_subtitle: "Pilih item untuk dialter.",
             step1_title: "Pilih Item", btn_next_loc: "Seterusnya: Lokasi",
+            lbl_cust_name: "Nama Pelanggan", placeholder_name: "cth. Siti Aishah", lbl_design_code: "Kod Rekaan", lbl_size: "Saiz", btn_add_item: "Tambah Item Lain",
+            alert_name: "Sila masukkan nama anda.", alert_item_detail: "Sila pilih Kod Rekaan dan Saiz untuk semua item.",
             step2_title: "Sahkan Lokasi", btn_use_order_addr: "Guna Alamat Tempahan", btn_use_gps: "Guna GPS Semasa", txt_detecting: "Mengesan lokasi...", txt_locating_fresh: "Mendapatkan isyarat GPS baru...",
             txt_detected_gps: "Lokasi Dikesan:", label_unit: "No. Unit / Rumah / Lot", placeholder_unit: "cth. Unit 15-1 atau Rumah 42", btn_confirm_loc: "Sahkan Lokasi", btn_cancel: "Batal", btn_change: "Tukar",
             alert_unit: "Sila masukkan No. Unit/Rumah anda.",
             step3_title: "Pilih Logistik", mode_walkin: "Walk-in", mode_lalamove: "Lalamove", label_timeslot: "Pilih Masa:", label_del_fee: "Caj Penghantaran", btn_next_srv: "Seterusnya: Servis",
             txt_new_buyer: "Sesuai untuk pelanggan baru",
             badge_free_return: "Penghantaran Pulang Percuma", txt_return_paid: "Caj pulang dibayar kepada rider atau ambil sendiri",
-            step4_title: "Servis & Ukuran", txt_measure_walkin: "Walk-in dipilih. Ukuran akan diambil di butik.", txt_measure_lala: "Lalamove dipilih. Sila masukkan ukuran.",
+            step4_title: "Servis Setiap Item", txt_measure_walkin: "Walk-in dipilih. Tiada ukuran diperlukan.", txt_measure_lala: "Lalamove dipilih. Sila masukkan ukuran.",
             srv_full: "Alter Keseluruhan Baju", srv_hem: "Alter Labuh", srv_sleeve: "Alter Lengan", srv_shoulder: "Alter Bahu", srv_pads: "Tambah Span Bahu",
             lbl_length: "Labuh (inci)", lbl_sleeve: "Lengan (inci)", lbl_shoulder: "Bahu (inci)", lbl_pads: "Span Bahu",
             label_total_est: "Anggaran Jumlah", btn_confirm: "Sahkan Tempahan",
@@ -279,7 +302,7 @@
             btn_add_meas: "Masukkan Ukuran (Wajib)", btn_edit_meas: "Ukuran Disimpan (Ubah)",
             modal_title: "Masukkan Ukuran", btn_save: "Simpan",
             alert_no_items: "Sila pilih sekurang-kurangnya satu item.", alert_no_hub: "Sila pilih lokasi.", alert_no_slot: "Sila pilih masa.", alert_measure: "Sila lengkapkan semua ukuran yang diperlukan.",
-            alert_max: "mesti kurang dari saiz asal"
+            alert_max: "mesti kurang dari saiz asal", txt_no_items_step4: "Tiada item dipilih. Sila pilih item di Langkah 1."
         }
     };
     let currentLang = 'en';
@@ -287,19 +310,20 @@
     function setLang(lang) {
         currentLang = lang;
         
-        // Update Inner Text
         document.querySelectorAll('[data-t]').forEach(el => {
             const key = el.getAttribute('data-t');
             if(t[lang][key]) el.innerText = t[lang][key];
         });
         
-        // Update Placeholders
         document.querySelectorAll('[data-t-placeholder]').forEach(el => {
             const key = el.getAttribute('data-t-placeholder');
             if(t[lang][key]) el.placeholder = t[lang][key];
         });
 
-        // Update Toggle Buttons
+        // Update Dynamic Form Dropdown Labels
+        document.querySelectorAll('.design-select option:first-child').forEach(opt => opt.innerText = t[lang].lbl_design_code);
+        document.querySelectorAll('.size-select option:first-child').forEach(opt => opt.innerText = t[lang].lbl_size);
+
         document.getElementById('lang-en').className = lang === 'en' ? "text-xs font-bold text-luxe" : "text-xs text-white/50 hover:text-white";
         document.getElementById('lang-bm').className = lang === 'bm' ? "text-xs font-bold text-luxe" : "text-xs text-white/50 hover:text-white";
         
@@ -310,17 +334,10 @@
         }
     }
 
-    // Auto-detect browser language on load
-    document.addEventListener('DOMContentLoaded', () => {
-        const userLang = navigator.language || navigator.userLanguage;
-        if (userLang && userLang.toLowerCase().startsWith('ms')) {
-            setLang('bm');
-        } else {
-            setLang('en');
-        }
-    });
+    // --- DATA ---
+    const designCodes = ['D01', 'D02', 'D03', 'D04', 'D05', 'D06', 'D07', 'W01', 'W02', 'W03', 'W04', 'W05', 'W06', 'Z01', 'Z02', 'Z03', 'Z04', 'Z05', 'Z06', 'Z07', 'Z08', 'M01', 'M02', 'M03'];
+    const sizes = ['XS', 'S', 'M', 'L', 'XL', 'XXL', 'XXXL'];
 
-    // --- STATE & SIZE CHART ---
     const sizeChart = {
         'XS': { length: 55, sleeve: 22, shoulder: 14 },
         'S': { length: 55, sleeve: 22, shoulder: 15 },
@@ -346,45 +363,111 @@
     const timeSlots = ["10:00", "11:30", "14:00", "15:30", "17:00", "20:00"];
     
     let state = {
+        path: 'A', // 'A' = Unique Link, 'B' = Public Link
         selectedItems: [], 
         lat: 0, lng: 0, mode: 'walkin', hubId: null, hubDist: 0, slot: null,
-        deliveryCost: 0, servicesTotal: 0,
-        measurements: {} 
+        deliveryCost: 0, servicesTotal: 0, measurements: {} 
     };
     let editingItemId = null;
+
+    // --- INITIALIZATION ---
+    document.addEventListener('DOMContentLoaded', () => {
+        // Auto-detect Language
+        const userLang = navigator.language || navigator.userLanguage;
+        if (userLang && userLang.toLowerCase().startsWith('ms')) setLang('bm'); else setLang('en');
+
+        // URL Pathing Logic
+        const urlParams = new URLSearchParams(window.location.search);
+        const orderId = urlParams.get('order');
+        if(orderId) {
+            state.path = 'A';
+            document.getElementById('path-a-container').classList.remove('hidden');
+            document.getElementById('order-id-display').innerText = "#" + orderId;
+        } else {
+            state.path = 'B';
+            document.getElementById('path-b-container').classList.remove('hidden');
+            document.getElementById('btn-use-order-addr').classList.add('hidden');
+            document.getElementById('loc-buttons').classList.remove('sm:grid-cols-2');
+            document.getElementById('loc-buttons').classList.add('grid-cols-1');
+            addManualItem(); // Add first blank row
+        }
+    });
 
     // --- LOGIC ---
 
     // STEP 1
-    function syncItems() {
+    function addManualItem() {
+        const list = document.getElementById('manual-items-list');
+        const idx = list.children.length;
+        
+        let designOpts = `<option value="" class="text-black" data-t="lbl_design_code">${t[currentLang].lbl_design_code}</option>`;
+        designCodes.forEach(code => designOpts += `<option value="${code}" class="text-black">${code}</option>`);
+        
+        let sizeOpts = `<option value="" class="text-black" data-t="lbl_size">${t[currentLang].lbl_size}</option>`;
+        sizes.forEach(sz => sizeOpts += `<option value="${sz}" class="text-black">${sz}</option>`);
+
+        const row = document.createElement('div');
+        row.className = "flex gap-2 items-center manual-item-row";
+        row.dataset.id = 'm' + idx;
+        row.innerHTML = `
+            <div class="flex-1"><select class="design-select w-full" onchange="syncItemsB()">${designOpts}</select></div>
+            <div class="w-24"><select class="size-select w-full" onchange="syncItemsB()">${sizeOpts}</select></div>
+            ${idx > 0 ? `<button onclick="this.parentElement.remove(); syncItemsB();" class="text-red-400 hover:text-red-300 p-2 ml-1"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg></button>` : `<div class="w-9"></div>`}
+        `;
+        list.appendChild(row);
+    }
+
+    function syncItemsA() {
         const checked = document.querySelectorAll('input[name="order-item"]:checked');
         const newSelected = [];
-        
         checked.forEach(cb => {
             const name = cb.parentElement.querySelector('h3').innerText;
             const sizeStr = cb.parentElement.querySelector('p').innerText;
             const sizeMatch = sizeStr.match(/Size:\s*([A-Z]+)/i);
             const size = sizeMatch ? sizeMatch[1].toUpperCase() : 'M';
-            
             newSelected.push({ id: cb.value, name: name, size: size });
             if(!state.measurements[cb.value]) state.measurements[cb.value] = { length:'', sleeve:'', shoulder:'', pads:'' };
         });
-        
         state.selectedItems = newSelected;
-        
+        refreshStep4Live();
+    }
+
+    function syncItemsB() {
+        const rows = document.querySelectorAll('.manual-item-row');
+        const newSelected = [];
+        rows.forEach((row, idx) => {
+            const design = row.querySelector('.design-select').value;
+            const size = row.querySelector('.size-select').value;
+            if(design && size) {
+                newSelected.push({ id: 'm' + idx, name: "Design " + design, size: size });
+                if(!state.measurements['m'+idx]) state.measurements['m'+idx] = { length:'', sleeve:'', shoulder:'', pads:'' };
+            }
+        });
+        state.selectedItems = newSelected;
+        refreshStep4Live();
+    }
+
+    function refreshStep4Live() {
         if(!document.getElementById('step-4').classList.contains('opacity-30')) {
             document.getElementById('services-container').dataset.needsRender = "true";
             renderServices();
             if(state.selectedItems.length === 0) {
-                document.getElementById('services-container').innerHTML = '<p class="text-white/50 text-sm py-4">No items selected. Please select items in Step 1.</p>';
+                document.getElementById('services-container').innerHTML = `<p class="text-white/50 text-sm py-4">${t[currentLang].txt_no_items_step4}</p>`;
             }
             calculateTotal();
         }
     }
 
     function confirmItems() {
-        syncItems();
-        if(state.selectedItems.length === 0) return alert(t[currentLang].alert_no_items);
+        if(state.path === 'A') {
+            syncItemsA();
+            if(state.selectedItems.length === 0) return alert(t[currentLang].alert_no_items);
+        } else {
+            const name = document.getElementById('manual-cust-name').value.trim();
+            if(!name) return alert(t[currentLang].alert_name);
+            syncItemsB();
+            if(state.selectedItems.length === 0) return alert(t[currentLang].alert_item_detail);
+        }
         unlockStep(2); document.getElementById('step-2').scrollIntoView({behavior: 'smooth', block: 'center'});
     }
 
@@ -403,15 +486,18 @@
                 state.lng = pos.coords.longitude; 
                 desc.innerText = t[currentLang].txt_detecting;
                 
-                // Show Unit Input Panel
                 document.getElementById('loc-buttons').classList.add('hidden');
                 document.getElementById('gps-detected-text').innerText = `GPS: ${state.lat.toFixed(4)}, ${state.lng.toFixed(4)}`;
                 document.getElementById('gps-details-panel').classList.remove('hidden');
             },
             () => { 
                 desc.innerText = t[currentLang].txt_detecting;
-                alert("Failed. Using Order Address."); 
-                useOrderAddress(); 
+                if(state.path === 'A') {
+                    alert("Failed. Using Order Address."); 
+                    useOrderAddress(); 
+                } else {
+                    alert("Failed to detect GPS location. Please ensure location services are enabled.");
+                }
             },
             { enableHighAccuracy: true, maximumAge: 0, timeout: 10000 } 
         );
