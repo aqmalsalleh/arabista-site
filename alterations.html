@@ -97,8 +97,7 @@
               </div>
               
               <p class="text-sm text-white/70 mt-4 mb-2">Select Items to Alter:</p>
-              <div class="grid gap-3" id="auto-items-list">
-                 </div>
+              <div class="grid gap-3" id="auto-items-list"></div>
           </div>
 
           <div id="path-b-container" class="hidden space-y-5 bg-white/5 border border-white/10 rounded-xl p-5">
@@ -230,6 +229,23 @@
     </div>
   </div>
 
+  <div id="success-modal" class="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-md hidden opacity-0 transition-opacity duration-300 px-4">
+    <div class="bg-[#111213] border border-luxe/50 rounded-2xl w-full max-w-sm p-8 transform scale-95 transition-transform duration-300 text-center shadow-[0_0_50px_rgba(192,160,98,0.1)]" id="success-box">
+        <div class="w-16 h-16 rounded-full bg-green-500/20 text-green-400 flex items-center justify-center mx-auto mb-5">
+            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+        </div>
+        <h3 class="font-display text-2xl text-white mb-2" data-t="modal_success_title">Booking Successful!</h3>
+        <p class="text-sm text-white/70 mb-4" data-t="modal_success_desc">Your Alteration Order ID is:</p>
+        
+        <div class="bg-black/50 border border-white/10 rounded-lg py-3 px-4 mb-4 select-all">
+            <p class="font-mono text-xl text-luxe font-bold tracking-widest" id="display-alt-id">ALT-0000-XXXX</p>
+        </div>
+        
+        <p class="text-xs text-red-400 mb-6 font-medium uppercase tracking-wider" data-t="modal_success_warn">⚠️ Please screenshot this ID</p>
+        <button onclick="goToTracker()" class="w-full bg-luxe text-brand font-bold py-3 rounded-xl hover:bg-white transition shadow-soft" data-t="btn_track">Track My Order</button>
+    </div>
+  </div>
+
   <script>
     // --- APP SCRIPT URL ---
     const scriptURL = 'https://script.google.com/macros/s/AKfycbyrJFfuCrhAbdwzAj8uP4sSvFuzRzzzEFV5CHOCBSOK6OGlIXPtsf7-XEfjLHGnFZiyvw/exec'; 
@@ -256,7 +272,8 @@
             label_total_est: "Total Estimate", btn_confirm: "Confirm Booking", txt_value: "Value", txt_yousave: "You Save",
             btn_add_meas: "Add Measurements (Required)", btn_edit_meas: "Measurements Saved (Edit)", modal_title: "Provide Measurements", btn_save: "Save",
             alert_no_items: "Please select at least one item.", alert_no_hub: "Please select an Alteration Point.", alert_measure: "Please fill in measurements for all required items.",
-            alert_max: "must be strictly less than original size", alert_max_full: "must be less than or equal to original size", alert_full_equal: "At least one measurement must be reduced for a Full Body alteration.", txt_no_items_step4: "No items selected. Please select items in Step 1."
+            alert_max: "must be strictly less than original size", alert_max_full: "must be less than or equal to original size", alert_full_equal: "At least one measurement must be reduced for a Full Body alteration.", txt_no_items_step4: "No items selected. Please select items in Step 1.",
+            modal_success_title: "Booking Successful!", modal_success_desc: "Your Alteration Order ID is:", modal_success_warn: "⚠️ Please screenshot this ID", btn_track: "Track My Order"
         },
         bm: {
             page_title: "Servis Alterasi", page_subtitle: "Pilih item untuk dialter.",
@@ -279,11 +296,13 @@
             label_total_est: "Anggaran Jumlah", btn_confirm: "Sahkan Tempahan", txt_value: "Nilai", txt_yousave: "Anda Jimat",
             btn_add_meas: "Masukkan Ukuran (Wajib)", btn_edit_meas: "Ukuran Disimpan (Ubah)", modal_title: "Masukkan Ukuran", btn_save: "Simpan",
             alert_no_items: "Sila pilih sekurang-kurangnya satu item.", alert_no_hub: "Sila pilih Pusat Alterasi.", alert_measure: "Sila lengkapkan semua ukuran yang diperlukan.",
-            alert_max: "mesti kurang dari saiz asal", alert_max_full: "mesti kurang dari atau sama dengan saiz asal", alert_full_equal: "Sekurang-kurangnya satu ukuran mesti dikurangkan untuk Alter Keseluruhan Baju.", txt_no_items_step4: "Tiada item dipilih. Sila pilih item di Langkah 1."
+            alert_max: "mesti kurang dari saiz asal", alert_max_full: "mesti kurang dari atau sama dengan saiz asal", alert_full_equal: "Sekurang-kurangnya satu ukuran mesti dikurangkan untuk Alter Keseluruhan Baju.", txt_no_items_step4: "Tiada item dipilih. Sila pilih item di Langkah 1.",
+            modal_success_title: "Tempahan Berjaya!", modal_success_desc: "ID Tempahan Alterasi anda ialah:", modal_success_warn: "⚠️ Sila 'screenshot' ID ini", btn_track: "Jejak Tempahan Saya"
         }
     };
     let currentLang = 'en';
     let hubs = []; 
+    let generatedAltId = ""; // Stores the newly created ID
 
     function setLang(lang) {
         currentLang = lang;
@@ -487,13 +506,10 @@
         if(!navigator.geolocation) return alert("Geo not supported");
         const desc = document.getElementById('gps-desc'); desc.innerText = t[currentLang].txt_locating_fresh;
         
-        // Clear any stuck watch states
         if (state.gpsWatchId) navigator.geolocation.clearWatch(state.gpsWatchId);
         
-        // Use watchPosition to force device to bypass cached locations and ping the satellite
         state.gpsWatchId = navigator.geolocation.watchPosition(
             pos => { 
-                // Immediately clear the watch once we get a solid hit to save battery
                 navigator.geolocation.clearWatch(state.gpsWatchId);
                 state.gpsWatchId = null;
                 
@@ -525,7 +541,6 @@
     function showLocSuccess(addr) { document.getElementById('loc-buttons').classList.add('hidden'); document.getElementById('gps-details-panel').classList.add('hidden'); document.getElementById('validated-loc').classList.remove('hidden'); document.getElementById('final-address').innerText = addr; unlockStep(3); renderHubs(); }
     
     function resetLoc() { 
-        // Hard reset coordinates so a new GPS ping is forced
         state.lat = ""; 
         state.lng = "";
         state.unitNo = "";
@@ -559,7 +574,6 @@
     function renderHubs() {
         if(hubs.length === 0) return;
         
-        // Apply 1.4x Urban Multiplier to straight-line distance to protect driving distance delivery margins
         hubs.forEach(h => { 
             if (state.lat !== "" && state.lng !== "") {
                 const straightLine = getDist(state.lat, state.lng, h.lat, h.lng);
@@ -738,7 +752,7 @@
         updateMeasurementBtn(editingItemId); closeModal();
     }
 
-    // SUBMIT API
+    // SUBMIT API WITH NEW FETCH LOGIC & SUCCESS MODAL
     async function submitOrder() {
         if(!state.hubId) return alert(t[currentLang].alert_no_hub);
         if(state.servicesTotal === 0) return alert("Please select at least one service.");
@@ -753,7 +767,10 @@
             if(!valid) return alert(t[currentLang].alert_measure);
         }
 
-        const btn = document.querySelector('button[onclick="submitOrder()"]'); const originalText = btn.innerText; btn.innerText = "Processing..."; btn.disabled = true;
+        const btn = document.querySelector('button[onclick="submitOrder()"]'); 
+        const originalText = btn.innerText; 
+        btn.innerText = "Processing..."; 
+        btn.disabled = true;
 
         let itemDetailsStr = "";
         state.selectedItems.forEach(item => {
@@ -769,7 +786,6 @@
         });
 
         const hubData = hubs.find(h => h.id === state.hubId);
-        
         const custName = state.path === 'A' ? document.getElementById('auto-cust-name').value : document.getElementById('manual-cust-name').value.trim();
         const custPhone = state.path === 'A' ? document.getElementById('auto-cust-phone').value : document.getElementById('manual-cust-phone').value.trim();
 
@@ -791,14 +807,45 @@
         };
 
         try {
-            await fetch(scriptURL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
-            alert(t[currentLang].btn_confirm + " Successful!"); window.location.reload();
+            // Using standard fetch with text/plain to bypass Google's CORS preflight blocking, allowing us to read the response!
+            const res = await fetch(scriptURL, { 
+                method: 'POST', 
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify(payload) 
+            });
+            
+            const responseData = await res.json();
+            
+            if (responseData.status === "success") {
+                generatedAltId = responseData.alteration_id;
+                showSuccessModal(generatedAltId);
+            } else {
+                throw new Error(responseData.message || "Failed to generate ID");
+            }
         } catch (error) {
-            console.error('Error!', error.message); alert("Connection error. Please try again.");
-            btn.innerText = originalText; btn.disabled = false;
+            console.error('Error!', error.message); 
+            alert("Connection error. Please try again.");
+            btn.innerText = originalText; 
+            btn.disabled = false;
         }
     }
 
+    // --- NEW SUCCESS MODAL CONTROLLERS ---
+    function showSuccessModal(id) {
+        document.getElementById('display-alt-id').innerText = id;
+        const modal = document.getElementById('success-modal');
+        const box = document.getElementById('success-box');
+        modal.classList.remove('hidden');
+        setTimeout(() => { modal.classList.remove('opacity-0'); box.classList.remove('scale-95'); }, 10);
+    }
+
+    function goToTracker() {
+        if (generatedAltId) {
+            window.location.href = `tracker.html?id=${generatedAltId}`;
+        }
+    }
+
+    // --- UTILS ---
     function unlockStep(n) { document.getElementById(`step-${n}`).classList.remove('opacity-30', 'pointer-events-none'); document.getElementById(`badge-${n}`).classList.replace('border-white/20', 'border-luxe'); document.getElementById(`badge-${n}`).classList.replace('text-white/50', 'text-luxe'); }
     function lockStep(n) { document.getElementById(`step-${n}`).classList.add('opacity-30', 'pointer-events-none'); }
     function getDist(lat1,lon1,lat2,lon2) { var R=6371, dLat=d2r(lat2-lat1), dLon=d2r(lon2-lon1); var a=Math.sin(dLat/2)*Math.sin(dLat/2)+Math.cos(d2r(lat1))*Math.cos(d2r(lat2))*Math.sin(dLon/2)*Math.sin(dLon/2); return R*(2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a))); }
