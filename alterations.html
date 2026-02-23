@@ -751,7 +751,16 @@
         if(lenEl) m.length = lenEl.value; if(slvEl) m.sleeve = slvEl.value; if(shdEl) m.shoulder = shdEl.value; if(padEl) m.pads = padEl.value;
         updateMeasurementBtn(editingItemId); closeModal();
     }
-
+    // --- UTILS: PHONE SANITIZER ---
+    function sanitizePhone(phone) {
+        let p = phone.replace(/\D/g, ''); // Remove all non-numeric characters (spaces, dashes, +)
+        if (p.startsWith('0')) {
+            p = '6' + p; // Convert 012... to 6012...
+        } else if (!p.startsWith('60') && p.length >= 9) {
+            p = '60' + p; // Catch cases where they forgot the 0
+        }
+        return p;
+    }
     // SUBMIT API WITH NEW FETCH LOGIC & SUCCESS MODAL
     async function submitOrder() {
         if(!state.hubId) return alert(t[currentLang].alert_no_hub);
@@ -787,7 +796,8 @@
 
         const hubData = hubs.find(h => h.id === state.hubId);
         const custName = state.path === 'A' ? document.getElementById('auto-cust-name').value : document.getElementById('manual-cust-name').value.trim();
-        const custPhone = state.path === 'A' ? document.getElementById('auto-cust-phone').value : document.getElementById('manual-cust-phone').value.trim();
+        let rawPhone = state.path === 'A' ? document.getElementById('auto-cust-phone').value : document.getElementById('manual-cust-phone').value.trim();
+const custPhone = sanitizePhone(rawPhone);
 
         const payload = {
             Order_Type: state.path === 'A' ? "Website" : "Public",

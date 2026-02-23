@@ -145,6 +145,17 @@
       </nav>
   </div>
 
+// --- UTILS: PHONE SANITIZER ---
+    function sanitizePhone(phone) {
+        let p = phone.replace(/\D/g, ''); 
+        if (p.startsWith('0')) {
+            p = '6' + p; 
+        } else if (!p.startsWith('60') && p.length >= 9) {
+            p = '60' + p; 
+        }
+        return p;
+    }
+
   <script>
     // --- APP SCRIPT URL ---
     const scriptURL = 'https://script.google.com/macros/s/AKfycbyrJFfuCrhAbdwzAj8uP4sSvFuzRzzzEFV5CHOCBSOK6OGlIXPtsf7-XEfjLHGnFZiyvw/exec'; // IMPORTANT: Use your deployed URL!
@@ -163,8 +174,9 @@
     });
 
     async function login() {
-        const phone = document.getElementById('login-phone').value.trim();
-        const pin = document.getElementById('login-pin').value.trim();
+        let rawPhone = document.getElementById('login-phone').value.trim();
+const phone = sanitizePhone(rawPhone);
+const pin = document.getElementById('login-pin').value.trim();
         if(!phone || !pin) return alert("Please enter both Phone and PIN.");
         
         const btn = document.getElementById('btn-login'); btn.innerText = "Verifying..."; btn.disabled = true;
@@ -360,7 +372,8 @@
         const btn = document.getElementById('btn-save-prof'); btn.innerText = "Saving..."; btn.disabled = true;
         const payload = {
             action: "update_profile", hub_name: hubName,
-            address: document.getElementById('prof-address').value, phone: document.getElementById('prof-phone').value,
+            address: document.getElementById('prof-address').value, 
+    phone: sanitizePhone(document.getElementById('prof-phone').value),
             lat: hubLat, lng: hubLng, days: hubDays, open: document.getElementById('prof-open').value,
             close: document.getElementById('prof-close').value, status: document.getElementById('prof-status').value
         };
