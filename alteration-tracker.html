@@ -79,15 +79,6 @@
         
         <div class="space-y-6 relative ml-2" id="timeline-container"></div>
 
-        <div id="action-box" class="hidden mt-8 p-5 bg-luxe/10 border border-luxe/30 rounded-xl text-center fade-in">
-            <h3 class="text-luxe font-bold mb-2 text-lg font-display">Your Items are Ready!</h3>
-            <p class="text-sm text-white/80 mb-5" id="action-instruction">How would you like to receive your completed order?</p>
-            <div class="grid grid-cols-2 gap-3">
-                <button onclick="setReturnChoice('Self-Pickup', this)" class="action-btn px-4 py-3 rounded-xl border border-luxe text-luxe text-sm font-bold hover:bg-luxe/20 transition flex justify-center items-center">I will Self-Pickup</button>
-                <button onclick="setReturnChoice('Lalamove', this)" class="action-btn px-4 py-3 rounded-xl bg-luxe text-brand text-sm font-bold hover:bg-white transition shadow-soft flex justify-center items-center">Send via Lalamove</button>
-            </div>
-        </div>
-
         <div id="resolved-box" class="hidden mt-8 p-4 bg-white/5 border border-white/10 rounded-xl flex items-start gap-3 fade-in">
             <svg class="w-5 h-5 text-luxe shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
             <div><p class="text-sm font-bold text-white mb-1">Selection Confirmed</p><p class="text-xs text-white/50" id="resolved-desc">...</p></div>
@@ -106,6 +97,21 @@
 
     </div>
   </main>
+
+  <div id="action-modal" class="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-md hidden opacity-0 transition-opacity duration-300 px-4">
+    <div class="bg-[#111213] border border-luxe/50 rounded-2xl w-full max-w-sm p-8 transform scale-95 transition-transform duration-300 text-center shadow-[0_0_50px_rgba(192,160,98,0.1)]" id="action-modal-box">
+        <div class="w-16 h-16 rounded-full bg-luxe/20 text-luxe flex items-center justify-center mx-auto mb-5">
+            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
+        </div>
+        <h3 class="font-display text-2xl text-white mb-2">Your Items are Ready!</h3>
+        <p class="text-sm text-white/70 mb-6" id="action-modal-instruction">How would you like to receive your completed order?</p>
+        
+        <div class="space-y-3">
+            <button onclick="setReturnChoice('Lalamove', this)" class="action-btn w-full px-4 py-3.5 rounded-xl bg-luxe text-brand text-sm font-bold hover:bg-white transition shadow-soft flex justify-center items-center">Send via Lalamove</button>
+            <button onclick="setReturnChoice('Self-Pickup', this)" class="action-btn w-full px-4 py-3.5 rounded-xl border border-luxe text-luxe text-sm font-bold hover:bg-luxe/20 transition flex justify-center items-center">I will Self-Pickup</button>
+        </div>
+    </div>
+  </div>
 
   <script>
     // --- APP SCRIPT URL ---
@@ -136,7 +142,6 @@
             if (data.error) { alert("Order not found. Please check your ID and try again."); document.getElementById('search-panel').classList.remove('hidden'); return; }
             currentData = data.trackData;
             
-            // Extract Hub phone number for the contact button
             if (data.hubs && data.hubs.length > 0) {
                 const hub = data.hubs.find(h => h.name === currentData.hubName);
                 if (hub && hub.phone) hubPhone = hub.phone;
@@ -160,7 +165,6 @@
     }
 
     function buildTimeline(status) {
-        // Adjust the pipeline based on customer choice
         let stages = ["Pending Dropoff", "In Progress", "Ready for Return", "Dispatched", "Completed"];
         if (currentData.outboundChoice === "Self-Pickup") stages = ["Pending Dropoff", "In Progress", "Ready for Return", "Completed"];
         
@@ -172,7 +176,6 @@
             let isPast = idx < currentIdx;
             let isCurrent = idx === currentIdx;
             
-            // The final stage turns completely green if completed
             let isFinalStage = (stage === "Completed");
             let dotClass = isPast ? "completed" : (isCurrent ? (isFinalStage ? "completed" : "active") : "");
             let lineClass = isPast ? "active" : "";
@@ -193,30 +196,47 @@
 
         document.getElementById('timeline-container').innerHTML = html;
 
-        // Display the Final Success Box if status is Completed
         if (status === "Completed") {
             document.getElementById('final-success-box').classList.remove('hidden');
             if(hubPhone) document.getElementById('contact-hub-btn').href = `tel:${hubPhone}`;
-            else document.getElementById('contact-hub-btn').classList.add('hidden'); // hide if no phone saved
+            else document.getElementById('contact-hub-btn').classList.add('hidden'); 
         }
     }
 
     function handleActionBox() {
-        const actionBox = document.getElementById('action-box');
         const resolvedBox = document.getElementById('resolved-box');
         
         if (currentData.orderStatus === "Ready for Return") {
             if (!currentData.outboundChoice || currentData.outboundChoice === "") {
-                actionBox.classList.remove('hidden'); resolvedBox.classList.add('hidden');
-                let inst = document.getElementById('action-instruction');
+                resolvedBox.classList.add('hidden');
+                
+                let inst = document.getElementById('action-modal-instruction');
                 if (currentData.returnEligibility === "Free Return") inst.innerHTML = "You are eligible for <strong>Free Return Delivery</strong>! Please select your preference.";
                 else inst.innerHTML = "You may self-pickup or arrange a Lalamove (Rider will collect delivery fee from you).";
+                
+                // Show Auto-Popup Modal
+                const modal = document.getElementById('action-modal');
+                const box = document.getElementById('action-modal-box');
+                modal.classList.remove('hidden');
+                setTimeout(() => { modal.classList.remove('opacity-0'); box.classList.remove('scale-95'); }, 10);
+
             } else {
-                actionBox.classList.add('hidden'); resolvedBox.classList.remove('hidden');
+                closeActionModal();
+                resolvedBox.classList.remove('hidden');
                 document.getElementById('resolved-desc').innerText = currentData.outboundChoice === 'Lalamove' ? "You selected Lalamove. The Hub will dispatch your item shortly." : "You selected Self-Pickup. The Hub is awaiting your arrival.";
             }
         } else {
-            actionBox.classList.add('hidden'); resolvedBox.classList.add('hidden');
+            closeActionModal();
+            resolvedBox.classList.add('hidden');
+        }
+    }
+
+    function closeActionModal() {
+        const modal = document.getElementById('action-modal');
+        const box = document.getElementById('action-modal-box');
+        if(!modal.classList.contains('hidden')) {
+            modal.classList.add('opacity-0'); box.classList.add('scale-95');
+            setTimeout(() => { modal.classList.add('hidden'); }, 300);
         }
     }
 
@@ -229,7 +249,8 @@
             const res = await fetch(scriptURL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(payload) });
             const responseData = await res.json();
             if(responseData.status === "success") {
-                currentData.outboundChoice = choice; handleActionBox();
+                currentData.outboundChoice = choice; 
+                handleActionBox(); // This will auto-close the modal and show the resolved box
             } else throw new Error("Update failed");
         } catch (error) {
             alert("Network error. Please try again.");
