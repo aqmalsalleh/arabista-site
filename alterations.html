@@ -441,17 +441,31 @@
             calculateTotal();
         }
     }
+    
+    // --- UPDATED CONFIRM ITEMS (PHASE 3) ---
     function confirmItems() {
         if(state.path === 'A') { 
             syncItemsA(); 
             if(state.selectedItems.length === 0) return alert(t[currentLang].alert_no_items); 
+            
+            // For Path A (Website Customers): Just unlock Step 2 and scroll
+            unlockStep(2); 
+            document.getElementById('step-2').scrollIntoView({behavior: 'smooth', block: 'center'});
         } else {
             if(!document.getElementById('manual-cust-name').value.trim()) return alert(t[currentLang].alert_name);
             if(!document.getElementById('manual-cust-phone').value.trim()) return alert(t[currentLang].alert_phone);
             syncItemsB(); 
             if(state.selectedItems.length === 0) return alert(t[currentLang].alert_item_detail);
+            
+            // For Path B (Public Customers): Unlock, scroll, and AUTO-TRIGGER GPS!
+            unlockStep(2); 
+            document.getElementById('step-2').scrollIntoView({behavior: 'smooth', block: 'center'});
+            
+            // Small 500ms delay so the scroll animation finishes before the browser asks for GPS permission
+            setTimeout(() => {
+                useGPS();
+            }, 500);
         }
-        unlockStep(2); document.getElementById('step-2').scrollIntoView({behavior: 'smooth', block: 'center'});
     }
 
     // STEP 2 - GEOCODING VIA PRIVATE APPS SCRIPT
@@ -751,16 +765,18 @@
         if(lenEl) m.length = lenEl.value; if(slvEl) m.sleeve = slvEl.value; if(shdEl) m.shoulder = shdEl.value; if(padEl) m.pads = padEl.value;
         updateMeasurementBtn(editingItemId); closeModal();
     }
+    
     // --- UTILS: PHONE SANITIZER ---
     function sanitizePhone(phone) {
-        let p = phone.replace(/\D/g, ''); // Remove all non-numeric characters (spaces, dashes, +)
+        let p = phone.replace(/\D/g, ''); 
         if (p.startsWith('0')) {
-            p = '6' + p; // Convert 012... to 6012...
+            p = '6' + p; 
         } else if (!p.startsWith('60') && p.length >= 9) {
-            p = '60' + p; // Catch cases where they forgot the 0
+            p = '60' + p; 
         }
         return p;
     }
+
     // SUBMIT API WITH NEW FETCH LOGIC & SUCCESS MODAL
     async function submitOrder() {
         if(!state.hubId) return alert(t[currentLang].alert_no_hub);
@@ -797,7 +813,7 @@
         const hubData = hubs.find(h => h.id === state.hubId);
         const custName = state.path === 'A' ? document.getElementById('auto-cust-name').value : document.getElementById('manual-cust-name').value.trim();
         let rawPhone = state.path === 'A' ? document.getElementById('auto-cust-phone').value : document.getElementById('manual-cust-phone').value.trim();
-const custPhone = sanitizePhone(rawPhone);
+        const custPhone = sanitizePhone(rawPhone);
 
         const payload = {
             Order_Type: state.path === 'A' ? "Website" : "Public",
@@ -817,7 +833,6 @@ const custPhone = sanitizePhone(rawPhone);
         };
 
         try {
-            // Using standard fetch with text/plain to bypass Google's CORS preflight blocking, allowing us to read the response!
             const res = await fetch(scriptURL, { 
                 method: 'POST', 
                 headers: { 'Content-Type': 'text/plain;charset=utf-8' },
