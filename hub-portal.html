@@ -59,11 +59,12 @@
           </div>
           
           <div class="flex items-center gap-3">
-              <select id="langToggle" onchange="manualLangChange(this.value)" class="bg-black/20 border border-white/10 text-white text-[10px] rounded px-2 py-1 h-8 w-auto focus:border-luxe outline-none">
-                  <option value="en">EN</option>
-                  <option value="bm">BM</option>
-              </select>
-              <button onclick="logout()" class="text-xs text-white/40 hover:text-white transition" data-t="btn_logout">Logout</button>
+              <div class="flex items-center gap-2 border border-white/20 rounded-lg px-2 py-1 h-8">
+                  <button onclick="setLang('en')" id="lang-en" class="text-xs font-bold text-luxe">EN</button>
+                  <span class="text-white/20 text-xs">|</span>
+                  <button onclick="setLang('bm')" id="lang-bm" class="text-xs text-white/50 hover:text-white transition">BM</button>
+              </div>
+              <button onclick="logout()" class="text-xs text-white/40 hover:text-white transition ml-1" data-t="btn_logout">Logout</button>
           </div>
       </header>
 
@@ -222,7 +223,6 @@
         const userLang = navigator.language || navigator.userLanguage;
         const initialLang = (userLang && (userLang.toLowerCase().startsWith('ms') || userLang.toLowerCase().startsWith('bm'))) ? 'bm' : 'en';
         setLang(initialLang);
-        document.getElementById('langToggle').value = initialLang;
 
         if(hubName) { 
             document.getElementById('login-screen').classList.add('hidden'); 
@@ -233,17 +233,24 @@
         } 
     });
 
-    function manualLangChange(val) {
-        setLang(val);
-        // Refresh dashboard to apply language to status text if needed
-        const activeOrders = document.getElementById('list-active').innerHTML;
-        if(activeOrders.length > 200) loadDashboard(true); // Soft refresh if data loaded
-    }
-
     function setLang(lang) {
         currentLang = lang;
+        
+        // Update Text
         document.querySelectorAll('[data-t]').forEach(el => { if(t[lang][el.getAttribute('data-t')]) el.innerText = t[lang][el.getAttribute('data-t')]; });
         document.querySelectorAll('[data-t-placeholder]').forEach(el => { if(t[lang][el.getAttribute('data-t-placeholder')]) el.placeholder = t[lang][el.getAttribute('data-t-placeholder')]; });
+        
+        // Update Button Active State
+        const btnEn = document.getElementById('lang-en');
+        const btnBm = document.getElementById('lang-bm');
+        if(btnEn && btnBm) {
+            btnEn.className = lang === 'en' ? "text-xs font-bold text-luxe" : "text-xs text-white/50 hover:text-white transition";
+            btnBm.className = lang === 'bm' ? "text-xs font-bold text-luxe" : "text-xs text-white/50 hover:text-white transition";
+        }
+        
+        // Refresh dashboard to apply language to status text if needed
+        const activeOrders = document.getElementById('list-active').innerHTML;
+        if(activeOrders.length > 200) loadDashboard(true);
     }
 
     function updateConnectionStatus(isSyncing) {
