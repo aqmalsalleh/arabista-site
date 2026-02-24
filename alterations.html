@@ -414,8 +414,8 @@
                 const straightLine = getDist(state.lat, state.lng, h.lat, h.lng); h.dist = straightLine * 1.4; 
             } else { h.dist = 5.0; }
             
-            // "Rough Math" Estimation: RM 4 Base + RM 1 per km
-            h.fee = Math.ceil(4 + (h.dist * 1.0)); 
+            // "Rough Math" Estimation: RM 5 Base + RM 1 per km
+            h.fee = Math.ceil(5 + (h.dist * 1.0)); 
         });
         hubs.sort((a,b) => a.dist - b.dist);
         let filteredHubs = hubs.filter(h => h.dist <= 20);
@@ -488,7 +488,6 @@
             // FETCH REAL QUOTE
             if (state.lat && state.lng && state.hubLat && state.hubLng) {
                 try {
-                    // FIXED: Now sends FULL address details to prevent geocoding errors
                     const custAddress = state.unitNo ? `${state.unitNo}, ${document.getElementById('final-address').innerText}` : "Customer Location";
                     const payload = {
                         action: "get_lalamove_quote",
