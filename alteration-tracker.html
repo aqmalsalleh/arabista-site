@@ -25,7 +25,6 @@
     .timeline-line.active { background: #4ade80; }
     .last-step .timeline-line { display: none; }
     
-    /* Horizontal Lalamove Tracker */
     .lala-step { flex: 1; text-align: center; position: relative; z-index: 1; }
     .lala-step::before { content: ''; position: absolute; top: 5px; left: -50%; right: 50%; height: 2px; background: #333; z-index: -1; }
     .lala-step:first-child::before { display: none; }
@@ -51,7 +50,6 @@
   </header>
 
   <main class="pt-24 pb-20 max-w-screen-sm mx-auto px-4 sm:px-6 min-h-screen flex flex-col">
-    
     <div id="search-panel" class="hidden text-center mt-10 fade-in">
         <h1 class="font-display text-3xl mb-3" data-t="page_title">Track Alteration</h1>
         <p class="text-white/50 text-sm mb-8" data-t="page_subtitle">Enter your unique tracking ID below.</p>
@@ -81,14 +79,12 @@
         <div class="bg-white/5 border border-white/10 rounded-xl p-5 mb-8">
             <p class="text-sm font-medium mb-1" id="display-name">...</p>
             <p class="text-xs text-white/50 mb-3" id="display-hub">Assigned to: ...</p>
-            
             <div id="hub-map-link" class="hidden mb-3">
                  <a href="#" target="_blank" id="btn-drive-hub" class="inline-flex items-center gap-2 text-xs font-bold text-brand bg-white/80 px-3 py-1.5 rounded hover:bg-white transition">
                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"></path></svg>
                     Navigate to Hub
                  </a>
             </div>
-
             <div class="border-t border-white/10 pt-3">
                 <p class="text-xs text-white/40 mb-1" data-t="lbl_items">Items for Alteration:</p>
                 <p class="text-sm text-white/80 whitespace-pre-line" id="display-items">...</p>
@@ -96,7 +92,6 @@
         </div>
 
         <h2 class="font-display text-xl mb-4" data-t="section_status">Tracking Status</h2>
-        
         <div class="space-y-6 relative ml-2" id="timeline-container"></div>
     </div>
   </main>
@@ -123,23 +118,18 @@
 
   <div id="action-modal" class="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-md hidden opacity-0 transition-opacity duration-300 px-4">
     <div class="bg-[#111213] border border-luxe/50 rounded-2xl w-full max-w-sm p-8 transform scale-95 transition-transform duration-300 text-center shadow-[0_0_50px_rgba(192,160,98,0.1)] relative" id="action-modal-box">
-        
         <button onclick="closeModal()" class="absolute top-4 right-4 text-white/30 hover:text-white"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
-
         <div id="modal-step-2" class="text-left">
             <h3 class="font-display text-xl text-white mb-2 text-center" id="modal-addr-title">Confirm Delivery Location</h3>
-            
             <div class="bg-white/5 border border-white/10 rounded-lg p-3 mb-4 text-[10px] text-white/70 space-y-2">
                 <p class="font-bold text-luxe uppercase tracking-wider">📍 Location Accuracy Check</p>
                 <p>• <strong>Option 1 (Current Location):</strong> Click "Detect My Location" if you are at the pickup point now. Please verify the detected text description matches your actual building.</p>
                 <p>• <strong>Option 2 (Remote/Correction):</strong> If the GPS text is inaccurate, or if you are booking for a different location, please use "Type Address" to search manually.</p>
             </div>
-
             <div class="grid grid-cols-2 gap-2 mb-4">
                 <button onclick="toggleLocMethod('gps')" id="tab-gps" class="text-xs font-bold py-2 rounded-lg bg-white/10 text-white border border-transparent">Current GPS</button>
                 <button onclick="toggleLocMethod('manual')" id="tab-manual" class="text-xs font-bold py-2 rounded-lg bg-transparent text-white/50 border border-white/10 hover:text-white">Type Address</button>
             </div>
-
             <div id="view-gps" class="mb-4">
                 <button onclick="getGPS()" class="w-full py-3 border border-dashed border-luxe/50 text-luxe bg-luxe/5 rounded-xl text-sm font-bold flex items-center justify-center gap-2 hover:bg-luxe/10 transition" id="btn-get-gps">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
@@ -147,15 +137,11 @@
                 </button>
                 <p class="text-[10px] text-white/40 mt-2 text-center" id="gps-status">GPS signal required for accuracy.</p>
             </div>
-
             <div id="view-manual" class="hidden mb-4">
                 <input type="text" id="manual-addr-input" placeholder="Search Building / Street..." class="mb-2">
-                <button onclick="geocodeManual()" id="btn-manual-search" class="w-full py-2 bg-white/10 text-white text-xs font-bold rounded-lg hover:bg-white/20 transition flex items-center justify-center">
-                    Search Map
-                </button>
+                <button onclick="geocodeManual()" id="btn-manual-search" class="w-full py-2 bg-white/10 text-white text-xs font-bold rounded-lg hover:bg-white/20 transition flex items-center justify-center">Search Map</button>
                 <p class="text-[10px] text-luxe mt-2 hidden font-mono" id="manual-status">Found: ...</p>
             </div>
-
             <div class="space-y-3 border-t border-white/10 pt-4 opacity-50 pointer-events-none transition-opacity" id="addr-fields">
                 <div>
                     <label class="text-xs text-white/50 uppercase tracking-wider block mb-1">Unit / House No. <span class="text-red-400">*</span></label>
@@ -168,7 +154,6 @@
                 <button onclick="getQuotation()" class="w-full bg-luxe text-brand font-bold py-3 rounded-xl hover:bg-white transition mt-2">Check Price & Book</button>
             </div>
         </div>
-
         <div id="modal-step-3" class="hidden">
             <div class="w-16 h-16 rounded-full bg-orange-500/20 text-orange-500 flex items-center justify-center mx-auto mb-4">
                 <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
@@ -176,14 +161,12 @@
             <h3 class="font-display text-xl text-white mb-1">Estimated Delivery Fee</h3>
             <h1 class="text-3xl font-bold text-white mb-1" id="quote-amount">RM 0.00</h1>
             <p class="text-xs text-white/50 mb-6">Fee will be paid to rider upon arrival.</p>
-            
             <button onclick="bookRider()" class="w-full bg-orange-500 text-white font-bold py-3.5 rounded-xl hover:bg-orange-400 transition shadow-[0_0_20px_rgba(249,115,22,0.3)] flex justify-center items-center gap-2" id="btn-final-book">
                 <span>Call Rider Now</span>
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
             </button>
             <button onclick="closeModal()" class="mt-3 text-xs text-white/30 underline hover:text-white">Cancel</button>
         </div>
-
     </div>
   </div>
 
@@ -212,7 +195,7 @@
             page_title: "Jejak Tempahan", page_subtitle: "Masukkan ID tempahan unik anda di bawah.", lbl_id: "ID Tempahan", btn_track: "Jejak Pesanan", txt_loading: "Mencari butiran tempahan...", btn_share: "Kongsi Pautan", lbl_items: "Item untuk Diubahsuai:", section_status: "Status Terkini", back_home: "Kembali ke Utama",
             action_title: "Tindakan Diperlukan", action_desc_incoming: "Pesanan diluluskan! Sila hantar barang ke Hub.", action_desc_ready: "Barang anda dah siap! Sila aturkan pengambilan.", btn_self_pickup: "Saya Ambil Sendiri", btn_lalamove: "Tempah Lalamove",
             confirmed_title: "Pilihan Disahkan", confirmed_lala: "Lalamove Dipilih.", confirmed_self: "Ambil Sendiri Dipilih.",
-            success_title: "Alterasi Selesai", success_desc: "Terima kasih menggunakan servis kami. Jika ada pertanyaan, sila hubungi hub.", btn_contact: "Hubungi Hub",
+            success_title: "Alterasi Selesai", success_desc: "Terima kasih menggunakan servis kami.", btn_contact: "Hubungi Hub",
             track_lala: "Jejak Peta Lalamove"
         }
     };
@@ -224,8 +207,12 @@
 
     document.addEventListener('DOMContentLoaded', () => { 
         const urlParams = new URLSearchParams(window.location.search);
-        if (urlParams.get('id')) { document.getElementById('loading-panel').classList.remove('hidden'); fetchTrackingData(urlParams.get('id')); } 
-        else { document.getElementById('search-panel').classList.remove('hidden'); }
+        if (urlParams.get('id')) { 
+            document.getElementById('loading-panel').classList.remove('hidden'); 
+            fetchTrackingData(urlParams.get('id')); 
+        } else { 
+            document.getElementById('search-panel').classList.remove('hidden'); 
+        }
     });
 
     function searchTracker() {
@@ -236,23 +223,28 @@
 
     async function fetchTrackingData(id) {
         try {
-            const res = await fetch(`${scriptURL}?track_id=${id}`); const data = await res.json();
+            const res = await fetch(`${scriptURL}?track_id=${id}`);
+            const data = await res.json();
             document.getElementById('loading-panel').classList.add('hidden');
             if (data.error) { alert("Order not found."); document.getElementById('search-panel').classList.remove('hidden'); return; }
+            
             currentData = data.trackData;
             if (data.hubs && data.hubs.length > 0) {
                 const h = data.hubs.find(x => x.name === currentData.hubName);
                 if (h) { 
                     hubData = { phone: h.phone, lat: h.lat, lng: h.lng }; 
                     const driveBtn = document.getElementById('btn-drive-hub');
-                    if(driveBtn) driveBtn.href = `http://googleusercontent.com/maps.google.com/?q=${h.lat},${h.lng}`;
+                    if(driveBtn) driveBtn.href = `https://www.google.com/maps/dir/?api=1&destination=${h.lat},${h.lng}`;
                     if(currentData.orderStatus.includes("Dropoff")) document.getElementById('hub-map-link').classList.remove('hidden');
                 }
             }
             if (currentData.lalamoveStatus) sessionStorage.setItem('lala_status_' + currentData.alterationId, currentData.lalamoveStatus);
             else if (currentData.lalamoveOrderId) fetchLiveLalamoveStatus(currentData.alterationId);
             renderDashboard();
-        } catch (error) { alert("Connection Error"); }
+        } catch (error) { 
+            console.error(error);
+            alert("Connection Error"); 
+        }
     }
     
     async function fetchLiveLalamoveStatus(trackId) {
@@ -296,17 +288,11 @@
             
             if (stage === "Awaiting Dispatch" && isCurrent) {
                 isIncomingOrder = true;
-                document.getElementById('action-modal-title').innerText = t[currentLang].action_title;
-                document.getElementById('action-modal-instruction').innerText = t[currentLang].action_desc_incoming;
                 extraText = `<button onclick="startIncomingBooking()" class="mt-3 w-full py-2 bg-orange-500 text-white text-xs font-bold rounded hover:bg-orange-400 transition animate-pulse">${t[currentLang].btn_lalamove}</button>`;
             }
 
             if (stage === "Ready for Return" && isCurrent) {
                 isIncomingOrder = false;
-                document.getElementById('action-modal-title').innerText = "Your Items are Ready!";
-                document.getElementById('action-modal-instruction').innerText = t[currentLang].action_desc_ready;
-                
-                // NO AUTO MODAL OPENING. Render Buttons directly.
                 if (!currentData.outboundChoice) {
                     extraText = `
                     <div class="flex gap-2 mt-3">
@@ -331,7 +317,6 @@
                 </div>`;
             }
             
-            // --- FIX 4: RESTORE THANK YOU BOX ---
             if (stage === "Completed" && isCurrent) {
                  const boxTpl = document.getElementById('tpl-success-box');
                  const box = boxTpl.content.cloneNode(true);
@@ -349,16 +334,15 @@
         if(status === 'ON_GOING') activeIdx = 1; 
         if(status === 'PICKED_UP') activeIdx = 2; 
         if(status === 'COMPLETED') activeIdx = 3;
-        
         return steps.map((s, i) => `<div class="lala-step ${i <= activeIdx ? (i === activeIdx ? 'active' : 'completed') : ''}"><div class="lala-dot"></div><span class="lala-label">${s.label}</span></div>`).join('');
     }
 
-    // --- MODAL & GPS LOGIC ---
     function showModalStep(n) {
         const modal = document.getElementById('action-modal'); const box = document.getElementById('action-modal-box');
         modal.classList.remove('hidden'); modal.classList.remove('opacity-0'); 
         document.querySelectorAll('[id^="modal-step-"]').forEach(el => el.classList.add('hidden'));
-        document.getElementById(`modal-step-${n}`).classList.remove('hidden');
+        const stepEl = document.getElementById(`modal-step-${n}`);
+        if(stepEl) stepEl.classList.remove('hidden');
         setTimeout(() => { box.classList.remove('scale-95'); }, 10);
     }
     
@@ -377,15 +361,10 @@
         else { document.getElementById('view-manual').classList.remove('hidden'); document.getElementById('view-gps').classList.add('hidden'); }
     }
     
-    // REVERSE GEOCODING - PULSATING FIX
     function getGPS() {
         if(!navigator.geolocation) return alert("Geo not supported");
-        
         const btn = document.getElementById('btn-get-gps');
         const statusTxt = document.getElementById('gps-status');
-        const originalText = "Detect My Location"; 
-        
-        // FAKE DELAY UI
         btn.innerHTML = `${spinnerSvg} Locating...`;
         btn.disabled = true;
         statusTxt.innerHTML = "📡 Acquiring exact satellite coordinates...";
@@ -393,13 +372,10 @@
 
         navigator.geolocation.getCurrentPosition(async (pos) => {
             custData.lat = pos.coords.latitude; custData.lng = pos.coords.longitude;
-            
-            // Force 1.5s delay to show the Pulse effect
             setTimeout(async () => {
                 btn.innerHTML = `<svg class="w-4 h-4 mr-2 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> Location Locked`;
                 btn.disabled = false;
                 statusTxt.classList.remove('animate-pulse', 'text-luxe');
-                
                 try {
                     const res = await fetch(`${scriptURL}?action=reverse_geocode&lat=${custData.lat}&lng=${custData.lng}`);
                     const data = await res.json();
@@ -408,37 +384,35 @@
                 } catch(e) {}
                 document.getElementById('addr-fields').classList.remove('opacity-50', 'pointer-events-none');
             }, 1500); 
-            
         }, (err) => {
-             btn.innerHTML = originalText; btn.disabled = false; alert("GPS Error: " + err.message);
+             btn.innerHTML = "Detect My Location"; btn.disabled = false; alert("GPS Error: " + err.message);
         });
     }
     
-    // GEOCODE MANUAL - PULSATING FIX
     async function geocodeManual() {
         const addr = document.getElementById('manual-addr-input').value;
         const btn = document.getElementById('btn-manual-search');
-        
-        btn.innerHTML = `<svg class="animate-spin h-3 w-3 mr-2" viewBox="0 0 24 24" fill="none"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Searching...`;
+        btn.innerHTML = `${spinnerSvg} Searching...`;
         btn.classList.add('animate-pulse');
         btn.disabled = true;
-
-        const res = await fetch(`${scriptURL}?action=geocode&address=${encodeURIComponent(addr)}`);
-        const data = await res.json();
-        
-        btn.innerHTML = "Search Map";
-        btn.classList.remove('animate-pulse');
-        btn.disabled = false;
-
-        if(data.lat) { 
-            custData.lat = data.lat; custData.lng = data.lng; 
-            const stat = document.getElementById('manual-status');
-            stat.classList.remove('hidden');
-            stat.innerHTML = `<span class="text-green-400 font-bold">✅ Pin Dropped:</span> ${data.formatted_address || data.lat}`;
-            document.getElementById('addr-fields').classList.remove('opacity-50', 'pointer-events-none'); 
-        } else {
-            document.getElementById('manual-status').classList.remove('hidden');
-            document.getElementById('manual-status').innerText = "❌ Location not found. Try 'Street, City'.";
+        try {
+            const res = await fetch(`${scriptURL}?action=geocode&address=${encodeURIComponent(addr)}`);
+            const data = await res.json();
+            btn.innerHTML = "Search Map";
+            btn.classList.remove('animate-pulse');
+            btn.disabled = false;
+            if(data.lat) { 
+                custData.lat = data.lat; custData.lng = data.lng; 
+                const stat = document.getElementById('manual-status');
+                stat.classList.remove('hidden');
+                stat.innerHTML = `<span class="text-green-400 font-bold">✅ Pin Dropped:</span> ${data.formatted_address || data.lat}`;
+                document.getElementById('addr-fields').classList.remove('opacity-50', 'pointer-events-none'); 
+            } else {
+                document.getElementById('manual-status').classList.remove('hidden');
+                document.getElementById('manual-status').innerText = "❌ Location not found.";
+            }
+        } catch(e) {
+            btn.innerHTML = "Search Map"; btn.classList.remove('animate-pulse'); btn.disabled = false;
         }
     }
 
@@ -447,9 +421,8 @@
         const building = document.getElementById('input-building').value.trim();
         if(!unit) return alert("Please enter Unit / House Number.");
         custData.address = building ? `${unit}, ${building}` : unit;
-        
         const btn = document.querySelector('#addr-fields button');
-        const orig = btn.innerText; btn.innerText = "Calculating..."; btn.disabled = true;
+        btn.innerText = "Calculating..."; btn.disabled = true;
 
         let payload = { action: "get_lalamove_quote" };
         if (isIncomingOrder) {
@@ -468,17 +441,13 @@
                 document.getElementById('quote-amount').innerText = `${data.currency} ${data.amount}`;
                 showModalStep(3);
             } else { alert("Fee Error: " + (data.message || "Unknown")); }
-            btn.innerText = orig; btn.disabled = false;
-        } catch(e) { alert("Error"); btn.innerText = orig; btn.disabled = false; }
+            btn.innerText = "Check Price & Book"; btn.disabled = false;
+        } catch(e) { alert("Error"); btn.innerText = "Check Price & Book"; btn.disabled = false; }
     }
 
     async function bookRider() {
-        if(!activeQuoteId) return;
         const btn = document.getElementById('btn-final-book');
         btn.innerHTML = `${spinnerSvg} Booking...`; btn.disabled = true;
-
-        if(!isIncomingOrder) await fetch(scriptURL, { method: 'POST', body: JSON.stringify({ action: "update_outbound", alteration_id: currentData.alterationId, outbound_choice: "Lalamove" }) });
-
         let payload = {
             action: "book_lalamove_order",
             quotationId: activeQuoteId,
@@ -487,7 +456,6 @@
             recipientStopId: currentStops[1].stopId
         };
         const cPhone = currentData.customerPhone || "60123456789";
-        
         if (isIncomingOrder) {
             payload.direction = "Inbound";
             payload.senderName = currentData.customerName; payload.senderPhone = cPhone; 
@@ -497,7 +465,6 @@
             payload.senderName = currentData.hubName; payload.senderPhone = hubData.phone;
             payload.recipientName = currentData.customerName; payload.recipientPhone = cPhone;
         }
-
         try {
             const res = await fetch(scriptURL, { method: 'POST', body: JSON.stringify(payload) });
             const data = await res.json();
@@ -505,7 +472,6 @@
             else { alert("Failed: " + data.message); btn.innerHTML = "Retry"; btn.disabled = false; }
         } catch(e) { alert("Error"); }
     }
-    
     function setReturnChoice(choice) { fetch(scriptURL, { method: 'POST', body: JSON.stringify({ action: "update_outbound", alteration_id: currentData.alterationId, outbound_choice: choice }) }).then(()=>window.location.reload()); }
     function shareLink() { navigator.clipboard.writeText(window.location.href); alert("Copied!"); }
   </script>
