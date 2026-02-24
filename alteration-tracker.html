@@ -110,11 +110,11 @@
             <div class="w-16 h-16 rounded-full bg-luxe/20 text-luxe flex items-center justify-center mx-auto mb-5">
                 <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
             </div>
-            <h3 class="font-display text-2xl text-white mb-2" data-t="action_title">Your Items are Ready!</h3>
+            <h3 class="font-display text-2xl text-white mb-2" id="action-modal-title" data-t="action_title">Your Items are Ready!</h3>
             <p class="text-sm text-white/70 mb-6" id="action-modal-instruction">How would you like to receive your completed order?</p>
             <div class="space-y-3">
                 <button onclick="goToStep2()" class="action-btn w-full px-4 py-3.5 rounded-xl bg-luxe text-brand text-sm font-bold hover:bg-white transition shadow-soft flex justify-center items-center" data-t="btn_lalamove">Send via Lalamove</button>
-                <button onclick="setReturnChoice('Self-Pickup', this)" class="action-btn w-full px-4 py-3.5 rounded-xl border border-luxe text-luxe text-sm font-bold hover:bg-luxe/20 transition flex justify-center items-center" data-t="btn_self_pickup">I will Self-Pickup</button>
+                <button onclick="setReturnChoice('Self-Pickup', this)" id="btn-self-pickup" class="action-btn w-full px-4 py-3.5 rounded-xl border border-luxe text-luxe text-sm font-bold hover:bg-luxe/20 transition flex justify-center items-center" data-t="btn_self_pickup">I will Self-Pickup</button>
             </div>
         </div>
 
@@ -175,22 +175,23 @@
     let hubData = { phone: "", lat: 0, lng: 0 }; 
     let custData = { lat: 0, lng: 0, address: "" }; 
     let activeQuoteId = null;
-    let currentStops = null; // FIXED: Store stops for booking
+    let currentStops = null;
     let currentLang = 'en';
+    let isIncomingOrder = false; // FLAG: True = Cust->Hub, False = Hub->Cust
 
     const t = {
         en: {
             page_title: "Track Alteration", page_subtitle: "Enter your unique tracking ID below.", lbl_id: "Alteration ID", btn_track: "Track Order", txt_loading: "Locating your order details...", btn_share: "Share Link", lbl_items: "Items for Alteration:", section_status: "Tracking Status", back_home: "Back to Home",
-            action_title: "Your Items are Ready!", action_desc_free: "You are eligible for <strong>Free Return Delivery</strong>! Please select your preference.", action_desc_paid: "You may self-pickup or arrange a Lalamove (Rider will collect delivery fee from you).", btn_self_pickup: "I will Self-Pickup", btn_lalamove: "Send via Lalamove",
-            confirmed_title: "Selection Confirmed", confirmed_lala: "You selected Lalamove. The Hub will dispatch your item shortly.", confirmed_self: "You selected Self-Pickup. The Hub is awaiting your arrival.",
-            success_title: "Alteration Completed", success_desc: "Thank you for using our service. If you have any inquiries regarding your alteration, please contact the hub.", btn_contact: "Contact Hub",
+            action_title: "Action Required", action_desc_incoming: "Your order is approved! Please arrange delivery to the Hub.", action_desc_ready: "Your items are ready! Please arrange retrieval.", btn_self_pickup: "I will Self-Pickup", btn_lalamove: "Book Lalamove Rider",
+            confirmed_title: "Selection Confirmed", confirmed_lala: "Lalamove Selected.", confirmed_self: "Self-Pickup Selected.",
+            success_title: "Alteration Completed", success_desc: "Thank you for using our service.", btn_contact: "Contact Hub",
             track_lala: "Track Lalamove Map"
         },
         bm: {
             page_title: "Jejak Tempahan", page_subtitle: "Masukkan ID tempahan unik anda di bawah.", lbl_id: "ID Tempahan", btn_track: "Jejak Pesanan", txt_loading: "Mencari butiran tempahan...", btn_share: "Kongsi Pautan", lbl_items: "Item untuk Diubahsuai:", section_status: "Status Terkini", back_home: "Kembali ke Utama",
-            action_title: "Baju Anda Siap!", action_desc_free: "Anda layak untuk <strong>Penghantaran Pulang Percuma</strong>! Sila pilih pilihan anda.", action_desc_paid: "Anda boleh ambil sendiri atau guna Lalamove (Rider akan ambil bayaran dari anda).", btn_self_pickup: "Saya Ambil Sendiri", btn_lalamove: "Hantar guna Lalamove",
-            confirmed_title: "Pilihan Disahkan", confirmed_lala: "Anda pilih Lalamove. Hub akan hantar barang anda sebentar lagi.", confirmed_self: "Anda pilih Ambil Sendiri. Hub sedang menunggu ketibaan anda.",
-            success_title: "Alterasi Selesai", success_desc: "Terima kasih menggunakan servis kami. Jika ada pertanyaan, sila hubungi hub.", btn_contact: "Hubungi Hub",
+            action_title: "Tindakan Diperlukan", action_desc_incoming: "Pesanan diluluskan! Sila hantar barang ke Hub.", action_desc_ready: "Barang anda dah siap! Sila aturkan pengambilan.", btn_self_pickup: "Saya Ambil Sendiri", btn_lalamove: "Tempah Lalamove",
+            confirmed_title: "Pilihan Disahkan", confirmed_lala: "Lalamove Dipilih.", confirmed_self: "Ambil Sendiri Dipilih.",
+            success_title: "Alterasi Selesai", success_desc: "Terima kasih menggunakan servis kami.", btn_contact: "Hubungi Hub",
             track_lala: "Jejak Peta Lalamove"
         }
     };
@@ -200,20 +201,15 @@
         document.querySelectorAll('[data-t]').forEach(el => { if(t[lang][el.getAttribute('data-t')]) el.innerHTML = t[lang][el.getAttribute('data-t')]; });
     }
 
-    document.addEventListener('DOMContentLoaded', () => {
-        const userLang = navigator.language || navigator.userLanguage;
-        if (userLang && (userLang.toLowerCase().startsWith('ms') || userLang.toLowerCase().startsWith('bm'))) setLang('bm'); else setLang('en');
-
+    document.addEventListener('DOMContentLoaded', () => { 
         const urlParams = new URLSearchParams(window.location.search);
-        const trackId = urlParams.get('id');
-        if (trackId) { document.getElementById('loading-panel').classList.remove('hidden'); fetchTrackingData(trackId); } 
+        if (urlParams.get('id')) { document.getElementById('loading-panel').classList.remove('hidden'); fetchTrackingData(urlParams.get('id')); } 
         else { document.getElementById('search-panel').classList.remove('hidden'); }
     });
 
     function searchTracker() {
         const val = document.getElementById('search-input').value.trim().toUpperCase();
         if(!val) return alert("Please enter an Alteration ID.");
-        const btn = document.getElementById('btn-search'); btn.innerHTML = `${spinnerSvg} Loading...`; btn.disabled = true; btn.classList.add('opacity-70');
         window.location.href = `alteration-tracker.html?id=${val}`;
     }
 
@@ -221,21 +217,14 @@
         try {
             const res = await fetch(`${scriptURL}?track_id=${id}`); const data = await res.json();
             document.getElementById('loading-panel').classList.add('hidden');
-            if (data.error) { alert("Order not found. Please check your ID and try again."); document.getElementById('search-panel').classList.remove('hidden'); return; }
+            if (data.error) { alert("Order not found."); document.getElementById('search-panel').classList.remove('hidden'); return; }
             currentData = data.trackData;
-            
-            // Find Hub Coords for Lalamove logic
             if (data.hubs && data.hubs.length > 0) {
                 const h = data.hubs.find(x => x.name === currentData.hubName);
-                if (h) { 
-                    hubData.phone = h.phone; 
-                    hubData.lat = h.lat; 
-                    hubData.lng = h.lng; 
-                }
+                if (h) { hubData = { phone: h.phone, lat: h.lat, lng: h.lng }; }
             }
-
             renderDashboard();
-        } catch (error) { alert("Connection error. Please try again."); document.getElementById('search-panel').classList.remove('hidden'); }
+        } catch (error) { alert("Connection Error"); }
     }
 
     function renderDashboard() {
@@ -257,18 +246,29 @@
 
         let html = '';
         stages.forEach((stage, idx) => {
-            let isPast = idx < currentIdx;
             let isCurrent = idx === currentIdx;
-            let isFinalStage = (stage === "Completed");
-            let dotClass = isPast ? "completed" : (isCurrent ? (isFinalStage ? "completed" : "active") : "");
-            let lineClass = isPast ? "active" : "";
-            
+            let dotClass = idx < currentIdx ? "completed" : (isCurrent ? "active" : "");
             let extraText = "";
             
-            // ACTION TRIGGER: Ready for Return
+            // 1. INCOMING ACTION (Awaiting Dispatch)
+            if (stage === "Awaiting Dispatch" && isCurrent) {
+                isIncomingOrder = true; // Set Flag
+                document.getElementById('action-modal-title').innerText = t[currentLang].action_title;
+                document.getElementById('action-modal-instruction').innerText = t[currentLang].action_desc_incoming;
+                document.getElementById('btn-self-pickup').classList.add('hidden'); // No self-pickup for incoming (usually)
+                
+                extraText = `<button onclick="showModalStep(1)" class="mt-3 w-full py-2 bg-orange-500 text-white text-xs font-bold rounded hover:bg-orange-400 transition animate-pulse">${t[currentLang].btn_lalamove}</button>`;
+            }
+
+            // 2. OUTGOING ACTION (Ready for Return)
             if (stage === "Ready for Return" && isCurrent) {
+                isIncomingOrder = false; // Set Flag
+                document.getElementById('action-modal-title').innerText = "Your Items are Ready!";
+                document.getElementById('action-modal-instruction').innerText = t[currentLang].action_desc_ready;
+                document.getElementById('btn-self-pickup').classList.remove('hidden'); 
+
                 if (!currentData.outboundChoice) {
-                    showModalStep(1); // Trigger selection
+                    showModalStep(1); 
                 } else {
                     const boxTpl = document.getElementById('tpl-resolved-box');
                     const box = boxTpl.content.cloneNode(true);
@@ -278,203 +278,122 @@
                 }
             }
 
-            // SUCCESS TRIGGER
-            if (stage === "Completed" && isCurrent) {
-                const successTpl = document.getElementById('tpl-success-box');
-                const box = successTpl.content.cloneNode(true);
-                if(hubData.phone) box.querySelector('.contact-hub-btn').href = `tel:${hubData.phone}`;
-                else box.querySelector('.contact-hub-btn').classList.add('hidden');
-                const div = document.createElement('div'); div.appendChild(box); extraText = div.innerHTML;
-            }
-
-            // LALAMOVE LINK
+            // 3. TRACKING LINK
             if (stage === "Dispatched" && isCurrent && currentData.trackingUrl) {
-                extraText += `<a href="${currentData.trackingUrl}" target="_blank" class="mt-4 inline-flex items-center gap-1 text-xs font-bold text-white bg-orange-500 px-3 py-1.5 rounded hover:bg-orange-400 transition shadow-[0_0_10px_rgba(249,115,22,0.3)]">${t[currentLang].track_lala} &rarr;</a>`;
+                extraText += `<a href="${currentData.trackingUrl}" target="_blank" class="mt-4 inline-flex items-center gap-1 text-xs font-bold text-white bg-orange-500 px-3 py-1.5 rounded hover:bg-orange-400 transition">${t[currentLang].track_lala} &rarr;</a>`;
             }
 
             html += `
             <div class="relative pl-6 pb-8 ${idx === stages.length - 1 ? 'last-step' : ''}">
-                <div class="timeline-line ${lineClass}"></div>
+                <div class="timeline-line ${idx < currentIdx ? 'active' : ''}"></div>
                 <div class="absolute left-0 top-1 timeline-dot ${dotClass}"></div>
-                <h4 class="text-sm font-bold ${isPast || isCurrent ? (isCurrent && isFinalStage ? 'text-green-400' : 'text-white') : 'text-white/30'}">${stage}</h4>
+                <h4 class="text-sm font-bold ${isCurrent ? 'text-green-400' : 'text-white/30'}">${stage}</h4>
                 ${extraText}
             </div>`;
         });
-
         document.getElementById('timeline-container').innerHTML = html;
-        setLang(currentLang);
     }
 
-    // --- MODAL LOGIC & LALAMOVE WIZARD ---
-
+    // --- MODAL & GPS LOGIC ---
     function showModalStep(n) {
-        const modal = document.getElementById('action-modal');
-        const box = document.getElementById('action-modal-box');
-        document.getElementById('modal-step-1').classList.add('hidden');
-        document.getElementById('modal-step-2').classList.add('hidden');
-        document.getElementById('modal-step-3').classList.add('hidden');
-        
+        document.getElementById('action-modal').classList.remove('hidden');
+        document.querySelectorAll('[id^="modal-step-"]').forEach(el => el.classList.add('hidden'));
         document.getElementById(`modal-step-${n}`).classList.remove('hidden');
-        
-        modal.classList.remove('hidden');
-        setTimeout(() => { modal.classList.remove('opacity-0'); box.classList.remove('scale-95'); }, 10);
+        setTimeout(() => { document.getElementById('action-modal-box').classList.remove('scale-95'); }, 10);
     }
-
-    function closeModal() {
-        const modal = document.getElementById('action-modal');
-        const box = document.getElementById('action-modal-box');
-        modal.classList.add('opacity-0'); box.classList.add('scale-95');
-        setTimeout(() => { modal.classList.add('hidden'); }, 300);
-    }
-
+    function closeModal() { document.getElementById('action-modal').classList.add('hidden'); }
     function goToStep2() { showModalStep(2); toggleLocMethod('gps'); }
-
     function toggleLocMethod(method) {
-        document.getElementById('addr-fields').classList.add('opacity-50', 'pointer-events-none'); // Reset fields
-        if(method === 'gps') {
-            document.getElementById('tab-gps').className = "text-xs font-bold py-2 rounded-lg bg-white/10 text-white border border-transparent";
-            document.getElementById('tab-manual').className = "text-xs font-bold py-2 rounded-lg bg-transparent text-white/50 border border-white/10 hover:text-white";
-            document.getElementById('view-gps').classList.remove('hidden');
-            document.getElementById('view-manual').classList.add('hidden');
-        } else {
-            document.getElementById('tab-manual').className = "text-xs font-bold py-2 rounded-lg bg-white/10 text-white border border-transparent";
-            document.getElementById('tab-gps').className = "text-xs font-bold py-2 rounded-lg bg-transparent text-white/50 border border-white/10 hover:text-white";
-            document.getElementById('view-manual').classList.remove('hidden');
-            document.getElementById('view-gps').classList.add('hidden');
-        }
+        if(method==='gps'){ document.getElementById('view-gps').classList.remove('hidden'); document.getElementById('view-manual').classList.add('hidden'); }
+        else { document.getElementById('view-manual').classList.remove('hidden'); document.getElementById('view-gps').classList.add('hidden'); }
     }
-
     function getGPS() {
-        const btn = document.getElementById('btn-get-gps');
-        const txt = document.getElementById('gps-btn-text');
-        if(!navigator.geolocation) return alert("Geolocation is not supported by this browser.");
-        
-        txt.innerText = "Locating..."; btn.classList.add('opacity-70');
-        
-        navigator.geolocation.getCurrentPosition(
-            (pos) => {
-                custData.lat = pos.coords.latitude;
-                custData.lng = pos.coords.longitude;
-                btn.innerHTML = `<svg class="w-4 h-4 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg><span class="text-green-400">Location Locked</span>`;
-                btn.className = "w-full py-3 border border-green-500/50 bg-green-500/10 rounded-xl text-sm font-bold flex items-center justify-center gap-2";
-                document.getElementById('gps-status').innerText = `GPS: ${custData.lat.toFixed(5)}, ${custData.lng.toFixed(5)}`;
-                document.getElementById('addr-fields').classList.remove('opacity-50', 'pointer-events-none');
-            },
-            (err) => { 
-                alert("Could not get location. Please allow permissions or try manual search."); 
-                txt.innerText = "Retry GPS"; btn.classList.remove('opacity-70');
-            },
-            { enableHighAccuracy: true }
-        );
+        if(!navigator.geolocation) return alert("Geo not supported");
+        document.getElementById('gps-btn-text').innerText = "Locating...";
+        navigator.geolocation.getCurrentPosition(pos => {
+            custData.lat = pos.coords.latitude; custData.lng = pos.coords.longitude;
+            document.getElementById('gps-btn-text').innerText = "Location Locked";
+            document.getElementById('addr-fields').classList.remove('opacity-50', 'pointer-events-none');
+        });
     }
-
     async function geocodeManual() {
         const addr = document.getElementById('manual-addr-input').value;
-        if(!addr) return;
-        const stat = document.getElementById('manual-status');
-        stat.classList.remove('hidden'); stat.innerText = "Searching map...";
-        
-        try {
-            const res = await fetch(`${scriptURL}?action=geocode&address=${encodeURIComponent(addr)}`);
-            const data = await res.json();
-            if(data.lat) {
-                custData.lat = data.lat; custData.lng = data.lng;
-                stat.innerHTML = `<span class="text-green-400">✓ Found coordinates for map location.</span>`;
-                document.getElementById('addr-fields').classList.remove('opacity-50', 'pointer-events-none');
-            } else { stat.innerText = "Location not found. Try a broader search."; }
-        } catch(e) { stat.innerText = "Map error."; }
+        const res = await fetch(`${scriptURL}?action=geocode&address=${encodeURIComponent(addr)}`);
+        const data = await res.json();
+        if(data.lat) { custData.lat = data.lat; custData.lng = data.lng; document.getElementById('addr-fields').classList.remove('opacity-50', 'pointer-events-none'); }
     }
 
+    // --- UPDATED: GET QUOTATION (Direction Aware) ---
     async function getQuotation() {
         const unit = document.getElementById('final-unit').value.trim();
-        if(!unit) return alert("Please enter unit/floor details for the driver.");
-        
-        const btn = document.querySelector('#addr-fields button');
-        const orig = btn.innerText; btn.innerText = "Getting Price..."; btn.disabled = true;
-
-        // Save Unit info to use in booking
+        if(!unit) return alert("Enter address details.");
         custData.address = unit;
         
-        // FIXED: Send Addresses to Backend
-        const payload = {
-            action: "get_lalamove_quote",
-            pickupLat: hubData.lat, 
-            pickupLng: hubData.lng,
-            pickupAddress: currentData.hubName + " (Arabista Hub)", 
-            dropoffLat: custData.lat, 
-            dropoffLng: custData.lng,
-            dropoffAddress: custData.address
-        };
+        const btn = document.querySelector('#addr-fields button');
+        const orig = btn.innerText; btn.innerText = "Calculaing..."; btn.disabled = true;
+
+        // DIRECTION LOGIC
+        let payload = { action: "get_lalamove_quote" };
+        if (isIncomingOrder) {
+            // INCOMING: Cust -> Hub
+            payload.pickupLat = custData.lat; payload.pickupLng = custData.lng; payload.pickupAddress = custData.address;
+            payload.dropoffLat = hubData.lat; payload.dropoffLng = hubData.lng; payload.dropoffAddress = currentData.hubName + " (Hub)";
+        } else {
+            // RETURN: Hub -> Cust
+            payload.pickupLat = hubData.lat; payload.pickupLng = hubData.lng; payload.pickupAddress = currentData.hubName + " (Hub)";
+            payload.dropoffLat = custData.lat; payload.dropoffLng = custData.lng; payload.dropoffAddress = custData.address;
+        }
 
         try {
             const res = await fetch(scriptURL, { method: 'POST', body: JSON.stringify(payload) });
             const data = await res.json();
-            
             if(data.status === "success") {
                 activeQuoteId = data.quotationId;
-                currentStops = data.stops; // STORE STOPS!
+                currentStops = data.stops;
                 document.getElementById('quote-amount').innerText = `${data.currency} ${data.amount}`;
-                showModalStep(3); // Go to Book Screen
-            } else {
-                alert("Lalamove Error: " + data.message);
-                btn.innerText = orig; btn.disabled = false;
-            }
-        } catch(e) { alert("Connection Error"); btn.innerText = orig; btn.disabled = false; }
+                showModalStep(3);
+            } else { alert("Fee Error"); }
+            btn.innerText = orig; btn.disabled = false;
+        } catch(e) { alert("Error"); btn.innerText = orig; btn.disabled = false; }
     }
 
+    // --- UPDATED: BOOK RIDER (Direction Aware) ---
     async function bookRider() {
-        if(!activeQuoteId || !currentStops) return;
+        if(!activeQuoteId) return;
         const btn = document.getElementById('btn-final-book');
-        const orig = btn.innerHTML; btn.innerHTML = `${spinnerSvg} Booking Driver...`; btn.disabled = true;
+        btn.innerHTML = `${spinnerSvg} Booking...`; btn.disabled = true;
 
-        // 1. Update DB to say "Lalamove"
-        await fetch(scriptURL, { method: 'POST', body: JSON.stringify({ action: "update_outbound", alteration_id: currentData.alterationId, outbound_choice: "Lalamove" }) });
+        // If it's return, update preference. If incoming, just book.
+        if(!isIncomingOrder) await fetch(scriptURL, { method: 'POST', body: JSON.stringify({ action: "update_outbound", alteration_id: currentData.alterationId, outbound_choice: "Lalamove" }) });
 
-        // 2. Book Order
-        const payload = {
+        let payload = {
             action: "book_lalamove_order",
             quotationId: activeQuoteId,
             trackId: currentData.alterationId,
-            // FIXED: Send STOP IDs to Backend
             senderStopId: currentStops[0].stopId,
-            recipientStopId: currentStops[1].stopId,
-            senderName: currentData.hubName, 
-            senderPhone: hubData.phone,
-            recipientName: currentData.customerName,
-            recipientPhone: "60123456789" // Placeholder for customer phone
+            recipientStopId: currentStops[1].stopId
         };
-        
+
+        if (isIncomingOrder) {
+            // Sender = Cust, Recipient = Hub
+            payload.senderName = currentData.customerName; payload.senderPhone = "60123456789"; 
+            payload.recipientName = currentData.hubName; payload.recipientPhone = hubData.phone;
+        } else {
+            // Sender = Hub, Recipient = Cust
+            payload.senderName = currentData.hubName; payload.senderPhone = hubData.phone;
+            payload.recipientName = currentData.customerName; payload.recipientPhone = "60123456789";
+        }
+
         try {
             const res = await fetch(scriptURL, { method: 'POST', body: JSON.stringify(payload) });
             const data = await res.json();
-            
-            if(data.status === "success") {
-                // Success!
-                currentData.outboundChoice = "Lalamove";
-                closeModal();
-                alert("Driver Booked Successfully! You can track them on the timeline.");
-                window.location.reload();
-            } else {
-                alert("Booking Failed: " + (data.message || JSON.stringify(data)));
-                btn.innerHTML = orig; btn.disabled = false;
-            }
-        } catch(e) { alert("Network Error"); btn.innerHTML = orig; btn.disabled = false; }
+            if(data.status === "success") { alert("Driver Booked!"); window.location.reload(); }
+            else { alert("Failed: " + data.message); btn.innerHTML = "Retry"; btn.disabled = false; }
+        } catch(e) { alert("Error"); }
     }
-
-    async function setReturnChoice(choice, btnElement) {
-        // Only for Self-Pickup
-        const orig = btnElement.innerHTML; btnElement.innerHTML = `${spinnerSvg} Processing...`;
-        try {
-            const res = await fetch(scriptURL, { method: 'POST', body: JSON.stringify({ action: "update_outbound", alteration_id: currentData.alterationId, outbound_choice: choice }) });
-            const data = await res.json();
-            if(data.status === "success") { window.location.reload(); }
-        } catch(e) { alert("Error"); btnElement.innerHTML = orig; }
-    }
-
-    function shareLink() {
-        if (navigator.share) navigator.share({ title: 'Arabista Alteration Tracker', text: `Track my Abaya alteration order (${currentData.alterationId}):`, url: window.location.href }).catch(console.log);
-        else { navigator.clipboard.writeText(window.location.href); alert("Tracking link copied to clipboard!"); }
-    }
+    
+    function setReturnChoice(choice) { fetch(scriptURL, { method: 'POST', body: JSON.stringify({ action: "update_outbound", alteration_id: currentData.alterationId, outbound_choice: choice }) }).then(()=>window.location.reload()); }
+    function shareLink() { navigator.clipboard.writeText(window.location.href); alert("Copied!"); }
   </script>
 </body>
 </html>
