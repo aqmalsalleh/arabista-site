@@ -103,7 +103,7 @@
               <div id="list-active" class="space-y-3 transition-all overflow-hidden mb-8"></div>
 
               <button onclick="toggleSection('list-completed-container', 'icon-completed')" class="w-full flex justify-between items-center text-xs text-white/40 uppercase tracking-widest font-bold mb-3 border-b border-white/10 pb-2 hover:text-white transition">
-                  <span data-t="header_completed">Completed / Dispatched</span><svg id="icon-completed" class="w-4 h-4 transform transition-transform duration-200 rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                  <span data-t="header_completed">History / Delivered</span><svg id="icon-completed" class="w-4 h-4 transform transition-transform duration-200 rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
               </button>
               <div id="list-completed-container" class="hidden transition-all overflow-hidden">
                   <div class="flex gap-2 mb-3 bg-white/5 border border-white/10 p-2 rounded-lg items-center">
@@ -166,8 +166,8 @@
   </div>
 
   <script>
-    const APP_VERSION = "1.0"; 
-    const scriptURL = 'https://script.google.com/macros/s/AKfycbyrJFfuCrhAbdwzAj8uP4sSvFuzRzzzEFV5CHOCBSOK6OGlIXPtsf7-XEfjLHGnFZiyvw/exec'; 
+    const APP_VERSION = "1.0";
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbyrJFfuCrhAbdwzAj8uP4sSvFuzRzzzEFV5CHOCBSOK6OGlIXPtsf7-XEfjLHGnFZiyvw/exec';
     const trackerBaseUrl = 'https://aqmalsalleh.github.io/arabista-site/alteration-tracker.html?id=';
     const spinnerSvg = `<svg class="animate-spin h-4 w-4 inline mr-2 text-current" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>`;
 
@@ -177,11 +177,11 @@
             lbl_active_hub: "Active Hub", btn_logout: "Logout",
             title_timeline: "Orders Timeline", txt_syncing: "Syncing database...",
             header_requests: "New Requests (Approval)", header_pending: "Expected Arrivals (Pending)", header_active: "Currently Altering (In Progress)", header_completed: "Completed / Dispatched",
-            txt_no_requests: "No new requests.", txt_no_pending: "No pending arrivals.", txt_no_active: "No active alterations.", txt_no_completed: "No completed orders in this period.",
+            txt_no_requests: "No new requests.", txt_no_pending: "No pending arrivals.", txt_no_active: "No active alterations.", txt_no_completed: "No completed orders.",
             btn_accept: "Accept Order", btn_reject: "Reject",
             btn_mark_received: "Mark as Received", btn_mark_completed: "Mark as Completed", btn_cust_pickup: "Customer Picked Up", btn_dispatch: "Dispatch Lalamove", btn_override: "Mark as Delivered (Override)",
             btn_wait_choice: "Waiting for Customer Choice...",
-            arriving: "Arriving", waiting_days: "Waiting", days: "Days",
+            arriving: "Arriving", arrived: "ARRIVED", waiting_days: "Waiting", days: "Days",
             filter_today: "Today (Default)", filter_7days: "Last 7 Days", filter_custom: "Custom Period...", filter_all: "All Time",
             title_find: "Find Order", ph_search: "Search ID, Name, or Phone...", txt_no_results: "No results found.",
             title_settings: "Hub Settings", lbl_address: "Shop Address", lbl_gps: "GPS Coordinates", btn_update_gps: "Update GPS", lbl_tel: "Telephone", lbl_capacity: "Max Active Queue Capacity", lbl_open: "Open Time", lbl_close: "Close Time", lbl_status: "Status", opt_active: "Active (Accepting Orders)", opt_inactive: "Inactive (On Holiday)", btn_save: "Save Changes",
@@ -203,7 +203,7 @@
             btn_accept: "Terima Pesanan", btn_reject: "Tolak",
             btn_mark_received: "Tanda Telah Diterima", btn_mark_completed: "Tanda Telah Siap", btn_cust_pickup: "Pelanggan Dah Ambil", btn_dispatch: "Panggil Lalamove", btn_override: "Tanda Telah Dihantar (Override)",
             btn_wait_choice: "Menunggu Pilihan Pelanggan...",
-            arriving: "Dalam Perjalanan", waiting_days: "Menunggu", days: "Hari",
+            arriving: "Dalam Perjalanan", arrived: "TIBA", waiting_days: "Menunggu", days: "Hari",
             filter_today: "Hari Ini (Asal)", filter_7days: "7 Hari Lepas", filter_custom: "Tempoh Tersuai...", filter_all: "Semua Masa",
             title_find: "Cari Pesanan", ph_search: "Cari ID, Nama, atau Telefon...", txt_no_results: "Tiada hasil dijumpai.",
             title_settings: "Tetapan Hub", lbl_address: "Alamat Kedai", lbl_gps: "Koordinat GPS", btn_update_gps: "Kemaskini GPS", lbl_tel: "Telefon", lbl_capacity: "Kapasiti Maksimum Barisan", lbl_open: "Waktu Buka", lbl_close: "Waktu Tutup", lbl_status: "Status", opt_active: "Aktif (Terima Pesanan)", opt_inactive: "Tidak Aktif (Cuti)", btn_save: "Simpan Perubahan",
@@ -222,7 +222,7 @@
     let hubLat = ""; let hubLng = ""; let hubDays = "";
     let completedOrdersData = [];
     let previousPendingCount = -1;
-    let previousActionMap = new Map(); 
+    let previousActionMap = new Map();
     let pollInterval = null;
     let currentLang = 'en';
 
@@ -245,8 +245,7 @@
         currentLang = lang;
         document.querySelectorAll('[data-t]').forEach(el => { if(t[lang][el.getAttribute('data-t')]) el.innerText = t[lang][el.getAttribute('data-t')]; });
         document.querySelectorAll('[data-t-placeholder]').forEach(el => { if(t[lang][el.getAttribute('data-t-placeholder')]) el.placeholder = t[lang][el.getAttribute('data-t-placeholder')]; });
-        const btnEn = document.getElementById('lang-en');
-        const btnBm = document.getElementById('lang-bm');
+        const btnEn = document.getElementById('lang-en'); const btnBm = document.getElementById('lang-bm');
         if(btnEn && btnBm) {
             btnEn.className = lang === 'en' ? "text-xs font-bold text-luxe" : "text-xs text-white/50 hover:text-white transition";
             btnBm.className = lang === 'bm' ? "text-xs font-bold text-luxe" : "text-xs text-white/50 hover:text-white transition";
@@ -256,10 +255,8 @@
     }
 
     function updateConnectionStatus(isSyncing) {
-        const dot = document.getElementById('statusDot');
-        const text = document.getElementById('statusText');
-        if(isSyncing) { dot.classList.add('syncing'); text.innerText = "Syncing..."; } 
-        else { dot.classList.remove('syncing'); text.innerText = "Online"; }
+        const dot = document.getElementById('statusDot'); const text = document.getElementById('statusText');
+        if(isSyncing) { dot.classList.add('syncing'); text.innerText = "Syncing..."; } else { dot.classList.remove('syncing'); text.innerText = "Online"; }
     }
 
     function sanitizePhone(phone) { let p = phone.replace(/\D/g, ''); if (p.startsWith('0')) p = '6' + p; else if (!p.startsWith('60') && p.length >= 9) p = '60' + p; return p; }
@@ -279,7 +276,11 @@
 
     function playAlert(type) {
         try {
-            const soundUrl = type === 1 ? 'https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3' : 'https://www.soundjay.com/buttons/sounds/beep-07.mp3';
+            // Type 1: New Order (Chime), Type 2: Action Required (Ping), Type 3: Arrived (Success)
+            let soundUrl = 'https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3';
+            if (type === 2) soundUrl = 'https://www.soundjay.com/buttons/sounds/beep-07.mp3';
+            if (type === 3) soundUrl = 'https://assets.mixkit.co/active_storage/sfx/1435/1435-preview.mp3'; // Success chime
+            
             const msg = type === 1 ? (currentLang === 'bm' ? "Pesanan Baru Diterima!" : "New Alteration Order!") : t[currentLang].alert_action_required;
             const audio = new Audio(soundUrl); audio.volume = 1.0; audio.play().catch(e => console.log("Audio autoplay blocked.", e));
             if ("Notification" in window && Notification.permission === "granted") { new Notification("Arabista", { body: msg, icon: "images/logo-88.webp" }); }
@@ -333,10 +334,9 @@
 
     function renderPending(orders) {
         const requests = orders.filter(o => o.status === "Pending Approval");
-        // FIX: 'Dispatched' (from Customer to Hub) is considered an ARRIVAL (Pending)
-        const arrivals = orders.filter(o => o.status === "Pending Dropoff" || o.status === "Awaiting Dispatch" || (o.status === "Dispatched" && o.outbound === ""));
-
-        // 1. RENDER REQUESTS
+        const arrivals = orders.filter(o => o.status === "Pending Dropoff" || o.status === "Awaiting Dispatch" || (o.status === "Dispatched" && o.direction === "Inbound"));
+        
+        // 1. New Requests
         const reqList = document.getElementById('list-requests'); const reqIcon = document.getElementById('icon-requests'); const reqHeader = document.getElementById('header-requests-text');
         if (requests.length > 0) {
             reqHeader.innerHTML = `${currentLang === 'bm' ? "Permintaan Baru" : "New Requests"} <span class="text-white font-bold ml-1 bg-red-500 px-2 rounded-full text-[10px] animate-pulse">${requests.length}</span>`;
@@ -350,10 +350,20 @@
             reqList.classList.add('hidden'); reqIcon.classList.add('rotate-180'); reqList.innerHTML = `<p class="text-white/30 text-xs text-center py-4">${t[currentLang].txt_no_requests}</p>`;
         }
 
-        // 2. RENDER PENDING ARRIVALS
-        const list = document.getElementById('list-pending'); const icon = document.getElementById('icon-pending');
+        // 2. Expected Arrivals
+        const list = document.getElementById('list-pending'); const icon = document.getElementById('icon-pending'); const pendingHeader = document.getElementById('header-pending-text');
         const headerTxt = currentLang === 'bm' ? "Jangkaan Tiba" : "Expected Arrivals";
-        document.getElementById('header-pending-text').innerHTML = `${headerTxt} <span class="text-luxe font-bold ml-1">[ ${arrivals.length} ]</span>`;
+        
+        // CHECK FOR ARRIVED ITEMS (Status = Dispatched AND Lalamove = COMPLETED)
+        const arrivedCount = arrivals.filter(o => o.lalamoveStatus === "COMPLETED").length;
+        
+        if (arrivedCount > 0) {
+             pendingHeader.innerHTML = `${headerTxt} <span class="text-white font-bold ml-1 bg-red-500 px-2 rounded-full text-[10px] animate-pulse">${arrivals.length}</span>`;
+             if(previousPendingCount !== -1 && arrivedCount > 0) playAlert(3); // Play Arrival Sound
+        } else {
+             pendingHeader.innerHTML = `${headerTxt} <span class="text-luxe font-bold ml-1">[ ${arrivals.length} ]</span>`;
+        }
+
         if(arrivals.length === 0) { list.classList.add('hidden'); icon.classList.add('rotate-180'); list.innerHTML = `<p class="text-white/30 text-xs text-center py-4">${t[currentLang].txt_no_pending}</p>`; return; } 
         else { list.classList.remove('hidden'); icon.classList.remove('rotate-180'); }
         
@@ -364,15 +374,23 @@
             const daysOld = Math.floor((new Date() - new Date(o.date)) / (1000*60*60*24));
             const ageBadge = daysOld >= 3 ? `<span class="text-[9px] bg-red-500/20 text-red-400 px-2 py-0.5 rounded shadow-sm border border-red-500/30">⏳ ${t[currentLang].waiting_days} ${daysOld} ${t[currentLang].days}</span>` : '';
             let statusBadge = "";
+            let arrivedClass = "";
+            
             if (o.status === "Awaiting Dispatch") statusBadge = `<span class="text-[9px] bg-yellow-500/10 text-yellow-400 px-2 py-0.5 rounded border border-yellow-500/20">Awaiting Customer Action</span>`;
-            else if (o.status === "Dispatched") statusBadge = `<span class="text-[9px] bg-blue-500/10 text-blue-400 px-2 py-0.5 rounded border border-blue-500/20">Rider On The Way</span>`;
+            else if (o.status === "Dispatched") {
+                 if (o.lalamoveStatus === "COMPLETED") {
+                     statusBadge = `<span class="text-[9px] bg-green-500 text-brand font-bold px-2 py-0.5 rounded shadow-[0_0_10px_rgba(34,197,94,0.5)] animate-pulse">📢 ${t[currentLang].arrived}</span>`;
+                     arrivedClass = "border-green-500/50 shadow-[0_0_15px_rgba(34,197,94,0.1)]";
+                 } else {
+                     statusBadge = `<span class="text-[9px] bg-blue-500/10 text-blue-400 px-2 py-0.5 rounded border border-blue-500/20">Rider On The Way</span>`;
+                 }
+            }
 
-            list.innerHTML += `<div class="bg-[#1A1B1E] border border-white/5 rounded-xl p-4 shadow-sm"><div class="flex justify-between items-start mb-2"><div class="flex items-center gap-2"><span class="text-[10px] bg-white/10 px-2 py-0.5 rounded text-white/70 font-mono">${o.id}</span><span class="text-[10px] text-white/40">${formatDate(o.date)}</span>${ageBadge}</div><span class="text-xs font-bold text-orange-400">${t[currentLang].arriving}</span></div><div class="mb-2">${statusBadge}</div><p class="font-bold text-base text-white">${o.custName}</p><p class="text-xs text-white/50 mt-1 mb-4 whitespace-pre-line">${o.items.replace(/\[/g, '').replace(/\]/g, '')}</p><button onclick="updateStatus('${o.id}', 'In Progress', '${o.custName}', '${o.custPhone}', '${link}', 1, this)" class="w-full bg-green-500/10 text-green-400 border border-green-500/20 font-bold py-2.5 rounded-lg text-sm hover:bg-green-500/20 transition flex justify-center items-center gap-2"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> ${t[currentLang].btn_mark_received}</button></div>`;
+            list.innerHTML += `<div class="bg-[#1A1B1E] border ${arrivedClass ? arrivedClass : 'border-white/5'} rounded-xl p-4 shadow-sm"><div class="flex justify-between items-start mb-2"><div class="flex items-center gap-2"><span class="text-[10px] bg-white/10 px-2 py-0.5 rounded text-white/70 font-mono">${o.id}</span><span class="text-[10px] text-white/40">${formatDate(o.date)}</span>${ageBadge}</div><span class="text-xs font-bold ${arrivedClass ? 'text-green-400' : 'text-orange-400'}">${arrivedClass ? t[currentLang].arrived : t[currentLang].arriving}</span></div><div class="mb-2">${statusBadge}</div><p class="font-bold text-base text-white">${o.custName}</p><p class="text-xs text-white/50 mt-1 mb-4 whitespace-pre-line">${o.items.replace(/\[/g, '').replace(/\]/g, '')}</p><button onclick="updateStatus('${o.id}', 'In Progress', '${o.custName}', '${o.custPhone}', '${link}', 1, this)" class="w-full bg-green-500/10 text-green-400 border border-green-500/20 font-bold py-2.5 rounded-lg text-sm hover:bg-green-500/20 transition flex justify-center items-center gap-2"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> ${t[currentLang].btn_mark_received}</button></div>`;
         });
     }
 
     function renderActive(orders) {
-        // Active orders: In Progress, Ready, or Dispatched (Outgoing)
         const list = document.getElementById('list-active'); const icon = document.getElementById('icon-active');
         const headerTxt = currentLang === 'bm' ? "Sedang Dijahit" : "Currently Altering";
         document.getElementById('header-active-text').innerHTML = `${headerTxt} <span class="text-luxe font-bold ml-1">[ ${orders.length} ]</span>`;
@@ -382,9 +400,6 @@
         orders.sort((a,b) => new Date(a.date) - new Date(b.date));
         list.innerHTML = '';
         
-        // Asynchronously fetch status for any dispatched orders
-        orders.forEach(o => { if(o.status === "Dispatched" && o.lalamoveId) fetchLiveLalamoveStatus(o.id, o.lalamoveId); });
-
         orders.forEach(o => {
             const link = `${trackerBaseUrl}${o.id}`; let actionHtml = '';
             const daysOld = Math.floor((new Date() - new Date(o.date)) / (1000*60*60*24));
@@ -404,12 +419,11 @@
             // HORIZONTAL TRACKER
             let trackerHtml = "";
             if (o.status === "Dispatched") {
-                 const currentStatus = sessionStorage.getItem('lala_status_' + o.id) || 'ASSIGNING_DRIVER';
                  trackerHtml = `
                     <div class="mt-3 mb-3 pt-3 border-t border-white/5">
                         <div class="lala-track-container w-full">
                             <div class="lala-track-line"></div>
-                            ${renderLalamoveSteps(currentStatus)}
+                            ${renderLalamoveSteps(o.lalamoveStatus || 'ASSIGNING_DRIVER')}
                         </div>
                     </div>`;
             }
@@ -423,23 +437,9 @@
         let activeIdx = 0;
         if(status === 'ON_GOING') activeIdx = 1; 
         if(status === 'PICKED_UP') activeIdx = 2; 
-        if(status === 'COMPLETED') activeIdx = 3; // Should ideally move to History
+        if(status === 'COMPLETED') activeIdx = 4;
         
         return steps.map((s, i) => `<div class="lala-step ${i <= activeIdx ? (i === activeIdx ? 'active' : 'completed') : ''}"><div class="lala-dot"></div><span class="lala-label">${s.label}</span></div>`).join('');
-    }
-
-    async function fetchLiveLalamoveStatus(trackId, lalamoveId) {
-         try {
-             // Cache check to prevent spamming API on every render
-             if (sessionStorage.getItem('lala_status_' + trackId)) return;
-             
-             const res = await fetch(`${scriptURL}?action=get_lalamove_status&track_id=${trackId}`, {method: 'POST', body: JSON.stringify({action: 'get_lalamove_status', track_id: trackId})});
-             const data = await res.json();
-             if(data.status === 'success' && data.lalamove_status) {
-                 sessionStorage.setItem('lala_status_' + trackId, data.lalamove_status);
-                 loadDashboard(true); // Silent refresh to update UI
-             }
-         } catch(e) {}
     }
 
     function filterCompleted() {
