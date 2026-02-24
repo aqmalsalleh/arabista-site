@@ -135,7 +135,7 @@
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
                     <span id="gps-btn-text">Detect My Location</span>
                 </button>
-                <p class="text-[10px] text-white/40 mt-2 text-center" id="gps-status">Please ensure you are at the delivery point.</p>
+                <p class="text-[10px] text-white/40 mt-2 text-center" id="gps-status">GPS signal required for accuracy.</p>
             </div>
 
             <div id="view-manual" class="hidden mb-4">
@@ -185,21 +185,21 @@
     let activeQuoteId = null;
     let currentStops = null;
     let currentLang = 'en';
-    let isIncomingOrder = false; 
+    let isIncomingOrder = false; // FLAG: True = Cust->Hub, False = Hub->Cust
 
     const t = {
         en: {
             page_title: "Track Alteration", page_subtitle: "Enter your unique tracking ID below.", lbl_id: "Alteration ID", btn_track: "Track Order", txt_loading: "Locating your order details...", btn_share: "Share Link", lbl_items: "Items for Alteration:", section_status: "Tracking Status", back_home: "Back to Home",
             action_title: "Action Required", action_desc_incoming: "Your order is approved! Please arrange delivery to the Hub.", action_desc_ready: "Your items are ready! Please arrange retrieval.", btn_self_pickup: "I will Self-Pickup", btn_lalamove: "Book Lalamove Rider",
             confirmed_title: "Selection Confirmed", confirmed_lala: "Lalamove Selected.", confirmed_self: "Self-Pickup Selected.",
-            success_title: "Alteration Completed", success_desc: "Thank you for using our service. If you have any inquiries regarding your alteration, please contact the hub.", btn_contact: "Contact Hub",
+            success_title: "Alteration Completed", success_desc: "Thank you for using our service.", btn_contact: "Contact Hub",
             track_lala: "Track Lalamove Map"
         },
         bm: {
             page_title: "Jejak Tempahan", page_subtitle: "Masukkan ID tempahan unik anda di bawah.", lbl_id: "ID Tempahan", btn_track: "Jejak Pesanan", txt_loading: "Mencari butiran tempahan...", btn_share: "Kongsi Pautan", lbl_items: "Item untuk Diubahsuai:", section_status: "Status Terkini", back_home: "Kembali ke Utama",
             action_title: "Tindakan Diperlukan", action_desc_incoming: "Pesanan diluluskan! Sila hantar barang ke Hub.", action_desc_ready: "Barang anda dah siap! Sila aturkan pengambilan.", btn_self_pickup: "Saya Ambil Sendiri", btn_lalamove: "Tempah Lalamove",
             confirmed_title: "Pilihan Disahkan", confirmed_lala: "Lalamove Dipilih.", confirmed_self: "Ambil Sendiri Dipilih.",
-            success_title: "Alterasi Selesai", success_desc: "Terima kasih menggunakan servis kami. Jika ada pertanyaan, sila hubungi hub.", btn_contact: "Hubungi Hub",
+            success_title: "Alterasi Selesai", success_desc: "Terima kasih menggunakan servis kami.", btn_contact: "Hubungi Hub",
             track_lala: "Jejak Peta Lalamove"
         }
     };
