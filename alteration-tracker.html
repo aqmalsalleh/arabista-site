@@ -243,8 +243,22 @@
                 const h = data.hubs.find(x => x.name === currentData.hubName);
                 if (h) { hubData = { phone: h.phone, lat: h.lat, lng: h.lng }; }
             }
+            // NEW: Fetch Live Lalamove Status if Order ID exists
+            if (currentData.lalamoveOrderId) { fetchLiveLalamoveStatus(currentData.alterationId); }
             renderDashboard();
         } catch (error) { alert("Connection Error"); }
+    }
+
+    // NEW: Function to poll Lalamove Status
+    async function fetchLiveLalamoveStatus(trackId) {
+        try {
+            const res = await fetch(`${scriptURL}?action=get_lalamove_status&track_id=${trackId}`, {method: 'POST', body: JSON.stringify({action: 'get_lalamove_status', track_id: trackId})});
+            const data = await res.json();
+            if(data.status === 'success' && data.lalamove_status) {
+                currentData.lalamoveStatus = data.lalamove_status;
+                renderDashboard(); // Re-render to update the bar
+            }
+        } catch(e) { console.log("Status fetch fail", e); }
     }
 
     function renderDashboard() {
@@ -331,9 +345,10 @@
         
         // Map simplified status to step index
         let activeIdx = 0;
-        if (status === 'ON_GOING') activeIdx = 1;
-        if (status === 'PICKED_UP') activeIdx = 2;
+        if (status === 'ON_GOING') activeIdx = 1; // Driver found/assigning
+        if (status === 'PICKED_UP') activeIdx = 2; 
         if (status === 'COMPLETED') activeIdx = 3;
+        if (status === 'CANCELED' || status === 'REJECTED') activeIdx = 0; // Reset to start
 
         return steps.map((s, i) => `
             <div class="lala-step ${i <= activeIdx ? (i === activeIdx ? 'active' : 'completed') : ''}">
