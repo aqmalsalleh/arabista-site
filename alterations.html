@@ -406,14 +406,16 @@
         return { isOpen, text: isOpen ? `${t[currentLang].txt_open} (${t[currentLang].txt_closes_at} ${formatTime(hub.close)})` : `${t[currentLang].txt_closed} (${t[currentLang].txt_opens_at} ${formatTime(hub.open)})` };
     }
     
-    // --- UPDATED RENDER HUBS (CAPACITY MANAGEMENT) ---
+    // --- UPDATED RENDER HUBS (CAPACITY & FREE RETURN LOGIC) ---
     function renderHubs() {
         if(hubs.length === 0) return;
         hubs.forEach(h => { 
             if (state.lat !== "" && state.lng !== "") {
                 const straightLine = getDist(state.lat, state.lng, h.lat, h.lng); h.dist = straightLine * 1.4; 
             } else { h.dist = 5.0; }
-            h.fee = Math.ceil(5 + (h.dist * 1.0)); 
+            
+            // "Rough Math" Estimation: RM 4 Base + RM 1 per km
+            h.fee = Math.ceil(4 + (h.dist * 1.0)); 
         });
         hubs.sort((a,b) => a.dist - b.dist);
         let filteredHubs = hubs.filter(h => h.dist <= 20);
@@ -421,20 +423,27 @@
         
         const list = document.getElementById('hub-list'); list.innerHTML = '';
         filteredHubs.forEach(h => {
-            const isFull = h.backlog >= h.max_capacity; // CAPACITY CHECK
+            const isFull = h.backlog >= h.max_capacity; 
             const isSelected = state.hubId === h.id; 
             const status = checkHubStatus(h);
             
-            // Dynamic Badges
             const badgeCls = isFull ? "text-red-400 bg-red-500/10" : (status.isOpen ? "text-green-400 bg-green-500/10" : "text-red-400 bg-red-500/10");
             const badgeText = isFull ? "🔴 BUSY / FULL" : status.text;
             
-            // Dynamic Card Classes
             const cardClasses = `p-3 rounded-lg border transition flex justify-between items-center gap-3 ${isFull ? 'border-white/5 opacity-50 cursor-not-allowed bg-black/40' : (isSelected ? 'border-luxe bg-luxe/10 hover:bg-white/5 cursor-pointer' : 'border-white/10 opacity-70 hover:bg-white/5 cursor-pointer')}`;
-            const onClickAttr = isFull ? '' : `onclick="selectHub(${h.id}, ${h.dist}, ${h.fee}, ${h.lat}, ${h.lng})"` // PASSED COORDS
+            const onClickAttr = isFull ? '' : `onclick="selectHub(${h.id}, ${h.dist}, ${h.fee}, ${h.lat}, ${h.lng})"` 
 
+            // --- FIXED BADGE LOGIC HERE ---
             let lalamoveHtml = '';
-            if(state.mode === 'lalamove') lalamoveHtml = `<div class="mt-1 text-[10px] text-white/40" data-t="txt_return_paid">${t[currentLang].txt_return_paid}</div>`;
+            if(state.mode === 'lalamove') {
+                if(h.fee < 10) {
+                    // Estimated < RM 10 -> Show Free Return Badge
+                    lalamoveHtml = `<div class="mt-1 text-[10px] font-bold text-green-400 bg-green-500/10 inline-block px-1.5 py-0.5 rounded border border-green-500/20">${t[currentLang].badge_free_return} (Est.)</div>`;
+                } else {
+                    // Estimated > RM 10 -> Show Paid Return Text
+                    lalamoveHtml = `<div class="mt-1 text-[10px] text-white/40" data-t="txt_return_paid">${t[currentLang].txt_return_paid}</div>`;
+                }
+            }
             
             list.innerHTML += `<div ${onClickAttr} class="${cardClasses}"><div class="flex-1"><span class="text-sm text-white/90 font-medium block">${h.name}</span><span class="text-[9px] font-bold px-1.5 py-0.5 rounded mt-1 inline-block ${badgeCls}">${badgeText}</span>${lalamoveHtml}</div><div class="flex items-center gap-3"><span class="text-xs font-bold text-luxe">${h.dist.toFixed(1)} km</span>${h.phone ? `<a href="tel:${h.phone}" onclick="event.stopPropagation()" class="p-2 bg-white/5 hover:bg-luxe hover:text-brand text-white/50 rounded border border-white/10 transition" title="Call"><svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" /></svg></a>` : ''}</div></div>`;
         });
@@ -497,6 +506,7 @@
                         priceDisp.innerText = `RM ${state.deliveryCost.toFixed(2)}`;
                         priceDisp.classList.remove('animate-pulse');
                         
+                        // Free Return Check
                         let badge = "";
                         if (state.deliveryCost < 10) badge = `<div class="mt-2 text-[10px] font-bold text-green-400 bg-green-500/10 inline-block px-1.5 py-0.5 rounded border border-green-500/20">${t[currentLang].badge_free_return}</div>`;
                         lPanel.innerHTML += badge;
