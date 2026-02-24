@@ -119,8 +119,12 @@
         </div>
 
         <div id="modal-step-2" class="hidden text-left">
-            <h3 class="font-display text-xl text-white mb-4 text-center">Confirm Delivery Location</h3>
+            <h3 class="font-display text-xl text-white mb-2 text-center" id="modal-addr-title">Confirm Delivery Location</h3>
             
+            <p class="text-xs text-orange-400 bg-orange-500/10 border border-orange-500/20 p-2 rounded mb-4 text-center">
+                ⚠️ You must be at the location now. Rider will come to your current GPS pin.
+            </p>
+
             <div class="grid grid-cols-2 gap-2 mb-4">
                 <button onclick="toggleLocMethod('gps')" id="tab-gps" class="text-xs font-bold py-2 rounded-lg bg-white/10 text-white border border-transparent">Current GPS</button>
                 <button onclick="toggleLocMethod('manual')" id="tab-manual" class="text-xs font-bold py-2 rounded-lg bg-transparent text-white/50 border border-white/10 hover:text-white">Type Address</button>
@@ -131,7 +135,7 @@
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
                     <span id="gps-btn-text">Detect My Location</span>
                 </button>
-                <p class="text-[10px] text-white/40 mt-2 text-center" id="gps-status">Please ensure you are at the delivery point.</p>
+                <p class="text-[10px] text-white/40 mt-2 text-center" id="gps-status">GPS signal required for accuracy.</p>
             </div>
 
             <div id="view-manual" class="hidden mb-4">
@@ -142,8 +146,12 @@
 
             <div class="space-y-3 border-t border-white/10 pt-4 opacity-50 pointer-events-none transition-opacity" id="addr-fields">
                 <div>
-                    <label class="text-xs text-white/50 uppercase tracking-wider block mb-1">Unit / Floor / Remarks</label>
-                    <input type="text" id="final-unit" placeholder="e.g. Unit 12, Level 5">
+                    <label class="text-xs text-white/50 uppercase tracking-wider block mb-1">Unit / House No. <span class="text-red-400">*</span></label>
+                    <input type="text" id="input-unit" placeholder="e.g. Unit 15-2 or House 40">
+                </div>
+                <div>
+                    <label class="text-xs text-white/50 uppercase tracking-wider block mb-1">Building / Street (Optional)</label>
+                    <input type="text" id="input-building" placeholder="e.g. Galaxy Apartments">
                 </div>
                 <button onclick="getQuotation()" class="w-full bg-luxe text-brand font-bold py-3 rounded-xl hover:bg-white transition mt-2">Check Price & Book</button>
             </div>
@@ -255,9 +263,10 @@
                 isIncomingOrder = true; // Set Flag
                 document.getElementById('action-modal-title').innerText = t[currentLang].action_title;
                 document.getElementById('action-modal-instruction').innerText = t[currentLang].action_desc_incoming;
-                document.getElementById('btn-self-pickup').classList.add('hidden'); // No self-pickup for incoming (usually)
+                document.getElementById('btn-self-pickup').classList.add('hidden'); // No self-pickup for incoming
                 
-                extraText = `<button onclick="showModalStep(1)" class="mt-3 w-full py-2 bg-orange-500 text-white text-xs font-bold rounded hover:bg-orange-400 transition animate-pulse">${t[currentLang].btn_lalamove}</button>`;
+                // IMPORTANT: Button calls startIncomingBooking() to open Step 2 directly
+                extraText = `<button onclick="startIncomingBooking()" class="mt-3 w-full py-2 bg-orange-500 text-white text-xs font-bold rounded hover:bg-orange-400 transition animate-pulse">${t[currentLang].btn_lalamove}</button>`;
             }
 
             // 2. OUTGOING ACTION (Ready for Return)
@@ -301,12 +310,23 @@
         document.getElementById(`modal-step-${n}`).classList.remove('hidden');
         setTimeout(() => { document.getElementById('action-modal-box').classList.remove('scale-95'); }, 10);
     }
+    
     function closeModal() { document.getElementById('action-modal').classList.add('hidden'); }
     function goToStep2() { showModalStep(2); toggleLocMethod('gps'); }
+    
+    // START INCOMING BOOKING (Called from Timeline Button)
+    function startIncomingBooking() {
+        isIncomingOrder = true;
+        // Skip Choice Step, go straight to Location
+        goToStep2();
+        document.getElementById('modal-addr-title').innerText = "Confirm Pickup Location";
+    }
+
     function toggleLocMethod(method) {
         if(method==='gps'){ document.getElementById('view-gps').classList.remove('hidden'); document.getElementById('view-manual').classList.add('hidden'); }
         else { document.getElementById('view-manual').classList.remove('hidden'); document.getElementById('view-gps').classList.add('hidden'); }
     }
+    
     function getGPS() {
         if(!navigator.geolocation) return alert("Geo not supported");
         document.getElementById('gps-btn-text').innerText = "Locating...";
@@ -316,6 +336,7 @@
             document.getElementById('addr-fields').classList.remove('opacity-50', 'pointer-events-none');
         });
     }
+    
     async function geocodeManual() {
         const addr = document.getElementById('manual-addr-input').value;
         const res = await fetch(`${scriptURL}?action=geocode&address=${encodeURIComponent(addr)}`);
@@ -323,14 +344,18 @@
         if(data.lat) { custData.lat = data.lat; custData.lng = data.lng; document.getElementById('addr-fields').classList.remove('opacity-50', 'pointer-events-none'); }
     }
 
-    // --- UPDATED: GET QUOTATION (Direction Aware) ---
+    // --- UPDATED: GET QUOTATION (Direction Aware + Address inputs) ---
     async function getQuotation() {
-        const unit = document.getElementById('final-unit').value.trim();
-        if(!unit) return alert("Enter address details.");
-        custData.address = unit;
+        const unit = document.getElementById('input-unit').value.trim();
+        const building = document.getElementById('input-building').value.trim();
+        
+        if(!unit) return alert("Please enter Unit / House Number.");
+        
+        // Combine inputs for better driver visibility
+        custData.address = `${unit}, ${building}`;
         
         const btn = document.querySelector('#addr-fields button');
-        const orig = btn.innerText; btn.innerText = "Calculaing..."; btn.disabled = true;
+        const orig = btn.innerText; btn.innerText = "Calculating..."; btn.disabled = true;
 
         // DIRECTION LOGIC
         let payload = { action: "get_lalamove_quote" };
@@ -352,7 +377,7 @@
                 currentStops = data.stops;
                 document.getElementById('quote-amount').innerText = `${data.currency} ${data.amount}`;
                 showModalStep(3);
-            } else { alert("Fee Error"); }
+            } else { alert("Fee Error: " + (data.message || "Unknown")); }
             btn.innerText = orig; btn.disabled = false;
         } catch(e) { alert("Error"); btn.innerText = orig; btn.disabled = false; }
     }
@@ -376,12 +401,15 @@
 
         if (isIncomingOrder) {
             // Sender = Cust, Recipient = Hub
-            payload.senderName = currentData.customerName; payload.senderPhone = "60123456789"; 
+            // Use customer phone from trackData if available (passed from backend) or placeholder
+            const cPhone = currentData.customerPhone || "60123456789"; 
+            payload.senderName = currentData.customerName; payload.senderPhone = cPhone; 
             payload.recipientName = currentData.hubName; payload.recipientPhone = hubData.phone;
         } else {
             // Sender = Hub, Recipient = Cust
+            const cPhone = currentData.customerPhone || "60123456789";
             payload.senderName = currentData.hubName; payload.senderPhone = hubData.phone;
-            payload.recipientName = currentData.customerName; payload.recipientPhone = "60123456789";
+            payload.recipientName = currentData.customerName; payload.recipientPhone = cPhone;
         }
 
         try {
