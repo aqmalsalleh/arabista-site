@@ -24,6 +24,18 @@
     .timeline-line { position: absolute; left: 5px; top: 12px; bottom: -24px; width: 2px; background: #333; z-index: 0; transition: all 0.3s;}
     .timeline-line.active { background: #4ade80; }
     .last-step .timeline-line { display: none; }
+    
+    /* Horizontal Lalamove Tracker */
+    .lala-step { flex: 1; text-align: center; position: relative; z-index: 1; }
+    .lala-step::before { content: ''; position: absolute; top: 5px; left: -50%; right: 50%; height: 2px; background: #333; z-index: -1; }
+    .lala-step:first-child::before { display: none; }
+    .lala-step.active::before, .lala-step.completed::before { background: #4ade80; }
+    .lala-dot { width: 10px; height: 10px; background: #333; border-radius: 50%; margin: 0 auto 8px; transition: all 0.3s; }
+    .lala-step.active .lala-dot { background: #C0A062; box-shadow: 0 0 8px rgba(192,160,98,0.6); transform: scale(1.2); }
+    .lala-step.completed .lala-dot { background: #4ade80; }
+    .lala-label { font-size: 8px; color: rgba(255,255,255,0.3); text-transform: uppercase; letter-spacing: 0.5px; line-height: 1.2; }
+    .lala-step.active .lala-label { color: #C0A062; font-weight: bold; }
+    .lala-step.completed .lala-label { color: #4ade80; }
   </style>
 </head>
 <body class="antialiased selection:bg-luxe selection:text-brand">
@@ -192,14 +204,14 @@
             page_title: "Track Alteration", page_subtitle: "Enter your unique tracking ID below.", lbl_id: "Alteration ID", btn_track: "Track Order", txt_loading: "Locating your order details...", btn_share: "Share Link", lbl_items: "Items for Alteration:", section_status: "Tracking Status", back_home: "Back to Home",
             action_title: "Action Required", action_desc_incoming: "Your order is approved! Please arrange delivery to the Hub.", action_desc_ready: "Your items are ready! Please arrange retrieval.", btn_self_pickup: "I will Self-Pickup", btn_lalamove: "Book Lalamove Rider",
             confirmed_title: "Selection Confirmed", confirmed_lala: "Lalamove Selected.", confirmed_self: "Self-Pickup Selected.",
-            success_title: "Alteration Completed", success_desc: "Thank you for using our service.", btn_contact: "Contact Hub",
+            success_title: "Alteration Completed", success_desc: "Thank you for using our service. If you have any inquiries regarding your alteration, please contact the hub.", btn_contact: "Contact Hub",
             track_lala: "Track Lalamove Map"
         },
         bm: {
             page_title: "Jejak Tempahan", page_subtitle: "Masukkan ID tempahan unik anda di bawah.", lbl_id: "ID Tempahan", btn_track: "Jejak Pesanan", txt_loading: "Mencari butiran tempahan...", btn_share: "Kongsi Pautan", lbl_items: "Item untuk Diubahsuai:", section_status: "Status Terkini", back_home: "Kembali ke Utama",
             action_title: "Tindakan Diperlukan", action_desc_incoming: "Pesanan diluluskan! Sila hantar barang ke Hub.", action_desc_ready: "Barang anda dah siap! Sila aturkan pengambilan.", btn_self_pickup: "Saya Ambil Sendiri", btn_lalamove: "Tempah Lalamove",
             confirmed_title: "Pilihan Disahkan", confirmed_lala: "Lalamove Dipilih.", confirmed_self: "Ambil Sendiri Dipilih.",
-            success_title: "Alterasi Selesai", success_desc: "Terima kasih menggunakan servis kami.", btn_contact: "Hubungi Hub",
+            success_title: "Alterasi Selesai", success_desc: "Terima kasih menggunakan servis kami. Jika ada pertanyaan, sila hubungi hub.", btn_contact: "Hubungi Hub",
             track_lala: "Jejak Peta Lalamove"
         }
     };
@@ -287,9 +299,15 @@
                 }
             }
 
-            // 3. TRACKING LINK
-            if (stage === "Dispatched" && isCurrent && currentData.trackingUrl) {
-                extraText += `<a href="${currentData.trackingUrl}" target="_blank" class="mt-4 inline-flex items-center gap-1 text-xs font-bold text-white bg-orange-500 px-3 py-1.5 rounded hover:bg-orange-400 transition">${t[currentLang].track_lala} &rarr;</a>`;
+            // 3. TRACKING LINK & HORIZONTAL STATUS
+            if (stage === "Dispatched" && isCurrent) {
+                extraText += `<div class="mt-4 bg-white/5 rounded-lg p-3 border border-white/10">
+                    <p class="text-[10px] text-white/40 uppercase tracking-widest mb-3">Lalamove Live Status</p>
+                    <div class="flex justify-between items-center text-center">
+                        ${renderLalamoveSteps(currentData.lalamoveStatus || 'ASSIGNING_DRIVER')}
+                    </div>
+                    ${currentData.trackingUrl ? `<a href="${currentData.trackingUrl}" target="_blank" class="mt-4 block w-full text-center text-xs font-bold text-brand bg-luxe py-2 rounded hover:bg-white transition">${t[currentLang].track_lala} &rarr;</a>` : ''}
+                </div>`;
             }
 
             html += `
@@ -301,6 +319,28 @@
             </div>`;
         });
         document.getElementById('timeline-container').innerHTML = html;
+    }
+
+    function renderLalamoveSteps(status) {
+        const steps = [
+            { id: 'ASSIGNING_DRIVER', label: 'Assigning' },
+            { id: 'ON_GOING', label: 'Accepted' },
+            { id: 'PICKED_UP', label: 'Picked Up' },
+            { id: 'COMPLETED', label: 'Delivered' }
+        ];
+        
+        // Map simplified status to step index
+        let activeIdx = 0;
+        if (status === 'ON_GOING') activeIdx = 1;
+        if (status === 'PICKED_UP') activeIdx = 2;
+        if (status === 'COMPLETED') activeIdx = 3;
+
+        return steps.map((s, i) => `
+            <div class="lala-step ${i <= activeIdx ? (i === activeIdx ? 'active' : 'completed') : ''}">
+                <div class="lala-dot"></div>
+                <span class="lala-label">${s.label}</span>
+            </div>
+        `).join('');
     }
 
     // --- MODAL & GPS LOGIC ---
@@ -376,7 +416,7 @@
             // VISUAL FEEDBACK
             const stat = document.getElementById('manual-status');
             stat.classList.remove('hidden');
-            stat.innerHTML = `<span class="text-green-400 font-bold">✅ Pin Dropped:</span> ${data.lat.toFixed(4)}, ${data.lng.toFixed(4)}`;
+            stat.innerHTML = `<span class="text-green-400 font-bold">✅ Pin Dropped:</span> ${data.formatted_address || data.lat.toFixed(4) + ', ' + data.lng.toFixed(4)}`;
             document.getElementById('addr-fields').classList.remove('opacity-50', 'pointer-events-none'); 
         } else {
             document.getElementById('manual-status').classList.remove('hidden');
