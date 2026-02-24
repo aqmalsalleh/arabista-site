@@ -133,24 +133,12 @@
           <div id="tab-profile" class="tab-content fade-in">
               <h3 class="text-lg font-bold mb-4" data-t="title_settings">Hub Settings</h3>
               <div class="space-y-4 bg-white/5 p-4 rounded-xl border border-white/10">
-                  <div>
-                      <label class="block text-xs text-white/50 mb-1" data-t="lbl_address">Shop Address</label>
-                      <div class="relative"><input type="text" id="prof-address" readonly class="opacity-70 pr-10 cursor-not-allowed text-sm"><button id="btn-edit-address" onclick="unlockAddress()" class="absolute right-2 top-2.5 p-1.5 bg-brand border border-white/10 text-white/50 hover:text-luxe rounded transition shadow-md" title="Edit Address"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg></button></div>
-                  </div>
-                  <div class="flex items-center justify-between p-3 bg-luxe/10 border border-luxe/20 rounded-lg">
-                      <div><p class="text-xs text-luxe font-bold" data-t="lbl_gps">GPS Coordinates</p><p class="text-[10px] text-white/60 font-mono mt-0.5" id="prof-gps">...</p></div>
-                      <button id="btn-update-gps" onclick="updateGPS(this)" class="text-xs bg-luxe text-brand px-3 py-1.5 rounded font-bold shadow-soft flex items-center" data-t="btn_update_gps">Update GPS</button>
-                  </div>
+                  <div><label class="block text-xs text-white/50 mb-1" data-t="lbl_address">Shop Address</label><div class="relative"><input type="text" id="prof-address" readonly class="opacity-70 pr-10 cursor-not-allowed text-sm"><button id="btn-edit-address" onclick="unlockAddress()" class="absolute right-2 top-2.5 p-1.5 bg-brand border border-white/10 text-white/50 hover:text-luxe rounded transition shadow-md"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg></button></div></div>
+                  <div class="flex items-center justify-between p-3 bg-luxe/10 border border-luxe/20 rounded-lg"><div><p class="text-xs text-luxe font-bold" data-t="lbl_gps">GPS Coordinates</p><p class="text-[10px] text-white/60 font-mono mt-0.5" id="prof-gps">...</p></div><button id="btn-update-gps" onclick="updateGPS(this)" class="text-xs bg-luxe text-brand px-3 py-1.5 rounded font-bold shadow-soft flex items-center" data-t="btn_update_gps">Update GPS</button></div>
                   <div><label class="block text-xs text-white/50 mb-1" data-t="lbl_tel">Telephone</label><input type="tel" id="prof-phone" class="text-sm"></div>
-                  <div><label class="block text-xs text-white/50 mb-1" data-t="lbl_capacity">Max Active Queue Capacity</label><input type="number" id="prof-capacity" class="text-sm text-luxe font-bold" placeholder="e.g. 10"></div>
-                  <div class="grid grid-cols-2 gap-3">
-                      <div><label class="block text-xs text-white/50 mb-1" data-t="lbl_open">Open Time</label><input type="time" id="prof-open" class="text-sm"></div>
-                      <div><label class="block text-xs text-white/50 mb-1" data-t="lbl_close">Close Time</label><input type="time" id="prof-close" class="text-sm"></div>
-                  </div>
-                  <div>
-                      <label class="block text-xs text-white/50 mb-1" data-t="lbl_status">Status</label>
-                      <select id="prof-status" class="text-sm"><option value="Active" class="text-black" data-t="opt_active">Active (Accepting Orders)</option><option value="Inactive" class="text-black" data-t="opt_inactive">Inactive (On Holiday)</option></select>
-                  </div>
+                  <div><label class="block text-xs text-white/50 mb-1" data-t="lbl_capacity">Max Active Queue Capacity</label><input type="number" id="prof-capacity" class="text-sm text-luxe font-bold"></div>
+                  <div class="grid grid-cols-2 gap-3"><div><label class="block text-xs text-white/50 mb-1" data-t="lbl_open">Open Time</label><input type="time" id="prof-open" class="text-sm"></div><div><label class="block text-xs text-white/50 mb-1" data-t="lbl_close">Close Time</label><input type="time" id="prof-close" class="text-sm"></div></div>
+                  <div><label class="block text-xs text-white/50 mb-1" data-t="lbl_status">Status</label><select id="prof-status" class="text-sm"><option value="Active" class="text-black" data-t="opt_active">Active</option><option value="Inactive" class="text-black" data-t="opt_inactive">Inactive</option></select></div>
                   <button id="btn-save-prof" onclick="saveProfile()" class="w-full bg-white text-brand font-bold py-3 rounded-xl mt-2 shadow-soft flex justify-center items-center" data-t="btn_save">Save Changes</button>
               </div>
           </div>
@@ -279,7 +267,7 @@
             // Type 1: New Order (Chime), Type 2: Action Required (Ping), Type 3: Arrived (Success)
             let soundUrl = 'https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3';
             if (type === 2) soundUrl = 'https://www.soundjay.com/buttons/sounds/beep-07.mp3';
-            if (type === 3) soundUrl = 'https://assets.mixkit.co/active_storage/sfx/1435/1435-preview.mp3'; // Success chime
+            if (type === 3) soundUrl = 'https://www.soundjay.com/buttons/sounds/beep-07.mp3'; // Changed to simple beep to differentiate from approval chime
             
             const msg = type === 1 ? (currentLang === 'bm' ? "Pesanan Baru Diterima!" : "New Alteration Order!") : t[currentLang].alert_action_required;
             const audio = new Audio(soundUrl); audio.volume = 1.0; audio.play().catch(e => console.log("Audio autoplay blocked.", e));
@@ -433,11 +421,11 @@
     }
 
     function renderLalamoveSteps(status) {
-        const steps = [{label:'Assigning'},{label:'Found'},{label:'Picked Up'},{label:'On Way'},{label:'Delivered'}];
+        const steps = [{label:'Assigning'},{label:'Found'},{label:'Picked Up'},{label:'Delivered'}];
         let activeIdx = 0;
         if(status === 'ON_GOING') activeIdx = 1; 
         if(status === 'PICKED_UP') activeIdx = 2; 
-        if(status === 'COMPLETED') activeIdx = 4;
+        if(status === 'COMPLETED') activeIdx = 3;
         
         return steps.map((s, i) => `<div class="lala-step ${i <= activeIdx ? (i === activeIdx ? 'active' : 'completed') : ''}"><div class="lala-dot"></div><span class="lala-label">${s.label}</span></div>`).join('');
     }
