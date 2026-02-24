@@ -126,19 +126,7 @@
         
         <button onclick="closeModal()" class="absolute top-4 right-4 text-white/30 hover:text-white"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
 
-        <div id="modal-step-1">
-            <div class="w-16 h-16 rounded-full bg-luxe/20 text-luxe flex items-center justify-center mx-auto mb-5">
-                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
-            </div>
-            <h3 class="font-display text-2xl text-white mb-2" id="action-modal-title" data-t="action_title">Your Items are Ready!</h3>
-            <p class="text-sm text-white/70 mb-6" id="action-modal-instruction">How would you like to receive your completed order?</p>
-            <div class="space-y-3">
-                <button onclick="goToStep2()" class="action-btn w-full px-4 py-3.5 rounded-xl bg-luxe text-brand text-sm font-bold hover:bg-white transition shadow-soft flex justify-center items-center" data-t="btn_lalamove">Send via Lalamove</button>
-                <button onclick="setReturnChoice('Self-Pickup', this)" id="btn-self-pickup" class="action-btn w-full px-4 py-3.5 rounded-xl border border-luxe text-luxe text-sm font-bold hover:bg-luxe/20 transition flex justify-center items-center" data-t="btn_self_pickup">I will Self-Pickup</button>
-            </div>
-        </div>
-
-        <div id="modal-step-2" class="hidden text-left">
+        <div id="modal-step-2" class="text-left">
             <h3 class="font-display text-xl text-white mb-2 text-center" id="modal-addr-title">Confirm Delivery Location</h3>
             
             <div class="bg-white/5 border border-white/10 rounded-lg p-3 mb-4 text-[10px] text-white/70 space-y-2">
@@ -256,23 +244,17 @@
                 const h = data.hubs.find(x => x.name === currentData.hubName);
                 if (h) { 
                     hubData = { phone: h.phone, lat: h.lat, lng: h.lng }; 
-                    // Add Map Link if Walk-in
                     const driveBtn = document.getElementById('btn-drive-hub');
                     if(driveBtn) driveBtn.href = `http://googleusercontent.com/maps.google.com/?q=${h.lat},${h.lng}`;
                     if(currentData.orderStatus.includes("Dropoff")) document.getElementById('hub-map-link').classList.remove('hidden');
                 }
             }
-            // Use cached status if available, fallback to api fetch
-            if (currentData.lalamoveStatus) { 
-                 sessionStorage.setItem('lala_status_' + currentData.alterationId, currentData.lalamoveStatus);
-            } else if (currentData.lalamoveOrderId) { 
-                 fetchLiveLalamoveStatus(currentData.alterationId); 
-            }
+            if (currentData.lalamoveStatus) sessionStorage.setItem('lala_status_' + currentData.alterationId, currentData.lalamoveStatus);
+            else if (currentData.lalamoveOrderId) fetchLiveLalamoveStatus(currentData.alterationId);
             renderDashboard();
         } catch (error) { alert("Connection Error"); }
     }
     
-    // FETCH LIVE STATUS
     async function fetchLiveLalamoveStatus(trackId) {
         try {
             const res = await fetch(`${scriptURL}?action=get_lalamove_status&track_id=${trackId}`, {method: 'POST', body: JSON.stringify({action: 'get_lalamove_status', track_id: trackId})});
@@ -297,9 +279,6 @@
 
     function buildTimeline(status) {
         let stages = ["Pending Dropoff", "Pending Approval", "Awaiting Dispatch", "In Progress", "Ready for Return", "Dispatched", "Completed"];
-        
-        // DYNAMIC TIMELINE LOGIC
-        // If dispatched but no outbound preference OR direction is Inbound, it means it's INCOMING
         if (status === "Dispatched" && ((!currentData.outboundChoice || currentData.outboundChoice === "") || currentData.logisticsDirection === "Inbound")) {
              stages = ["Pending Approval", "Awaiting Dispatch", "Dispatched", "In Progress", "Ready for Return", "Completed"];
         } else if (currentData.outboundChoice === "Self-Pickup") {
@@ -315,26 +294,25 @@
             let dotClass = idx < currentIdx ? "completed" : (isCurrent ? "active" : "");
             let extraText = "";
             
-            // 1. INCOMING ACTION (Awaiting Dispatch)
             if (stage === "Awaiting Dispatch" && isCurrent) {
-                isIncomingOrder = true; // Set Flag
+                isIncomingOrder = true;
                 document.getElementById('action-modal-title').innerText = t[currentLang].action_title;
                 document.getElementById('action-modal-instruction').innerText = t[currentLang].action_desc_incoming;
-                document.getElementById('btn-self-pickup').classList.add('hidden'); 
-                
-                // Call startIncomingBooking directly
                 extraText = `<button onclick="startIncomingBooking()" class="mt-3 w-full py-2 bg-orange-500 text-white text-xs font-bold rounded hover:bg-orange-400 transition animate-pulse">${t[currentLang].btn_lalamove}</button>`;
             }
 
-            // 2. OUTGOING ACTION (Ready for Return)
             if (stage === "Ready for Return" && isCurrent) {
-                isIncomingOrder = false; // Set Flag
+                isIncomingOrder = false;
                 document.getElementById('action-modal-title').innerText = "Your Items are Ready!";
                 document.getElementById('action-modal-instruction').innerText = t[currentLang].action_desc_ready;
-                document.getElementById('btn-self-pickup').classList.remove('hidden'); 
-
+                
+                // NO AUTO MODAL OPENING. Render Buttons directly.
                 if (!currentData.outboundChoice) {
-                    showModalStep(1); 
+                    extraText = `
+                    <div class="flex gap-2 mt-3">
+                         <button onclick="triggerOutbound('Lalamove')" class="flex-1 py-3 rounded-xl bg-luxe text-brand text-xs font-bold hover:bg-white transition shadow-soft flex justify-center items-center">${t[currentLang].btn_lalamove}</button>
+                         <button onclick="setReturnChoice('Self-Pickup', this)" class="flex-1 py-3 rounded-xl border border-luxe text-luxe text-xs font-bold hover:bg-luxe/20 transition flex justify-center items-center">${t[currentLang].btn_self_pickup}</button>
+                    </div>`;
                 } else {
                     const boxTpl = document.getElementById('tpl-resolved-box');
                     const box = boxTpl.content.cloneNode(true);
@@ -344,45 +322,40 @@
                 }
             }
 
-            // 3. TRACKING LINK & BAR
             if (stage === "Dispatched" && isCurrent) {
-                // Use cached status first to avoid flicker
                 const displayStatus = currentData.lalamoveStatus || sessionStorage.getItem('lala_status_' + currentData.alterationId) || 'ASSIGNING_DRIVER';
-                
                 extraText += `<div class="mt-4 bg-white/5 rounded-lg p-3 border border-white/10">
                     <p class="text-[10px] text-white/40 uppercase tracking-widest mb-3">Lalamove Live Status</p>
-                    <div class="flex justify-between items-center text-center">
-                        ${renderLalamoveSteps(displayStatus)}
-                    </div>
+                    <div class="flex justify-between items-center text-center">${renderLalamoveSteps(displayStatus)}</div>
                     ${currentData.trackingUrl ? `<a href="${currentData.trackingUrl}" target="_blank" class="mt-4 block w-full text-center text-xs font-bold text-brand bg-luxe py-2 rounded hover:bg-white transition">${t[currentLang].track_lala} →</a>` : ''}
                 </div>`;
             }
+            
+            // --- FIX 4: RESTORE THANK YOU BOX ---
+            if (stage === "Completed" && isCurrent) {
+                 const boxTpl = document.getElementById('tpl-success-box');
+                 const box = boxTpl.content.cloneNode(true);
+                 const div = document.createElement('div'); div.appendChild(box); extraText = div.innerHTML;
+            }
 
-            html += `
-            <div class="relative pl-6 pb-8 ${idx === stages.length - 1 ? 'last-step' : ''}">
-                <div class="timeline-line ${idx < currentIdx ? 'active' : ''}"></div>
-                <div class="absolute left-0 top-1 timeline-dot ${dotClass}"></div>
-                <h4 class="text-sm font-bold ${isCurrent ? 'text-green-400' : 'text-white/30'}">${stage}</h4>
-                ${extraText}
-            </div>`;
+            html += `<div class="relative pl-6 pb-8 ${idx === stages.length - 1 ? 'last-step' : ''}"><div class="timeline-line ${idx < currentIdx ? 'active' : ''}"></div><div class="absolute left-0 top-1 timeline-dot ${dotClass}"></div><h4 class="text-sm font-bold ${isCurrent ? 'text-green-400' : 'text-white/30'}">${stage}</h4>${extraText}</div>`;
         });
         document.getElementById('timeline-container').innerHTML = html;
     }
 
     function renderLalamoveSteps(status) {
-        const steps = [{label:'Assigning'},{label:'Found'},{label:'Picked Up'},{label:'On Way'},{label:'Delivered'}];
+        const steps = [{label:'Assigning'},{label:'Found'},{label:'Picked Up'},{label:'Delivered'}];
         let activeIdx = 0;
         if(status === 'ON_GOING') activeIdx = 1; 
         if(status === 'PICKED_UP') activeIdx = 2; 
-        if(status === 'COMPLETED') activeIdx = 4;
+        if(status === 'COMPLETED') activeIdx = 3;
         
         return steps.map((s, i) => `<div class="lala-step ${i <= activeIdx ? (i === activeIdx ? 'active' : 'completed') : ''}"><div class="lala-dot"></div><span class="lala-label">${s.label}</span></div>`).join('');
     }
 
     // --- MODAL & GPS LOGIC ---
     function showModalStep(n) {
-        const modal = document.getElementById('action-modal');
-        const box = document.getElementById('action-modal-box');
+        const modal = document.getElementById('action-modal'); const box = document.getElementById('action-modal-box');
         modal.classList.remove('hidden'); modal.classList.remove('opacity-0'); 
         document.querySelectorAll('[id^="modal-step-"]').forEach(el => el.classList.add('hidden'));
         document.getElementById(`modal-step-${n}`).classList.remove('hidden');
@@ -397,52 +370,55 @@
 
     function goToStep2() { showModalStep(2); toggleLocMethod('gps'); }
     function startIncomingBooking() { isIncomingOrder = true; goToStep2(); document.getElementById('modal-addr-title').innerText = "Confirm Pickup Location"; }
+    function triggerOutbound(choice) { isIncomingOrder = false; goToStep2(); document.getElementById('modal-addr-title').innerText = "Confirm Delivery Location"; }
+
     function toggleLocMethod(method) {
         if(method==='gps'){ document.getElementById('view-gps').classList.remove('hidden'); document.getElementById('view-manual').classList.add('hidden'); }
         else { document.getElementById('view-manual').classList.remove('hidden'); document.getElementById('view-gps').classList.add('hidden'); }
     }
     
-    // REVERSE GEOCODING - UPDATED PULSE LOGIC
+    // REVERSE GEOCODING - PULSATING FIX
     function getGPS() {
         if(!navigator.geolocation) return alert("Geo not supported");
         
-        // START LOADING UI
         const btn = document.getElementById('btn-get-gps');
-        const originalText = "Detect My Location"; // Reset text context
-        btn.innerHTML = `<svg class="animate-spin h-4 w-4 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Locating Satellite...`;
-        btn.classList.add('animate-pulse', 'bg-luxe/20');
+        const statusTxt = document.getElementById('gps-status');
+        const originalText = "Detect My Location"; 
+        
+        // FAKE DELAY UI
+        btn.innerHTML = `${spinnerSvg} Locating...`;
         btn.disabled = true;
+        statusTxt.innerHTML = "📡 Acquiring exact satellite coordinates...";
+        statusTxt.classList.add('animate-pulse', 'text-luxe');
 
         navigator.geolocation.getCurrentPosition(async (pos) => {
             custData.lat = pos.coords.latitude; custData.lng = pos.coords.longitude;
             
-            // STOP LOADING UI
-            btn.classList.remove('animate-pulse', 'bg-luxe/20');
-            btn.innerHTML = `<svg class="w-4 h-4 mr-2 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> Location Locked`;
-            btn.disabled = false;
+            // Force 1.5s delay to show the Pulse effect
+            setTimeout(async () => {
+                btn.innerHTML = `<svg class="w-4 h-4 mr-2 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> Location Locked`;
+                btn.disabled = false;
+                statusTxt.classList.remove('animate-pulse', 'text-luxe');
+                
+                try {
+                    const res = await fetch(`${scriptURL}?action=reverse_geocode&lat=${custData.lat}&lng=${custData.lng}`);
+                    const data = await res.json();
+                    if(data.address) statusTxt.innerHTML = `<span class="text-green-400 font-bold block">GPS Locked:</span> ${data.address}`;
+                    else statusTxt.innerText = `GPS: ${custData.lat.toFixed(5)}, ${custData.lng.toFixed(5)}`;
+                } catch(e) {}
+                document.getElementById('addr-fields').classList.remove('opacity-50', 'pointer-events-none');
+            }, 1500); 
             
-            try {
-                const res = await fetch(`${scriptURL}?action=reverse_geocode&lat=${custData.lat}&lng=${custData.lng}`);
-                const data = await res.json();
-                if(data.address) document.getElementById('gps-status').innerHTML = `<span class="text-green-400 font-bold block">GPS Locked:</span> ${data.address}`;
-                else document.getElementById('gps-status').innerText = `GPS: ${custData.lat.toFixed(5)}, ${custData.lng.toFixed(5)}`;
-            } catch(e) {}
-            document.getElementById('addr-fields').classList.remove('opacity-50', 'pointer-events-none');
         }, (err) => {
-             // ERROR UI
-             btn.classList.remove('animate-pulse', 'bg-luxe/20');
-             btn.innerHTML = originalText;
-             btn.disabled = false;
-             alert("GPS Error: " + err.message);
+             btn.innerHTML = originalText; btn.disabled = false; alert("GPS Error: " + err.message);
         });
     }
     
-    // GEOCODE MANUAL - UPDATED PULSE LOGIC
+    // GEOCODE MANUAL - PULSATING FIX
     async function geocodeManual() {
         const addr = document.getElementById('manual-addr-input').value;
         const btn = document.getElementById('btn-manual-search');
         
-        // LOADING UI
         btn.innerHTML = `<svg class="animate-spin h-3 w-3 mr-2" viewBox="0 0 24 24" fill="none"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Searching...`;
         btn.classList.add('animate-pulse');
         btn.disabled = true;
@@ -450,7 +426,6 @@
         const res = await fetch(`${scriptURL}?action=geocode&address=${encodeURIComponent(addr)}`);
         const data = await res.json();
         
-        // RESET UI
         btn.innerHTML = "Search Map";
         btn.classList.remove('animate-pulse');
         btn.disabled = false;
@@ -513,7 +488,6 @@
         };
         const cPhone = currentData.customerPhone || "60123456789";
         
-        // CRITICAL UPDATE: Send direction to Backend v5.0
         if (isIncomingOrder) {
             payload.direction = "Inbound";
             payload.senderName = currentData.customerName; payload.senderPhone = cPhone; 
@@ -532,7 +506,7 @@
         } catch(e) { alert("Error"); }
     }
     
-    function setReturnChoice(choice) { fetch(scriptURL, { method: 'POST', body: JSON.stringify({ action: "update_outbound", alteration_id: currentData.alterationId, outbound_choice: "Lalamove" }) }).then(()=>window.location.reload()); }
+    function setReturnChoice(choice) { fetch(scriptURL, { method: 'POST', body: JSON.stringify({ action: "update_outbound", alteration_id: currentData.alterationId, outbound_choice: choice }) }).then(()=>window.location.reload()); }
     function shareLink() { navigator.clipboard.writeText(window.location.href); alert("Copied!"); }
   </script>
 </body>
