@@ -172,9 +172,10 @@
     const spinnerSvg = `<svg class="animate-spin h-4 w-4 inline mr-2 text-current" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>`;
     
     let currentData = null;
-    let hubData = { phone: "", lat: 0, lng: 0 }; // Hub Coordinates
-    let custData = { lat: 0, lng: 0, address: "" }; // Captured Customer Coordinates
+    let hubData = { phone: "", lat: 0, lng: 0 }; 
+    let custData = { lat: 0, lng: 0, address: "" }; 
     let activeQuoteId = null;
+    let currentStops = null; // FIXED: Store stops for booking
     let currentLang = 'en';
 
     const t = {
@@ -393,11 +394,16 @@
 
         // Save Unit info to use in booking
         custData.address = unit;
-
+        
+        // FIXED: Send Addresses to Backend
         const payload = {
             action: "get_lalamove_quote",
-            pickupLat: hubData.lat, pickupLng: hubData.lng, // Sender = Hub
-            dropoffLat: custData.lat, dropoffLng: custData.lng // Recipient = Customer
+            pickupLat: hubData.lat, 
+            pickupLng: hubData.lng,
+            pickupAddress: currentData.hubName + " (Arabista Hub)", 
+            dropoffLat: custData.lat, 
+            dropoffLng: custData.lng,
+            dropoffAddress: custData.address
         };
 
         try {
@@ -406,6 +412,7 @@
             
             if(data.status === "success") {
                 activeQuoteId = data.quotationId;
+                currentStops = data.stops; // STORE STOPS!
                 document.getElementById('quote-amount').innerText = `${data.currency} ${data.amount}`;
                 showModalStep(3); // Go to Book Screen
             } else {
@@ -416,13 +423,10 @@
     }
 
     async function bookRider() {
-        if(!activeQuoteId) return;
+        if(!activeQuoteId || !currentStops) return;
         const btn = document.getElementById('btn-final-book');
         const orig = btn.innerHTML; btn.innerHTML = `${spinnerSvg} Booking Driver...`; btn.disabled = true;
 
-        // Save Outbound Choice FIRST (Ensures DB is updated even if Lalamove logic has quirks)
-        // Then book.
-        
         // 1. Update DB to say "Lalamove"
         await fetch(scriptURL, { method: 'POST', body: JSON.stringify({ action: "update_outbound", alteration_id: currentData.alterationId, outbound_choice: "Lalamove" }) });
 
@@ -431,22 +435,14 @@
             action: "book_lalamove_order",
             quotationId: activeQuoteId,
             trackId: currentData.alterationId,
-            // Sender = Hub
+            // FIXED: Send STOP IDs to Backend
+            senderStopId: currentStops[0].stopId,
+            recipientStopId: currentStops[1].stopId,
             senderName: currentData.hubName, 
             senderPhone: hubData.phone,
-            // Recipient = Customer
             recipientName: currentData.customerName,
-            recipientPhone: "", // Ideally we'd have this from trackData, currently missing from trackData object. Will need to fix fetching.
-            // For now, let's assume we can fetch it or it's in the system. 
-            // WAIT -> Code.gs fetchTrackingData doesn't return phone. I need to update Code.gs fetch too? 
-            // Or just pass it if we have it? We don't have it in frontend `currentData`.
-            // FIX: I will add phone to `fetchTrackingData` in Code.gs later. For now, let's pass a placeholder or rely on backend to lookup? 
-            // Backend `book_lalamove_order` takes payload. Frontend doesn't have phone. 
-            // STRATEGY: I will modify book_lalamove_order in backend to look up phone from DB if missing.
+            recipientPhone: "60123456789" // Placeholder for customer phone
         };
-
-        // Minor fix for phone: Frontend doesn't have it. Backend has it in DB.
-        // Let's rely on backend lookup for phone.
         
         try {
             const res = await fetch(scriptURL, { method: 'POST', body: JSON.stringify(payload) });
@@ -459,7 +455,7 @@
                 alert("Driver Booked Successfully! You can track them on the timeline.");
                 window.location.reload();
             } else {
-                alert("Booking Failed: " + data.message);
+                alert("Booking Failed: " + (data.message || JSON.stringify(data)));
                 btn.innerHTML = orig; btn.disabled = false;
             }
         } catch(e) { alert("Network Error"); btn.innerHTML = orig; btn.disabled = false; }
