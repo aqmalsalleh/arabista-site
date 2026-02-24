@@ -219,7 +219,7 @@
             page_title: "Jejak Tempahan", page_subtitle: "Masukkan ID tempahan unik anda di bawah.", lbl_id: "ID Tempahan", btn_track: "Jejak Pesanan", txt_loading: "Mencari butiran tempahan...", btn_share: "Kongsi Pautan", lbl_items: "Item untuk Diubahsuai:", section_status: "Status Terkini", back_home: "Kembali ke Utama",
             action_title: "Tindakan Diperlukan", action_desc_incoming: "Pesanan diluluskan! Sila hantar barang ke Hub.", action_desc_ready: "Barang anda dah siap! Sila aturkan pengambilan.", btn_self_pickup: "Saya Ambil Sendiri", btn_lalamove: "Tempah Lalamove",
             confirmed_title: "Pilihan Disahkan", confirmed_lala: "Lalamove Dipilih.", confirmed_self: "Ambil Sendiri Dipilih.",
-            success_title: "Alterasi Selesai", success_desc: "Terima kasih menggunakan servis kami. Jika ada pertanyaan, sila hubungi hub.", btn_contact: "Hubungi Hub",
+            success_title: "Alterasi Selesai", success_desc: "Terima kasih menggunakan servis kami.", btn_contact: "Hubungi Hub",
             track_lala: "Jejak Peta Lalamove"
         }
     };
@@ -253,7 +253,7 @@
                     hubData = { phone: h.phone, lat: h.lat, lng: h.lng }; 
                     // Add Map Link if Walk-in
                     const driveBtn = document.getElementById('btn-drive-hub');
-                    if(driveBtn) driveBtn.href = `https://www.google.com/maps/dir/?api=1&destination=${h.lat},${h.lng}`;
+                    if(driveBtn) driveBtn.href = `http://googleusercontent.com/maps.google.com/?q=${h.lat},${h.lng}`;
                     if(currentData.orderStatus.includes("Dropoff")) document.getElementById('hub-map-link').classList.remove('hidden');
                 }
             }
@@ -287,8 +287,7 @@
     function buildTimeline(status) {
         let stages = ["Pending Dropoff", "Pending Approval", "Awaiting Dispatch", "In Progress", "Ready for Return", "Dispatched", "Completed"];
         
-        // BUG FIX 1: DYNAMIC TIMELINE FOR INCOMING LALAMOVE
-        // If dispatched but no outbound preference yet, it means it's INCOMING
+        // DYNAMIC TIMELINE LOGIC
         if (status === "Dispatched" && (!currentData.outboundChoice || currentData.outboundChoice === "")) {
              stages = ["Pending Approval", "Awaiting Dispatch", "Dispatched", "In Progress", "Ready for Return", "Completed"];
         } else if (currentData.outboundChoice === "Self-Pickup") {
@@ -340,7 +339,7 @@
                     <div class="flex justify-between items-center text-center">
                         ${renderLalamoveSteps(currentData.lalamoveStatus || 'ASSIGNING_DRIVER')}
                     </div>
-                    ${currentData.trackingUrl ? `<a href="${currentData.trackingUrl}" target="_blank" class="mt-4 block w-full text-center text-xs font-bold text-brand bg-luxe py-2 rounded hover:bg-white transition">${t[currentLang].track_lala} &rarr;</a>` : ''}
+                    ${currentData.trackingUrl ? `<a href="${currentData.trackingUrl}" target="_blank" class="mt-4 block w-full text-center text-xs font-bold text-brand bg-luxe py-2 rounded hover:bg-white transition">${t[currentLang].track_lala} →</a>` : ''}
                 </div>`;
             }
 
@@ -388,13 +387,25 @@
         else { document.getElementById('view-manual').classList.remove('hidden'); document.getElementById('view-gps').classList.add('hidden'); }
     }
     
-    // REVERSE GEOCODING
+    // REVERSE GEOCODING (Display GPS Address) - UPDATED WITH PULSE
     function getGPS() {
         if(!navigator.geolocation) return alert("Geo not supported");
-        document.getElementById('gps-btn-text').innerText = "Locating...";
+        
+        // START LOADING UI
+        const btn = document.getElementById('btn-get-gps');
+        const originalText = btn.innerHTML;
+        btn.innerHTML = `<svg class="animate-spin h-4 w-4 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Locating Satellite...`;
+        btn.classList.add('animate-pulse', 'bg-luxe/20');
+        btn.disabled = true;
+
         navigator.geolocation.getCurrentPosition(async (pos) => {
             custData.lat = pos.coords.latitude; custData.lng = pos.coords.longitude;
-            document.getElementById('gps-btn-text').innerText = "Location Locked";
+            
+            // STOP LOADING UI
+            btn.classList.remove('animate-pulse', 'bg-luxe/20');
+            btn.innerHTML = `<svg class="w-4 h-4 mr-2 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> Location Locked`;
+            btn.disabled = false;
+            
             try {
                 const res = await fetch(`${scriptURL}?action=reverse_geocode&lat=${custData.lat}&lng=${custData.lng}`);
                 const data = await res.json();
@@ -402,6 +413,12 @@
                 else document.getElementById('gps-status').innerText = `GPS: ${custData.lat.toFixed(5)}, ${custData.lng.toFixed(5)}`;
             } catch(e) {}
             document.getElementById('addr-fields').classList.remove('opacity-50', 'pointer-events-none');
+        }, (err) => {
+             // ERROR UI
+             btn.classList.remove('animate-pulse', 'bg-luxe/20');
+             btn.innerHTML = originalText;
+             btn.disabled = false;
+             alert("GPS Error: " + err.message);
         });
     }
     
@@ -466,10 +483,14 @@
             recipientStopId: currentStops[1].stopId
         };
         const cPhone = currentData.customerPhone || "60123456789";
+        
+        // CRITICAL UPDATE: Send direction to Backend v5.0
         if (isIncomingOrder) {
+            payload.direction = "Inbound";
             payload.senderName = currentData.customerName; payload.senderPhone = cPhone; 
             payload.recipientName = currentData.hubName; payload.recipientPhone = hubData.phone;
         } else {
+            payload.direction = "Outbound";
             payload.senderName = currentData.hubName; payload.senderPhone = hubData.phone;
             payload.recipientName = currentData.customerName; payload.recipientPhone = cPhone;
         }
