@@ -25,6 +25,11 @@
     .nav-btn.active { color: #C0A062; }
     .loader { border: 3px solid rgba(192,160,98,0.2); border-top-color: #C0A062; border-radius: 50%; width: 24px; height: 24px; animation: spin 1s linear infinite; }
     @keyframes spin { to { transform: rotate(360deg); } }
+    
+    /* Connection Status Pulse */
+    .status-dot { height: 8px; width: 8px; background-color: #22c55e; border-radius: 50%; display: inline-block; margin-right: 6px; }
+    .status-dot.syncing { background-color: #3b82f6; animation: blinker 1s linear infinite; }
+    @keyframes blinker { 50% { opacity: 0; } }
   </style>
 </head>
 <body class="antialiased h-[100dvh] flex flex-col overflow-hidden">
@@ -41,9 +46,25 @@
   </div>
 
   <div id="main-app" class="hidden flex-1 flex flex-col h-full overflow-hidden relative">
-      <header class="bg-[#151618] border-b border-white/5 px-4 py-4 flex justify-between items-center z-20 shadow-md">
-          <div><p class="text-[10px] text-luxe uppercase tracking-widest font-bold" data-t="lbl_active_hub">Active Hub</p><h2 class="text-base font-bold text-white truncate max-w-[200px]" id="header-hub-name">...</h2></div>
-          <button onclick="logout()" class="text-xs text-white/40 hover:text-white transition" data-t="btn_logout">Logout</button>
+      <header class="bg-[#151618] border-b border-white/5 px-4 py-3 flex justify-between items-center z-20 shadow-md">
+          <div class="flex flex-col">
+              <div class="flex items-center gap-2">
+                  <span class="text-[10px] text-luxe uppercase tracking-widest font-bold" data-t="lbl_active_hub">Active Hub</span>
+                  <div class="flex items-center bg-white/5 rounded-full px-2 py-0.5 border border-white/5">
+                      <span id="statusDot" class="status-dot"></span>
+                      <span id="statusText" class="text-[9px] text-white/60 font-medium">Online</span>
+                  </div>
+              </div>
+              <h2 class="text-sm font-bold text-white truncate max-w-[150px] leading-tight mt-0.5" id="header-hub-name">...</h2>
+          </div>
+          
+          <div class="flex items-center gap-3">
+              <select id="langToggle" onchange="manualLangChange(this.value)" class="bg-black/20 border border-white/10 text-white text-[10px] rounded px-2 py-1 h-8 w-auto focus:border-luxe outline-none">
+                  <option value="en">EN</option>
+                  <option value="bm">BM</option>
+              </select>
+              <button onclick="logout()" class="text-xs text-white/40 hover:text-white transition" data-t="btn_logout">Logout</button>
+          </div>
       </header>
 
       <div class="flex-1 overflow-y-auto px-4 py-6 scroll-smooth relative" id="scroll-area">
@@ -197,9 +218,11 @@
         const storedVersion = localStorage.getItem('arabista_app_version');
         if (storedVersion !== APP_VERSION) { logout(); localStorage.setItem('arabista_app_version', APP_VERSION); return; }
         
-        // Auto-Detect Language (Default to EN if not Malay)
+        // Language & UI Init
         const userLang = navigator.language || navigator.userLanguage;
-        if (userLang && (userLang.toLowerCase().startsWith('ms') || userLang.toLowerCase().startsWith('bm'))) setLang('bm'); else setLang('en');
+        const initialLang = (userLang && (userLang.toLowerCase().startsWith('ms') || userLang.toLowerCase().startsWith('bm'))) ? 'bm' : 'en';
+        setLang(initialLang);
+        document.getElementById('langToggle').value = initialLang;
 
         if(hubName) { 
             document.getElementById('login-screen').classList.add('hidden'); 
@@ -210,10 +233,29 @@
         } 
     });
 
+    function manualLangChange(val) {
+        setLang(val);
+        // Refresh dashboard to apply language to status text if needed
+        const activeOrders = document.getElementById('list-active').innerHTML;
+        if(activeOrders.length > 200) loadDashboard(true); // Soft refresh if data loaded
+    }
+
     function setLang(lang) {
         currentLang = lang;
         document.querySelectorAll('[data-t]').forEach(el => { if(t[lang][el.getAttribute('data-t')]) el.innerText = t[lang][el.getAttribute('data-t')]; });
         document.querySelectorAll('[data-t-placeholder]').forEach(el => { if(t[lang][el.getAttribute('data-t-placeholder')]) el.placeholder = t[lang][el.getAttribute('data-t-placeholder')]; });
+    }
+
+    function updateConnectionStatus(isSyncing) {
+        const dot = document.getElementById('statusDot');
+        const text = document.getElementById('statusText');
+        if(isSyncing) {
+            dot.classList.add('syncing');
+            text.innerText = "Syncing...";
+        } else {
+            dot.classList.remove('syncing');
+            text.innerText = "Online";
+        }
     }
 
     function sanitizePhone(phone) { let p = phone.replace(/\D/g, ''); if (p.startsWith('0')) p = '6' + p; else if (!p.startsWith('60') && p.length >= 9) p = '60' + p; return p; }
@@ -234,11 +276,15 @@
 
     function playAlert(type) {
         try {
-            // Type 1: New Order (Chime), Type 2: Action Required (Ping)
-            const soundUrl = type === 1 ? 'https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3' : 'https://assets.mixkit.co/active_storage/sfx/2578/2578-preview.mp3';
+            // Type 1: New Order (Chime - kept as is), Type 2: Action Required (Swapped to generic beep)
+            const soundUrl = type === 1 
+                ? 'https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3' 
+                : 'https://www.soundjay.com/buttons/sounds/beep-07.mp3'; // Changed to a simple beep/alert
+            
             const msg = type === 1 ? (currentLang === 'bm' ? "Pesanan Baru Diterima!" : "New Alteration Order!") : t[currentLang].alert_action_required;
             
             const audio = new Audio(soundUrl); 
+            audio.volume = 1.0;
             audio.play().catch(e => console.log("Audio autoplay blocked.", e));
             
             if ("Notification" in window && Notification.permission === "granted") { new Notification("Arabista", { body: msg, icon: "images/logo-88.webp" }); }
@@ -273,10 +319,15 @@
 
     async function loadDashboard(isSilent = false) {
         if (!isSilent) document.getElementById('dash-loader').classList.remove('hidden'); 
+        if (isSilent) updateConnectionStatus(true); // Show syncing pulse
+        
         try {
             const res = await fetch(scriptURL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: "get_dashboard", hub_name: hubName }) });
             const data = await res.json(); 
+            
             if (!isSilent) document.getElementById('dash-loader').classList.add('hidden');
+            if (isSilent) setTimeout(() => updateConnectionStatus(false), 1000); // Revert to Online
+
             if(data.status === "success") { 
                 // 1. Check for New Pending Orders
                 const newPendingCount = data.orders.pending.length;
@@ -300,7 +351,10 @@
 
                 renderPending(data.orders.pending); renderActive(data.orders.inProgress.concat(data.orders.ready)); completedOrdersData = data.orders.completed || []; filterCompleted(); populateProfile(data.profile); 
             }
-        } catch (e) { if (!isSilent) { alert(t[currentLang].alert_sync_fail); document.getElementById('dash-loader').classList.add('hidden'); } }
+        } catch (e) { 
+            if (!isSilent) { alert(t[currentLang].alert_sync_fail); document.getElementById('dash-loader').classList.add('hidden'); }
+            updateConnectionStatus(false); // Fail state (could add error color here if needed)
+        }
     }
 
     function renderPending(orders) {
