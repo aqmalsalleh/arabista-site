@@ -514,18 +514,16 @@
                         // DISPLAY ACTUAL ERROR
                         console.error("Lalamove Error:", data);
                         let errMsg = "Fee Error";
-                        // Attempt to extract helpful error text
                         if(data.message) {
                              if(data.message.includes("OUT_OF_SERVICE")) errMsg = "Out of Area";
                              else if(data.message.includes("API Keys")) errMsg = "Keys Missing";
                              else if(data.message.includes("401")) errMsg = "Auth Fail";
-                             else errMsg = "API Error"; // Keep short for UI
+                             else errMsg = "API Error"; 
                         }
                         priceDisp.innerText = errMsg;
                         priceDisp.classList.remove('animate-pulse');
                         priceDisp.classList.add('text-red-400');
-                        // ALERT FULL DEBUG MESSAGE FOR DEVELOPER
-                        alert("Lalamove API Debug:\n" + JSON.stringify(data.message || data));
+                        // ALERT REMOVED FOR PRODUCTION STABILITY
                     }
                 } catch(e) { 
                     console.error(e);
@@ -722,4 +720,3 @@
   </script>
 </body>
 </html>
-}
