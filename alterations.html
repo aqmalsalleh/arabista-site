@@ -5,15 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Arabista — Alteration Service</title>
   <meta name="theme-color" content="#0F0F10" />
-  
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
-    tailwind.config = {
-      theme: { extend: { fontFamily: { display: ['"Cormorant Garamond"', 'serif'], sans: ['Inter', 'ui-sans-serif', 'system-ui'], }, colors: { brand: { DEFAULT: '#0F0F10' }, luxe: { DEFAULT: '#C0A062' }, }, boxShadow: { soft: '0 10px 30px rgba(0,0,0,0.08)' }, }, },
-    }
+    tailwind.config = { theme: { extend: { fontFamily: { display: ['"Cormorant Garamond"', 'serif'], sans: ['Inter', 'ui-sans-serif', 'system-ui'], }, colors: { brand: { DEFAULT: '#0F0F10' }, luxe: { DEFAULT: '#C0A062' }, }, boxShadow: { soft: '0 10px 30px rgba(0,0,0,0.08)' }, }, }, }
   </script>
   <style>
     body { background-color: #0F0F10; color: white; }
@@ -198,7 +195,6 @@
   </div>
 
   <script>
-    // --- APP SCRIPT URL ---
     const scriptURL = 'https://script.google.com/macros/s/AKfycbyrJFfuCrhAbdwzAj8uP4sSvFuzRzzzEFV5CHOCBSOK6OGlIXPtsf7-XEfjLHGnFZiyvw/exec'; 
     const spinnerSvg = `<svg class="animate-spin h-4 w-4 inline mr-2 text-current" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>`;
 
@@ -264,7 +260,7 @@
     const sizes = ['XS', 'S', 'M', 'L', 'XL', 'XXL', 'XXXL'];
     const sizeChart = { 'XS': { length: 55, sleeve: 22, shoulder: 14 }, 'S': { length: 55, sleeve: 22, shoulder: 15 }, 'M': { length: 57, sleeve: 23, shoulder: 16 }, 'L': { length: 60, sleeve: 23.5, shoulder: 16.5 }, 'XL': { length: 60, sleeve: 23.5, shoulder: 17.5 }, 'XXL': { length: 60, sleeve: 23.5, shoulder: 18 }, 'XXXL': { length: 60, sleeve: 23.5, shoulder: 19 } };
     
-    let state = { path: 'A', selectedItems: [], lat: "", lng: "", unitNo: '', orderAddress: '', mode: 'walkin', hubId: null, hubDist: 0, deliveryCost: 0, servicesTotal: 0, measurements: {}, logisticsSchedule: '', gpsWatchId: null };
+    let state = { path: 'A', selectedItems: [], lat: "", lng: "", unitNo: '', orderAddress: '', mode: 'walkin', hubId: null, hubDist: 0, deliveryCost: 0, servicesTotal: 0, measurements: {}, logisticsSchedule: '', gpsWatchId: null, hubLat: 0, hubLng: 0 };
     let editingItemId = null;
 
     function addManualItem() {
@@ -416,7 +412,6 @@
             if (state.lat !== "" && state.lng !== "") {
                 const straightLine = getDist(state.lat, state.lng, h.lat, h.lng); h.dist = straightLine * 1.4; 
             } else { h.dist = 5.0; }
-            // Placeholder Fee (Overridden by API for Lalamove)
             h.fee = Math.ceil(5 + (h.dist * 1.0)); 
         });
         hubs.sort((a,b) => a.dist - b.dist);
@@ -425,17 +420,15 @@
         
         const list = document.getElementById('hub-list'); list.innerHTML = '';
         filteredHubs.forEach(h => {
-            const isFull = h.backlog >= h.max_capacity; // CAPACITY CHECK
+            const isFull = h.backlog >= h.max_capacity; 
             const isSelected = state.hubId === h.id; 
             const status = checkHubStatus(h);
             
-            // Dynamic Badges
             const badgeCls = isFull ? "text-red-400 bg-red-500/10" : (status.isOpen ? "text-green-400 bg-green-500/10" : "text-red-400 bg-red-500/10");
             const badgeText = isFull ? "🔴 BUSY / FULL" : status.text;
             
-            // Dynamic Card Classes
             const cardClasses = `p-3 rounded-lg border transition flex justify-between items-center gap-3 ${isFull ? 'border-white/5 opacity-50 cursor-not-allowed bg-black/40' : (isSelected ? 'border-luxe bg-luxe/10 hover:bg-white/5 cursor-pointer' : 'border-white/10 opacity-70 hover:bg-white/5 cursor-pointer')}`;
-            const onClickAttr = isFull ? '' : `onclick="selectHub(${h.id}, ${h.dist}, ${h.fee}, ${h.lat}, ${h.lng})"`; // PASSED COORDS
+            const onClickAttr = isFull ? '' : `onclick="selectHub(${h.id}, ${h.dist}, ${h.fee}, ${h.lat}, ${h.lng})"` 
 
             let lalamoveHtml = '';
             if(state.mode === 'lalamove') lalamoveHtml = `<div class="mt-1 text-[10px] text-white/40" data-t="txt_return_paid">${t[currentLang].txt_return_paid}</div>`;
@@ -446,9 +439,7 @@
     
     function selectHub(id, dist, fee, hLat, hLng) { 
         state.hubId = id; state.hubDist = dist; 
-        // Save Hub Coords for API
         state.hubLat = hLat; state.hubLng = hLng;
-        
         renderHubs(); updateDispatchUI(); calculateTotal(); checkStep3Complete(); 
     }
     
@@ -482,10 +473,15 @@
             // FETCH REAL QUOTE
             if (state.lat && state.lng && state.hubLat && state.hubLng) {
                 try {
+                    const custAddress = state.unitNo ? `${state.unitNo}, ${document.getElementById('final-address').innerText}` : "Customer Location";
                     const payload = {
                         action: "get_lalamove_quote",
-                        pickupLat: state.lat, pickupLng: state.lng, // Cust to Hub (Trip 1)
-                        dropoffLat: state.hubLat, dropoffLng: state.hubLng
+                        pickupLat: state.lat, 
+                        pickupLng: state.lng,
+                        pickupAddress: custAddress, // Customer (Sender)
+                        dropoffLat: state.hubLat, 
+                        dropoffLng: state.hubLng,
+                        dropoffAddress: hub.address // Hub (Receiver)
                     };
                     const res = await fetch(scriptURL, { method: 'POST', body: JSON.stringify(payload) });
                     const data = await res.json();
