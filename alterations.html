@@ -397,6 +397,7 @@
         hours = hours % 12; hours = hours ? hours : 12; return `${hours}:${m} ${ampm}`;
     }
     function checkHubStatus(hub) {
+        if(!hub || !hub.days) return { isOpen: false, text: "Closed" }; // Safety check
         const now = new Date(); const currentDay = now.getDay(); const currentTimeNum = now.getHours() + (now.getMinutes() / 60);
         const operatingDays = hub.days.split(',').map(Number);
         const [openH, openM] = hub.open.split(':').map(Number); const [closeH, closeM] = hub.close.split(':').map(Number);
@@ -441,9 +442,7 @@
     
     function selectHub(id, dist, fee, hLat, hLng) { 
         state.hubId = id; state.hubDist = dist; 
-        // Save Hub Coords for API
         state.hubLat = hLat; state.hubLng = hLng;
-        
         renderHubs(); updateDispatchUI(); calculateTotal(); checkStep3Complete(); 
     }
     
@@ -462,7 +461,9 @@
     
     async function updateDispatchUI() {
         if(!state.hubId) return;
-        const hub = hubs.find(h => h.id === state.hubId); const status = checkHubStatus(hub);
+        const hub = hubs.find(h => h.id === state.hubId);
+        if(!hub) return; // Safety check
+        const status = checkHubStatus(hub);
         const wPanel = document.getElementById('walkin-panel'); const lPanel = document.getElementById('lalamove-panel');
         
         if (state.mode === 'walkin') {
@@ -472,15 +473,12 @@
         } else {
             // LALAMOVE LOGIC
             wPanel.classList.add('hidden'); lPanel.classList.remove('hidden');
-            const priceDisp = document.getElementById('lala-price-disp');
-            // DEBUG MODE: REPLACED GENERIC "Error" WITH EXACT MESSAGE
-            priceDisp.innerHTML = `${t[currentLang].txt_calculating}`;
-            priceDisp.classList.add('animate-pulse');
+            lPanel.innerHTML = `<div class="flex justify-between items-center mb-2"><span class="text-sm text-orange-200">${t[currentLang].label_del_fee}</span><span class="font-bold text-white animate-pulse" id="lala-price-disp">${t[currentLang].txt_calculating}</span></div>`;
+            const priceDisp = document.getElementById('lala-price-disp'); // DEFINED HERE TO FIX CRASH
             
             // FETCH REAL QUOTE
             if (state.lat && state.lng && state.hubLat && state.hubLng) {
                 try {
-                    // FIXED: Now sends FULL address details to prevent geocoding errors
                     const custAddress = state.unitNo ? `${state.unitNo}, ${document.getElementById('final-address').innerText}` : "Customer Location";
                     const payload = {
                         action: "get_lalamove_quote",
@@ -499,26 +497,22 @@
                         priceDisp.innerText = `RM ${state.deliveryCost.toFixed(2)}`;
                         priceDisp.classList.remove('animate-pulse');
                         
-                        // Free Return Check
                         let badge = "";
                         if (state.deliveryCost < 10) badge = `<div class="mt-2 text-[10px] font-bold text-green-400 bg-green-500/10 inline-block px-1.5 py-0.5 rounded border border-green-500/20">${t[currentLang].badge_free_return}</div>`;
-                        lPanel.innerHTML = `<div class="flex justify-between items-center mb-2"><span class="text-sm text-orange-200">${t[currentLang].label_del_fee}</span><span class="font-bold text-white" id="lala-price-disp">RM ${state.deliveryCost.toFixed(2)}</span></div>${badge}`;
+                        lPanel.innerHTML += badge;
                     } else {
-                        // DEBUG MODE: Display the actual error message
+                        // DISPLAY ACTUAL ERROR
                         console.error("Lalamove Error:", data);
                         let errMsg = "Fee Error";
-                        // Attempt to extract helpful error text
                         if(data.message) {
                              if(data.message.includes("OUT_OF_SERVICE")) errMsg = "Out of Area";
                              else if(data.message.includes("API Keys")) errMsg = "Keys Missing";
                              else if(data.message.includes("401")) errMsg = "Auth Fail";
-                             else errMsg = "API Error"; // Keep short for UI
+                             else errMsg = "API Error"; 
                         }
                         priceDisp.innerText = errMsg;
                         priceDisp.classList.remove('animate-pulse');
                         priceDisp.classList.add('text-red-400');
-                        // ALERT FULL DEBUG MESSAGE FOR DEVELOPER
-                        alert("Lalamove API Debug:\n" + JSON.stringify(data.message || data));
                     }
                 } catch(e) { 
                     console.error(e);
