@@ -81,17 +81,6 @@
     </div>
   </main>
 
-  <template id="tpl-action-box">
-      <div class="mt-4 p-5 bg-luxe/10 border border-luxe/30 rounded-xl text-center fade-in relative z-20">
-          <h3 class="text-luxe font-bold mb-2 text-lg font-display" data-t="action_title">Your Items are Ready!</h3>
-          <p class="text-sm text-white/80 mb-5 action-instruction">How would you like to receive your completed order?</p>
-          <div class="grid grid-cols-2 gap-3">
-              <button onclick="setReturnChoice('Self-Pickup', this)" class="action-btn px-4 py-3 rounded-xl border border-luxe text-luxe text-sm font-bold hover:bg-luxe/20 transition flex justify-center items-center" data-t="btn_self_pickup">I will Self-Pickup</button>
-              <button onclick="setReturnChoice('Lalamove', this)" class="action-btn px-4 py-3 rounded-xl bg-luxe text-brand text-sm font-bold hover:bg-white transition shadow-soft flex justify-center items-center" data-t="btn_lalamove">Send via Lalamove</button>
-          </div>
-      </div>
-  </template>
-
   <template id="tpl-resolved-box">
       <div class="mt-4 p-4 bg-white/5 border border-white/10 rounded-xl flex items-start gap-3 fade-in relative z-20">
           <svg class="w-5 h-5 text-luxe shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
@@ -111,6 +100,21 @@
           </a>
       </div>
   </template>
+
+  <div id="action-modal" class="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-md hidden opacity-0 transition-opacity duration-300 px-4">
+    <div class="bg-[#111213] border border-luxe/50 rounded-2xl w-full max-w-sm p-8 transform scale-95 transition-transform duration-300 text-center shadow-[0_0_50px_rgba(192,160,98,0.1)]" id="action-modal-box">
+        <div class="w-16 h-16 rounded-full bg-luxe/20 text-luxe flex items-center justify-center mx-auto mb-5">
+            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
+        </div>
+        <h3 class="font-display text-2xl text-white mb-2" data-t="action_title">Your Items are Ready!</h3>
+        <p class="text-sm text-white/70 mb-6" id="action-modal-instruction">How would you like to receive your completed order?</p>
+        
+        <div class="space-y-3">
+            <button onclick="setReturnChoice('Lalamove', this)" class="action-btn w-full px-4 py-3.5 rounded-xl bg-luxe text-brand text-sm font-bold hover:bg-white transition shadow-soft flex justify-center items-center" data-t="btn_lalamove">Send via Lalamove</button>
+            <button onclick="setReturnChoice('Self-Pickup', this)" class="action-btn w-full px-4 py-3.5 rounded-xl border border-luxe text-luxe text-sm font-bold hover:bg-luxe/20 transition flex justify-center items-center" data-t="btn_self_pickup">I will Self-Pickup</button>
+        </div>
+    </div>
+  </div>
 
   <script>
     const scriptURL = 'https://script.google.com/macros/s/AKfycbyrJFfuCrhAbdwzAj8uP4sSvFuzRzzzEFV5CHOCBSOK6OGlIXPtsf7-XEfjLHGnFZiyvw/exec'; 
@@ -144,7 +148,7 @@
 
     document.addEventListener('DOMContentLoaded', () => {
         const userLang = navigator.language || navigator.userLanguage;
-        if (userLang && userLang.toLowerCase().startsWith('ms')) setLang('bm'); else setLang('en');
+        if (userLang && (userLang.toLowerCase().startsWith('ms') || userLang.toLowerCase().startsWith('bm'))) setLang('bm'); else setLang('en');
 
         const urlParams = new URLSearchParams(window.location.search);
         const trackId = urlParams.get('id');
@@ -202,35 +206,39 @@
             
             let extraText = "";
             
-            // INJECT ACTION BOX (Ready for Return)
+            // 1. INJECT ACTION MODAL TRIGGER (Input Required)
             if (stage === "Ready for Return" && isCurrent) {
-                const boxTpl = document.getElementById(currentData.outboundChoice ? 'tpl-resolved-box' : 'tpl-action-box');
-                const box = boxTpl.content.cloneNode(true);
-                
                 if (!currentData.outboundChoice) {
-                    let desc = currentData.returnEligibility === "Free Return" ? t[currentLang].action_desc_free : t[currentLang].action_desc_paid;
-                    box.querySelector('.action-instruction').innerHTML = desc;
-                    // Note: Buttons auto-translate via data-t tags in the template
+                    // Show Modal
+                    const modal = document.getElementById('action-modal');
+                    const box = document.getElementById('action-modal-box');
+                    modal.classList.remove('hidden');
+                    
+                    let inst = document.getElementById('action-modal-instruction');
+                    if (currentData.returnEligibility === "Free Return") inst.innerHTML = t[currentLang].action_desc_free;
+                    else inst.innerHTML = t[currentLang].action_desc_paid;
+                    
+                    setTimeout(() => { modal.classList.remove('opacity-0'); box.classList.remove('scale-95'); }, 10);
                 } else {
+                    // Show Passive Resolved Box
+                    const boxTpl = document.getElementById('tpl-resolved-box');
+                    const box = boxTpl.content.cloneNode(true);
                     let desc = currentData.outboundChoice === 'Lalamove' ? t[currentLang].confirmed_lala : t[currentLang].confirmed_self;
                     box.querySelector('.resolved-desc').innerText = desc;
+                    const div = document.createElement('div'); div.appendChild(box); extraText = div.innerHTML;
                 }
-                
-                // Hacky way to turn the fragment into string to inject into timeline flow
-                const div = document.createElement('div'); div.appendChild(box); extraText = div.innerHTML;
             }
 
-            // INJECT SUCCESS BOX (Completed)
+            // 2. INJECT SUCCESS BOX (Passive Info)
             if (stage === "Completed" && isCurrent) {
                 const successTpl = document.getElementById('tpl-success-box');
                 const box = successTpl.content.cloneNode(true);
                 if(hubPhone) box.querySelector('.contact-hub-btn').href = `tel:${hubPhone}`;
                 else box.querySelector('.contact-hub-btn').classList.add('hidden');
-                
                 const div = document.createElement('div'); div.appendChild(box); extraText = div.innerHTML;
             }
 
-            // Lalamove Tracking Link
+            // 3. Lalamove Link (Passive Info)
             if (stage === "Dispatched" && isCurrent && currentData.trackingUrl) {
                 extraText += `<a href="${currentData.trackingUrl}" target="_blank" class="mt-4 inline-flex items-center gap-1 text-xs font-bold text-white bg-orange-500 px-3 py-1.5 rounded hover:bg-orange-400 transition shadow-[0_0_10px_rgba(249,115,22,0.3)]">${t[currentLang].track_lala} &rarr;</a>`;
             }
@@ -245,7 +253,7 @@
         });
 
         document.getElementById('timeline-container').innerHTML = html;
-        setLang(currentLang); // Re-run translation to catch injected template text
+        setLang(currentLang); // Ensure injected templates get translated
     }
 
     async function setReturnChoice(choice, btnElement) {
@@ -258,7 +266,11 @@
             const responseData = await res.json();
             if(responseData.status === "success") {
                 currentData.outboundChoice = choice; 
-                buildTimeline(currentData.orderStatus); // Re-render timeline to swap the box
+                // Close modal
+                const modal = document.getElementById('action-modal');
+                const box = document.getElementById('action-modal-box');
+                modal.classList.add('opacity-0'); box.classList.add('scale-95');
+                setTimeout(() => { modal.classList.add('hidden'); buildTimeline(currentData.orderStatus); }, 300);
             } else throw new Error("Update failed");
         } catch (error) {
             alert("Network error. Please try again.");

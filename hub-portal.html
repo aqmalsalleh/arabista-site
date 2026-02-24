@@ -156,7 +156,8 @@
             wa_completed: "Hi {name}! Good news, your Abaya alteration (Order {id}) is completely finished! 🪡 Please click your tracker link to let us know if you'd like us to Lalamove it to you, or if you will self-pickup: {link}",
             wa_dispatch: "Hi {name}! Your Arabista alteration is complete and on its way back to you! 🪡 You can track the Lalamove rider live via your tracker page: {link}",
             nav_orders: "Orders", nav_search: "Search", nav_settings: "Settings",
-            confirm_update: "Update this order to: {status}?", confirm_dispatch: "Are you sure you want to dispatch a Lalamove rider now? This will deduct from the corporate wallet.", edit_addr_warn: "Editing Shop Address.\n\nPlease ensure this matches your exact GPS Coordinates for accurate Lalamove routing."
+            confirm_update: "Update this order to: {status}?", confirm_dispatch: "Are you sure you want to dispatch a Lalamove rider now? This will deduct from the corporate wallet.", edit_addr_warn: "Editing Shop Address.\n\nPlease ensure this matches your exact GPS Coordinates for accurate Lalamove routing.",
+            alert_action_required: "Action Required! Customer confirmed delivery choice."
         },
         bm: {
             login_title: "Portal Tukang Jahit", login_desc: "Masukkan No. Telefon dan PIN Hub anda.", lbl_phone: "No. Telefon", lbl_pin: "PIN 6-Digit", btn_login: "Log Masuk Selamat",
@@ -176,14 +177,18 @@
             wa_completed: "Hai {name}! Berita baik, alterasi Abaya anda (Order {id}) telah siap sepenuhnya! 🪡 Sila klik pautan jejak untuk beritahu jika anda mahu Lalamove atau ambil sendiri: {link}",
             wa_dispatch: "Hai {name}! Alterasi Arabista anda telah siap dan sedang dihantar kembali! 🪡 Anda boleh jejak rider Lalamove secara langsung: {link}",
             nav_orders: "Pesanan", nav_search: "Cari", nav_settings: "Tetapan",
-            confirm_update: "Kemaskini pesanan ini kepada: {status}?", confirm_dispatch: "Adakah anda pasti mahu memanggil rider Lalamove? Ini akan menolak baki wallet korporat.", edit_addr_warn: "Mengedit Alamat Kedai.\n\nPastikan ia sepadan dengan Koordinat GPS untuk routing Lalamove yang tepat."
+            confirm_update: "Kemaskini pesanan ini kepada: {status}?", confirm_dispatch: "Adakah anda pasti mahu memanggil rider Lalamove? Ini akan menolak baki wallet korporat.", edit_addr_warn: "Mengedit Alamat Kedai.\n\nPastikan ia sepadan dengan Koordinat GPS untuk routing Lalamove yang tepat.",
+            alert_action_required: "Tindakan Diperlukan! Pelanggan telah memilih cara penghantaran."
         }
     };
 
     let hubName = localStorage.getItem('arabista_hub_name') || "";
     let hubLat = ""; let hubLng = ""; let hubDays = "";
     let completedOrdersData = [];
+    
+    // Auto-Polling Variables
     let previousPendingCount = -1;
+    let previousActionMap = new Map(); // Stores the outbound status of 'Ready for Return' orders
     let pollInterval = null;
     let currentLang = 'en';
 
@@ -227,11 +232,16 @@
 
     function requestNotificationPermission() { if ("Notification" in window && Notification.permission !== "granted" && Notification.permission !== "denied") { Notification.requestPermission(); } }
 
-    function playAlert() {
+    function playAlert(type) {
         try {
-            const audio = new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3'); 
-            audio.play().catch(e => console.log("Audio autoplay blocked by browser until user interacts.", e));
-            if ("Notification" in window && Notification.permission === "granted") { new Notification("Arabista", { body: currentLang === 'bm' ? "Pesanan Baru Diterima!" : "New Alteration Order!", icon: "images/logo-88.webp" }); }
+            // Type 1: New Order (Chime), Type 2: Action Required (Ping)
+            const soundUrl = type === 1 ? 'https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3' : 'https://assets.mixkit.co/active_storage/sfx/2578/2578-preview.mp3';
+            const msg = type === 1 ? (currentLang === 'bm' ? "Pesanan Baru Diterima!" : "New Alteration Order!") : t[currentLang].alert_action_required;
+            
+            const audio = new Audio(soundUrl); 
+            audio.play().catch(e => console.log("Audio autoplay blocked.", e));
+            
+            if ("Notification" in window && Notification.permission === "granted") { new Notification("Arabista", { body: msg, icon: "images/logo-88.webp" }); }
         } catch (e) {}
     }
 
@@ -268,9 +278,26 @@
             const data = await res.json(); 
             if (!isSilent) document.getElementById('dash-loader').classList.add('hidden');
             if(data.status === "success") { 
+                // 1. Check for New Pending Orders
                 const newPendingCount = data.orders.pending.length;
-                if (previousPendingCount !== -1 && newPendingCount > previousPendingCount) { playAlert(); }
+                if (previousPendingCount !== -1 && newPendingCount > previousPendingCount) { playAlert(1); }
                 previousPendingCount = newPendingCount;
+
+                // 2. Check for Action Required (Outbound Choice Updated)
+                // Filter all current "Ready for Return" orders
+                const currentReadyOrders = (data.orders.inProgress || []).filter(o => o.status === "Ready for Return");
+                
+                // Compare with previous state
+                currentReadyOrders.forEach(o => {
+                    const prevOutbound = previousActionMap.get(o.id);
+                    // If we knew about this order before, it had NO outbound choice, and NOW it has one...
+                    if (previousActionMap.has(o.id) && !prevOutbound && o.outbound && o.outbound !== "") {
+                        playAlert(2); // Play "Ping" Action Sound
+                    }
+                    // Update map
+                    previousActionMap.set(o.id, o.outbound);
+                });
+
                 renderPending(data.orders.pending); renderActive(data.orders.inProgress.concat(data.orders.ready)); completedOrdersData = data.orders.completed || []; filterCompleted(); populateProfile(data.profile); 
             }
         } catch (e) { if (!isSilent) { alert(t[currentLang].alert_sync_fail); document.getElementById('dash-loader').classList.add('hidden'); } }
