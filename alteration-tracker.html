@@ -135,7 +135,7 @@
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
                     <span id="gps-btn-text">Detect My Location</span>
                 </button>
-                <p class="text-[10px] text-white/40 mt-2 text-center" id="gps-status">GPS signal required for accuracy.</p>
+                <p class="text-[10px] text-white/40 mt-2 text-center" id="gps-status">Please ensure you are at the delivery point.</p>
             </div>
 
             <div id="view-manual" class="hidden mb-4">
@@ -185,14 +185,14 @@
     let activeQuoteId = null;
     let currentStops = null;
     let currentLang = 'en';
-    let isIncomingOrder = false; // FLAG: True = Cust->Hub, False = Hub->Cust
+    let isIncomingOrder = false;
 
     const t = {
         en: {
             page_title: "Track Alteration", page_subtitle: "Enter your unique tracking ID below.", lbl_id: "Alteration ID", btn_track: "Track Order", txt_loading: "Locating your order details...", btn_share: "Share Link", lbl_items: "Items for Alteration:", section_status: "Tracking Status", back_home: "Back to Home",
             action_title: "Action Required", action_desc_incoming: "Your order is approved! Please arrange delivery to the Hub.", action_desc_ready: "Your items are ready! Please arrange retrieval.", btn_self_pickup: "I will Self-Pickup", btn_lalamove: "Book Lalamove Rider",
             confirmed_title: "Selection Confirmed", confirmed_lala: "Lalamove Selected.", confirmed_self: "Self-Pickup Selected.",
-            success_title: "Alteration Completed", success_desc: "Thank you for using our service.", btn_contact: "Contact Hub",
+            success_title: "Alteration Completed", success_desc: "Thank you for using our service. If you have any inquiries regarding your alteration, please contact the hub.", btn_contact: "Contact Hub",
             track_lala: "Track Lalamove Map"
         },
         bm: {
@@ -305,12 +305,30 @@
 
     // --- MODAL & GPS LOGIC ---
     function showModalStep(n) {
-        document.getElementById('action-modal').classList.remove('hidden');
+        // FIXED: Remove opacity-0 explicitly so modal appears
+        const modal = document.getElementById('action-modal');
+        const box = document.getElementById('action-modal-box');
+        
+        modal.classList.remove('hidden');
+        modal.classList.remove('opacity-0'); // <--- CRITICAL FIX
+        
         document.querySelectorAll('[id^="modal-step-"]').forEach(el => el.classList.add('hidden'));
         document.getElementById(`modal-step-${n}`).classList.remove('hidden');
-        setTimeout(() => { document.getElementById('action-modal-box').classList.remove('scale-95'); }, 10);
+        
+        setTimeout(() => { box.classList.remove('scale-95'); }, 10);
     }
-    function closeModal() { document.getElementById('action-modal').classList.add('hidden'); }
+    
+    function closeModal() { 
+        const modal = document.getElementById('action-modal');
+        const box = document.getElementById('action-modal-box');
+        
+        // Fade out
+        modal.classList.add('opacity-0');
+        box.classList.add('scale-95');
+        
+        setTimeout(() => { modal.classList.add('hidden'); }, 300); 
+    }
+
     function goToStep2() { showModalStep(2); toggleLocMethod('gps'); }
     
     // DIRECT INCOMING START
