@@ -379,9 +379,10 @@
         // 1. RENDER REQUESTS (NEW SECTION)
         const reqList = document.getElementById('list-requests'); 
         const reqIcon = document.getElementById('icon-requests');
+        const reqHeader = document.getElementById('header-requests-text'); // Get Header Element
         
         if (requests.length > 0) {
-            document.getElementById('header-requests-text').innerHTML = `${currentLang === 'bm' ? "Permintaan Baru" : "New Requests"} <span class="text-white font-bold ml-1 bg-red-500 px-2 rounded-full text-[10px] animate-pulse">${requests.length}</span>`;
+            reqHeader.innerHTML = `${currentLang === 'bm' ? "Permintaan Baru" : "New Requests"} <span class="text-white font-bold ml-1 bg-red-500 px-2 rounded-full text-[10px] animate-pulse">${requests.length}</span>`;
             reqList.classList.remove('hidden'); reqIcon.classList.remove('rotate-180');
             reqList.innerHTML = '';
             requests.forEach(o => {
@@ -400,6 +401,9 @@
                 </div>`;
             });
         } else {
+            // --- FIX: Reset Header Text to remove Red Badge ---
+            reqHeader.innerText = currentLang === 'bm' ? "Permintaan Baru (Kelulusan)" : "New Requests (Approval)";
+            
             reqList.classList.add('hidden'); reqIcon.classList.add('rotate-180');
             reqList.innerHTML = `<p class="text-white/30 text-xs text-center py-4">${t[currentLang].txt_no_requests}</p>`;
         }
