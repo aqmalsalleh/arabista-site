@@ -76,13 +76,18 @@
               </div>
               <div id="dash-loader" class="flex flex-col items-center justify-center py-10 text-white/50 text-sm hidden"><div class="loader mb-3"></div> <span data-t="txt_syncing">Syncing database...</span></div>
 
+              <button onclick="toggleSection('list-requests', 'icon-requests')" class="w-full flex justify-between items-center text-xs text-luxe uppercase tracking-widest font-bold mb-3 border-b border-luxe/20 pb-2 hover:text-white transition">
+                  <span id="header-requests-text">New Requests (Approval)</span><svg id="icon-requests" class="w-4 h-4 transform transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+              </button>
+              <div id="list-requests" class="space-y-3 mb-8 transition-all overflow-hidden"></div>
+
               <button onclick="toggleSection('list-pending', 'icon-pending')" class="w-full flex justify-between items-center text-xs text-white/40 uppercase tracking-widest font-bold mb-3 border-b border-white/10 pb-2 hover:text-white transition">
-                  <span id="header-pending-text">Expected Arrivals (Pending)</span><svg id="icon-pending" class="w-4 h-4 transform transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                  <span id="header-pending-text">Expected Arrivals</span><svg id="icon-pending" class="w-4 h-4 transform transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
               </button>
               <div id="list-pending" class="space-y-3 mb-8 transition-all overflow-hidden"></div>
 
               <button onclick="toggleSection('list-active', 'icon-active')" class="w-full flex justify-between items-center text-xs text-white/40 uppercase tracking-widest font-bold mb-3 border-b border-white/10 pb-2 hover:text-white transition">
-                  <span id="header-active-text">Currently Altering (In Progress)</span><svg id="icon-active" class="w-4 h-4 transform transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                  <span id="header-active-text">Currently Altering</span><svg id="icon-active" class="w-4 h-4 transform transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
               </button>
               <div id="list-active" class="space-y-3 transition-all overflow-hidden mb-8"></div>
 
@@ -164,8 +169,9 @@
             login_title: "Tailor Portal", login_desc: "Enter your registered Hub Phone Number and PIN.", lbl_phone: "Phone Number", lbl_pin: "6-Digit PIN", btn_login: "Login securely",
             lbl_active_hub: "Active Hub", btn_logout: "Logout",
             title_timeline: "Orders Timeline", txt_syncing: "Syncing database...",
-            header_pending: "Expected Arrivals (Pending)", header_active: "Currently Altering (In Progress)", header_completed: "Completed / Dispatched",
-            txt_no_pending: "No pending arrivals.", txt_no_active: "No active alterations.", txt_no_completed: "No completed orders in this period.",
+            header_requests: "New Requests (Approval)", header_pending: "Expected Arrivals (Pending)", header_active: "Currently Altering (In Progress)", header_completed: "Completed / Dispatched",
+            txt_no_requests: "No new requests.", txt_no_pending: "No pending arrivals.", txt_no_active: "No active alterations.", txt_no_completed: "No completed orders in this period.",
+            btn_accept: "Accept Order", btn_reject: "Reject",
             btn_mark_received: "Mark as Received", btn_mark_completed: "Mark as Completed", btn_cust_pickup: "Customer Picked Up", btn_dispatch: "Dispatch Lalamove", btn_override: "Mark as Delivered (Override)",
             btn_wait_choice: "Waiting for Customer Choice...",
             arriving: "Arriving", waiting_days: "Waiting", days: "Days",
@@ -185,8 +191,9 @@
             login_title: "Portal Tukang Jahit", login_desc: "Masukkan No. Telefon dan PIN Hub anda.", lbl_phone: "No. Telefon", lbl_pin: "PIN 6-Digit", btn_login: "Log Masuk Selamat",
             lbl_active_hub: "Hub Aktif", btn_logout: "Log Keluar",
             title_timeline: "Garis Masa Pesanan", txt_syncing: "Menyegerakkan data...",
-            header_pending: "Jangkaan Tiba (Pending)", header_active: "Sedang Dijahit (In Progress)", header_completed: "Selesai / Dihantar",
-            txt_no_pending: "Tiada ketibaan baru.", txt_no_active: "Tiada alterasi aktif.", txt_no_completed: "Tiada pesanan selesai tempoh ini.",
+            header_requests: "Permintaan Baru (Kelulusan)", header_pending: "Jangkaan Tiba (Pending)", header_active: "Sedang Dijahit (In Progress)", header_completed: "Selesai / Dihantar",
+            txt_no_requests: "Tiada permintaan baru.", txt_no_pending: "Tiada ketibaan baru.", txt_no_active: "Tiada alterasi aktif.", txt_no_completed: "Tiada pesanan selesai tempoh ini.",
+            btn_accept: "Terima Pesanan", btn_reject: "Tolak",
             btn_mark_received: "Tanda Telah Diterima", btn_mark_completed: "Tanda Telah Siap", btn_cust_pickup: "Pelanggan Dah Ambil", btn_dispatch: "Panggil Lalamove", btn_override: "Tanda Telah Dihantar (Override)",
             btn_wait_choice: "Menunggu Pilihan Pelanggan...",
             arriving: "Dalam Perjalanan", waiting_days: "Menunggu", days: "Hari",
@@ -365,19 +372,59 @@
     }
 
     function renderPending(orders) {
+        // --- SPLIT INTO "REQUESTS" (APPROVAL) vs "PENDING ARRIVALS" ---
+        const requests = orders.filter(o => o.status === "Pending Approval");
+        const arrivals = orders.filter(o => o.status === "Pending Dropoff" || o.status === "Dispatched" || o.status === "Awaiting Dispatch");
+
+        // 1. RENDER REQUESTS (NEW SECTION)
+        const reqList = document.getElementById('list-requests'); 
+        const reqIcon = document.getElementById('icon-requests');
+        
+        if (requests.length > 0) {
+            document.getElementById('header-requests-text').innerHTML = `${currentLang === 'bm' ? "Permintaan Baru" : "New Requests"} <span class="text-white font-bold ml-1 bg-red-500 px-2 rounded-full text-[10px] animate-pulse">${requests.length}</span>`;
+            reqList.classList.remove('hidden'); reqIcon.classList.remove('rotate-180');
+            reqList.innerHTML = '';
+            requests.forEach(o => {
+                reqList.innerHTML += `
+                <div class="bg-[#1A1B1E] border border-luxe/50 rounded-xl p-4 shadow-[0_0_15px_rgba(192,160,98,0.1)] relative overflow-hidden">
+                    <div class="absolute top-0 right-0 bg-luxe text-brand text-[9px] font-bold px-2 py-0.5 rounded-bl-lg uppercase">Action Required</div>
+                    <div class="mb-3">
+                        <span class="text-xs text-white/50 font-mono">${o.id}</span>
+                        <h3 class="font-bold text-lg text-white">${o.custName}</h3>
+                        <p class="text-xs text-luxe mt-1">Est. Fee: ${o.fee}</p>
+                    </div>
+                    <div class="flex gap-2">
+                        <button onclick="updateStatus('${o.id}', 'Rejected', '${o.custName}', '${o.custPhone}', '', 0, this)" class="px-4 py-2 rounded-lg border border-red-500/30 text-red-400 text-xs font-bold hover:bg-red-500/10 transition">${t[currentLang].btn_reject}</button>
+                        <button onclick="updateStatus('${o.id}', 'Awaiting Dispatch', '${o.custName}', '${o.custPhone}', '', 0, this)" class="flex-1 py-2 rounded-lg bg-green-500 text-brand text-xs font-bold hover:bg-green-400 transition shadow-soft flex justify-center items-center gap-2"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> ${t[currentLang].btn_accept}</button>
+                    </div>
+                </div>`;
+            });
+        } else {
+            reqList.classList.add('hidden'); reqIcon.classList.add('rotate-180');
+            reqList.innerHTML = `<p class="text-white/30 text-xs text-center py-4">${t[currentLang].txt_no_requests}</p>`;
+        }
+
+        // 2. RENDER PENDING ARRIVALS (EXISTING)
         const list = document.getElementById('list-pending'); const icon = document.getElementById('icon-pending');
         const headerTxt = currentLang === 'bm' ? "Jangkaan Tiba" : "Expected Arrivals";
-        document.getElementById('header-pending-text').innerHTML = `${headerTxt} <span class="text-luxe font-bold ml-1">[ ${orders.length} ]</span>`;
+        document.getElementById('header-pending-text').innerHTML = `${headerTxt} <span class="text-luxe font-bold ml-1">[ ${arrivals.length} ]</span>`;
         
-        if(orders.length === 0) { list.classList.add('hidden'); icon.classList.add('rotate-180'); list.innerHTML = `<p class="text-white/30 text-xs text-center py-4">${t[currentLang].txt_no_pending}</p>`; return; } 
+        if(arrivals.length === 0) { list.classList.add('hidden'); icon.classList.add('rotate-180'); list.innerHTML = `<p class="text-white/30 text-xs text-center py-4">${t[currentLang].txt_no_pending}</p>`; return; } 
         else { list.classList.remove('hidden'); icon.classList.remove('rotate-180'); }
-        orders.sort((a,b) => new Date(a.date) - new Date(b.date));
+        
+        arrivals.sort((a,b) => new Date(a.date) - new Date(b.date));
         list.innerHTML = '';
-        orders.forEach(o => {
+        arrivals.forEach(o => {
             const link = `${trackerBaseUrl}${o.id}`;
             const daysOld = Math.floor((new Date() - new Date(o.date)) / (1000*60*60*24));
             const ageBadge = daysOld >= 3 ? `<span class="text-[9px] bg-red-500/20 text-red-400 px-2 py-0.5 rounded shadow-sm border border-red-500/30">⏳ ${t[currentLang].waiting_days} ${daysOld} ${t[currentLang].days}</span>` : '';
-            list.innerHTML += `<div class="bg-[#1A1B1E] border border-white/5 rounded-xl p-4 shadow-sm"><div class="flex justify-between items-start mb-2"><div class="flex items-center gap-2"><span class="text-[10px] bg-white/10 px-2 py-0.5 rounded text-white/70 font-mono">${o.id}</span><span class="text-[10px] text-white/40">${formatDate(o.date)}</span>${ageBadge}</div><span class="text-xs font-bold text-orange-400">${t[currentLang].arriving}</span></div><p class="font-bold text-base text-white">${o.custName}</p><p class="text-xs text-white/50 mt-1 mb-4 whitespace-pre-line">${o.items.replace(/\[/g, '').replace(/\]/g, '')}</p><button onclick="updateStatus('${o.id}', 'In Progress', '${o.custName}', '${o.custPhone}', '${link}', 1, this)" class="w-full bg-green-500/10 text-green-400 border border-green-500/20 font-bold py-2.5 rounded-lg text-sm hover:bg-green-500/20 transition flex justify-center items-center gap-2"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> ${t[currentLang].btn_mark_received}</button></div>`;
+            
+            // Status Logic for Display
+            let statusBadge = "";
+            if (o.status === "Awaiting Dispatch") statusBadge = `<span class="text-[9px] bg-yellow-500/10 text-yellow-400 px-2 py-0.5 rounded border border-yellow-500/20">Awaiting Customer Action</span>`;
+            else if (o.status === "Dispatched") statusBadge = `<span class="text-[9px] bg-blue-500/10 text-blue-400 px-2 py-0.5 rounded border border-blue-500/20">Rider On The Way</span>`;
+
+            list.innerHTML += `<div class="bg-[#1A1B1E] border border-white/5 rounded-xl p-4 shadow-sm"><div class="flex justify-between items-start mb-2"><div class="flex items-center gap-2"><span class="text-[10px] bg-white/10 px-2 py-0.5 rounded text-white/70 font-mono">${o.id}</span><span class="text-[10px] text-white/40">${formatDate(o.date)}</span>${ageBadge}</div><span class="text-xs font-bold text-orange-400">${t[currentLang].arriving}</span></div><div class="mb-2">${statusBadge}</div><p class="font-bold text-base text-white">${o.custName}</p><p class="text-xs text-white/50 mt-1 mb-4 whitespace-pre-line">${o.items.replace(/\[/g, '').replace(/\]/g, '')}</p><button onclick="updateStatus('${o.id}', 'In Progress', '${o.custName}', '${o.custPhone}', '${link}', 1, this)" class="w-full bg-green-500/10 text-green-400 border border-green-500/20 font-bold py-2.5 rounded-lg text-sm hover:bg-green-500/20 transition flex justify-center items-center gap-2"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> ${t[currentLang].btn_mark_received}</button></div>`;
         });
     }
 
