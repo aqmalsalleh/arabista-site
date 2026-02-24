@@ -33,7 +33,7 @@
       <div class="h-14 grid grid-cols-3 items-center">
         <div class="col-span-1 flex items-center"><a href="index.html" class="font-display tracking-[0.18em] text-[14px] leading-none hover:text-luxe transition">ARABISTA</a></div>
         <div class="col-span-1 flex items-center justify-center"><a href="index.html"><img src="images/logo-88.webp" alt="Arabista logo" class="h-11 w-auto" width="88" height="88"></a></div>
-        <div class="col-span-1 flex items-center justify-end gap-3 text-sm"><a href="index.html" class="hover:text-luxe transition text-white/50">Back to Home</a></div>
+        <div class="col-span-1 flex items-center justify-end gap-3 text-sm"><a href="index.html" class="hover:text-luxe transition text-white/50" data-t="back_home">Back to Home</a></div>
       </div>
     </div>
   </header>
@@ -41,28 +41,28 @@
   <main class="pt-24 pb-20 max-w-screen-sm mx-auto px-4 sm:px-6 min-h-screen flex flex-col">
     
     <div id="search-panel" class="hidden text-center mt-10 fade-in">
-        <h1 class="font-display text-3xl mb-3">Track Alteration</h1>
-        <p class="text-white/50 text-sm mb-8">Enter your unique tracking ID below.</p>
+        <h1 class="font-display text-3xl mb-3" data-t="page_title">Track Alteration</h1>
+        <p class="text-white/50 text-sm mb-8" data-t="page_subtitle">Enter your unique tracking ID below.</p>
         <div class="bg-white/5 border border-white/10 p-6 rounded-xl text-left">
-            <label class="block text-xs text-white/70 mb-2 uppercase tracking-widest">Alteration ID</label>
+            <label class="block text-xs text-white/70 mb-2 uppercase tracking-widest" data-t="lbl_id">Alteration ID</label>
             <input type="text" id="search-input" placeholder="e.g. ALT-0226-ABCD">
-            <button id="btn-search" onclick="searchTracker()" class="w-full mt-4 bg-luxe text-brand font-bold py-3 rounded-xl hover:bg-white transition flex justify-center items-center">Track Order</button>
+            <button id="btn-search" onclick="searchTracker()" class="w-full mt-4 bg-luxe text-brand font-bold py-3 rounded-xl hover:bg-white transition flex justify-center items-center" data-t="btn_track">Track Order</button>
         </div>
     </div>
 
     <div id="loading-panel" class="hidden text-center mt-20 flex-1 flex flex-col items-center justify-center fade-in">
         <svg class="animate-spin h-8 w-8 text-luxe mx-auto mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-        <p class="text-white/50">Locating your order details...</p>
+        <p class="text-white/50" data-t="txt_loading">Locating your order details...</p>
     </div>
 
     <div id="tracker-panel" class="hidden fade-in">
         <div class="flex justify-between items-end mb-6">
             <div>
-                <p class="text-xs text-luxe uppercase tracking-widest mb-1">Order ID</p>
+                <p class="text-xs text-luxe uppercase tracking-widest mb-1" data-t="lbl_id">Order ID</p>
                 <h1 class="font-mono text-2xl font-bold" id="display-id">...</h1>
             </div>
             <button onclick="shareLink()" class="flex items-center gap-2 text-xs font-medium bg-white/10 hover:bg-white/20 border border-white/10 px-3 py-1.5 rounded transition">
-                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"></path></svg> Share Link
+                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"></path></svg> <span data-t="btn_share">Share Link</span>
             </button>
         </div>
 
@@ -70,58 +70,82 @@
             <p class="text-sm font-medium mb-1" id="display-name">...</p>
             <p class="text-xs text-white/50 mb-3" id="display-hub">Assigned to: ...</p>
             <div class="border-t border-white/10 pt-3">
-                <p class="text-xs text-white/40 mb-1">Items for Alteration:</p>
+                <p class="text-xs text-white/40 mb-1" data-t="lbl_items">Items for Alteration:</p>
                 <p class="text-sm text-white/80 whitespace-pre-line" id="display-items">...</p>
             </div>
         </div>
 
-        <h2 class="font-display text-xl mb-4">Tracking Status</h2>
+        <h2 class="font-display text-xl mb-4" data-t="section_status">Tracking Status</h2>
         
         <div class="space-y-6 relative ml-2" id="timeline-container"></div>
-
-        <div id="resolved-box" class="hidden mt-8 p-4 bg-white/5 border border-white/10 rounded-xl flex items-start gap-3 fade-in">
-            <svg class="w-5 h-5 text-luxe shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-            <div><p class="text-sm font-bold text-white mb-1">Selection Confirmed</p><p class="text-xs text-white/50" id="resolved-desc">...</p></div>
-        </div>
-
-        <div id="final-success-box" class="hidden mt-8 p-6 bg-green-500/10 border border-green-500/30 rounded-2xl text-center fade-in shadow-[0_0_20px_rgba(74,222,128,0.1)]">
-            <div class="w-14 h-14 rounded-full bg-green-500/20 text-green-400 flex items-center justify-center mx-auto mb-4">
-                <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-            </div>
-            <h3 class="text-green-400 font-bold mb-2 text-xl font-display">Alteration Completed</h3>
-            <p class="text-sm text-green-200/80 mb-6">Thank you for using our service. If you have any inquiries regarding your alteration, please contact the hub.</p>
-            <a href="#" id="contact-hub-btn" class="inline-flex justify-center items-center gap-2 px-6 py-3 rounded-xl bg-green-500 text-brand font-bold text-sm hover:bg-green-400 transition shadow-soft">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg> Contact Hub
-            </a>
-        </div>
-
     </div>
   </main>
 
-  <div id="action-modal" class="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-md hidden opacity-0 transition-opacity duration-300 px-4">
-    <div class="bg-[#111213] border border-luxe/50 rounded-2xl w-full max-w-sm p-8 transform scale-95 transition-transform duration-300 text-center shadow-[0_0_50px_rgba(192,160,98,0.1)]" id="action-modal-box">
-        <div class="w-16 h-16 rounded-full bg-luxe/20 text-luxe flex items-center justify-center mx-auto mb-5">
-            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
-        </div>
-        <h3 class="font-display text-2xl text-white mb-2">Your Items are Ready!</h3>
-        <p class="text-sm text-white/70 mb-6" id="action-modal-instruction">How would you like to receive your completed order?</p>
-        
-        <div class="space-y-3">
-            <button onclick="setReturnChoice('Lalamove', this)" class="action-btn w-full px-4 py-3.5 rounded-xl bg-luxe text-brand text-sm font-bold hover:bg-white transition shadow-soft flex justify-center items-center">Send via Lalamove</button>
-            <button onclick="setReturnChoice('Self-Pickup', this)" class="action-btn w-full px-4 py-3.5 rounded-xl border border-luxe text-luxe text-sm font-bold hover:bg-luxe/20 transition flex justify-center items-center">I will Self-Pickup</button>
-        </div>
-    </div>
-  </div>
+  <template id="tpl-action-box">
+      <div class="mt-4 p-5 bg-luxe/10 border border-luxe/30 rounded-xl text-center fade-in relative z-20">
+          <h3 class="text-luxe font-bold mb-2 text-lg font-display" data-t="action_title">Your Items are Ready!</h3>
+          <p class="text-sm text-white/80 mb-5 action-instruction">How would you like to receive your completed order?</p>
+          <div class="grid grid-cols-2 gap-3">
+              <button onclick="setReturnChoice('Self-Pickup', this)" class="action-btn px-4 py-3 rounded-xl border border-luxe text-luxe text-sm font-bold hover:bg-luxe/20 transition flex justify-center items-center" data-t="btn_self_pickup">I will Self-Pickup</button>
+              <button onclick="setReturnChoice('Lalamove', this)" class="action-btn px-4 py-3 rounded-xl bg-luxe text-brand text-sm font-bold hover:bg-white transition shadow-soft flex justify-center items-center" data-t="btn_lalamove">Send via Lalamove</button>
+          </div>
+      </div>
+  </template>
+
+  <template id="tpl-resolved-box">
+      <div class="mt-4 p-4 bg-white/5 border border-white/10 rounded-xl flex items-start gap-3 fade-in relative z-20">
+          <svg class="w-5 h-5 text-luxe shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+          <div><p class="text-sm font-bold text-white mb-1" data-t="confirmed_title">Selection Confirmed</p><p class="text-xs text-white/50 resolved-desc">...</p></div>
+      </div>
+  </template>
+
+  <template id="tpl-success-box">
+      <div class="mt-4 p-6 bg-green-500/10 border border-green-500/30 rounded-2xl text-center fade-in shadow-[0_0_20px_rgba(74,222,128,0.1)] relative z-20">
+          <div class="w-14 h-14 rounded-full bg-green-500/20 text-green-400 flex items-center justify-center mx-auto mb-4">
+              <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+          </div>
+          <h3 class="text-green-400 font-bold mb-2 text-xl font-display" data-t="success_title">Alteration Completed</h3>
+          <p class="text-sm text-green-200/80 mb-6" data-t="success_desc">Thank you for using our service. If you have any inquiries regarding your alteration, please contact the hub.</p>
+          <a href="#" class="contact-hub-btn inline-flex justify-center items-center gap-2 px-6 py-3 rounded-xl bg-green-500 text-brand font-bold text-sm hover:bg-green-400 transition shadow-soft">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg> <span data-t="btn_contact">Contact Hub</span>
+          </a>
+      </div>
+  </template>
 
   <script>
-    // --- APP SCRIPT URL ---
-    const scriptURL = 'https://script.google.com/macros/s/AKfycbyrJFfuCrhAbdwzAj8uP4sSvFuzRzzzEFV5CHOCBSOK6OGlIXPtsf7-XEfjLHGnFZiyvw/exec'; // IMPORTANT: Use deployed URL!
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbyrJFfuCrhAbdwzAj8uP4sSvFuzRzzzEFV5CHOCBSOK6OGlIXPtsf7-XEfjLHGnFZiyvw/exec'; 
     const spinnerSvg = `<svg class="animate-spin h-4 w-4 inline mr-2 text-current" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>`;
     
     let currentData = null;
     let hubPhone = "";
+    let currentLang = 'en';
+
+    const t = {
+        en: {
+            page_title: "Track Alteration", page_subtitle: "Enter your unique tracking ID below.", lbl_id: "Alteration ID", btn_track: "Track Order", txt_loading: "Locating your order details...", btn_share: "Share Link", lbl_items: "Items for Alteration:", section_status: "Tracking Status", back_home: "Back to Home",
+            action_title: "Your Items are Ready!", action_desc_free: "You are eligible for <strong>Free Return Delivery</strong>! Please select your preference.", action_desc_paid: "You may self-pickup or arrange a Lalamove (Rider will collect delivery fee from you).", btn_self_pickup: "I will Self-Pickup", btn_lalamove: "Send via Lalamove",
+            confirmed_title: "Selection Confirmed", confirmed_lala: "You selected Lalamove. The Hub will dispatch your item shortly.", confirmed_self: "You selected Self-Pickup. The Hub is awaiting your arrival.",
+            success_title: "Alteration Completed", success_desc: "Thank you for using our service. If you have any inquiries regarding your alteration, please contact the hub.", btn_contact: "Contact Hub",
+            track_lala: "Track Lalamove Map"
+        },
+        bm: {
+            page_title: "Jejak Tempahan", page_subtitle: "Masukkan ID tempahan unik anda di bawah.", lbl_id: "ID Tempahan", btn_track: "Jejak Pesanan", txt_loading: "Mencari butiran tempahan...", btn_share: "Kongsi Pautan", lbl_items: "Item untuk Diubahsuai:", section_status: "Status Terkini", back_home: "Kembali ke Utama",
+            action_title: "Baju Anda Siap!", action_desc_free: "Anda layak untuk <strong>Penghantaran Pulang Percuma</strong>! Sila pilih pilihan anda.", action_desc_paid: "Anda boleh ambil sendiri atau guna Lalamove (Rider akan ambil bayaran dari anda).", btn_self_pickup: "Saya Ambil Sendiri", btn_lalamove: "Hantar guna Lalamove",
+            confirmed_title: "Pilihan Disahkan", confirmed_lala: "Anda pilih Lalamove. Hub akan hantar barang anda sebentar lagi.", confirmed_self: "Anda pilih Ambil Sendiri. Hub sedang menunggu ketibaan anda.",
+            success_title: "Alterasi Selesai", success_desc: "Terima kasih menggunakan servis kami. Jika ada pertanyaan, sila hubungi hub.", btn_contact: "Hubungi Hub",
+            track_lala: "Jejak Peta Lalamove"
+        }
+    };
+
+    function setLang(lang) {
+        currentLang = lang;
+        document.querySelectorAll('[data-t]').forEach(el => { if(t[lang][el.getAttribute('data-t')]) el.innerHTML = t[lang][el.getAttribute('data-t')]; });
+    }
 
     document.addEventListener('DOMContentLoaded', () => {
+        const userLang = navigator.language || navigator.userLanguage;
+        if (userLang && userLang.toLowerCase().startsWith('ms')) setLang('bm'); else setLang('en');
+
         const urlParams = new URLSearchParams(window.location.search);
         const trackId = urlParams.get('id');
         if (trackId) { document.getElementById('loading-panel').classList.remove('hidden'); fetchTrackingData(trackId); } 
@@ -154,14 +178,11 @@
     function renderDashboard() {
         document.getElementById('search-panel').classList.add('hidden');
         document.getElementById('tracker-panel').classList.remove('hidden');
-        
         document.getElementById('display-id').innerText = currentData.alterationId;
         document.getElementById('display-name').innerText = currentData.customerName;
         document.getElementById('display-hub').innerText = `Assigned to: ${currentData.hubName}`;
         document.getElementById('display-items').innerText = currentData.itemDetails.replace(/\[/g, '').replace(/\]/g, '');
-
         buildTimeline(currentData.orderStatus);
-        handleActionBox();
     }
 
     function buildTimeline(status) {
@@ -175,14 +196,43 @@
         stages.forEach((stage, idx) => {
             let isPast = idx < currentIdx;
             let isCurrent = idx === currentIdx;
-            
             let isFinalStage = (stage === "Completed");
             let dotClass = isPast ? "completed" : (isCurrent ? (isFinalStage ? "completed" : "active") : "");
             let lineClass = isPast ? "active" : "";
             
             let extraText = "";
+            
+            // INJECT ACTION BOX (Ready for Return)
+            if (stage === "Ready for Return" && isCurrent) {
+                const boxTpl = document.getElementById(currentData.outboundChoice ? 'tpl-resolved-box' : 'tpl-action-box');
+                const box = boxTpl.content.cloneNode(true);
+                
+                if (!currentData.outboundChoice) {
+                    let desc = currentData.returnEligibility === "Free Return" ? t[currentLang].action_desc_free : t[currentLang].action_desc_paid;
+                    box.querySelector('.action-instruction').innerHTML = desc;
+                    // Note: Buttons auto-translate via data-t tags in the template
+                } else {
+                    let desc = currentData.outboundChoice === 'Lalamove' ? t[currentLang].confirmed_lala : t[currentLang].confirmed_self;
+                    box.querySelector('.resolved-desc').innerText = desc;
+                }
+                
+                // Hacky way to turn the fragment into string to inject into timeline flow
+                const div = document.createElement('div'); div.appendChild(box); extraText = div.innerHTML;
+            }
+
+            // INJECT SUCCESS BOX (Completed)
+            if (stage === "Completed" && isCurrent) {
+                const successTpl = document.getElementById('tpl-success-box');
+                const box = successTpl.content.cloneNode(true);
+                if(hubPhone) box.querySelector('.contact-hub-btn').href = `tel:${hubPhone}`;
+                else box.querySelector('.contact-hub-btn').classList.add('hidden');
+                
+                const div = document.createElement('div'); div.appendChild(box); extraText = div.innerHTML;
+            }
+
+            // Lalamove Tracking Link
             if (stage === "Dispatched" && isCurrent && currentData.trackingUrl) {
-                extraText = `<a href="${currentData.trackingUrl}" target="_blank" class="mt-2 inline-flex items-center gap-1 text-xs font-bold text-white bg-orange-500 px-3 py-1.5 rounded hover:bg-orange-400 transition shadow-[0_0_10px_rgba(249,115,22,0.3)]">Track Lalamove Map &rarr;</a>`;
+                extraText += `<a href="${currentData.trackingUrl}" target="_blank" class="mt-4 inline-flex items-center gap-1 text-xs font-bold text-white bg-orange-500 px-3 py-1.5 rounded hover:bg-orange-400 transition shadow-[0_0_10px_rgba(249,115,22,0.3)]">${t[currentLang].track_lala} &rarr;</a>`;
             }
 
             html += `
@@ -195,49 +245,7 @@
         });
 
         document.getElementById('timeline-container').innerHTML = html;
-
-        if (status === "Completed") {
-            document.getElementById('final-success-box').classList.remove('hidden');
-            if(hubPhone) document.getElementById('contact-hub-btn').href = `tel:${hubPhone}`;
-            else document.getElementById('contact-hub-btn').classList.add('hidden'); 
-        }
-    }
-
-    function handleActionBox() {
-        const resolvedBox = document.getElementById('resolved-box');
-        
-        if (currentData.orderStatus === "Ready for Return") {
-            if (!currentData.outboundChoice || currentData.outboundChoice === "") {
-                resolvedBox.classList.add('hidden');
-                
-                let inst = document.getElementById('action-modal-instruction');
-                if (currentData.returnEligibility === "Free Return") inst.innerHTML = "You are eligible for <strong>Free Return Delivery</strong>! Please select your preference.";
-                else inst.innerHTML = "You may self-pickup or arrange a Lalamove (Rider will collect delivery fee from you).";
-                
-                // Show Auto-Popup Modal
-                const modal = document.getElementById('action-modal');
-                const box = document.getElementById('action-modal-box');
-                modal.classList.remove('hidden');
-                setTimeout(() => { modal.classList.remove('opacity-0'); box.classList.remove('scale-95'); }, 10);
-
-            } else {
-                closeActionModal();
-                resolvedBox.classList.remove('hidden');
-                document.getElementById('resolved-desc').innerText = currentData.outboundChoice === 'Lalamove' ? "You selected Lalamove. The Hub will dispatch your item shortly." : "You selected Self-Pickup. The Hub is awaiting your arrival.";
-            }
-        } else {
-            closeActionModal();
-            resolvedBox.classList.add('hidden');
-        }
-    }
-
-    function closeActionModal() {
-        const modal = document.getElementById('action-modal');
-        const box = document.getElementById('action-modal-box');
-        if(!modal.classList.contains('hidden')) {
-            modal.classList.add('opacity-0'); box.classList.add('scale-95');
-            setTimeout(() => { modal.classList.add('hidden'); }, 300);
-        }
+        setLang(currentLang); // Re-run translation to catch injected template text
     }
 
     async function setReturnChoice(choice, btnElement) {
@@ -250,7 +258,7 @@
             const responseData = await res.json();
             if(responseData.status === "success") {
                 currentData.outboundChoice = choice; 
-                handleActionBox(); // This will auto-close the modal and show the resolved box
+                buildTimeline(currentData.orderStatus); // Re-render timeline to swap the box
             } else throw new Error("Update failed");
         } catch (error) {
             alert("Network error. Please try again.");
