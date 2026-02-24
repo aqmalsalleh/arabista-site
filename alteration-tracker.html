@@ -162,7 +162,9 @@
 
             <div id="view-manual" class="hidden mb-4">
                 <input type="text" id="manual-addr-input" placeholder="Search Building / Street..." class="mb-2">
-                <button onclick="geocodeManual()" class="w-full py-2 bg-white/10 text-white text-xs font-bold rounded-lg hover:bg-white/20 transition">Search Map</button>
+                <button onclick="geocodeManual()" id="btn-manual-search" class="w-full py-2 bg-white/10 text-white text-xs font-bold rounded-lg hover:bg-white/20 transition flex items-center justify-center">
+                    Search Map
+                </button>
                 <p class="text-[10px] text-luxe mt-2 hidden font-mono" id="manual-status">Found: ...</p>
             </div>
 
@@ -199,6 +201,7 @@
 
   <script>
     const scriptURL = 'https://script.google.com/macros/s/AKfycbyrJFfuCrhAbdwzAj8uP4sSvFuzRzzzEFV5CHOCBSOK6OGlIXPtsf7-XEfjLHGnFZiyvw/exec'; 
+    const trackerBaseUrl = 'https://aqmalsalleh.github.io/arabista-site/alteration-tracker.html?id=';
     const spinnerSvg = `<svg class="animate-spin h-4 w-4 inline mr-2 text-current" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>`;
     
     let currentData = null;
@@ -259,7 +262,12 @@
                     if(currentData.orderStatus.includes("Dropoff")) document.getElementById('hub-map-link').classList.remove('hidden');
                 }
             }
-            if (currentData.lalamoveOrderId) { fetchLiveLalamoveStatus(currentData.alterationId); }
+            // Use cached status if available, fallback to api fetch
+            if (currentData.lalamoveStatus) { 
+                 sessionStorage.setItem('lala_status_' + currentData.alterationId, currentData.lalamoveStatus);
+            } else if (currentData.lalamoveOrderId) { 
+                 fetchLiveLalamoveStatus(currentData.alterationId); 
+            }
             renderDashboard();
         } catch (error) { alert("Connection Error"); }
     }
@@ -271,6 +279,7 @@
             const data = await res.json();
             if(data.status === 'success' && data.lalamove_status) {
                 currentData.lalamoveStatus = data.lalamove_status;
+                sessionStorage.setItem('lala_status_' + trackId, data.lalamove_status);
                 renderDashboard();
             }
         } catch(e) {}
@@ -290,7 +299,8 @@
         let stages = ["Pending Dropoff", "Pending Approval", "Awaiting Dispatch", "In Progress", "Ready for Return", "Dispatched", "Completed"];
         
         // DYNAMIC TIMELINE LOGIC
-        if (status === "Dispatched" && (!currentData.outboundChoice || currentData.outboundChoice === "")) {
+        // If dispatched but no outbound preference OR direction is Inbound, it means it's INCOMING
+        if (status === "Dispatched" && ((!currentData.outboundChoice || currentData.outboundChoice === "") || currentData.logisticsDirection === "Inbound")) {
              stages = ["Pending Approval", "Awaiting Dispatch", "Dispatched", "In Progress", "Ready for Return", "Completed"];
         } else if (currentData.outboundChoice === "Self-Pickup") {
              stages = ["Pending Dropoff", "Pending Approval", "In Progress", "Ready for Return", "Completed"];
@@ -336,10 +346,13 @@
 
             // 3. TRACKING LINK & BAR
             if (stage === "Dispatched" && isCurrent) {
+                // Use cached status first to avoid flicker
+                const displayStatus = currentData.lalamoveStatus || sessionStorage.getItem('lala_status_' + currentData.alterationId) || 'ASSIGNING_DRIVER';
+                
                 extraText += `<div class="mt-4 bg-white/5 rounded-lg p-3 border border-white/10">
                     <p class="text-[10px] text-white/40 uppercase tracking-widest mb-3">Lalamove Live Status</p>
                     <div class="flex justify-between items-center text-center">
-                        ${renderLalamoveSteps(currentData.lalamoveStatus || 'ASSIGNING_DRIVER')}
+                        ${renderLalamoveSteps(displayStatus)}
                     </div>
                     ${currentData.trackingUrl ? `<a href="${currentData.trackingUrl}" target="_blank" class="mt-4 block w-full text-center text-xs font-bold text-brand bg-luxe py-2 rounded hover:bg-white transition">${t[currentLang].track_lala} →</a>` : ''}
                 </div>`;
@@ -389,13 +402,13 @@
         else { document.getElementById('view-manual').classList.remove('hidden'); document.getElementById('view-gps').classList.add('hidden'); }
     }
     
-    // REVERSE GEOCODING (Display GPS Address) - UPDATED WITH PULSE
+    // REVERSE GEOCODING - UPDATED PULSE LOGIC
     function getGPS() {
         if(!navigator.geolocation) return alert("Geo not supported");
         
         // START LOADING UI
         const btn = document.getElementById('btn-get-gps');
-        const originalText = btn.innerHTML;
+        const originalText = "Detect My Location"; // Reset text context
         btn.innerHTML = `<svg class="animate-spin h-4 w-4 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Locating Satellite...`;
         btn.classList.add('animate-pulse', 'bg-luxe/20');
         btn.disabled = true;
@@ -424,10 +437,24 @@
         });
     }
     
+    // GEOCODE MANUAL - UPDATED PULSE LOGIC
     async function geocodeManual() {
         const addr = document.getElementById('manual-addr-input').value;
+        const btn = document.getElementById('btn-manual-search');
+        
+        // LOADING UI
+        btn.innerHTML = `<svg class="animate-spin h-3 w-3 mr-2" viewBox="0 0 24 24" fill="none"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Searching...`;
+        btn.classList.add('animate-pulse');
+        btn.disabled = true;
+
         const res = await fetch(`${scriptURL}?action=geocode&address=${encodeURIComponent(addr)}`);
         const data = await res.json();
+        
+        // RESET UI
+        btn.innerHTML = "Search Map";
+        btn.classList.remove('animate-pulse');
+        btn.disabled = false;
+
         if(data.lat) { 
             custData.lat = data.lat; custData.lng = data.lng; 
             const stat = document.getElementById('manual-status');
@@ -505,7 +532,7 @@
         } catch(e) { alert("Error"); }
     }
     
-    function setReturnChoice(choice) { fetch(scriptURL, { method: 'POST', body: JSON.stringify({ action: "update_outbound", alteration_id: currentData.alterationId, outbound_choice: choice }) }).then(()=>window.location.reload()); }
+    function setReturnChoice(choice) { fetch(scriptURL, { method: 'POST', body: JSON.stringify({ action: "update_outbound", alteration_id: currentData.alterationId, outbound_choice: "Lalamove" }) }).then(()=>window.location.reload()); }
     function shareLink() { navigator.clipboard.writeText(window.location.href); alert("Copied!"); }
   </script>
 </body>
