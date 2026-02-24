@@ -420,15 +420,17 @@
         
         const list = document.getElementById('hub-list'); list.innerHTML = '';
         filteredHubs.forEach(h => {
-            const isFull = h.backlog >= h.max_capacity; 
+            const isFull = h.backlog >= h.max_capacity; // CAPACITY CHECK
             const isSelected = state.hubId === h.id; 
             const status = checkHubStatus(h);
             
+            // Dynamic Badges
             const badgeCls = isFull ? "text-red-400 bg-red-500/10" : (status.isOpen ? "text-green-400 bg-green-500/10" : "text-red-400 bg-red-500/10");
             const badgeText = isFull ? "🔴 BUSY / FULL" : status.text;
             
+            // Dynamic Card Classes
             const cardClasses = `p-3 rounded-lg border transition flex justify-between items-center gap-3 ${isFull ? 'border-white/5 opacity-50 cursor-not-allowed bg-black/40' : (isSelected ? 'border-luxe bg-luxe/10 hover:bg-white/5 cursor-pointer' : 'border-white/10 opacity-70 hover:bg-white/5 cursor-pointer')}`;
-            const onClickAttr = isFull ? '' : `onclick="selectHub(${h.id}, ${h.dist}, ${h.fee}, ${h.lat}, ${h.lng})"` 
+            const onClickAttr = isFull ? '' : `onclick="selectHub(${h.id}, ${h.dist}, ${h.fee}, ${h.lat}, ${h.lng})"` // PASSED COORDS
 
             let lalamoveHtml = '';
             if(state.mode === 'lalamove') lalamoveHtml = `<div class="mt-1 text-[10px] text-white/40" data-t="txt_return_paid">${t[currentLang].txt_return_paid}</div>`;
@@ -439,7 +441,9 @@
     
     function selectHub(id, dist, fee, hLat, hLng) { 
         state.hubId = id; state.hubDist = dist; 
+        // Save Hub Coords for API
         state.hubLat = hLat; state.hubLng = hLng;
+        
         renderHubs(); updateDispatchUI(); calculateTotal(); checkStep3Complete(); 
     }
     
@@ -468,11 +472,15 @@
         } else {
             // LALAMOVE LOGIC
             wPanel.classList.add('hidden'); lPanel.classList.remove('hidden');
-            lPanel.innerHTML = `<div class="flex justify-between items-center mb-2"><span class="text-sm text-orange-200">${t[currentLang].label_del_fee}</span><span class="font-bold text-white animate-pulse" id="lala-price-disp">${t[currentLang].txt_calculating}</span></div>`;
+            const priceDisp = document.getElementById('lala-price-disp');
+            // DEBUG MODE: REPLACED GENERIC "Error" WITH EXACT MESSAGE
+            priceDisp.innerHTML = `${t[currentLang].txt_calculating}`;
+            priceDisp.classList.add('animate-pulse');
             
             // FETCH REAL QUOTE
             if (state.lat && state.lng && state.hubLat && state.hubLng) {
                 try {
+                    // FIXED: Now sends FULL address details to prevent geocoding errors
                     const custAddress = state.unitNo ? `${state.unitNo}, ${document.getElementById('final-address').innerText}` : "Customer Location";
                     const payload = {
                         action: "get_lalamove_quote",
@@ -488,17 +496,35 @@
                     
                     if(data.status === "success") {
                         state.deliveryCost = parseFloat(data.amount);
-                        document.getElementById('lala-price-disp').innerText = `RM ${state.deliveryCost.toFixed(2)}`;
-                        document.getElementById('lala-price-disp').classList.remove('animate-pulse');
+                        priceDisp.innerText = `RM ${state.deliveryCost.toFixed(2)}`;
+                        priceDisp.classList.remove('animate-pulse');
                         
                         // Free Return Check
                         let badge = "";
                         if (state.deliveryCost < 10) badge = `<div class="mt-2 text-[10px] font-bold text-green-400 bg-green-500/10 inline-block px-1.5 py-0.5 rounded border border-green-500/20">${t[currentLang].badge_free_return}</div>`;
-                        lPanel.innerHTML += badge;
+                        lPanel.innerHTML = `<div class="flex justify-between items-center mb-2"><span class="text-sm text-orange-200">${t[currentLang].label_del_fee}</span><span class="font-bold text-white" id="lala-price-disp">RM ${state.deliveryCost.toFixed(2)}</span></div>${badge}`;
                     } else {
-                        document.getElementById('lala-price-disp').innerText = "Error";
+                        // DEBUG MODE: Display the actual error message
+                        console.error("Lalamove Error:", data);
+                        let errMsg = "Fee Error";
+                        // Attempt to extract helpful error text
+                        if(data.message) {
+                             if(data.message.includes("OUT_OF_SERVICE")) errMsg = "Out of Area";
+                             else if(data.message.includes("API Keys")) errMsg = "Keys Missing";
+                             else if(data.message.includes("401")) errMsg = "Auth Fail";
+                             else errMsg = "API Error"; // Keep short for UI
+                        }
+                        priceDisp.innerText = errMsg;
+                        priceDisp.classList.remove('animate-pulse');
+                        priceDisp.classList.add('text-red-400');
+                        // ALERT FULL DEBUG MESSAGE FOR DEVELOPER
+                        alert("Lalamove API Debug:\n" + JSON.stringify(data.message || data));
                     }
-                } catch(e) { document.getElementById('lala-price-disp').innerText = "Error"; }
+                } catch(e) { 
+                    console.error(e);
+                    priceDisp.innerText = "Net Err"; 
+                    priceDisp.classList.remove('animate-pulse');
+                }
             }
             state.logisticsSchedule = "Immediate (Lalamove)";
         }
