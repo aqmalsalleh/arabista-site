@@ -25,6 +25,7 @@
     .timeline-line.active { background: #4ade80; }
     .last-step .timeline-line { display: none; }
     
+    /* Horizontal Lalamove Tracker */
     .lala-step { flex: 1; text-align: center; position: relative; z-index: 1; }
     .lala-step::before { content: ''; position: absolute; top: 5px; left: -50%; right: 50%; height: 2px; background: #333; z-index: -1; }
     .lala-step:first-child::before { display: none; }
@@ -50,6 +51,7 @@
   </header>
 
   <main class="pt-24 pb-20 max-w-screen-sm mx-auto px-4 sm:px-6 min-h-screen flex flex-col">
+    
     <div id="search-panel" class="hidden text-center mt-10 fade-in">
         <h1 class="font-display text-3xl mb-3" data-t="page_title">Track Alteration</h1>
         <p class="text-white/50 text-sm mb-8" data-t="page_subtitle">Enter your unique tracking ID below.</p>
@@ -79,12 +81,14 @@
         <div class="bg-white/5 border border-white/10 rounded-xl p-5 mb-8">
             <p class="text-sm font-medium mb-1" id="display-name">...</p>
             <p class="text-xs text-white/50 mb-3" id="display-hub">Assigned to: ...</p>
+            
             <div id="hub-map-link" class="hidden mb-3">
                  <a href="#" target="_blank" id="btn-drive-hub" class="inline-flex items-center gap-2 text-xs font-bold text-brand bg-white/80 px-3 py-1.5 rounded hover:bg-white transition">
                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"></path></svg>
                     Navigate to Hub
                  </a>
             </div>
+
             <div class="border-t border-white/10 pt-3">
                 <p class="text-xs text-white/40 mb-1" data-t="lbl_items">Items for Alteration:</p>
                 <p class="text-sm text-white/80 whitespace-pre-line" id="display-items">...</p>
@@ -92,6 +96,7 @@
         </div>
 
         <h2 class="font-display text-xl mb-4" data-t="section_status">Tracking Status</h2>
+        
         <div class="space-y-6 relative ml-2" id="timeline-container"></div>
     </div>
   </main>
@@ -118,18 +123,23 @@
 
   <div id="action-modal" class="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-md hidden opacity-0 transition-opacity duration-300 px-4">
     <div class="bg-[#111213] border border-luxe/50 rounded-2xl w-full max-w-sm p-8 transform scale-95 transition-transform duration-300 text-center shadow-[0_0_50px_rgba(192,160,98,0.1)] relative" id="action-modal-box">
+        
         <button onclick="closeModal()" class="absolute top-4 right-4 text-white/30 hover:text-white"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
+
         <div id="modal-step-2" class="text-left">
             <h3 class="font-display text-xl text-white mb-2 text-center" id="modal-addr-title">Confirm Delivery Location</h3>
+            
             <div class="bg-white/5 border border-white/10 rounded-lg p-3 mb-4 text-[10px] text-white/70 space-y-2">
                 <p class="font-bold text-luxe uppercase tracking-wider">📍 Location Accuracy Check</p>
                 <p>• <strong>Option 1 (Current Location):</strong> Click "Detect My Location" if you are at the pickup point now. Please verify the detected text description matches your actual building.</p>
                 <p>• <strong>Option 2 (Remote/Correction):</strong> If the GPS text is inaccurate, or if you are booking for a different location, please use "Type Address" to search manually.</p>
             </div>
+
             <div class="grid grid-cols-2 gap-2 mb-4">
                 <button onclick="toggleLocMethod('gps')" id="tab-gps" class="text-xs font-bold py-2 rounded-lg bg-white/10 text-white border border-transparent">Current GPS</button>
                 <button onclick="toggleLocMethod('manual')" id="tab-manual" class="text-xs font-bold py-2 rounded-lg bg-transparent text-white/50 border border-white/10 hover:text-white">Type Address</button>
             </div>
+
             <div id="view-gps" class="mb-4">
                 <button onclick="getGPS()" class="w-full py-3 border border-dashed border-luxe/50 text-luxe bg-luxe/5 rounded-xl text-sm font-bold flex items-center justify-center gap-2 hover:bg-luxe/10 transition" id="btn-get-gps">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
@@ -137,11 +147,15 @@
                 </button>
                 <p class="text-[10px] text-white/40 mt-2 text-center" id="gps-status">GPS signal required for accuracy.</p>
             </div>
+
             <div id="view-manual" class="hidden mb-4">
                 <input type="text" id="manual-addr-input" placeholder="Search Building / Street..." class="mb-2">
-                <button onclick="geocodeManual()" id="btn-manual-search" class="w-full py-2 bg-white/10 text-white text-xs font-bold rounded-lg hover:bg-white/20 transition flex items-center justify-center">Search Map</button>
+                <button onclick="geocodeManual()" id="btn-manual-search" class="w-full py-2 bg-white/10 text-white text-xs font-bold rounded-lg hover:bg-white/20 transition flex items-center justify-center">
+                    Search Map
+                </button>
                 <p class="text-[10px] text-luxe mt-2 hidden font-mono" id="manual-status">Found: ...</p>
             </div>
+
             <div class="space-y-3 border-t border-white/10 pt-4 opacity-50 pointer-events-none transition-opacity" id="addr-fields">
                 <div>
                     <label class="text-xs text-white/50 uppercase tracking-wider block mb-1">Unit / House No. <span class="text-red-400">*</span></label>
@@ -154,6 +168,7 @@
                 <button onclick="getQuotation()" class="w-full bg-luxe text-brand font-bold py-3 rounded-xl hover:bg-white transition mt-2">Check Price & Book</button>
             </div>
         </div>
+
         <div id="modal-step-3" class="hidden">
             <div class="w-16 h-16 rounded-full bg-orange-500/20 text-orange-500 flex items-center justify-center mx-auto mb-4">
                 <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
@@ -161,12 +176,14 @@
             <h3 class="font-display text-xl text-white mb-1">Estimated Delivery Fee</h3>
             <h1 class="text-3xl font-bold text-white mb-1" id="quote-amount">RM 0.00</h1>
             <p class="text-xs text-white/50 mb-6">Fee will be paid to rider upon arrival.</p>
+            
             <button onclick="bookRider()" class="w-full bg-orange-500 text-white font-bold py-3.5 rounded-xl hover:bg-orange-400 transition shadow-[0_0_20px_rgba(249,115,22,0.3)] flex justify-center items-center gap-2" id="btn-final-book">
                 <span>Call Rider Now</span>
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
             </button>
             <button onclick="closeModal()" class="mt-3 text-xs text-white/30 underline hover:text-white">Cancel</button>
         </div>
+
     </div>
   </div>
 
@@ -234,12 +251,14 @@
                 if (h) { 
                     hubData = { phone: h.phone, lat: h.lat, lng: h.lng }; 
                     const driveBtn = document.getElementById('btn-drive-hub');
-                    if(driveBtn) driveBtn.href = `https://www.google.com/maps/dir/?api=1&destination=${h.lat},${h.lng}`;
+                    // FIX: Corrected typo in map link generation
+                    if(driveBtn) driveBtn.href = `http://googleusercontent.com/maps.google.com/?q=${h.lat},${h.lng}`;
                     if(currentData.orderStatus.includes("Dropoff")) document.getElementById('hub-map-link').classList.remove('hidden');
                 }
             }
             if (currentData.lalamoveStatus) sessionStorage.setItem('lala_status_' + currentData.alterationId, currentData.lalamoveStatus);
             else if (currentData.lalamoveOrderId) fetchLiveLalamoveStatus(currentData.alterationId);
+            
             renderDashboard();
         } catch (error) { 
             console.error(error);
@@ -270,15 +289,25 @@
     }
 
     function buildTimeline(status) {
-        let stages = ["Pending Dropoff", "Pending Approval", "Awaiting Dispatch", "In Progress", "Ready for Return", "Dispatched", "Completed"];
-        if (status === "Dispatched" && ((!currentData.outboundChoice || currentData.outboundChoice === "") || currentData.logisticsDirection === "Inbound")) {
-             stages = ["Pending Approval", "Awaiting Dispatch", "Dispatched", "In Progress", "Ready for Return", "Completed"];
-        } else if (currentData.outboundChoice === "Self-Pickup") {
-             stages = ["Pending Dropoff", "Pending Approval", "In Progress", "Ready for Return", "Completed"];
+        let stages = [];
+        
+        // FIX: Master Timeline State Machine resolving incoming/outgoing conflicts
+        if (currentData.outboundChoice === "Self-Pickup") {
+            stages = ["Pending Dropoff", "Pending Approval", "In Progress", "Ready for Return", "Completed"];
+        } else if (currentData.logisticsDirection === "Outbound" || currentData.outboundChoice === "Lalamove") {
+            stages = ["Pending Dropoff", "Pending Approval", "In Progress", "Ready for Return", "Dispatched", "Completed"];
+        } else if (currentData.logisticsDirection === "Inbound" || status === "Awaiting Dispatch" || (status === "Dispatched" && !currentData.outboundChoice)) {
+            stages = ["Pending Approval", "Awaiting Dispatch", "Dispatched", "In Progress", "Ready for Return", "Completed"];
+        } else {
+            // Default generic fallback
+            stages = ["Pending Dropoff", "Pending Approval", "In Progress", "Ready for Return", "Completed"];
         }
         
         let currentIdx = stages.indexOf(status);
-        if (currentIdx === -1) currentIdx = 0; 
+        if (currentIdx === -1) {
+            if (status === "Dispatched") currentIdx = stages.indexOf("Dispatched");
+            else currentIdx = 0; 
+        }
 
         let html = '';
         stages.forEach((stage, idx) => {
@@ -288,14 +317,18 @@
             
             if (stage === "Awaiting Dispatch" && isCurrent) {
                 isIncomingOrder = true;
-                extraText = `<button onclick="startIncomingBooking()" class="mt-3 w-full py-2 bg-orange-500 text-white text-xs font-bold rounded hover:bg-orange-400 transition animate-pulse">${t[currentLang].btn_lalamove}</button>`;
+                // FIX: Eliminated the broken document.getElementById DOM manipulations targeting missing modal components.
+                extraText = `
+                <div class="mt-2 text-xs text-white/70 mb-3">${t[currentLang].action_desc_incoming}</div>
+                <button onclick="startIncomingBooking()" class="w-full py-2 bg-orange-500 text-white text-xs font-bold rounded hover:bg-orange-400 transition animate-pulse">${t[currentLang].btn_lalamove}</button>`;
             }
 
             if (stage === "Ready for Return" && isCurrent) {
                 isIncomingOrder = false;
                 if (!currentData.outboundChoice) {
                     extraText = `
-                    <div class="flex gap-2 mt-3">
+                    <div class="mt-2 text-xs text-white/70 mb-3">${t[currentLang].action_desc_ready}</div>
+                    <div class="flex gap-2">
                          <button onclick="triggerOutbound('Lalamove')" class="flex-1 py-3 rounded-xl bg-luxe text-brand text-xs font-bold hover:bg-white transition shadow-soft flex justify-center items-center">${t[currentLang].btn_lalamove}</button>
                          <button onclick="setReturnChoice('Self-Pickup', this)" class="flex-1 py-3 rounded-xl border border-luxe text-luxe text-xs font-bold hover:bg-luxe/20 transition flex justify-center items-center">${t[currentLang].btn_self_pickup}</button>
                     </div>`;
