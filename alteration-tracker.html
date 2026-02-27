@@ -45,7 +45,13 @@
       <div class="h-14 grid grid-cols-3 items-center">
         <div class="col-span-1 flex items-center"><a href="index.html" class="font-display tracking-[0.18em] text-[14px] leading-none hover:text-luxe transition">ARABISTA</a></div>
         <div class="col-span-1 flex items-center justify-center"><a href="index.html"><img src="images/logo-88.webp" alt="Arabista logo" class="h-11 w-auto" width="88" height="88"></a></div>
-        <div class="col-span-1 flex items-center justify-end gap-3 text-sm"><a href="index.html" class="hover:text-luxe transition text-white/50" data-t="back_home">Back to Home</a></div>
+        <div class="col-span-1 flex items-center justify-end gap-3 text-sm">
+            <div class="flex items-center gap-2 border border-white/20 rounded-lg px-2 py-1 h-8">
+                <button onclick="setLang('en')" id="lang-en" class="text-xs font-bold text-luxe">EN</button>
+                <span class="text-white/20 text-[10px]">|</span>
+                <button onclick="setLang('bm')" id="lang-bm" class="text-xs text-white/50 hover:text-white transition">BM</button>
+            </div>
+        </div>
       </div>
     </div>
   </header>
@@ -85,7 +91,7 @@
             <div id="hub-map-link" class="hidden mb-3">
                  <a href="#" target="_blank" id="btn-drive-hub" class="inline-flex items-center gap-2 text-xs font-bold text-brand bg-white/80 px-3 py-1.5 rounded hover:bg-white transition">
                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"></path></svg>
-                    Navigate to Hub
+                    <span data-t="btn_nav_hub">Navigate to Hub</span>
                  </a>
             </div>
 
@@ -130,42 +136,49 @@
             <h3 class="font-display text-xl text-white mb-2 text-center" id="modal-addr-title">Confirm Delivery Location</h3>
             
             <div class="bg-white/5 border border-white/10 rounded-lg p-3 mb-4 text-[10px] text-white/70 space-y-2">
-                <p class="font-bold text-luxe uppercase tracking-wider">📍 Location Accuracy Check</p>
-                <p>• <strong>Option 1 (Current Location):</strong> Click "Detect My Location" if you are at the pickup point now. Please verify the detected text description matches your actual building.</p>
-                <p>• <strong>Option 2 (Remote/Correction):</strong> If the GPS text is inaccurate, or if you are booking for a different location, please use "Type Address" to search manually.</p>
+                <p class="font-bold text-luxe uppercase tracking-wider">📍 <span data-t="txt_accuracy_check">Location Accuracy Check</span></p>
+                <p>• <span data-t="txt_opt_1"><strong>Option 1:</strong> Use the "Original Address" if it perfectly matches your location.</span></p>
+                <p>• <span data-t="txt_opt_2"><strong>Option 2:</strong> Detect new GPS or Search Map if you are at a different location.</span></p>
             </div>
 
-            <div class="grid grid-cols-2 gap-2 mb-4">
-                <button onclick="toggleLocMethod('gps')" id="tab-gps" class="text-xs font-bold py-2 rounded-lg bg-white/10 text-white border border-transparent">Current GPS</button>
-                <button onclick="toggleLocMethod('manual')" id="tab-manual" class="text-xs font-bold py-2 rounded-lg bg-transparent text-white/50 border border-white/10 hover:text-white">Type Address</button>
+            <div class="grid grid-cols-3 gap-2 mb-4 bg-black/50 p-1 rounded-xl border border-white/10" id="address-tabs">
+                <button onclick="toggleLocMethod('orig')" id="tab-orig" class="text-[10px] font-bold py-2 rounded-lg bg-white/10 text-white transition">Original</button>
+                <button onclick="toggleLocMethod('gps')" id="tab-gps" class="text-[10px] font-bold py-2 rounded-lg bg-transparent text-white/50 hover:text-white transition">GPS</button>
+                <button onclick="toggleLocMethod('manual')" id="tab-manual" class="text-[10px] font-bold py-2 rounded-lg bg-transparent text-white/50 hover:text-white transition">Manual</button>
             </div>
 
-            <div id="view-gps" class="mb-4">
+            <div id="view-orig" class="mb-4">
+                <p class="text-[10px] text-white/40 mb-1" data-t="txt_use_orig">Use the address you provided during the initial booking.</p>
+                <div class="p-3 bg-white/5 border border-white/10 rounded-xl text-sm text-white/90 mb-3 font-medium whitespace-pre-wrap" id="orig-addr-text">...</div>
+                <button onclick="getQuotation('orig')" class="w-full bg-luxe text-brand font-bold py-3 rounded-xl hover:bg-white transition mt-2 shadow-soft" data-t="btn_check_book">Check Price & Book</button>
+            </div>
+
+            <div id="view-gps" class="mb-4 hidden">
                 <button onclick="getGPS()" class="w-full py-3 border border-dashed border-luxe/50 text-luxe bg-luxe/5 rounded-xl text-sm font-bold flex items-center justify-center gap-2 hover:bg-luxe/10 transition" id="btn-get-gps">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
-                    <span id="gps-btn-text">Detect My Location</span>
+                    <span id="gps-btn-text" data-t="btn_detect_loc">Detect My Location</span>
                 </button>
-                <p class="text-[10px] text-white/40 mt-2 text-center" id="gps-status">GPS signal required for accuracy.</p>
+                <p class="text-[10px] text-white/40 mt-2 text-center" id="gps-status" data-t="txt_gps_signal">GPS signal required for accuracy.</p>
             </div>
 
             <div id="view-manual" class="hidden mb-4">
                 <input type="text" id="manual-addr-input" placeholder="Search Building / Street..." class="mb-2">
-                <button onclick="geocodeManual()" id="btn-manual-search" class="w-full py-2 bg-white/10 text-white text-xs font-bold rounded-lg hover:bg-white/20 transition flex items-center justify-center">
+                <button onclick="geocodeManual()" id="btn-manual-search" class="w-full py-2 bg-white/10 text-white text-xs font-bold rounded-lg hover:bg-white/20 transition flex items-center justify-center" data-t="btn_search_map">
                     Search Map
                 </button>
                 <p class="text-[10px] text-luxe mt-2 hidden font-mono" id="manual-status">Found: ...</p>
             </div>
 
-            <div class="space-y-3 border-t border-white/10 pt-4 opacity-50 pointer-events-none transition-opacity" id="addr-fields">
+            <div class="space-y-3 border-t border-white/10 pt-4 opacity-50 pointer-events-none transition-opacity hidden" id="addr-fields">
                 <div>
-                    <label class="text-xs text-white/50 uppercase tracking-wider block mb-1">Unit / House No. <span class="text-red-400">*</span></label>
+                    <label class="text-xs text-white/50 uppercase tracking-wider block mb-1" data-t="lbl_unit">Unit / House No. <span class="text-red-400">*</span></label>
                     <input type="text" id="input-unit" placeholder="e.g. Unit 15-2 or House 40">
                 </div>
                 <div>
-                    <label class="text-xs text-white/50 uppercase tracking-wider block mb-1">Building / Street (Optional)</label>
+                    <label class="text-xs text-white/50 uppercase tracking-wider block mb-1" data-t="lbl_building">Building / Street (Optional)</label>
                     <input type="text" id="input-building" placeholder="e.g. Galaxy Apartments">
                 </div>
-                <button onclick="getQuotation()" class="w-full bg-luxe text-brand font-bold py-3 rounded-xl hover:bg-white transition mt-2">Check Price & Book</button>
+                <button onclick="getQuotation('new')" class="w-full bg-luxe text-brand font-bold py-3 rounded-xl hover:bg-white transition mt-2" data-t="btn_check_book">Check Price & Book</button>
             </div>
         </div>
 
@@ -173,15 +186,15 @@
             <div class="w-16 h-16 rounded-full bg-orange-500/20 text-orange-500 flex items-center justify-center mx-auto mb-4">
                 <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
             </div>
-            <h3 class="font-display text-xl text-white mb-1">Estimated Delivery Fee</h3>
+            <h3 class="font-display text-xl text-white mb-1" data-t="modal_est_fee">Estimated Delivery Fee</h3>
             <h1 class="text-3xl font-bold text-white mb-1" id="quote-amount">RM 0.00</h1>
-            <p class="text-xs text-white/50 mb-6">Fee will be paid to rider upon arrival.</p>
+            <p class="text-xs text-orange-300 font-bold mb-6 bg-orange-500/10 p-2 rounded inline-block border border-orange-500/20" data-t="txt_pay_cash">Pay Cash directly to the Lalamove Rider.</p>
             
             <button onclick="bookRider()" class="w-full bg-orange-500 text-white font-bold py-3.5 rounded-xl hover:bg-orange-400 transition shadow-[0_0_20px_rgba(249,115,22,0.3)] flex justify-center items-center gap-2" id="btn-final-book">
-                <span>Call Rider Now</span>
+                <span data-t="btn_call_rider">Call Rider Now</span>
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
             </button>
-            <button onclick="closeModal()" class="mt-3 text-xs text-white/30 underline hover:text-white">Cancel</button>
+            <button onclick="closeModal()" class="mt-3 text-xs text-white/30 underline hover:text-white" data-t="btn_cancel">Cancel</button>
         </div>
 
     </div>
@@ -199,34 +212,53 @@
     let currentStops = null;
     let currentLang = 'en';
     let isIncomingOrder = false; 
+    let syncInterval = null; // V6.0: Auto refresh
 
     const t = {
         en: {
-            page_title: "Track Alteration", page_subtitle: "Enter your unique tracking ID below.", lbl_id: "Alteration ID", btn_track: "Track Order", txt_loading: "Locating your order details...", btn_share: "Share Link", lbl_items: "Items for Alteration:", section_status: "Tracking Status", back_home: "Back to Home",
+            page_title: "Track Alteration", page_subtitle: "Enter your unique tracking ID below.", lbl_id: "Alteration ID", btn_track: "Track Order", txt_loading: "Locating your order details...", btn_share: "Share Link", lbl_items: "Items for Alteration:", section_status: "Tracking Status", back_home: "Back to Home", btn_nav_hub: "Navigate to Hub",
             action_title: "Action Required", action_desc_incoming: "Your order is approved! Please arrange delivery to the Hub.", action_desc_ready: "Your items are ready! Please arrange retrieval.", btn_self_pickup: "I will Self-Pickup", btn_lalamove: "Book Lalamove Rider",
             confirmed_title: "Selection Confirmed", confirmed_lala: "Lalamove Selected.", confirmed_self: "Self-Pickup Selected.",
             success_title: "Alteration Completed", success_desc: "Thank you for using our service. If you have any inquiries regarding your alteration, please contact the hub.", btn_contact: "Contact Hub",
-            track_lala: "Track Lalamove Map"
+            track_lala: "Track Lalamove Map", btn_cancel_rider: "Cancel Lalamove Booking", confirm_cancel_rider: "Are you sure you want to cancel the rider? This action cannot be undone.", txt_canceling: "Canceling...",
+            txt_accuracy_check: "Location Accuracy Check", txt_opt_1: "<strong>Option 1:</strong> Use the 'Original Address' if it matches your location perfectly.", txt_opt_2: "<strong>Option 2:</strong> Detect new GPS or Search Map if you are at a different location.",
+            txt_use_orig: "Use the address you provided during the initial booking.", btn_check_book: "Check Price & Book", btn_detect_loc: "Detect My Location", txt_gps_signal: "GPS signal required for accuracy.", btn_search_map: "Search Map", lbl_unit: "Unit / House No.", lbl_building: "Building / Street (Optional)", modal_est_fee: "Estimated Delivery Fee", txt_pay_cash: "Pay Cash directly to the Lalamove Rider.", btn_call_rider: "Call Rider Now", btn_cancel: "Cancel"
         },
         bm: {
-            page_title: "Jejak Tempahan", page_subtitle: "Masukkan ID tempahan unik anda di bawah.", lbl_id: "ID Tempahan", btn_track: "Jejak Pesanan", txt_loading: "Mencari butiran tempahan...", btn_share: "Kongsi Pautan", lbl_items: "Item untuk Diubahsuai:", section_status: "Status Terkini", back_home: "Kembali ke Utama",
+            page_title: "Jejak Tempahan", page_subtitle: "Masukkan ID tempahan unik anda di bawah.", lbl_id: "ID Tempahan", btn_track: "Jejak Pesanan", txt_loading: "Mencari butiran tempahan...", btn_share: "Kongsi Pautan", lbl_items: "Item untuk Diubahsuai:", section_status: "Status Terkini", back_home: "Kembali ke Utama", btn_nav_hub: "Pandu Arah ke Hub",
             action_title: "Tindakan Diperlukan", action_desc_incoming: "Pesanan diluluskan! Sila hantar barang ke Hub.", action_desc_ready: "Barang anda dah siap! Sila aturkan pengambilan.", btn_self_pickup: "Saya Ambil Sendiri", btn_lalamove: "Tempah Lalamove",
             confirmed_title: "Pilihan Disahkan", confirmed_lala: "Lalamove Dipilih.", confirmed_self: "Ambil Sendiri Dipilih.",
             success_title: "Alterasi Selesai", success_desc: "Terima kasih menggunakan servis kami.", btn_contact: "Hubungi Hub",
-            track_lala: "Jejak Peta Lalamove"
+            track_lala: "Jejak Peta Lalamove", btn_cancel_rider: "Batal Tempahan Lalamove", confirm_cancel_rider: "Adakah anda pasti mahu membatalkan rider? Tindakan ini tidak boleh diubah.", txt_canceling: "Membatalkan...",
+            txt_accuracy_check: "Semakan Ketepatan Lokasi", txt_opt_1: "<strong>Pilihan 1:</strong> Guna 'Alamat Asal' jika ia menepati lokasi anda dengan tepat.", txt_opt_2: "<strong>Pilihan 2:</strong> Kesan GPS baru atau Cari Peta jika anda berada di lokasi berbeza.",
+            txt_use_orig: "Guna alamat yang anda berikan semasa tempahan awal.", btn_check_book: "Semak Harga & Tempah", btn_detect_loc: "Kesan Lokasi Saya", txt_gps_signal: "Isyarat GPS diperlukan untuk ketepatan.", btn_search_map: "Cari Peta", lbl_unit: "No. Unit / Rumah", lbl_building: "Bangunan / Jalan (Pilihan)", modal_est_fee: "Anggaran Caj Penghantaran", txt_pay_cash: "Bayar Tunai terus kepada Rider Lalamove.", btn_call_rider: "Panggil Rider Sekarang", btn_cancel: "Batal"
         }
     };
 
     function setLang(lang) {
         currentLang = lang;
         document.querySelectorAll('[data-t]').forEach(el => { if(t[lang][el.getAttribute('data-t')]) el.innerHTML = t[lang][el.getAttribute('data-t')]; });
+        
+        const btnEn = document.getElementById('lang-en'); const btnBm = document.getElementById('lang-bm');
+        if(btnEn && btnBm) {
+            btnEn.className = lang === 'en' ? "text-xs font-bold text-luxe" : "text-xs text-white/50 hover:text-white transition";
+            btnBm.className = lang === 'bm' ? "text-xs font-bold text-luxe" : "text-xs text-white/50 hover:text-white transition";
+        }
+        
+        if(currentData) buildTimeline(currentData.orderStatus);
     }
 
     document.addEventListener('DOMContentLoaded', () => { 
+        const userLang = navigator.language || navigator.userLanguage;
+        if (userLang && userLang.toLowerCase().startsWith('ms')) setLang('bm'); else setLang('en');
+
         const urlParams = new URLSearchParams(window.location.search);
         if (urlParams.get('id')) { 
             document.getElementById('loading-panel').classList.remove('hidden'); 
             fetchTrackingData(urlParams.get('id')); 
+            
+            // V6.0: Silent Auto-Refresh every 60s
+            syncInterval = setInterval(() => { fetchTrackingData(urlParams.get('id'), true); }, 60000);
         } else { 
             document.getElementById('search-panel').classList.remove('hidden'); 
         }
@@ -238,31 +270,43 @@
         window.location.href = `alteration-tracker.html?id=${val}`;
     }
 
-    async function fetchTrackingData(id) {
+    async function fetchTrackingData(id, isSilent = false) {
         try {
             const res = await fetch(`${scriptURL}?track_id=${id}`);
             const data = await res.json();
-            document.getElementById('loading-panel').classList.add('hidden');
-            if (data.error) { alert("Order not found."); document.getElementById('search-panel').classList.remove('hidden'); return; }
+            
+            if (!isSilent) document.getElementById('loading-panel').classList.add('hidden');
+            if (data.error) { 
+                if(!isSilent) { alert("Order not found."); document.getElementById('search-panel').classList.remove('hidden'); }
+                if(syncInterval) clearInterval(syncInterval);
+                return; 
+            }
             
             currentData = data.trackData;
+            
+            // Ensure Map link is shown if Self-Pickup or Dropoff phase
+            if(currentData.orderStatus.includes("Dropoff") || currentData.outboundChoice === "Self-Pickup") {
+                document.getElementById('hub-map-link').classList.remove('hidden');
+            } else {
+                document.getElementById('hub-map-link').classList.add('hidden');
+            }
+            
             if (data.hubs && data.hubs.length > 0) {
                 const h = data.hubs.find(x => x.name === currentData.hubName);
                 if (h) { 
                     hubData = { phone: h.phone, lat: h.lat, lng: h.lng }; 
                     const driveBtn = document.getElementById('btn-drive-hub');
-                    // FIX: Corrected typo in map link generation
                     if(driveBtn) driveBtn.href = `http://googleusercontent.com/maps.google.com/?q=${h.lat},${h.lng}`;
-                    if(currentData.orderStatus.includes("Dropoff")) document.getElementById('hub-map-link').classList.remove('hidden');
                 }
             }
+            
             if (currentData.lalamoveStatus) sessionStorage.setItem('lala_status_' + currentData.alterationId, currentData.lalamoveStatus);
             else if (currentData.lalamoveOrderId) fetchLiveLalamoveStatus(currentData.alterationId);
             
             renderDashboard();
         } catch (error) { 
             console.error(error);
-            alert("Connection Error"); 
+            if(!isSilent) alert("Connection Error"); 
         }
     }
     
@@ -290,8 +334,6 @@
 
     function buildTimeline(status) {
         let stages = [];
-        
-        // FIX: Master Timeline State Machine resolving incoming/outgoing conflicts
         if (currentData.outboundChoice === "Self-Pickup") {
             stages = ["Pending Dropoff", "Pending Approval", "In Progress", "Ready for Return", "Completed"];
         } else if (currentData.logisticsDirection === "Outbound" || currentData.outboundChoice === "Lalamove") {
@@ -299,15 +341,12 @@
         } else if (currentData.logisticsDirection === "Inbound" || status === "Awaiting Dispatch" || (status === "Dispatched" && !currentData.outboundChoice)) {
             stages = ["Pending Approval", "Awaiting Dispatch", "Dispatched", "In Progress", "Ready for Return", "Completed"];
         } else {
-            // Default generic fallback
-            stages = ["Pending Dropoff", "Pending Approval", "In Progress", "Ready for Return", "Completed"];
+            if (status === "Dispatched") stages = ["Pending Approval", "Awaiting Dispatch", "Dispatched", "In Progress", "Ready for Return", "Completed"];
+            else stages = ["Pending Dropoff", "Pending Approval", "In Progress", "Ready for Return", "Completed"];
         }
         
         let currentIdx = stages.indexOf(status);
-        if (currentIdx === -1) {
-            if (status === "Dispatched") currentIdx = stages.indexOf("Dispatched");
-            else currentIdx = 0; 
-        }
+        if (currentIdx === -1) currentIdx = 0; 
 
         let html = '';
         stages.forEach((stage, idx) => {
@@ -317,7 +356,6 @@
             
             if (stage === "Awaiting Dispatch" && isCurrent) {
                 isIncomingOrder = true;
-                // FIX: Eliminated the broken document.getElementById DOM manipulations targeting missing modal components.
                 extraText = `
                 <div class="mt-2 text-xs text-white/70 mb-3">${t[currentLang].action_desc_incoming}</div>
                 <button onclick="startIncomingBooking()" class="w-full py-2 bg-orange-500 text-white text-xs font-bold rounded hover:bg-orange-400 transition animate-pulse">${t[currentLang].btn_lalamove}</button>`;
@@ -343,10 +381,18 @@
 
             if (stage === "Dispatched" && isCurrent) {
                 const displayStatus = currentData.lalamoveStatus || sessionStorage.getItem('lala_status_' + currentData.alterationId) || 'ASSIGNING_DRIVER';
+                
+                // V6.0: Cancel Rider Button Logic
+                let cancelBtnHtml = "";
+                if (displayStatus !== "COMPLETED" && displayStatus !== "CANCELED") {
+                    cancelBtnHtml = `<button onclick="cancelRider()" class="mt-3 w-full py-2 border border-red-500/50 text-red-400 text-xs font-bold rounded hover:bg-red-500/10 transition" data-t="btn_cancel_rider">${t[currentLang].btn_cancel_rider}</button>`;
+                }
+                
                 extraText += `<div class="mt-4 bg-white/5 rounded-lg p-3 border border-white/10">
                     <p class="text-[10px] text-white/40 uppercase tracking-widest mb-3">Lalamove Live Status</p>
                     <div class="flex justify-between items-center text-center">${renderLalamoveSteps(displayStatus)}</div>
                     ${currentData.trackingUrl ? `<a href="${currentData.trackingUrl}" target="_blank" class="mt-4 block w-full text-center text-xs font-bold text-brand bg-luxe py-2 rounded hover:bg-white transition">${t[currentLang].track_lala} →</a>` : ''}
+                    ${cancelBtnHtml}
                 </div>`;
             }
             
@@ -385,13 +431,40 @@
         setTimeout(() => { modal.classList.add('hidden'); }, 300); 
     }
 
-    function goToStep2() { showModalStep(2); toggleLocMethod('gps'); }
-    function startIncomingBooking() { isIncomingOrder = true; goToStep2(); document.getElementById('modal-addr-title').innerText = "Confirm Pickup Location"; }
-    function triggerOutbound(choice) { isIncomingOrder = false; goToStep2(); document.getElementById('modal-addr-title').innerText = "Confirm Delivery Location"; }
+    function goToStep2() { 
+        showModalStep(2); 
+        // V6.0: Smart Address Tab Selection
+        if (currentData.originalLat && currentData.originalAddress) {
+            document.getElementById('orig-addr-text').innerText = currentData.originalAddress;
+            toggleLocMethod('orig');
+        } else {
+            document.getElementById('tab-orig').classList.add('hidden'); // Hide original if no data
+            toggleLocMethod('gps');
+        }
+    }
+    
+    function startIncomingBooking() { 
+        isIncomingOrder = true; 
+        goToStep2(); 
+        document.getElementById('modal-addr-title').innerText = currentLang === 'bm' ? "Sahkan Lokasi Pengambilan" : "Confirm Pickup Location"; 
+    }
+    
+    function triggerOutbound(choice) { 
+        isIncomingOrder = false; 
+        goToStep2(); 
+        document.getElementById('modal-addr-title').innerText = currentLang === 'bm' ? "Sahkan Lokasi Penghantaran" : "Confirm Delivery Location"; 
+    }
 
     function toggleLocMethod(method) {
-        if(method==='gps'){ document.getElementById('view-gps').classList.remove('hidden'); document.getElementById('view-manual').classList.add('hidden'); }
-        else { document.getElementById('view-manual').classList.remove('hidden'); document.getElementById('view-gps').classList.add('hidden'); }
+        ['orig', 'gps', 'manual'].forEach(m => {
+            const btn = document.getElementById('tab-'+m);
+            if(btn) btn.className = "text-[10px] font-bold py-2 rounded-lg transition " + (method===m ? "bg-white/10 text-white border border-transparent" : "bg-transparent text-white/50 border border-white/10 hover:text-white");
+            const view = document.getElementById('view-'+m);
+            if(view) { if(method===m) view.classList.remove('hidden'); else view.classList.add('hidden'); }
+        });
+        
+        if (method === 'orig') document.getElementById('addr-fields').classList.add('hidden');
+        else document.getElementById('addr-fields').classList.remove('hidden', 'opacity-50', 'pointer-events-none');
     }
     
     function getGPS() {
@@ -415,7 +488,6 @@
                     if(data.address) statusTxt.innerHTML = `<span class="text-green-400 font-bold block">GPS Locked:</span> ${data.address}`;
                     else statusTxt.innerText = `GPS: ${custData.lat.toFixed(5)}, ${custData.lng.toFixed(5)}`;
                 } catch(e) {}
-                document.getElementById('addr-fields').classList.remove('opacity-50', 'pointer-events-none');
             }, 1500); 
         }, (err) => {
              btn.innerHTML = "Detect My Location"; btn.disabled = false; alert("GPS Error: " + err.message);
@@ -431,7 +503,7 @@
         try {
             const res = await fetch(`${scriptURL}?action=geocode&address=${encodeURIComponent(addr)}`);
             const data = await res.json();
-            btn.innerHTML = "Search Map";
+            btn.innerHTML = t[currentLang].btn_search_map;
             btn.classList.remove('animate-pulse');
             btn.disabled = false;
             if(data.lat) { 
@@ -439,23 +511,33 @@
                 const stat = document.getElementById('manual-status');
                 stat.classList.remove('hidden');
                 stat.innerHTML = `<span class="text-green-400 font-bold">✅ Pin Dropped:</span> ${data.formatted_address || data.lat}`;
-                document.getElementById('addr-fields').classList.remove('opacity-50', 'pointer-events-none'); 
             } else {
                 document.getElementById('manual-status').classList.remove('hidden');
                 document.getElementById('manual-status').innerText = "❌ Location not found.";
             }
         } catch(e) {
-            btn.innerHTML = "Search Map"; btn.classList.remove('animate-pulse'); btn.disabled = false;
+            btn.innerHTML = t[currentLang].btn_search_map; btn.classList.remove('animate-pulse'); btn.disabled = false;
         }
     }
 
-    async function getQuotation() {
-        const unit = document.getElementById('input-unit').value.trim();
-        const building = document.getElementById('input-building').value.trim();
-        if(!unit) return alert("Please enter Unit / House Number.");
-        custData.address = building ? `${unit}, ${building}` : unit;
-        const btn = document.querySelector('#addr-fields button');
-        btn.innerText = "Calculating..."; btn.disabled = true;
+    // V6.0: Refactored Quotation Logic to handle "Original" tab
+    async function getQuotation(method = 'new') {
+        const btn = (method === 'orig') ? document.querySelector('#view-orig button') : document.querySelector('#addr-fields button');
+        const origText = btn.innerText; 
+        btn.innerText = "Calculating..."; 
+        btn.disabled = true;
+
+        if (method === 'orig') {
+            custData.lat = currentData.originalLat;
+            custData.lng = currentData.originalLng;
+            custData.address = currentData.originalAddress;
+        } else {
+            const unit = document.getElementById('input-unit').value.trim();
+            const building = document.getElementById('input-building').value.trim();
+            if(!unit) { alert("Please enter Unit / House Number."); btn.innerText = origText; btn.disabled = false; return; }
+            custData.address = building ? `${unit}, ${building}` : unit;
+            if(!custData.lat) { alert("Please locate GPS or Search Map first."); btn.innerText = origText; btn.disabled = false; return; }
+        }
 
         let payload = { action: "get_lalamove_quote" };
         if (isIncomingOrder) {
@@ -474,8 +556,8 @@
                 document.getElementById('quote-amount').innerText = `${data.currency} ${data.amount}`;
                 showModalStep(3);
             } else { alert("Fee Error: " + (data.message || "Unknown")); }
-            btn.innerText = "Check Price & Book"; btn.disabled = false;
-        } catch(e) { alert("Error"); btn.innerText = "Check Price & Book"; btn.disabled = false; }
+            btn.innerText = origText; btn.disabled = false;
+        } catch(e) { alert("Error"); btn.innerText = origText; btn.disabled = false; }
     }
 
     async function bookRider() {
@@ -505,8 +587,32 @@
             else { alert("Failed: " + data.message); btn.innerHTML = "Retry"; btn.disabled = false; }
         } catch(e) { alert("Error"); }
     }
+    
+    // V6.0: Cancel Rider Logic
+    async function cancelRider() {
+        if(!confirm(t[currentLang].confirm_cancel_rider)) return;
+        try {
+            const res = await fetch(scriptURL, { method: 'POST', body: JSON.stringify({ action: "cancel_lalamove_order", track_id: currentData.alterationId }) });
+            const data = await res.json();
+            if(data.status === "success") { window.location.reload(); }
+            else { alert("Cancel Failed: " + data.message); }
+        } catch(e) { alert("Error canceling."); }
+    }
+    
     function setReturnChoice(choice) { fetch(scriptURL, { method: 'POST', body: JSON.stringify({ action: "update_outbound", alteration_id: currentData.alterationId, outbound_choice: choice }) }).then(()=>window.location.reload()); }
-    function shareLink() { navigator.clipboard.writeText(window.location.href); alert("Copied!"); }
+    
+    // V6.0: Native Share Link Logic
+    function shareLink() { 
+        if (navigator.share) {
+            navigator.share({
+                title: 'Arabista Alteration Tracker',
+                url: window.location.href
+            }).catch(console.error);
+        } else {
+            navigator.clipboard.writeText(window.location.href); 
+            alert("Copied to clipboard!"); 
+        }
+    }
   </script>
 </body>
 </html>
