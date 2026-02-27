@@ -127,10 +127,31 @@
       </div>
   </template>
 
+  <div id="hub-pay-modal" class="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-md hidden opacity-0 transition-opacity duration-300 px-4">
+    <div class="bg-[#111213] border border-luxe/50 rounded-2xl w-full max-w-sm p-8 transform scale-95 transition-transform duration-300 text-center shadow-[0_0_50px_rgba(192,160,98,0.1)] relative" id="hub-pay-box">
+        <button onclick="closeHubPayModal()" class="absolute top-4 right-4 text-white/30 hover:text-white transition"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
+        <div class="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-transparent via-luxe to-transparent"></div>
+        
+        <h4 class="font-bold text-white mb-1 text-xl font-display mt-2" data-t="txt_alt_fee_title">Alteration Fee Payment</h4>
+        <p class="text-[11px] text-white/50 mb-5" data-t="txt_alt_fee_desc">Your item is ready! Please pay the alteration fee to the Hub below.</p>
+        
+        <div class="bg-white p-2 rounded-lg inline-block mb-3 shadow-md">
+            <img id="modal-hub-qr" src="images/hub-1-qr.webp" alt="Hub QR Code" class="w-32 h-32 object-contain">
+        </div>
+        
+        <div class="text-3xl font-bold text-luxe mb-6" id="modal-hub-fee">RM 0.00</div>
+        
+        <button id="btn-modal-hub-wa" onclick="notifyHubPayment()" class="w-full py-3.5 bg-[#25D366] text-white text-sm font-bold rounded-xl hover:bg-[#1EBE57] transition shadow-soft flex justify-center items-center gap-2">
+            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 00-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
+            <span data-t="btn_wa_hub">Send Receipt to Hub</span>
+        </button>
+    </div>
+  </div>
+
   <div id="action-modal" class="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-md hidden opacity-0 transition-opacity duration-300 px-4">
     <div class="bg-[#111213] border border-luxe/50 rounded-2xl w-full max-w-sm p-8 transform scale-95 transition-transform duration-300 text-center shadow-[0_0_50px_rgba(192,160,98,0.1)] relative" id="action-modal-box">
         
-        <button onclick="closeModal()" class="absolute top-4 right-4 text-white/30 hover:text-white"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
+        <button onclick="closeModal()" class="absolute top-4 right-4 text-white/30 hover:text-white transition"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
 
         <div id="modal-step-2" class="text-left">
             <h3 class="font-display text-xl text-white mb-2 text-center" id="modal-addr-title">Confirm Delivery Location</h3>
@@ -149,7 +170,9 @@
 
             <div id="view-orig" class="mb-4">
                 <p class="text-[10px] text-white/40 mb-2" data-t="txt_use_orig">Use the address you provided during the initial booking.</p>
-                <div class="p-4 bg-white/5 border border-white/10 rounded-xl mb-3" id="orig-addr-text">...</div>
+                <div class="p-4 bg-white/5 border border-white/10 rounded-xl mb-3 relative" id="orig-addr-text">
+                    ...
+                </div>
                 <button onclick="getQuotation('orig')" class="w-full bg-luxe text-brand font-bold py-3 rounded-xl hover:bg-white transition mt-2 shadow-soft" data-t="btn_check_book">Check Price & Book</button>
             </div>
 
@@ -234,7 +257,7 @@
             txt_use_orig: "Use the address you provided during the initial booking.", btn_check_book: "Check Price & Book", btn_detect_loc: "Detect My Location", txt_gps_signal: "GPS signal required for accuracy.", btn_search_map: "Search Map", lbl_unit: "Unit / House No.", lbl_building: "Building / Street (Optional)", btn_cancel: "Cancel",
             
             // V6.0 QR TRANSLATIONS
-            txt_alt_fee_title: "Alteration Fee Payment", txt_alt_fee_desc: "Your item is ready! Please pay the alteration fee to the Hub below.", btn_wa_hub: "Send Receipt to Hub", txt_hub_paid_thanks: "Thank you! Please select your return method below:", txt_hq_qr_title: "Lalamove Delivery Payment", txt_hq_qr_desc: "Please pay the delivery fee to Arabista HQ.", txt_pay_hq: "Scan to pay, then send receipt via WhatsApp.", btn_wa_hq: "1. Send Receipt to HQ", btn_call_rider: "2. Call Rider Now", txt_view_map: "View on Google Maps", txt_receipt_sent: "Receipt Sent!"
+            txt_alt_fee_title: "Alteration Fee Payment", txt_alt_fee_desc: "Your item is ready! Please pay the alteration fee to the Hub below.", btn_wa_hub: "Send Receipt to Hub", txt_hub_paid_thanks: "Thank you! Please select your return method below:", txt_hq_qr_title: "Lalamove Delivery Payment", txt_hq_qr_desc: "Please pay the delivery fee to Arabista HQ.", txt_pay_hq: "Scan to pay, then send receipt via WhatsApp.", btn_wa_hq: "1. Send Receipt to HQ", btn_call_rider: "2. Call Rider Now", txt_view_map: "View on Google Maps", txt_receipt_sent: "Receipt Sent!", txt_action_pay: "Payment Required for Alteration", btn_pay_alt: "Pay Alteration Fee", btn_view_hub_qr: "View Hub QR Code Again", btn_close: "Close"
         },
         bm: {
             page_title: "Jejak Tempahan", page_subtitle: "Masukkan ID tempahan unik anda di bawah.", lbl_id: "ID Tempahan", btn_track: "Jejak Pesanan", txt_loading: "Mencari butiran tempahan...", btn_share: "Kongsi Pautan", lbl_items: "Item untuk Diubahsuai:", section_status: "Status Terkini", back_home: "Kembali ke Utama", btn_nav_hub: "Pandu Arah ke Hub",
@@ -246,7 +269,7 @@
             txt_use_orig: "Guna alamat yang anda berikan semasa tempahan awal.", btn_check_book: "Semak Harga & Tempah", btn_detect_loc: "Kesan Lokasi Saya", txt_gps_signal: "Isyarat GPS diperlukan untuk ketepatan.", btn_search_map: "Cari Peta", lbl_unit: "No. Unit / Rumah", lbl_building: "Bangunan / Jalan (Pilihan)", btn_cancel: "Batal",
             
             // V6.0 QR TRANSLATIONS
-            txt_alt_fee_title: "Bayaran Caj Alterasi", txt_alt_fee_desc: "Barang anda dah siap! Sila bayar caj alterasi kepada Hub di bawah.", btn_wa_hub: "Hantar Resit ke Hub", txt_hub_paid_thanks: "Terima kasih! Sila pilih kaedah penghantaran di bawah:", txt_hq_qr_title: "Bayaran Lalamove", txt_hq_qr_desc: "Sila bayar caj penghantaran kepada Arabista HQ.", txt_pay_hq: "Imbas untuk bayar, dan hantar resit di WhatsApp.", btn_wa_hq: "1. Hantar Resit ke HQ", btn_call_rider: "2. Panggil Rider", txt_view_map: "Lihat di Google Maps", txt_receipt_sent: "Resit Dihantar!"
+            txt_alt_fee_title: "Bayaran Caj Alterasi", txt_alt_fee_desc: "Barang anda dah siap! Sila bayar caj alterasi kepada Hub di bawah.", btn_wa_hub: "Hantar Resit ke Hub", txt_hub_paid_thanks: "Terima kasih! Sila pilih kaedah penghantaran di bawah:", txt_hq_qr_title: "Bayaran Lalamove", txt_hq_qr_desc: "Sila bayar caj penghantaran kepada Arabista HQ.", txt_pay_hq: "Imbas untuk bayar, dan hantar resit di WhatsApp.", btn_wa_hq: "1. Hantar Resit ke HQ", btn_call_rider: "2. Panggil Rider", txt_view_map: "Lihat di Google Maps", txt_receipt_sent: "Resit Dihantar!", txt_action_pay: "Bayaran Alterasi Diperlukan", btn_pay_alt: "Bayar Caj Alterasi", btn_view_hub_qr: "Lihat Semula QR Hub", btn_close: "Tutup"
         }
     };
 
@@ -375,31 +398,31 @@
                 isIncomingOrder = false;
                 if (!currentData.outboundChoice) {
                     
-                    // V6.0: GATE 1 - Hub Alteration Fee Payment
+                    // V6.0: GATE 1 - Hub Alteration Fee Payment Check
                     let hasPaidHub = sessionStorage.getItem('paid_hub_' + currentData.alterationId) === 'true';
                     
                     if (!hasPaidHub) {
                         extraText = `
-                        <div class="mt-4 bg-white/5 rounded-xl p-5 border border-white/10 text-center shadow-lg relative overflow-hidden">
-                            <div class="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-transparent via-luxe to-transparent"></div>
-                            <h4 class="font-bold text-white mb-1" data-t="txt_alt_fee_title">${t[currentLang].txt_alt_fee_title}</h4>
-                            <p class="text-[11px] text-white/50 mb-4" data-t="txt_alt_fee_desc">${t[currentLang].txt_alt_fee_desc}</p>
-                            
-                            <div class="bg-white p-2 rounded-lg inline-block mb-3 shadow-md">
-                                <img src="${currentData.hubQr || 'images/hub-1-qr.webp'}" alt="Hub QR Code" class="w-32 h-32 object-contain">
-                            </div>
-                            
-                            <div class="text-2xl font-bold text-luxe mb-5">${currentData.servicesTotal}</div>
-                            
-                            <button onclick="notifyHubPayment()" class="w-full py-3.5 bg-[#25D366] text-white text-sm font-bold rounded-xl hover:bg-[#1EBE57] transition shadow-soft flex justify-center items-center gap-2">
-                                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 00-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
-                                <span data-t="btn_wa_hub">${t[currentLang].btn_wa_hub}</span>
-                            </button>
-                        </div>`;
+                        <div class="mt-2 text-xs text-white/70 mb-3" data-t="txt_action_pay">${t[currentLang].txt_action_pay}</div>
+                        <button onclick="openHubPayModal()" class="w-full py-3 bg-luxe text-brand text-sm font-bold rounded-xl hover:bg-white transition animate-pulse shadow-[0_0_15px_rgba(192,160,98,0.3)] flex justify-center items-center gap-2">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"></path></svg> 
+                            <span data-t="btn_pay_alt">${t[currentLang].btn_pay_alt}</span>
+                        </button>
+                        `;
+                        // Auto popup on load (only once)
+                        if(!window.hubModalShown) {
+                            window.hubModalShown = true;
+                            setTimeout(() => { openHubPayModal(); }, 600);
+                        }
                     } else {
-                        // GATE 1 Passed - Show delivery choices
+                        // GATE 1 Passed - Show delivery choices and View QR button
                         extraText = `
-                        <div class="mt-2 text-xs text-white/70 mb-3" data-t="txt_hub_paid_thanks">${t[currentLang].txt_hub_paid_thanks}</div>
+                        <div class="mt-2 text-xs text-green-400 mb-3 font-bold flex items-center gap-1">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> 
+                            <span data-t="txt_hub_paid_thanks">${t[currentLang].txt_hub_paid_thanks}</span>
+                        </div>
+                        <button onclick="openHubPayModal(true)" class="w-full py-2 mb-4 border border-white/10 text-white/50 text-xs font-bold rounded-lg hover:bg-white/5 transition" data-t="btn_view_hub_qr">${t[currentLang].btn_view_hub_qr}</button>
+                        
                         <div class="flex gap-2">
                              <button onclick="triggerOutbound('Lalamove')" class="flex-1 py-3 rounded-xl bg-luxe text-brand text-xs font-bold hover:bg-white transition shadow-soft flex justify-center items-center">${t[currentLang].btn_lalamove}</button>
                              <button onclick="setReturnChoice('Self-Pickup', this)" class="flex-1 py-3 rounded-xl border border-luxe text-luxe text-xs font-bold hover:bg-luxe/20 transition flex justify-center items-center">${t[currentLang].btn_self_pickup}</button>
@@ -449,6 +472,49 @@
         return steps.map((s, i) => `<div class="lala-step ${i <= activeIdx ? (i === activeIdx ? 'active' : 'completed') : ''}"><div class="lala-dot"></div><span class="lala-label">${s.label}</span></div>`).join('');
     }
 
+    // V6.0: HUB PAYMENT MODAL LOGIC (GATE 1)
+    function openHubPayModal(isReview = false) {
+        document.getElementById('modal-hub-qr').src = currentData.hubQr || 'images/hub-1-qr.webp';
+        document.getElementById('modal-hub-fee').innerText = currentData.servicesTotal;
+        const modal = document.getElementById('hub-pay-modal');
+        const box = document.getElementById('hub-pay-box');
+        modal.classList.remove('hidden');
+        setTimeout(() => { modal.classList.remove('opacity-0'); box.classList.remove('scale-95'); }, 10);
+        
+        const btn = document.getElementById('btn-modal-hub-wa');
+        if(isReview) {
+            btn.innerHTML = `<span data-t="btn_close">${t[currentLang].btn_close}</span>`;
+            btn.onclick = closeHubPayModal;
+            btn.classList.replace('bg-[#25D366]', 'bg-white/10');
+            btn.classList.replace('hover:bg-[#1EBE57]', 'hover:bg-white/20');
+        } else {
+            btn.innerHTML = `<svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 00-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg><span data-t="btn_wa_hub">${t[currentLang].btn_wa_hub}</span>`;
+            btn.onclick = notifyHubPayment;
+            btn.classList.replace('bg-white/10', 'bg-[#25D366]');
+            btn.classList.replace('hover:bg-white/20', 'hover:bg-[#1EBE57]');
+        }
+    }
+
+    function closeHubPayModal() {
+        const modal = document.getElementById('hub-pay-modal');
+        const box = document.getElementById('hub-pay-box');
+        modal.classList.add('opacity-0');
+        box.classList.add('scale-95');
+        setTimeout(() => { modal.classList.add('hidden'); }, 300);
+    }
+
+    function notifyHubPayment() {
+        sessionStorage.setItem('paid_hub_' + currentData.alterationId, 'true');
+        const phone = currentData.hubPhone || "60192482084"; 
+        let cleanPhone = phone.replace(/[^0-9]/g, ''); 
+        if (cleanPhone.startsWith('0')) cleanPhone = '6' + cleanPhone;
+        const msg = `Hi Arabista Hub, I have paid ${currentData.servicesTotal} for Alteration Order ${currentData.alterationId}. [Attached is my receipt]`;
+        window.open(`https://wa.me/${cleanPhone}?text=${encodeURIComponent(msg)}`, '_blank');
+        closeHubPayModal();
+        renderDashboard(); // Re-render to unlock delivery buttons
+    }
+
+    // LALAMOVE DELIVERY MODALS
     function showModalStep(n) {
         const modal = document.getElementById('action-modal'); const box = document.getElementById('action-modal-box');
         modal.classList.remove('hidden'); modal.classList.remove('opacity-0'); 
@@ -464,18 +530,54 @@
         setTimeout(() => { modal.classList.add('hidden'); }, 300); 
     }
 
+    // V6.0 Task 13: Elegant Formatting for Original Address
+    async function loadOriginalAddress() {
+        const origContainer = document.getElementById('orig-addr-text');
+        const raw = currentData.originalAddress || "";
+        let unitPart = "Saved Address";
+        let restPart = raw;
+        
+        if(raw.includes(',')) {
+            unitPart = raw.substring(0, raw.indexOf(',')).trim();
+            restPart = raw.substring(raw.indexOf(',')+1).trim();
+            if(restPart.includes('GPS:')) {
+                restPart = restPart.substring(0, restPart.indexOf('GPS:')).trim();
+                if(restPart.endsWith(',')) restPart = restPart.substring(0, restPart.length - 1).trim();
+            }
+        }
+
+        origContainer.innerHTML = `<div class="animate-pulse text-white/50 text-xs py-2">Translating GPS Coordinates...</div>`;
+
+        let prettyAddress = restPart;
+        if(currentData.originalLat && currentData.originalLng) {
+            try {
+                const res = await fetch(`${scriptURL}?action=reverse_geocode&lat=${currentData.originalLat}&lng=${currentData.originalLng}`);
+                const data = await res.json();
+                if(data.address) prettyAddress = data.address;
+            } catch(e) {}
+        }
+
+        origContainer.innerHTML = `
+            <div class="mb-3 border-b border-white/10 pb-3">
+                <span class="text-[10px] uppercase tracking-widest text-white/40 block mb-0.5" data-t="lbl_unit">${t[currentLang].lbl_unit}</span>
+                <span class="text-sm font-bold text-white">${unitPart}</span>
+            </div>
+            <div class="mb-4">
+                <span class="text-[10px] uppercase tracking-widest text-white/40 block mb-0.5">Location</span>
+                <span class="text-xs text-white/80 leading-relaxed">${prettyAddress}</span>
+            </div>
+            <a href="http://googleusercontent.com/maps.google.com/?q=${currentData.originalLat},${currentData.originalLng}" target="_blank" class="w-full flex justify-center items-center gap-2 text-[11px] font-bold text-luxe bg-luxe/10 hover:bg-luxe hover:text-brand border border-luxe/30 py-2.5 rounded-lg transition">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                <span data-t="txt_view_map">${t[currentLang].txt_view_map}</span>
+                <span>(${parseFloat(currentData.originalLat).toFixed(5)}, ${parseFloat(currentData.originalLng).toFixed(5)})</span>
+            </a>
+        `;
+    }
+
     function goToStep2() { 
         showModalStep(2); 
         if (currentData.originalLat && currentData.originalAddress) {
-            
-            // V6.0 Task 13: UI Bug Fix - Full Address & Google Maps Link
-            document.getElementById('orig-addr-text').innerHTML = `
-                <span class="block text-sm text-white/90 mb-1">${currentData.originalAddress}</span>
-                <a href="https://maps.google.com/?q=${currentData.originalLat},${currentData.originalLng}" target="_blank" class="text-[10px] text-luxe underline inline-flex items-center gap-1 hover:text-white transition">
-                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
-                    <span data-t="txt_view_map">${t[currentLang].txt_view_map}</span>
-                </a>
-            `;
+            loadOriginalAddress();
             toggleLocMethod('orig');
         } else {
             document.getElementById('tab-orig').classList.add('hidden'); 
@@ -530,7 +632,7 @@
                 } catch(e) {}
             }, 1500); 
         }, (err) => {
-             btn.innerHTML = "Detect My Location"; btn.disabled = false; alert("GPS Error: " + err.message);
+             btn.innerHTML = t[currentLang].btn_detect_loc; btn.disabled = false; alert("GPS Error: " + err.message);
         });
     }
     
@@ -594,7 +696,7 @@
                 activeQuoteId = data.quotationId; currentStops = data.stops;
                 document.getElementById('quote-amount').innerText = `${data.currency} ${data.amount}`;
                 
-                // Lock the Call Rider button initially
+                // GATE 2: Reset UI to force HQ Payment WA
                 const bookBtn = document.getElementById('btn-final-book');
                 bookBtn.classList.add('opacity-50', 'pointer-events-none');
                 const waBtn = document.getElementById('btn-wa-hq');
@@ -606,17 +708,6 @@
             } else { alert("Fee Error: " + (data.message || "Unknown")); }
             btn.innerText = origText; btn.disabled = false;
         } catch(e) { alert("Error"); btn.innerText = origText; btn.disabled = false; }
-    }
-
-    // V6.0: WA Notifiers (The Gates)
-    function notifyHubPayment() {
-        sessionStorage.setItem('paid_hub_' + currentData.alterationId, 'true');
-        const phone = currentData.hubPhone || "60192482084"; 
-        let cleanPhone = phone.replace(/[^0-9]/g, ''); 
-        if (cleanPhone.startsWith('0')) cleanPhone = '6' + cleanPhone;
-        const msg = `Hi Arabista Hub, I have paid ${currentData.servicesTotal} for Alteration Order ${currentData.alterationId}. [Attached is my receipt]`;
-        window.open(`https://wa.me/${cleanPhone}?text=${encodeURIComponent(msg)}`, '_blank');
-        renderDashboard(); // Re-render to unlock delivery buttons
     }
 
     function notifyHQPayment() {
