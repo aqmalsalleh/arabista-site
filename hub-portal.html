@@ -528,7 +528,6 @@
                                 <span class="text-[10px] text-white/40">${formatDate(o.date)}</span>
                             </div>
                             <h3 class="font-bold text-lg text-white">${o.custName}</h3>
-                            <p class="text-xs text-luxe mt-1">Est. Fee: ${o.fee}</p>
                         </div>
                         <div class="flex gap-2">
                             <button onclick="updateStatus('${o.id}', 'Rejected', '${o.custName}', '${o.custPhone}', '', 0, this)" class="px-4 py-2 rounded-lg border border-red-500/30 text-red-400 text-xs font-bold hover:bg-red-500/10 transition">${t[currentLang].btn_reject}</button>
@@ -583,6 +582,11 @@
             let arrivedClass = "";
             let trackerHtml = "";
             
+            // Mode Badge
+            let modeBadge = "";
+            if (o.direction === "Inbound" || o.lalamoveId) modeBadge = `<span class="text-[9px] bg-blue-500/20 text-blue-400 px-2 py-0.5 rounded border border-blue-500/30 mt-1 inline-block">🚚 Inbound: Lalamove</span>`;
+            else modeBadge = `<span class="text-[9px] bg-orange-500/20 text-orange-400 px-2 py-0.5 rounded border border-orange-500/30 mt-1 inline-block">🚶 Inbound: Walk-in / Drop-off</span>`;
+            
             if (o.status === "Awaiting Dispatch") {
                 statusBadge = `<span class="text-[9px] bg-yellow-500/10 text-yellow-400 px-2 py-0.5 rounded border border-yellow-500/20">Awaiting Customer Action</span>`;
             } else if (o.status === "Dispatched") {
@@ -613,7 +617,7 @@
                         </div>
                         <span class="text-xs font-bold ${arrivedClass ? 'text-green-400' : 'text-orange-400'}">${arrivedClass ? t[currentLang].arrived : t[currentLang].arriving}</span>
                     </div>
-                    <div class="mb-2">${statusBadge}</div>
+                    <div class="mb-2">${statusBadge} ${modeBadge}</div>
                     <p class="font-bold text-base text-white">${o.custName}</p>
                     <p class="text-xs text-white/50 mt-1 mb-4 whitespace-pre-line">${o.items.replace(/\[/g, '').replace(/\]/g, '')}</p>
                     ${trackerHtml}
@@ -651,7 +655,11 @@
             
             const daysOld = Math.floor((new Date() - new Date(o.date)) / (1000*60*60*24));
             const ageBadge = daysOld >= 3 ? `<span class="text-[9px] bg-red-500/20 text-red-400 px-2 py-0.5 rounded shadow-sm border border-red-500/30">⏳ ${t[currentLang].waiting_days} ${daysOld} ${t[currentLang].days}</span>` : '';
-            const freeReturnBadge = o.returnElig === 'Free Return' ? `<span class="ml-2 text-[9px] bg-green-500/20 text-green-400 px-2 py-0.5 rounded border border-green-500/30">Free Return Eligible</span>` : '';
+            
+            let modeBadge = "";
+            if (o.outbound === "Lalamove" || o.direction === "Outbound") modeBadge = `<span class="text-[9px] bg-purple-500/20 text-purple-400 px-2 py-0.5 rounded border border-purple-500/30 mt-1 inline-block">🚚 Outbound: Lalamove</span>`;
+            else if (o.outbound === "Self-Pickup") modeBadge = `<span class="text-[9px] bg-orange-500/20 text-orange-400 px-2 py-0.5 rounded border border-orange-500/30 mt-1 inline-block">📦 Outbound: Self-Pickup</span>`;
+            else modeBadge = `<span class="text-[9px] bg-gray-500/20 text-gray-400 px-2 py-0.5 rounded border border-gray-500/30 mt-1 inline-block">⏳ Outbound: Pending Choice</span>`;
 
             if (o.status === "In Progress") { 
                  actionHtml = `
@@ -687,7 +695,6 @@
             }
             
             let trackerHtml = "";
-            
             if (o.status === "Dispatched") {
                  const displayStatus = o.lalamoveStatus || sessionStorage.getItem('lala_status_' + o.id) || 'ASSIGNING_DRIVER';
                  trackerHtml = `
@@ -706,10 +713,10 @@
                             <span class="text-[10px] bg-white/10 px-2 py-0.5 rounded text-white/70 font-mono">${o.id}</span>
                             <span class="text-[10px] text-white/40">${formatDate(o.date)}</span>
                             ${ageBadge}
-                            ${freeReturnBadge}
                         </div>
                         <span class="text-[10px] font-bold px-2 py-0.5 rounded ${o.status === 'Ready for Return' ? 'bg-luxe text-brand' : 'bg-white/10 text-white/70'}">${o.status}</span>
                     </div>
+                    <div class="mb-2">${modeBadge}</div>
                     <div class="flex justify-between items-center mb-3">
                         <p class="font-bold text-base text-white">${o.custName}</p>
                         <a href="tel:${o.custPhone}" class="p-2 bg-white/5 hover:bg-white/10 rounded-full text-white/70 transition" title="Call Customer">
