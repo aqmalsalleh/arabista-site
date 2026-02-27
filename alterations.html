@@ -22,7 +22,18 @@
     .scrollbar-thin::-webkit-scrollbar { width: 4px; }
     .scrollbar-thin::-webkit-scrollbar-track { background: transparent; }
     .scrollbar-thin::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 10px; }
-    input[type="number"], input[type="text"], input[type="tel"], select { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); color: white; border-radius: 8px; padding: 10px 14px; width: 100%; transition: all 0.2s; }
+    
+    /* V6.3: Force 16px font size on mobile to prevent iOS Safari auto-zoom */
+    input[type="number"], input[type="text"], input[type="tel"], select { 
+        background: rgba(255,255,255,0.05); 
+        border: 1px solid rgba(255,255,255,0.2); 
+        color: white; 
+        border-radius: 8px; 
+        padding: 10px 14px; 
+        width: 100%; 
+        transition: all 0.2s; 
+        font-size: 16px !important; 
+    }
     input[type="number"]:focus, input[type="text"]:focus, input[type="tel"]:focus, select:focus { outline: none; border-color: #C0A062; background: rgba(192,160,98,0.05); }
     input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
   </style>
@@ -103,7 +114,7 @@
               <button id="btn-confirm-loc" onclick="confirmGPSDetails()" class="w-full py-3.5 rounded-xl bg-luxe text-brand text-sm font-bold hover:bg-white transition shadow-[0_0_15px_rgba(192,160,98,0.3)]" data-t="btn_confirm_loc">Confirm Location</button>
               
               <div id="fallback-search-box" class="hidden mt-6 pt-5 border-t border-white/10">
-                  <p class="text-[11px] text-white/50 uppercase tracking-widest mb-3" data-t="txt_loc_inaccurate">Location inaccurate?</p>
+                  <p class="text-[11px] text-white/50 uppercase tracking-widest mb-3" data-t="txt_loc_inaccurate">Location inaccurate? Search below:</p>
                   
                   <div class="flex gap-2 mb-3">
                       <button onclick="useGPS()" class="w-full py-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg text-xs font-bold text-white transition flex items-center justify-center gap-2">
@@ -113,7 +124,7 @@
                   </div>
 
                   <div class="flex gap-2">
-                      <input type="text" id="manual-search-input" class="flex-1 text-sm bg-black/30" placeholder="Or search building / street manually..." data-t-placeholder="ph_manual_search">
+                      <input type="text" id="manual-search-input" class="flex-1" placeholder="Or search building / street..." data-t-placeholder="ph_manual_search">
                       <button id="btn-manual-find" onclick="geocodeManualAlteration()" class="px-5 bg-white/10 text-white text-sm font-bold rounded-lg hover:bg-white/20 transition flex items-center justify-center" data-t="btn_search">Search</button>
                   </div>
                   <p class="text-xs text-red-400 mt-2 hidden ml-1" id="manual-search-error"></p>
@@ -404,7 +415,7 @@
             document.getElementById('gps-detected-text').innerText = `${coords.formatted_address || state.orderAddress}`; 
             
             document.getElementById('map-verify-link').innerHTML = `
-                <a href="https://www.google.com/maps?q=${state.lat},${state.lng}" target="_blank" class="w-full flex justify-center items-center gap-2 text-[11px] font-bold text-luxe bg-luxe/10 hover:bg-luxe hover:text-brand border border-luxe/30 py-2.5 rounded-lg transition">
+                <a href="https://www.google.com/maps?q=${state.lat},${state.lng}" target="_blank" rel="noopener noreferrer" class="w-full flex justify-center items-center gap-2 text-[11px] font-bold text-luxe bg-luxe/10 hover:bg-luxe hover:text-brand border border-luxe/30 py-2.5 rounded-lg transition">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
                     <span data-t="txt_view_on_map">${t[currentLang].txt_view_on_map}</span>
                     <span class="font-mono opacity-50">(${parseFloat(state.lat).toFixed(4)}, ${parseFloat(state.lng).toFixed(4)})</span>
@@ -452,7 +463,7 @@
                 }
 
                 document.getElementById('map-verify-link').innerHTML = `
-                    <a href="https://www.google.com/maps?q=${state.lat},${state.lng}" target="_blank" class="w-full flex justify-center items-center gap-2 text-[11px] font-bold text-luxe bg-luxe/10 hover:bg-luxe hover:text-brand border border-luxe/30 py-2.5 rounded-lg transition">
+                    <a href="https://www.google.com/maps?q=${state.lat},${state.lng}" target="_blank" rel="noopener noreferrer" class="w-full flex justify-center items-center gap-2 text-[11px] font-bold text-luxe bg-luxe/10 hover:bg-luxe hover:text-brand border border-luxe/30 py-2.5 rounded-lg transition">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
                         <span data-t="txt_view_on_map">${t[currentLang].txt_view_on_map}</span>
                         <span class="font-mono opacity-50">(${parseFloat(state.lat).toFixed(4)}, ${parseFloat(state.lng).toFixed(4)})</span>
@@ -499,7 +510,7 @@
                 document.getElementById('gps-detected-text').innerText = `${data.formatted_address || addr}`;
                 
                 document.getElementById('map-verify-link').innerHTML = `
-                    <a href="https://www.google.com/maps?q=${state.lat},${state.lng}" target="_blank" class="w-full flex justify-center items-center gap-2 text-[11px] font-bold text-luxe bg-luxe/10 hover:bg-luxe hover:text-brand border border-luxe/30 py-2.5 rounded-lg transition">
+                    <a href="https://www.google.com/maps?q=${state.lat},${state.lng}" target="_blank" rel="noopener noreferrer" class="w-full flex justify-center items-center gap-2 text-[11px] font-bold text-luxe bg-luxe/10 hover:bg-luxe hover:text-brand border border-luxe/30 py-2.5 rounded-lg transition">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
                         <span data-t="txt_view_on_map">${t[currentLang].txt_view_on_map}</span>
                         <span class="font-mono opacity-50">(${parseFloat(state.lat).toFixed(4)}, ${parseFloat(state.lng).toFixed(4)})</span>
@@ -521,11 +532,28 @@
         btnConfirm.innerText = t[currentLang].btn_confirm_loc;
     }
 
+    // Smart string deduplication logic
     function confirmGPSDetails() {
         state.unitNo = document.getElementById('gps-unit-input').value.trim();
         if(!state.unitNo) return alert(t[currentLang].alert_unit);
         document.getElementById('gps-details-panel').classList.add('hidden'); 
-        showLocSuccess(`${state.unitNo}, ${document.getElementById('gps-detected-text').innerText}`);
+        
+        let detectedText = document.getElementById('gps-detected-text').innerText;
+        let finalAddress = `${state.unitNo}, ${detectedText}`;
+        
+        let lowerDetected = detectedText.toLowerCase();
+        let lowerUnit = state.unitNo.toLowerCase();
+        
+        if (lowerDetected.startsWith(lowerUnit)) {
+            finalAddress = detectedText;
+        } else {
+            let firstPart = detectedText.split(',')[0].trim().toLowerCase();
+            if (firstPart === lowerUnit) {
+                finalAddress = detectedText;
+            }
+        }
+        
+        showLocSuccess(finalAddress);
     }
     
     function showLocSuccess(addr) { 
@@ -541,9 +569,10 @@
         if (state.gpsWatchId) { navigator.geolocation.clearWatch(state.gpsWatchId); state.gpsWatchId = null; }
         
         document.getElementById('gps-details-panel').classList.remove('hidden'); 
-        document.getElementById('gps-detected-text').innerText = "Please search for your location again.";
+        document.getElementById('gps-detected-text').innerText = "Please search for your location again or detect GPS.";
         document.getElementById('map-verify-link').innerHTML = '';
         document.getElementById('gps-unit-input').value = ''; 
+        document.getElementById('fallback-search-box').classList.remove('hidden');
         
         document.getElementById('validated-loc').classList.add('hidden'); 
         lockStep(3); lockStep(4); 
@@ -591,7 +620,6 @@
 
             let lalamoveHtml = '';
             if(state.mode === 'lalamove') {
-                // Simplified text per requirement
                 lalamoveHtml = `<div class="mt-1 text-[10px] text-orange-300 font-medium">${t[currentLang].lbl_delivery_cost}</div>`;
             }
             
@@ -832,7 +860,6 @@
             Logistics_Mode: state.mode === 'walkin' ? "Walk-in" : "Lalamove",
             Hub_Name: hubData.name,
             Logistics_Schedule: state.logisticsSchedule,
-            // Updated Payload explicitly mentioning "Pay to Arabista"
             Delivery_Fee: state.mode === 'walkin' ? "RM 0" : "RM " + state.deliveryCost.toFixed(2) + " (Pay to Arabista)",
             Services_Total: "RM " + state.servicesTotal,
             Grand_Total: "RM " + state.servicesTotal,
