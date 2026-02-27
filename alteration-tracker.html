@@ -148,8 +148,8 @@
             </div>
 
             <div id="view-orig" class="mb-4">
-                <p class="text-[10px] text-white/40 mb-1" data-t="txt_use_orig">Use the address you provided during the initial booking.</p>
-                <div class="p-3 bg-white/5 border border-white/10 rounded-xl text-sm text-white/90 mb-3 font-medium whitespace-pre-wrap" id="orig-addr-text">...</div>
+                <p class="text-[10px] text-white/40 mb-2" data-t="txt_use_orig">Use the address you provided during the initial booking.</p>
+                <div class="p-4 bg-white/5 border border-white/10 rounded-xl mb-3" id="orig-addr-text">...</div>
                 <button onclick="getQuotation('orig')" class="w-full bg-luxe text-brand font-bold py-3 rounded-xl hover:bg-white transition mt-2 shadow-soft" data-t="btn_check_book">Check Price & Book</button>
             </div>
 
@@ -182,19 +182,28 @@
             </div>
         </div>
 
-        <div id="modal-step-3" class="hidden">
-            <div class="w-16 h-16 rounded-full bg-orange-500/20 text-orange-500 flex items-center justify-center mx-auto mb-4">
-                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-            </div>
-            <h3 class="font-display text-xl text-white mb-1" data-t="modal_est_fee">Estimated Delivery Fee</h3>
-            <h1 class="text-3xl font-bold text-white mb-1" id="quote-amount">RM 0.00</h1>
-            <p class="text-xs text-orange-300 font-bold mb-6 bg-orange-500/10 p-2 rounded inline-block border border-orange-500/20" data-t="txt_pay_cash">Pay Cash directly to the Lalamove Rider.</p>
+        <div id="modal-step-3" class="hidden text-center">
+            <h3 class="font-display text-xl text-white mb-1" data-t="txt_hq_qr_title">Lalamove Delivery Payment</h3>
+            <p class="text-[11px] text-white/50 mb-3" data-t="txt_hq_qr_desc">Please pay the delivery fee to Arabista HQ.</p>
             
-            <button onclick="bookRider()" class="w-full bg-orange-500 text-white font-bold py-3.5 rounded-xl hover:bg-orange-400 transition shadow-[0_0_20px_rgba(249,115,22,0.3)] flex justify-center items-center gap-2" id="btn-final-book">
-                <span data-t="btn_call_rider">Call Rider Now</span>
+            <div class="bg-white p-2 rounded-lg inline-block mb-2 shadow-lg">
+                <img src="images/qr-pay.webp" alt="Arabista HQ QR" class="w-32 h-32 object-contain">
+            </div>
+            
+            <h1 class="text-3xl font-bold text-luxe mb-1" id="quote-amount">RM 0.00</h1>
+            <p class="text-[10px] text-orange-300 font-bold mb-4 bg-orange-500/10 px-3 py-1.5 rounded inline-block border border-orange-500/20" data-t="txt_pay_hq">Scan to pay, then send receipt via WhatsApp.</p>
+            
+            <button onclick="notifyHQPayment()" class="w-full bg-[#25D366] text-white font-bold py-3.5 rounded-xl hover:bg-[#1EBE57] transition shadow-soft flex justify-center items-center gap-2 mb-3" id="btn-wa-hq">
+                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 00-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
+                <span data-t="btn_wa_hq">1. Send Receipt to HQ</span>
+            </button>
+            
+            <button onclick="bookRider()" class="w-full bg-orange-500 text-white font-bold py-3.5 rounded-xl hover:bg-orange-400 transition shadow-[0_0_20px_rgba(249,115,22,0.3)] flex justify-center items-center gap-2 opacity-50 pointer-events-none" id="btn-final-book">
+                <span data-t="btn_call_rider">2. Call Rider Now</span>
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
             </button>
-            <button onclick="closeModal()" class="mt-3 text-xs text-white/30 underline hover:text-white" data-t="btn_cancel">Cancel</button>
+            
+            <button onclick="closeModal()" class="mt-4 text-[10px] text-white/30 underline hover:text-white uppercase tracking-widest" data-t="btn_cancel">Cancel</button>
         </div>
 
     </div>
@@ -212,7 +221,7 @@
     let currentStops = null;
     let currentLang = 'en';
     let isIncomingOrder = false; 
-    let syncInterval = null; // V6.0: Auto refresh
+    let syncInterval = null; 
 
     const t = {
         en: {
@@ -222,7 +231,10 @@
             success_title: "Alteration Completed", success_desc: "Thank you for using our service. If you have any inquiries regarding your alteration, please contact the hub.", btn_contact: "Contact Hub",
             track_lala: "Track Lalamove Map", btn_cancel_rider: "Cancel Lalamove Booking", confirm_cancel_rider: "Are you sure you want to cancel the rider? This action cannot be undone.", txt_canceling: "Canceling...",
             txt_accuracy_check: "Location Accuracy Check", txt_opt_1: "<strong>Option 1:</strong> Use the 'Original Address' if it matches your location perfectly.", txt_opt_2: "<strong>Option 2:</strong> Detect new GPS or Search Map if you are at a different location.",
-            txt_use_orig: "Use the address you provided during the initial booking.", btn_check_book: "Check Price & Book", btn_detect_loc: "Detect My Location", txt_gps_signal: "GPS signal required for accuracy.", btn_search_map: "Search Map", lbl_unit: "Unit / House No.", lbl_building: "Building / Street (Optional)", modal_est_fee: "Estimated Delivery Fee", txt_pay_cash: "Pay Cash directly to the Lalamove Rider.", btn_call_rider: "Call Rider Now", btn_cancel: "Cancel"
+            txt_use_orig: "Use the address you provided during the initial booking.", btn_check_book: "Check Price & Book", btn_detect_loc: "Detect My Location", txt_gps_signal: "GPS signal required for accuracy.", btn_search_map: "Search Map", lbl_unit: "Unit / House No.", lbl_building: "Building / Street (Optional)", btn_cancel: "Cancel",
+            
+            // V6.0 QR TRANSLATIONS
+            txt_alt_fee_title: "Alteration Fee Payment", txt_alt_fee_desc: "Your item is ready! Please pay the alteration fee to the Hub below.", btn_wa_hub: "Send Receipt to Hub", txt_hub_paid_thanks: "Thank you! Please select your return method below:", txt_hq_qr_title: "Lalamove Delivery Payment", txt_hq_qr_desc: "Please pay the delivery fee to Arabista HQ.", txt_pay_hq: "Scan to pay, then send receipt via WhatsApp.", btn_wa_hq: "1. Send Receipt to HQ", btn_call_rider: "2. Call Rider Now", txt_view_map: "View on Google Maps", txt_receipt_sent: "Receipt Sent!"
         },
         bm: {
             page_title: "Jejak Tempahan", page_subtitle: "Masukkan ID tempahan unik anda di bawah.", lbl_id: "ID Tempahan", btn_track: "Jejak Pesanan", txt_loading: "Mencari butiran tempahan...", btn_share: "Kongsi Pautan", lbl_items: "Item untuk Diubahsuai:", section_status: "Status Terkini", back_home: "Kembali ke Utama", btn_nav_hub: "Pandu Arah ke Hub",
@@ -231,7 +243,10 @@
             success_title: "Alterasi Selesai", success_desc: "Terima kasih menggunakan servis kami.", btn_contact: "Hubungi Hub",
             track_lala: "Jejak Peta Lalamove", btn_cancel_rider: "Batal Tempahan Lalamove", confirm_cancel_rider: "Adakah anda pasti mahu membatalkan rider? Tindakan ini tidak boleh diubah.", txt_canceling: "Membatalkan...",
             txt_accuracy_check: "Semakan Ketepatan Lokasi", txt_opt_1: "<strong>Pilihan 1:</strong> Guna 'Alamat Asal' jika ia menepati lokasi anda dengan tepat.", txt_opt_2: "<strong>Pilihan 2:</strong> Kesan GPS baru atau Cari Peta jika anda berada di lokasi berbeza.",
-            txt_use_orig: "Guna alamat yang anda berikan semasa tempahan awal.", btn_check_book: "Semak Harga & Tempah", btn_detect_loc: "Kesan Lokasi Saya", txt_gps_signal: "Isyarat GPS diperlukan untuk ketepatan.", btn_search_map: "Cari Peta", lbl_unit: "No. Unit / Rumah", lbl_building: "Bangunan / Jalan (Pilihan)", modal_est_fee: "Anggaran Caj Penghantaran", txt_pay_cash: "Bayar Tunai terus kepada Rider Lalamove.", btn_call_rider: "Panggil Rider Sekarang", btn_cancel: "Batal"
+            txt_use_orig: "Guna alamat yang anda berikan semasa tempahan awal.", btn_check_book: "Semak Harga & Tempah", btn_detect_loc: "Kesan Lokasi Saya", txt_gps_signal: "Isyarat GPS diperlukan untuk ketepatan.", btn_search_map: "Cari Peta", lbl_unit: "No. Unit / Rumah", lbl_building: "Bangunan / Jalan (Pilihan)", btn_cancel: "Batal",
+            
+            // V6.0 QR TRANSLATIONS
+            txt_alt_fee_title: "Bayaran Caj Alterasi", txt_alt_fee_desc: "Barang anda dah siap! Sila bayar caj alterasi kepada Hub di bawah.", btn_wa_hub: "Hantar Resit ke Hub", txt_hub_paid_thanks: "Terima kasih! Sila pilih kaedah penghantaran di bawah:", txt_hq_qr_title: "Bayaran Lalamove", txt_hq_qr_desc: "Sila bayar caj penghantaran kepada Arabista HQ.", txt_pay_hq: "Imbas untuk bayar, dan hantar resit di WhatsApp.", btn_wa_hq: "1. Hantar Resit ke HQ", btn_call_rider: "2. Panggil Rider", txt_view_map: "Lihat di Google Maps", txt_receipt_sent: "Resit Dihantar!"
         }
     };
 
@@ -244,7 +259,6 @@
             btnEn.className = lang === 'en' ? "text-xs font-bold text-luxe" : "text-xs text-white/50 hover:text-white transition";
             btnBm.className = lang === 'bm' ? "text-xs font-bold text-luxe" : "text-xs text-white/50 hover:text-white transition";
         }
-        
         if(currentData) buildTimeline(currentData.orderStatus);
     }
 
@@ -256,8 +270,6 @@
         if (urlParams.get('id')) { 
             document.getElementById('loading-panel').classList.remove('hidden'); 
             fetchTrackingData(urlParams.get('id')); 
-            
-            // V6.0: Silent Auto-Refresh every 60s
             syncInterval = setInterval(() => { fetchTrackingData(urlParams.get('id'), true); }, 60000);
         } else { 
             document.getElementById('search-panel').classList.remove('hidden'); 
@@ -284,7 +296,6 @@
             
             currentData = data.trackData;
             
-            // Ensure Map link is shown if Self-Pickup or Dropoff phase
             if(currentData.orderStatus.includes("Dropoff") || currentData.outboundChoice === "Self-Pickup") {
                 document.getElementById('hub-map-link').classList.remove('hidden');
             } else {
@@ -305,7 +316,6 @@
             
             renderDashboard();
         } catch (error) { 
-            console.error(error);
             if(!isSilent) alert("Connection Error"); 
         }
     }
@@ -364,12 +374,37 @@
             if (stage === "Ready for Return" && isCurrent) {
                 isIncomingOrder = false;
                 if (!currentData.outboundChoice) {
-                    extraText = `
-                    <div class="mt-2 text-xs text-white/70 mb-3">${t[currentLang].action_desc_ready}</div>
-                    <div class="flex gap-2">
-                         <button onclick="triggerOutbound('Lalamove')" class="flex-1 py-3 rounded-xl bg-luxe text-brand text-xs font-bold hover:bg-white transition shadow-soft flex justify-center items-center">${t[currentLang].btn_lalamove}</button>
-                         <button onclick="setReturnChoice('Self-Pickup', this)" class="flex-1 py-3 rounded-xl border border-luxe text-luxe text-xs font-bold hover:bg-luxe/20 transition flex justify-center items-center">${t[currentLang].btn_self_pickup}</button>
-                    </div>`;
+                    
+                    // V6.0: GATE 1 - Hub Alteration Fee Payment
+                    let hasPaidHub = sessionStorage.getItem('paid_hub_' + currentData.alterationId) === 'true';
+                    
+                    if (!hasPaidHub) {
+                        extraText = `
+                        <div class="mt-4 bg-white/5 rounded-xl p-5 border border-white/10 text-center shadow-lg relative overflow-hidden">
+                            <div class="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-transparent via-luxe to-transparent"></div>
+                            <h4 class="font-bold text-white mb-1" data-t="txt_alt_fee_title">${t[currentLang].txt_alt_fee_title}</h4>
+                            <p class="text-[11px] text-white/50 mb-4" data-t="txt_alt_fee_desc">${t[currentLang].txt_alt_fee_desc}</p>
+                            
+                            <div class="bg-white p-2 rounded-lg inline-block mb-3 shadow-md">
+                                <img src="${currentData.hubQr || 'images/hub-1-qr.webp'}" alt="Hub QR Code" class="w-32 h-32 object-contain">
+                            </div>
+                            
+                            <div class="text-2xl font-bold text-luxe mb-5">${currentData.servicesTotal}</div>
+                            
+                            <button onclick="notifyHubPayment()" class="w-full py-3.5 bg-[#25D366] text-white text-sm font-bold rounded-xl hover:bg-[#1EBE57] transition shadow-soft flex justify-center items-center gap-2">
+                                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 00-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
+                                <span data-t="btn_wa_hub">${t[currentLang].btn_wa_hub}</span>
+                            </button>
+                        </div>`;
+                    } else {
+                        // GATE 1 Passed - Show delivery choices
+                        extraText = `
+                        <div class="mt-2 text-xs text-white/70 mb-3" data-t="txt_hub_paid_thanks">${t[currentLang].txt_hub_paid_thanks}</div>
+                        <div class="flex gap-2">
+                             <button onclick="triggerOutbound('Lalamove')" class="flex-1 py-3 rounded-xl bg-luxe text-brand text-xs font-bold hover:bg-white transition shadow-soft flex justify-center items-center">${t[currentLang].btn_lalamove}</button>
+                             <button onclick="setReturnChoice('Self-Pickup', this)" class="flex-1 py-3 rounded-xl border border-luxe text-luxe text-xs font-bold hover:bg-luxe/20 transition flex justify-center items-center">${t[currentLang].btn_self_pickup}</button>
+                        </div>`;
+                    }
                 } else {
                     const boxTpl = document.getElementById('tpl-resolved-box');
                     const box = boxTpl.content.cloneNode(true);
@@ -381,8 +416,6 @@
 
             if (stage === "Dispatched" && isCurrent) {
                 const displayStatus = currentData.lalamoveStatus || sessionStorage.getItem('lala_status_' + currentData.alterationId) || 'ASSIGNING_DRIVER';
-                
-                // V6.0: Cancel Rider Button Logic
                 let cancelBtnHtml = "";
                 if (displayStatus !== "COMPLETED" && displayStatus !== "CANCELED") {
                     cancelBtnHtml = `<button onclick="cancelRider()" class="mt-3 w-full py-2 border border-red-500/50 text-red-400 text-xs font-bold rounded hover:bg-red-500/10 transition" data-t="btn_cancel_rider">${t[currentLang].btn_cancel_rider}</button>`;
@@ -433,12 +466,19 @@
 
     function goToStep2() { 
         showModalStep(2); 
-        // V6.0: Smart Address Tab Selection
         if (currentData.originalLat && currentData.originalAddress) {
-            document.getElementById('orig-addr-text').innerText = currentData.originalAddress;
+            
+            // V6.0 Task 13: UI Bug Fix - Full Address & Google Maps Link
+            document.getElementById('orig-addr-text').innerHTML = `
+                <span class="block text-sm text-white/90 mb-1">${currentData.originalAddress}</span>
+                <a href="https://maps.google.com/?q=${currentData.originalLat},${currentData.originalLng}" target="_blank" class="text-[10px] text-luxe underline inline-flex items-center gap-1 hover:text-white transition">
+                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+                    <span data-t="txt_view_map">${t[currentLang].txt_view_map}</span>
+                </a>
+            `;
             toggleLocMethod('orig');
         } else {
-            document.getElementById('tab-orig').classList.add('hidden'); // Hide original if no data
+            document.getElementById('tab-orig').classList.add('hidden'); 
             toggleLocMethod('gps');
         }
     }
@@ -520,7 +560,6 @@
         }
     }
 
-    // V6.0: Refactored Quotation Logic to handle "Original" tab
     async function getQuotation(method = 'new') {
         const btn = (method === 'orig') ? document.querySelector('#view-orig button') : document.querySelector('#addr-fields button');
         const origText = btn.innerText; 
@@ -554,10 +593,46 @@
             if(data.status === "success") {
                 activeQuoteId = data.quotationId; currentStops = data.stops;
                 document.getElementById('quote-amount').innerText = `${data.currency} ${data.amount}`;
+                
+                // Lock the Call Rider button initially
+                const bookBtn = document.getElementById('btn-final-book');
+                bookBtn.classList.add('opacity-50', 'pointer-events-none');
+                const waBtn = document.getElementById('btn-wa-hq');
+                waBtn.classList.replace('bg-white/10', 'bg-[#25D366]');
+                waBtn.classList.replace('text-white/50', 'text-white');
+                waBtn.innerHTML = `<svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 00-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg> <span data-t="btn_wa_hq">${t[currentLang].btn_wa_hq}</span>`;
+                
                 showModalStep(3);
             } else { alert("Fee Error: " + (data.message || "Unknown")); }
             btn.innerText = origText; btn.disabled = false;
         } catch(e) { alert("Error"); btn.innerText = origText; btn.disabled = false; }
+    }
+
+    // V6.0: WA Notifiers (The Gates)
+    function notifyHubPayment() {
+        sessionStorage.setItem('paid_hub_' + currentData.alterationId, 'true');
+        const phone = currentData.hubPhone || "60192482084"; 
+        let cleanPhone = phone.replace(/[^0-9]/g, ''); 
+        if (cleanPhone.startsWith('0')) cleanPhone = '6' + cleanPhone;
+        const msg = `Hi Arabista Hub, I have paid ${currentData.servicesTotal} for Alteration Order ${currentData.alterationId}. [Attached is my receipt]`;
+        window.open(`https://wa.me/${cleanPhone}?text=${encodeURIComponent(msg)}`, '_blank');
+        renderDashboard(); // Re-render to unlock delivery buttons
+    }
+
+    function notifyHQPayment() {
+        const hqPhone = "60126913286";
+        const amt = document.getElementById('quote-amount').innerText;
+        const msg = `Hi Arabista HQ, I am paying ${amt} for Lalamove (Order: ${currentData.alterationId}). [Attached is my receipt]`;
+        window.open(`https://wa.me/${hqPhone}?text=${encodeURIComponent(msg)}`, '_blank');
+        
+        // Unlock Gate 2: Call Rider Button
+        const bookBtn = document.getElementById('btn-final-book');
+        bookBtn.classList.remove('opacity-50', 'pointer-events-none');
+        
+        const waBtn = document.getElementById('btn-wa-hq');
+        waBtn.classList.replace('bg-[#25D366]', 'bg-white/10');
+        waBtn.classList.replace('text-white', 'text-white/50');
+        waBtn.innerHTML = `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> <span data-t="txt_receipt_sent">${t[currentLang].txt_receipt_sent}</span>`;
     }
 
     async function bookRider() {
@@ -583,12 +658,11 @@
         try {
             const res = await fetch(scriptURL, { method: 'POST', body: JSON.stringify(payload) });
             const data = await res.json();
-            if(data.status === "success") { alert("Driver Booked!"); window.location.reload(); }
+            if(data.status === "success") { window.location.reload(); }
             else { alert("Failed: " + data.message); btn.innerHTML = "Retry"; btn.disabled = false; }
         } catch(e) { alert("Error"); }
     }
     
-    // V6.0: Cancel Rider Logic
     async function cancelRider() {
         if(!confirm(t[currentLang].confirm_cancel_rider)) return;
         try {
@@ -601,17 +675,10 @@
     
     function setReturnChoice(choice) { fetch(scriptURL, { method: 'POST', body: JSON.stringify({ action: "update_outbound", alteration_id: currentData.alterationId, outbound_choice: choice }) }).then(()=>window.location.reload()); }
     
-    // V6.0: Native Share Link Logic
     function shareLink() { 
         if (navigator.share) {
-            navigator.share({
-                title: 'Arabista Alteration Tracker',
-                url: window.location.href
-            }).catch(console.error);
-        } else {
-            navigator.clipboard.writeText(window.location.href); 
-            alert("Copied to clipboard!"); 
-        }
+            navigator.share({ title: 'Arabista Alteration Tracker', url: window.location.href }).catch(console.error);
+        } else { navigator.clipboard.writeText(window.location.href); alert("Copied to clipboard!"); }
     }
   </script>
 </body>
