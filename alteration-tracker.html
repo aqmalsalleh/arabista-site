@@ -135,9 +135,13 @@
         <h4 class="font-bold text-white mb-1 text-xl font-display mt-2" data-t="txt_alt_fee_title">Alteration Fee Payment</h4>
         <p class="text-[11px] text-white/50 mb-5" data-t="txt_alt_fee_desc">Your item is ready! Please pay the alteration fee to the Hub below.</p>
         
-        <div class="bg-white p-2 rounded-lg inline-block mb-3 shadow-md">
-            <img id="modal-hub-qr" src="images/hub-1-qr.webp" alt="Hub QR Code" class="w-32 h-32 object-contain">
+        <div class="bg-white p-2 rounded-lg inline-block mb-1 shadow-md cursor-pointer relative group" onclick="openFullscreenQR(document.getElementById('modal-hub-qr').src)">
+            <img id="modal-hub-qr" src="images/hub-1-qr.webp" alt="Hub QR Code" class="w-32 h-32 object-contain transition duration-300 group-hover:opacity-60">
+            <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition duration-300">
+                <svg class="w-8 h-8 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"></path></svg>
+            </div>
         </div>
+        <p class="text-[9px] text-white/40 mb-3 uppercase tracking-widest cursor-pointer hover:text-white transition" onclick="openFullscreenQR(document.getElementById('modal-hub-qr').src)" data-t="txt_click_enlarge">Click QR to enlarge</p>
         
         <div class="text-3xl font-bold text-luxe mb-6" id="modal-hub-fee">RM 0.00</div>
         
@@ -209,9 +213,13 @@
             <h3 class="font-display text-xl text-white mb-1" data-t="txt_hq_qr_title">Lalamove Delivery Payment</h3>
             <p class="text-[11px] text-white/50 mb-3" data-t="txt_hq_qr_desc">Please pay the delivery fee to Arabista HQ.</p>
             
-            <div class="bg-white p-2 rounded-lg inline-block mb-2 shadow-lg">
-                <img src="images/qr-pay.webp" alt="Arabista HQ QR" class="w-32 h-32 object-contain">
+            <div class="bg-white p-2 rounded-lg inline-block mb-1 shadow-lg cursor-pointer relative group" onclick="openFullscreenQR('images/qr-pay.webp')">
+                <img src="images/qr-pay.webp" alt="Arabista HQ QR" class="w-32 h-32 object-contain transition duration-300 group-hover:opacity-60">
+                <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition duration-300">
+                    <svg class="w-8 h-8 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"></path></svg>
+                </div>
             </div>
+            <p class="text-[9px] text-white/40 mb-3 uppercase tracking-widest cursor-pointer hover:text-white transition" onclick="openFullscreenQR('images/qr-pay.webp')" data-t="txt_click_enlarge">Click QR to enlarge</p>
             
             <h1 class="text-3xl font-bold text-luxe mb-1" id="quote-amount">RM 0.00</h1>
             <p class="text-[10px] text-orange-300 font-bold mb-4 bg-orange-500/10 px-3 py-1.5 rounded inline-block border border-orange-500/20" data-t="txt_pay_hq">Scan to pay, then send receipt via WhatsApp.</p>
@@ -230,6 +238,14 @@
         </div>
 
     </div>
+  </div>
+
+  <div id="fullscreen-qr-modal" class="fixed inset-0 z-[200] flex flex-col items-center justify-center bg-black/95 backdrop-blur-sm hidden opacity-0 transition-opacity duration-300 px-6 py-10" onclick="closeFullscreenQR()">
+      <button class="absolute top-6 right-6 text-white/50 hover:text-white bg-white/10 hover:bg-white/20 p-2 rounded-full transition"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
+      <div class="bg-white p-4 rounded-2xl shadow-[0_0_50px_rgba(255,255,255,0.1)] transform scale-95 transition-transform duration-300 max-w-sm w-full" id="fullscreen-qr-box" onclick="event.stopPropagation()">
+          <img id="fullscreen-qr-img" src="" class="w-full h-auto object-contain rounded-xl">
+      </div>
+      <p class="mt-8 text-white/60 text-sm font-medium animate-pulse" data-t="txt_save_instruction">Long press or screenshot to save</p>
   </div>
 
   <script>
@@ -255,9 +271,8 @@
             track_lala: "Track Lalamove Map", btn_cancel_rider: "Cancel Lalamove Booking", confirm_cancel_rider: "Are you sure you want to cancel the rider? This action cannot be undone.", txt_canceling: "Canceling...",
             txt_accuracy_check: "Location Accuracy Check", txt_opt_1: "<strong>Option 1:</strong> Use the 'Original Address' if it matches your location perfectly.", txt_opt_2: "<strong>Option 2:</strong> Detect new GPS or Search Map if you are at a different location.",
             txt_use_orig: "Use the address you provided during the initial booking.", btn_check_book: "Check Price & Book", btn_detect_loc: "Detect My Location", txt_gps_signal: "GPS signal required for accuracy.", btn_search_map: "Search Map", lbl_unit: "Unit / House No.", lbl_building: "Building / Street (Optional)", btn_cancel: "Cancel",
-            
-            // V6.0 QR TRANSLATIONS
-            txt_alt_fee_title: "Alteration Fee Payment", txt_alt_fee_desc: "Your item is ready! Please pay the alteration fee to the Hub below.", btn_wa_hub: "Send Receipt to Hub", txt_hub_paid_thanks: "Thank you! Please select your return method below:", txt_hq_qr_title: "Lalamove Delivery Payment", txt_hq_qr_desc: "Please pay the delivery fee to Arabista HQ.", txt_pay_hq: "Scan to pay, then send receipt via WhatsApp.", btn_wa_hq: "1. Send Receipt to HQ", btn_call_rider: "2. Call Rider Now", txt_view_map: "View on Google Maps", txt_receipt_sent: "Receipt Sent!", txt_action_pay: "Payment Required for Alteration", btn_pay_alt: "Pay Alteration Fee", btn_view_hub_qr: "View Hub QR Code Again", btn_close: "Close"
+            txt_alt_fee_title: "Alteration Fee Payment", txt_alt_fee_desc: "Your item is ready! Please pay the alteration fee to the Hub below.", btn_wa_hub: "Send Receipt to Hub", txt_hub_paid_thanks: "Thank you! Please select your return method below:", txt_hq_qr_title: "Lalamove Delivery Payment", txt_hq_qr_desc: "Please pay the delivery fee to Arabista HQ.", txt_pay_hq: "Scan to pay, then send receipt via WhatsApp.", btn_wa_hq: "1. Send Receipt to HQ", btn_call_rider: "2. Call Rider Now", txt_view_map: "View on Google Maps", txt_receipt_sent: "Receipt Sent!", txt_action_pay: "Payment Required for Alteration", btn_pay_alt: "Pay Alteration Fee", btn_view_hub_qr: "View Hub QR Code Again", btn_close: "Close",
+            txt_click_enlarge: "Click QR to enlarge", txt_save_instruction: "Long press or screenshot to save"
         },
         bm: {
             page_title: "Jejak Tempahan", page_subtitle: "Masukkan ID tempahan unik anda di bawah.", lbl_id: "ID Tempahan", btn_track: "Jejak Pesanan", txt_loading: "Mencari butiran tempahan...", btn_share: "Kongsi Pautan", lbl_items: "Item untuk Diubahsuai:", section_status: "Status Terkini", back_home: "Kembali ke Utama", btn_nav_hub: "Pandu Arah ke Hub",
@@ -267,9 +282,8 @@
             track_lala: "Jejak Peta Lalamove", btn_cancel_rider: "Batal Tempahan Lalamove", confirm_cancel_rider: "Adakah anda pasti mahu membatalkan rider? Tindakan ini tidak boleh diubah.", txt_canceling: "Membatalkan...",
             txt_accuracy_check: "Semakan Ketepatan Lokasi", txt_opt_1: "<strong>Pilihan 1:</strong> Guna 'Alamat Asal' jika ia menepati lokasi anda dengan tepat.", txt_opt_2: "<strong>Pilihan 2:</strong> Kesan GPS baru atau Cari Peta jika anda berada di lokasi berbeza.",
             txt_use_orig: "Guna alamat yang anda berikan semasa tempahan awal.", btn_check_book: "Semak Harga & Tempah", btn_detect_loc: "Kesan Lokasi Saya", txt_gps_signal: "Isyarat GPS diperlukan untuk ketepatan.", btn_search_map: "Cari Peta", lbl_unit: "No. Unit / Rumah", lbl_building: "Bangunan / Jalan (Pilihan)", btn_cancel: "Batal",
-            
-            // V6.0 QR TRANSLATIONS
-            txt_alt_fee_title: "Bayaran Caj Alterasi", txt_alt_fee_desc: "Barang anda dah siap! Sila bayar caj alterasi kepada Hub di bawah.", btn_wa_hub: "Hantar Resit ke Hub", txt_hub_paid_thanks: "Terima kasih! Sila pilih kaedah penghantaran di bawah:", txt_hq_qr_title: "Bayaran Lalamove", txt_hq_qr_desc: "Sila bayar caj penghantaran kepada Arabista HQ.", txt_pay_hq: "Imbas untuk bayar, dan hantar resit di WhatsApp.", btn_wa_hq: "1. Hantar Resit ke HQ", btn_call_rider: "2. Panggil Rider", txt_view_map: "Lihat di Google Maps", txt_receipt_sent: "Resit Dihantar!", txt_action_pay: "Bayaran Alterasi Diperlukan", btn_pay_alt: "Bayar Caj Alterasi", btn_view_hub_qr: "Lihat Semula QR Hub", btn_close: "Tutup"
+            txt_alt_fee_title: "Bayaran Caj Alterasi", txt_alt_fee_desc: "Barang anda dah siap! Sila bayar caj alterasi kepada Hub di bawah.", btn_wa_hub: "Hantar Resit ke Hub", txt_hub_paid_thanks: "Terima kasih! Sila pilih kaedah penghantaran di bawah:", txt_hq_qr_title: "Bayaran Lalamove", txt_hq_qr_desc: "Sila bayar caj penghantaran kepada Arabista HQ.", txt_pay_hq: "Imbas untuk bayar, dan hantar resit di WhatsApp.", btn_wa_hq: "1. Hantar Resit ke HQ", btn_call_rider: "2. Panggil Rider", txt_view_map: "Lihat di Google Maps", txt_receipt_sent: "Resit Dihantar!", txt_action_pay: "Bayaran Alterasi Diperlukan", btn_pay_alt: "Bayar Caj Alterasi", btn_view_hub_qr: "Lihat Semula QR Hub", btn_close: "Tutup",
+            txt_click_enlarge: "Klik QR untuk besarkan", txt_save_instruction: "Tekan lama atau screenshot untuk simpan"
         }
     };
 
@@ -330,7 +344,7 @@
                 if (h) { 
                     hubData = { phone: h.phone, lat: h.lat, lng: h.lng }; 
                     const driveBtn = document.getElementById('btn-drive-hub');
-                    if(driveBtn) driveBtn.href = `http://googleusercontent.com/maps.google.com/?q=${h.lat},${h.lng}`;
+                    if(driveBtn) driveBtn.href = `https://www.google.com/maps/search/?api=1&query=${h.lat},${h.lng}`;
                 }
             }
             
@@ -398,7 +412,6 @@
                 isIncomingOrder = false;
                 if (!currentData.outboundChoice) {
                     
-                    // V6.0: GATE 1 - Hub Alteration Fee Payment Check
                     let hasPaidHub = sessionStorage.getItem('paid_hub_' + currentData.alterationId) === 'true';
                     
                     if (!hasPaidHub) {
@@ -409,13 +422,11 @@
                             <span data-t="btn_pay_alt">${t[currentLang].btn_pay_alt}</span>
                         </button>
                         `;
-                        // Auto popup on load (only once)
                         if(!window.hubModalShown) {
                             window.hubModalShown = true;
                             setTimeout(() => { openHubPayModal(); }, 600);
                         }
                     } else {
-                        // GATE 1 Passed - Show delivery choices and View QR button
                         extraText = `
                         <div class="mt-2 text-xs text-green-400 mb-3 font-bold flex items-center gap-1">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> 
@@ -463,16 +474,20 @@
         document.getElementById('timeline-container').innerHTML = html;
     }
 
-    function renderLalamoveSteps(status) {
-        const steps = [{label:'Assigning'},{label:'Found'},{label:'Picked Up'},{label:'Delivered'}];
-        let activeIdx = 0;
-        if(status === 'ON_GOING') activeIdx = 1; 
-        if(status === 'PICKED_UP') activeIdx = 2; 
-        if(status === 'COMPLETED') activeIdx = 3;
-        return steps.map((s, i) => `<div class="lala-step ${i <= activeIdx ? (i === activeIdx ? 'active' : 'completed') : ''}"><div class="lala-dot"></div><span class="lala-label">${s.label}</span></div>`).join('');
+    function openFullscreenQR(src) {
+        const modal = document.getElementById('fullscreen-qr-modal');
+        const box = document.getElementById('fullscreen-qr-box');
+        document.getElementById('fullscreen-qr-img').src = src;
+        modal.classList.remove('hidden');
+        setTimeout(() => { modal.classList.remove('opacity-0'); box.classList.remove('scale-95'); }, 10);
+    }
+    function closeFullscreenQR() {
+        const modal = document.getElementById('fullscreen-qr-modal');
+        const box = document.getElementById('fullscreen-qr-box');
+        modal.classList.add('opacity-0'); box.classList.add('scale-95');
+        setTimeout(() => { modal.classList.add('hidden'); }, 300);
     }
 
-    // V6.0: HUB PAYMENT MODAL LOGIC (GATE 1)
     function openHubPayModal(isReview = false) {
         document.getElementById('modal-hub-qr').src = currentData.hubQr || 'images/hub-1-qr.webp';
         document.getElementById('modal-hub-fee').innerText = currentData.servicesTotal;
@@ -511,10 +526,9 @@
         const msg = `Hi Arabista Hub, I have paid ${currentData.servicesTotal} for Alteration Order ${currentData.alterationId}. [Attached is my receipt]`;
         window.open(`https://wa.me/${cleanPhone}?text=${encodeURIComponent(msg)}`, '_blank');
         closeHubPayModal();
-        renderDashboard(); // Re-render to unlock delivery buttons
+        renderDashboard(); 
     }
 
-    // LALAMOVE DELIVERY MODALS
     function showModalStep(n) {
         const modal = document.getElementById('action-modal'); const box = document.getElementById('action-modal-box');
         modal.classList.remove('hidden'); modal.classList.remove('opacity-0'); 
@@ -530,23 +544,23 @@
         setTimeout(() => { modal.classList.add('hidden'); }, 300); 
     }
 
-    // V6.0 Task 13: Elegant Formatting for Original Address
     async function loadOriginalAddress() {
         const origContainer = document.getElementById('orig-addr-text');
         const raw = currentData.originalAddress || "";
-        let unitPart = "Saved Address";
+        let unitPart = "";
         let restPart = raw;
         
         if(raw.includes(',')) {
             unitPart = raw.substring(0, raw.indexOf(',')).trim();
             restPart = raw.substring(raw.indexOf(',')+1).trim();
+            // Clean up GPS artifacts if they exist in string
             if(restPart.includes('GPS:')) {
                 restPart = restPart.substring(0, restPart.indexOf('GPS:')).trim();
                 if(restPart.endsWith(',')) restPart = restPart.substring(0, restPart.length - 1).trim();
             }
         }
 
-        origContainer.innerHTML = `<div class="animate-pulse text-white/50 text-xs py-2">Translating GPS Coordinates...</div>`;
+        origContainer.innerHTML = `<div class="animate-pulse text-white/50 text-xs py-2">Acquiring detailed location info...</div>`;
 
         let prettyAddress = restPart;
         if(currentData.originalLat && currentData.originalLng) {
@@ -560,16 +574,16 @@
         origContainer.innerHTML = `
             <div class="mb-3 border-b border-white/10 pb-3">
                 <span class="text-[10px] uppercase tracking-widest text-white/40 block mb-0.5" data-t="lbl_unit">${t[currentLang].lbl_unit}</span>
-                <span class="text-sm font-bold text-white">${unitPart}</span>
+                <span class="text-sm font-bold text-white">${unitPart || 'N/A'}</span>
             </div>
             <div class="mb-4">
                 <span class="text-[10px] uppercase tracking-widest text-white/40 block mb-0.5">Location</span>
                 <span class="text-xs text-white/80 leading-relaxed">${prettyAddress}</span>
             </div>
-            <a href="http://googleusercontent.com/maps.google.com/?q=${currentData.originalLat},${currentData.originalLng}" target="_blank" class="w-full flex justify-center items-center gap-2 text-[11px] font-bold text-luxe bg-luxe/10 hover:bg-luxe hover:text-brand border border-luxe/30 py-2.5 rounded-lg transition">
+            <a href="https://www.google.com/maps/search/?api=1&query=${currentData.originalLat},${currentData.originalLng}" target="_blank" class="w-full flex justify-center items-center gap-2 text-[11px] font-bold text-luxe bg-luxe/10 hover:bg-luxe hover:text-brand border border-luxe/30 py-2.5 rounded-lg transition">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
                 <span data-t="txt_view_map">${t[currentLang].txt_view_map}</span>
-                <span>(${parseFloat(currentData.originalLat).toFixed(5)}, ${parseFloat(currentData.originalLng).toFixed(5)})</span>
+                <span class="font-mono opacity-50">(${parseFloat(currentData.originalLat).toFixed(4)}, ${parseFloat(currentData.originalLng).toFixed(4)})</span>
             </a>
         `;
     }
@@ -696,7 +710,6 @@
                 activeQuoteId = data.quotationId; currentStops = data.stops;
                 document.getElementById('quote-amount').innerText = `${data.currency} ${data.amount}`;
                 
-                // GATE 2: Reset UI to force HQ Payment WA
                 const bookBtn = document.getElementById('btn-final-book');
                 bookBtn.classList.add('opacity-50', 'pointer-events-none');
                 const waBtn = document.getElementById('btn-wa-hq');
@@ -710,13 +723,23 @@
         } catch(e) { alert("Error"); btn.innerText = origText; btn.disabled = false; }
     }
 
+    function notifyHubPayment() {
+        sessionStorage.setItem('paid_hub_' + currentData.alterationId, 'true');
+        const phone = currentData.hubPhone || "60192482084"; 
+        let cleanPhone = phone.replace(/[^0-9]/g, ''); 
+        if (cleanPhone.startsWith('0')) cleanPhone = '6' + cleanPhone;
+        const msg = `Hi Arabista Hub, I have paid ${currentData.servicesTotal} for Alteration Order ${currentData.alterationId}. [Attached is my receipt]`;
+        window.open(`https://wa.me/${cleanPhone}?text=${encodeURIComponent(msg)}`, '_blank');
+        closeHubPayModal();
+        renderDashboard(); 
+    }
+
     function notifyHQPayment() {
         const hqPhone = "60126913286";
         const amt = document.getElementById('quote-amount').innerText;
         const msg = `Hi Arabista HQ, I am paying ${amt} for Lalamove (Order: ${currentData.alterationId}). [Attached is my receipt]`;
         window.open(`https://wa.me/${hqPhone}?text=${encodeURIComponent(msg)}`, '_blank');
         
-        // Unlock Gate 2: Call Rider Button
         const bookBtn = document.getElementById('btn-final-book');
         bookBtn.classList.remove('opacity-50', 'pointer-events-none');
         
@@ -749,7 +772,7 @@
         try {
             const res = await fetch(scriptURL, { method: 'POST', body: JSON.stringify(payload) });
             const data = await res.json();
-            if(data.status === "success") { window.location.reload(); }
+            if(data.status === \"success\") { window.location.reload(); }
             else { alert("Failed: " + data.message); btn.innerHTML = "Retry"; btn.disabled = false; }
         } catch(e) { alert("Error"); }
     }
