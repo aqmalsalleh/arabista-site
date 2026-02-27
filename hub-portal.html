@@ -237,8 +237,7 @@
             wa_approved: "Hi {name}! Your alteration request (Order {id}) has been APPROVED by Arabista Hub! Please click your tracker link to arrange delivery/drop-off: {link}",
             nav_orders: "Orders", nav_search: "Search", nav_settings: "Settings",
             confirm_update: "Update this order to: {status}?", edit_addr_warn: "Editing Shop Address.\n\nPlease ensure this matches your exact GPS Coordinates for accurate Lalamove routing.",
-            alert_action_required: "Action Required! Customer confirmed delivery choice.",
-            btn_cancel_rider: "Cancel Rider", confirm_cancel_rider: "Are you sure you want to cancel the Lalamove rider?"
+            alert_action_required: "Action Required! Customer confirmed delivery choice."
         },
         bm: {
             login_title: "Portal Tukang Jahit", login_desc: "Masukkan No. Telefon dan PIN Hub anda.", lbl_phone: "No. Telefon", lbl_pin: "PIN 6-Digit", btn_login: "Log Masuk Selamat",
@@ -260,8 +259,7 @@
             wa_approved: "Hai {name}! Tempahan alterasi anda (Order {id}) telah DILULUSKAN oleh Arabista Hub! Sila klik pautan ini untuk aturkan penghantaran/drop-off: {link}",
             nav_orders: "Pesanan", nav_search: "Cari", nav_settings: "Tetapan",
             confirm_update: "Kemaskini pesanan ini kepada: {status}?", edit_addr_warn: "Mengedit Alamat Kedai.\n\nPastikan ia sepadan dengan Koordinat GPS untuk routing Lalamove yang tepat.",
-            alert_action_required: "Tindakan Diperlukan! Pelanggan telah memilih cara penghantaran.",
-            btn_cancel_rider: "Batal Rider", confirm_cancel_rider: "Adakah anda pasti mahu membatalkan rider Lalamove?"
+            alert_action_required: "Tindakan Diperlukan! Pelanggan telah memilih cara penghantaran."
         }
     };
 
@@ -386,9 +384,10 @@
 
     function playAlert(type) {
         try {
-            let soundUrl = 'https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3';
-            if (type === 2) soundUrl = 'https://www.soundjay.com/buttons/sounds/beep-07.mp3';
-            if (type === 3) soundUrl = 'https://www.soundjay.com/buttons/sounds/beep-07.mp3'; 
+            // V6.0: Upgraded Notification Sounds to reliable Mixkit CDNs
+            let soundUrl = 'https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3'; // Chime (New Request)
+            if (type === 2) soundUrl = 'https://assets.mixkit.co/active_storage/sfx/2870/2870-preview.mp3'; // Ping (Action Required)
+            if (type === 3) soundUrl = 'https://assets.mixkit.co/active_storage/sfx/1435/1435-preview.mp3'; // Bell (Arrived)
             
             const msg = type === 1 ? (currentLang === 'bm' ? "Pesanan Baru Diterima!" : "New Alteration Order!") : t[currentLang].alert_action_required;
             const audio = new Audio(soundUrl); 
@@ -524,7 +523,10 @@
                     <div class="bg-[#1A1B1E] border border-luxe/50 rounded-xl p-4 shadow-[0_0_15px_rgba(192,160,98,0.1)] relative overflow-hidden">
                         <div class="absolute top-0 right-0 bg-luxe text-brand text-[9px] font-bold px-2 py-0.5 rounded-bl-lg uppercase">Action Required</div>
                         <div class="mb-3">
-                            <span class="text-xs text-white/50 font-mono">${o.id}</span>
+                            <div class="flex items-center gap-2 mb-1">
+                                <span class="text-[10px] bg-white/10 px-2 py-0.5 rounded text-white/70 font-mono">${o.id}</span>
+                                <span class="text-[10px] text-white/40">${formatDate(o.date)}</span>
+                            </div>
                             <h3 class="font-bold text-lg text-white">${o.custName}</h3>
                             <p class="text-xs text-luxe mt-1">Est. Fee: ${o.fee}</p>
                         </div>
@@ -669,7 +671,6 @@
                             ${t[currentLang].btn_cust_pickup}
                         </button>`; 
                  } else if (o.outbound === "Lalamove") {
-                     // Locked pending customer booking via Tracker
                      actionHtml = `
                         <button disabled class="flex-1 bg-orange-500/20 text-orange-300 border border-orange-500/30 font-bold py-2.5 rounded-lg text-xs cursor-not-allowed flex justify-center items-center gap-1">
                             <svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> 
@@ -686,7 +687,6 @@
             }
             
             let trackerHtml = "";
-            let cancelBtnHtml = "";
             
             if (o.status === "Dispatched") {
                  const displayStatus = o.lalamoveStatus || sessionStorage.getItem('lala_status_' + o.id) || 'ASSIGNING_DRIVER';
@@ -697,13 +697,6 @@
                             ${renderLalamoveSteps(displayStatus)}
                         </div>
                     </div>`;
-                    
-                 if (displayStatus !== "COMPLETED" && displayStatus !== "CANCELED") {
-                     cancelBtnHtml = `
-                        <button onclick="cancelRider('${o.id}')" class="flex-1 w-full bg-red-500/10 text-red-400 border border-red-500/20 font-bold py-2.5 rounded-lg text-xs hover:bg-red-500/20 transition flex justify-center items-center mt-2">
-                            ${t[currentLang].btn_cancel_rider}
-                        </button>`;
-                 }
             }
 
             list.innerHTML += `
@@ -726,7 +719,6 @@
                     <p class="text-xs text-white/50 mb-4 whitespace-pre-line">${o.items.replace(/\[/g, '').replace(/\]/g, '')}</p>
                     ${trackerHtml}
                     <div class="flex gap-2 w-full">${actionHtml}</div>
-                    ${cancelBtnHtml}
                 </div>`;
         });
     }
@@ -840,24 +832,6 @@
             btn.innerHTML = orig; 
             btn.disabled = false; 
             btn.classList.remove('opacity-70', 'cursor-not-allowed'); 
-        }
-    }
-
-    async function cancelRider(id) {
-        if(!confirm(t[currentLang].confirm_cancel_rider)) return;
-        try {
-            const res = await fetch(scriptURL, { 
-                method: 'POST', 
-                body: JSON.stringify({ action: "cancel_lalamove_order", track_id: id }) 
-            });
-            const data = await res.json();
-            if(data.status === "success") { 
-                loadDashboard(); 
-            } else { 
-                alert("Cancel Failed: " + data.message); 
-            }
-        } catch(e) { 
-            alert("Error canceling."); 
         }
     }
 
