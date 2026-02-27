@@ -87,6 +87,14 @@
         <div class="bg-white/5 border border-white/10 rounded-xl p-5 mb-8">
             <p class="text-sm font-medium mb-1" id="display-name">...</p>
             <p class="text-xs text-white/50 mb-3" id="display-hub">Assigned to: ...</p>
+            
+            <div id="hub-map-link" class="hidden mb-3">
+                 <a href="#" target="_blank" id="btn-drive-hub" rel="noopener noreferrer" class="inline-flex items-center gap-2 text-xs font-bold text-brand bg-white/80 px-3 py-1.5 rounded hover:bg-white transition">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"></path></svg>
+                    <span data-t="btn_nav_hub">Navigate to Hub</span>
+                 </a>
+            </div>
+
             <div class="border-t border-white/10 pt-3">
                 <p class="text-xs text-white/40 mb-1" data-t="lbl_items">Items for Alteration:</p>
                 <p class="text-sm text-white/80 whitespace-pre-line" id="display-items">...</p>
@@ -558,7 +566,8 @@
             btn.classList.replace('bg-[#25D366]', 'bg-white/10');
             btn.classList.replace('hover:bg-[#1EBE57]', 'hover:bg-white/20');
         } else {
-            btn.innerHTML = `<svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 00-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg><span data-t="btn_wa_hub">${t[currentLang].btn_wa_hub}</span>`;
+            btn.innerHTML = `<svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 00-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
+            <span data-t="btn_wa_hub">${t[currentLang].btn_wa_hub}</span>`;
             btn.onclick = notifyHubPayment;
             btn.classList.replace('bg-white/10', 'bg-[#25D366]');
             btn.classList.replace('hover:bg-white/20', 'hover:bg-[#1EBE57]');
@@ -610,7 +619,6 @@
             } catch(e) {}
         }
 
-        // Point 9 Fix: Standardized Map Links
         origContainer.innerHTML = `
             <div class="mb-3 border-b border-white/10 pb-3">
                 <span class="text-[10px] uppercase tracking-widest text-white/40 block mb-0.5" data-t="lbl_unit">${t[currentLang].lbl_unit || "Unit No."}</span>
@@ -620,14 +628,13 @@
                 <span class="text-[10px] uppercase tracking-widest text-white/40 block mb-0.5">Location</span>
                 <span class="text-xs text-white/80 leading-relaxed">${prettyAddress}</span>
             </div>
-            <a href="https://www.google.com/maps/search/?api=1&query=${currentData.originalLat},${currentData.originalLng}" target="_blank" rel="noopener noreferrer" class="w-full flex justify-center items-center gap-2 text-[11px] font-bold text-luxe bg-luxe/10 hover:bg-luxe hover:text-brand border border-luxe/30 py-2.5 rounded-lg transition">
+            <a href="https://www.google.com/maps/dir/?api=1&destination=${currentData.originalLat},${currentData.originalLng}" target="_blank" rel="noopener noreferrer" class="w-full flex justify-center items-center gap-2 text-[11px] font-bold text-luxe bg-luxe/10 hover:bg-luxe hover:text-brand border border-luxe/30 py-2.5 rounded-lg transition">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
                 <span data-t="txt_view_map">${t[currentLang].txt_view_map || "View on Google Maps"}</span>
                 <span class="font-mono opacity-50">(${parseFloat(currentData.originalLat).toFixed(4)}, ${parseFloat(currentData.originalLng).toFixed(4)})</span>
             </a>
         `;
         
-        // Point 1: Re-enable the Book button after processing
         const btnOrigBook = document.getElementById('btn-orig-book');
         if(btnOrigBook) {
             btnOrigBook.classList.remove('animate-pulse', 'opacity-50', 'pointer-events-none');
@@ -638,7 +645,6 @@
     function goToStep2() { 
         showModalStep(2); 
         if (currentData.originalLat && currentData.originalAddress) {
-            // Point 1: Disable Book button initially
             const btnOrigBook = document.getElementById('btn-orig-book');
             if(btnOrigBook) {
                 btnOrigBook.classList.add('animate-pulse', 'opacity-50', 'pointer-events-none');
@@ -685,7 +691,6 @@
         statusTxt.innerHTML = "📡 Acquiring exact satellite coordinates...";
         statusTxt.classList.add('animate-pulse', 'text-luxe');
 
-        // Point 1: Pulse/Disable Book button
         const btnConfirm = document.getElementById('btn-new-book');
         if(btnConfirm) {
             btnConfirm.classList.add('opacity-50', 'pointer-events-none', 'animate-pulse');
@@ -705,7 +710,6 @@
                     else statusTxt.innerText = `GPS: ${custData.lat.toFixed(5)}, ${custData.lng.toFixed(5)}`;
                 } catch(e) {}
                 
-                // Point 1: Re-enable Book button
                 if(btnConfirm) {
                     btnConfirm.classList.remove('opacity-50', 'pointer-events-none', 'animate-pulse');
                     btnConfirm.innerText = t[currentLang].btn_check_book || "Check Price & Book";
@@ -728,7 +732,6 @@
         btn.classList.add('animate-pulse');
         btn.disabled = true;
         
-        // Point 1: Pulse/Disable Book button
         const btnConfirm = document.getElementById('btn-new-book');
         if(btnConfirm) {
             btnConfirm.classList.add('opacity-50', 'pointer-events-none', 'animate-pulse');
@@ -757,7 +760,6 @@
             btn.disabled = false;
         }
         
-        // Point 1: Re-enable Book button
         if(btnConfirm) {
             btnConfirm.classList.remove('opacity-50', 'pointer-events-none', 'animate-pulse');
             btnConfirm.innerText = t[currentLang].btn_check_book || "Check Price & Book";
@@ -856,7 +858,18 @@
         } catch(e) { alert("Error canceling."); }
     }
     
-    function setReturnChoice(choice) { fetch(scriptURL, { method: 'POST', body: JSON.stringify({ action: "update_outbound", alteration_id: currentData.alterationId, outbound_choice: choice }) }).then(()=>window.location.reload()); }
+    // V6.0: Pulsating Self-Pickup Update Logic
+    function setReturnChoice(choice, btn) { 
+        if (btn) {
+            btn.innerHTML = `${spinnerSvg} Wait...`;
+            btn.classList.add('animate-pulse', 'opacity-70', 'pointer-events-none');
+            btn.disabled = true;
+        }
+        fetch(scriptURL, { 
+            method: 'POST', 
+            body: JSON.stringify({ action: "update_outbound", alteration_id: currentData.alterationId, outbound_choice: choice }) 
+        }).then(() => window.location.reload()); 
+    }
     
     function shareLink() { 
         if (navigator.share) {
