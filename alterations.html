@@ -328,6 +328,7 @@
         });
         state.selectedItems = newSelected; refreshStep4Live();
     }
+    
     function refreshStep4Live() {
         if(!document.getElementById('step-4').classList.contains('opacity-30')) {
             document.getElementById('services-container').dataset.needsRender = "true"; renderServices();
@@ -347,7 +348,6 @@
             syncItemsB(); 
             if(state.selectedItems.length === 0) return alert(t[currentLang].alert_item_detail);
             unlockStep(2); document.getElementById('step-2').scrollIntoView({behavior: 'smooth', block: 'center'});
-            setTimeout(() => { useGPS(document.querySelector('#loc-buttons button')); }, 500);
         }
     }
 
@@ -380,18 +380,21 @@
             
             if(data.lat) { 
                 state.lat = data.lat; state.lng = data.lng; 
+                
                 document.getElementById('loc-buttons').classList.add('hidden');
                 document.getElementById('manual-search-box').classList.add('hidden');
+                
                 document.getElementById('gps-detected-text').innerText = `${data.formatted_address || addr}`;
                 
                 // Maps Link for Manual Search Verification
                 document.getElementById('map-verify-link').innerHTML = `
-                    <a href="http://googleusercontent.com/maps.google.com/?q=${state.lat},${state.lng}" target="_blank" class="w-full flex justify-center items-center gap-2 text-[11px] font-bold text-luxe bg-luxe/10 hover:bg-luxe hover:text-brand border border-luxe/30 py-2.5 rounded-lg transition">
+                    <a href="https://www.google.com/maps?q=${state.lat},${state.lng}" target="_blank" class="w-full flex justify-center items-center gap-2 text-[11px] font-bold text-luxe bg-luxe/10 hover:bg-luxe hover:text-brand border border-luxe/30 py-2.5 rounded-lg transition">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
                         <span data-t="txt_view_on_map">${t[currentLang].txt_view_on_map}</span>
                         <span class="font-mono opacity-50">(${parseFloat(state.lat).toFixed(4)}, ${parseFloat(state.lng).toFixed(4)})</span>
                     </a>
                 `;
+                
                 document.getElementById('gps-details-panel').classList.remove('hidden'); 
             } else {
                 document.getElementById('manual-search-error').innerText = t[currentLang].txt_no_results || "❌ Location not found.";
@@ -422,7 +425,7 @@
             
             // Maps Link for Order Address Verification
             document.getElementById('map-verify-link').innerHTML = `
-                <a href="http://googleusercontent.com/maps.google.com/?q=${state.lat},${state.lng}" target="_blank" class="w-full flex justify-center items-center gap-2 text-[11px] font-bold text-luxe bg-luxe/10 hover:bg-luxe hover:text-brand border border-luxe/30 py-2.5 rounded-lg transition">
+                <a href="https://www.google.com/maps?q=${state.lat},${state.lng}" target="_blank" class="w-full flex justify-center items-center gap-2 text-[11px] font-bold text-luxe bg-luxe/10 hover:bg-luxe hover:text-brand border border-luxe/30 py-2.5 rounded-lg transition">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
                     <span data-t="txt_view_on_map">${t[currentLang].txt_view_on_map}</span>
                     <span class="font-mono opacity-50">(${parseFloat(state.lat).toFixed(4)}, ${parseFloat(state.lng).toFixed(4)})</span>
@@ -450,8 +453,13 @@
                 state.lat = pos.coords.latitude; state.lng = pos.coords.longitude; 
                 if(btn) btn.classList.remove('opacity-70', 'pointer-events-none');
                 descEl.innerText = originalText;
+                
+                // V6.3: Smooth Transition Fix
                 document.getElementById('loc-buttons').classList.add('hidden'); 
                 document.getElementById('manual-search-box').classList.add('hidden'); 
+                document.getElementById('map-verify-link').innerHTML = ''; // clear temporarily
+                document.getElementById('gps-detected-text').innerHTML = `<div class="animate-pulse text-white/50 text-sm py-1">Translating GPS to street address...</div>`;
+                document.getElementById('gps-details-panel').classList.remove('hidden');
                 
                 try {
                     const res = await fetch(`${scriptURL}?action=reverse_geocode&lat=${state.lat}&lng=${state.lng}`);
@@ -463,14 +471,12 @@
 
                 // Maps Link for GPS Verification
                 document.getElementById('map-verify-link').innerHTML = `
-                    <a href="http://googleusercontent.com/maps.google.com/?q=${state.lat},${state.lng}" target="_blank" class="w-full flex justify-center items-center gap-2 text-[11px] font-bold text-luxe bg-luxe/10 hover:bg-luxe hover:text-brand border border-luxe/30 py-2.5 rounded-lg transition">
+                    <a href="https://www.google.com/maps?q=${state.lat},${state.lng}" target="_blank" class="w-full flex justify-center items-center gap-2 text-[11px] font-bold text-luxe bg-luxe/10 hover:bg-luxe hover:text-brand border border-luxe/30 py-2.5 rounded-lg transition">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
                         <span data-t="txt_view_on_map">${t[currentLang].txt_view_on_map}</span>
                         <span class="font-mono opacity-50">(${parseFloat(state.lat).toFixed(4)}, ${parseFloat(state.lng).toFixed(4)})</span>
                     </a>
                 `;
-
-                document.getElementById('gps-details-panel').classList.remove('hidden');
             },
             () => { 
                 if(btn) btn.classList.remove('opacity-70', 'pointer-events-none');
@@ -488,7 +494,15 @@
         showLocSuccess(`${state.unitNo}, ${document.getElementById('gps-detected-text').innerText}`);
     }
     
-    function showLocSuccess(addr) { document.getElementById('loc-buttons').classList.add('hidden'); document.getElementById('manual-search-box').classList.add('hidden'); document.getElementById('gps-details-panel').classList.add('hidden'); document.getElementById('validated-loc').classList.remove('hidden'); document.getElementById('final-address').innerText = addr; unlockStep(3); renderHubs(); }
+    function showLocSuccess(addr) { 
+        document.getElementById('loc-buttons').classList.add('hidden'); 
+        document.getElementById('manual-search-box').classList.add('hidden'); 
+        document.getElementById('gps-details-panel').classList.add('hidden'); 
+        document.getElementById('validated-loc').classList.remove('hidden'); 
+        document.getElementById('final-address').innerText = addr; 
+        unlockStep(3); 
+        renderHubs(); 
+    }
     
     function resetLoc() { 
         state.lat = ""; state.lng = ""; state.unitNo = "";
@@ -508,6 +522,7 @@
         let [h, m] = timeStr.split(':'); let hours = parseInt(h); const ampm = hours >= 12 ? 'PM' : 'AM';
         hours = hours % 12; hours = hours ? hours : 12; return `${hours}:${m} ${ampm}`;
     }
+
     function checkHubStatus(hub) {
         if(!hub || !hub.days) return { isOpen: false, text: "Closed" }; 
         const now = new Date(); const currentDay = now.getDay(); const currentTimeNum = now.getHours() + (now.getMinutes() / 60);
@@ -537,7 +552,7 @@
             const status = checkHubStatus(h);
             
             const badgeCls = isFull ? "text-red-400 bg-red-500/10" : (status.isOpen ? "text-green-400 bg-green-500/10" : "text-red-400 bg-red-500/10");
-            const badgeText = isFull ? "🔴 BUSY / FULL" : status.text;
+            const badgeText = isFull ? "BUSY / FULL" : status.text;
             
             const cardClasses = `p-3 rounded-lg border transition flex justify-between items-center gap-3 ${isFull ? 'border-white/5 opacity-50 cursor-not-allowed bg-black/40' : (isSelected ? 'border-luxe bg-luxe/10 hover:bg-white/5 cursor-pointer' : 'border-white/10 opacity-70 hover:bg-white/5 cursor-pointer')}`;
             const onClickAttr = isFull ? '' : `onclick="selectHub(${h.id}, ${h.dist}, ${h.fee}, ${h.lat}, ${h.lng})"` 
@@ -784,7 +799,7 @@
             Logistics_Mode: state.mode === 'walkin' ? "Walk-in" : "Lalamove",
             Hub_Name: hubData.name,
             Logistics_Schedule: state.logisticsSchedule,
-            // Cleaned up the payload string to reflect the new HQ payment strategy
+            // Updated Payload explicitly mentioning "Pay to Arabista"
             Delivery_Fee: state.mode === 'walkin' ? "RM 0" : "RM " + state.deliveryCost.toFixed(2) + " (Pay to Arabista)",
             Services_Total: "RM " + state.servicesTotal,
             Grand_Total: "RM " + state.servicesTotal,
