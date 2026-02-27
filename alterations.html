@@ -89,42 +89,40 @@
         
         <div>
           <h2 class="text-xl font-display mb-4 text-white" data-t="step2_title">Verify Location</h2>
-          
-          <div class="grid sm:grid-cols-2 gap-3" id="loc-buttons">
-            <button onclick="useGPS(this)" class="relative p-4 rounded-xl border border-white/10 hover:border-luxe hover:bg-white/5 transition text-left group overflow-hidden">
-                <div id="badge-recommended" class="absolute top-0 right-0 bg-luxe text-brand text-[9px] font-bold px-2 py-0.5 rounded-bl-lg uppercase tracking-wider shadow-md" data-t="txt_recommended">Recommended</div>
-                <span class="block text-sm font-bold text-white mb-1 group-hover:text-luxe" data-t="btn_use_gps">Use Current GPS</span>
-                <span class="block text-xs text-white/50" id="gps-desc" data-t="txt_detecting">Click to Detect Location</span>
-            </button>
-            <button id="btn-use-order-addr" onclick="useOrderAddress(this)" class="p-4 rounded-xl border border-white/10 hover:border-luxe hover:bg-white/5 transition text-left group">
-                <span class="block text-sm font-bold text-white mb-1 group-hover:text-luxe" data-t="btn_use_order_addr">Use Order Address</span>
-                <span class="block text-[11px] text-white/50 mt-1 whitespace-normal break-words" id="order-addr-display">...</span>
-            </button>
-          </div>
 
-          <div id="manual-search-box" class="mt-4 flex gap-2">
-              <input type="text" id="manual-search-input" class="flex-1 text-sm bg-black/30" placeholder="Or search building / street manually..." data-t-placeholder="ph_manual_search">
-              <button id="btn-manual-find" onclick="geocodeManualAlteration()" class="px-5 bg-white/10 text-white text-sm font-bold rounded-lg hover:bg-white/20 transition flex items-center justify-center" data-t="btn_search">Search</button>
-          </div>
-          <p class="text-xs text-red-400 mt-2 hidden ml-1" id="manual-search-error"></p>
-
-          <div id="gps-details-panel" class="hidden fade-in bg-white/5 border border-white/10 rounded-xl p-5 mt-4 mb-2">
+          <div id="gps-details-panel" class="hidden fade-in bg-white/5 border border-white/10 rounded-xl p-5 mb-2">
               <p class="text-xs text-white/50 uppercase tracking-widest mb-1" data-t="txt_detected_gps">Detected Location:</p>
+              
               <p class="text-sm text-white font-medium mb-3 whitespace-pre-wrap" id="gps-detected-text">...</p>
               
               <div id="map-verify-link" class="mb-5"></div>
 
-              <label class="block text-sm text-white/70 mb-2" data-t="label_unit">Unit / House / Lot No.</label>
+              <label class="block text-sm text-white/70 mb-2" data-t="label_unit">Unit / House / Lot No. <span class="text-red-400">*</span></label>
               <input type="text" id="gps-unit-input" class="w-full mb-5" placeholder="e.g. Unit 15-1 or House 42" data-t-placeholder="placeholder_unit">
-              <div class="flex gap-3">
-                  <button onclick="resetLoc()" class="px-5 py-2.5 rounded-lg border border-white/10 text-white/70 text-sm font-bold hover:bg-white/5 transition" data-t="btn_cancel">Cancel</button>
-                  <button onclick="confirmGPSDetails()" class="flex-1 px-5 py-2.5 rounded-lg bg-luxe text-brand text-sm font-bold hover:bg-white transition shadow-[0_0_15px_rgba(192,160,98,0.3)]" data-t="btn_confirm_loc">Confirm Location</button>
+              
+              <button id="btn-confirm-loc" onclick="confirmGPSDetails()" class="w-full py-3.5 rounded-xl bg-luxe text-brand text-sm font-bold hover:bg-white transition shadow-[0_0_15px_rgba(192,160,98,0.3)]" data-t="btn_confirm_loc">Confirm Location</button>
+              
+              <div id="fallback-search-box" class="hidden mt-6 pt-5 border-t border-white/10">
+                  <p class="text-[11px] text-white/50 uppercase tracking-widest mb-3" data-t="txt_loc_inaccurate">Location inaccurate?</p>
+                  
+                  <div class="flex gap-2 mb-3">
+                      <button onclick="useGPS()" class="w-full py-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg text-xs font-bold text-white transition flex items-center justify-center gap-2">
+                          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                          <span data-t="btn_detect_gps">Detect Current GPS</span>
+                      </button>
+                  </div>
+
+                  <div class="flex gap-2">
+                      <input type="text" id="manual-search-input" class="flex-1 text-sm bg-black/30" placeholder="Or search building / street..." data-t-placeholder="ph_manual_search">
+                      <button id="btn-manual-find" onclick="geocodeManualAlteration()" class="px-5 bg-white/10 text-white text-sm font-bold rounded-lg hover:bg-white/20 transition flex items-center justify-center" data-t="btn_search">Search</button>
+                  </div>
+                  <p class="text-xs text-red-400 mt-2 hidden ml-1" id="manual-search-error"></p>
               </div>
           </div>
 
           <div id="validated-loc" class="hidden mt-2 p-3 bg-luxe/10 border border-luxe/30 rounded-lg flex justify-between items-center">
              <div class="flex-1 overflow-hidden pr-4"><p class="text-xs text-luxe uppercase tracking-widest">Base Location</p><p class="text-sm text-white mt-0.5 truncate" id="final-address">...</p></div>
-             <button onclick="resetLoc()" class="text-xs text-white/50 underline" data-t="btn_change">Change</button>
+             <button onclick="resetLoc()" class="text-xs text-white/50 underline hover:text-white transition" data-t="btn_change">Change</button>
           </div>
         </div>
       </div>
@@ -220,26 +218,21 @@
 
     const t = {
         en: { 
-            page_title: "Alteration Service", page_subtitle: "Select items to alter.", step1_title: "Select Items to Alter", btn_next_loc: "Next: Location", lbl_cust_name: "Customer Name", placeholder_name: "e.g. Siti Aishah", lbl_phone: "Telephone No.", placeholder_phone: "e.g. 0123456789", lbl_design_code: "Design Code", lbl_size: "Size", btn_add_item: "Add Another Item", alert_name: "Please enter your name.", alert_phone: "Please enter your telephone number.", alert_item_detail: "Please select Design Code and Size for all items.", step2_title: "Verify Location", btn_use_order_addr: "Use Order Address", btn_use_gps: "Use Current GPS", 
-            txt_detecting: "Click to Detect Location", 
-            txt_locating_fresh: "Acquiring fresh GPS...", txt_recommended: "Recommended", txt_loading_system: "Loading system...", txt_pinpointing: "Mapping Google coordinates...", alert_geocode_fail: "Unable to map this address automatically. Please use 'Use Current GPS' for accurate delivery fees.", txt_detected_gps: "Detected Location:", label_unit: "Unit / House / Lot No.", placeholder_unit: "e.g. Unit 15-1 or House 42", btn_confirm_loc: "Confirm Location", btn_cancel: "Cancel", btn_change: "Change", alert_unit: "Please enter your Unit/House No.", step3_title: "Choose Logistics", mode_walkin: "Walk-in", mode_lalamove: "Lalamove", label_del_fee: "Delivery Fee", btn_next_srv: "Next: Services", txt_open: "OPEN", txt_closed: "CLOSED", txt_closes_at: "Closes", txt_opens_at: "Opens", txt_walkin_open: "Drop off your items anytime today before", txt_walkin_closed: "Store is currently closed. Please drop off your items when they open at", txt_lala_open: "Pickup: Immediate dispatch.", txt_lala_closed: "Pickup: Scheduled for dispatch at", step4_title: "Services per Item", txt_measure_walkin: "Walk-in selected. No measurements needed.", txt_measure_lala: "Lalamove selected. Please provide measurements.", srv_full: "Full Body Alteration", srv_hem: "Alter Length", srv_sleeve: "Alter Sleeves", srv_shoulder: "Alter Shoulders", srv_pads: "Add Shoulder Pads", lbl_length: "Length (inches)", lbl_sleeve: "Sleeves (inches)", lbl_shoulder: "Shoulders (inches)", lbl_pads: "Shoulder Pads", 
-            lbl_services_cost: "Alteration Services", 
-            lbl_delivery_cost: "Lalamove delivery fee to be paid to Arabista", 
-            label_total_est: "Total to Pay Hub", 
-            btn_confirm: "Confirm Booking", txt_value: "Value", txt_yousave: "You Save", btn_add_meas: "Add Measurements (Required)", btn_edit_meas: "Measurements Saved (Edit)", modal_title: "Provide Measurements", btn_save: "Save", alert_no_items: "Please select at least one item.", alert_no_hub: "Please select an Alteration Point.", alert_measure: "Please fill in measurements for all required items.", alert_max: "must be strictly less than original size", alert_max_full: "must be less than or equal to original size", alert_full_equal: "At least one measurement must be reduced for a Full Body alteration.", txt_no_items_step4: "No items selected. Please select items in Step 1.", modal_success_title: "Booking Successful!", modal_success_desc: "Your Alteration Order ID is:", modal_success_warn: "⚠️ Please screenshot this ID", btn_track: "Track My Order", txt_calculating: "Calculating...", ph_manual_search: "Or search building / street manually...", btn_search: "Search", txt_no_results: "No results found. Try a different term.", 
-            txt_view_on_map: "View on Google Maps"
+            page_title: "Alteration Service", page_subtitle: "Select items to alter.", step1_title: "Select Items to Alter", btn_next_loc: "Next: Location", lbl_cust_name: "Customer Name", placeholder_name: "e.g. Siti Aishah", lbl_phone: "Telephone No.", placeholder_phone: "e.g. 0123456789", lbl_design_code: "Design Code", lbl_size: "Size", btn_add_item: "Add Another Item", alert_name: "Please enter your name.", alert_phone: "Please enter your telephone number.", alert_item_detail: "Please select Design Code and Size for all items.", step2_title: "Verify Location", 
+            txt_detecting: "Click to Detect Location", btn_detect_gps: "Detect Current GPS", txt_loc_inaccurate: "Location inaccurate? Search below:",
+            txt_locating_fresh: "Acquiring fresh GPS...", txt_recommended: "Recommended", txt_loading_system: "Loading system...", txt_pinpointing: "Mapping Google coordinates...", alert_geocode_fail: "Unable to map this address automatically. Please use 'Use Current GPS' for accurate delivery fees.", txt_detected_gps: "Detected Location:", label_unit: "Unit / House / Lot No. *", placeholder_unit: "e.g. Unit 15-1 or House 42", btn_confirm_loc: "Confirm Location", btn_cancel: "Cancel", btn_change: "Change", alert_unit: "Please enter your Unit/House No.", step3_title: "Choose Logistics", mode_walkin: "Walk-in", mode_lalamove: "Lalamove", label_del_fee: "Delivery Fee", btn_next_srv: "Next: Services", txt_open: "OPEN", txt_closed: "CLOSED", txt_closes_at: "Closes", txt_opens_at: "Opens", txt_walkin_open: "Drop off your items anytime today before", txt_walkin_closed: "Store is currently closed. Please drop off your items when they open at", txt_lala_open: "Pickup: Immediate dispatch.", txt_lala_closed: "Pickup: Scheduled for dispatch at", step4_title: "Services per Item", txt_measure_walkin: "Walk-in selected. No measurements needed.", txt_measure_lala: "Lalamove selected. Please provide measurements.", srv_full: "Full Body Alteration", srv_hem: "Alter Length", srv_sleeve: "Alter Sleeves", srv_shoulder: "Alter Shoulders", srv_pads: "Add Shoulder Pads", lbl_length: "Length (inches)", lbl_sleeve: "Sleeves (inches)", lbl_shoulder: "Shoulders (inches)", lbl_pads: "Shoulder Pads", 
+            lbl_services_cost: "Alteration Services", lbl_delivery_cost: "Lalamove delivery fee to be paid to Arabista", label_total_est: "Total to Pay Hub", 
+            btn_confirm: "Confirm Booking", txt_value: "Value", txt_yousave: "You Save", btn_add_meas: "Add Measurements (Required)", btn_edit_meas: "Measurements Saved (Edit)", modal_title: "Provide Measurements", btn_save: "Save", alert_no_items: "Please select at least one item.", alert_no_hub: "Please select an Alteration Point.", alert_measure: "Please fill in measurements for all required items.", alert_max: "must be strictly less than original size", alert_max_full: "must be less than or equal to original size", alert_full_equal: "At least one measurement must be reduced for a Full Body alteration.", txt_no_items_step4: "No items selected. Please select items in Step 1.", modal_success_title: "Booking Successful!", modal_success_desc: "Your Alteration Order ID is:", modal_success_warn: "⚠️ Please screenshot this ID", btn_track: "Track My Order", txt_calculating: "Calculating...", ph_manual_search: "Or search building / street...", btn_search: "Search", txt_no_results: "No results found. Try a different term.", txt_view_on_map: "View on Google Maps"
         },
         bm: { 
-            page_title: "Servis Alterasi", page_subtitle: "Pilih item untuk dialter.", step1_title: "Pilih Item", btn_next_loc: "Seterusnya: Lokasi", lbl_cust_name: "Nama Pelanggan", placeholder_name: "cth. Siti Aishah", lbl_phone: "No. Telefon", placeholder_phone: "cth. 0123456789", lbl_design_code: "Kod Rekaan", lbl_size: "Saiz", btn_add_item: "Tambah Item Lain", alert_name: "Sila masukkan nama anda.", alert_phone: "Sila masukkan no. telefon anda.", alert_item_detail: "Sila pilih Kod Rekaan dan Saiz untuk semua item.", step2_title: "Sahkan Lokasi", btn_use_order_addr: "Guna Alamat Tempahan", btn_use_gps: "Guna GPS Semasa", 
-            txt_detecting: "Klik untuk Kesan Lokasi", 
-            txt_locating_fresh: "Mendapatkan isyarat GPS baru...", txt_recommended: "Disyorkan", txt_loading_system: "Memuatkan sistem...", txt_pinpointing: "Memetakan koordinat Google...", alert_geocode_fail: "Gagal memetakan alamat secara automatik. Sila guna 'Guna GPS Semasa' untuk caj penghantaran yang tepat.", txt_detected_gps: "Lokasi Dikesan:", label_unit: "No. Unit / Rumah / Lot", placeholder_unit: "cth. Unit 15-1 atau Rumah 42", btn_confirm_loc: "Sahkan Lokasi", btn_cancel: "Batal", btn_change: "Tukar", alert_unit: "Sila masukkan No. Unit/Rumah anda.", step3_title: "Pilih Logistik", mode_walkin: "Walk-in", mode_lalamove: "Lalamove", label_del_fee: "Caj Penghantaran", btn_next_srv: "Seterusnya: Servis", txt_open: "BUKA", txt_closed: "TUTUP", txt_closes_at: "Tutup", txt_opens_at: "Buka", txt_walkin_open: "Hantar baju anda hari ini sebelum", txt_walkin_closed: "Kedai tutup. Sila hantar baju anda apabila mereka buka pada", txt_lala_open: "Pickup: Akan diambil segera.", txt_lala_closed: "Pickup: Dijadualkan untuk diambil pada", step4_title: "Servis Setiap Item", txt_measure_walkin: "Walk-in dipilih. Tiada ukuran diperlukan.", txt_measure_lala: "Lalamove dipilih. Sila masukkan ukuran.", srv_full: "Alter Keseluruhan Baju", srv_hem: "Alter Labuh", srv_sleeve: "Alter Lengan", srv_shoulder: "Alter Bahu", srv_pads: "Tambah Span Bahu", lbl_length: "Labuh (inci)", lbl_sleeve: "Lengan (inci)", lbl_shoulder: "Bahu (inci)", lbl_pads: "Span Bahu", 
-            lbl_services_cost: "Servis Alterasi", 
-            lbl_delivery_cost: "Caj Lalamove perlu dibayar kepada Arabista", 
-            label_total_est: "Jumlah Dibayar ke Hub",
-            btn_confirm: "Sahkan Tempahan", txt_value: "Nilai", txt_yousave: "Anda Jimat", btn_add_meas: "Masukkan Ukuran (Wajib)", btn_edit_meas: "Ukuran Disimpan (Ubah)", modal_title: "Masukkan Ukuran", btn_save: "Simpan", alert_no_items: "Sila pilih sekurang-kurangnya satu item.", alert_no_hub: "Sila pilih Pusat Alterasi.", alert_measure: "Sila lengkapkan semua ukuran yang diperlukan.", alert_max: "mesti kurang dari saiz asal", alert_max_full: "mesti kurang dari atau sama dengan saiz asal", alert_full_equal: "Sekurang-kurangnya satu ukuran mesti dikurangkan untuk Alter Keseluruhan Baju.", txt_no_items_step4: "Tiada item dipilih. Sila pilih item di Langkah 1.", modal_success_title: "Tempahan Berjaya!", modal_success_desc: "ID Tempahan Alterasi anda ialah:", modal_success_warn: "⚠️ Sila 'screenshot' ID ini", btn_track: "Jejak Tempahan Saya", txt_calculating: "Mengira...", ph_manual_search: "Atau cari bangunan / jalan secara manual...", btn_search: "Cari", txt_no_results: "Tiada hasil dijumpai. Cuba terma lain.", 
-            txt_view_on_map: "Lihat di Google Maps"
+            page_title: "Servis Alterasi", page_subtitle: "Pilih item untuk dialter.", step1_title: "Pilih Item", btn_next_loc: "Seterusnya: Lokasi", lbl_cust_name: "Nama Pelanggan", placeholder_name: "cth. Siti Aishah", lbl_phone: "No. Telefon", placeholder_phone: "cth. 0123456789", lbl_design_code: "Kod Rekaan", lbl_size: "Saiz", btn_add_item: "Tambah Item Lain", alert_name: "Sila masukkan nama anda.", alert_phone: "Sila masukkan no. telefon anda.", alert_item_detail: "Sila pilih Kod Rekaan dan Saiz untuk semua item.", step2_title: "Sahkan Lokasi", 
+            txt_detecting: "Klik untuk Kesan Lokasi", btn_detect_gps: "Kesan GPS Semasa", txt_loc_inaccurate: "Lokasi tidak tepat? Cari di bawah:",
+            txt_locating_fresh: "Mendapatkan isyarat GPS baru...", txt_recommended: "Disyorkan", txt_loading_system: "Memuatkan sistem...", txt_pinpointing: "Memetakan koordinat Google...", alert_geocode_fail: "Gagal memetakan alamat secara automatik. Sila guna 'Guna GPS Semasa' untuk caj penghantaran yang tepat.", txt_detected_gps: "Lokasi Dikesan:", label_unit: "No. Unit / Rumah / Lot *", placeholder_unit: "cth. Unit 15-1 atau Rumah 42", btn_confirm_loc: "Sahkan Lokasi", btn_cancel: "Batal", btn_change: "Tukar", alert_unit: "Sila masukkan No. Unit/Rumah anda.", step3_title: "Pilih Logistik", mode_walkin: "Walk-in", mode_lalamove: "Lalamove", label_del_fee: "Caj Penghantaran", btn_next_srv: "Seterusnya: Servis", txt_open: "BUKA", txt_closed: "TUTUP", txt_closes_at: "Tutup", txt_opens_at: "Buka", txt_walkin_open: "Hantar baju anda hari ini sebelum", txt_walkin_closed: "Kedai tutup. Sila hantar baju anda apabila mereka buka pada", txt_lala_open: "Pickup: Akan diambil segera.", txt_lala_closed: "Pickup: Dijadualkan untuk diambil pada", step4_title: "Servis Setiap Item", txt_measure_walkin: "Walk-in dipilih. Tiada ukuran diperlukan.", txt_measure_lala: "Lalamove dipilih. Sila masukkan ukuran.", srv_full: "Alter Keseluruhan Baju", srv_hem: "Alter Labuh", srv_sleeve: "Alter Lengan", srv_shoulder: "Alter Bahu", srv_pads: "Tambah Span Bahu", lbl_length: "Labuh (inci)", lbl_sleeve: "Lengan (inci)", lbl_shoulder: "Bahu (inci)", lbl_pads: "Span Bahu", 
+            lbl_services_cost: "Servis Alterasi", lbl_delivery_cost: "Caj Lalamove perlu dibayar kepada Arabista", label_total_est: "Jumlah Dibayar ke Hub",
+            btn_confirm: "Sahkan Tempahan", txt_value: "Nilai", txt_yousave: "Anda Jimat", btn_add_meas: "Masukkan Ukuran (Wajib)", btn_edit_meas: "Ukuran Disimpan (Ubah)", modal_title: "Masukkan Ukuran", btn_save: "Simpan", alert_no_items: "Sila pilih sekurang-kurangnya satu item.", alert_no_hub: "Sila pilih Pusat Alterasi.", alert_measure: "Sila lengkapkan semua ukuran yang diperlukan.", alert_max: "mesti kurang dari saiz asal", alert_max_full: "mesti kurang dari atau sama dengan saiz asal", alert_full_equal: "Sekurang-kurangnya satu ukuran mesti dikurangkan untuk Alter Keseluruhan Baju.", txt_no_items_step4: "Tiada item dipilih. Sila pilih item di Langkah 1.", modal_success_title: "Tempahan Berjaya!", modal_success_desc: "ID Tempahan Alterasi anda ialah:", modal_success_warn: "⚠️ Sila 'screenshot' ID ini", btn_track: "Jejak Tempahan Saya", txt_calculating: "Mengira...", ph_manual_search: "Atau cari bangunan / jalan...", btn_search: "Cari", txt_no_results: "Tiada hasil dijumpai. Cuba terma lain.", txt_view_on_map: "Lihat di Google Maps"
         }
     };
+    
     let currentLang = 'en';
     let hubs = []; 
     let generatedAltId = ""; 
@@ -252,8 +245,13 @@
         document.querySelectorAll('.size-select option:first-child').forEach(opt => opt.innerText = t[lang].lbl_size);
         document.getElementById('lang-en').className = lang === 'en' ? "text-xs font-bold text-luxe" : "text-xs text-white/50 hover:text-white";
         document.getElementById('lang-bm').className = lang === 'bm' ? "text-xs font-bold text-luxe" : "text-xs text-white/50 hover:text-white";
-        updateMeasurementInstruction(); if(hubs.length > 0) renderHubs(); if(state.hubId) updateDispatchUI();
-        if(document.getElementById('services-container').innerHTML !== "") { document.getElementById('services-container').dataset.needsRender = "true"; renderServices(); }
+        updateMeasurementInstruction(); 
+        if(hubs.length > 0) renderHubs(); 
+        if(state.hubId) updateDispatchUI();
+        if(document.getElementById('services-container').innerHTML !== "") { 
+            document.getElementById('services-container').dataset.needsRender = "true"; 
+            renderServices(); 
+        }
     }
 
     document.addEventListener('DOMContentLoaded', async () => {
@@ -261,17 +259,25 @@
         if (userLang && userLang.toLowerCase().startsWith('ms')) setLang('bm'); else setLang('en');
         const urlParams = new URLSearchParams(window.location.search);
         const orderId = urlParams.get('order');
-        document.getElementById('step1-loading').classList.remove('hidden'); document.getElementById('hub-list-loading').classList.remove('hidden');
+        document.getElementById('step1-loading').classList.remove('hidden'); 
+        document.getElementById('hub-list-loading').classList.remove('hidden');
+        
         try {
             const fetchUrl = orderId ? `${scriptURL}?order=${orderId}` : scriptURL;
-            const res = await fetch(fetchUrl); const data = await res.json();
+            const res = await fetch(fetchUrl); 
+            const data = await res.json();
             if (data.error) throw new Error(data.error);
             hubs = Array.isArray(data.hubs) ? data.hubs : [];
+            
             if (orderId && data.orderData) {
-                state.path = 'A'; document.getElementById('step1-loading').classList.add('hidden'); document.getElementById('path-a-container').classList.remove('hidden');
+                state.path = 'A'; 
+                document.getElementById('step1-loading').classList.add('hidden'); 
+                document.getElementById('path-a-container').classList.remove('hidden');
                 document.getElementById('order-id-display').innerText = "#" + data.orderData.orderRef;
-                document.getElementById('auto-cust-name').value = data.orderData.name; document.getElementById('auto-cust-phone').value = data.orderData.phone;
-                state.orderAddress = data.orderData.address; document.getElementById('order-addr-display').innerText = state.orderAddress;
+                document.getElementById('auto-cust-name').value = data.orderData.name; 
+                document.getElementById('auto-cust-phone').value = data.orderData.phone;
+                state.orderAddress = data.orderData.address; 
+                
                 const itemsList = document.getElementById('auto-items-list'); itemsList.innerHTML = '';
                 const rawItems = data.orderData.itemsRaw.split(','); let itemIdx = 0;
                 rawItems.forEach(itemStr => {
@@ -285,13 +291,16 @@
                     }
                 });
             } else {
-                state.path = 'B'; if (orderId) alert("Order #" + orderId + " not found. Proceeding with manual entry.");
-                document.getElementById('path-b-container').classList.remove('hidden'); document.getElementById('btn-use-order-addr').classList.add('hidden');
-                document.getElementById('loc-buttons').classList.remove('sm:grid-cols-2'); document.getElementById('loc-buttons').classList.add('grid-cols-1'); 
-                document.getElementById('badge-recommended').classList.add('hidden'); addManualItem(); 
+                state.path = 'B'; 
+                if (orderId) alert("Order #" + orderId + " not found. Proceeding with manual entry.");
+                document.getElementById('path-b-container').classList.remove('hidden'); 
+                addManualItem(); 
             }
-            document.getElementById('step1-loading').classList.add('hidden'); document.getElementById('hub-list-loading').classList.add('hidden');
-        } catch(e) { document.getElementById('step1-loading').innerText = "Database Error: " + e.message; }
+            document.getElementById('step1-loading').classList.add('hidden'); 
+            document.getElementById('hub-list-loading').classList.add('hidden');
+        } catch(e) { 
+            document.getElementById('step1-loading').innerText = "Database Error: " + e.message; 
+        }
     });
 
     const designCodes = ['D01', 'D02', 'D03', 'D04', 'D05', 'D06', 'D07', 'W01', 'W02', 'W03', 'W04', 'W05', 'W06', 'Z01', 'Z02', 'Z03', 'Z04', 'Z05', 'Z06', 'Z07', 'Z08', 'M01', 'M02', 'M03'];
@@ -328,7 +337,7 @@
         });
         state.selectedItems = newSelected; refreshStep4Live();
     }
-    
+
     function refreshStep4Live() {
         if(!document.getElementById('step-4').classList.contains('opacity-30')) {
             document.getElementById('services-container').dataset.needsRender = "true"; renderServices();
@@ -341,125 +350,99 @@
         if(state.path === 'A') { 
             syncItemsA(); 
             if(state.selectedItems.length === 0) return alert(t[currentLang].alert_no_items); 
-            unlockStep(2); document.getElementById('step-2').scrollIntoView({behavior: 'smooth', block: 'center'});
+            unlockStep(2); 
+            document.getElementById('step-2').scrollIntoView({behavior: 'smooth', block: 'start'});
+            
+            // Auto Trigger Order Address Location
+            setTimeout(() => { useOrderAddress(); }, 400);
         } else {
             if(!document.getElementById('manual-cust-name').value.trim()) return alert(t[currentLang].alert_name);
             if(!document.getElementById('manual-cust-phone').value.trim()) return alert(t[currentLang].alert_phone);
             syncItemsB(); 
             if(state.selectedItems.length === 0) return alert(t[currentLang].alert_item_detail);
-            unlockStep(2); document.getElementById('step-2').scrollIntoView({behavior: 'smooth', block: 'center'});
+            unlockStep(2); 
+            document.getElementById('step-2').scrollIntoView({behavior: 'smooth', block: 'start'});
+            
+            // Auto Trigger GPS
+            setTimeout(() => { useGPS(); }, 400);
         }
     }
 
     async function geocodeAddress(address) {
         try {
-            let res = await fetch(`${scriptURL}?action=geocode&address=${encodeURIComponent(address)}`); let data = await res.json();
+            let res = await fetch(`${scriptURL}?action=geocode&address=${encodeURIComponent(address)}`); 
+            let data = await res.json();
             if(data && data.lat && data.lng) return data;
+            
             const parts = address.split(',');
             if(parts.length > 1) {
-                res = await fetch(`${scriptURL}?action=geocode&address=${encodeURIComponent(parts.slice(1).join(',').trim())}`); data = await res.json();
+                res = await fetch(`${scriptURL}?action=geocode&address=${encodeURIComponent(parts.slice(1).join(',').trim())}`); 
+                data = await res.json();
                 if(data && data.lat && data.lng) return data;
             }
         } catch(e) {}
         return null;
     }
 
-    // V6.3: Geocode Manual Address with Map Link Verification
-    async function geocodeManualAlteration() {
-        const addr = document.getElementById('manual-search-input').value.trim();
-        if(!addr) return;
-        const btn = document.getElementById('btn-manual-find');
-        const origText = btn.innerText;
-        btn.innerHTML = spinnerSvg; btn.disabled = true;
-        document.getElementById('manual-search-error').classList.add('hidden');
-        
-        try {
-            const res = await fetch(`${scriptURL}?action=geocode&address=${encodeURIComponent(addr)}`);
-            const data = await res.json();
-            btn.innerHTML = origText; btn.disabled = false;
-            
-            if(data.lat) { 
-                state.lat = data.lat; state.lng = data.lng; 
-                
-                document.getElementById('loc-buttons').classList.add('hidden');
-                document.getElementById('manual-search-box').classList.add('hidden');
-                
-                document.getElementById('gps-detected-text').innerText = `${data.formatted_address || addr}`;
-                
-                // Maps Link for Manual Search Verification
-                document.getElementById('map-verify-link').innerHTML = `
-                    <a href="https://www.google.com/maps?q=${state.lat},${state.lng}" target="_blank" class="w-full flex justify-center items-center gap-2 text-[11px] font-bold text-luxe bg-luxe/10 hover:bg-luxe hover:text-brand border border-luxe/30 py-2.5 rounded-lg transition">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
-                        <span data-t="txt_view_on_map">${t[currentLang].txt_view_on_map}</span>
-                        <span class="font-mono opacity-50">(${parseFloat(state.lat).toFixed(4)}, ${parseFloat(state.lng).toFixed(4)})</span>
-                    </a>
-                `;
-                
-                document.getElementById('gps-details-panel').classList.remove('hidden'); 
-            } else {
-                document.getElementById('manual-search-error').innerText = t[currentLang].txt_no_results || "❌ Location not found.";
-                document.getElementById('manual-search-error').classList.remove('hidden');
-            }
-        } catch(e) {
-            btn.innerHTML = origText; btn.disabled = false;
-            document.getElementById('manual-search-error').innerText = "❌ Search failed.";
-            document.getElementById('manual-search-error').classList.remove('hidden');
-        }
-    }
-
-    async function useOrderAddress(btn) { 
+    // Auto-triggered for Path A
+    async function useOrderAddress() { 
         if(!state.orderAddress) state.orderAddress = "Kuala Lumpur, Malaysia";
-        const descEl = document.getElementById('order-addr-display');
-        const originalText = descEl.innerText;
-        descEl.innerHTML = `${spinnerSvg} ${t[currentLang].txt_pinpointing}`;
-        btn.classList.add('opacity-70', 'pointer-events-none');
         
+        document.getElementById('gps-details-panel').classList.remove('hidden');
+        document.getElementById('map-verify-link').innerHTML = '';
+        document.getElementById('fallback-search-box').classList.add('hidden');
+        
+        const btnConfirm = document.getElementById('btn-confirm-loc');
+        btnConfirm.classList.add('opacity-50', 'pointer-events-none', 'animate-pulse');
+        btnConfirm.innerText = t[currentLang].txt_pinpointing || "Mapping...";
+        
+        document.getElementById('gps-detected-text').innerHTML = `<div class="animate-pulse text-white/50 text-sm py-1">Mapping Order Address...</div>`;
+
         const coords = await geocodeAddress(state.orderAddress);
-        btn.classList.remove('opacity-70', 'pointer-events-none');
         
         if(coords) {
             state.lat = coords.lat; state.lng = coords.lng;
-            document.getElementById('loc-buttons').classList.add('hidden');
-            document.getElementById('manual-search-box').classList.add('hidden'); 
             document.getElementById('gps-detected-text').innerText = `${coords.formatted_address || state.orderAddress}`; 
             
-            // Maps Link for Order Address Verification
             document.getElementById('map-verify-link').innerHTML = `
-                <a href="https://www.google.com/maps?q=${state.lat},${state.lng}" target="_blank" class="w-full flex justify-center items-center gap-2 text-[11px] font-bold text-luxe bg-luxe/10 hover:bg-luxe hover:text-brand border border-luxe/30 py-2.5 rounded-lg transition">
+                <a href="http://googleusercontent.com/maps.google.com/?q=${state.lat},${state.lng}" target="_blank" class="w-full flex justify-center items-center gap-2 text-[11px] font-bold text-luxe bg-luxe/10 hover:bg-luxe hover:text-brand border border-luxe/30 py-2.5 rounded-lg transition">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
                     <span data-t="txt_view_on_map">${t[currentLang].txt_view_on_map}</span>
                     <span class="font-mono opacity-50">(${parseFloat(state.lat).toFixed(4)}, ${parseFloat(state.lng).toFixed(4)})</span>
                 </a>
             `;
-            document.getElementById('gps-details-panel').classList.remove('hidden');
-            descEl.innerText = originalText;
         } else {
+            document.getElementById('gps-detected-text').innerText = state.orderAddress;
             alert(t[currentLang].alert_geocode_fail);
-            descEl.innerText = originalText;
         }
+        
+        btnConfirm.classList.remove('opacity-50', 'pointer-events-none', 'animate-pulse');
+        btnConfirm.innerText = t[currentLang].btn_confirm_loc;
+        document.getElementById('fallback-search-box').classList.remove('hidden');
     }
     
-    function useGPS(btn) {
+    // Auto-triggered for Path B, or manually triggered in Fallback Box
+    function useGPS() {
         if(!navigator.geolocation) return alert("Geo not supported");
-        const descEl = document.getElementById('gps-desc');
-        const originalText = descEl.innerText;
-        descEl.innerHTML = `${spinnerSvg} ${t[currentLang].txt_locating_fresh}`;
-        if(btn) btn.classList.add('opacity-70', 'pointer-events-none');
         
+        document.getElementById('gps-details-panel').classList.remove('hidden');
+        document.getElementById('map-verify-link').innerHTML = '';
+        document.getElementById('fallback-search-box').classList.add('hidden');
+        
+        const btnConfirm = document.getElementById('btn-confirm-loc');
+        btnConfirm.classList.add('opacity-50', 'pointer-events-none', 'animate-pulse');
+        btnConfirm.innerText = "Locating...";
+        
+        document.getElementById('gps-detected-text').innerHTML = `<div class="animate-pulse text-luxe text-sm py-1">Acquiring satellite coordinates...</div>`;
+
         if (state.gpsWatchId) navigator.geolocation.clearWatch(state.gpsWatchId);
         state.gpsWatchId = navigator.geolocation.watchPosition(
             async pos => { 
                 navigator.geolocation.clearWatch(state.gpsWatchId); state.gpsWatchId = null;
                 state.lat = pos.coords.latitude; state.lng = pos.coords.longitude; 
-                if(btn) btn.classList.remove('opacity-70', 'pointer-events-none');
-                descEl.innerText = originalText;
                 
-                // V6.3: Smooth Transition Fix
-                document.getElementById('loc-buttons').classList.add('hidden'); 
-                document.getElementById('manual-search-box').classList.add('hidden'); 
-                document.getElementById('map-verify-link').innerHTML = ''; // clear temporarily
                 document.getElementById('gps-detected-text').innerHTML = `<div class="animate-pulse text-white/50 text-sm py-1">Translating GPS to street address...</div>`;
-                document.getElementById('gps-details-panel').classList.remove('hidden');
+                btnConfirm.innerText = "Translating...";
                 
                 try {
                     const res = await fetch(`${scriptURL}?action=reverse_geocode&lat=${state.lat}&lng=${state.lng}`);
@@ -469,24 +452,76 @@
                     document.getElementById('gps-detected-text').innerText = `GPS Locked`; 
                 }
 
-                // Maps Link for GPS Verification
                 document.getElementById('map-verify-link').innerHTML = `
-                    <a href="https://www.google.com/maps?q=${state.lat},${state.lng}" target="_blank" class="w-full flex justify-center items-center gap-2 text-[11px] font-bold text-luxe bg-luxe/10 hover:bg-luxe hover:text-brand border border-luxe/30 py-2.5 rounded-lg transition">
+                    <a href="http://googleusercontent.com/maps.google.com/?q=${state.lat},${state.lng}" target="_blank" class="w-full flex justify-center items-center gap-2 text-[11px] font-bold text-luxe bg-luxe/10 hover:bg-luxe hover:text-brand border border-luxe/30 py-2.5 rounded-lg transition">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
                         <span data-t="txt_view_on_map">${t[currentLang].txt_view_on_map}</span>
                         <span class="font-mono opacity-50">(${parseFloat(state.lat).toFixed(4)}, ${parseFloat(state.lng).toFixed(4)})</span>
                     </a>
                 `;
+                
+                btnConfirm.classList.remove('opacity-50', 'pointer-events-none', 'animate-pulse');
+                btnConfirm.innerText = t[currentLang].btn_confirm_loc;
+                document.getElementById('fallback-search-box').classList.remove('hidden');
             },
             () => { 
-                if(btn) btn.classList.remove('opacity-70', 'pointer-events-none');
-                descEl.innerText = originalText; 
+                btnConfirm.classList.remove('opacity-50', 'pointer-events-none', 'animate-pulse');
+                btnConfirm.innerText = t[currentLang].btn_confirm_loc;
                 alert("Failed to detect GPS location. Please ensure location services are enabled on your device."); 
+                document.getElementById('fallback-search-box').classList.remove('hidden');
             }, 
             { enableHighAccuracy: true, maximumAge: 0, timeout: 15000 } 
         );
     }
     
+    // Manual trigger in Fallback Box
+    async function geocodeManualAlteration() {
+        const addr = document.getElementById('manual-search-input').value.trim();
+        if(!addr) return;
+        const btn = document.getElementById('btn-manual-find');
+        const origText = btn.innerText;
+        btn.innerHTML = spinnerSvg; btn.disabled = true;
+        document.getElementById('manual-search-error').classList.add('hidden');
+        
+        const btnConfirm = document.getElementById('btn-confirm-loc');
+        btnConfirm.classList.add('opacity-50', 'pointer-events-none', 'animate-pulse');
+        btnConfirm.innerText = "Searching...";
+        
+        document.getElementById('map-verify-link').innerHTML = '';
+        document.getElementById('gps-detected-text').innerHTML = `<div class="animate-pulse text-white/50 text-sm py-1">Searching Map...</div>`;
+        
+        try {
+            const res = await fetch(`${scriptURL}?action=geocode&address=${encodeURIComponent(addr)}`);
+            const data = await res.json();
+            btn.innerHTML = origText; btn.disabled = false;
+            
+            if(data.lat) { 
+                state.lat = data.lat; state.lng = data.lng; 
+                document.getElementById('gps-detected-text').innerText = `${data.formatted_address || addr}`;
+                
+                document.getElementById('map-verify-link').innerHTML = `
+                    <a href="http://googleusercontent.com/maps.google.com/?q=${state.lat},${state.lng}" target="_blank" class="w-full flex justify-center items-center gap-2 text-[11px] font-bold text-luxe bg-luxe/10 hover:bg-luxe hover:text-brand border border-luxe/30 py-2.5 rounded-lg transition">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                        <span data-t="txt_view_on_map">${t[currentLang].txt_view_on_map}</span>
+                        <span class="font-mono opacity-50">(${parseFloat(state.lat).toFixed(4)}, ${parseFloat(state.lng).toFixed(4)})</span>
+                    </a>
+                `;
+            } else {
+                document.getElementById('manual-search-error').innerText = t[currentLang].txt_no_results || "❌ Location not found.";
+                document.getElementById('manual-search-error').classList.remove('hidden');
+                document.getElementById('gps-detected-text').innerText = "Location not found.";
+            }
+        } catch(e) {
+            btn.innerHTML = origText; btn.disabled = false;
+            document.getElementById('manual-search-error').innerText = "❌ Search failed.";
+            document.getElementById('manual-search-error').classList.remove('hidden');
+            document.getElementById('gps-detected-text').innerText = "Search Failed.";
+        }
+        
+        btnConfirm.classList.remove('opacity-50', 'pointer-events-none', 'animate-pulse');
+        btnConfirm.innerText = t[currentLang].btn_confirm_loc;
+    }
+
     function confirmGPSDetails() {
         state.unitNo = document.getElementById('gps-unit-input').value.trim();
         if(!state.unitNo) return alert(t[currentLang].alert_unit);
@@ -495,8 +530,6 @@
     }
     
     function showLocSuccess(addr) { 
-        document.getElementById('loc-buttons').classList.add('hidden'); 
-        document.getElementById('manual-search-box').classList.add('hidden'); 
         document.getElementById('gps-details-panel').classList.add('hidden'); 
         document.getElementById('validated-loc').classList.remove('hidden'); 
         document.getElementById('final-address').innerText = addr; 
@@ -507,12 +540,12 @@
     function resetLoc() { 
         state.lat = ""; state.lng = ""; state.unitNo = "";
         if (state.gpsWatchId) { navigator.geolocation.clearWatch(state.gpsWatchId); state.gpsWatchId = null; }
-        document.getElementById('loc-buttons').classList.remove('hidden'); 
-        document.getElementById('manual-search-box').classList.remove('hidden'); 
-        document.getElementById('manual-search-input').value = ''; 
-        document.getElementById('manual-search-error').classList.add('hidden');
-        document.getElementById('gps-details-panel').classList.add('hidden'); 
+        
+        document.getElementById('gps-details-panel').classList.remove('hidden'); 
+        document.getElementById('gps-detected-text').innerText = "Please search for your location again.";
+        document.getElementById('map-verify-link').innerHTML = '';
         document.getElementById('gps-unit-input').value = ''; 
+        
         document.getElementById('validated-loc').classList.add('hidden'); 
         lockStep(3); lockStep(4); 
     }
@@ -559,6 +592,7 @@
 
             let lalamoveHtml = '';
             if(state.mode === 'lalamove') {
+                // Simplified text per requirement
                 lalamoveHtml = `<div class="mt-1 text-[10px] text-orange-300 font-medium">${t[currentLang].lbl_delivery_cost}</div>`;
             }
             
