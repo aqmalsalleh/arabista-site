@@ -113,7 +113,7 @@
                   </div>
 
                   <div class="flex gap-2">
-                      <input type="text" id="manual-search-input" class="flex-1 text-sm bg-black/30" placeholder="Or search building / street..." data-t-placeholder="ph_manual_search">
+                      <input type="text" id="manual-search-input" class="flex-1 text-sm bg-black/30" placeholder="Or search building / street manually..." data-t-placeholder="ph_manual_search">
                       <button id="btn-manual-find" onclick="geocodeManualAlteration()" class="px-5 bg-white/10 text-white text-sm font-bold rounded-lg hover:bg-white/20 transition flex items-center justify-center" data-t="btn_search">Search</button>
                   </div>
                   <p class="text-xs text-red-400 mt-2 hidden ml-1" id="manual-search-error"></p>
@@ -259,8 +259,7 @@
         if (userLang && userLang.toLowerCase().startsWith('ms')) setLang('bm'); else setLang('en');
         const urlParams = new URLSearchParams(window.location.search);
         const orderId = urlParams.get('order');
-        document.getElementById('step1-loading').classList.remove('hidden'); 
-        document.getElementById('hub-list-loading').classList.remove('hidden');
+        document.getElementById('step1-loading').classList.remove('hidden'); document.getElementById('hub-list-loading').classList.remove('hidden');
         
         try {
             const fetchUrl = orderId ? `${scriptURL}?order=${orderId}` : scriptURL;
@@ -405,7 +404,7 @@
             document.getElementById('gps-detected-text').innerText = `${coords.formatted_address || state.orderAddress}`; 
             
             document.getElementById('map-verify-link').innerHTML = `
-                <a href="http://googleusercontent.com/maps.google.com/?q=${state.lat},${state.lng}" target="_blank" class="w-full flex justify-center items-center gap-2 text-[11px] font-bold text-luxe bg-luxe/10 hover:bg-luxe hover:text-brand border border-luxe/30 py-2.5 rounded-lg transition">
+                <a href="https://www.google.com/maps?q=${state.lat},${state.lng}" target="_blank" class="w-full flex justify-center items-center gap-2 text-[11px] font-bold text-luxe bg-luxe/10 hover:bg-luxe hover:text-brand border border-luxe/30 py-2.5 rounded-lg transition">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
                     <span data-t="txt_view_on_map">${t[currentLang].txt_view_on_map}</span>
                     <span class="font-mono opacity-50">(${parseFloat(state.lat).toFixed(4)}, ${parseFloat(state.lng).toFixed(4)})</span>
@@ -453,7 +452,7 @@
                 }
 
                 document.getElementById('map-verify-link').innerHTML = `
-                    <a href="http://googleusercontent.com/maps.google.com/?q=${state.lat},${state.lng}" target="_blank" class="w-full flex justify-center items-center gap-2 text-[11px] font-bold text-luxe bg-luxe/10 hover:bg-luxe hover:text-brand border border-luxe/30 py-2.5 rounded-lg transition">
+                    <a href="https://www.google.com/maps?q=${state.lat},${state.lng}" target="_blank" class="w-full flex justify-center items-center gap-2 text-[11px] font-bold text-luxe bg-luxe/10 hover:bg-luxe hover:text-brand border border-luxe/30 py-2.5 rounded-lg transition">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
                         <span data-t="txt_view_on_map">${t[currentLang].txt_view_on_map}</span>
                         <span class="font-mono opacity-50">(${parseFloat(state.lat).toFixed(4)}, ${parseFloat(state.lng).toFixed(4)})</span>
@@ -500,7 +499,7 @@
                 document.getElementById('gps-detected-text').innerText = `${data.formatted_address || addr}`;
                 
                 document.getElementById('map-verify-link').innerHTML = `
-                    <a href="http://googleusercontent.com/maps.google.com/?q=${state.lat},${state.lng}" target="_blank" class="w-full flex justify-center items-center gap-2 text-[11px] font-bold text-luxe bg-luxe/10 hover:bg-luxe hover:text-brand border border-luxe/30 py-2.5 rounded-lg transition">
+                    <a href="https://www.google.com/maps?q=${state.lat},${state.lng}" target="_blank" class="w-full flex justify-center items-center gap-2 text-[11px] font-bold text-luxe bg-luxe/10 hover:bg-luxe hover:text-brand border border-luxe/30 py-2.5 rounded-lg transition">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
                         <span data-t="txt_view_on_map">${t[currentLang].txt_view_on_map}</span>
                         <span class="font-mono opacity-50">(${parseFloat(state.lat).toFixed(4)}, ${parseFloat(state.lng).toFixed(4)})</span>
