@@ -96,7 +96,7 @@
           <div id="tab-dashboard" class="tab-content active fade-in">
               <div class="flex justify-between items-center mb-4">
                   <h3 class="text-lg font-bold" data-t="title_timeline">Orders Timeline</h3>
-                  <button onclick="loadDashboard()" class="p-2 text-luxe hover:bg-white/5 rounded-full transition" title="Refresh">
+                  <button onclick="loadDashboard(true, true)" class="p-2 text-luxe hover:bg-white/5 rounded-full transition" title="Refresh">
                       <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
                   </button>
               </div>
@@ -200,7 +200,7 @@
   </div>
 
   <script>
-    const APP_VERSION = "1.1";
+    const APP_VERSION = "1.2";
     const scriptURL = 'https://script.google.com/macros/s/AKfycbyrJFfuCrhAbdwzAj8uP4sSvFuzRzzzEFV5CHOCBSOK6OGlIXPtsf7-XEfjLHGnFZiyvw/exec';
     const trackerBaseUrl = 'https://aqmalsalleh.github.io/arabista-site/alteration-tracker.html?id=';
     const spinnerSvg = `<svg class="animate-spin h-4 w-4 inline mr-2 text-current" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>`;
@@ -260,7 +260,6 @@
     let pollInterval = null;
     let currentLang = 'en';
     
-    // V6.5 Delta Polling Handshake Variable
     let lastSyncTime = 0;
 
     document.addEventListener('DOMContentLoaded', () => { 
@@ -301,7 +300,7 @@
         }
         
         const activeOrders = document.getElementById('list-active').innerHTML;
-        if(activeOrders.length > 200) loadDashboard(true);
+        if(activeOrders.length > 200) loadDashboard(true, true);
     }
 
     function updateConnectionStatus(isSyncing) {
@@ -343,8 +342,7 @@
             let endY = e.changedTouches[0].clientY; 
             if (endY - startY > 80) { 
                 if(document.getElementById('tab-dashboard').classList.contains('active')) {
-                    lastSyncTime = 0; // Force a full pull on manual swipe refresh
-                    loadDashboard(); 
+                    loadDashboard(false, true); 
                 }
             } 
         } 
@@ -379,9 +377,9 @@
 
     function playAlert(type) {
         try {
-            let soundUrl = 'https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3'; // Chime
-            if (type === 2) soundUrl = 'https://assets.mixkit.co/active_storage/sfx/2870/2870-preview.mp3'; // Ping
-            if (type === 3) soundUrl = 'https://assets.mixkit.co/active_storage/sfx/1435/1435-preview.mp3'; // Bell
+            let soundUrl = 'https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3'; 
+            if (type === 2) soundUrl = 'https://assets.mixkit.co/active_storage/sfx/2870/2870-preview.mp3'; 
+            if (type === 3) soundUrl = 'https://assets.mixkit.co/active_storage/sfx/1435/1435-preview.mp3'; 
             
             const msg = type === 1 ? t[currentLang].msg_new_order : t[currentLang].alert_action_required;
             const audio = new Audio(soundUrl); 
@@ -397,7 +395,7 @@
     function startPolling() { 
         requestNotificationPermission(); 
         if (pollInterval) clearInterval(pollInterval); 
-        pollInterval = setInterval(() => { loadDashboard(true); }, 60000); 
+        pollInterval = setInterval(() => { loadDashboard(true, false); }, 60000); 
     }
 
     async function login() {
@@ -429,8 +427,7 @@
                 document.getElementById('main-app').classList.remove('hidden'); 
                 document.getElementById('header-hub-name').innerText = hubName; 
                 
-                lastSyncTime = 0; // Start fresh
-                loadDashboard(); 
+                loadDashboard(false, true); 
                 startPolling();
             } else { 
                 throw new Error(data.message || t[currentLang].alert_invalid); 
@@ -456,9 +453,11 @@
         scrollArea.scrollTo(0,0); 
     }
 
-    async function loadDashboard(isSilent = false) {
+    async function loadDashboard(isSilent = false, forceRefresh = false) {
         if (!isSilent) document.getElementById('dash-loader').classList.remove('hidden'); 
         if (isSilent) updateConnectionStatus(true);
+        
+        if (forceRefresh) lastSyncTime = 0; 
         
         try {
             const res = await fetch(scriptURL, { 
@@ -471,14 +470,13 @@
             if (!isSilent) document.getElementById('dash-loader').classList.add('hidden');
             if (isSilent) setTimeout(() => updateConnectionStatus(false), 1000);
 
-            // V6.5 Delta Polling Exit
             if (data.status === "no_change") {
                 if (data.timestamp) lastSyncTime = data.timestamp;
                 return;
             }
 
             if(data.status === "success") { 
-                if (data.timestamp) lastSyncTime = data.timestamp; // Stamp new sync time
+                if (data.timestamp) lastSyncTime = data.timestamp; 
                 
                 const newPendingCount = data.orders.pending.length;
                 if (previousPendingCount !== -1 && newPendingCount > previousPendingCount) { playAlert(1); }
@@ -491,11 +489,12 @@
                     previousActionMap.set(o.id, o.outbound);
                 });
                 
+                // Optimized Batch Rendering Functions
                 renderPending(data.orders.pending); 
                 renderActive(data.orders.inProgress.concat(data.orders.ready)); 
                 
                 completedOrdersData = data.orders.completed || []; 
-                renderCompleted(); // V6.5 Simplified rendering
+                renderCompleted(); 
                 populateProfile(data.profile); 
             }
         } catch (e) { 
@@ -520,11 +519,11 @@
             reqHeader.innerHTML = `${currentLang === 'bm' ? "Permintaan Baru" : "New Requests"} <span class="text-white font-bold ml-1 bg-red-500 px-2 rounded-full text-[10px] animate-pulse">${requests.length}</span>`;
             reqList.classList.remove('hidden'); 
             reqIcon.classList.remove('rotate-180');
-            reqList.innerHTML = '';
             
+            let reqHtml = ''; // DOM Optimization: Batch building
             requests.forEach(o => {
                 const link = `${trackerBaseUrl}${o.id}`;
-                reqList.innerHTML += `
+                reqHtml += `
                     <div class="bg-[#1A1B1E] border border-luxe/50 rounded-xl p-4 shadow-[0_0_15px_rgba(192,160,98,0.1)] relative overflow-hidden">
                         <div class="absolute top-0 right-0 bg-luxe text-brand text-[9px] font-bold px-2 py-0.5 rounded-bl-lg uppercase">Action Required</div>
                         <div class="mb-3">
@@ -543,6 +542,7 @@
                         </div>
                     </div>`;
             });
+            reqList.innerHTML = reqHtml; // DOM Optimization: Single injection
         } else {
             reqHeader.innerText = currentLang === 'bm' ? "Permintaan Baru (Kelulusan)" : "New Requests (Approval)";
             reqList.classList.add('hidden'); 
@@ -576,8 +576,8 @@
         }
         
         arrivals.sort((a,b) => new Date(a.date) - new Date(b.date));
-        list.innerHTML = '';
         
+        let arrHtml = ''; // DOM Optimization: Batch building
         arrivals.forEach(o => {
             const link = `${trackerBaseUrl}${o.id}`;
             const daysOld = Math.floor((new Date() - new Date(o.date)) / (1000*60*60*24));
@@ -587,7 +587,7 @@
             let arrivedClass = "";
             let trackerHtml = "";
             
-            // Mode Badge (Inbound Logistics)
+            // Mode Badge
             let modeBadge = (o.direction === "Inbound" || o.lalamoveId) 
                 ? `<span class="text-[9px] bg-blue-500/20 text-blue-400 px-2 py-0.5 rounded border border-blue-500/30 mt-1 inline-block">🚚 Inbound: Lalamove</span>` 
                 : `<span class="text-[9px] bg-orange-500/20 text-orange-400 px-2 py-0.5 rounded border border-orange-500/30 mt-1 inline-block">🚶 Inbound: Walk-in / Drop-off</span>`;
@@ -612,7 +612,7 @@
                  }
             }
 
-            list.innerHTML += `
+            arrHtml += `
                 <div class="bg-[#1A1B1E] border ${arrivedClass ? arrivedClass : 'border-white/5'} rounded-xl p-4 shadow-sm">
                     <div class="flex justify-between items-start mb-2">
                         <div class="flex items-center gap-2">
@@ -632,6 +632,7 @@
                     </button>
                 </div>`;
         });
+        list.innerHTML = arrHtml; // DOM Optimization: Single injection
     }
 
     function renderActive(orders) {
@@ -652,8 +653,8 @@
         }
         
         orders.sort((a,b) => new Date(a.date) - new Date(b.date));
-        list.innerHTML = '';
         
+        let actHtml = ''; // DOM Optimization: Batch building
         orders.forEach(o => {
             const link = `${trackerBaseUrl}${o.id}`; 
             let actionHtml = '';
@@ -661,7 +662,7 @@
             const daysOld = Math.floor((new Date() - new Date(o.date)) / (1000*60*60*24));
             const ageBadge = daysOld >= 3 ? `<span class="text-[9px] bg-red-500/20 text-red-400 px-2 py-0.5 rounded shadow-sm border border-red-500/30">⏳ ${t[currentLang].waiting_days} ${daysOld} ${t[currentLang].days}</span>` : '';
             
-            // Mode Badge (Outbound Logistics)
+            // Mode Badge
             let modeBadge = "";
             if (o.outbound === "Lalamove" || o.direction === "Outbound") modeBadge = `<span class="text-[9px] bg-purple-500/20 text-purple-400 px-2 py-0.5 rounded border border-purple-500/30 mt-1 inline-block">🚚 Outbound: Lalamove</span>`;
             else if (o.outbound === "Self-Pickup") modeBadge = `<span class="text-[9px] bg-orange-500/20 text-orange-400 px-2 py-0.5 rounded border border-orange-500/30 mt-1 inline-block">📦 Outbound: Self-Pickup</span>`;
@@ -712,7 +713,7 @@
                     </div>`;
             }
 
-            list.innerHTML += `
+            actHtml += `
                 <div class="bg-[#1A1B1E] border ${o.status === 'Ready for Return' ? 'border-luxe/50' : 'border-white/5'} rounded-xl p-4 shadow-sm">
                     <div class="flex justify-between items-start mb-2">
                         <div class="flex items-center gap-2">
@@ -734,6 +735,7 @@
                     <div class="flex gap-2 w-full">${actionHtml}</div>
                 </div>`;
         });
+        list.innerHTML = actHtml; // DOM Optimization: Single injection
     }
 
     function renderLalamoveSteps(status) {
@@ -750,7 +752,6 @@
             </div>`).join('');
     }
 
-    // V6.5: Cleaned up render function for the Payload Diet (<24 hours)
     function renderCompleted() {
         const list = document.getElementById('list-completed');
         if(completedOrdersData.length === 0) {
@@ -759,7 +760,7 @@
         
         completedOrdersData.sort((a,b) => new Date(b.date) - new Date(a.date));
         
-        let html = '';
+        let html = ''; // DOM Optimization
         completedOrdersData.forEach(o => { 
             html += `
                 <div class="bg-white/5 border border-white/10 rounded-xl p-3 shadow-sm opacity-70 hover:opacity-100 transition">
@@ -774,7 +775,7 @@
                     <p class="text-[10px] text-white/40 whitespace-pre-line truncate">${o.items.replace(/\[/g, '').replace(/\]/g, '')}</p>
                 </div>`; 
         });
-        list.innerHTML = html;
+        list.innerHTML = html; // Single Injection
     }
 
     async function updateStatus(id, newStatus, custName, phone, link, milestone, btn) {
@@ -800,8 +801,7 @@
                 sendWA(phone, t[currentLang].wa_approved.replace('{id}', id).replace('{link}', link));
             }
             
-            lastSyncTime = 0; // Force full fetch after write
-            loadDashboard();
+            loadDashboard(false, true); // Force full pull to refresh DB state
         } catch (e) { 
             alert(t[currentLang].alert_err_update); 
             btn.innerHTML = orig; 
@@ -840,8 +840,9 @@
             if (data.results.length === 0) {
                 document.getElementById('list-search').innerHTML = `<p class="text-white/30 text-xs text-center py-4">${t[currentLang].txt_no_results}</p>`;
             } else {
+                let sHtml = ''; // DOM Optimization: Batch building
                 data.results.forEach(o => { 
-                    document.getElementById('list-search').innerHTML += `
+                    sHtml += `
                         <div class="bg-white/5 border border-white/10 rounded-xl p-4">
                             <div class="flex justify-between items-center mb-1">
                                 <span class="text-[10px] font-mono text-white/50">${o.id}</span>
@@ -852,6 +853,7 @@
                             <p class="text-xs text-white/50 truncate">${o.items}</p>
                         </div>`; 
                 });
+                document.getElementById('list-search').innerHTML = sHtml; // Single Injection
             }
         } catch(e) { 
             alert(t[currentLang].alert_search_fail); 
