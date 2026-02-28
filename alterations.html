@@ -23,7 +23,6 @@
     .scrollbar-thin::-webkit-scrollbar-track { background: transparent; }
     .scrollbar-thin::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 10px; }
     
-    /* V6.3: Force 16px font size on mobile to prevent iOS Safari auto-zoom */
     input[type="number"], input[type="text"], input[type="tel"], select { 
         background: rgba(255,255,255,0.05); 
         border: 1px solid rgba(255,255,255,0.2); 
@@ -225,16 +224,23 @@
 
   <script>
     // --- SECURITY UTILITIES ---
+    // Safely escapes characters using explicit chained replace to avoid parser breakage.
     function sanitizeHTML(str) {
         if (!str) return "";
-        return String(str).replace(/[&<>'"]/g, tag => ({
-            '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'
-        }[tag] || tag));
+        return String(str)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;');
     }
 
     function escapeJS(str) {
         if (!str) return "";
-        return String(str).replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/"/g, '\\"');
+        return String(str)
+            .replace(/\\/g, '\\\\')
+            .replace(/'/g, "\\'")
+            .replace(/"/g, '\\"');
     }
 
     const scriptURL = 'https://script.google.com/macros/s/AKfycbyrJFfuCrhAbdwzAj8uP4sSvFuzRzzzEFV5CHOCBSOK6OGlIXPtsf7-XEfjLHGnFZiyvw/exec'; 
