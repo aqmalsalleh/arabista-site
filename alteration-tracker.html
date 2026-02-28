@@ -843,7 +843,7 @@
             const data = await res.json();
             if(data.status === "success") {
                 activeQuoteId = data.quotationId; currentStops = data.stops;
-                document.getElementById('quote-amount').innerText = `${sanitizeHTML(data.currency)} ${sanitizeHTML(data.amount)}`;
+                document.getElementById('quote-amount').innerHTML = `${sanitizeHTML(data.currency)} ${sanitizeHTML(data.amount)}`;
                 showModalStep(3);
             } else { alert((t[currentLang].alert_fee_error || "Fee Error: ") + (data.message || "Unknown")); }
             btn.innerText = origText; btn.disabled = false;
