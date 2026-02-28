@@ -199,7 +199,7 @@
   </div>
 
   <script>
-    const APP_VERSION = "1.4"; // Updated version
+    const APP_VERSION = "1.5"; // Version bumped to enforce cache clear
     const scriptURL = 'https://script.google.com/macros/s/AKfycbyrJFfuCrhAbdwzAj8uP4sSvFuzRzzzEFV5CHOCBSOK6OGlIXPtsf7-XEfjLHGnFZiyvw/exec';
     const trackerBaseUrl = 'https://aqmalsalleh.github.io/arabista-site/alteration-tracker.html?id=';
     const spinnerSvg = `<svg class="animate-spin h-4 w-4 inline mr-2 text-current" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>`;
@@ -283,10 +283,12 @@
     document.addEventListener('DOMContentLoaded', () => { 
         const storedVersion = localStorage.getItem('arabista_app_version');
         if (storedVersion !== APP_VERSION) { 
-            // Fix Infinite Loop: Save version before triggering reload/logout
+            // Fix Infinite Loop: Safely clear cache without reloading the page
+            localStorage.removeItem('arabista_hub_name');
+            localStorage.removeItem('arabista_hub_token');
             localStorage.setItem('arabista_app_version', APP_VERSION); 
-            logout(); 
-            return; 
+            hubName = "";
+            hubToken = "";
         }
         
         const userLang = navigator.language || navigator.userLanguage;
@@ -298,9 +300,11 @@
             document.getElementById('main-app').classList.remove('hidden'); 
             document.getElementById('header-hub-name').innerText = sanitizeHTML(hubName); 
             requestNotificationPermission();
-            loadDashboard(); 
+            loadDashboard(false, true); 
         } else {
-            logout(); // Force clean slate if missing token
+            // Fix Infinite Loop: Show login screen gracefully
+            document.getElementById('login-screen').classList.remove('hidden');
+            document.getElementById('main-app').classList.add('hidden');
         }
     });
 
