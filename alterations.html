@@ -132,7 +132,7 @@
           </div>
 
           <div id="validated-loc" class="hidden mt-2 p-3 bg-luxe/10 border border-luxe/30 rounded-lg flex justify-between items-center">
-             <div class="flex-1 overflow-hidden pr-4"><p class="text-xs text-luxe uppercase tracking-widest">Base Location</p><p class="text-sm text-white mt-0.5 truncate" id="final-address">...</p></div>
+             <div class="flex-1 overflow-hidden pr-4"><p class="text-xs text-luxe uppercase tracking-widest" data-t="lbl_saved_address">Base Location</p><p class="text-sm text-white mt-0.5 truncate" id="final-address">...</p></div>
              <button onclick="resetLoc()" class="text-xs text-white/50 underline hover:text-white transition" data-t="btn_change">Change</button>
           </div>
         </div>
@@ -227,26 +227,34 @@
     const scriptURL = 'https://script.google.com/macros/s/AKfycbyrJFfuCrhAbdwzAj8uP4sSvFuzRzzzEFV5CHOCBSOK6OGlIXPtsf7-XEfjLHGnFZiyvw/exec'; 
     const spinnerSvg = `<svg class="animate-spin h-4 w-4 inline mr-2 text-current" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>`;
 
+    // V6.4: Full Bilingual Dictionary sweep
     const t = {
         en: { 
             page_title: "Alteration Service", page_subtitle: "Select items to alter.", step1_title: "Select Items to Alter", btn_next_loc: "Next: Location", lbl_cust_name: "Customer Name", placeholder_name: "e.g. Siti Aishah", lbl_phone: "Telephone No.", placeholder_phone: "e.g. 0123456789", lbl_design_code: "Design Code", lbl_size: "Size", btn_add_item: "Add Another Item", alert_name: "Please enter your name.", alert_phone: "Please enter your telephone number.", alert_item_detail: "Please select Design Code and Size for all items.", step2_title: "Verify Location", 
             txt_detecting: "Click to Detect Location", btn_detect_gps: "Detect Current GPS", txt_loc_inaccurate: "Location inaccurate? Search below:",
             txt_locating_fresh: "Acquiring fresh GPS...", txt_recommended: "Recommended", txt_loading_system: "Loading system...", txt_pinpointing: "Mapping Google coordinates...", alert_geocode_fail: "Unable to map this address automatically. Please use 'Use Current GPS' for accurate delivery fees.", txt_detected_gps: "Detected Location:", label_unit: "Unit / House / Lot No. *", placeholder_unit: "e.g. Unit 15-1 or House 42", btn_confirm_loc: "Confirm Location", btn_cancel: "Cancel", btn_change: "Change", alert_unit: "Please enter your Unit/House No.", step3_title: "Choose Logistics", mode_walkin: "Walk-in", mode_lalamove: "Lalamove", label_del_fee: "Delivery Fee", btn_next_srv: "Next: Services", txt_open: "OPEN", txt_closed: "CLOSED", txt_closes_at: "Closes", txt_opens_at: "Opens", txt_walkin_open: "Drop off your items anytime today before", txt_walkin_closed: "Store is currently closed. Please drop off your items when they open at", txt_lala_open: "Pickup: Immediate dispatch.", txt_lala_closed: "Pickup: Scheduled for dispatch at", step4_title: "Services per Item", txt_measure_walkin: "Walk-in selected. No measurements needed.", txt_measure_lala: "Lalamove selected. Please provide measurements.", srv_full: "Full Body Alteration", srv_hem: "Alter Length", srv_sleeve: "Alter Sleeves", srv_shoulder: "Alter Shoulders", srv_pads: "Add Shoulder Pads", lbl_length: "Length (inches)", lbl_sleeve: "Sleeves (inches)", lbl_shoulder: "Shoulders (inches)", lbl_pads: "Shoulder Pads", 
             lbl_services_cost: "Alteration Services", lbl_delivery_cost: "Lalamove delivery fee to be paid to Arabista", label_total_est: "Total to Pay Hub", 
-            btn_confirm: "Confirm Booking", txt_value: "Value", txt_yousave: "You Save", btn_add_meas: "Add Measurements (Required)", btn_edit_meas: "Measurements Saved (Edit)", modal_title: "Provide Measurements", btn_save: "Save", alert_no_items: "Please select at least one item.", alert_no_hub: "Please select an Alteration Point.", alert_measure: "Please fill in measurements for all required items.", alert_max: "must be strictly less than original size", alert_max_full: "must be less than or equal to original size", alert_full_equal: "At least one measurement must be reduced for a Full Body alteration.", txt_no_items_step4: "No items selected. Please select items in Step 1.", modal_success_title: "Booking Successful!", modal_success_desc: "Your Alteration Order ID is:", modal_success_warn: "⚠️ Please screenshot this ID", btn_track: "Track My Order", txt_calculating: "Calculating...", ph_manual_search: "Or search building / street...", btn_search: "Search", txt_no_results: "No results found. Try a different term.", txt_view_on_map: "View on Google Maps"
+            btn_confirm: "Confirm Booking", txt_value: "Value", txt_yousave: "You Save", btn_add_meas: "Add Measurements (Required)", btn_edit_meas: "Measurements Saved (Edit)", modal_title: "Provide Measurements", btn_save: "Save", alert_no_items: "Please select at least one item.", alert_no_hub: "Please select an Alteration Point.", alert_measure: "Please fill in measurements for all required items.", alert_max: "must be strictly less than original size", alert_max_full: "must be less than or equal to original size", alert_full_equal: "At least one measurement must be reduced for a Full Body alteration.", txt_no_items_step4: "No items selected. Please select items in Step 1.", modal_success_title: "Booking Successful!", modal_success_desc: "Your Alteration Order ID is:", modal_success_warn: "⚠️ Please screenshot this ID", btn_track: "Track My Order", txt_calculating: "Calculating...", ph_manual_search: "Or search building / street...", btn_search: "Search", txt_no_results: "No results found. Try a different term.", txt_view_on_map: "View on Google Maps",
+            alert_order_not_found: "Order not found. Proceeding with manual entry.", alert_no_service: "Please select at least one service.", msg_processing: "Processing...", msg_translating: "Translating...", msg_locating: "Locating...", msg_searching_map: "Searching Map...", msg_search_failed: "Search Failed.", msg_reset_loc: "Please search for your location again or detect GPS.", msg_geo_notsupported: "Geolocation is not supported by your browser.", msg_db_error: "Database Error: ", lbl_saved_address: "Base Location"
         },
         bm: { 
             page_title: "Servis Alterasi", page_subtitle: "Pilih item untuk dialter.", step1_title: "Pilih Item", btn_next_loc: "Seterusnya: Lokasi", lbl_cust_name: "Nama Pelanggan", placeholder_name: "cth. Siti Aishah", lbl_phone: "No. Telefon", placeholder_phone: "cth. 0123456789", lbl_design_code: "Kod Rekaan", lbl_size: "Saiz", btn_add_item: "Tambah Item Lain", alert_name: "Sila masukkan nama anda.", alert_phone: "Sila masukkan no. telefon anda.", alert_item_detail: "Sila pilih Kod Rekaan dan Saiz untuk semua item.", step2_title: "Sahkan Lokasi", 
             txt_detecting: "Klik untuk Kesan Lokasi", btn_detect_gps: "Kesan GPS Semasa", txt_loc_inaccurate: "Lokasi tidak tepat? Cari di bawah:",
             txt_locating_fresh: "Mendapatkan isyarat GPS baru...", txt_recommended: "Disyorkan", txt_loading_system: "Memuatkan sistem...", txt_pinpointing: "Memetakan koordinat Google...", alert_geocode_fail: "Gagal memetakan alamat secara automatik. Sila guna 'Guna GPS Semasa' untuk caj penghantaran yang tepat.", txt_detected_gps: "Lokasi Dikesan:", label_unit: "No. Unit / Rumah / Lot *", placeholder_unit: "cth. Unit 15-1 atau Rumah 42", btn_confirm_loc: "Sahkan Lokasi", btn_cancel: "Batal", btn_change: "Tukar", alert_unit: "Sila masukkan No. Unit/Rumah anda.", step3_title: "Pilih Logistik", mode_walkin: "Walk-in", mode_lalamove: "Lalamove", label_del_fee: "Caj Penghantaran", btn_next_srv: "Seterusnya: Servis", txt_open: "BUKA", txt_closed: "TUTUP", txt_closes_at: "Tutup", txt_opens_at: "Buka", txt_walkin_open: "Hantar baju anda hari ini sebelum", txt_walkin_closed: "Kedai tutup. Sila hantar baju anda apabila mereka buka pada", txt_lala_open: "Pickup: Akan diambil segera.", txt_lala_closed: "Pickup: Dijadualkan untuk diambil pada", step4_title: "Servis Setiap Item", txt_measure_walkin: "Walk-in dipilih. Tiada ukuran diperlukan.", txt_measure_lala: "Lalamove dipilih. Sila masukkan ukuran.", srv_full: "Alter Keseluruhan Baju", srv_hem: "Alter Labuh", srv_sleeve: "Alter Lengan", srv_shoulder: "Alter Bahu", srv_pads: "Tambah Span Bahu", lbl_length: "Labuh (inci)", lbl_sleeve: "Lengan (inci)", lbl_shoulder: "Bahu (inci)", lbl_pads: "Span Bahu", 
             lbl_services_cost: "Servis Alterasi", lbl_delivery_cost: "Caj Lalamove perlu dibayar kepada Arabista", label_total_est: "Jumlah Dibayar ke Hub",
-            btn_confirm: "Sahkan Tempahan", txt_value: "Nilai", txt_yousave: "Anda Jimat", btn_add_meas: "Masukkan Ukuran (Wajib)", btn_edit_meas: "Ukuran Disimpan (Ubah)", modal_title: "Masukkan Ukuran", btn_save: "Simpan", alert_no_items: "Sila pilih sekurang-kurangnya satu item.", alert_no_hub: "Sila pilih Pusat Alterasi.", alert_measure: "Sila lengkapkan semua ukuran yang diperlukan.", alert_max: "mesti kurang dari saiz asal", alert_max_full: "mesti kurang dari atau sama dengan saiz asal", alert_full_equal: "Sekurang-kurangnya satu ukuran mesti dikurangkan untuk Alter Keseluruhan Baju.", txt_no_items_step4: "Tiada item dipilih. Sila pilih item di Langkah 1.", modal_success_title: "Tempahan Berjaya!", modal_success_desc: "ID Tempahan Alterasi anda ialah:", modal_success_warn: "⚠️ Sila 'screenshot' ID ini", btn_track: "Jejak Tempahan Saya", txt_calculating: "Mengira...", ph_manual_search: "Atau cari bangunan / jalan...", btn_search: "Cari", txt_no_results: "Tiada hasil dijumpai. Cuba terma lain.", txt_view_on_map: "Lihat di Google Maps"
+            btn_confirm: "Sahkan Tempahan", txt_value: "Nilai", txt_yousave: "Anda Jimat", btn_add_meas: "Masukkan Ukuran (Wajib)", btn_edit_meas: "Ukuran Disimpan (Ubah)", modal_title: "Masukkan Ukuran", btn_save: "Simpan", alert_no_items: "Sila pilih sekurang-kurangnya satu item.", alert_no_hub: "Sila pilih Pusat Alterasi.", alert_measure: "Sila lengkapkan semua ukuran yang diperlukan.", alert_max: "mesti kurang dari saiz asal", alert_max_full: "mesti kurang dari atau sama dengan saiz asal", alert_full_equal: "Sekurang-kurangnya satu ukuran mesti dikurangkan untuk Alter Keseluruhan Baju.", txt_no_items_step4: "Tiada item dipilih. Sila pilih item di Langkah 1.", modal_success_title: "Tempahan Berjaya!", modal_success_desc: "ID Tempahan Alterasi anda ialah:", modal_success_warn: "⚠️ Sila 'screenshot' ID ini", btn_track: "Jejak Tempahan Saya", txt_calculating: "Mengira...", ph_manual_search: "Atau cari bangunan / jalan...", btn_search: "Cari", txt_no_results: "Tiada hasil dijumpai. Cuba terma lain.", txt_view_on_map: "Lihat di Google Maps",
+            alert_order_not_found: "Pesanan tidak dijumpai. Teruskan dengan entri manual.", alert_no_service: "Sila pilih sekurang-kurangnya satu servis.", msg_processing: "Memproses...", msg_translating: "Menterjemah...", msg_locating: "Mengescan...", msg_searching_map: "Mencari Peta...", msg_search_failed: "Carian Gagal.", msg_reset_loc: "Sila cari lokasi anda semula atau kesan GPS.", msg_geo_notsupported: "Geolokasi tidak disokong oleh pelayar anda.", msg_db_error: "Ralat Pangkalan Data: ", lbl_saved_address: "Lokasi Asas"
         }
     };
     
     let currentLang = 'en';
     let hubs = []; 
     let generatedAltId = ""; 
+    let pricingData = { // V6.4 Fallback Pricing
+        full: {price:30, value:40, savings:10}, 
+        hem: {price:12}, sleeve: {price:12}, 
+        shoulder: {price:10}, pads: {price:6}
+    };
 
     function setLang(lang) {
         currentLang = lang;
@@ -277,6 +285,12 @@
             const res = await fetch(fetchUrl); 
             const data = await res.json();
             if (data.error) throw new Error(data.error);
+            
+            // V6.4 Load dynamic pricing
+            if (data.pricing && Object.keys(data.pricing).length > 0) {
+                pricingData = data.pricing;
+            }
+            
             hubs = Array.isArray(data.hubs) ? data.hubs : [];
             
             if (orderId && data.orderData) {
@@ -302,14 +316,14 @@
                 });
             } else {
                 state.path = 'B'; 
-                if (orderId) alert("Order #" + orderId + " not found. Proceeding with manual entry.");
+                if (orderId) alert((t[currentLang].alert_order_not_found || "Order not found.") + " #" + orderId);
                 document.getElementById('path-b-container').classList.remove('hidden'); 
                 addManualItem(); 
             }
             document.getElementById('step1-loading').classList.add('hidden'); 
             document.getElementById('hub-list-loading').classList.add('hidden');
         } catch(e) { 
-            document.getElementById('step1-loading').innerText = "Database Error: " + e.message; 
+            document.getElementById('step1-loading').innerText = (t[currentLang].msg_db_error || "Database Error: ") + e.message; 
         }
     });
 
@@ -363,7 +377,6 @@
             unlockStep(2); 
             document.getElementById('step-2').scrollIntoView({behavior: 'smooth', block: 'start'});
             
-            // Auto Trigger Order Address Location
             setTimeout(() => { useOrderAddress(); }, 400);
         } else {
             if(!document.getElementById('manual-cust-name').value.trim()) return alert(t[currentLang].alert_name);
@@ -373,7 +386,6 @@
             unlockStep(2); 
             document.getElementById('step-2').scrollIntoView({behavior: 'smooth', block: 'start'});
             
-            // Auto Trigger GPS
             setTimeout(() => { useGPS(); }, 400);
         }
     }
@@ -394,7 +406,6 @@
         return null;
     }
 
-    // Auto-triggered for Path A
     async function useOrderAddress() { 
         if(!state.orderAddress) state.orderAddress = "Kuala Lumpur, Malaysia";
         
@@ -406,7 +417,7 @@
         btnConfirm.classList.add('opacity-50', 'pointer-events-none', 'animate-pulse');
         btnConfirm.innerText = t[currentLang].txt_pinpointing || "Mapping...";
         
-        document.getElementById('gps-detected-text').innerHTML = `<div class="animate-pulse text-white/50 text-sm py-1">Mapping Order Address...</div>`;
+        document.getElementById('gps-detected-text').innerHTML = `<div class="animate-pulse text-white/50 text-sm py-1">${t[currentLang].txt_pinpointing || "Mapping..."}</div>`;
 
         const coords = await geocodeAddress(state.orderAddress);
         
@@ -415,9 +426,9 @@
             document.getElementById('gps-detected-text').innerText = `${coords.formatted_address || state.orderAddress}`; 
             
             document.getElementById('map-verify-link').innerHTML = `
-                <a href="https://www.google.com/maps?q=${state.lat},${state.lng}" target="_blank" rel="noopener noreferrer" class="w-full flex justify-center items-center gap-2 text-[11px] font-bold text-luxe bg-luxe/10 hover:bg-luxe hover:text-brand border border-luxe/30 py-2.5 rounded-lg transition">
+                <a href="http://googleusercontent.com/maps.google.com/?q=${state.lat},${state.lng}" target="_blank" class="w-full flex justify-center items-center gap-2 text-[11px] font-bold text-luxe bg-luxe/10 hover:bg-luxe hover:text-brand border border-luxe/30 py-2.5 rounded-lg transition">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
-                    <span data-t="txt_view_on_map">${t[currentLang].txt_view_on_map}</span>
+                    <span data-t="txt_view_on_map">${t[currentLang].txt_view_on_map || "View on Google Maps"}</span>
                     <span class="font-mono opacity-50">(${parseFloat(state.lat).toFixed(4)}, ${parseFloat(state.lng).toFixed(4)})</span>
                 </a>
             `;
@@ -431,9 +442,8 @@
         document.getElementById('fallback-search-box').classList.remove('hidden');
     }
     
-    // Auto-triggered for Path B, or manually triggered in Fallback Box
     function useGPS() {
-        if(!navigator.geolocation) return alert("Geo not supported");
+        if(!navigator.geolocation) return alert(t[currentLang].msg_geo_notsupported || "Geo not supported");
         
         document.getElementById('gps-details-panel').classList.remove('hidden');
         document.getElementById('map-verify-link').innerHTML = '';
@@ -441,9 +451,9 @@
         
         const btnConfirm = document.getElementById('btn-confirm-loc');
         btnConfirm.classList.add('opacity-50', 'pointer-events-none', 'animate-pulse');
-        btnConfirm.innerText = "Locating...";
+        btnConfirm.innerText = t[currentLang].msg_locating || "Locating...";
         
-        document.getElementById('gps-detected-text').innerHTML = `<div class="animate-pulse text-luxe text-sm py-1">Acquiring satellite coordinates...</div>`;
+        document.getElementById('gps-detected-text').innerHTML = `<div class="animate-pulse text-luxe text-sm py-1">📡 ${t[currentLang].msg_locating || "Acquiring satellite coordinates..."}</div>`;
 
         if (state.gpsWatchId) navigator.geolocation.clearWatch(state.gpsWatchId);
         state.gpsWatchId = navigator.geolocation.watchPosition(
@@ -451,8 +461,8 @@
                 navigator.geolocation.clearWatch(state.gpsWatchId); state.gpsWatchId = null;
                 state.lat = pos.coords.latitude; state.lng = pos.coords.longitude; 
                 
-                document.getElementById('gps-detected-text').innerHTML = `<div class="animate-pulse text-white/50 text-sm py-1">Translating GPS to street address...</div>`;
-                btnConfirm.innerText = "Translating...";
+                document.getElementById('gps-detected-text').innerHTML = `<div class="animate-pulse text-white/50 text-sm py-1">${t[currentLang].msg_translating || "Translating GPS..."}</div>`;
+                btnConfirm.innerText = t[currentLang].msg_translating || "Translating...";
                 
                 try {
                     const res = await fetch(`${scriptURL}?action=reverse_geocode&lat=${state.lat}&lng=${state.lng}`);
@@ -463,9 +473,9 @@
                 }
 
                 document.getElementById('map-verify-link').innerHTML = `
-                    <a href="https://www.google.com/maps?q=${state.lat},${state.lng}" target="_blank" rel="noopener noreferrer" class="w-full flex justify-center items-center gap-2 text-[11px] font-bold text-luxe bg-luxe/10 hover:bg-luxe hover:text-brand border border-luxe/30 py-2.5 rounded-lg transition">
+                    <a href="http://googleusercontent.com/maps.google.com/?q=${state.lat},${state.lng}" target="_blank" class="w-full flex justify-center items-center gap-2 text-[11px] font-bold text-luxe bg-luxe/10 hover:bg-luxe hover:text-brand border border-luxe/30 py-2.5 rounded-lg transition">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
-                        <span data-t="txt_view_on_map">${t[currentLang].txt_view_on_map}</span>
+                        <span data-t="txt_view_on_map">${t[currentLang].txt_view_on_map || "View on Google Maps"}</span>
                         <span class="font-mono opacity-50">(${parseFloat(state.lat).toFixed(4)}, ${parseFloat(state.lng).toFixed(4)})</span>
                     </a>
                 `;
@@ -484,7 +494,6 @@
         );
     }
     
-    // Manual trigger in Fallback Box
     async function geocodeManualAlteration() {
         const addr = document.getElementById('manual-search-input').value.trim();
         if(!addr) return;
@@ -495,10 +504,10 @@
         
         const btnConfirm = document.getElementById('btn-confirm-loc');
         btnConfirm.classList.add('opacity-50', 'pointer-events-none', 'animate-pulse');
-        btnConfirm.innerText = "Searching...";
+        btnConfirm.innerText = t[currentLang].msg_searching_map || "Searching...";
         
         document.getElementById('map-verify-link').innerHTML = '';
-        document.getElementById('gps-detected-text').innerHTML = `<div class="animate-pulse text-white/50 text-sm py-1">Searching Map...</div>`;
+        document.getElementById('gps-detected-text').innerHTML = `<div class="animate-pulse text-white/50 text-sm py-1">${t[currentLang].msg_searching_map || "Searching Map..."}</div>`;
         
         try {
             const res = await fetch(`${scriptURL}?action=geocode&address=${encodeURIComponent(addr)}`);
@@ -510,29 +519,28 @@
                 document.getElementById('gps-detected-text').innerText = `${data.formatted_address || addr}`;
                 
                 document.getElementById('map-verify-link').innerHTML = `
-                    <a href="https://www.google.com/maps?q=${state.lat},${state.lng}" target="_blank" rel="noopener noreferrer" class="w-full flex justify-center items-center gap-2 text-[11px] font-bold text-luxe bg-luxe/10 hover:bg-luxe hover:text-brand border border-luxe/30 py-2.5 rounded-lg transition">
+                    <a href="http://googleusercontent.com/maps.google.com/?q=${state.lat},${state.lng}" target="_blank" class="w-full flex justify-center items-center gap-2 text-[11px] font-bold text-luxe bg-luxe/10 hover:bg-luxe hover:text-brand border border-luxe/30 py-2.5 rounded-lg transition">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
-                        <span data-t="txt_view_on_map">${t[currentLang].txt_view_on_map}</span>
+                        <span data-t="txt_view_on_map">${t[currentLang].txt_view_on_map || "View on Google Maps"}</span>
                         <span class="font-mono opacity-50">(${parseFloat(state.lat).toFixed(4)}, ${parseFloat(state.lng).toFixed(4)})</span>
                     </a>
                 `;
             } else {
                 document.getElementById('manual-search-error').innerText = t[currentLang].txt_no_results || "❌ Location not found.";
                 document.getElementById('manual-search-error').classList.remove('hidden');
-                document.getElementById('gps-detected-text').innerText = "Location not found.";
+                document.getElementById('gps-detected-text').innerText = t[currentLang].txt_no_results || "Location not found.";
             }
         } catch(e) {
             btn.innerHTML = origText; btn.disabled = false;
             document.getElementById('manual-search-error').innerText = "❌ Search failed.";
             document.getElementById('manual-search-error').classList.remove('hidden');
-            document.getElementById('gps-detected-text').innerText = "Search Failed.";
+            document.getElementById('gps-detected-text').innerText = t[currentLang].msg_search_failed || "Search Failed.";
         }
         
         btnConfirm.classList.remove('opacity-50', 'pointer-events-none', 'animate-pulse');
         btnConfirm.innerText = t[currentLang].btn_confirm_loc;
     }
 
-    // Smart string deduplication logic
     function confirmGPSDetails() {
         state.unitNo = document.getElementById('gps-unit-input').value.trim();
         if(!state.unitNo) return alert(t[currentLang].alert_unit);
@@ -559,6 +567,11 @@
     function showLocSuccess(addr) { 
         document.getElementById('gps-details-panel').classList.add('hidden'); 
         document.getElementById('validated-loc').classList.remove('hidden'); 
+        
+        // Setup base label translation
+        const baseLocLabel = document.querySelector('#validated-loc p.text-xs');
+        if (baseLocLabel) baseLocLabel.innerText = t[currentLang].lbl_saved_address || "Base Location";
+
         document.getElementById('final-address').innerText = addr; 
         unlockStep(3); 
         renderHubs(); 
@@ -569,7 +582,7 @@
         if (state.gpsWatchId) { navigator.geolocation.clearWatch(state.gpsWatchId); state.gpsWatchId = null; }
         
         document.getElementById('gps-details-panel').classList.remove('hidden'); 
-        document.getElementById('gps-detected-text').innerText = "Please search for your location again or detect GPS.";
+        document.getElementById('gps-detected-text').innerText = t[currentLang].msg_reset_loc || "Please search for your location again or detect GPS.";
         document.getElementById('map-verify-link').innerHTML = '';
         document.getElementById('gps-unit-input').value = ''; 
         document.getElementById('fallback-search-box').classList.remove('hidden');
@@ -682,7 +695,6 @@
                         priceDisp.innerText = `RM ${state.deliveryCost.toFixed(2)}`;
                         priceDisp.classList.remove('animate-pulse');
                     } else {
-                        console.error("Lalamove Error:", data);
                         let errMsg = "Fee Error";
                         if(data.message) {
                              if(data.message.includes("OUT_OF_SERVICE")) errMsg = "Out of Area";
@@ -695,7 +707,6 @@
                         priceDisp.classList.add('text-red-400');
                     }
                 } catch(e) { 
-                    console.error(e);
                     priceDisp.innerText = "Net Err"; 
                     priceDisp.classList.remove('animate-pulse');
                 }
@@ -715,13 +726,22 @@
 
     function updateMeasurementInstruction() { const el = document.getElementById('measure-instruction'); el.innerText = state.mode === 'walkin' ? t[currentLang].txt_measure_walkin : t[currentLang].txt_measure_lala; if(state.mode === 'lalamove') el.classList.replace('text-white/50', 'text-luxe'); else el.classList.replace('text-luxe', 'text-white/50'); }
 
+    // V6.4: DYNAMIC PRICING RENDER
     function renderServices() {
         const container = document.getElementById('services-container'); if(container.innerHTML !== "" && !container.dataset.needsRender) return; if(state.selectedItems.length === 0) return;
         container.innerHTML = '';
+        
+        // Fallbacks if backend pricing isn't configured yet
+        const pFull = pricingData.full || {price:30, value:40, savings:10};
+        const pHem = pricingData.hem || {price:12};
+        const pSleeve = pricingData.sleeve || {price:12};
+        const pShoulder = pricingData.shoulder || {price:10};
+        const pPads = pricingData.pads || {price:6};
+
         state.selectedItems.forEach(item => {
             const block = document.createElement('div'); block.className = "bg-white/5 border border-white/10 rounded-xl overflow-hidden relative";
             const header = `<div class="bg-black/30 p-4 border-b border-white/5 font-display text-lg flex justify-between"><span class="text-white">${item.name}</span><span class="text-xs font-sans text-luxe border border-luxe/30 px-2 py-0.5 rounded">Size: ${item.size}</span></div>`;
-            const body = `<div class="p-4 space-y-3"><div class="border border-luxe/50 rounded-lg p-4 bg-gradient-to-br from-luxe/10 to-transparent hover:border-luxe transition relative group"><div class="absolute -top-2.5 right-4 bg-luxe text-brand text-[9px] font-bold px-2 py-0.5 rounded shadow-lg uppercase tracking-wider" data-t="txt_value">${t[currentLang].txt_value} RM 40 | ${t[currentLang].txt_yousave} RM 10</div><label class="flex items-start gap-3 cursor-pointer"><input type="checkbox" id="cb-${item.id}-full" value="30" class="mt-1.5 w-5 h-5 rounded border-luxe/50 text-luxe focus:ring-luxe bg-transparent srv-cb transition" onchange="handleSrvCheck('${item.id}', 'full')"><div class="flex-1"><div class="flex justify-between items-center mb-1"><span class="text-base font-medium text-white group-hover:text-luxe transition" data-t="srv_full">${t[currentLang].srv_full}</span><span class="text-luxe font-bold text-lg">RM 30</span></div></div></label></div><div class="grid grid-cols-2 gap-3 pt-2"><div class="border border-white/10 rounded-lg p-3 hover:border-luxe/50 transition" id="wrap-${item.id}-hem"><label class="flex items-center gap-3 cursor-pointer"><input type="checkbox" id="cb-${item.id}-hem" value="12" class="w-4 h-4 rounded border-white/30 text-luxe bg-transparent srv-cb" onchange="handleSrvCheck('${item.id}', 'hem')"><div class="flex-1 flex justify-between text-sm"><span data-t="srv_hem">${t[currentLang].srv_hem}</span> <span class="text-white/50">RM12</span></div></label></div><div class="border border-white/10 rounded-lg p-3 hover:border-luxe/50 transition" id="wrap-${item.id}-sleeve"><label class="flex items-center gap-3 cursor-pointer"><input type="checkbox" id="cb-${item.id}-sleeve" value="12" class="w-4 h-4 rounded border-white/30 text-luxe bg-transparent srv-cb" onchange="handleSrvCheck('${item.id}', 'sleeve')"><div class="flex-1 flex justify-between text-sm"><span data-t="srv_sleeve">${t[currentLang].srv_sleeve}</span> <span class="text-white/50">RM12</span></div></label></div><div class="border border-white/10 rounded-lg p-3 hover:border-luxe/50 transition" id="wrap-${item.id}-shoulder"><label class="flex items-center gap-3 cursor-pointer"><input type="checkbox" id="cb-${item.id}-shoulder" value="10" class="w-4 h-4 rounded border-white/30 text-luxe bg-transparent srv-cb" onchange="handleSrvCheck('${item.id}', 'shoulder')"><div class="flex-1 flex justify-between text-sm"><span data-t="srv_shoulder">${t[currentLang].srv_shoulder}</span> <span class="text-white/50">RM10</span></div></label></div><div class="border border-white/10 rounded-lg p-3 hover:border-luxe/50 transition" id="wrap-${item.id}-pads"><label class="flex items-center gap-3 cursor-pointer"><input type="checkbox" id="cb-${item.id}-pads" value="6" class="w-4 h-4 rounded border-white/30 text-luxe bg-transparent srv-cb" onchange="handleSrvCheck('${item.id}', 'pads')"><div class="flex-1 flex justify-between text-sm"><span data-t="srv_pads">${t[currentLang].srv_pads}</span> <span class="text-white/50">RM6</span></div></label></div></div><div id="btn-container-${item.id}" class="hidden pt-4 border-t border-white/10 mt-4"><button onclick="openModal('${item.id}')" id="meas-btn-${item.id}" class="w-full py-3 rounded-xl border border-luxe bg-luxe/10 text-luxe text-sm font-bold flex justify-center items-center gap-2 hover:bg-luxe hover:text-brand transition"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg><span data-t="btn_add_meas">${t[currentLang].btn_add_meas}</span></button></div></div>`;
+            const body = `<div class="p-4 space-y-3"><div class="border border-luxe/50 rounded-lg p-4 bg-gradient-to-br from-luxe/10 to-transparent hover:border-luxe transition relative group"><div class="absolute -top-2.5 right-4 bg-luxe text-brand text-[9px] font-bold px-2 py-0.5 rounded shadow-lg uppercase tracking-wider">${t[currentLang].txt_value} RM ${pFull.value} | ${t[currentLang].txt_yousave} RM ${pFull.savings}</div><label class="flex items-start gap-3 cursor-pointer"><input type="checkbox" id="cb-${item.id}-full" value="${pFull.price}" class="mt-1.5 w-5 h-5 rounded border-luxe/50 text-luxe focus:ring-luxe bg-transparent srv-cb transition" onchange="handleSrvCheck('${item.id}', 'full')"><div class="flex-1"><div class="flex justify-between items-center mb-1"><span class="text-base font-medium text-white group-hover:text-luxe transition" data-t="srv_full">${t[currentLang].srv_full}</span><span class="text-luxe font-bold text-lg">RM ${pFull.price}</span></div></div></label></div><div class="grid grid-cols-2 gap-3 pt-2"><div class="border border-white/10 rounded-lg p-3 hover:border-luxe/50 transition" id="wrap-${item.id}-hem"><label class="flex items-center gap-3 cursor-pointer"><input type="checkbox" id="cb-${item.id}-hem" value="${pHem.price}" class="w-4 h-4 rounded border-white/30 text-luxe bg-transparent srv-cb" onchange="handleSrvCheck('${item.id}', 'hem')"><div class="flex-1 flex justify-between text-sm"><span data-t="srv_hem">${t[currentLang].srv_hem}</span> <span class="text-white/50">RM${pHem.price}</span></div></label></div><div class="border border-white/10 rounded-lg p-3 hover:border-luxe/50 transition" id="wrap-${item.id}-sleeve"><label class="flex items-center gap-3 cursor-pointer"><input type="checkbox" id="cb-${item.id}-sleeve" value="${pSleeve.price}" class="w-4 h-4 rounded border-white/30 text-luxe bg-transparent srv-cb" onchange="handleSrvCheck('${item.id}', 'sleeve')"><div class="flex-1 flex justify-between text-sm"><span data-t="srv_sleeve">${t[currentLang].srv_sleeve}</span> <span class="text-white/50">RM${pSleeve.price}</span></div></label></div><div class="border border-white/10 rounded-lg p-3 hover:border-luxe/50 transition" id="wrap-${item.id}-shoulder"><label class="flex items-center gap-3 cursor-pointer"><input type="checkbox" id="cb-${item.id}-shoulder" value="${pShoulder.price}" class="w-4 h-4 rounded border-white/30 text-luxe bg-transparent srv-cb" onchange="handleSrvCheck('${item.id}', 'shoulder')"><div class="flex-1 flex justify-between text-sm"><span data-t="srv_shoulder">${t[currentLang].srv_shoulder}</span> <span class="text-white/50">RM${pShoulder.price}</span></div></label></div><div class="border border-white/10 rounded-lg p-3 hover:border-luxe/50 transition" id="wrap-${item.id}-pads"><label class="flex items-center gap-3 cursor-pointer"><input type="checkbox" id="cb-${item.id}-pads" value="${pPads.price}" class="w-4 h-4 rounded border-white/30 text-luxe bg-transparent srv-cb" onchange="handleSrvCheck('${item.id}', 'pads')"><div class="flex-1 flex justify-between text-sm"><span data-t="srv_pads">${t[currentLang].srv_pads}</span> <span class="text-white/50">RM${pPads.price}</span></div></label></div></div><div id="btn-container-${item.id}" class="hidden pt-4 border-t border-white/10 mt-4"><button onclick="openModal('${item.id}')" id="meas-btn-${item.id}" class="w-full py-3 rounded-xl border border-luxe bg-luxe/10 text-luxe text-sm font-bold flex justify-center items-center gap-2 hover:bg-luxe hover:text-brand transition"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg><span data-t="btn_add_meas">${t[currentLang].btn_add_meas}</span></button></div></div>`;
             block.innerHTML = header + body; container.appendChild(block); handleSrvCheck(item.id, 'init', true);
         }); container.dataset.needsRender = false;
     }
@@ -813,7 +833,7 @@
 
     async function submitOrder() {
         if(!state.hubId) return alert(t[currentLang].alert_no_hub);
-        if(state.servicesTotal === 0) return alert("Please select at least one service.");
+        if(state.servicesTotal === 0) return alert(t[currentLang].alert_no_service || "Please select at least one service.");
         if(state.mode === 'lalamove') {
             let valid = true;
             state.selectedItems.forEach(item => { const id = item.id; const m = state.measurements[id];
@@ -827,19 +847,23 @@
 
         const btn = document.getElementById('btn-final-submit');
         const originalText = btn.innerHTML; 
-        btn.innerHTML = `${spinnerSvg} Processing...`; 
+        btn.innerHTML = `${spinnerSvg} ${t[currentLang].msg_processing || "Processing..."}`; 
         btn.disabled = true;
         btn.classList.add('opacity-70', 'cursor-not-allowed');
 
         let itemDetailsStr = "";
+        let serviceKeysArray = []; // V6.4: Array of keys for backend validation
+
         state.selectedItems.forEach(item => {
             let servicesArr = []; const m = state.measurements[item.id];
-            if(document.getElementById(`cb-${item.id}-full`)?.checked) servicesArr.push(`Full Body (L:${m.length||'-'} S:${m.sleeve||'-'} Sh:${m.shoulder||'-'} Pads:${m.pads||'-'})`);
-            else {
-                if(document.getElementById(`cb-${item.id}-hem`)?.checked) servicesArr.push(`Hem (L:${m.length})`);
-                if(document.getElementById(`cb-${item.id}-sleeve`)?.checked) servicesArr.push(`Sleeves (S:${m.sleeve})`);
-                if(document.getElementById(`cb-${item.id}-shoulder`)?.checked) servicesArr.push(`Shoulders (Sh:${m.shoulder})`);
-                if(document.getElementById(`cb-${item.id}-pads`)?.checked) servicesArr.push(`Pads`);
+            if(document.getElementById(`cb-${item.id}-full`)?.checked) {
+                servicesArr.push(`Full Body (L:${m.length||'-'} S:${m.sleeve||'-'} Sh:${m.shoulder||'-'} Pads:${m.pads||'-'})`);
+                serviceKeysArray.push('full');
+            } else {
+                if(document.getElementById(`cb-${item.id}-hem`)?.checked) { servicesArr.push(`Hem (L:${m.length})`); serviceKeysArray.push('hem'); }
+                if(document.getElementById(`cb-${item.id}-sleeve`)?.checked) { servicesArr.push(`Sleeves (S:${m.sleeve})`); serviceKeysArray.push('sleeve'); }
+                if(document.getElementById(`cb-${item.id}-shoulder`)?.checked) { servicesArr.push(`Shoulders (Sh:${m.shoulder})`); serviceKeysArray.push('shoulder'); }
+                if(document.getElementById(`cb-${item.id}-pads`)?.checked) { servicesArr.push(`Pads`); serviceKeysArray.push('pads'); }
             }
             itemDetailsStr += `[${item.name} | Size: ${item.size}] -> ${servicesArr.join(', ')}\n`;
         });
@@ -863,7 +887,8 @@
             Delivery_Fee: state.mode === 'walkin' ? "RM 0" : "RM " + state.deliveryCost.toFixed(2) + " (Pay to Arabista)",
             Services_Total: "RM " + state.servicesTotal,
             Grand_Total: "RM " + state.servicesTotal,
-            Item_Details: itemDetailsStr.trim()
+            Item_Details: itemDetailsStr.trim(),
+            Service_Keys: serviceKeysArray // V6.4: Sent for backend trust calculation
         };
 
         try {
