@@ -101,7 +101,13 @@
             </div>
         </div>
 
-        <h2 class="font-display text-xl mb-4" data-t="section_status">Tracking Status</h2>
+        <div class="flex justify-between items-center mb-4">
+            <h2 class="font-display text-xl" data-t="section_status">Tracking Status</h2>
+            <button onclick="refreshTracker()" id="btn-refresh" class="flex items-center gap-1.5 text-xs font-bold text-luxe bg-luxe/10 hover:bg-luxe hover:text-brand px-3 py-1.5 rounded-lg transition border border-luxe/30 shadow-sm">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                <span data-t="btn_refresh">Refresh</span>
+            </button>
+        </div>
         
         <div class="space-y-6 relative ml-2" id="timeline-container"></div>
     </div>
@@ -261,24 +267,25 @@
     function sanitizeHTML(str) {
         if (!str) return "";
         return String(str)
-            .replace(/&/g, '&amp;')
-            .replace(/</g, '&lt;')
-            .replace(/>/g, '&gt;')
-            .replace(/"/g, '&quot;')
-            .replace(/'/g, '&#39;');
+            .replace(/&/g, "&" + "amp;")
+            .replace(/</g, "&" + "lt;")
+            .replace(/>/g, "&" + "gt;")
+            .replace(/"/g, "&" + "quot;")
+            .replace(/'/g, "&" + "#39;");
     }
 
     function escapeJS(str) {
         if (!str) return "";
         return String(str)
             .replace(/\\/g, '\\\\')
-            .replace(/'/g, "\\'")
+            .replace(/'/g, "\\" + "'")
             .replace(/"/g, '\\"');
     }
 
     const scriptURL = 'https://script.google.com/macros/s/AKfycbyrJFfuCrhAbdwzAj8uP4sSvFuzRzzzEFV5CHOCBSOK6OGlIXPtsf7-XEfjLHGnFZiyvw/exec'; 
     const trackerBaseUrl = 'https://aqmalsalleh.github.io/arabista-site/alteration-tracker.html?id=';
     const spinnerSvg = `<svg class="animate-spin h-4 w-4 inline mr-2 text-current" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>`;
+    const miniSpinnerSvg = `<svg class="animate-spin h-3.5 w-3.5 inline text-current" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>`;
     
     let currentData = null;
     let hubData = { phone: "", lat: 0, lng: 0 }; 
@@ -287,11 +294,10 @@
     let currentStops = null;
     let currentLang = 'en';
     let isIncomingOrder = false; 
-    let syncInterval = null; 
 
     const t = {
         en: {
-            page_title: "Track Alteration", page_subtitle: "Enter your unique tracking ID below.", lbl_id: "Alteration ID", btn_track: "Track Order", txt_loading: "Locating your order details...", btn_share: "Share Link", lbl_items: "Items for Alteration:", section_status: "Tracking Status", back_home: "Back to Home", btn_nav_hub: "Navigate to Hub",
+            page_title: "Track Alteration", page_subtitle: "Enter your unique tracking ID below.", lbl_id: "Alteration ID", btn_track: "Track Order", txt_loading: "Locating your order details...", btn_share: "Share Link", lbl_items: "Items for Alteration:", section_status: "Tracking Status", btn_refresh: "Refresh Status", back_home: "Back to Home", btn_nav_hub: "Navigate to Hub",
             action_title: "Action Required", action_desc_incoming: "Your order is approved! Please arrange delivery to the Hub.", action_desc_ready: "Your items are ready! Please arrange retrieval.", btn_self_pickup: "I will Self-Pickup", btn_lalamove: "Book Lalamove Rider",
             confirmed_title: "Selection Confirmed", confirmed_lala: "Lalamove Selected.", confirmed_self: "Self-Pickup Selected.",
             success_title: "Alteration Completed", success_desc: "Thank you for using our service. If you have any inquiries regarding your alteration, please contact the hub.", btn_contact: "Contact Hub", btn_call: "Call Hub",
@@ -306,7 +312,7 @@
             wa_hq_pay: "*[DELIVERY PAYMENT]*\n- *Order:* {id}\n- *Amount:* {total}\n- *Paid To:* Arabista HQ\n\nReceipt attached below."
         },
         bm: {
-            page_title: "Jejak Tempahan", page_subtitle: "Masukkan ID tempahan unik anda di bawah.", lbl_id: "ID Tempahan", btn_track: "Jejak Pesanan", txt_loading: "Mencari butiran tempahan...", btn_share: "Kongsi Pautan", lbl_items: "Item untuk Diubahsuai:", section_status: "Status Terkini", back_home: "Kembali ke Utama", btn_nav_hub: "Pandu Arah ke Hub",
+            page_title: "Jejak Tempahan", page_subtitle: "Masukkan ID tempahan unik anda di bawah.", lbl_id: "ID Tempahan", btn_track: "Jejak Pesanan", txt_loading: "Mencari butiran tempahan...", btn_share: "Kongsi Pautan", lbl_items: "Item untuk Diubahsuai:", section_status: "Status Terkini", btn_refresh: "Segar Semula", back_home: "Kembali ke Utama", btn_nav_hub: "Pandu Arah ke Hub",
             action_title: "Tindakan Diperlukan", action_desc_incoming: "Pesanan diluluskan! Sila hantar barang ke Hub.", action_desc_ready: "Barang anda dah siap! Sila aturkan pengambilan.", btn_self_pickup: "Saya Ambil Sendiri", btn_lalamove: "Tempah Lalamove",
             confirmed_title: "Pilihan Disahkan", confirmed_lala: "Lalamove Dipilih.", confirmed_self: "Ambil Sendiri Dipilih.",
             success_title: "Alterasi Selesai", success_desc: "Terima kasih menggunakan servis kami.", btn_contact: "Hubungi Hub", btn_call: "Telefon Hub",
@@ -345,8 +351,6 @@
             const safeId = sanitizeHTML(rawId);
             document.getElementById('loading-panel').classList.remove('hidden'); 
             fetchTrackingData(safeId); 
-            
-            syncInterval = setInterval(() => { fetchTrackingData(safeId, true); }, 60000);
         } else { 
             document.getElementById('search-panel').classList.remove('hidden'); 
         }
@@ -366,7 +370,6 @@
             if (!isSilent) document.getElementById('loading-panel').classList.add('hidden');
             if (data.error) { 
                 if(!isSilent) { alert(t[currentLang].alert_order_not_found); document.getElementById('search-panel').classList.remove('hidden'); }
-                if(syncInterval) clearInterval(syncInterval);
                 return; 
             }
             
@@ -384,7 +387,7 @@
             }
             
             if (currentData.lalamoveOrderId && currentData.lalamoveStatus !== "COMPLETED" && currentData.lalamoveStatus !== "CANCELED") {
-                fetchLiveLalamoveStatus(currentData.alterationId);
+                await fetchLiveLalamoveStatus(currentData.alterationId);
             }
             
             renderDashboard();
@@ -401,9 +404,23 @@
             if(data.status === 'success' && data.lalamove_status) {
                 currentData.lalamoveStatus = data.lalamove_status;
                 sessionStorage.setItem('lala_status_' + sanitizeHTML(trackId), sanitizeHTML(data.lalamove_status));
-                renderDashboard();
             }
         } catch(e) {}
+    }
+
+    async function refreshTracker() {
+        if (!currentData || !currentData.alterationId) return;
+        const btn = document.getElementById('btn-refresh');
+        const origHTML = btn.innerHTML;
+        btn.innerHTML = `${miniSpinnerSvg} <span data-t="btn_refresh">${t[currentLang].btn_refresh}</span>`;
+        btn.disabled = true;
+        btn.classList.add('opacity-50', 'cursor-not-allowed');
+        
+        await fetchTrackingData(currentData.alterationId, true);
+        
+        btn.innerHTML = origHTML;
+        btn.disabled = false;
+        btn.classList.remove('opacity-50', 'cursor-not-allowed');
     }
 
     function renderDashboard() {
@@ -442,7 +459,7 @@
                 if (hubData && hubData.lat && hubData.lng) {
                     extraText = `
                     <div class="mt-2 text-xs text-white/70 mb-3">Please drop off your items at the hub.</div>
-                    <a href="https://maps.google.com/?q=$$${parseFloat(hubData.lat)},${parseFloat(hubData.lng)}" target="_blank" rel="noopener noreferrer" class="w-full inline-flex justify-center items-center gap-2 text-xs font-bold text-brand bg-white/80 py-2.5 rounded hover:bg-white transition shadow-soft">
+                    <a href="https://maps.google.com/?q=$${parseFloat(hubData.lat)},${parseFloat(hubData.lng)}" target="_blank" rel="noopener noreferrer" class="w-full inline-flex justify-center items-center gap-2 text-xs font-bold text-brand bg-white/80 py-2.5 rounded hover:bg-white transition shadow-soft">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"></path></svg>
                         <span data-t="btn_nav_hub">${t[currentLang].btn_nav_hub || "Navigate to Hub"}</span>
                     </a>`;
@@ -497,7 +514,7 @@
 
                     if (currentData.outboundChoice === 'Self-Pickup' && hubData && hubData.lat && hubData.lng) {
                         extraText += `
-                        <a href="https://maps.google.com/?q=$$${parseFloat(hubData.lat)},${parseFloat(hubData.lng)}" target="_blank" rel="noopener noreferrer" class="mt-3 w-full inline-flex justify-center items-center gap-2 text-xs font-bold text-brand bg-white/80 py-2.5 rounded hover:bg-white transition shadow-soft">
+                        <a href="https://maps.google.com/?q=$${parseFloat(hubData.lat)},${parseFloat(hubData.lng)}" target="_blank" rel="noopener noreferrer" class="mt-3 w-full inline-flex justify-center items-center gap-2 text-xs font-bold text-brand bg-white/80 py-2.5 rounded hover:bg-white transition shadow-soft">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"></path></svg>
                             <span data-t="btn_nav_hub">${t[currentLang].btn_nav_hub || "Navigate to Hub"}</span>
                         </a>`;
@@ -655,7 +672,7 @@
                 <span class="text-[10px] uppercase tracking-widest text-white/40 block mb-0.5">Location</span>
                 <span class="text-xs text-white/80 leading-relaxed">${prettyAddress}</span>
             </div>
-            <a href="https://maps.google.com/?q=$$${parseFloat(currentData.originalLat)},${parseFloat(currentData.originalLng)}" target="_blank" rel="noopener noreferrer" class="w-full flex justify-center items-center gap-2 text-[11px] font-bold text-luxe bg-luxe/10 hover:bg-luxe hover:text-brand border border-luxe/30 py-2.5 rounded-lg transition">
+            <a href="https://maps.google.com/?q=$${parseFloat(currentData.originalLat)},${parseFloat(currentData.originalLng)}" target="_blank" rel="noopener noreferrer" class="w-full flex justify-center items-center gap-2 text-[11px] font-bold text-luxe bg-luxe/10 hover:bg-luxe hover:text-brand border border-luxe/30 py-2.5 rounded-lg transition">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
                 <span data-t="txt_view_map">${t[currentLang].txt_view_map || "View on Google Maps"}</span>
                 <span class="font-mono opacity-50">(${parseFloat(currentData.originalLat).toFixed(4)}, ${parseFloat(currentData.originalLng).toFixed(4)})</span>
