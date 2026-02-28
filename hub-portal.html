@@ -23,7 +23,7 @@
     body { background-color: #0F0F10; color: white; -webkit-tap-highlight-color: transparent; }
     .fade-in { animation: fadeIn 0.3s ease-out forwards; }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
-    input, select { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); color: white; border-radius: 8px; padding: 12px 16px; width: 100%; outline: none; transition: all 0.2s; }
+    input, select { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); color: white; border-radius: 8px; padding: 12px 16px; width: 100%; outline: none; transition: all 0.2s; font-size: 16px !important; }
     input:focus, select:focus { border-color: #C0A062; background: rgba(192,160,98,0.05); }
     input[type="date"] { color-scheme: dark; } 
     .tab-content { display: none; padding-bottom: 90px; }
@@ -63,7 +63,7 @@
           </div>
           <div>
               <label class="block text-xs text-white/50 uppercase tracking-widest mb-1.5" data-t="lbl_pin">6-Digit PIN</label>
-              <input type="password" id="login-pin" placeholder="••••••" maxlength="6" pattern="\d*">
+              <input type="password" id="login-pin" inputmode="numeric" oninput="this.value = this.value.replace(/[^0-9]/g, '')" placeholder="••••••" maxlength="6">
           </div>
           <button id="btn-login" onclick="login()" class="w-full bg-luxe text-brand font-bold py-3.5 rounded-xl hover:bg-white transition mt-4 flex justify-center items-center" data-t="btn_login">Login securely</button>
       </div>
@@ -216,6 +216,7 @@
     const trackerBaseUrl = 'https://aqmalsalleh.github.io/arabista-site/alteration-tracker.html?id=';
     const spinnerSvg = `<svg class="animate-spin h-4 w-4 inline mr-2 text-current" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>`;
 
+    // V6.4: Full Bilingual Update with Professional WhatsApp Templates
     const t = {
         en: {
             login_title: "Tailor Portal", login_desc: "Enter your registered Hub Phone Number and PIN.", lbl_phone: "Phone Number", lbl_pin: "6-Digit PIN", btn_login: "Login securely",
@@ -232,12 +233,12 @@
             title_settings: "Hub Settings", lbl_address: "Shop Address", lbl_gps: "GPS Coordinates", btn_update_gps: "Update GPS", lbl_tel: "Telephone", lbl_capacity: "Max Active Queue Capacity", lbl_open: "Open Time", lbl_close: "Close Time", lbl_status: "Status", opt_active: "Active (Accepting Orders)", opt_inactive: "Inactive (On Holiday)", btn_save: "Save Changes",
             alert_both: "Please enter both Phone and PIN.", alert_invalid: "Invalid credentials", alert_sync_fail: "Failed to sync dashboard.", alert_err_update: "Error updating status.", alert_search_fail: "Search failed.", alert_gps_fail: "GPS failed. Please enable location permissions.", alert_save_fail: "Failed to save.",
             msg_verifying: "Verifying...", msg_saving: "Saving...", msg_updating: "Updating...", msg_locating: "Locating satellite...", msg_saved: "Saved Successfully!",
-            wa_received: "Hi {name}! This is Arabista Hub. We have safely received your Abaya for Alteration Order {id}. We will begin working on it soon. Track progress here: {link}",
-            wa_completed: "Hi {name}! Good news, your Abaya alteration (Order {id}) is completely finished! 🪡 Please click your tracker link to let us know if you'd like us to Lalamove it to you, or if you will self-pickup: {link}",
-            wa_approved: "Hi {name}! Your alteration request (Order {id}) has been APPROVED by Arabista Hub! Please click your tracker link to arrange delivery/drop-off: {link}",
+            msg_new_order: "New Alteration Order!", alert_action_required: "Action Required! Customer confirmed delivery choice.",
+            wa_received: "*[ARABISTA HUB UPDATE]*\n- *Order:* {id}\n- *Status:* Item Safely Received\n- *Action:* Alteration in progress\n\nTrack live status here:\n{link}",
+            wa_completed: "*[ARABISTA HUB UPDATE]*\n- *Order:* {id}\n- *Status:* Alteration Completed\n- *Action Required:* Please choose delivery or pickup\n\nMake your selection here:\n{link}",
+            wa_approved: "*[ARABISTA HUB UPDATE]*\n- *Order:* {id}\n- *Status:* Request Approved\n- *Action Required:* Please arrange drop-off or delivery\n\nView Hub location here:\n{link}",
             nav_orders: "Orders", nav_search: "Search", nav_settings: "Settings",
-            confirm_update: "Update this order to: {status}?", edit_addr_warn: "Editing Shop Address.\n\nPlease ensure this matches your exact GPS Coordinates for accurate Lalamove routing.",
-            alert_action_required: "Action Required! Customer confirmed delivery choice."
+            confirm_update: "Update this order to: {status}?", edit_addr_warn: "Editing Shop Address.\n\nPlease ensure this matches your exact GPS Coordinates for accurate Lalamove routing."
         },
         bm: {
             login_title: "Portal Tukang Jahit", login_desc: "Masukkan No. Telefon dan PIN Hub anda.", lbl_phone: "No. Telefon", lbl_pin: "PIN 6-Digit", btn_login: "Log Masuk Selamat",
@@ -254,12 +255,12 @@
             title_settings: "Tetapan Hub", lbl_address: "Alamat Kedai", lbl_gps: "Koordinat GPS", btn_update_gps: "Kemaskini GPS", lbl_tel: "Telefon", lbl_capacity: "Kapasiti Maksimum Barisan", lbl_open: "Waktu Buka", lbl_close: "Waktu Tutup", lbl_status: "Status", opt_active: "Aktif (Terima Pesanan)", opt_inactive: "Tidak Aktif (Cuti)", btn_save: "Simpan Perubahan",
             alert_both: "Sila masukkan Telefon dan PIN.", alert_invalid: "Maklumat tidak sah", alert_sync_fail: "Gagal menyegerakkan data.", alert_err_update: "Ralat mengemaskini status.", alert_search_fail: "Carian gagal.", alert_gps_fail: "GPS gagal. Sila aktifkan lokasi.", alert_save_fail: "Gagal menyimpan.",
             msg_verifying: "Mengesahkan...", msg_saving: "Menyimpan...", msg_updating: "Mengemaskini...", msg_locating: "Mencari satelit...", msg_saved: "Berjaya Disimpan!",
-            wa_received: "Hai {name}! Ini Arabista Hub. Kami telah menerima Abaya anda untuk Order Alterasi {id}. Kami akan mulakan kerja secepat mungkin. Jejak di sini: {link}",
-            wa_completed: "Hai {name}! Berita baik, alterasi Abaya anda (Order {id}) telah siap sepenuhnya! 🪡 Sila klik pautan jejak untuk beritahu jika anda mahu Lalamove atau ambil sendiri: {link}",
-            wa_approved: "Hai {name}! Tempahan alterasi anda (Order {id}) telah DILULUSKAN oleh Arabista Hub! Sila klik pautan ini untuk aturkan penghantaran/drop-off: {link}",
+            msg_new_order: "Pesanan Baru Diterima!", alert_action_required: "Tindakan Diperlukan! Pelanggan telah memilih cara penghantaran.",
+            wa_received: "*[KEMASKINI HUB ARABISTA]*\n- *Pesanan:* {id}\n- *Status:* Item Selamat Diterima\n- *Tindakan:* Alterasi sedang dijalankan\n\nJejak status di sini:\n{link}",
+            wa_completed: "*[KEMASKINI HUB ARABISTA]*\n- *Pesanan:* {id}\n- *Status:* Alterasi Selesai\n- *Tindakan Diperlukan:* Sila pilih penghantaran atau ambil sendiri\n\nBuat pilihan anda di sini:\n{link}",
+            wa_approved: "*[KEMASKINI HUB ARABISTA]*\n- *Pesanan:* {id}\n- *Status:* Permintaan Diluluskan\n- *Tindakan Diperlukan:* Sila uruskan penghantaran atau drop-off\n\nLihat lokasi Hub di sini:\n{link}",
             nav_orders: "Pesanan", nav_search: "Cari", nav_settings: "Tetapan",
-            confirm_update: "Kemaskini pesanan ini kepada: {status}?", edit_addr_warn: "Mengedit Alamat Kedai.\n\nPastikan ia sepadan dengan Koordinat GPS untuk routing Lalamove yang tepat.",
-            alert_action_required: "Tindakan Diperlukan! Pelanggan telah memilih cara penghantaran."
+            confirm_update: "Kemaskini pesanan ini kepada: {status}?", edit_addr_warn: "Mengedit Alamat Kedai.\n\nPastikan ia sepadan dengan Koordinat GPS untuk routing Lalamove yang tepat."
         }
     };
 
@@ -384,12 +385,11 @@
 
     function playAlert(type) {
         try {
-            // V6.0: Upgraded Notification Sounds to reliable Mixkit CDNs
-            let soundUrl = 'https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3'; // Chime (New Request)
-            if (type === 2) soundUrl = 'https://assets.mixkit.co/active_storage/sfx/2870/2870-preview.mp3'; // Ping (Action Required)
-            if (type === 3) soundUrl = 'https://assets.mixkit.co/active_storage/sfx/1435/1435-preview.mp3'; // Bell (Arrived)
+            let soundUrl = 'https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3'; // Chime
+            if (type === 2) soundUrl = 'https://assets.mixkit.co/active_storage/sfx/2870/2870-preview.mp3'; // Ping
+            if (type === 3) soundUrl = 'https://assets.mixkit.co/active_storage/sfx/1435/1435-preview.mp3'; // Bell
             
-            const msg = type === 1 ? (currentLang === 'bm' ? "Pesanan Baru Diterima!" : "New Alteration Order!") : t[currentLang].alert_action_required;
+            const msg = type === 1 ? t[currentLang].msg_new_order : t[currentLang].alert_action_required;
             const audio = new Audio(soundUrl); 
             audio.volume = 1.0; 
             audio.play().catch(e => console.log("Audio autoplay blocked.", e));
@@ -582,10 +582,10 @@
             let arrivedClass = "";
             let trackerHtml = "";
             
-            // Mode Badge
-            let modeBadge = "";
-            if (o.direction === "Inbound" || o.lalamoveId) modeBadge = `<span class="text-[9px] bg-blue-500/20 text-blue-400 px-2 py-0.5 rounded border border-blue-500/30 mt-1 inline-block">🚚 Inbound: Lalamove</span>`;
-            else modeBadge = `<span class="text-[9px] bg-orange-500/20 text-orange-400 px-2 py-0.5 rounded border border-orange-500/30 mt-1 inline-block">🚶 Inbound: Walk-in / Drop-off</span>`;
+            // Mode Badge (Inbound Logistics)
+            let modeBadge = (o.direction === "Inbound" || o.lalamoveId) 
+                ? `<span class="text-[9px] bg-blue-500/20 text-blue-400 px-2 py-0.5 rounded border border-blue-500/30 mt-1 inline-block">🚚 Inbound: Lalamove</span>` 
+                : `<span class="text-[9px] bg-orange-500/20 text-orange-400 px-2 py-0.5 rounded border border-orange-500/30 mt-1 inline-block">🚶 Inbound: Walk-in / Drop-off</span>`;
             
             if (o.status === "Awaiting Dispatch") {
                 statusBadge = `<span class="text-[9px] bg-yellow-500/10 text-yellow-400 px-2 py-0.5 rounded border border-yellow-500/20">Awaiting Customer Action</span>`;
@@ -656,6 +656,7 @@
             const daysOld = Math.floor((new Date() - new Date(o.date)) / (1000*60*60*24));
             const ageBadge = daysOld >= 3 ? `<span class="text-[9px] bg-red-500/20 text-red-400 px-2 py-0.5 rounded shadow-sm border border-red-500/30">⏳ ${t[currentLang].waiting_days} ${daysOld} ${t[currentLang].days}</span>` : '';
             
+            // Mode Badge (Outbound Logistics)
             let modeBadge = "";
             if (o.outbound === "Lalamove" || o.direction === "Outbound") modeBadge = `<span class="text-[9px] bg-purple-500/20 text-purple-400 px-2 py-0.5 rounded border border-purple-500/30 mt-1 inline-block">🚚 Outbound: Lalamove</span>`;
             else if (o.outbound === "Self-Pickup") modeBadge = `<span class="text-[9px] bg-orange-500/20 text-orange-400 px-2 py-0.5 rounded border border-orange-500/30 mt-1 inline-block">📦 Outbound: Self-Pickup</span>`;
@@ -826,11 +827,11 @@
             });
             
             if (milestone === 1) {
-                sendWA(phone, t[currentLang].wa_received.replace('{name}', custName).replace('{id}', id).replace('{link}', link));
+                sendWA(phone, t[currentLang].wa_received.replace('{id}', id).replace('{link}', link));
             } else if (milestone === 1.5) {
-                sendWA(phone, t[currentLang].wa_completed.replace('{name}', custName).replace('{id}', id).replace('{link}', link));
+                sendWA(phone, t[currentLang].wa_completed.replace('{id}', id).replace('{link}', link));
             } else if (milestone === 2) {
-                sendWA(phone, t[currentLang].wa_approved.replace('{name}', custName).replace('{id}', id).replace('{link}', link));
+                sendWA(phone, t[currentLang].wa_approved.replace('{id}', id).replace('{link}', link));
             }
             
             loadDashboard();
