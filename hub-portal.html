@@ -25,7 +25,6 @@
     @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
     input, select { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); color: white; border-radius: 8px; padding: 12px 16px; width: 100%; outline: none; transition: all 0.2s; font-size: 16px !important; }
     input:focus, select:focus { border-color: #C0A062; background: rgba(192,160,98,0.05); }
-    input[type="date"] { color-scheme: dark; } 
     .tab-content { display: none; padding-bottom: 90px; }
     .tab-content.active { display: block; }
     .nav-btn { color: rgba(255,255,255,0.4); transition: color 0.2s; }
@@ -125,23 +124,13 @@
               <div id="list-active" class="space-y-3 transition-all overflow-hidden mb-8"></div>
 
               <button onclick="toggleSection('list-completed-container', 'icon-completed')" class="w-full flex justify-between items-center text-xs text-white/40 uppercase tracking-widest font-bold mb-3 border-b border-white/10 pb-2 hover:text-white transition">
-                  <span data-t="header_completed">History / Delivered</span>
+                  <span data-t="header_completed">Today's Deliveries</span>
                   <svg id="icon-completed" class="w-4 h-4 transform transition-transform duration-200 rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
               </button>
               <div id="list-completed-container" class="hidden transition-all overflow-hidden">
-                  <div class="flex gap-2 mb-3 bg-white/5 border border-white/10 p-2 rounded-lg items-center">
-                      <svg class="w-4 h-4 text-white/40 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path></svg>
-                      <select id="filter-completed" onchange="filterCompleted()" class="text-xs bg-transparent border-none py-1 focus:ring-0 text-white">
-                          <option value="today" class="text-black" data-t="filter_today">Today (Default)</option>
-                          <option value="last7" class="text-black" data-t="filter_7days">Last 7 Days</option>
-                          <option value="custom" class="text-black" data-t="filter_custom">Custom Period...</option>
-                          <option value="all" class="text-black" data-t="filter_all">All Time</option>
-                      </select>
-                  </div>
-                  <div id="custom-date-row" class="hidden flex-row gap-2 mb-3 items-center bg-black/30 p-2 rounded-lg border border-white/5">
-                      <input type="date" id="date-start" class="text-xs py-1.5 px-2 flex-1" onchange="filterCompleted()">
-                      <span class="text-white/40 text-[10px] uppercase">to</span>
-                      <input type="date" id="date-end" class="text-xs py-1.5 px-2 flex-1" onchange="filterCompleted()">
+                  <div class="bg-blue-500/10 border border-blue-500/20 p-3 rounded-lg mb-3 flex items-start gap-2">
+                      <svg class="w-4 h-4 text-blue-400 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                      <p class="text-[10px] text-blue-300/80 leading-relaxed" data-t="txt_history_limit">Showing deliveries completed in the last 24 hours. Use the Search tab to find older orders.</p>
                   </div>
                   <div id="list-completed" class="space-y-3 pb-6"></div>
               </div>
@@ -211,24 +200,23 @@
   </div>
 
   <script>
-    const APP_VERSION = "1.0";
+    const APP_VERSION = "1.1";
     const scriptURL = 'https://script.google.com/macros/s/AKfycbyrJFfuCrhAbdwzAj8uP4sSvFuzRzzzEFV5CHOCBSOK6OGlIXPtsf7-XEfjLHGnFZiyvw/exec';
     const trackerBaseUrl = 'https://aqmalsalleh.github.io/arabista-site/alteration-tracker.html?id=';
     const spinnerSvg = `<svg class="animate-spin h-4 w-4 inline mr-2 text-current" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>`;
 
-    // V6.4: Full Bilingual Update with Professional WhatsApp Templates
     const t = {
         en: {
             login_title: "Tailor Portal", login_desc: "Enter your registered Hub Phone Number and PIN.", lbl_phone: "Phone Number", lbl_pin: "6-Digit PIN", btn_login: "Login securely",
             lbl_active_hub: "Active Hub", btn_logout: "Logout",
             title_timeline: "Orders Timeline", txt_syncing: "Syncing database...",
-            header_requests: "New Requests (Approval)", header_pending: "Expected Arrivals (Pending)", header_active: "Currently Altering (In Progress)", header_completed: "Completed / Dispatched",
+            header_requests: "New Requests (Approval)", header_pending: "Expected Arrivals (Pending)", header_active: "Currently Altering (In Progress)", header_completed: "Today's Deliveries",
+            txt_history_limit: "Showing deliveries completed in the last 24 hours. Use the Search tab to find older orders.",
             txt_no_requests: "No new requests.", txt_no_pending: "No pending arrivals.", txt_no_active: "No active alterations.", txt_no_completed: "No completed orders.",
             btn_accept: "Accept Order", btn_reject: "Reject",
             btn_mark_received: "Mark as Received", btn_mark_completed: "Mark as Completed", btn_cust_pickup: "Customer Picked Up", btn_override: "Mark as Delivered (Override)",
             btn_wait_choice: "Waiting for Customer Choice...", btn_wait_booking: "Waiting for Customer to Book...",
             arriving: "Arriving", arrived: "ARRIVED", waiting_days: "Waiting", days: "Days",
-            filter_today: "Today (Default)", filter_7days: "Last 7 Days", filter_custom: "Custom Period...", filter_all: "All Time",
             title_find: "Find Order", ph_search: "Search ID, Name, or Phone...", txt_no_results: "No results found.",
             title_settings: "Hub Settings", lbl_address: "Shop Address", lbl_gps: "GPS Coordinates", btn_update_gps: "Update GPS", lbl_tel: "Telephone", lbl_capacity: "Max Active Queue Capacity", lbl_open: "Open Time", lbl_close: "Close Time", lbl_status: "Status", opt_active: "Active (Accepting Orders)", opt_inactive: "Inactive (On Holiday)", btn_save: "Save Changes",
             alert_both: "Please enter both Phone and PIN.", alert_invalid: "Invalid credentials", alert_sync_fail: "Failed to sync dashboard.", alert_err_update: "Error updating status.", alert_search_fail: "Search failed.", alert_gps_fail: "GPS failed. Please enable location permissions.", alert_save_fail: "Failed to save.",
@@ -244,13 +232,13 @@
             login_title: "Portal Tukang Jahit", login_desc: "Masukkan No. Telefon dan PIN Hub anda.", lbl_phone: "No. Telefon", lbl_pin: "PIN 6-Digit", btn_login: "Log Masuk Selamat",
             lbl_active_hub: "Hub Aktif", btn_logout: "Log Keluar",
             title_timeline: "Garis Masa Pesanan", txt_syncing: "Menyegerakkan data...",
-            header_requests: "Permintaan Baru (Kelulusan)", header_pending: "Jangkaan Tiba (Pending)", header_active: "Sedang Dijahit (In Progress)", header_completed: "Selesai / Dihantar",
+            header_requests: "Permintaan Baru (Kelulusan)", header_pending: "Jangkaan Tiba (Pending)", header_active: "Sedang Dijahit (In Progress)", header_completed: "Penghantaran Hari Ini",
+            txt_history_limit: "Memaparkan penghantaran selesai dalam masa 24 jam lepas. Guna tab Cari untuk pesanan lama.",
             txt_no_requests: "Tiada permintaan baru.", txt_no_pending: "Tiada ketibaan baru.", txt_no_active: "Tiada alterasi aktif.", txt_no_completed: "Tiada pesanan selesai tempoh ini.",
             btn_accept: "Terima Pesanan", btn_reject: "Tolak",
             btn_mark_received: "Tanda Telah Diterima", btn_mark_completed: "Tanda Telah Siap", btn_cust_pickup: "Pelanggan Dah Ambil", btn_override: "Tanda Telah Dihantar (Override)",
             btn_wait_choice: "Menunggu Pilihan Pelanggan...", btn_wait_booking: "Menunggu Pelanggan Tempah...",
             arriving: "Dalam Perjalanan", arrived: "TIBA", waiting_days: "Menunggu", days: "Hari",
-            filter_today: "Hari Ini (Asal)", filter_7days: "7 Hari Lepas", filter_custom: "Tempoh Tersuai...", filter_all: "Semua Masa",
             title_find: "Cari Pesanan", ph_search: "Cari ID, Nama, atau Telefon...", txt_no_results: "Tiada hasil dijumpai.",
             title_settings: "Tetapan Hub", lbl_address: "Alamat Kedai", lbl_gps: "Koordinat GPS", btn_update_gps: "Kemaskini GPS", lbl_tel: "Telefon", lbl_capacity: "Kapasiti Maksimum Barisan", lbl_open: "Waktu Buka", lbl_close: "Waktu Tutup", lbl_status: "Status", opt_active: "Aktif (Terima Pesanan)", opt_inactive: "Tidak Aktif (Cuti)", btn_save: "Simpan Perubahan",
             alert_both: "Sila masukkan Telefon dan PIN.", alert_invalid: "Maklumat tidak sah", alert_sync_fail: "Gagal menyegerakkan data.", alert_err_update: "Ralat mengemaskini status.", alert_search_fail: "Carian gagal.", alert_gps_fail: "GPS gagal. Sila aktifkan lokasi.", alert_save_fail: "Gagal menyimpan.",
@@ -271,6 +259,9 @@
     let previousActionMap = new Map();
     let pollInterval = null;
     let currentLang = 'en';
+    
+    // V6.5 Delta Polling Handshake Variable
+    let lastSyncTime = 0;
 
     document.addEventListener('DOMContentLoaded', () => { 
         const storedVersion = localStorage.getItem('arabista_app_version');
@@ -296,7 +287,7 @@
     function setLang(lang) {
         currentLang = lang;
         document.querySelectorAll('[data-t]').forEach(el => { 
-            if(t[lang][el.getAttribute('data-t')]) el.innerText = t[lang][el.getAttribute('data-t')]; 
+            if(t[lang][el.getAttribute('data-t')]) el.innerHTML = t[lang][el.getAttribute('data-t')]; 
         });
         document.querySelectorAll('[data-t-placeholder]').forEach(el => { 
             if(t[lang][el.getAttribute('data-t-placeholder')]) el.placeholder = t[lang][el.getAttribute('data-t-placeholder')]; 
@@ -351,7 +342,10 @@
         if (startY > 0 && scrollArea.scrollTop === 0) { 
             let endY = e.changedTouches[0].clientY; 
             if (endY - startY > 80) { 
-                if(document.getElementById('tab-dashboard').classList.contains('active')) loadDashboard(); 
+                if(document.getElementById('tab-dashboard').classList.contains('active')) {
+                    lastSyncTime = 0; // Force a full pull on manual swipe refresh
+                    loadDashboard(); 
+                }
             } 
         } 
         startY = 0; 
@@ -434,6 +428,8 @@
                 document.getElementById('login-screen').classList.add('hidden'); 
                 document.getElementById('main-app').classList.remove('hidden'); 
                 document.getElementById('header-hub-name').innerText = hubName; 
+                
+                lastSyncTime = 0; // Start fresh
                 loadDashboard(); 
                 startPolling();
             } else { 
@@ -468,14 +464,22 @@
             const res = await fetch(scriptURL, { 
                 method: 'POST', 
                 headers: { 'Content-Type': 'text/plain;charset=utf-8' }, 
-                body: JSON.stringify({ action: "get_dashboard", hub_name: hubName }) 
+                body: JSON.stringify({ action: "get_dashboard", hub_name: hubName, last_sync: lastSyncTime }) 
             });
             const data = await res.json(); 
             
             if (!isSilent) document.getElementById('dash-loader').classList.add('hidden');
             if (isSilent) setTimeout(() => updateConnectionStatus(false), 1000);
 
+            // V6.5 Delta Polling Exit
+            if (data.status === "no_change") {
+                if (data.timestamp) lastSyncTime = data.timestamp;
+                return;
+            }
+
             if(data.status === "success") { 
+                if (data.timestamp) lastSyncTime = data.timestamp; // Stamp new sync time
+                
                 const newPendingCount = data.orders.pending.length;
                 if (previousPendingCount !== -1 && newPendingCount > previousPendingCount) { playAlert(1); }
                 previousPendingCount = newPendingCount;
@@ -489,8 +493,9 @@
                 
                 renderPending(data.orders.pending); 
                 renderActive(data.orders.inProgress.concat(data.orders.ready)); 
+                
                 completedOrdersData = data.orders.completed || []; 
-                filterCompleted(); 
+                renderCompleted(); // V6.5 Simplified rendering
                 populateProfile(data.profile); 
             }
         } catch (e) { 
@@ -745,56 +750,17 @@
             </div>`).join('');
     }
 
-    function filterCompleted() {
-        const filterType = document.getElementById('filter-completed').value; 
-        const customRow = document.getElementById('custom-date-row');
-        
-        if (filterType === 'custom') { 
-            customRow.classList.remove('hidden'); 
-            customRow.classList.add('flex'); 
-        } else { 
-            customRow.classList.add('hidden'); 
-            customRow.classList.remove('flex'); 
-        }
-        
-        const now = new Date(); 
-        let filtered = [];
-        
-        if (filterType === 'all') {
-            filtered = completedOrdersData;
-        } else if (filterType === 'today') { 
-            const todayStr = now.toDateString(); 
-            filtered = completedOrdersData.filter(o => new Date(o.date).toDateString() === todayStr); 
-        } else if (filterType === 'last7') { 
-            const past7 = new Date(); 
-            past7.setDate(now.getDate() - 7); 
-            filtered = completedOrdersData.filter(o => new Date(o.date) >= past7); 
-        } else if (filterType === 'custom') { 
-            const start = document.getElementById('date-start').value; 
-            const end = document.getElementById('date-end').value; 
-            if (!start || !end) {
-                filtered = completedOrdersData; 
-            } else { 
-                const s = new Date(start); 
-                s.setHours(0,0,0,0); 
-                const e = new Date(end); 
-                e.setHours(23,59,59,999); 
-                filtered = completedOrdersData.filter(o => { 
-                    const d = new Date(o.date); 
-                    return d >= s && d <= e; 
-                }); 
-            } 
-        }
-        
-        filtered.sort((a,b) => new Date(b.date) - new Date(a.date));
-        
+    // V6.5: Cleaned up render function for the Payload Diet (<24 hours)
+    function renderCompleted() {
         const list = document.getElementById('list-completed');
-        if(filtered.length === 0) {
+        if(completedOrdersData.length === 0) {
             return list.innerHTML = `<p class="text-white/30 text-xs text-center py-4">${t[currentLang].txt_no_completed}</p>`;
         }
         
+        completedOrdersData.sort((a,b) => new Date(b.date) - new Date(a.date));
+        
         let html = '';
-        filtered.forEach(o => { 
+        completedOrdersData.forEach(o => { 
             html += `
                 <div class="bg-white/5 border border-white/10 rounded-xl p-3 shadow-sm opacity-70 hover:opacity-100 transition">
                     <div class="flex justify-between items-start mb-2">
@@ -834,6 +800,7 @@
                 sendWA(phone, t[currentLang].wa_approved.replace('{id}', id).replace('{link}', link));
             }
             
+            lastSyncTime = 0; // Force full fetch after write
             loadDashboard();
         } catch (e) { 
             alert(t[currentLang].alert_err_update); 
