@@ -713,15 +713,14 @@
                         priceDisp.innerText = `RM ${state.deliveryCost.toFixed(2)}`;
                         priceDisp.classList.remove('animate-pulse');
                     } else {
-                        // TRANSPARENT ERROR SURFACING FIX
                         let errMsg = data.message ? "API: " + data.message : "API Error";
-                        if (errMsg.length > 25) errMsg = errMsg.substring(0, 25) + "...";
+                        if (errMsg.length > 50) errMsg = errMsg.substring(0, 50) + "...";
                         if(data.message && data.message.includes("OUT_OF_SERVICE")) errMsg = "Out of Area";
                         
                         priceDisp.innerText = errMsg;
                         priceDisp.classList.remove('animate-pulse');
                         priceDisp.classList.add('text-red-400');
-                        priceDisp.title = data.message || "Unknown Error"; // Shows full error on hover
+                        priceDisp.title = data.message || "Unknown Error";
                     }
                 } catch(e) { 
                     priceDisp.innerText = "Network Error"; 
@@ -885,7 +884,7 @@
                 if(document.getElementById(`cb-${item.id}-shoulder`)?.checked) { servicesArr.push(`Shoulders (Sh:${m.shoulder})`); serviceKeysArray.push('shoulder'); }
                 if(document.getElementById(`cb-${item.id}-pads`)?.checked) { servicesArr.push(`Pads`); serviceKeysArray.push('pads'); }
             }
-            itemDetailsStr += `[${item.name} | Size: ${item.size}] -> ${servicesArr.join(', ')}\n`;
+            itemDetailsStr += `[${item.name} | ${item.size}] : ${servicesArr.join(', ')}\n`;
         });
 
         const hubData = hubs.find(h => h.id === state.hubId);
