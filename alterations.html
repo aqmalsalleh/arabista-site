@@ -224,22 +224,21 @@
 
   <script>
     // --- SECURITY UTILITIES ---
-    // Safely escapes characters using explicit chained replace to avoid parser breakage.
     function sanitizeHTML(str) {
         if (!str) return "";
         return String(str)
-            .replace(/&/g, '&amp;')
-            .replace(/</g, '&lt;')
-            .replace(/>/g, '&gt;')
-            .replace(/"/g, '&quot;')
-            .replace(/'/g, '&#39;');
+            .replace(/&/g, "&" + "amp;")
+            .replace(/</g, "&" + "lt;")
+            .replace(/>/g, "&" + "gt;")
+            .replace(/"/g, "&" + "quot;")
+            .replace(/'/g, "&" + "#39;");
     }
 
     function escapeJS(str) {
         if (!str) return "";
         return String(str)
             .replace(/\\/g, '\\\\')
-            .replace(/'/g, "\\'")
+            .replace(/'/g, "\\" + "'")
             .replace(/"/g, '\\"');
     }
 
@@ -295,7 +294,7 @@
         const userLang = navigator.language || navigator.userLanguage;
         if (userLang && userLang.toLowerCase().startsWith('ms')) setLang('bm'); else setLang('en');
         const urlParams = new URLSearchParams(window.location.search);
-        const orderId = sanitizeHTML(urlParams.get('order')); // Sanitized Input
+        const orderId = sanitizeHTML(urlParams.get('order'));
         document.getElementById('step1-loading').classList.remove('hidden'); document.getElementById('hub-list-loading').classList.remove('hidden');
         
         try {
@@ -714,20 +713,20 @@
                         priceDisp.innerText = `RM ${state.deliveryCost.toFixed(2)}`;
                         priceDisp.classList.remove('animate-pulse');
                     } else {
-                        let errMsg = "Fee Error";
-                        if(data.message) {
-                             if(data.message.includes("OUT_OF_SERVICE")) errMsg = "Out of Area";
-                             else if(data.message.includes("API Keys")) errMsg = "Keys Missing";
-                             else if(data.message.includes("401")) errMsg = "Auth Fail";
-                             else errMsg = "API Error"; 
-                        }
+                        // TRANSPARENT ERROR SURFACING FIX
+                        let errMsg = data.message ? "API: " + data.message : "API Error";
+                        if (errMsg.length > 25) errMsg = errMsg.substring(0, 25) + "...";
+                        if(data.message && data.message.includes("OUT_OF_SERVICE")) errMsg = "Out of Area";
+                        
                         priceDisp.innerText = errMsg;
                         priceDisp.classList.remove('animate-pulse');
                         priceDisp.classList.add('text-red-400');
+                        priceDisp.title = data.message || "Unknown Error"; // Shows full error on hover
                     }
                 } catch(e) { 
-                    priceDisp.innerText = "Net Err"; 
+                    priceDisp.innerText = "Network Error"; 
                     priceDisp.classList.remove('animate-pulse');
+                    priceDisp.classList.add('text-red-400');
                 }
             }
             state.logisticsSchedule = "Immediate (Lalamove)";
