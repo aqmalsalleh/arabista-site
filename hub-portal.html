@@ -199,7 +199,7 @@
   </div>
 
   <script>
-    const APP_VERSION = "1.6"; // Version bumped to enforce cache clear for new Walk-in logic
+    const APP_VERSION = "1.7"; // Version bumped to enforce cache clear for new WA templates
     const scriptURL = 'https://script.google.com/macros/s/AKfycbyrJFfuCrhAbdwzAj8uP4sSvFuzRzzzEFV5CHOCBSOK6OGlIXPtsf7-XEfjLHGnFZiyvw/exec';
     const trackerBaseUrl = 'https://aqmalsalleh.github.io/arabista-site/alteration-tracker.html?id=';
     const spinnerSvg = `<svg class="animate-spin h-4 w-4 inline mr-2 text-current" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>`;
@@ -222,8 +222,9 @@
             msg_verifying: "Verifying...", msg_saving: "Saving...", msg_updating: "Updating...", msg_locating: "Locating satellite...", msg_saved: "Saved Successfully!",
             msg_new_order: "New Alteration Order!", alert_action_required: "Action Required! Customer confirmed delivery choice.",
             wa_received: "*[ARABISTA HUB UPDATE]*\n- *Order:* {id}\n- *Status:* Item Safely Received\n- *Action:* Alteration in progress\n\nTrack live status here:\n{link}",
-            wa_completed: "*[ARABISTA HUB UPDATE]*\n- *Order:* {id}\n- *Status:* Alteration Completed\n- *Action Required:* Please choose delivery or pickup\n\nMake your selection here:\n{link}",
-            wa_approved: "*[ARABISTA HUB UPDATE]*\n- *Order:* {id}\n- *Status:* Request Approved\n- *Action Required:* Please arrange drop-off or delivery\n\nView Hub location here:\n{link}",
+            wa_completed: "*[ARABISTA HUB UPDATE]*\n- *Order:* {id}\n- *Status:* Alteration Completed\n- *Action Required:* Please make payment and choose delivery or pickup\n\nPay and make your selection here:\n{link}",
+            wa_approved_walkin: "*[ARABISTA HUB UPDATE]*\n- *Order:* {id}\n- *Status:* Request Approved\n- *Action Required:* Please arrange drop-off\n\nView Hub location here:\n{link}",
+            wa_approved_lala: "*[ARABISTA HUB UPDATE]*\n- *Order:* {id}\n- *Status:* Request Approved\n- *Action Required:* Please arrange delivery\n\nBook your Lalamove here:\n{link}",
             nav_orders: "Orders", nav_search: "Search", nav_settings: "Settings",
             confirm_update: "Update this order to: {status}?", edit_addr_warn: "Editing Shop Address.\n\nPlease ensure this matches your exact GPS Coordinates for accurate Lalamove routing."
         },
@@ -244,8 +245,9 @@
             msg_verifying: "Mengesahkan...", msg_saving: "Menyimpan...", msg_updating: "Mengemaskini...", msg_locating: "Mencari satelit...", msg_saved: "Berjaya Disimpan!",
             msg_new_order: "Pesanan Baru Diterima!", alert_action_required: "Tindakan Diperlukan! Pelanggan telah memilih cara penghantaran.",
             wa_received: "*[KEMASKINI HUB ARABISTA]*\n- *Pesanan:* {id}\n- *Status:* Item Selamat Diterima\n- *Tindakan:* Alterasi sedang dijalankan\n\nJejak status di sini:\n{link}",
-            wa_completed: "*[KEMASKINI HUB ARABISTA]*\n- *Pesanan:* {id}\n- *Status:* Alterasi Selesai\n- *Tindakan Diperlukan:* Sila pilih penghantaran atau ambil sendiri\n\nBuat pilihan anda di sini:\n{link}",
-            wa_approved: "*[KEMASKINI HUB ARABISTA]*\n- *Pesanan:* {id}\n- *Status:* Permintaan Diluluskan\n- *Tindakan Diperlukan:* Sila uruskan penghantaran atau drop-off\n\nLihat lokasi Hub di sini:\n{link}",
+            wa_completed: "*[KEMASKINI HUB ARABISTA]*\n- *Pesanan:* {id}\n- *Status:* Alterasi Selesai\n- *Tindakan Diperlukan:* Sila buat bayaran dan pilih penghantaran atau ambil sendiri\n\nBuat bayaran dan pilihan anda di sini:\n{link}",
+            wa_approved_walkin: "*[KEMASKINI HUB ARABISTA]*\n- *Pesanan:* {id}\n- *Status:* Permintaan Diluluskan\n- *Tindakan Diperlukan:* Sila uruskan drop-off\n\nLihat lokasi Hub di sini:\n{link}",
+            wa_approved_lala: "*[KEMASKINI HUB ARABISTA]*\n- *Pesanan:* {id}\n- *Status:* Permintaan Diluluskan\n- *Tindakan Diperlukan:* Sila uruskan penghantaran\n\nTempah Lalamove anda di sini:\n{link}",
             nav_orders: "Pesanan", nav_search: "Cari", nav_settings: "Tetapan",
             confirm_update: "Kemaskini pesanan ini kepada: {status}?", edit_addr_warn: "Mengedit Alamat Kedai.\n\nPastikan ia sepadan dengan Koordinat GPS untuk routing Lalamove yang tepat."
         }
@@ -417,7 +419,7 @@
         } catch (e) {}
     }
 
-async function login() {
+    async function login() {
         let rawPhone = document.getElementById('login-phone').value.trim(); 
         const phone = sanitizePhone(rawPhone); 
         const pin = document.getElementById('login-pin').value.trim();
@@ -516,8 +518,8 @@ async function login() {
                     previousActionMap.set(o.id, o.outbound);
                 });
                 
-                renderPending(data.orders.pending); 
-                renderActive(data.orders.inProgress.concat(data.orders.ready)); 
+                renderPending(data.orders.pending);
+renderActive(data.orders.inProgress.concat(data.orders.ready)); 
                 
                 completedOrdersData = data.orders.completed || []; 
                 renderCompleted(); 
@@ -856,7 +858,11 @@ async function login() {
             } else if (milestone === 1.5) {
                 sendWA(phone, t[currentLang].wa_completed.replace('{id}', id).replace('{link}', link));
             } else if (milestone === 2) {
-                sendWA(phone, t[currentLang].wa_approved.replace('{id}', id).replace('{link}', link));
+                if (newStatus === "Pending Dropoff") {
+                    sendWA(phone, t[currentLang].wa_approved_walkin.replace('{id}', id).replace('{link}', link));
+                } else {
+                    sendWA(phone, t[currentLang].wa_approved_lala.replace('{id}', id).replace('{link}', link));
+                }
             }
             
             loadDashboard(false, true); 
