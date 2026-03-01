@@ -473,10 +473,11 @@
     function checkRecoveryState() {
         const urlParams = new URLSearchParams(window.location.search);
         if (urlParams.get('book_rider') === 'true') {
-            const savedQuote = sessionStorage.getItem('lala_quote_' + currentData.alterationId);
-            const savedStops = sessionStorage.getItem('lala_stops_' + currentData.alterationId);
-            const savedAmt = sessionStorage.getItem('lala_amt_' + currentData.alterationId);
-            const savedInbound = sessionStorage.getItem('lala_is_inbound_' + currentData.alterationId);
+            // FIX: Retrieve from localStorage
+            const savedQuote = localStorage.getItem('lala_quote_' + currentData.alterationId);
+            const savedStops = localStorage.getItem('lala_stops_' + currentData.alterationId);
+            const savedAmt = localStorage.getItem('lala_amt_' + currentData.alterationId);
+            const savedInbound = localStorage.getItem('lala_is_inbound_' + currentData.alterationId);
             
             if (savedQuote && savedStops) {
                 activeQuoteId = savedQuote;
@@ -492,12 +493,19 @@
                 waBtn.classList.replace('bg-[#25D366]', 'bg-white/10');
                 waBtn.classList.replace('text-white', 'text-white/50');
                 waBtn.innerHTML = `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> <span data-t="txt_receipt_sent">${t[currentLang].txt_receipt_sent || "Receipt Sent!"}</span>`;
+                
+                // Clean up localStorage so it doesn't get stuck
+                localStorage.removeItem('lala_quote_' + currentData.alterationId);
+                localStorage.removeItem('lala_stops_' + currentData.alterationId);
+                localStorage.removeItem('lala_amt_' + currentData.alterationId);
+                localStorage.removeItem('lala_is_inbound_' + currentData.alterationId);
             }
             
             const newUrl = window.location.protocol + "//" + window.location.host + window.location.pathname + '?id=' + encodeURIComponent(currentData.alterationId);
             window.history.replaceState({path:newUrl}, '', newUrl);
         }
     }
+
 function buildTimeline(status) {
         let stages = [];
         
@@ -949,11 +957,11 @@ function buildTimeline(status) {
         const hqPhone = "60126913286";
         const amt = document.getElementById('quote-amount').innerText;
         
-        // Save state for Recovery
-        sessionStorage.setItem('lala_quote_' + currentData.alterationId, activeQuoteId);
-        sessionStorage.setItem('lala_stops_' + currentData.alterationId, JSON.stringify(currentStops));
-        sessionStorage.setItem('lala_amt_' + currentData.alterationId, amt);
-        sessionStorage.setItem('lala_is_inbound_' + currentData.alterationId, isIncomingOrder);
+        // FIX: Changed sessionStorage to localStorage to survive WhatsApp opening a new tab
+        localStorage.setItem('lala_quote_' + currentData.alterationId, activeQuoteId);
+        localStorage.setItem('lala_stops_' + currentData.alterationId, JSON.stringify(currentStops));
+        localStorage.setItem('lala_amt_' + currentData.alterationId, amt);
+        localStorage.setItem('lala_is_inbound_' + currentData.alterationId, isIncomingOrder);
         
         const linkWithParam = trackerBaseUrl + encodeURIComponent(currentData.alterationId) + "&book_rider=true";
         const msg = (t[currentLang].wa_hq_pay || "").replace('{id}', currentData.alterationId).replace('{total}', amt).replace('{link}', linkWithParam);
@@ -994,19 +1002,22 @@ function buildTimeline(status) {
             const res = await fetch(scriptURL, { method: 'POST', body: JSON.stringify(payload) });
             const data = await res.json();
             if(data.status === "success") { 
-                showDriverBookedModal(isIncomingOrder); 
+                // FIX: Pass the official Lalamove Tracking URL to the modal
+                showDriverBookedModal(isIncomingOrder, data.tracking_url); 
             }
             else { alert((t[currentLang].alert_failed || "Failed: ") + data.message); btn.innerHTML = t[currentLang].msg_retry || "Retry"; btn.disabled = false; }
         } catch(e) { alert(t[currentLang].alert_error); btn.innerHTML = t[currentLang].msg_retry || "Retry"; btn.disabled = false;}
     }
     
-    function showDriverBookedModal(isInbound) {
+    // FIX: Added trackingUrl parameter to pass the official Lalamove link
+    function showDriverBookedModal(isInbound, trackingUrl) {
         closeModal(); 
         const div = document.createElement('div');
         div.id = 'driver-booked-modal';
         div.className = 'fixed inset-0 z-[300] flex items-center justify-center bg-black/90 backdrop-blur-md px-4 fade-in';
         
-        const msg = `*[LALAMOVE BOOKED]*\n- *Order ID:* ${currentData.alterationId}\n- *Direction:* ${isInbound ? 'Inbound to Hub' : 'Outbound to Customer'}\n\nA Lalamove rider has been booked. You can track the live status here:\n${trackerBaseUrl + encodeURIComponent(currentData.alterationId)}`;
+        // Now using the official Lalamove Tracking URL
+        const msg = `*[LALAMOVE BOOKED]*\n- *Order ID:* ${currentData.alterationId}\n- *Direction:* ${isInbound ? 'Inbound to Hub' : 'Outbound to Customer'}\n\nA Lalamove rider has been booked. You can track the live status here:\n${trackingUrl}`;
         let cleanPhone = hubData.phone ? hubData.phone.replace(/[^0-9]/g, '') : "60123456789"; 
         if (cleanPhone.startsWith('0')) cleanPhone = '6' + cleanPhone;
         const waLink = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(msg)}`;
