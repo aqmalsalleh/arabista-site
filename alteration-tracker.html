@@ -25,7 +25,6 @@
     .timeline-line.active { background: #4ade80; }
     .last-step .timeline-line { display: none; }
     
-    /* Horizontal Lalamove Tracker */
     .lala-step { flex: 1; text-align: center; position: relative; z-index: 1; }
     .lala-step::before { content: ''; position: absolute; top: 5px; left: -50%; right: 50%; height: 2px; background: #333; z-index: -1; }
     .lala-step:first-child::before { display: none; }
@@ -262,8 +261,6 @@
   </div>
 
   <script>
-    // --- SECURITY UTILITIES ---
-    // Safely escapes characters using explicit chained replace to avoid parser breakage.
     function sanitizeHTML(str) {
         if (!str) return "";
         return String(str)
@@ -283,7 +280,7 @@
     }
 
     const scriptURL = 'https://script.google.com/macros/s/AKfycbyrJFfuCrhAbdwzAj8uP4sSvFuzRzzzEFV5CHOCBSOK6OGlIXPtsf7-XEfjLHGnFZiyvw/exec'; 
-    const trackerBaseUrl = 'https://aqmalsalleh.github.io/arabista-site/alteration-tracker.html?id=';
+    const trackerBaseUrl = window.location.origin + window.location.pathname + '?id=';
     const spinnerSvg = `<svg class="animate-spin h-4 w-4 inline mr-2 text-current" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>`;
     const miniSpinnerSvg = `<svg class="animate-spin h-3.5 w-3.5 inline text-current" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>`;
     
@@ -362,6 +359,15 @@
         window.location.href = `alteration-tracker.html?id=${encodeURIComponent(val)}`;
     }
 
+    function triggerInitialWhatsApp() {
+        if(!currentData || !hubData) return;
+        let cleanPhone = hubData.phone ? hubData.phone.replace(/[^0-9]/g, '') : "60123456789"; 
+        if (cleanPhone.startsWith('0')) cleanPhone = '6' + cleanPhone;
+        const link = trackerBaseUrl + encodeURIComponent(currentData.alterationId);
+        const msg = `*[NEW ALTERATION REQUEST]*\n- *Order ID:* ${currentData.alterationId}\n- *Customer:* ${currentData.customerName}\n\nI have submitted a new alteration request. Please review and approve it here:\n${link}`;
+        window.open(`https://wa.me/${cleanPhone}?text=${encodeURIComponent(msg)}`, '_blank');
+    }
+
     async function fetchTrackingData(id, isSilent = false) {
         try {
             const res = await fetch(`${scriptURL}?track_id=${encodeURIComponent(id)}`);
@@ -380,6 +386,13 @@
                 if (h) { 
                     hubData = { phone: h.phone, lat: h.lat, lng: h.lng }; 
                 }
+            }
+
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('new') === 'true') {
+                triggerInitialWhatsApp();
+                const newUrl = window.location.protocol + "//" + window.location.host + window.location.pathname + '?id=' + encodeURIComponent(id);
+                window.history.replaceState({path:newUrl}, '', newUrl);
             }
             
             if (currentData.lalamoveStatus) {
@@ -424,6 +437,23 @@
     }
 
     function renderDashboard() {
+        if (currentData.orderStatus === "Rejected") {
+            document.getElementById('tracker-panel').classList.remove('hidden');
+            document.getElementById('tracker-panel').innerHTML = `
+                <div class="bg-red-500/10 border border-red-500/30 rounded-xl p-6 text-center fade-in mt-10 shadow-[0_0_20px_rgba(239,68,68,0.1)]">
+                    <div class="w-14 h-14 rounded-full bg-red-500/20 text-red-400 flex items-center justify-center mx-auto mb-4">
+                        <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                    </div>
+                    <h3 class="text-red-400 font-bold mb-2 text-2xl font-display">Order Rejected</h3>
+                    <p class="text-sm text-white/70 mb-6 leading-relaxed">Unfortunately, the Hub is currently unable to accept your request (likely due to high volume or closing time).</p>
+                    <button onclick="window.location.href='alterations.html?rebook=' + encodeURIComponent(currentData.alterationId)" class="w-full bg-red-500 text-white font-bold py-3.5 rounded-xl hover:bg-red-400 transition shadow-[0_0_20px_rgba(239,68,68,0.2)] text-sm">
+                        Choose Another Hub
+                    </button>
+                </div>
+            `;
+            return;
+        }
+
         document.getElementById('search-panel').classList.add('hidden');
         document.getElementById('tracker-panel').classList.remove('hidden');
         document.getElementById('display-id').innerText = sanitizeHTML(currentData.alterationId);
@@ -435,31 +465,52 @@
 
     function buildTimeline(status) {
         let stages = [];
-        if (currentData.outboundChoice === "Self-Pickup") {
-            stages = ["Pending Dropoff", "Pending Approval", "In Progress", "Ready for Return", "Completed"];
-        } else if (currentData.logisticsDirection === "Outbound" || currentData.outboundChoice === "Lalamove") {
-            stages = ["Pending Dropoff", "Pending Approval", "In Progress", "Ready for Return", "Dispatched", "Completed"];
-        } else if (currentData.logisticsDirection === "Inbound" || status === "Awaiting Dispatch" || (status === "Dispatched" && !currentData.outboundChoice)) {
-            stages = ["Pending Approval", "Awaiting Dispatch", "Dispatched", "In Progress", "Ready for Return", "Completed"];
+        let isLalaIn = (currentData.logisticsMode === "Lalamove" || currentData.logisticsDirection === "Inbound" || status === "Awaiting Dispatch" || (status === "Dispatched" && !currentData.outboundChoice));
+        
+        if (isLalaIn) {
+            stages = ["Pending Approval", "Awaiting Dispatch", "Inbound Dispatched", "In Progress", "Ready for Return"];
         } else {
-            if (status === "Dispatched") stages = ["Pending Approval", "Awaiting Dispatch", "Dispatched", "In Progress", "Ready for Return", "Completed"];
-            else stages = ["Pending Dropoff", "Pending Approval", "In Progress", "Ready for Return", "Completed"];
+            stages = ["Pending Approval", "Pending Dropoff", "In Progress", "Ready for Return"];
+        }
+
+        if (currentData.outboundChoice === "Lalamove") {
+            stages.push("Outbound Dispatched", "Completed");
+        } else {
+            stages.push("Completed");
+        }
+
+        let mappedStatus = status;
+        if (status === "Dispatched") {
+            if (currentData.outboundChoice) mappedStatus = "Outbound Dispatched";
+            else mappedStatus = "Inbound Dispatched";
         }
         
-        let currentIdx = stages.indexOf(status);
-        if (currentIdx === -1) currentIdx = 0; 
+        let currentIdx = stages.indexOf(mappedStatus);
+        if (currentIdx === -1) {
+            if (status === "Completed") currentIdx = stages.length - 1;
+            else currentIdx = 0;
+        } 
 
         let html = '';
         stages.forEach((stage, idx) => {
             let isCurrent = idx === currentIdx;
             let dotClass = idx < currentIdx ? "completed" : (isCurrent ? "active" : "");
             let extraText = "";
+
+            if (stage === "Pending Approval" && isCurrent) {
+                extraText = `
+                <div class="mt-2 text-[11px] text-white/50 mb-3">Your request is waiting for Hub's approval. If it takes too long, you can re-notify them.</div>
+                <button onclick="triggerInitialWhatsApp()" class="w-full py-2.5 bg-[#25D366] text-white text-xs font-bold rounded-lg hover:bg-[#1EBE57] transition shadow-soft flex justify-center items-center gap-2">
+                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 00-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
+                    Re-notify Hub via WhatsApp
+                </button>`;
+            }
             
             if (stage === "Pending Dropoff" && isCurrent) {
                 if (hubData && hubData.lat && hubData.lng) {
                     extraText = `
                     <div class="mt-2 text-xs text-white/70 mb-3">Please drop off your items at the hub.</div>
-                    <a href="https://maps.google.com/?q=$${parseFloat(hubData.lat)},${parseFloat(hubData.lng)}" target="_blank" rel="noopener noreferrer" class="w-full inline-flex justify-center items-center gap-2 text-xs font-bold text-brand bg-white/80 py-2.5 rounded hover:bg-white transition shadow-soft">
+                    <a href="https://maps.google.com/?q=` + parseFloat(hubData.lat) + `,` + parseFloat(hubData.lng) + `" target="_blank" rel="noopener noreferrer" class="w-full inline-flex justify-center items-center gap-2 text-xs font-bold text-brand bg-white/80 py-2.5 rounded hover:bg-white transition shadow-soft">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"></path></svg>
                         <span data-t="btn_nav_hub">${t[currentLang].btn_nav_hub || "Navigate to Hub"}</span>
                     </a>`;
@@ -514,7 +565,7 @@
 
                     if (currentData.outboundChoice === 'Self-Pickup' && hubData && hubData.lat && hubData.lng) {
                         extraText += `
-                        <a href="https://maps.google.com/?q=$${parseFloat(hubData.lat)},${parseFloat(hubData.lng)}" target="_blank" rel="noopener noreferrer" class="mt-3 w-full inline-flex justify-center items-center gap-2 text-xs font-bold text-brand bg-white/80 py-2.5 rounded hover:bg-white transition shadow-soft">
+                        <a href="https://maps.google.com/?q=` + parseFloat(hubData.lat) + `,` + parseFloat(hubData.lng) + `" target="_blank" rel="noopener noreferrer" class="mt-3 w-full inline-flex justify-center items-center gap-2 text-xs font-bold text-brand bg-white/80 py-2.5 rounded hover:bg-white transition shadow-soft">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"></path></svg>
                             <span data-t="btn_nav_hub">${t[currentLang].btn_nav_hub || "Navigate to Hub"}</span>
                         </a>`;
@@ -522,7 +573,7 @@
                 }
             }
 
-            if (stage === "Dispatched" && isCurrent) {
+            if ((stage === "Inbound Dispatched" || stage === "Outbound Dispatched") && isCurrent) {
                 const displayStatus = currentData.lalamoveStatus || sessionStorage.getItem('lala_status_' + sanitizeHTML(currentData.alterationId)) || 'ASSIGNING_DRIVER';
                 
                 let cancelBtnHtml = "";
@@ -550,8 +601,11 @@
                  
                  const div = document.createElement('div'); div.appendChild(box); extraText = div.innerHTML;
             }
+            
+            let displayStageName = stage;
+            if (stage === "Inbound Dispatched" || stage === "Outbound Dispatched") displayStageName = "Dispatched";
 
-            html += `<div class="relative pl-6 pb-8 ${idx === stages.length - 1 ? 'last-step' : ''}"><div class="timeline-line ${idx < currentIdx ? 'active' : ''}"></div><div class="absolute left-0 top-1 timeline-dot ${dotClass}"></div><h4 class="text-sm font-bold ${isCurrent ? 'text-green-400' : 'text-white/30'}">${stage}</h4>${extraText}</div>`;
+            html += `<div class="relative pl-6 pb-8 ${idx === stages.length - 1 ? 'last-step' : ''}"><div class="timeline-line ${idx < currentIdx ? 'active' : ''}"></div><div class="absolute left-0 top-1 timeline-dot ${dotClass}"></div><h4 class="text-sm font-bold ${isCurrent ? 'text-green-400' : 'text-white/30'}">${displayStageName}</h4>${extraText}</div>`;
         });
         document.getElementById('timeline-container').innerHTML = html;
     }
@@ -672,7 +726,7 @@
                 <span class="text-[10px] uppercase tracking-widest text-white/40 block mb-0.5">Location</span>
                 <span class="text-xs text-white/80 leading-relaxed">${prettyAddress}</span>
             </div>
-            <a href="https://maps.google.com/?q=$${parseFloat(currentData.originalLat)},${parseFloat(currentData.originalLng)}" target="_blank" rel="noopener noreferrer" class="w-full flex justify-center items-center gap-2 text-[11px] font-bold text-luxe bg-luxe/10 hover:bg-luxe hover:text-brand border border-luxe/30 py-2.5 rounded-lg transition">
+            <a href="https://maps.google.com/?q=` + parseFloat(currentData.originalLat) + `,` + parseFloat(currentData.originalLng) + `" target="_blank" rel="noopener noreferrer" class="w-full flex justify-center items-center gap-2 text-[11px] font-bold text-luxe bg-luxe/10 hover:bg-luxe hover:text-brand border border-luxe/30 py-2.5 rounded-lg transition">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
                 <span data-t="txt_view_map">${t[currentLang].txt_view_map || "View on Google Maps"}</span>
                 <span class="font-mono opacity-50">(${parseFloat(currentData.originalLat).toFixed(4)}, ${parseFloat(currentData.originalLng).toFixed(4)})</span>
