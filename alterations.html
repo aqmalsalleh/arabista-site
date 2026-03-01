@@ -223,7 +223,6 @@
   </div>
 
   <script>
-    // --- SECURITY UTILITIES ---
     function sanitizeHTML(str) {
         if (!str) return "";
         return String(str)
@@ -295,10 +294,13 @@
         if (userLang && userLang.toLowerCase().startsWith('ms')) setLang('bm'); else setLang('en');
         const urlParams = new URLSearchParams(window.location.search);
         const orderId = sanitizeHTML(urlParams.get('order'));
+        const rebookId = sanitizeHTML(urlParams.get('rebook'));
+        
         document.getElementById('step1-loading').classList.remove('hidden'); document.getElementById('hub-list-loading').classList.remove('hidden');
         
         try {
-            const fetchUrl = orderId ? `${scriptURL}?order=${orderId}` : scriptURL;
+            const fetchId = orderId || rebookId;
+            const fetchUrl = fetchId ? `${scriptURL}?order=${fetchId}` : scriptURL;
             const res = await fetch(fetchUrl); 
             const data = await res.json();
             if (data.error) throw new Error(data.error);
@@ -309,7 +311,7 @@
             
             hubs = Array.isArray(data.hubs) ? data.hubs : [];
             
-            if (orderId && data.orderData) {
+            if (fetchId && data.orderData) {
                 state.path = 'A'; 
                 document.getElementById('step1-loading').classList.add('hidden'); 
                 document.getElementById('path-a-container').classList.remove('hidden');
@@ -327,14 +329,24 @@
                         const size = sanitizeHTML(parts[1].trim()); 
                         const qty = parseInt(parts[2]) || 1;
                         for(let q=0; q < qty; q++) {
-                            itemsList.innerHTML += `<label class="flex items-center gap-4 p-4 border border-white/10 rounded-xl hover:bg-white/5 cursor-pointer transition"><input type="checkbox" name="order-item" value="a-${itemIdx}" data-design="${design}" data-size="${size}" onchange="syncItemsA()" class="w-5 h-5 rounded border-white/30 text-luxe focus:ring-luxe bg-transparent"><div><h3 class="font-display text-lg text-white">${design}</h3><p class="text-xs text-white/50">Size: ${size}</p></div></label>`;
+                            itemsList.innerHTML += `<label class="flex items-center gap-4 p-4 border border-white/10 rounded-xl hover:bg-white/5 cursor-pointer transition"><input type="checkbox" name="order-item" value="a-${itemIdx}" data-design="${design}" data-size="${size}" onchange="syncItemsA()" class="w-5 h-5 rounded border-white/30 text-luxe focus:ring-luxe bg-transparent" ${rebookId ? 'checked' : ''}><div><h3 class="font-display text-lg text-white">${design}</h3><p class="text-xs text-white/50">Size: ${size}</p></div></label>`;
                             itemIdx++;
                         }
                     }
                 });
+                
+                if (rebookId) {
+                    syncItemsA();
+                    unlockStep(2);
+                    setTimeout(() => { 
+                        useOrderAddress().then(() => {
+                            document.getElementById('step-3').scrollIntoView({behavior: 'smooth', block: 'start'});
+                        });
+                    }, 400);
+                }
             } else {
                 state.path = 'B'; 
-                if (orderId) alert((t[currentLang].alert_order_not_found || "Order not found.") + " #" + orderId);
+                if (fetchId) alert((t[currentLang].alert_order_not_found || "Order not found.") + " #" + fetchId);
                 document.getElementById('path-b-container').classList.remove('hidden'); 
                 addManualItem(); 
             }
@@ -424,7 +436,7 @@
         return null;
     }
 
-    async function useOrderAddress() { 
+async function useOrderAddress() { 
         if(!state.orderAddress) state.orderAddress = "Kuala Lumpur, Malaysia";
         
         document.getElementById('gps-details-panel').classList.remove('hidden');
@@ -435,21 +447,15 @@
         btnConfirm.classList.add('opacity-50', 'pointer-events-none', 'animate-pulse');
         btnConfirm.innerText = t[currentLang].txt_pinpointing || "Mapping...";
         
-        document.getElementById('gps-detected-text').innerHTML = `<div class="animate-pulse text-white/50 text-sm py-1">${t[currentLang].txt_pinpointing || "Mapping..."}</div>`;
+        document.getElementById('gps-detected-text').innerHTML = '<div class="animate-pulse text-white/50 text-sm py-1">' + (t[currentLang].txt_pinpointing || "Mapping...") + '</div>';
 
         const coords = await geocodeAddress(state.orderAddress);
         
         if(coords) {
             state.lat = coords.lat; state.lng = coords.lng;
-            document.getElementById('gps-detected-text').innerText = `${coords.formatted_address || state.orderAddress}`; 
+            document.getElementById('gps-detected-text').innerText = coords.formatted_address || state.orderAddress; 
             
-            document.getElementById('map-verify-link').innerHTML = `
-                <a href="https://maps.google.com/?q=${state.lat},${state.lng}" target="_blank" class="w-full flex justify-center items-center gap-2 text-[11px] font-bold text-luxe bg-luxe/10 hover:bg-luxe hover:text-brand border border-luxe/30 py-2.5 rounded-lg transition">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
-                    <span data-t="txt_view_on_map">${t[currentLang].txt_view_on_map || "View on Google Maps"}</span>
-                    <span class="font-mono opacity-50">(${parseFloat(state.lat).toFixed(4)}, ${parseFloat(state.lng).toFixed(4)})</span>
-                </a>
-            `;
+            document.getElementById('map-verify-link').innerHTML = '<a href="https://www.google.com/maps/search/?api=1&query=' + state.lat + ',' + state.lng + '" target="_blank" class="w-full flex justify-center items-center gap-2 text-[11px] font-bold text-luxe bg-luxe/10 hover:bg-luxe hover:text-brand border border-luxe/30 py-2.5 rounded-lg transition"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg><span data-t="txt_view_on_map">' + (t[currentLang].txt_view_on_map || "View on Google Maps") + '</span><span class="font-mono opacity-50">(' + parseFloat(state.lat).toFixed(4) + ', ' + parseFloat(state.lng).toFixed(4) + ')</span></a>';
         } else {
             document.getElementById('gps-detected-text').innerText = state.orderAddress;
             alert(t[currentLang].alert_geocode_fail);
@@ -471,7 +477,7 @@
         btnConfirm.classList.add('opacity-50', 'pointer-events-none', 'animate-pulse');
         btnConfirm.innerText = t[currentLang].msg_locating || "Locating...";
         
-        document.getElementById('gps-detected-text').innerHTML = `<div class="animate-pulse text-luxe text-sm py-1">📡 ${t[currentLang].msg_locating || "Acquiring satellite coordinates..."}</div>`;
+        document.getElementById('gps-detected-text').innerHTML = '<div class="animate-pulse text-luxe text-sm py-1">📡 ' + (t[currentLang].msg_locating || "Acquiring satellite coordinates...") + '</div>';
 
         if (state.gpsWatchId) navigator.geolocation.clearWatch(state.gpsWatchId);
         state.gpsWatchId = navigator.geolocation.watchPosition(
@@ -479,7 +485,7 @@
                 navigator.geolocation.clearWatch(state.gpsWatchId); state.gpsWatchId = null;
                 state.lat = pos.coords.latitude; state.lng = pos.coords.longitude; 
                 
-                document.getElementById('gps-detected-text').innerHTML = `<div class="animate-pulse text-white/50 text-sm py-1">${t[currentLang].msg_translating || "Translating GPS..."}</div>`;
+                document.getElementById('gps-detected-text').innerHTML = '<div class="animate-pulse text-white/50 text-sm py-1">' + (t[currentLang].msg_translating || "Translating GPS...") + '</div>';
                 btnConfirm.innerText = t[currentLang].msg_translating || "Translating...";
                 
                 try {
@@ -490,13 +496,7 @@
                     document.getElementById('gps-detected-text').innerText = `GPS Locked`; 
                 }
 
-                document.getElementById('map-verify-link').innerHTML = `
-                    <a href="https://maps.google.com/?q=${state.lat},${state.lng}" target="_blank" class="w-full flex justify-center items-center gap-2 text-[11px] font-bold text-luxe bg-luxe/10 hover:bg-luxe hover:text-brand border border-luxe/30 py-2.5 rounded-lg transition">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
-                        <span data-t="txt_view_on_map">${t[currentLang].txt_view_on_map || "View on Google Maps"}</span>
-                        <span class="font-mono opacity-50">(${parseFloat(state.lat).toFixed(4)}, ${parseFloat(state.lng).toFixed(4)})</span>
-                    </a>
-                `;
+                document.getElementById('map-verify-link').innerHTML = '<a href="https://www.google.com/maps/search/?api=1&query=' + state.lat + ',' + state.lng + '" target="_blank" class="w-full flex justify-center items-center gap-2 text-[11px] font-bold text-luxe bg-luxe/10 hover:bg-luxe hover:text-brand border border-luxe/30 py-2.5 rounded-lg transition"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg><span data-t="txt_view_on_map">' + (t[currentLang].txt_view_on_map || "View on Google Maps") + '</span><span class="font-mono opacity-50">(' + parseFloat(state.lat).toFixed(4) + ', ' + parseFloat(state.lng).toFixed(4) + ')</span></a>';
                 
                 btnConfirm.classList.remove('opacity-50', 'pointer-events-none', 'animate-pulse');
                 btnConfirm.innerText = t[currentLang].btn_confirm_loc;
@@ -525,7 +525,7 @@
         btnConfirm.innerText = t[currentLang].msg_searching_map || "Searching...";
         
         document.getElementById('map-verify-link').innerHTML = '';
-        document.getElementById('gps-detected-text').innerHTML = `<div class="animate-pulse text-white/50 text-sm py-1">${t[currentLang].msg_searching_map || "Searching Map..."}</div>`;
+        document.getElementById('gps-detected-text').innerHTML = '<div class="animate-pulse text-white/50 text-sm py-1">' + (t[currentLang].msg_searching_map || "Searching Map...") + '</div>';
         
         try {
             const res = await fetch(`${scriptURL}?action=geocode&address=${encodeURIComponent(addr)}`);
@@ -536,13 +536,7 @@
                 state.lat = data.lat; state.lng = data.lng; 
                 document.getElementById('gps-detected-text').innerText = `${data.formatted_address || addr}`;
                 
-                document.getElementById('map-verify-link').innerHTML = `
-                    <a href="https://maps.google.com/?q=${state.lat},${state.lng}" target="_blank" class="w-full flex justify-center items-center gap-2 text-[11px] font-bold text-luxe bg-luxe/10 hover:bg-luxe hover:text-brand border border-luxe/30 py-2.5 rounded-lg transition">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
-                        <span data-t="txt_view_on_map">${t[currentLang].txt_view_on_map || "View on Google Maps"}</span>
-                        <span class="font-mono opacity-50">(${parseFloat(state.lat).toFixed(4)}, ${parseFloat(state.lng).toFixed(4)})</span>
-                    </a>
-                `;
+                document.getElementById('map-verify-link').innerHTML = '<a href="https://www.google.com/maps/search/?api=1&query=' + state.lat + ',' + state.lng + '" target="_blank" class="w-full flex justify-center items-center gap-2 text-[11px] font-bold text-luxe bg-luxe/10 hover:bg-luxe hover:text-brand border border-luxe/30 py-2.5 rounded-lg transition"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg><span data-t="txt_view_on_map">' + (t[currentLang].txt_view_on_map || "View on Google Maps") + '</span><span class="font-mono opacity-50">(' + parseFloat(state.lat).toFixed(4) + ', ' + parseFloat(state.lng).toFixed(4) + ')</span></a>';
             } else {
                 document.getElementById('manual-search-error').innerText = t[currentLang].txt_no_results || "❌ Location not found.";
                 document.getElementById('manual-search-error').classList.remove('hidden');
@@ -647,7 +641,7 @@
             const badgeText = isFull ? "BUSY / FULL" : status.text;
             
             const cardClasses = `p-3 rounded-lg border transition flex justify-between items-center gap-3 ${isFull ? 'border-white/5 opacity-50 cursor-not-allowed bg-black/40' : (isSelected ? 'border-luxe bg-luxe/10 hover:bg-white/5 cursor-pointer' : 'border-white/10 opacity-70 hover:bg-white/5 cursor-pointer')}`;
-            const onClickAttr = isFull ? '' : `onclick="selectHub(${h.id}, ${h.dist}, ${h.fee}, ${h.lat}, ${h.lng})"` 
+            const onClickAttr = isFull ? '' : `onclick="selectHub(${h.id}, ${h.dist}, ${h.fee}, ${h.lat}, ${h.lng})"`;
 
             let lalamoveHtml = '';
             if(state.mode === 'lalamove') {
@@ -884,7 +878,7 @@
                 if(document.getElementById(`cb-${item.id}-shoulder`)?.checked) { servicesArr.push(`Shoulders (Sh:${m.shoulder})`); serviceKeysArray.push('shoulder'); }
                 if(document.getElementById(`cb-${item.id}-pads`)?.checked) { servicesArr.push(`Pads`); serviceKeysArray.push('pads'); }
             }
-            itemDetailsStr += `[${item.name} | ${item.size}] : ${servicesArr.join(', ')}\n`;
+            itemDetailsStr += "[" + item.name + " | " + item.size + "] : " + servicesArr.join(', ') + "\n";
         });
 
         const hubData = hubs.find(h => h.id === state.hubId);
@@ -940,7 +934,7 @@
         setTimeout(() => { modal.classList.remove('opacity-0'); box.classList.remove('scale-95'); }, 10);
     }
 
-    function goToTracker() { if (generatedAltId) window.location.href = "alteration-tracker.html?id=" + encodeURIComponent(generatedAltId); }
+    function goToTracker() { if (generatedAltId) window.location.href = "alteration-tracker.html?id=" + encodeURIComponent(generatedAltId) + "&new=true"; }
 
     function unlockStep(n) { document.getElementById(`step-${n}`).classList.remove('opacity-30', 'pointer-events-none'); document.getElementById(`badge-${n}`).classList.replace('border-white/20', 'border-luxe'); document.getElementById(`badge-${n}`).classList.replace('text-white/50', 'text-luxe'); }
     function lockStep(n) { document.getElementById(`step-${n}`).classList.add('opacity-30', 'pointer-events-none'); }
