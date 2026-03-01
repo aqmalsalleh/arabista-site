@@ -283,9 +283,12 @@
     document.addEventListener('DOMContentLoaded', () => { 
         const storedVersion = localStorage.getItem('arabista_app_version');
         if (storedVersion !== APP_VERSION) { 
+            // Silently clear old credentials without forcing a reload
+            localStorage.removeItem('arabista_hub_name');
+            localStorage.removeItem('arabista_hub_token');
             localStorage.setItem('arabista_app_version', APP_VERSION); 
-            logout(); 
-            return; 
+            hubName = "";
+            hubToken = "";
         }
         
         const userLang = navigator.language || navigator.userLanguage;
@@ -299,7 +302,9 @@
             requestNotificationPermission();
             loadDashboard(); 
         } else {
-            logout(); 
+            // Fix: Just show the login screen instead of triggering logout()/reload
+            document.getElementById('login-screen').classList.remove('hidden');
+            document.getElementById('main-app').classList.add('hidden');
         }
     });
 
