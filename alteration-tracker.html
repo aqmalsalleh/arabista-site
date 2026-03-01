@@ -342,7 +342,19 @@
         if(currentData) buildTimeline(currentData.orderStatus);
     }
 
+    const TRACKER_VERSION = "1.0"; // Bump this number in the future if you ever need to force clear customer caches 
+
     document.addEventListener('DOMContentLoaded', () => { 
+        // --- SELF-CLEANING MECHANISM ---
+        const storedVersion = localStorage.getItem('arabista_tracker_version');
+        if (storedVersion !== TRACKER_VERSION) { 
+            localStorage.clear();
+            sessionStorage.clear();
+            localStorage.setItem('arabista_tracker_version', TRACKER_VERSION); 
+            window.location.reload(); // Force a clean reload
+            return; 
+        }
+        // -------------------------------
         const userLang = navigator.language || navigator.userLanguage;
         if (userLang && userLang.toLowerCase().startsWith('ms')) setLang('bm'); else setLang('en');
 

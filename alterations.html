@@ -289,7 +289,20 @@
         }
     }
 
+    const BOOKING_VERSION = "1.0"; // Bump this number in the future if you ever need to force clear customer caches
+
     document.addEventListener('DOMContentLoaded', async () => {
+        // --- SELF-CLEANING MECHANISM ---
+        const storedVersion = localStorage.getItem('arabista_booking_version');
+        if (storedVersion !== BOOKING_VERSION) { 
+            localStorage.clear();
+            sessionStorage.clear();
+            localStorage.setItem('arabista_booking_version', BOOKING_VERSION); 
+            window.location.reload(); // Force a clean reload
+            return; 
+        }
+        // -------------------------------
+
         const userLang = navigator.language || navigator.userLanguage;
         if (userLang && userLang.toLowerCase().startsWith('ms')) setLang('bm'); else setLang('en');
         const urlParams = new URLSearchParams(window.location.search);
