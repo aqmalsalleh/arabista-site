@@ -552,6 +552,7 @@ renderActive(data.orders.inProgress.concat(data.orders.ready));
                 const safeId = sanitizeHTML(o.id);
                 const safeName = sanitizeHTML(o.custName);
                 const safePhone = sanitizeHTML(o.custPhone);
+                const safeItems = sanitizeHTML(o.items).replace(/\[/g, '').replace(/\]/g, ''); // ADDED: Item Details
                 const jsId = escapeJS(safeId);
                 const jsName = escapeJS(safeName);
                 const jsPhone = escapeJS(safePhone);
@@ -573,6 +574,7 @@ renderActive(data.orders.inProgress.concat(data.orders.ready));
                             </div>
                             <div class="mb-2">${modeBadge}</div>
                             <h3 class="font-bold text-lg text-white">${safeName}</h3>
+                            <p class="text-xs text-white/50 mt-1 mb-2 whitespace-pre-line">${safeItems}</p>
                         </div>
                         <div class="flex gap-2">
                             <button onclick="updateStatus('${jsId}', 'Rejected', '${jsName}', '${jsPhone}', '', 0, this)" class="px-4 py-2 rounded-lg border border-red-500/30 text-red-400 text-xs font-bold hover:bg-red-500/10 transition">${t[currentLang].btn_reject}</button>
