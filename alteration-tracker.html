@@ -236,18 +236,20 @@
             <h1 class="text-3xl font-bold text-luxe mb-1" id="quote-amount">RM 0.00</h1>
             <p class="text-[10px] text-orange-300 font-bold mb-4 bg-orange-500/10 px-3 py-1.5 rounded inline-block border border-orange-500/20" data-t="txt_pay_hq">Scan to pay, then send receipt via WhatsApp.</p>
             
-            <button onclick="notifyHQPayment()" class="w-full bg-[#25D366] text-white font-bold py-3.5 rounded-xl hover:bg-[#1EBE57] transition shadow-soft flex justify-center items-center gap-2 mb-3" id="btn-wa-hq">
+            <div class="text-left mb-1.5"><span class="text-xs font-bold text-white/70" data-t="txt_step1">Step 1</span></div>
+            <button onclick="notifyHQPayment()" class="w-full bg-[#25D366] text-white font-bold py-3.5 rounded-xl hover:bg-[#1EBE57] transition shadow-soft flex justify-center items-center gap-2 mb-4" id="btn-wa-hq">
                 <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 00-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
-                <span data-t="btn_wa_hq">1. Send Receipt to HQ</span>
-            </button>
-            
-            <button onclick="bookRider()" class="w-full bg-orange-500 text-white font-bold py-3.5 rounded-xl hover:bg-orange-400 transition shadow-[0_0_20px_rgba(249,115,22,0.3)] flex justify-center items-center gap-2 opacity-50 pointer-events-none" id="btn-final-book">
-                <span data-t="btn_call_rider">2. Call Rider Now</span>
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
-            </button>
-            
-            <button onclick="closeModal()" class="mt-4 text-[10px] text-white/30 underline hover:text-white uppercase tracking-widest" data-t="btn_cancel">Cancel</button>
-        </div>
+            <span data-t="btn_wa_hq">Send Receipt to HQ</span>
+        </button>
+        
+        <div class="text-left mb-1.5"><span class="text-xs font-bold text-white/70" data-t="txt_step2">Step 2: Please ensure the Lalamove fee has been paid</span></div>
+        <button onclick="bookRider()" class="w-full bg-orange-500 text-white font-bold py-3.5 rounded-xl hover:bg-orange-400 transition shadow-[0_0_20px_rgba(249,115,22,0.3)] flex justify-center items-center gap-2 opacity-50 pointer-events-none" id="btn-final-book">
+            <span data-t="btn_call_rider">Call Rider Now</span>
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+        </button>
+        
+        <button onclick="closeModal()" class="mt-4 text-[10px] text-white/30 underline hover:text-white uppercase tracking-widest" data-t="btn_cancel">Cancel</button>
+    </div>
 
     </div>
   </div>
@@ -301,12 +303,13 @@
             track_lala: "Track Lalamove Map", btn_cancel_rider: "Cancel Lalamove Booking", confirm_cancel_rider: "Are you sure you want to cancel the rider? This action cannot be undone.", txt_canceling: "Canceling...",
             txt_accuracy_check: "Location Accuracy Check", txt_opt_1: "<strong>Option 1:</strong> Use the 'Original Address' if it matches your location perfectly.", txt_opt_2: "<strong>Option 2:</strong> Detect new GPS or Search Map if you are at a different location.",
             txt_use_orig: "Use the address you provided during the initial booking.", btn_check_book: "Check Price & Book", btn_detect_loc: "Detect My Location", txt_gps_signal: "GPS signal required for accuracy.", btn_search_map: "Search Map", lbl_unit: "Unit / House No.", lbl_building: "Building / Street (Optional)", modal_est_fee: "Estimated Delivery Fee", txt_pay_cash: "Pay Cash directly to the Lalamove Rider.", btn_call_rider: "Call Rider Now", btn_cancel: "Cancel",
-            txt_alt_fee_title: "Alteration Fee Payment", txt_alt_fee_desc: "Your item is ready! Please pay the alteration fee to the Hub below.", btn_wa_hub: "Send Receipt to Hub", txt_hub_paid_thanks: "Thank you! Please select your return method below:", txt_hq_qr_title: "Lalamove Delivery Payment", txt_hq_qr_desc: "Please pay the delivery fee to Arabista HQ.", txt_pay_hq: "Scan to pay, then send receipt via WhatsApp.", btn_wa_hq: "1. Send Receipt to HQ", txt_view_map: "View on Google Maps", txt_receipt_sent: "Receipt Sent!", txt_action_pay: "Payment Required for Alteration", btn_pay_alt: "Pay Alteration Fee", btn_view_hub_qr: "View Hub QR Code Again", btn_close: "Close", txt_click_enlarge: "Click QR to enlarge", txt_save_instruction: "Long press or screenshot to save",
+            txt_alt_fee_title: "Alteration Fee Payment", txt_alt_fee_desc: "Your item is ready! Please pay the alteration fee to the Hub below.", btn_wa_hub: "Send Receipt to Hub", txt_hub_paid_thanks: "Thank you! Please select your return method below:", txt_hq_qr_title: "Lalamove Delivery Payment", txt_hq_qr_desc: "Please pay the delivery fee to Arabista HQ.", txt_pay_hq: "Scan to pay, then send receipt via WhatsApp.", btn_wa_hq: "Send Receipt to HQ", txt_view_map: "View on Google Maps", txt_receipt_sent: "Receipt Sent!", txt_action_pay: "Payment Required for Alteration", btn_pay_alt: "Pay Alteration Fee", btn_view_hub_qr: "View Hub QR Code Again", btn_close: "Close", txt_click_enlarge: "Click QR to enlarge", txt_save_instruction: "Long press or screenshot to save",
             
+            txt_step1: "Step 1", txt_step2: "Step 2: Please ensure the Lalamove fee has been paid", txt_pay_alt_warn: "Please ensure the alteration fee has been paid to the hub before arranging Lalamove or Self-Pickup.",
             alert_enter_id: "Please enter an Alteration ID.", alert_order_not_found: "Order not found.", alert_conn_error: "Connection Error.", alert_enter_unit: "Please enter Unit / House Number.", alert_locate_gps: "Please locate GPS or Search Map first.", alert_fee_error: "Fee Error: ", alert_error: "Error", alert_driver_booked: "Driver Booked!", alert_failed: "Failed: ", alert_cancel_failed: "Cancel Failed: ", alert_error_canceling: "Error canceling.", alert_copied: "Copied to clipboard!",
             msg_calculating: "Calculating...", msg_locating: "Locating...", msg_searching: "Searching...", msg_translating: "Translating...", msg_booking: "Booking...", msg_retry: "Retry", msg_gps_acquiring: "📡 Acquiring exact satellite coordinates...", msg_gps_locked: "GPS Locked:", msg_pin_dropped: "✅ Pin Dropped:", msg_location_not_found: "❌ Location not found.", msg_search_failed: "❌ Search failed.", msg_wait: "Wait...", msg_geo_notsupported: "Geo not supported",
             wa_hub_pay: "*[ALTERATION PAYMENT]*\n- *Order:* {id}\n- *Amount:* {total}\n- *Paid To:* Arabista Hub\n\nReceipt attached below.",
-            wa_hq_pay: "*[DELIVERY PAYMENT]*\n- *Order:* {id}\n- *Amount:* {total}\n- *Paid To:* Arabista HQ\n\nReceipt attached below."
+            wa_hq_pay: "*[DELIVERY PAYMENT]*\n- *Order:* {id}\n- *Amount:* {total}\n- *Paid To:* Arabista HQ\n- *Link:* {link}\n\nReceipt attached below."
         },
         bm: {
             page_title: "Jejak Tempahan", page_subtitle: "Masukkan ID tempahan unik anda di bawah.", lbl_id: "ID Tempahan", btn_track: "Jejak Pesanan", txt_loading: "Mencari butiran tempahan...", btn_share: "Kongsi Pautan", lbl_items: "Item untuk Diubahsuai:", section_status: "Status Terkini", btn_refresh: "Segar Semula", back_home: "Kembali ke Utama", btn_nav_hub: "Pandu Arah ke Hub",
@@ -316,12 +319,13 @@
             track_lala: "Jejak Peta Lalamove", btn_cancel_rider: "Batal Tempahan Lalamove", confirm_cancel_rider: "Adakah anda pasti mahu membatalkan rider? Tindakan ini tidak boleh diubah.", txt_canceling: "Membatalkan...",
             txt_accuracy_check: "Semakan Ketepatan Lokasi", txt_opt_1: "<strong>Pilihan 1:</strong> Guna 'Alamat Asal' jika ia menepati lokasi anda dengan tepat.", txt_opt_2: "<strong>Pilihan 2:</strong> Kesan GPS baru atau Cari Peta jika anda berada di lokasi berbeza.",
             txt_use_orig: "Guna alamat yang anda berikan semasa tempahan awal.", btn_check_book: "Semak Harga & Tempah", btn_detect_loc: "Kesan Lokasi Saya", txt_gps_signal: "Isyarat GPS diperlukan untuk ketepatan.", btn_search_map: "Cari Peta", lbl_unit: "No. Unit / Rumah", lbl_building: "Bangunan / Jalan (Pilihan)", modal_est_fee: "Anggaran Caj Penghantaran", txt_pay_cash: "Bayar Tunai terus kepada Rider Lalamove.", btn_call_rider: "Panggil Rider Sekarang", btn_cancel: "Batal",
-            txt_alt_fee_title: "Bayaran Caj Alterasi", txt_alt_fee_desc: "Barang anda dah siap! Sila bayar caj alterasi kepada Hub di bawah.", btn_wa_hub: "Hantar Resit ke Hub", txt_hub_paid_thanks: "Terima kasih! Sila pilih kaedah penghantaran di bawah:", txt_hq_qr_title: "Bayaran Lalamove", txt_hq_qr_desc: "Sila bayar caj penghantaran kepada Arabista HQ.", txt_pay_hq: "Imbas untuk bayar, dan hantar resit di WhatsApp.", btn_wa_hq: "1. Hantar Resit ke HQ", txt_view_map: "Lihat di Google Maps", txt_receipt_sent: "Resit Dihantar!", txt_action_pay: "Bayaran Alterasi Diperlukan", btn_pay_alt: "Bayar Caj Alterasi", btn_view_hub_qr: "Lihat Semula QR Hub", btn_close: "Tutup", txt_click_enlarge: "Klik QR untuk besarkan", txt_save_instruction: "Tekan lama atau screenshot untuk simpan",
+            txt_alt_fee_title: "Bayaran Caj Alterasi", txt_alt_fee_desc: "Barang anda dah siap! Sila bayar caj alterasi kepada Hub di bawah.", btn_wa_hub: "Hantar Resit ke Hub", txt_hub_paid_thanks: "Terima kasih! Sila pilih kaedah penghantaran di bawah:", txt_hq_qr_title: "Bayaran Lalamove", txt_hq_qr_desc: "Sila bayar caj penghantaran kepada Arabista HQ.", txt_pay_hq: "Imbas untuk bayar, dan hantar resit di WhatsApp.", btn_wa_hq: "Hantar Resit ke HQ", txt_view_map: "Lihat di Google Maps", txt_receipt_sent: "Resit Dihantar!", txt_action_pay: "Bayaran Alterasi Diperlukan", btn_pay_alt: "Bayar Caj Alterasi", btn_view_hub_qr: "Lihat Semula QR Hub", btn_close: "Tutup", txt_click_enlarge: "Klik QR untuk besarkan", txt_save_instruction: "Tekan lama atau screenshot untuk simpan",
             
+            txt_step1: "Langkah 1", txt_step2: "Langkah 2: Sila pastikan caj Lalamove telah dibayar", txt_pay_alt_warn: "Sila pastikan caj alterasi telah dibayar kepada hub sebelum menempah Lalamove atau Ambil Sendiri.",
             alert_enter_id: "Sila masukkan ID Tempahan.", alert_order_not_found: "Tempahan tidak dijumpai.", alert_conn_error: "Ralat Sambungan.", alert_enter_unit: "Sila masukkan No. Unit / Rumah.", alert_locate_gps: "Sila kesan GPS atau Cari Peta dahulu.", alert_fee_error: "Ralat Caj: ", alert_error: "Ralat", alert_driver_booked: "Rider Berjaya Ditempah!", alert_failed: "Gagal: ", alert_cancel_failed: "Gagal Batal: ", alert_error_canceling: "Ralat membatalkan.", alert_copied: "Disalin ke papan keratan!",
             msg_calculating: "Mengira...", msg_locating: "Mengescan...", msg_searching: "Mencari...", msg_translating: "Menterjemah...", msg_booking: "Menempah...", msg_retry: "Cuba Lagi", msg_gps_acquiring: "📡 Mendapatkan koordinat satelit yang tepat...", msg_gps_locked: "GPS Dikunci:", msg_pin_dropped: "✅ Pin Diletakkan:", msg_location_not_found: "❌ Lokasi tidak dijumpai.", msg_search_failed: "❌ Carian gagal.", msg_wait: "Tunggu...", msg_geo_notsupported: "Geo tidak disokong",
             wa_hub_pay: "*[BAYARAN ALTERASI]*\n- *Pesanan:* {id}\n- *Jumlah:* {total}\n- *Dibayar Kepada:* Arabista Hub\n\nResit dilampirkan di bawah.",
-            wa_hq_pay: "*[BAYARAN PENGHANTARAN]*\n- *Pesanan:* {id}\n- *Jumlah:* {total}\n- *Dibayar Kepada:* Arabista HQ\n\nResit dilampirkan di bawah."
+            wa_hq_pay: "*[BAYARAN PENGHANTARAN]*\n- *Pesanan:* {id}\n- *Jumlah:* {total}\n- *Dibayar Kepada:* Arabista HQ\n- *Pautan:* {link}\n\nResit dilampirkan di bawah."
         }
     };
 
@@ -364,7 +368,7 @@
         let cleanPhone = hubData.phone ? hubData.phone.replace(/[^0-9]/g, '') : "60123456789"; 
         if (cleanPhone.startsWith('0')) cleanPhone = '6' + cleanPhone;
         const link = trackerBaseUrl + encodeURIComponent(currentData.alterationId);
-        const msg = `*[NEW ALTERATION REQUEST]*\n- *Order ID:* ${currentData.alterationId}\n- *Customer:* ${currentData.customerName}\n\nI have submitted a new alteration request. Please review and approve it here:\n${link}`;
+        const msg = `*[NEW ALTERATION REQUEST]*\n- *Order ID:* ${currentData.alterationId}\n- *Customer:* ${currentData.customerName}\n\nI have submitted a new alteration request. Please review and approve it:\n${link}`;
         window.open(`https://wa.me/${cleanPhone}?text=${encodeURIComponent(msg)}`, '_blank');
     }
 
@@ -460,12 +464,45 @@
         document.getElementById('display-name').innerText = sanitizeHTML(currentData.customerName);
         document.getElementById('display-hub').innerText = `Assigned to: ${sanitizeHTML(currentData.hubName)}`;
         document.getElementById('display-items').innerText = sanitizeHTML(currentData.itemDetails).replace(/\[/g, '').replace(/\]/g, '');
+        
+        checkRecoveryState();
+        
         buildTimeline(currentData.orderStatus);
     }
-
-    function buildTimeline(status) {
+    
+    function checkRecoveryState() {
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('book_rider') === 'true') {
+            const savedQuote = sessionStorage.getItem('lala_quote_' + currentData.alterationId);
+            const savedStops = sessionStorage.getItem('lala_stops_' + currentData.alterationId);
+            const savedAmt = sessionStorage.getItem('lala_amt_' + currentData.alterationId);
+            const savedInbound = sessionStorage.getItem('lala_is_inbound_' + currentData.alterationId);
+            
+            if (savedQuote && savedStops) {
+                activeQuoteId = savedQuote;
+                currentStops = JSON.parse(savedStops);
+                isIncomingOrder = savedInbound === 'true';
+                document.getElementById('quote-amount').innerText = savedAmt || "";
+                
+                showModalStep(3);
+                const bookBtn = document.getElementById('btn-final-book');
+                bookBtn.classList.remove('opacity-50', 'pointer-events-none');
+                
+                const waBtn = document.getElementById('btn-wa-hq');
+                waBtn.classList.replace('bg-[#25D366]', 'bg-white/10');
+                waBtn.classList.replace('text-white', 'text-white/50');
+                waBtn.innerHTML = `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> <span data-t="txt_receipt_sent">${t[currentLang].txt_receipt_sent || "Receipt Sent!"}</span>`;
+            }
+            
+            const newUrl = window.location.protocol + "//" + window.location.host + window.location.pathname + '?id=' + encodeURIComponent(currentData.alterationId);
+            window.history.replaceState({path:newUrl}, '', newUrl);
+        }
+    }
+function buildTimeline(status) {
         let stages = [];
-        let isLalaIn = (currentData.logisticsMode === "Lalamove" || currentData.logisticsDirection === "Inbound" || status === "Awaiting Dispatch" || (status === "Dispatched" && !currentData.outboundChoice));
+        
+        // Fixed Bug #6: Strictly separate Inbound vs Outbound logic based on Logistics Direction
+        let isLalaIn = (currentData.logisticsMode === "Lalamove" || currentData.logisticsDirection === "Inbound" || status === "Awaiting Dispatch" || (status === "Dispatched" && currentData.logisticsDirection !== "Outbound"));
         
         if (isLalaIn) {
             stages = ["Pending Approval", "Awaiting Dispatch", "Inbound Dispatched", "In Progress", "Ready for Return"];
@@ -473,7 +510,7 @@
             stages = ["Pending Approval", "Pending Dropoff", "In Progress", "Ready for Return"];
         }
 
-        if (currentData.outboundChoice === "Lalamove") {
+        if (currentData.outboundChoice === "Lalamove" || currentData.logisticsDirection === "Outbound") {
             stages.push("Outbound Dispatched", "Completed");
         } else {
             stages.push("Completed");
@@ -481,7 +518,7 @@
 
         let mappedStatus = status;
         if (status === "Dispatched") {
-            if (currentData.outboundChoice) mappedStatus = "Outbound Dispatched";
+            if (currentData.logisticsDirection === "Outbound" || currentData.outboundChoice === "Lalamove") mappedStatus = "Outbound Dispatched";
             else mappedStatus = "Inbound Dispatched";
         }
         
@@ -508,9 +545,10 @@
             
             if (stage === "Pending Dropoff" && isCurrent) {
                 if (hubData && hubData.lat && hubData.lng) {
+                    // Fixed Google Maps URL string concatenation
                     extraText = `
                     <div class="mt-2 text-xs text-white/70 mb-3">Please drop off your items at the hub.</div>
-                    <a href="https://maps.google.com/?q=` + parseFloat(hubData.lat) + `,` + parseFloat(hubData.lng) + `" target="_blank" rel="noopener noreferrer" class="w-full inline-flex justify-center items-center gap-2 text-xs font-bold text-brand bg-white/80 py-2.5 rounded hover:bg-white transition shadow-soft">
+                    <a href="https://www.google.com/maps/search/?api=1&query=` + parseFloat(hubData.lat) + `,` + parseFloat(hubData.lng) + `" target="_blank" rel="noopener noreferrer" class="w-full inline-flex justify-center items-center gap-2 text-xs font-bold text-brand bg-white/80 py-2.5 rounded hover:bg-white transition shadow-soft">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"></path></svg>
                         <span data-t="btn_nav_hub">${t[currentLang].btn_nav_hub || "Navigate to Hub"}</span>
                     </a>`;
@@ -543,13 +581,16 @@
                             setTimeout(() => { openHubPayModal(); }, 600);
                         }
                     } else {
+                        // Added Warning Notice for Lalamove vs Self-Pickup
                         extraText = `
                         <div class="mt-2 text-xs text-green-400 mb-3 font-bold flex items-center gap-1">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> 
                             <span data-t="txt_hub_paid_thanks">${t[currentLang].txt_hub_paid_thanks}</span>
                         </div>
-                        <button onclick="openHubPayModal(true)" class="w-full py-2 mb-4 border border-white/10 text-white/50 text-xs font-bold rounded-lg hover:bg-white/5 transition" data-t="btn_view_hub_qr">${t[currentLang].btn_view_hub_qr}</button>
+                        <button onclick="openHubPayModal(true)" class="w-full py-2 mb-3 border border-white/10 text-white/50 text-xs font-bold rounded-lg hover:bg-white/5 transition" data-t="btn_view_hub_qr">${t[currentLang].btn_view_hub_qr}</button>
                         
+                        <p class="text-[10px] text-red-400 font-bold mb-3 p-2 bg-red-500/10 border border-red-500/20 rounded" data-t="txt_pay_alt_warn">${t[currentLang].txt_pay_alt_warn}</p>
+
                         <div class="flex gap-2">
                              <button onclick="triggerOutbound('Lalamove')" class="flex-1 py-3 rounded-xl bg-luxe text-brand text-xs font-bold hover:bg-white transition shadow-soft flex justify-center items-center">${t[currentLang].btn_lalamove}</button>
                              <button onclick="setReturnChoice('Self-Pickup', this)" class="flex-1 py-3 rounded-xl border border-luxe text-luxe text-xs font-bold hover:bg-luxe/20 transition flex justify-center items-center">${t[currentLang].btn_self_pickup}</button>
@@ -565,7 +606,7 @@
 
                     if (currentData.outboundChoice === 'Self-Pickup' && hubData && hubData.lat && hubData.lng) {
                         extraText += `
-                        <a href="https://maps.google.com/?q=` + parseFloat(hubData.lat) + `,` + parseFloat(hubData.lng) + `" target="_blank" rel="noopener noreferrer" class="mt-3 w-full inline-flex justify-center items-center gap-2 text-xs font-bold text-brand bg-white/80 py-2.5 rounded hover:bg-white transition shadow-soft">
+                        <a href="https://www.google.com/maps/search/?api=1&query=` + parseFloat(hubData.lat) + `,` + parseFloat(hubData.lng) + `" target="_blank" rel="noopener noreferrer" class="mt-3 w-full inline-flex justify-center items-center gap-2 text-xs font-bold text-brand bg-white/80 py-2.5 rounded hover:bg-white transition shadow-soft">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"></path></svg>
                             <span data-t="btn_nav_hub">${t[currentLang].btn_nav_hub || "Navigate to Hub"}</span>
                         </a>`;
@@ -665,7 +706,7 @@
             btn.classList.replace('hover:bg-[#1EBE57]', 'hover:bg-white/20');
         } else {
             btn.innerHTML = `<svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 00-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
-            <span data-t="btn_wa_hub">${t[currentLang].btn_wa_hub}</span>`;
+            <span data-t="btn_wa_hub">${t[currentLang].btn_wa_hub || "Send Receipt to Hub"}</span>`;
             btn.onclick = notifyHubPayment;
             btn.classList.replace('bg-white/10', 'bg-[#25D366]');
             btn.classList.replace('hover:bg-white/20', 'hover:bg-[#1EBE57]');
@@ -726,7 +767,7 @@
                 <span class="text-[10px] uppercase tracking-widest text-white/40 block mb-0.5">Location</span>
                 <span class="text-xs text-white/80 leading-relaxed">${prettyAddress}</span>
             </div>
-            <a href="https://maps.google.com/?q=` + parseFloat(currentData.originalLat) + `,` + parseFloat(currentData.originalLng) + `" target="_blank" rel="noopener noreferrer" class="w-full flex justify-center items-center gap-2 text-[11px] font-bold text-luxe bg-luxe/10 hover:bg-luxe hover:text-brand border border-luxe/30 py-2.5 rounded-lg transition">
+            <a href="https://www.google.com/maps/search/?api=1&query=` + parseFloat(currentData.originalLat) + `,` + parseFloat(currentData.originalLng) + `" target="_blank" rel="noopener noreferrer" class="w-full flex justify-center items-center gap-2 text-[11px] font-bold text-luxe bg-luxe/10 hover:bg-luxe hover:text-brand border border-luxe/30 py-2.5 rounded-lg transition">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
                 <span data-t="txt_view_map">${t[currentLang].txt_view_map || "View on Google Maps"}</span>
                 <span class="font-mono opacity-50">(${parseFloat(currentData.originalLat).toFixed(4)}, ${parseFloat(currentData.originalLng).toFixed(4)})</span>
@@ -907,9 +948,19 @@
     function notifyHQPayment() {
         const hqPhone = "60126913286";
         const amt = document.getElementById('quote-amount').innerText;
-        const msg = (t[currentLang].wa_hq_pay || "").replace('{id}', currentData.alterationId).replace('{total}', amt);
+        
+        // Save state for Recovery
+        sessionStorage.setItem('lala_quote_' + currentData.alterationId, activeQuoteId);
+        sessionStorage.setItem('lala_stops_' + currentData.alterationId, JSON.stringify(currentStops));
+        sessionStorage.setItem('lala_amt_' + currentData.alterationId, amt);
+        sessionStorage.setItem('lala_is_inbound_' + currentData.alterationId, isIncomingOrder);
+        
+        const linkWithParam = trackerBaseUrl + encodeURIComponent(currentData.alterationId) + "&book_rider=true";
+        const msg = (t[currentLang].wa_hq_pay || "").replace('{id}', currentData.alterationId).replace('{total}', amt).replace('{link}', linkWithParam);
+        
         window.open(`https://wa.me/${hqPhone}?text=${encodeURIComponent(msg)}`, '_blank');
         
+        // Unlock button locally as fallback
         const bookBtn = document.getElementById('btn-final-book');
         bookBtn.classList.remove('opacity-50', 'pointer-events-none');
         
@@ -942,9 +993,39 @@
         try {
             const res = await fetch(scriptURL, { method: 'POST', body: JSON.stringify(payload) });
             const data = await res.json();
-            if(data.status === "success") { alert(t[currentLang].alert_driver_booked); window.location.reload(); }
-            else { alert((t[currentLang].alert_failed || "Failed: ") + data.message); btn.innerHTML = t[currentLang].msg_retry; btn.disabled = false; }
-        } catch(e) { alert(t[currentLang].alert_error); }
+            if(data.status === "success") { 
+                showDriverBookedModal(isIncomingOrder); 
+            }
+            else { alert((t[currentLang].alert_failed || "Failed: ") + data.message); btn.innerHTML = t[currentLang].msg_retry || "Retry"; btn.disabled = false; }
+        } catch(e) { alert(t[currentLang].alert_error); btn.innerHTML = t[currentLang].msg_retry || "Retry"; btn.disabled = false;}
+    }
+    
+    function showDriverBookedModal(isInbound) {
+        closeModal(); 
+        const div = document.createElement('div');
+        div.id = 'driver-booked-modal';
+        div.className = 'fixed inset-0 z-[300] flex items-center justify-center bg-black/90 backdrop-blur-md px-4 fade-in';
+        
+        const msg = `*[LALAMOVE BOOKED]*\n- *Order ID:* ${currentData.alterationId}\n- *Direction:* ${isInbound ? 'Inbound to Hub' : 'Outbound to Customer'}\n\nA Lalamove rider has been booked. You can track the live status here:\n${trackerBaseUrl + encodeURIComponent(currentData.alterationId)}`;
+        let cleanPhone = hubData.phone ? hubData.phone.replace(/[^0-9]/g, '') : "60123456789"; 
+        if (cleanPhone.startsWith('0')) cleanPhone = '6' + cleanPhone;
+        const waLink = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(msg)}`;
+
+        div.innerHTML = `
+            <div class="bg-[#111213] border border-green-500/50 rounded-2xl w-full max-w-sm p-8 text-center shadow-[0_0_50px_rgba(34,197,94,0.1)]">
+                <div class="w-16 h-16 rounded-full bg-green-500/20 text-green-400 flex items-center justify-center mx-auto mb-4">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                </div>
+                <h3 class="text-green-400 font-bold mb-2 text-2xl font-display">Driver Booked!</h3>
+                <p class="text-sm text-white/70 mb-6">Your Lalamove rider has been successfully scheduled. Please notify the Hub.</p>
+                <a href="${waLink}" target="_blank" onclick="setTimeout(()=>window.location.reload(), 1000)" class="w-full bg-[#25D366] text-white font-bold py-3.5 rounded-xl hover:bg-[#1EBE57] transition shadow-soft flex justify-center items-center gap-2 mb-3">
+                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 00-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
+                    Notify Hub via WhatsApp
+                </a>
+                <button onclick="window.location.reload()" class="text-xs text-white/40 hover:text-white transition underline">Skip & Reload Tracker</button>
+            </div>
+        `;
+        document.body.appendChild(div);
     }
     
     async function cancelRider() {
