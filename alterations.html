@@ -22,6 +22,7 @@
     .scrollbar-thin::-webkit-scrollbar { width: 4px; }
     .scrollbar-thin::-webkit-scrollbar-track { background: transparent; }
     .scrollbar-thin::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 10px; }
+    
     input[type="number"], input[type="text"], input[type="tel"], select { 
         background: rgba(255,255,255,0.05); 
         border: 1px solid rgba(255,255,255,0.2); 
@@ -117,7 +118,7 @@
               <label class="block text-sm text-white/70 mb-2" data-t="label_unit">Unit / House / Lot No. <span class="text-red-400">*</span></label>
               <input type="text" id="gps-unit-input" class="w-full mb-5" placeholder="e.g. Unit 15-1 or House 42" data-t-placeholder="placeholder_unit">
               
-              <button id="btn-confirm-loc" onclick="confirmGPSDetails()" class="w-full py-3.5 rounded-xl bg-luxe text-brand text-sm font-bold hover:bg-white transition shadow-soft" data-t="btn_confirm_loc">Confirm Location</button>
+              <button id="btn-confirm-loc" onclick="confirmGPSDetails()" class="w-full py-3.5 rounded-xl bg-luxe text-brand text-sm font-bold hover:bg-white transition shadow-[0_0_15px_rgba(192,160,98,0.3)]" data-t="btn_confirm_loc">Confirm Location</button>
               
               <div id="fallback-search-box" class="hidden mt-6 pt-5 border-t border-white/10">
                   <p class="text-[11px] text-white/50 uppercase tracking-widest mb-3" data-t="txt_loc_inaccurate">Location inaccurate? Search below:</p>
@@ -156,7 +157,7 @@
           </div>
 
           <div id="hub-list-loading" class="text-center py-6 text-white/50 text-sm hidden" data-t="txt_loading_hubs">Loading Alteration Points...</div>
-          <div id="hub-list" class="space-y-2 mb-4"></div>
+          <div id="hub-list" class="space-y-2 max-h-[250px] overflow-y-auto pr-2 scrollbar-thin mb-4"></div>
           
           <div id="walkin-panel" class="mb-4 hidden fade-in"></div>
           <div id="lalamove-panel" class="hidden mb-4 p-3 bg-orange-500/10 border border-orange-500/20 rounded-lg fade-in"></div>
@@ -210,7 +211,7 @@
         <div id="modal-fields" class="space-y-5"></div>
         <div class="mt-8 flex gap-3">
             <button onclick="closeModal()" class="flex-1 px-4 py-3 rounded-xl border border-white/10 hover:bg-white/5 text-white/70 transition text-sm font-bold" data-t="btn_cancel">Cancel</button>
-            <button onclick="saveMeasurements()" class="flex-1 px-4 py-3 rounded-xl bg-luxe text-brand hover:bg-white transition text-sm font-bold shadow-soft" data-t="btn_save">Save Measurements</button>
+            <button onclick="saveMeasurements()" class="flex-1 px-4 py-3 rounded-xl bg-luxe text-brand hover:bg-white transition text-sm font-bold shadow-[0_0_15px_rgba(192,160,98,0.3)]" data-t="btn_save">Save Measurements</button>
         </div>
     </div>
   </div>
@@ -260,7 +261,7 @@
             lbl_services_cost: "Alteration Services", lbl_delivery_cost: "Lalamove delivery fee to be paid to Arabista", label_total_est: "Total to Pay Hub", 
             btn_confirm: "Confirm Booking", txt_value: "Value", txt_yousave: "You Save", btn_add_meas: "Add Measurements (Required)", btn_edit_meas: "Measurements Saved (Edit)", modal_title: "Provide Measurements", btn_save: "Save", alert_no_items: "Please select at least one item.", alert_no_hub: "Please select an Alteration Point.", alert_measure: "Please fill in measurements for all required items.", alert_max: "must be strictly less than original size", alert_max_full: "must be less than or equal to original size", alert_full_equal: "At least one measurement must be reduced for a Full Body alteration.", txt_no_items_step4: "No items selected. Please select items in Step 1.", modal_success_title: "Booking Successful!", modal_success_desc: "Your Alteration Order ID is:", modal_success_warn: "⚠️ Please screenshot this ID", btn_track: "Track My Order", txt_calculating: "Calculating...", ph_manual_search: "Or search building / street...", btn_search: "Search", txt_no_results: "No results found. Try a different term.", txt_view_on_map: "View on Google Maps",
             alert_order_not_found: "Order not found. Proceeding with manual entry.", alert_no_service: "Please select at least one service.", msg_processing: "Processing...", msg_translating: "Translating...", msg_locating: "Locating...", msg_searching_map: "Searching Map...", msg_search_failed: "Search Failed.", msg_reset_loc: "Please search for your location again or detect GPS.", msg_geo_notsupported: "Geolocation is not supported by your browser.", msg_db_error: "Database Error: ", lbl_saved_address: "Base Location",
-            txt_rebook_title: "Retrieving Your Order", txt_rebook_desc: "Retrieving your previous booking. Please select another Hub.",
+            txt_rebook_title: "Retrieving Your Order", txt_rebook_desc: "Retrieving your previous booking. Please select another Hub.", btn_see_more_hubs: "See More Hubs",
             
             // UI JavaScript Injections
             txt_busy_full: "BUSY / FULL", alert_gps_failed: "Failed to detect GPS location. Please ensure location services are enabled on your device.", msg_search_failed_icon: "❌ Search failed.", msg_gps_locked: "GPS Locked",
@@ -273,7 +274,7 @@
             lbl_services_cost: "Servis Alterasi", lbl_delivery_cost: "Caj Lalamove perlu dibayar kepada Arabista", label_total_est: "Jumlah Dibayar ke Hub",
             btn_confirm: "Sahkan Tempahan", txt_value: "Nilai", txt_yousave: "Anda Jimat", btn_add_meas: "Masukkan Ukuran (Wajib)", btn_edit_meas: "Ukuran Disimpan (Ubah)", modal_title: "Masukkan Ukuran", btn_save: "Simpan", alert_no_items: "Sila pilih sekurang-kurangnya satu item.", alert_no_hub: "Sila pilih Pusat Alterasi.", alert_measure: "Sila lengkapkan semua ukuran yang diperlukan.", alert_max: "mesti kurang dari saiz asal", alert_max_full: "mesti kurang dari atau sama dengan saiz asal", alert_full_equal: "Sekurang-kurangnya satu ukuran mesti dikurangkan untuk Alter Keseluruhan Baju.", txt_no_items_step4: "Tiada item dipilih. Sila pilih item di Langkah 1.", modal_success_title: "Tempahan Berjaya!", modal_success_desc: "ID Tempahan Alterasi anda ialah:", modal_success_warn: "⚠️ Sila tangkap skrin (screenshot) ID ini", btn_track: "Jejak Tempahan Saya", txt_calculating: "Mengira...", ph_manual_search: "Atau cari bangunan / jalan...", btn_search: "Cari", txt_no_results: "Tiada hasil dijumpai. Cuba terma lain.", txt_view_on_map: "Lihat di Google Maps",
             alert_order_not_found: "Pesanan tidak dijumpai. Teruskan dengan entri manual.", alert_no_service: "Sila pilih sekurang-kurangnya satu servis.", msg_processing: "Memproses...", msg_translating: "Menterjemah...", msg_locating: "Mengesan lokasi...", msg_searching_map: "Mencari Peta...", msg_search_failed: "Carian Gagal.", msg_reset_loc: "Sila cari lokasi anda semula atau kesan GPS.", msg_geo_notsupported: "Geolokasi tidak disokong oleh pelayar anda.", msg_db_error: "Ralat Pangkalan Data: ", lbl_saved_address: "Lokasi Asas",
-            txt_rebook_title: "Mendapatkan Pesanan Anda", txt_rebook_desc: "Mendapatkan tempahan lepas anda. Sila pilih Hub yang baru.",
+            txt_rebook_title: "Mendapatkan Pesanan Anda", txt_rebook_desc: "Mendapatkan tempahan lepas anda. Sila pilih Hub yang baru.", btn_see_more_hubs: "Lihat Lebih Banyak Hub",
             
             // UI JavaScript Injections
             txt_busy_full: "PENUH / SIBUK", alert_gps_failed: "Gagal mengesan lokasi GPS. Sila pastikan servis lokasi diaktifkan pada peranti anda.", msg_search_failed_icon: "❌ Carian gagal.", msg_gps_locked: "GPS Dikunci",
@@ -283,6 +284,7 @@
     
     let currentLang = 'en';
     let hubs = []; 
+    let hubDisplayLimit = 10;
     let generatedAltId = ""; 
     let pricingData = { 
         full: {price:30, value:40, savings:10}, 
@@ -310,10 +312,20 @@
         }
     }
 
+    const BOOKING_VERSION = "1.3"; 
+
     document.addEventListener('DOMContentLoaded', () => {
+        const storedVersion = localStorage.getItem('arabista_booking_version');
+        if (storedVersion !== BOOKING_VERSION) { 
+            localStorage.clear();
+            sessionStorage.clear();
+            localStorage.setItem('arabista_booking_version', BOOKING_VERSION); 
+            window.location.reload(); 
+            return; 
+        }
+
         const userLang = navigator.language || navigator.userLanguage;
         if (userLang && userLang.toLowerCase().startsWith('ms')) setLang('bm'); else setLang('en');
-        
         const urlParams = new URLSearchParams(window.location.search);
         const orderId = sanitizeHTML(urlParams.get('order'));
         const rebookId = sanitizeHTML(urlParams.get('rebook'));
@@ -345,7 +357,10 @@
             .then(data => {
                 if (data.error) throw new Error(data.error);
                 
-                if (data.pricing && Object.keys(data.pricing).length > 0) pricingData = data.pricing;
+                if (data.pricing && Object.keys(data.pricing).length > 0) {
+                    pricingData = data.pricing;
+                }
+                
                 hubs = Array.isArray(data.hubs) ? data.hubs : [];
                 isDataReady = true;
                 
@@ -402,7 +417,6 @@
                             }, 400);
                         }
                     } else {
-                        // Order not found fallback
                         state.path = 'B'; 
                         alert((t[currentLang].alert_order_not_found || "Order not found.") + " #" + fetchId);
                         document.getElementById('step1-loading').classList.add('hidden'); 
@@ -476,7 +490,6 @@
             if(state.selectedItems.length === 0) return alert(t[currentLang].alert_item_detail);
         }
 
-        // SPEED DEMON GUARD: Wait for background fetch to finish if user is extremely fast
         if (!isDataReady && backgroundFetchPromise) {
             btn.innerHTML = `${spinnerSvg} ${t[currentLang].txt_syncing_system || "Syncing..."}`;
             btn.disabled = true;
@@ -701,6 +714,11 @@ async function useOrderAddress() {
         const isOpen = operatingDays.includes(currentDay) && currentTimeNum >= openTimeNum && currentTimeNum < closeTimeNum;
         return { isOpen, text: isOpen ? `${t[currentLang].txt_open} (${t[currentLang].txt_closes_at} ${formatTime(hub.close)})` : `${t[currentLang].txt_closed} (${t[currentLang].txt_opens_at} ${formatTime(hub.open)})` };
     }
+    
+    function showMoreHubs() {
+        hubDisplayLimit += 20;
+        renderHubs();
+    }
 
     function renderHubs() {
         if(hubs.length === 0) return;
@@ -712,8 +730,10 @@ async function useOrderAddress() {
         });
         hubs.sort((a,b) => a.dist - b.dist);
         let filteredHubs = hubs.filter(h => h.dist <= 20);
+        const totalValidHubs = filteredHubs.length;
+        
         if (filteredHubs.length === 0) filteredHubs = hubs.slice(0, 3); 
-        else filteredHubs = filteredHubs.slice(0, 10);
+        else filteredHubs = filteredHubs.slice(0, hubDisplayLimit);
         
         const list = document.getElementById('hub-list'); list.innerHTML = '';
         filteredHubs.forEach(h => {
@@ -735,6 +755,10 @@ async function useOrderAddress() {
             
             list.innerHTML += `<div ${onClickAttr} class="${cardClasses}"><div class="flex-1"><span class="text-sm text-white/90 font-medium block">${safeHubName}</span><span class="text-[9px] font-bold px-1.5 py-0.5 rounded mt-1 inline-block ${badgeCls}">${badgeText}</span>${lalamoveHtml}</div><div class="flex items-center gap-3"><span class="text-xs font-bold text-luxe">${h.dist.toFixed(1)} km</span>${h.phone ? `<a href="tel:${h.phone}" onclick="event.stopPropagation()" class="p-2 bg-white/5 hover:bg-luxe hover:text-brand text-white/50 rounded border border-white/10 transition" title="Call"><svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" /></svg></a>` : ''}</div></div>`;
         });
+        
+        if (totalValidHubs > hubDisplayLimit) {
+            list.innerHTML += `<button onclick="showMoreHubs()" class="w-full py-3 mt-2 rounded-lg border border-white/10 text-white/50 hover:text-white hover:bg-white/5 transition text-sm font-bold" data-t="btn_see_more_hubs">${t[currentLang].btn_see_more_hubs || "See More Hubs"}</button>`;
+        }
     }
     
     function selectHub(id, dist, fee, hLat, hLng) { 
@@ -868,7 +892,7 @@ async function useOrderAddress() {
             btnContainer.classList.remove('hidden'); const btn = document.getElementById(`meas-btn-${itemId}`); const data = state.measurements[itemId];
             const isFilled = (document.getElementById(`cb-${itemId}-full`)?.checked && data.length && data.sleeve && data.shoulder) || (document.getElementById(`cb-${itemId}-hem`)?.checked && data.length) || (document.getElementById(`cb-${itemId}-sleeve`)?.checked && data.sleeve) || (document.getElementById(`cb-${itemId}-shoulder`)?.checked && data.shoulder);
             if(isFilled) { btn.className = "w-full py-3 rounded-xl border border-green-500/50 bg-green-500/10 text-green-400 text-sm font-bold flex justify-center items-center gap-2 hover:bg-green-500/20 transition"; btn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" /></svg> <span data-t="btn_edit_meas">${t[currentLang].btn_edit_meas}</span>`; } 
-            else { btn.className = "w-full py-3 rounded-xl border border-luxe bg-luxe text-brand text-sm font-bold flex justify-center items-center gap-2 hover:bg-white transition shadow-soft"; btn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg> <span data-t="btn_add_meas">${t[currentLang].btn_add_meas}</span>`; }
+            else { btn.className = "w-full py-3 rounded-xl border border-luxe bg-luxe text-brand text-sm font-bold flex justify-center items-center gap-2 hover:bg-white transition shadow-[0_0_15px_rgba(192,160,98,0.3)]"; btn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg> <span data-t="btn_add_meas">${t[currentLang].btn_add_meas}</span>`; }
         } else { btnContainer.classList.add('hidden'); }
     }
     
