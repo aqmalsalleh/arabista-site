@@ -12,7 +12,11 @@
   <link rel="preconnect" href="https://script.google.com">
   <link rel="preload" href="../images/logo-88.webp" as="image">
   
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Inter:wght@300;400;500;600&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Inter:wght@300;400;500;600&display=swap" media="print" onload="this.media='all'">
+  <noscript>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Inter:wght@300;400;500;600&display=swap">
+  </noscript>
   
   <link rel="stylesheet" href="style.css">
   <style>
@@ -165,7 +169,7 @@
 
           <div id="hub-list-loading" class="text-center py-6 text-white/50 text-sm hidden" data-t="txt_loading_hubs">Loading Alteration Points...</div>
           
-          <div id="hub-list" class="space-y-3 min-h-[240px] max-h-[240px] overflow-y-auto pr-2 scrollbar-thin mb-4">
+          <div id="hub-list" class="space-y-3 h-[240px] overflow-y-auto pr-2 scrollbar-thin mb-4">
               <div class="skeleton h-16 w-full opacity-20"></div>
               <div class="skeleton h-16 w-full opacity-10"></div>
               <div class="skeleton h-16 w-full opacity-5"></div>
@@ -274,8 +278,6 @@
             btn_confirm: "Confirm Booking", txt_value: "Value", txt_yousave: "You Save", btn_add_meas: "Add Measurements (Required)", btn_edit_meas: "Measurements Saved (Edit)", modal_title: "Provide Measurements", btn_save: "Save", alert_no_items: "Please select at least one item.", alert_no_hub: "Please select an Alteration Point.", alert_measure: "Please fill in measurements for all required items.", alert_max: "must be strictly less than original size", alert_max_full: "must be less than or equal to original size", alert_full_equal: "At least one measurement must be reduced for a Full Body alteration.", txt_no_items_step4: "No items selected. Please select items in Step 1.", modal_success_title: "Booking Successful!", modal_success_desc: "Your Alteration Order ID is:", modal_success_warn: "⚠️ Please screenshot this ID", btn_track: "Track My Order", txt_calculating: "Calculating...", ph_manual_search: "Or search building / street...", btn_search: "Search", txt_no_results: "No results found. Try a different term.", txt_view_on_map: "View on Google Maps",
             alert_order_not_found: "Order not found. Proceeding with manual entry.", alert_no_service: "Please select at least one service.", msg_processing: "Processing...", msg_translating: "Translating...", msg_locating: "Locating...", msg_searching_map: "Searching Map...", msg_search_failed: "Search Failed.", msg_reset_loc: "Please search for your location again or detect GPS.", msg_geo_notsupported: "Geolocation is not supported by your browser.", msg_db_error: "Database Error: ", lbl_saved_address: "Base Location",
             txt_rebook_title: "Retrieving Your Order", txt_rebook_desc: "Retrieving your previous booking. Please select another Hub.", btn_see_more_hubs: "See More Hubs",
-            
-            // UI JavaScript Injections
             txt_busy_full: "BUSY / FULL", alert_gps_failed: "Failed to detect GPS location. Please ensure location services are enabled on your device.", msg_search_failed_icon: "❌ Search failed.", msg_gps_locked: "GPS Locked",
             lbl_select_option: "Select...", lbl_yes: "Yes", lbl_no: "No", lbl_max: "Max:", lbl_order: "Order", txt_select_items: "Select Items to Alter:", txt_size_label: "Size:", alert_conn_error: "Connection error. Please try again.", txt_loading_hubs: "Loading Alteration Points...", txt_translating_gps: "Translating GPS...", txt_fast: "FAST", txt_api_error: "API Error", txt_out_of_area: "Out of Area"
         },
@@ -287,8 +289,6 @@
             btn_confirm: "Sahkan Tempahan", txt_value: "Nilai", txt_yousave: "Anda Jimat", btn_add_meas: "Masukkan Ukuran (Wajib)", btn_edit_meas: "Ukuran Disimpan (Ubah)", modal_title: "Masukkan Ukuran", btn_save: "Simpan", alert_no_items: "Sila pilih sekurang-kurangnya satu item.", alert_no_hub: "Sila pilih Pusat Alterasi.", alert_measure: "Sila lengkapkan semua ukuran yang diperlukan.", alert_max: "mesti kurang dari saiz asal", alert_max_full: "mesti kurang dari atau sama dengan saiz asal", alert_full_equal: "Sekurang-kurangnya satu ukuran mesti dikurangkan untuk Alter Keseluruhan Baju.", txt_no_items_step4: "Tiada item dipilih. Sila pilih item di Langkah 1.", modal_success_title: "Tempahan Berjaya!", modal_success_desc: "ID Tempahan Alterasi anda ialah:", modal_success_warn: "⚠️ Sila tangkap skrin (screenshot) ID ini", btn_track: "Jejak Tempahan Saya", txt_calculating: "Mengira...", ph_manual_search: "Atau cari bangunan / jalan...", btn_search: "Cari", txt_no_results: "Tiada hasil dijumpai. Cuba terma lain.", txt_view_on_map: "Lihat di Google Maps",
             alert_order_not_found: "Pesanan tidak dijumpai. Teruskan dengan entri manual.", alert_no_service: "Sila pilih sekurang-kurangnya satu servis.", msg_processing: "Memproses...", msg_translating: "Menterjemah...", msg_locating: "Mengesan lokasi...", msg_searching_map: "Mencari Peta...", msg_search_failed: "Carian Gagal.", msg_reset_loc: "Sila cari lokasi anda semula atau kesan GPS.", msg_geo_notsupported: "Geolokasi tidak disokong oleh pelayar anda.", msg_db_error: "Ralat Pangkalan Data: ", lbl_saved_address: "Lokasi Asas",
             txt_rebook_title: "Mendapatkan Pesanan Anda", txt_rebook_desc: "Mendapatkan tempahan lepas anda. Sila pilih Hub yang baru.", btn_see_more_hubs: "Lihat Lebih Banyak Hub",
-            
-            // UI JavaScript Injections
             txt_busy_full: "PENUH / SIBUK", alert_gps_failed: "Gagal mengesan lokasi GPS. Sila pastikan servis lokasi diaktifkan pada peranti anda.", msg_search_failed_icon: "❌ Carian gagal.", msg_gps_locked: "GPS Dikunci",
             lbl_select_option: "Pilih...", lbl_yes: "Ya", lbl_no: "Tidak", lbl_max: "Maks:", lbl_order: "Pesanan", txt_select_items: "Pilih Item untuk Diubahsuai:", txt_size_label: "Saiz:", alert_conn_error: "Ralat sambungan. Sila cuba lagi.", txt_loading_hubs: "Memuatkan Pusat Alterasi...", txt_translating_gps: "Menterjemah GPS...", txt_fast: "PANTAS", txt_api_error: "Ralat API", txt_out_of_area: "Luar Kawasan"
         }
@@ -321,10 +321,9 @@
         }
     }
 
-    const BOOKING_VERSION = "1.4"; 
+    const BOOKING_VERSION = "1.5"; 
 
     document.addEventListener('DOMContentLoaded', async () => {
-        // --- SMART HYBRID CACHING ---
         let hasCache = false;
         const cachedHubs = localStorage.getItem('arabista_cached_hubs');
         const cachedPricing = localStorage.getItem('arabista_cached_pricing');
@@ -359,7 +358,6 @@
             setTimeout(() => overlay.classList.remove('opacity-0'), 10);
         }
 
-        // If manual entry AND we have cache, instantly unlock the UI!
         if (!fetchId && hasCache) {
             document.getElementById('step1-loading').classList.add('hidden'); 
             document.getElementById('hub-list-loading').classList.add('hidden');
@@ -377,7 +375,6 @@
             const data = await res.json();
             if (data.error) throw new Error(data.error);
             
-            // Silently update cache in the background
             if (data.pricing && Object.keys(data.pricing).length > 0) {
                 pricingData = data.pricing;
                 localStorage.setItem('arabista_cached_pricing', JSON.stringify(pricingData));
