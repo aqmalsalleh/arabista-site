@@ -179,9 +179,9 @@
             </div>
 
             <div class="grid grid-cols-3 gap-2 mb-4 bg-black/50 p-1 rounded-xl border border-white/10" id="address-tabs">
-                <button onclick="toggleLocMethod('orig')" id="tab-orig" class="text-[10px] font-bold py-2 rounded-lg bg-white/10 text-white transition">Original</button>
-                <button onclick="toggleLocMethod('gps')" id="tab-gps" class="text-[10px] font-bold py-2 rounded-lg bg-transparent text-white/50 hover:text-white transition">GPS</button>
-                <button onclick="toggleLocMethod('manual')" id="tab-manual" class="text-[10px] font-bold py-2 rounded-lg bg-transparent text-white/50 hover:text-white transition">Manual</button>
+                <button onclick="toggleLocMethod('orig')" id="tab-orig" class="text-[10px] font-bold py-2 rounded-lg bg-white/10 text-white transition" data-t="txt_tab_orig">Original</button>
+                <button onclick="toggleLocMethod('gps')" id="tab-gps" class="text-[10px] font-bold py-2 rounded-lg bg-transparent text-white/50 hover:text-white transition" data-t="txt_tab_gps">GPS</button>
+                <button onclick="toggleLocMethod('manual')" id="tab-manual" class="text-[10px] font-bold py-2 rounded-lg bg-transparent text-white/50 hover:text-white transition" data-t="txt_tab_manual">Manual</button>
             </div>
 
             <div id="view-orig" class="mb-4">
@@ -239,17 +239,17 @@
             <div class="text-left mb-1.5"><span class="text-xs font-bold text-white/70" data-t="txt_step1">Step 1</span></div>
             <button onclick="notifyHQPayment()" class="w-full bg-[#25D366] text-white font-bold py-3.5 rounded-xl hover:bg-[#1EBE57] transition shadow-soft flex justify-center items-center gap-2 mb-4" id="btn-wa-hq">
                 <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 00-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
-            <span data-t="btn_wa_hq">Send Receipt to HQ</span>
-        </button>
-        
-        <div class="text-left mb-1.5"><span class="text-xs font-bold text-white/70" data-t="txt_step2">Step 2: Please ensure the Lalamove fee has been paid</span></div>
-        <button onclick="bookRider()" class="w-full bg-orange-500 text-white font-bold py-3.5 rounded-xl hover:bg-orange-400 transition shadow-[0_0_20px_rgba(249,115,22,0.3)] flex justify-center items-center gap-2 opacity-50 pointer-events-none" id="btn-final-book">
-            <span data-t="btn_call_rider">Call Rider Now</span>
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
-        </button>
-        
-        <button onclick="closeModal()" class="mt-4 text-[10px] text-white/30 underline hover:text-white uppercase tracking-widest" data-t="btn_cancel">Cancel</button>
-    </div>
+                <span data-t="btn_wa_hq">Send Receipt to HQ</span>
+            </button>
+            
+            <div class="text-left mb-1.5"><span class="text-xs font-bold text-white/70" data-t="txt_step2">Step 2: Please ensure the Lalamove fee has been paid</span></div>
+            <button onclick="bookRider()" class="w-full bg-orange-500 text-white font-bold py-3.5 rounded-xl hover:bg-orange-400 transition shadow-[0_0_20px_rgba(249,115,22,0.3)] flex justify-center items-center gap-2 opacity-50 pointer-events-none" id="btn-final-book">
+                <span data-t="btn_call_rider">Call Rider Now</span>
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+            </button>
+            
+            <button onclick="closeModal()" class="mt-4 text-[10px] text-white/30 underline hover:text-white uppercase tracking-widest" data-t="btn_cancel">Cancel</button>
+        </div>
 
     </div>
   </div>
@@ -309,23 +309,41 @@
             alert_enter_id: "Please enter an Alteration ID.", alert_order_not_found: "Order not found.", alert_conn_error: "Connection Error.", alert_enter_unit: "Please enter Unit / House Number.", alert_locate_gps: "Please locate GPS or Search Map first.", alert_fee_error: "Fee Error: ", alert_error: "Error", alert_driver_booked: "Driver Booked!", alert_failed: "Failed: ", alert_cancel_failed: "Cancel Failed: ", alert_error_canceling: "Error canceling.", alert_copied: "Copied to clipboard!",
             msg_calculating: "Calculating...", msg_locating: "Locating...", msg_searching: "Searching...", msg_translating: "Translating...", msg_booking: "Booking...", msg_retry: "Retry", msg_gps_acquiring: "📡 Acquiring exact satellite coordinates...", msg_gps_locked: "GPS Locked:", msg_pin_dropped: "✅ Pin Dropped:", msg_location_not_found: "❌ Location not found.", msg_search_failed: "❌ Search failed.", msg_wait: "Wait...", msg_geo_notsupported: "Geo not supported",
             wa_hub_pay: "*[ALTERATION PAYMENT]*\n- *Order:* {id}\n- *Amount:* {total}\n- *Paid To:* Arabista Hub\n\nReceipt attached below.",
-            wa_hq_pay: "*[DELIVERY PAYMENT]*\n- *Order:* {id}\n- *Amount:* {total}\n- *Paid To:* Arabista HQ\n- *Link:* {link}\n\nReceipt attached below."
+            wa_hq_pay: "*[DELIVERY PAYMENT]*\n- *Order:* {id}\n- *Amount:* {total}\n- *Paid To:* Arabista HQ\n- *Link:* {link}\n\nReceipt attached below.",
+            
+            // New UI Dictionary additions
+            status_assigned_to: "Assigned to: ", txt_rejected_title: "Order Rejected", txt_rejected_desc: "Unfortunately, the Hub is currently unable to accept your request (likely due to high volume or closing time).", btn_choose_another: "Choose Another Hub", txt_waiting_approval: "Your request is waiting for Hub's approval. If it takes too long, you can re-notify them.", btn_renotify: "Re-notify Hub via WhatsApp", txt_please_dropoff: "Please drop off your items at the hub.", txt_lala_live: "Lalamove Live Status", txt_tab_orig: "Original", txt_tab_gps: "GPS", txt_tab_manual: "Manual",
+            stage_pending_approval: "Pending Approval", stage_awaiting_dispatch: "Awaiting Dispatch", stage_inbound_dispatched: "Inbound Dispatched", stage_in_progress: "In Progress", stage_ready_for_return: "Ready for Return", stage_pending_dropoff: "Pending Dropoff", stage_outbound_dispatched: "Outbound Dispatched", stage_completed: "Completed", stage_dispatched: "Dispatched",
+            step_assigning: "Assigning", step_found: "Found", step_picked_up: "Picked Up", step_delivered: "Delivered",
+            modal_booked_title: "Driver Booked!", modal_booked_desc: "Your Lalamove rider has been successfully scheduled. Please notify the Hub.", btn_notify_hub_wa: "Notify Hub via WhatsApp", btn_skip_reload: "Skip & Reload Tracker",
+            wa_lala_booked: "*[LALAMOVE BOOKED]*\n- *Order ID:* {id}\n- *Direction:* {dir}\n\nA Lalamove rider has been booked. You can track the live status here:\n{link}",
+            dir_inbound: "Inbound to Hub", dir_outbound: "Outbound to Customer",
+            modal_title_pickup: "Confirm Pickup Location", modal_title_delivery: "Confirm Delivery Location", lbl_location: "Location", txt_saved_address: "Saved Address"
         },
         bm: {
             page_title: "Jejak Tempahan", page_subtitle: "Masukkan ID tempahan unik anda di bawah.", lbl_id: "ID Tempahan", btn_track: "Jejak Pesanan", txt_loading: "Mencari butiran tempahan...", btn_share: "Kongsi Pautan", lbl_items: "Item untuk Diubahsuai:", section_status: "Status Terkini", btn_refresh: "Segar Semula", back_home: "Kembali ke Utama", btn_nav_hub: "Pandu Arah ke Hub",
-            action_title: "Tindakan Diperlukan", action_desc_incoming: "Pesanan diluluskan! Sila hantar barang ke Hub.", action_desc_ready: "Barang anda dah siap! Sila aturkan pengambilan.", btn_self_pickup: "Saya Ambil Sendiri", btn_lalamove: "Tempah Lalamove",
+            action_title: "Tindakan Diperlukan", action_desc_incoming: "Pesanan diluluskan! Sila hantar barang ke Hub.", action_desc_ready: "Barang anda telah siap! Sila aturkan pengambilan.", btn_self_pickup: "Saya Ambil Sendiri", btn_lalamove: "Tempah Lalamove",
             confirmed_title: "Pilihan Disahkan", confirmed_lala: "Lalamove Dipilih.", confirmed_self: "Ambil Sendiri Dipilih.",
-            success_title: "Alterasi Selesai", success_desc: "Terima kasih menggunakan servis kami.", btn_contact: "Hubungi Hub", btn_call: "Telefon Hub",
+            success_title: "Alterasi Selesai", success_desc: "Terima kasih kerana menggunakan servis kami. Jika anda mempunyai sebarang pertanyaan, sila hubungi hub.", btn_contact: "Hubungi Hub", btn_call: "Telefon Hub",
             track_lala: "Jejak Peta Lalamove", btn_cancel_rider: "Batal Tempahan Lalamove", confirm_cancel_rider: "Adakah anda pasti mahu membatalkan rider? Tindakan ini tidak boleh diubah.", txt_canceling: "Membatalkan...",
             txt_accuracy_check: "Semakan Ketepatan Lokasi", txt_opt_1: "<strong>Pilihan 1:</strong> Guna 'Alamat Asal' jika ia menepati lokasi anda dengan tepat.", txt_opt_2: "<strong>Pilihan 2:</strong> Kesan GPS baru atau Cari Peta jika anda berada di lokasi berbeza.",
             txt_use_orig: "Guna alamat yang anda berikan semasa tempahan awal.", btn_check_book: "Semak Harga & Tempah", btn_detect_loc: "Kesan Lokasi Saya", txt_gps_signal: "Isyarat GPS diperlukan untuk ketepatan.", btn_search_map: "Cari Peta", lbl_unit: "No. Unit / Rumah", lbl_building: "Bangunan / Jalan (Pilihan)", modal_est_fee: "Anggaran Caj Penghantaran", txt_pay_cash: "Bayar Tunai terus kepada Rider Lalamove.", btn_call_rider: "Panggil Rider Sekarang", btn_cancel: "Batal",
-            txt_alt_fee_title: "Bayaran Caj Alterasi", txt_alt_fee_desc: "Barang anda dah siap! Sila bayar caj alterasi kepada Hub di bawah.", btn_wa_hub: "Hantar Resit ke Hub", txt_hub_paid_thanks: "Terima kasih! Sila pilih kaedah penghantaran di bawah:", txt_hq_qr_title: "Bayaran Lalamove", txt_hq_qr_desc: "Sila bayar caj penghantaran kepada Arabista HQ.", txt_pay_hq: "Imbas untuk bayar, dan hantar resit di WhatsApp.", btn_wa_hq: "Hantar Resit ke HQ", txt_view_map: "Lihat di Google Maps", txt_receipt_sent: "Resit Dihantar!", txt_action_pay: "Bayaran Alterasi Diperlukan", btn_pay_alt: "Bayar Caj Alterasi", btn_view_hub_qr: "Lihat Semula QR Hub", btn_close: "Tutup", txt_click_enlarge: "Klik QR untuk besarkan", txt_save_instruction: "Tekan lama atau screenshot untuk simpan",
+            txt_alt_fee_title: "Bayaran Caj Alterasi", txt_alt_fee_desc: "Barang anda telah siap! Sila bayar caj alterasi kepada Hub di bawah.", btn_wa_hub: "Hantar Resit ke Hub", txt_hub_paid_thanks: "Terima kasih! Sila pilih kaedah penghantaran di bawah:", txt_hq_qr_title: "Bayaran Lalamove", txt_hq_qr_desc: "Sila bayar caj penghantaran kepada Arabista HQ.", txt_pay_hq: "Imbas untuk bayar, dan hantar resit di WhatsApp.", btn_wa_hq: "Hantar Resit ke HQ", txt_view_map: "Lihat di Google Maps", txt_receipt_sent: "Resit Dihantar!", txt_action_pay: "Bayaran Alterasi Diperlukan", btn_pay_alt: "Bayar Caj Alterasi", btn_view_hub_qr: "Lihat Semula QR Hub", btn_close: "Tutup", txt_click_enlarge: "Klik QR untuk besarkan", txt_save_instruction: "Tekan lama atau screenshot untuk simpan",
             
             txt_step1: "Langkah 1", txt_step2: "Langkah 2: Sila pastikan caj Lalamove telah dibayar", txt_pay_alt_warn: "Sila pastikan caj alterasi telah dibayar kepada hub sebelum menempah Lalamove atau Ambil Sendiri.",
             alert_enter_id: "Sila masukkan ID Tempahan.", alert_order_not_found: "Tempahan tidak dijumpai.", alert_conn_error: "Ralat Sambungan.", alert_enter_unit: "Sila masukkan No. Unit / Rumah.", alert_locate_gps: "Sila kesan GPS atau Cari Peta dahulu.", alert_fee_error: "Ralat Caj: ", alert_error: "Ralat", alert_driver_booked: "Rider Berjaya Ditempah!", alert_failed: "Gagal: ", alert_cancel_failed: "Gagal Batal: ", alert_error_canceling: "Ralat membatalkan.", alert_copied: "Disalin ke papan keratan!",
             msg_calculating: "Mengira...", msg_locating: "Mengescan...", msg_searching: "Mencari...", msg_translating: "Menterjemah...", msg_booking: "Menempah...", msg_retry: "Cuba Lagi", msg_gps_acquiring: "📡 Mendapatkan koordinat satelit yang tepat...", msg_gps_locked: "GPS Dikunci:", msg_pin_dropped: "✅ Pin Diletakkan:", msg_location_not_found: "❌ Lokasi tidak dijumpai.", msg_search_failed: "❌ Carian gagal.", msg_wait: "Tunggu...", msg_geo_notsupported: "Geo tidak disokong",
             wa_hub_pay: "*[BAYARAN ALTERASI]*\n- *Pesanan:* {id}\n- *Jumlah:* {total}\n- *Dibayar Kepada:* Arabista Hub\n\nResit dilampirkan di bawah.",
-            wa_hq_pay: "*[BAYARAN PENGHANTARAN]*\n- *Pesanan:* {id}\n- *Jumlah:* {total}\n- *Dibayar Kepada:* Arabista HQ\n- *Pautan:* {link}\n\nResit dilampirkan di bawah."
+            wa_hq_pay: "*[BAYARAN PENGHANTARAN]*\n- *Pesanan:* {id}\n- *Jumlah:* {total}\n- *Dibayar Kepada:* Arabista HQ\n- *Pautan:* {link}\n\nResit dilampirkan di bawah.",
+            
+            // New UI Dictionary additions
+            status_assigned_to: "Ditetapkan kepada: ", txt_rejected_title: "Pesanan Ditolak", txt_rejected_desc: "Dukacita dimaklumkan, Hub tidak dapat menerima pesanan anda buat masa ini (mungkin kerana terlalu sibuk atau sudah tutup).", btn_choose_another: "Pilih Hub Lain", txt_waiting_approval: "Pesanan anda sedang menunggu kelulusan Hub. Jika terlalu lama, anda boleh maklumkan mereka semula.", btn_renotify: "Maklumkan Hub melalui WhatsApp", txt_please_dropoff: "Sila hantar (drop-off) barang anda di Hub.", txt_lala_live: "Status Terkini Lalamove", txt_tab_orig: "Asal", txt_tab_gps: "GPS", txt_tab_manual: "Manual",
+            stage_pending_approval: "Menunggu Kelulusan", stage_awaiting_dispatch: "Menunggu Pickup", stage_inbound_dispatched: "Rider Ditempah (Ke Hub)", stage_in_progress: "Sedang Dijahit", stage_ready_for_return: "Sedia Diambil/Dihantar", stage_pending_dropoff: "Menunggu Drop-off", stage_outbound_dispatched: "Rider Ditempah (Ke Pelanggan)", stage_completed: "Selesai", stage_dispatched: "Dihantar",
+            step_assigning: "Mencari", step_found: "Dijumpai", step_picked_up: "Diambil", step_delivered: "Selesai",
+            modal_booked_title: "Rider Ditempah!", modal_booked_desc: "Rider Lalamove anda telah berjaya dijadualkan. Sila maklumkan kepada Hub.", btn_notify_hub_wa: "Maklumkan Hub via WhatsApp", btn_skip_reload: "Langkau & Muat Semula",
+            wa_lala_booked: "*[LALAMOVE DITEMPAH]*\n- *Pesanan:* {id}\n- *Hala Tuju:* {dir}\n\nRider Lalamove telah ditempah. Anda boleh menjejak status terkini di sini:\n{link}",
+            dir_inbound: "Ke Hub (Inbound)", dir_outbound: "Ke Pelanggan (Outbound)",
+            modal_title_pickup: "Sahkan Lokasi Pengambilan", modal_title_delivery: "Sahkan Lokasi Penghantaran", lbl_location: "Lokasi", txt_saved_address: "Alamat Tersimpan"
         }
     };
 
@@ -339,22 +357,24 @@
             btnBm.className = lang === 'bm' ? "text-xs font-bold text-luxe" : "text-xs text-white/50 hover:text-white transition";
         }
         
-        if(currentData) buildTimeline(currentData.orderStatus);
+        if(currentData) {
+            document.getElementById('display-hub').innerText = `${t[currentLang].status_assigned_to}${sanitizeHTML(currentData.hubName)}`;
+            buildTimeline(currentData.orderStatus);
+        }
     }
 
-    const TRACKER_VERSION = "1.0"; // Bump this number in the future if you ever need to force clear customer caches 
+    const TRACKER_VERSION = "1.1"; 
 
     document.addEventListener('DOMContentLoaded', () => { 
-        // --- SELF-CLEANING MECHANISM ---
         const storedVersion = localStorage.getItem('arabista_tracker_version');
         if (storedVersion !== TRACKER_VERSION) { 
             localStorage.clear();
             sessionStorage.clear();
             localStorage.setItem('arabista_tracker_version', TRACKER_VERSION); 
-            window.location.reload(); // Force a clean reload
+            window.location.reload(); 
             return; 
         }
-        // -------------------------------
+
         const userLang = navigator.language || navigator.userLanguage;
         if (userLang && userLang.toLowerCase().startsWith('ms')) setLang('bm'); else setLang('en');
 
@@ -460,10 +480,10 @@
                     <div class="w-14 h-14 rounded-full bg-red-500/20 text-red-400 flex items-center justify-center mx-auto mb-4">
                         <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                     </div>
-                    <h3 class="text-red-400 font-bold mb-2 text-2xl font-display">Order Rejected</h3>
-                    <p class="text-sm text-white/70 mb-6 leading-relaxed">Unfortunately, the Hub is currently unable to accept your request (likely due to high volume or closing time).</p>
+                    <h3 class="text-red-400 font-bold mb-2 text-2xl font-display">${t[currentLang].txt_rejected_title}</h3>
+                    <p class="text-sm text-white/70 mb-6 leading-relaxed">${t[currentLang].txt_rejected_desc}</p>
                     <button onclick="window.location.href='alterations.html?rebook=' + encodeURIComponent(currentData.alterationId)" class="w-full bg-red-500 text-white font-bold py-3.5 rounded-xl hover:bg-red-400 transition shadow-[0_0_20px_rgba(239,68,68,0.2)] text-sm">
-                        Choose Another Hub
+                        ${t[currentLang].btn_choose_another}
                     </button>
                 </div>
             `;
@@ -474,7 +494,7 @@
         document.getElementById('tracker-panel').classList.remove('hidden');
         document.getElementById('display-id').innerText = sanitizeHTML(currentData.alterationId);
         document.getElementById('display-name').innerText = sanitizeHTML(currentData.customerName);
-        document.getElementById('display-hub').innerText = `Assigned to: ${sanitizeHTML(currentData.hubName)}`;
+        document.getElementById('display-hub').innerText = `${t[currentLang].status_assigned_to}${sanitizeHTML(currentData.hubName)}`;
         document.getElementById('display-items').innerText = sanitizeHTML(currentData.itemDetails).replace(/\[/g, '').replace(/\]/g, '');
         
         checkRecoveryState();
@@ -485,7 +505,6 @@
     function checkRecoveryState() {
         const urlParams = new URLSearchParams(window.location.search);
         if (urlParams.get('book_rider') === 'true') {
-            // FIX: Retrieve from localStorage
             const savedQuote = localStorage.getItem('lala_quote_' + currentData.alterationId);
             const savedStops = localStorage.getItem('lala_stops_' + currentData.alterationId);
             const savedAmt = localStorage.getItem('lala_amt_' + currentData.alterationId);
@@ -506,7 +525,6 @@
                 waBtn.classList.replace('text-white', 'text-white/50');
                 waBtn.innerHTML = `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> <span data-t="txt_receipt_sent">${t[currentLang].txt_receipt_sent || "Receipt Sent!"}</span>`;
                 
-                // Clean up localStorage so it doesn't get stuck
                 localStorage.removeItem('lala_quote_' + currentData.alterationId);
                 localStorage.removeItem('lala_stops_' + currentData.alterationId);
                 localStorage.removeItem('lala_amt_' + currentData.alterationId);
@@ -518,10 +536,9 @@
         }
     }
 
-function buildTimeline(status) {
+    function buildTimeline(status) {
         let stages = [];
         
-        // Fixed Bug #6: Strictly separate Inbound vs Outbound logic based on Logistics Direction
         let isLalaIn = (currentData.logisticsMode === "Lalamove" || currentData.logisticsDirection === "Inbound" || status === "Awaiting Dispatch" || (status === "Dispatched" && currentData.logisticsDirection !== "Outbound"));
         
         if (isLalaIn) {
@@ -556,21 +573,20 @@ function buildTimeline(status) {
 
             if (stage === "Pending Approval" && isCurrent) {
                 extraText = `
-                <div class="mt-2 text-[11px] text-white/50 mb-3">Your request is waiting for Hub's approval. If it takes too long, you can re-notify them.</div>
+                <div class="mt-2 text-[11px] text-white/50 mb-3">${t[currentLang].txt_waiting_approval}</div>
                 <button onclick="triggerInitialWhatsApp()" class="w-full py-2.5 bg-[#25D366] text-white text-xs font-bold rounded-lg hover:bg-[#1EBE57] transition shadow-soft flex justify-center items-center gap-2">
                     <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 00-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
-                    Re-notify Hub via WhatsApp
+                    ${t[currentLang].btn_renotify}
                 </button>`;
             }
             
             if (stage === "Pending Dropoff" && isCurrent) {
                 if (hubData && hubData.lat && hubData.lng) {
-                    // Fixed Google Maps URL string concatenation
                     extraText = `
-                    <div class="mt-2 text-xs text-white/70 mb-3">Please drop off your items at the hub.</div>
+                    <div class="mt-2 text-xs text-white/70 mb-3">${t[currentLang].txt_please_dropoff}</div>
                     <a href="https://www.google.com/maps/search/?api=1&query=` + parseFloat(hubData.lat) + `,` + parseFloat(hubData.lng) + `" target="_blank" rel="noopener noreferrer" class="w-full inline-flex justify-center items-center gap-2 text-xs font-bold text-brand bg-white/80 py-2.5 rounded hover:bg-white transition shadow-soft">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"></path></svg>
-                        <span data-t="btn_nav_hub">${t[currentLang].btn_nav_hub || "Navigate to Hub"}</span>
+                        <span>${t[currentLang].btn_nav_hub}</span>
                     </a>`;
                 }
             }
@@ -590,10 +606,10 @@ function buildTimeline(status) {
                     
                     if (!hasPaidHub) {
                         extraText = `
-                        <div class="mt-2 text-xs text-white/70 mb-3" data-t="txt_action_pay">${t[currentLang].txt_action_pay}</div>
+                        <div class="mt-2 text-xs text-white/70 mb-3">${t[currentLang].txt_action_pay}</div>
                         <button onclick="openHubPayModal()" class="w-full py-3 bg-luxe text-brand text-sm font-bold rounded-xl hover:bg-white transition animate-pulse shadow-[0_0_15px_rgba(192,160,98,0.3)] flex justify-center items-center gap-2">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"></path></svg> 
-                            <span data-t="btn_pay_alt">${t[currentLang].btn_pay_alt}</span>
+                            <span>${t[currentLang].btn_pay_alt}</span>
                         </button>
                         `;
                         if(!window.hubModalShown) {
@@ -601,15 +617,14 @@ function buildTimeline(status) {
                             setTimeout(() => { openHubPayModal(); }, 600);
                         }
                     } else {
-                        // Added Warning Notice for Lalamove vs Self-Pickup
                         extraText = `
                         <div class="mt-2 text-xs text-green-400 mb-3 font-bold flex items-center gap-1">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> 
-                            <span data-t="txt_hub_paid_thanks">${t[currentLang].txt_hub_paid_thanks}</span>
+                            <span>${t[currentLang].txt_hub_paid_thanks}</span>
                         </div>
-                        <button onclick="openHubPayModal(true)" class="w-full py-2 mb-3 border border-white/10 text-white/50 text-xs font-bold rounded-lg hover:bg-white/5 transition" data-t="btn_view_hub_qr">${t[currentLang].btn_view_hub_qr}</button>
+                        <button onclick="openHubPayModal(true)" class="w-full py-2 mb-3 border border-white/10 text-white/50 text-xs font-bold rounded-lg hover:bg-white/5 transition">${t[currentLang].btn_view_hub_qr}</button>
                         
-                        <p class="text-[10px] text-red-400 font-bold mb-3 p-2 bg-red-500/10 border border-red-500/20 rounded" data-t="txt_pay_alt_warn">${t[currentLang].txt_pay_alt_warn}</p>
+                        <p class="text-[10px] text-red-400 font-bold mb-3 p-2 bg-red-500/10 border border-red-500/20 rounded">${t[currentLang].txt_pay_alt_warn}</p>
 
                         <div class="flex gap-2">
                              <button onclick="triggerOutbound('Lalamove')" class="flex-1 py-3 rounded-xl bg-luxe text-brand text-xs font-bold hover:bg-white transition shadow-soft flex justify-center items-center">${t[currentLang].btn_lalamove}</button>
@@ -628,7 +643,7 @@ function buildTimeline(status) {
                         extraText += `
                         <a href="https://www.google.com/maps/search/?api=1&query=` + parseFloat(hubData.lat) + `,` + parseFloat(hubData.lng) + `" target="_blank" rel="noopener noreferrer" class="mt-3 w-full inline-flex justify-center items-center gap-2 text-xs font-bold text-brand bg-white/80 py-2.5 rounded hover:bg-white transition shadow-soft">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"></path></svg>
-                            <span data-t="btn_nav_hub">${t[currentLang].btn_nav_hub || "Navigate to Hub"}</span>
+                            <span>${t[currentLang].btn_nav_hub}</span>
                         </a>`;
                     }
                 }
@@ -639,11 +654,11 @@ function buildTimeline(status) {
                 
                 let cancelBtnHtml = "";
                 if (displayStatus !== "COMPLETED" && displayStatus !== "CANCELED") {
-                    cancelBtnHtml = `<button onclick="cancelRider()" class="mt-3 w-full py-2 border border-red-500/50 text-red-400 text-xs font-bold rounded hover:bg-red-500/10 transition" data-t="btn_cancel_rider">${t[currentLang].btn_cancel_rider}</button>`;
+                    cancelBtnHtml = `<button onclick="cancelRider()" class="mt-3 w-full py-2 border border-red-500/50 text-red-400 text-xs font-bold rounded hover:bg-red-500/10 transition">${t[currentLang].btn_cancel_rider}</button>`;
                 }
                 
                 extraText += `<div class="mt-4 bg-white/5 rounded-lg p-3 border border-white/10">
-                    <p class="text-[10px] text-white/40 uppercase tracking-widest mb-3">Lalamove Live Status</p>
+                    <p class="text-[10px] text-white/40 uppercase tracking-widest mb-3">${t[currentLang].txt_lala_live}</p>
                     <div class="flex justify-between items-center text-center">${renderLalamoveSteps(sanitizeHTML(displayStatus))}</div>
                     ${currentData.trackingUrl ? `<a href="${sanitizeHTML(currentData.trackingUrl)}" target="_blank" class="mt-4 block w-full text-center text-xs font-bold text-brand bg-luxe py-2 rounded hover:bg-white transition">${t[currentLang].track_lala} →</a>` : ''}
                     ${cancelBtnHtml}
@@ -663,16 +678,32 @@ function buildTimeline(status) {
                  const div = document.createElement('div'); div.appendChild(box); extraText = div.innerHTML;
             }
             
-            let displayStageName = stage;
-            if (stage === "Inbound Dispatched" || stage === "Outbound Dispatched") displayStageName = "Dispatched";
+            const stageMap = {
+                "Pending Approval": t[currentLang].stage_pending_approval,
+                "Awaiting Dispatch": t[currentLang].stage_awaiting_dispatch,
+                "Inbound Dispatched": t[currentLang].stage_inbound_dispatched,
+                "In Progress": t[currentLang].stage_in_progress,
+                "Ready for Return": t[currentLang].stage_ready_for_return,
+                "Pending Dropoff": t[currentLang].stage_pending_dropoff,
+                "Outbound Dispatched": t[currentLang].stage_outbound_dispatched,
+                "Completed": t[currentLang].stage_completed,
+                "Dispatched": t[currentLang].stage_dispatched
+            };
+            
+            let displayStageName = stageMap[mappedStatus] || mappedStatus;
+            let displayStageLabel = stageMap[stage] || stage;
+            
+            if (stage === "Inbound Dispatched" || stage === "Outbound Dispatched") {
+                displayStageLabel = t[currentLang].stage_dispatched;
+            }
 
-            html += `<div class="relative pl-6 pb-8 ${idx === stages.length - 1 ? 'last-step' : ''}"><div class="timeline-line ${idx < currentIdx ? 'active' : ''}"></div><div class="absolute left-0 top-1 timeline-dot ${dotClass}"></div><h4 class="text-sm font-bold ${isCurrent ? 'text-green-400' : 'text-white/30'}">${displayStageName}</h4>${extraText}</div>`;
+            html += `<div class="relative pl-6 pb-8 ${idx === stages.length - 1 ? 'last-step' : ''}"><div class="timeline-line ${idx < currentIdx ? 'active' : ''}"></div><div class="absolute left-0 top-1 timeline-dot ${dotClass}"></div><h4 class="text-sm font-bold ${isCurrent ? 'text-green-400' : 'text-white/30'}">${displayStageLabel}</h4>${extraText}</div>`;
         });
         document.getElementById('timeline-container').innerHTML = html;
     }
 
     function renderLalamoveSteps(status) {
-        const steps = [{label:'Assigning'},{label:'Found'},{label:'Picked Up'},{label:'Delivered'}];
+        const steps = [{label: t[currentLang].step_assigning},{label: t[currentLang].step_found},{label: t[currentLang].step_picked_up},{label: t[currentLang].step_delivered}];
         let activeIdx = 0;
         if(status === 'ON_GOING') activeIdx = 1; 
         if(status === 'PICKED_UP') activeIdx = 2; 
@@ -720,13 +751,13 @@ function buildTimeline(status) {
         
         const btn = document.getElementById('btn-modal-hub-wa');
         if(isReview) {
-            btn.innerHTML = `<span data-t="btn_close">${t[currentLang].btn_close}</span>`;
+            btn.innerHTML = `<span>${t[currentLang].btn_close}</span>`;
             btn.onclick = closeHubPayModal;
             btn.classList.replace('bg-[#25D366]', 'bg-white/10');
             btn.classList.replace('hover:bg-[#1EBE57]', 'hover:bg-white/20');
         } else {
             btn.innerHTML = `<svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 00-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
-            <span data-t="btn_wa_hub">${t[currentLang].btn_wa_hub || "Send Receipt to Hub"}</span>`;
+            <span>${t[currentLang].btn_wa_hub}</span>`;
             btn.onclick = notifyHubPayment;
             btn.classList.replace('bg-white/10', 'bg-[#25D366]');
             btn.classList.replace('hover:bg-white/20', 'hover:bg-[#1EBE57]');
@@ -781,15 +812,15 @@ function buildTimeline(status) {
         origContainer.innerHTML = `
             <div class="mb-3 border-b border-white/10 pb-3">
                 <span class="text-[10px] uppercase tracking-widest text-white/40 block mb-0.5" data-t="lbl_unit">${t[currentLang].lbl_unit || "Unit No."}</span>
-                <span class="text-sm font-bold text-white">${sanitizeHTML(unitPart) || 'Saved Address'}</span>
+                <span class="text-sm font-bold text-white">${sanitizeHTML(unitPart) || t[currentLang].txt_saved_address || 'Saved Address'}</span>
             </div>
             <div class="mb-4">
-                <span class="text-[10px] uppercase tracking-widest text-white/40 block mb-0.5">Location</span>
+                <span class="text-[10px] uppercase tracking-widest text-white/40 block mb-0.5" data-t="lbl_location">${t[currentLang].lbl_location || "Location"}</span>
                 <span class="text-xs text-white/80 leading-relaxed">${prettyAddress}</span>
             </div>
             <a href="https://www.google.com/maps/search/?api=1&query=` + parseFloat(currentData.originalLat) + `,` + parseFloat(currentData.originalLng) + `" target="_blank" rel="noopener noreferrer" class="w-full flex justify-center items-center gap-2 text-[11px] font-bold text-luxe bg-luxe/10 hover:bg-luxe hover:text-brand border border-luxe/30 py-2.5 rounded-lg transition">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
-                <span data-t="txt_view_map">${t[currentLang].txt_view_map || "View on Google Maps"}</span>
+                <span>${t[currentLang].txt_view_map || "View on Google Maps"}</span>
                 <span class="font-mono opacity-50">(${parseFloat(currentData.originalLat).toFixed(4)}, ${parseFloat(currentData.originalLng).toFixed(4)})</span>
             </a>
         `;
@@ -820,13 +851,13 @@ function buildTimeline(status) {
     function startIncomingBooking() { 
         isIncomingOrder = true; 
         goToStep2(); 
-        document.getElementById('modal-addr-title').innerText = currentLang === 'bm' ? "Sahkan Lokasi Pengambilan" : "Confirm Pickup Location"; 
+        document.getElementById('modal-addr-title').innerText = t[currentLang].modal_title_pickup; 
     }
     
     function triggerOutbound(choice) { 
         isIncomingOrder = false; 
         goToStep2(); 
-        document.getElementById('modal-addr-title').innerText = currentLang === 'bm' ? "Sahkan Lokasi Penghantaran" : "Confirm Delivery Location"; 
+        document.getElementById('modal-addr-title').innerText = t[currentLang].modal_title_delivery; 
     }
 
     function toggleLocMethod(method) {
@@ -969,7 +1000,6 @@ function buildTimeline(status) {
         const hqPhone = "60126913286";
         const amt = document.getElementById('quote-amount').innerText;
         
-        // FIX: Changed sessionStorage to localStorage to survive WhatsApp opening a new tab
         localStorage.setItem('lala_quote_' + currentData.alterationId, activeQuoteId);
         localStorage.setItem('lala_stops_' + currentData.alterationId, JSON.stringify(currentStops));
         localStorage.setItem('lala_amt_' + currentData.alterationId, amt);
@@ -980,14 +1010,13 @@ function buildTimeline(status) {
         
         window.open(`https://wa.me/${hqPhone}?text=${encodeURIComponent(msg)}`, '_blank');
         
-        // Unlock button locally as fallback
         const bookBtn = document.getElementById('btn-final-book');
         bookBtn.classList.remove('opacity-50', 'pointer-events-none');
         
         const waBtn = document.getElementById('btn-wa-hq');
         waBtn.classList.replace('bg-[#25D366]', 'bg-white/10');
         waBtn.classList.replace('text-white', 'text-white/50');
-        waBtn.innerHTML = `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> <span data-t="txt_receipt_sent">${t[currentLang].txt_receipt_sent || "Receipt Sent!"}</span>`;
+        waBtn.innerHTML = `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> <span>${t[currentLang].txt_receipt_sent || "Receipt Sent!"}</span>`;
     }
 
     async function bookRider() {
@@ -1014,22 +1043,21 @@ function buildTimeline(status) {
             const res = await fetch(scriptURL, { method: 'POST', body: JSON.stringify(payload) });
             const data = await res.json();
             if(data.status === "success") { 
-                // FIX: Pass the official Lalamove Tracking URL to the modal
                 showDriverBookedModal(isIncomingOrder, data.tracking_url); 
             }
             else { alert((t[currentLang].alert_failed || "Failed: ") + data.message); btn.innerHTML = t[currentLang].msg_retry || "Retry"; btn.disabled = false; }
         } catch(e) { alert(t[currentLang].alert_error); btn.innerHTML = t[currentLang].msg_retry || "Retry"; btn.disabled = false;}
     }
     
-    // FIX: Added trackingUrl parameter to pass the official Lalamove link
     function showDriverBookedModal(isInbound, trackingUrl) {
         closeModal(); 
         const div = document.createElement('div');
         div.id = 'driver-booked-modal';
         div.className = 'fixed inset-0 z-[300] flex items-center justify-center bg-black/90 backdrop-blur-md px-4 fade-in';
         
-        // Now using the official Lalamove Tracking URL
-        const msg = `*[LALAMOVE BOOKED]*\n- *Order ID:* ${currentData.alterationId}\n- *Direction:* ${isInbound ? 'Inbound to Hub' : 'Outbound to Customer'}\n\nA Lalamove rider has been booked. You can track the live status here:\n${trackingUrl}`;
+        const dirText = isInbound ? t[currentLang].dir_inbound : t[currentLang].dir_outbound;
+        const msg = (t[currentLang].wa_lala_booked || "").replace('{id}', currentData.alterationId).replace('{dir}', dirText).replace('{link}', trackingUrl);
+        
         let cleanPhone = hubData.phone ? hubData.phone.replace(/[^0-9]/g, '') : "60123456789"; 
         if (cleanPhone.startsWith('0')) cleanPhone = '6' + cleanPhone;
         const waLink = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(msg)}`;
@@ -1039,13 +1067,13 @@ function buildTimeline(status) {
                 <div class="w-16 h-16 rounded-full bg-green-500/20 text-green-400 flex items-center justify-center mx-auto mb-4">
                     <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
                 </div>
-                <h3 class="text-green-400 font-bold mb-2 text-2xl font-display">Driver Booked!</h3>
-                <p class="text-sm text-white/70 mb-6">Your Lalamove rider has been successfully scheduled. Please notify the Hub.</p>
+                <h3 class="text-green-400 font-bold mb-2 text-2xl font-display">${t[currentLang].modal_booked_title}</h3>
+                <p class="text-sm text-white/70 mb-6">${t[currentLang].modal_booked_desc}</p>
                 <a href="${waLink}" target="_blank" onclick="setTimeout(()=>window.location.reload(), 1000)" class="w-full bg-[#25D366] text-white font-bold py-3.5 rounded-xl hover:bg-[#1EBE57] transition shadow-soft flex justify-center items-center gap-2 mb-3">
                     <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 00-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
-                    Notify Hub via WhatsApp
+                    ${t[currentLang].btn_notify_hub_wa}
                 </a>
-                <button onclick="window.location.reload()" class="text-xs text-white/40 hover:text-white transition underline">Skip & Reload Tracker</button>
+                <button onclick="window.location.reload()" class="text-xs text-white/40 hover:text-white transition underline">${t[currentLang].btn_skip_reload}</button>
             </div>
         `;
         document.body.appendChild(div);
