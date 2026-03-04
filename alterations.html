@@ -78,10 +78,10 @@
           </div>
 
           <div id="path-a-container" class="hidden space-y-5 bg-white/5 border border-white/10 rounded-xl p-5">
-              <p class="text-xs text-white/50 mb-2">Order <span id="order-id-display"></span></p>
+              <p class="text-xs text-white/50 mb-2"><span data-t="lbl_order">Order</span> <span id="order-id-display"></span></p>
               <div><label class="block text-sm text-white/70 mb-2" data-t="lbl_cust_name">Customer Name</label><input type="text" id="auto-cust-name" class="w-full bg-white/10 text-white/50 cursor-not-allowed" readonly></div>
               <div><label class="block text-sm text-white/70 mb-2" data-t="lbl_phone">Telephone No.</label><input type="tel" id="auto-cust-phone" class="w-full bg-white/10 text-white/50 cursor-not-allowed" readonly></div>
-              <p class="text-sm text-white/70 mt-4 mb-2">Select Items to Alter:</p>
+              <p class="text-sm text-white/70 mt-4 mb-2" data-t="txt_select_items">Select Items to Alter:</p>
               <div class="grid gap-3" id="auto-items-list"></div>
           </div>
 
@@ -153,10 +153,10 @@
           <h2 class="text-xl font-display mb-4 text-white" data-t="step3_title">Choose Logistics</h2>
           <div class="grid grid-cols-2 gap-3 mb-4">
             <button id="btn-walkin" onclick="setMode('walkin')" class="p-4 rounded-xl border border-luxe bg-luxe/10 text-white text-sm font-medium transition relative overflow-hidden flex flex-col justify-center items-center h-full min-h-[72px]"><span data-t="mode_walkin">Walk-in</span></button>
-            <button id="btn-lalamove" onclick="setMode('lalamove')" class="p-4 rounded-xl border border-white/10 hover:bg-white/5 text-white/70 text-sm font-medium transition relative overflow-hidden flex flex-col justify-center items-center h-full min-h-[72px]"><span data-t="mode_lalamove">Lalamove</span><div class="absolute top-0 right-0 bg-orange-500 text-[10px] text-white px-2 py-0.5 font-bold uppercase tracking-wider">FAST</div></button>
+            <button id="btn-lalamove" onclick="setMode('lalamove')" class="p-4 rounded-xl border border-white/10 hover:bg-white/5 text-white/70 text-sm font-medium transition relative overflow-hidden flex flex-col justify-center items-center h-full min-h-[72px]"><span data-t="mode_lalamove">Lalamove</span><div class="absolute top-0 right-0 bg-orange-500 text-[10px] text-white px-2 py-0.5 font-bold uppercase tracking-wider" data-t="txt_fast">FAST</div></button>
           </div>
 
-          <div id="hub-list-loading" class="text-center py-6 text-white/50 text-sm hidden">Loading Alteration Points...</div>
+          <div id="hub-list-loading" class="text-center py-6 text-white/50 text-sm hidden" data-t="txt_loading_hubs">Loading Alteration Points...</div>
           <div id="hub-list" class="space-y-2 max-h-[250px] overflow-y-auto pr-2 scrollbar-thin mb-4"></div>
           <div id="walkin-panel" class="mb-4 hidden fade-in"></div>
           <div id="lalamove-panel" class="hidden mb-4 p-3 bg-orange-500/10 border border-orange-500/20 rounded-lg fade-in"></div>
@@ -260,16 +260,24 @@
             lbl_services_cost: "Alteration Services", lbl_delivery_cost: "Lalamove delivery fee to be paid to Arabista", label_total_est: "Total to Pay Hub", 
             btn_confirm: "Confirm Booking", txt_value: "Value", txt_yousave: "You Save", btn_add_meas: "Add Measurements (Required)", btn_edit_meas: "Measurements Saved (Edit)", modal_title: "Provide Measurements", btn_save: "Save", alert_no_items: "Please select at least one item.", alert_no_hub: "Please select an Alteration Point.", alert_measure: "Please fill in measurements for all required items.", alert_max: "must be strictly less than original size", alert_max_full: "must be less than or equal to original size", alert_full_equal: "At least one measurement must be reduced for a Full Body alteration.", txt_no_items_step4: "No items selected. Please select items in Step 1.", modal_success_title: "Booking Successful!", modal_success_desc: "Your Alteration Order ID is:", modal_success_warn: "⚠️ Please screenshot this ID", btn_track: "Track My Order", txt_calculating: "Calculating...", ph_manual_search: "Or search building / street...", btn_search: "Search", txt_no_results: "No results found. Try a different term.", txt_view_on_map: "View on Google Maps",
             alert_order_not_found: "Order not found. Proceeding with manual entry.", alert_no_service: "Please select at least one service.", msg_processing: "Processing...", msg_translating: "Translating...", msg_locating: "Locating...", msg_searching_map: "Searching Map...", msg_search_failed: "Search Failed.", msg_reset_loc: "Please search for your location again or detect GPS.", msg_geo_notsupported: "Geolocation is not supported by your browser.", msg_db_error: "Database Error: ", lbl_saved_address: "Base Location",
-            txt_rebook_title: "Retrieving Your Order", txt_rebook_desc: "Retrieving your previous booking. Please select another Hub.", btn_see_more_hubs: "See More Hubs"
+            txt_rebook_title: "Retrieving Your Order", txt_rebook_desc: "Retrieving your previous booking. Please select another Hub.", btn_see_more_hubs: "See More Hubs",
+            
+            // UI JavaScript Injections
+            txt_busy_full: "BUSY / FULL", alert_gps_failed: "Failed to detect GPS location. Please ensure location services are enabled on your device.", msg_search_failed_icon: "❌ Search failed.", msg_gps_locked: "GPS Locked",
+            lbl_select_option: "Select...", lbl_yes: "Yes", lbl_no: "No", lbl_max: "Max:", lbl_order: "Order", txt_select_items: "Select Items to Alter:", txt_size_label: "Size:", alert_conn_error: "Connection error. Please try again.", txt_loading_hubs: "Loading Alteration Points...", txt_translating_gps: "Translating GPS...", txt_fast: "FAST", txt_api_error: "API Error", txt_out_of_area: "Out of Area"
         },
         bm: { 
             page_title: "Servis Alterasi", page_subtitle: "Pilih item untuk dialter.", step1_title: "Pilih Item", btn_next_loc: "Seterusnya: Lokasi", lbl_cust_name: "Nama Pelanggan", placeholder_name: "cth. Siti Aishah", lbl_phone: "No. Telefon", placeholder_phone: "cth. 0123456789", lbl_design_code: "Kod Rekaan", lbl_size: "Saiz", btn_add_item: "Tambah Item Lain", alert_name: "Sila masukkan nama anda.", alert_phone: "Sila masukkan no. telefon anda.", alert_item_detail: "Sila pilih Kod Rekaan dan Saiz untuk semua item.", step2_title: "Sahkan Lokasi", 
             txt_detecting: "Klik untuk Kesan Lokasi", btn_detect_gps: "Kesan GPS Semasa", txt_loc_inaccurate: "Lokasi tidak tepat? Cari di bawah:",
-            txt_locating_fresh: "Mendapatkan isyarat GPS baru...", txt_recommended: "Disyorkan", txt_loading_system: "Memuatkan sistem...", txt_pinpointing: "Memetakan koordinat Google...", alert_geocode_fail: "Gagal memetakan alamat secara automatik. Sila guna 'Guna GPS Semasa' untuk caj penghantaran yang tepat.", txt_detected_gps: "Lokasi Dikesan:", label_unit: "No. Unit / Rumah / Lot *", placeholder_unit: "cth. Unit 15-1 atau Rumah 42", btn_confirm_loc: "Sahkan Lokasi", btn_cancel: "Batal", btn_change: "Tukar", alert_unit: "Sila masukkan No. Unit/Rumah anda.", step3_title: "Pilih Logistik", mode_walkin: "Walk-in", mode_lalamove: "Lalamove", label_del_fee: "Caj Penghantaran", btn_next_srv: "Seterusnya: Servis", txt_open: "BUKA", txt_closed: "TUTUP", txt_closes_at: "Tutup", txt_opens_at: "Buka", txt_walkin_open: "Hantar baju anda hari ini sebelum", txt_walkin_closed: "Kedai tutup. Sila hantar baju anda apabila mereka buka pada", txt_lala_open: "Pickup: Akan diambil segera.", txt_lala_closed: "Pickup: Dijadualkan untuk diambil pada", step4_title: "Servis Setiap Item", txt_measure_walkin: "Walk-in dipilih. Tiada ukuran diperlukan.", txt_measure_lala: "Lalamove dipilih. Sila masukkan ukuran.", srv_full: "Alter Keseluruhan Baju", srv_hem: "Alter Labuh", srv_sleeve: "Alter Lengan", srv_shoulder: "Alter Bahu", srv_pads: "Tambah Span Bahu", lbl_length: "Labuh (inci)", lbl_sleeve: "Lengan (inci)", lbl_shoulder: "Bahu (inci)", lbl_pads: "Span Bahu", 
+            txt_locating_fresh: "Mendapatkan isyarat GPS baru...", txt_recommended: "Disyorkan", txt_loading_system: "Memuatkan sistem...", txt_pinpointing: "Memetakan koordinat Google...", alert_geocode_fail: "Gagal memetakan alamat secara automatik. Sila guna 'Guna GPS Semasa' untuk caj penghantaran yang tepat.", txt_detected_gps: "Lokasi Dikesan:", label_unit: "No. Unit / Rumah / Lot *", placeholder_unit: "cth. Unit 15-1 atau Rumah 42", btn_confirm_loc: "Sahkan Lokasi", btn_cancel: "Batal", btn_change: "Tukar", alert_unit: "Sila masukkan No. Unit/Rumah anda.", step3_title: "Pilih Logistik", mode_walkin: "Walk-in", mode_lalamove: "Lalamove", label_del_fee: "Caj Penghantaran", btn_next_srv: "Seterusnya: Servis", txt_open: "BUKA", txt_closed: "TUTUP", txt_closes_at: "Tutup jam", txt_opens_at: "Buka jam", txt_walkin_open: "Hantar baju anda hari ini sebelum", txt_walkin_closed: "Kedai tutup. Sila hantar baju anda apabila mereka buka pada", txt_lala_open: "Pickup: Akan diambil segera.", txt_lala_closed: "Pickup: Dijadualkan untuk diambil pada", step4_title: "Servis Setiap Item", txt_measure_walkin: "Walk-in dipilih. Tiada ukuran diperlukan.", txt_measure_lala: "Lalamove dipilih. Sila masukkan ukuran.", srv_full: "Alter Keseluruhan Baju", srv_hem: "Alter Labuh", srv_sleeve: "Alter Lengan", srv_shoulder: "Alter Bahu", srv_pads: "Tambah Span Bahu", lbl_length: "Labuh (inci)", lbl_sleeve: "Lengan (inci)", lbl_shoulder: "Bahu (inci)", lbl_pads: "Span Bahu", 
             lbl_services_cost: "Servis Alterasi", lbl_delivery_cost: "Caj Lalamove perlu dibayar kepada Arabista", label_total_est: "Jumlah Dibayar ke Hub",
-            btn_confirm: "Sahkan Tempahan", txt_value: "Nilai", txt_yousave: "Anda Jimat", btn_add_meas: "Masukkan Ukuran (Wajib)", btn_edit_meas: "Ukuran Disimpan (Ubah)", modal_title: "Masukkan Ukuran", btn_save: "Simpan", alert_no_items: "Sila pilih sekurang-kurangnya satu item.", alert_no_hub: "Sila pilih Pusat Alterasi.", alert_measure: "Sila lengkapkan semua ukuran yang diperlukan.", alert_max: "mesti kurang dari saiz asal", alert_max_full: "mesti kurang dari atau sama dengan saiz asal", alert_full_equal: "Sekurang-kurangnya satu ukuran mesti dikurangkan untuk Alter Keseluruhan Baju.", txt_no_items_step4: "Tiada item dipilih. Sila pilih item di Langkah 1.", modal_success_title: "Tempahan Berjaya!", modal_success_desc: "ID Tempahan Alterasi anda ialah:", modal_success_warn: "⚠️ Sila 'screenshot' ID ini", btn_track: "Jejak Tempahan Saya", txt_calculating: "Mengira...", ph_manual_search: "Atau cari bangunan / jalan...", btn_search: "Cari", txt_no_results: "Tiada hasil dijumpai. Cuba terma lain.", txt_view_on_map: "Lihat di Google Maps",
-            alert_order_not_found: "Pesanan tidak dijumpai. Teruskan dengan entri manual.", alert_no_service: "Sila pilih sekurang-kurangnya satu servis.", msg_processing: "Memproses...", msg_translating: "Menterjemah...", msg_locating: "Mengescan...", msg_searching_map: "Mencari Peta...", msg_search_failed: "Carian Gagal.", msg_reset_loc: "Sila cari lokasi anda semula atau kesan GPS.", msg_geo_notsupported: "Geolokasi tidak disokong oleh pelayar anda.", msg_db_error: "Ralat Pangkalan Data: ", lbl_saved_address: "Lokasi Asas",
-            txt_rebook_title: "Mendapatkan Pesanan Anda", txt_rebook_desc: "Mendapatkan tempahan lepas anda. Sila pilih Hub yang baru.", btn_see_more_hubs: "Lihat Lebih Banyak Hub"
+            btn_confirm: "Sahkan Tempahan", txt_value: "Nilai", txt_yousave: "Anda Jimat", btn_add_meas: "Masukkan Ukuran (Wajib)", btn_edit_meas: "Ukuran Disimpan (Ubah)", modal_title: "Masukkan Ukuran", btn_save: "Simpan", alert_no_items: "Sila pilih sekurang-kurangnya satu item.", alert_no_hub: "Sila pilih Pusat Alterasi.", alert_measure: "Sila lengkapkan semua ukuran yang diperlukan.", alert_max: "mesti kurang dari saiz asal", alert_max_full: "mesti kurang dari atau sama dengan saiz asal", alert_full_equal: "Sekurang-kurangnya satu ukuran mesti dikurangkan untuk Alter Keseluruhan Baju.", txt_no_items_step4: "Tiada item dipilih. Sila pilih item di Langkah 1.", modal_success_title: "Tempahan Berjaya!", modal_success_desc: "ID Tempahan Alterasi anda ialah:", modal_success_warn: "⚠️ Sila tangkap skrin (screenshot) ID ini", btn_track: "Jejak Tempahan Saya", txt_calculating: "Mengira...", ph_manual_search: "Atau cari bangunan / jalan...", btn_search: "Cari", txt_no_results: "Tiada hasil dijumpai. Cuba terma lain.", txt_view_on_map: "Lihat di Google Maps",
+            alert_order_not_found: "Pesanan tidak dijumpai. Teruskan dengan entri manual.", alert_no_service: "Sila pilih sekurang-kurangnya satu servis.", msg_processing: "Memproses...", msg_translating: "Menterjemah...", msg_locating: "Mengesan lokasi...", msg_searching_map: "Mencari Peta...", msg_search_failed: "Carian Gagal.", msg_reset_loc: "Sila cari lokasi anda semula atau kesan GPS.", msg_geo_notsupported: "Geolokasi tidak disokong oleh pelayar anda.", msg_db_error: "Ralat Pangkalan Data: ", lbl_saved_address: "Lokasi Asas",
+            txt_rebook_title: "Mendapatkan Pesanan Anda", txt_rebook_desc: "Mendapatkan tempahan lepas anda. Sila pilih Hub yang baru.", btn_see_more_hubs: "Lihat Lebih Banyak Hub",
+            
+            // UI JavaScript Injections
+            txt_busy_full: "PENUH / SIBUK", alert_gps_failed: "Gagal mengesan lokasi GPS. Sila pastikan servis lokasi diaktifkan pada peranti anda.", msg_search_failed_icon: "❌ Carian gagal.", msg_gps_locked: "GPS Dikunci",
+            lbl_select_option: "Pilih...", lbl_yes: "Ya", lbl_no: "Tidak", lbl_max: "Maks:", lbl_order: "Pesanan", txt_select_items: "Pilih Item untuk Diubahsuai:", txt_size_label: "Saiz:", alert_conn_error: "Ralat sambungan. Sila cuba lagi.", txt_loading_hubs: "Memuatkan Pusat Alterasi...", txt_translating_gps: "Menterjemah GPS...", txt_fast: "PANTAS", txt_api_error: "Ralat API", txt_out_of_area: "Luar Kawasan"
         }
     };
     
@@ -300,7 +308,7 @@
         }
     }
 
-    const BOOKING_VERSION = "1.2"; 
+    const BOOKING_VERSION = "1.3"; 
 
     document.addEventListener('DOMContentLoaded', async () => {
         const storedVersion = localStorage.getItem('arabista_booking_version');
@@ -369,7 +377,7 @@
                         const size = sanitizeHTML(parts[1].trim()); 
                         const qty = parseInt(parts[2]) || 1;
                         for(let q=0; q < qty; q++) {
-                            itemsList.innerHTML += `<label class="flex items-center gap-4 p-4 border border-white/10 rounded-xl hover:bg-white/5 cursor-pointer transition"><input type="checkbox" name="order-item" value="a-${itemIdx}" data-design="${design}" data-size="${size}" onchange="syncItemsA()" class="w-5 h-5 rounded border-white/30 text-luxe focus:ring-luxe bg-transparent" ${rebookId ? 'checked' : ''}><div><h3 class="font-display text-lg text-white">${design}</h3><p class="text-xs text-white/50">Size: ${size}</p></div></label>`;
+                            itemsList.innerHTML += `<label class="flex items-center gap-4 p-4 border border-white/10 rounded-xl hover:bg-white/5 cursor-pointer transition"><input type="checkbox" name="order-item" value="a-${itemIdx}" data-design="${design}" data-size="${size}" onchange="syncItemsA()" class="w-5 h-5 rounded border-white/30 text-luxe focus:ring-luxe bg-transparent" ${rebookId ? 'checked' : ''}><div><h3 class="font-display text-lg text-white">${design}</h3><p class="text-xs text-white/50">${t[currentLang].txt_size_label || "Size:"} ${size}</p></div></label>`;
                             itemIdx++;
                         }
                     }
@@ -493,7 +501,7 @@ async function useOrderAddress() {
         btnConfirm.classList.add('opacity-50', 'pointer-events-none', 'animate-pulse');
         btnConfirm.innerText = t[currentLang].txt_pinpointing || "Mapping...";
         
-        document.getElementById('gps-detected-text').innerHTML = '<div class="animate-pulse text-white/50 text-sm py-1">' + (t[currentLang].txt_pinpointing || "Mapping...") + '</div>';
+        document.getElementById('gps-detected-text').innerHTML = `<div class="animate-pulse text-white/50 text-sm py-1">${t[currentLang].txt_pinpointing || "Mapping..."}</div>`;
 
         const coords = await geocodeAddress(state.orderAddress);
         
@@ -501,7 +509,7 @@ async function useOrderAddress() {
             state.lat = coords.lat; state.lng = coords.lng;
             document.getElementById('gps-detected-text').innerText = coords.formatted_address || state.orderAddress; 
             
-            document.getElementById('map-verify-link').innerHTML = '<a href="https://www.google.com/maps/search/?api=1&query=' + state.lat + ',' + state.lng + '" target="_blank" class="w-full flex justify-center items-center gap-2 text-[11px] font-bold text-luxe bg-luxe/10 hover:bg-luxe hover:text-brand border border-luxe/30 py-2.5 rounded-lg transition"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg><span data-t="txt_view_on_map">' + (t[currentLang].txt_view_on_map || "View on Google Maps") + '</span><span class="font-mono opacity-50">(' + parseFloat(state.lat).toFixed(4) + ', ' + parseFloat(state.lng).toFixed(4) + ')</span></a>';
+            document.getElementById('map-verify-link').innerHTML = '<a href="https://www.google.com/maps/search/?api=1&query=' + state.lat + ',' + state.lng + '" target="_blank" class="w-full flex justify-center items-center gap-2 text-[11px] font-bold text-luxe bg-luxe/10 hover:bg-luxe hover:text-brand border border-luxe/30 py-2.5 rounded-lg transition"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg><span>' + (t[currentLang].txt_view_on_map || "View on Google Maps") + '</span><span class="font-mono opacity-50">(' + parseFloat(state.lat).toFixed(4) + ', ' + parseFloat(state.lng).toFixed(4) + ')</span></a>';
         } else {
             document.getElementById('gps-detected-text').innerText = state.orderAddress;
             alert(t[currentLang].alert_geocode_fail);
@@ -523,7 +531,7 @@ async function useOrderAddress() {
         btnConfirm.classList.add('opacity-50', 'pointer-events-none', 'animate-pulse');
         btnConfirm.innerText = t[currentLang].msg_locating || "Locating...";
         
-        document.getElementById('gps-detected-text').innerHTML = '<div class="animate-pulse text-luxe text-sm py-1">📡 ' + (t[currentLang].msg_locating || "Acquiring satellite coordinates...") + '</div>';
+        document.getElementById('gps-detected-text').innerHTML = `<div class="animate-pulse text-luxe text-sm py-1">📡 ${t[currentLang].msg_locating || "Acquiring satellite coordinates..."}</div>`;
 
         if (state.gpsWatchId) navigator.geolocation.clearWatch(state.gpsWatchId);
         state.gpsWatchId = navigator.geolocation.watchPosition(
@@ -531,18 +539,18 @@ async function useOrderAddress() {
                 navigator.geolocation.clearWatch(state.gpsWatchId); state.gpsWatchId = null;
                 state.lat = pos.coords.latitude; state.lng = pos.coords.longitude; 
                 
-                document.getElementById('gps-detected-text').innerHTML = '<div class="animate-pulse text-white/50 text-sm py-1">' + (t[currentLang].msg_translating || "Translating GPS...") + '</div>';
-                btnConfirm.innerText = t[currentLang].msg_translating || "Translating...";
+                document.getElementById('gps-detected-text').innerHTML = `<div class="animate-pulse text-white/50 text-sm py-1">${t[currentLang].txt_translating_gps || "Translating GPS..."}</div>`;
+                btnConfirm.innerText = t[currentLang].txt_translating_gps || "Translating...";
                 
                 try {
                     const res = await fetch(`${scriptURL}?action=reverse_geocode&lat=${state.lat}&lng=${state.lng}`);
                     const data = await res.json();
-                    document.getElementById('gps-detected-text').innerText = data.address || `GPS Locked`; 
+                    document.getElementById('gps-detected-text').innerText = data.address || (t[currentLang].msg_gps_locked || "GPS Locked"); 
                 } catch (e) {
-                    document.getElementById('gps-detected-text').innerText = `GPS Locked`; 
+                    document.getElementById('gps-detected-text').innerText = (t[currentLang].msg_gps_locked || "GPS Locked"); 
                 }
 
-                document.getElementById('map-verify-link').innerHTML = '<a href="https://www.google.com/maps/search/?api=1&query=' + state.lat + ',' + state.lng + '" target="_blank" class="w-full flex justify-center items-center gap-2 text-[11px] font-bold text-luxe bg-luxe/10 hover:bg-luxe hover:text-brand border border-luxe/30 py-2.5 rounded-lg transition"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg><span data-t="txt_view_on_map">' + (t[currentLang].txt_view_on_map || "View on Google Maps") + '</span><span class="font-mono opacity-50">(' + parseFloat(state.lat).toFixed(4) + ', ' + parseFloat(state.lng).toFixed(4) + ')</span></a>';
+                document.getElementById('map-verify-link').innerHTML = '<a href="https://www.google.com/maps/search/?api=1&query=' + state.lat + ',' + state.lng + '" target="_blank" class="w-full flex justify-center items-center gap-2 text-[11px] font-bold text-luxe bg-luxe/10 hover:bg-luxe hover:text-brand border border-luxe/30 py-2.5 rounded-lg transition"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg><span>' + (t[currentLang].txt_view_on_map || "View on Google Maps") + '</span><span class="font-mono opacity-50">(' + parseFloat(state.lat).toFixed(4) + ', ' + parseFloat(state.lng).toFixed(4) + ')</span></a>';
                 
                 btnConfirm.classList.remove('opacity-50', 'pointer-events-none', 'animate-pulse');
                 btnConfirm.innerText = t[currentLang].btn_confirm_loc;
@@ -551,7 +559,7 @@ async function useOrderAddress() {
             () => { 
                 btnConfirm.classList.remove('opacity-50', 'pointer-events-none', 'animate-pulse');
                 btnConfirm.innerText = t[currentLang].btn_confirm_loc;
-                alert("Failed to detect GPS location. Please ensure location services are enabled on your device."); 
+                alert(t[currentLang].alert_gps_failed || "Failed to detect GPS location. Please ensure location services are enabled on your device."); 
                 document.getElementById('fallback-search-box').classList.remove('hidden');
             }, 
             { enableHighAccuracy: true, maximumAge: 0, timeout: 15000 } 
@@ -571,7 +579,7 @@ async function useOrderAddress() {
         btnConfirm.innerText = t[currentLang].msg_searching_map || "Searching...";
         
         document.getElementById('map-verify-link').innerHTML = '';
-        document.getElementById('gps-detected-text').innerHTML = '<div class="animate-pulse text-white/50 text-sm py-1">' + (t[currentLang].msg_searching_map || "Searching Map...") + '</div>';
+        document.getElementById('gps-detected-text').innerHTML = `<div class="animate-pulse text-white/50 text-sm py-1">${t[currentLang].msg_searching_map || "Searching Map..."}</div>`;
         
         try {
             const res = await fetch(`${scriptURL}?action=geocode&address=${encodeURIComponent(addr)}`);
@@ -582,15 +590,15 @@ async function useOrderAddress() {
                 state.lat = data.lat; state.lng = data.lng; 
                 document.getElementById('gps-detected-text').innerText = `${data.formatted_address || addr}`;
                 
-                document.getElementById('map-verify-link').innerHTML = '<a href="https://www.google.com/maps/search/?api=1&query=' + state.lat + ',' + state.lng + '" target="_blank" class="w-full flex justify-center items-center gap-2 text-[11px] font-bold text-luxe bg-luxe/10 hover:bg-luxe hover:text-brand border border-luxe/30 py-2.5 rounded-lg transition"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg><span data-t="txt_view_on_map">' + (t[currentLang].txt_view_on_map || "View on Google Maps") + '</span><span class="font-mono opacity-50">(' + parseFloat(state.lat).toFixed(4) + ', ' + parseFloat(state.lng).toFixed(4) + ')</span></a>';
+                document.getElementById('map-verify-link').innerHTML = '<a href="https://www.google.com/maps/search/?api=1&query=' + state.lat + ',' + state.lng + '" target="_blank" class="w-full flex justify-center items-center gap-2 text-[11px] font-bold text-luxe bg-luxe/10 hover:bg-luxe hover:text-brand border border-luxe/30 py-2.5 rounded-lg transition"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg><span>' + (t[currentLang].txt_view_on_map || "View on Google Maps") + '</span><span class="font-mono opacity-50">(' + parseFloat(state.lat).toFixed(4) + ', ' + parseFloat(state.lng).toFixed(4) + ')</span></a>';
             } else {
-                document.getElementById('manual-search-error').innerText = t[currentLang].txt_no_results || "❌ Location not found.";
+                document.getElementById('manual-search-error').innerText = t[currentLang].msg_search_failed_icon || "❌ Location not found.";
                 document.getElementById('manual-search-error').classList.remove('hidden');
                 document.getElementById('gps-detected-text').innerText = t[currentLang].txt_no_results || "Location not found.";
             }
         } catch(e) {
             btn.innerHTML = origText; btn.disabled = false;
-            document.getElementById('manual-search-error').innerText = "❌ Search failed.";
+            document.getElementById('manual-search-error').innerText = t[currentLang].msg_search_failed_icon || "❌ Search failed.";
             document.getElementById('manual-search-error').classList.remove('hidden');
             document.getElementById('gps-detected-text').innerText = t[currentLang].msg_search_failed || "Search Failed.";
         }
@@ -692,7 +700,7 @@ async function useOrderAddress() {
             const safeHubName = sanitizeHTML(h.name);
             
             const badgeCls = isFull ? "text-red-400 bg-red-500/10" : (status.isOpen ? "text-green-400 bg-green-500/10" : "text-red-400 bg-red-500/10");
-            const badgeText = isFull ? "BUSY / FULL" : status.text;
+            const badgeText = isFull ? (t[currentLang].txt_busy_full || "BUSY / FULL") : status.text;
             
             const cardClasses = `p-3 rounded-lg border transition flex justify-between items-center gap-3 ${isFull ? 'border-white/5 opacity-50 cursor-not-allowed bg-black/40' : (isSelected ? 'border-luxe bg-luxe/10 hover:bg-white/5 cursor-pointer' : 'border-white/10 opacity-70 hover:bg-white/5 cursor-pointer')}`;
             const onClickAttr = isFull ? '' : `onclick="selectHub(${h.id}, ${h.dist}, ${h.fee}, ${h.lat}, ${h.lng})"`;
@@ -765,9 +773,9 @@ async function useOrderAddress() {
                         priceDisp.innerText = `RM ${state.deliveryCost.toFixed(2)}`;
                         priceDisp.classList.remove('animate-pulse');
                     } else {
-                        let errMsg = data.message ? "API: " + data.message : "API Error";
+                        let errMsg = data.message ? "API: " + data.message : (t[currentLang].txt_api_error || "API Error");
                         if (errMsg.length > 50) errMsg = errMsg.substring(0, 50) + "...";
-                        if(data.message && data.message.includes("OUT_OF_SERVICE")) errMsg = "Out of Area";
+                        if(data.message && data.message.includes("OUT_OF_SERVICE")) errMsg = (t[currentLang].txt_out_of_area || "Out of Area");
                         
                         priceDisp.innerText = errMsg;
                         priceDisp.classList.remove('animate-pulse');
@@ -775,7 +783,7 @@ async function useOrderAddress() {
                         priceDisp.title = data.message || "Unknown Error";
                     }
                 } catch(e) { 
-                    priceDisp.innerText = "Network Error"; 
+                    priceDisp.innerText = t[currentLang].alert_conn_error || "Network Error"; 
                     priceDisp.classList.remove('animate-pulse');
                     priceDisp.classList.add('text-red-400');
                 }
@@ -810,7 +818,7 @@ async function useOrderAddress() {
             const safeName = sanitizeHTML(item.name);
             const safeSize = sanitizeHTML(item.size);
             
-            const header = `<div class="bg-black/30 p-4 border-b border-white/5 font-display text-lg flex justify-between"><span class="text-white">${safeName}</span><span class="text-xs font-sans text-luxe border border-luxe/30 px-2 py-0.5 rounded">Size: ${safeSize}</span></div>`;
+            const header = `<div class="bg-black/30 p-4 border-b border-white/5 font-display text-lg flex justify-between"><span class="text-white">${safeName}</span><span class="text-xs font-sans text-luxe border border-luxe/30 px-2 py-0.5 rounded">${t[currentLang].txt_size_label || "Size:"} ${safeSize}</span></div>`;
             const body = `<div class="p-4 space-y-3"><div class="border border-luxe/50 rounded-lg p-4 bg-gradient-to-br from-luxe/10 to-transparent hover:border-luxe transition relative group"><div class="absolute -top-2.5 right-4 bg-luxe text-brand text-[9px] font-bold px-2 py-0.5 rounded shadow-lg uppercase tracking-wider">${t[currentLang].txt_value} RM ${pFull.value} | ${t[currentLang].txt_yousave} RM ${pFull.savings}</div><label class="flex items-start gap-3 cursor-pointer"><input type="checkbox" id="cb-${item.id}-full" value="${pFull.price}" class="mt-1.5 w-5 h-5 rounded border-luxe/50 text-luxe focus:ring-luxe bg-transparent srv-cb transition" onchange="handleSrvCheck('${item.id}', 'full')"><div class="flex-1"><div class="flex justify-between items-center mb-1"><span class="text-base font-medium text-white group-hover:text-luxe transition" data-t="srv_full">${t[currentLang].srv_full}</span><span class="text-luxe font-bold text-lg">RM ${pFull.price}</span></div></div></label></div><div class="grid grid-cols-2 gap-3 pt-2"><div class="border border-white/10 rounded-lg p-3 hover:border-luxe/50 transition" id="wrap-${item.id}-hem"><label class="flex items-center gap-3 cursor-pointer"><input type="checkbox" id="cb-${item.id}-hem" value="${pHem.price}" class="w-4 h-4 rounded border-white/30 text-luxe bg-transparent srv-cb" onchange="handleSrvCheck('${item.id}', 'hem')"><div class="flex-1 flex justify-between text-sm"><span data-t="srv_hem">${t[currentLang].srv_hem}</span> <span class="text-white/50">RM${pHem.price}</span></div></label></div><div class="border border-white/10 rounded-lg p-3 hover:border-luxe/50 transition" id="wrap-${item.id}-sleeve"><label class="flex items-center gap-3 cursor-pointer"><input type="checkbox" id="cb-${item.id}-sleeve" value="${pSleeve.price}" class="w-4 h-4 rounded border-white/30 text-luxe bg-transparent srv-cb" onchange="handleSrvCheck('${item.id}', 'sleeve')"><div class="flex-1 flex justify-between text-sm"><span data-t="srv_sleeve">${t[currentLang].srv_sleeve}</span> <span class="text-white/50">RM${pSleeve.price}</span></div></label></div><div class="border border-white/10 rounded-lg p-3 hover:border-luxe/50 transition" id="wrap-${item.id}-shoulder"><label class="flex items-center gap-3 cursor-pointer"><input type="checkbox" id="cb-${item.id}-shoulder" value="${pShoulder.price}" class="w-4 h-4 rounded border-white/30 text-luxe bg-transparent srv-cb" onchange="handleSrvCheck('${item.id}', 'shoulder')"><div class="flex-1 flex justify-between text-sm"><span data-t="srv_shoulder">${t[currentLang].srv_shoulder}</span> <span class="text-white/50">RM${pShoulder.price}</span></div></label></div><div class="border border-white/10 rounded-lg p-3 hover:border-luxe/50 transition" id="wrap-${item.id}-pads"><label class="flex items-center gap-3 cursor-pointer"><input type="checkbox" id="cb-${item.id}-pads" value="${pPads.price}" class="w-4 h-4 rounded border-white/30 text-luxe bg-transparent srv-cb" onchange="handleSrvCheck('${item.id}', 'pads')"><div class="flex-1 flex justify-between text-sm"><span data-t="srv_pads">${t[currentLang].srv_pads}</span> <span class="text-white/50">RM${pPads.price}</span></div></label></div></div><div id="btn-container-${item.id}" class="hidden pt-4 border-t border-white/10 mt-4"><button onclick="openModal('${item.id}')" id="meas-btn-${item.id}" class="w-full py-3 rounded-xl border border-luxe bg-luxe/10 text-luxe text-sm font-bold flex justify-center items-center gap-2 hover:bg-luxe hover:text-brand transition"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg><span data-t="btn_add_meas">${t[currentLang].btn_add_meas}</span></button></div></div>`;
             block.innerHTML = header + body; container.appendChild(block); handleSrvCheck(item.id, 'init', true);
         }); container.dataset.needsRender = false;
@@ -862,9 +870,9 @@ async function useOrderAddress() {
 
     function openModal(itemId) {
         editingItemId = itemId; const item = state.selectedItems.find(i => i.id === itemId); const limit = sizeChart[item.size] || sizeChart['M']; 
-        document.getElementById('modal-subtitle').innerText = `${sanitizeHTML(item.name)} (Size: ${sanitizeHTML(item.size)})`;
+        document.getElementById('modal-subtitle').innerText = `${sanitizeHTML(item.name)} (${t[currentLang].txt_size_label || "Size:"} ${sanitizeHTML(item.size)})`;
         const fieldsDiv = document.getElementById('modal-fields'); fieldsDiv.innerHTML = ''; const m = state.measurements[itemId]; const isFull = document.getElementById(`cb-${itemId}-full`).checked;
-        const buildInput = (key, labelKey, maxVal, type="number") => { const op = isFull ? '<=' : '<'; return `<div><label class="block text-sm text-white/70 mb-2">${t[currentLang][labelKey] + (maxVal ? ` (Max: ${maxVal}")` : '')}</label>${type === 'select' ? `<select id="mod-${key}"><option value="" class="text-black">Select...</option><option value="Yes" class="text-black" ${m[key]==='Yes'?'selected':''}>Yes</option><option value="No" class="text-black" ${m[key]==='No'?'selected':''}>No</option></select>` : `<input type="number" id="mod-${key}" value="${sanitizeHTML(m[key])}" placeholder="${maxVal ? op+' '+maxVal : ''}">`}</div>`; };
+        const buildInput = (key, labelKey, maxVal, type="number") => { const op = isFull ? '<=' : '<'; return `<div><label class="block text-sm text-white/70 mb-2">${t[currentLang][labelKey] + (maxVal ? ` (${t[currentLang].lbl_max || "Max:"} ${maxVal}")` : '')}</label>${type === 'select' ? `<select id="mod-${key}"><option value="" class="text-black">${t[currentLang].lbl_select_option || "Select..."}</option><option value="Yes" class="text-black" ${m[key]==='Yes'?'selected':''}>${t[currentLang].lbl_yes || "Yes"}</option><option value="No" class="text-black" ${m[key]==='No'?'selected':''}>${t[currentLang].lbl_no || "No"}</option></select>` : `<input type="number" id="mod-${key}" value="${sanitizeHTML(m[key])}" placeholder="${maxVal ? op+' '+maxVal : ''}">`}</div>`; };
         if(isFull || document.getElementById(`cb-${itemId}-hem`)?.checked) fieldsDiv.innerHTML += buildInput('length', 'lbl_length', limit.length, 'number');
         if(isFull || document.getElementById(`cb-${itemId}-sleeve`)?.checked) fieldsDiv.innerHTML += buildInput('sleeve', 'lbl_sleeve', limit.sleeve, 'number');
         if(isFull || document.getElementById(`cb-${itemId}-shoulder`)?.checked) fieldsDiv.innerHTML += buildInput('shoulder', 'lbl_shoulder', limit.shoulder, 'number');
@@ -977,7 +985,7 @@ async function useOrderAddress() {
                 throw new Error(responseData.message || "Failed to generate ID");
             }
         } catch (error) {
-            alert("Connection error. Please try again.");
+            alert(t[currentLang].alert_conn_error || "Connection error. Please try again.");
             btn.innerHTML = originalText; 
             btn.disabled = false;
             btn.classList.remove('opacity-70', 'cursor-not-allowed');
