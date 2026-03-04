@@ -73,7 +73,7 @@
                   <span class="text-[10px] text-luxe uppercase tracking-widest font-bold" data-t="lbl_active_hub">Active Hub</span>
                   <div class="flex items-center bg-white/5 rounded-full px-2 py-0.5 border border-white/5">
                       <span id="statusDot" class="status-dot"></span>
-                      <span id="statusText" class="text-[9px] text-white/60 font-medium">Online</span>
+                      <span id="statusText" class="text-[9px] text-white/60 font-medium" data-t="txt_online">Online</span>
                   </div>
               </div>
               <h2 class="text-sm font-bold text-white truncate max-w-[150px] leading-tight mt-0.5" id="header-hub-name">...</h2>
@@ -96,7 +96,7 @@
                   <h3 class="text-lg font-bold" data-t="title_timeline">Orders Timeline</h3>
                   <button onclick="loadDashboard(false, true)" class="p-2 text-luxe hover:bg-white/5 rounded-full transition border border-luxe/30 shadow-sm flex items-center justify-center gap-1.5 px-3" title="Refresh">
                       <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
-                      <span class="text-xs font-bold">Refresh</span>
+                      <span class="text-xs font-bold" data-t="btn_refresh">Refresh</span>
                   </button>
               </div>
               <div id="dash-loader" class="flex flex-col items-center justify-center py-10 text-white/50 text-sm hidden">
@@ -105,19 +105,19 @@
               </div>
 
               <button onclick="toggleSection('list-requests', 'icon-requests')" class="w-full flex justify-between items-center text-xs text-luxe uppercase tracking-widest font-bold mb-3 border-b border-luxe/20 pb-2 hover:text-white transition">
-                  <span id="header-requests-text">New Requests (Approval)</span>
+                  <span id="header-requests-text" data-t="header_requests">New Requests (Approval)</span>
                   <svg id="icon-requests" class="w-4 h-4 transform transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
               </button>
               <div id="list-requests" class="space-y-3 mb-8 transition-all overflow-hidden"></div>
 
               <button onclick="toggleSection('list-pending', 'icon-pending')" class="w-full flex justify-between items-center text-xs text-white/40 uppercase tracking-widest font-bold mb-3 border-b border-white/10 pb-2 hover:text-white transition">
-                  <span id="header-pending-text">Expected Arrivals</span>
+                  <span id="header-pending-text" data-t="header_pending">Expected Arrivals</span>
                   <svg id="icon-pending" class="w-4 h-4 transform transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
               </button>
               <div id="list-pending" class="space-y-3 mb-8 transition-all overflow-hidden"></div>
 
               <button onclick="toggleSection('list-active', 'icon-active')" class="w-full flex justify-between items-center text-xs text-white/40 uppercase tracking-widest font-bold mb-3 border-b border-white/10 pb-2 hover:text-white transition">
-                  <span id="header-active-text">Currently Altering</span>
+                  <span id="header-active-text" data-t="header_active">Currently Altering</span>
                   <svg id="icon-active" class="w-4 h-4 transform transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
               </button>
               <div id="list-active" class="space-y-3 transition-all overflow-hidden mb-8"></div>
@@ -199,7 +199,7 @@
   </div>
 
   <script>
-    const APP_VERSION = "1.9"; 
+    const APP_VERSION = "2.0"; 
     const scriptURL = 'https://script.google.com/macros/s/AKfycbyrJFfuCrhAbdwzAj8uP4sSvFuzRzzzEFV5CHOCBSOK6OGlIXPtsf7-XEfjLHGnFZiyvw/exec';
     const trackerBaseUrl = 'https://aqmalsalleh.github.io/arabista-site/alteration-tracker.html?id=';
     const spinnerSvg = `<svg class="animate-spin h-4 w-4 inline mr-2 text-current" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>`;
@@ -208,7 +208,7 @@
         en: {
             login_title: "Tailor Portal", login_desc: "Enter your registered Hub Phone Number and PIN.", lbl_phone: "Phone Number", lbl_pin: "6-Digit PIN", btn_login: "Login securely",
             lbl_active_hub: "Active Hub", btn_logout: "Logout",
-            title_timeline: "Orders Timeline", txt_syncing: "Syncing database...",
+            title_timeline: "Orders Timeline", txt_syncing: "Syncing database...", btn_refresh: "Refresh",
             header_requests: "New Requests (Approval)", header_pending: "Expected Arrivals (Pending)", header_active: "Currently Altering (In Progress)", header_completed: "Today's Deliveries",
             txt_history_limit: "Showing deliveries completed in the last 24 hours. Use the Search tab to find older orders.",
             txt_no_requests: "No new requests.", txt_no_pending: "No pending arrivals.", txt_no_active: "No active alterations.", txt_no_completed: "No completed orders.",
@@ -227,19 +227,28 @@
             wa_approved_lala: "*[ARABISTA HUB UPDATE]*\n- *Order:* {id}\n- *Status:* Request Approved\n- *Action Required:* Please arrange delivery\n\nBook your Lalamove here:\n{link}",
             wa_rejected: "*[ARABISTA HUB UPDATE]*\n- *Order:* {id}\n- *Status:* Hub Unavailable\n\nHi, unfortunately our hub is currently full or unavailable to take new orders. Please use this link to select another hub:\n{link}",
             nav_orders: "Orders", nav_search: "Search", nav_settings: "Settings",
-            confirm_update: "Update this order to: {status}?", edit_addr_warn: "Editing Shop Address.\n\nPlease ensure this matches your exact GPS Coordinates for accurate Lalamove routing."
+            confirm_update: "Update this order to: {status}?", edit_addr_warn: "Editing Shop Address.\n\nPlease ensure this matches your exact GPS Coordinates for accurate Lalamove routing.",
+            
+            // UI Translation Keys
+            txt_online: "Online", txt_syncing_status: "Syncing...", status_completed: "Completed",
+            badge_action: "Action Required",
+            badge_walkin: "🚶 Walk-in", badge_lala: "🚚 Lalamove",
+            badge_in_lala: "🚚 Inbound: Lalamove", badge_in_walk: "🚶 Inbound: Walk-in / Drop-off",
+            badge_out_lala: "🚚 Outbound: Lalamove", badge_out_self: "📦 Outbound: Self-Pickup", badge_out_wait: "⏳ Outbound: Pending Choice",
+            stat_await_action: "Awaiting Customer Action", stat_await_drop: "Awaiting Customer Drop-off", stat_rider_way: "Rider On The Way",
+            step_assigning: "Assigning", step_found: "Found", step_picked_up: "Picked Up", step_delivered: "Delivered"
         },
         bm: {
             login_title: "Portal Tukang Jahit", login_desc: "Masukkan No. Telefon dan PIN Hub anda.", lbl_phone: "No. Telefon", lbl_pin: "PIN 6-Digit", btn_login: "Log Masuk Selamat",
             lbl_active_hub: "Hub Aktif", btn_logout: "Log Keluar",
-            title_timeline: "Garis Masa Pesanan", txt_syncing: "Menyegerakkan data...",
+            title_timeline: "Garis Masa Pesanan", txt_syncing: "Menyegerakkan data...", btn_refresh: "Segar Semula",
             header_requests: "Permintaan Baru (Kelulusan)", header_pending: "Jangkaan Tiba (Pending)", header_active: "Sedang Dijahit (In Progress)", header_completed: "Penghantaran Hari Ini",
             txt_history_limit: "Memaparkan penghantaran selesai dalam masa 24 jam lepas. Guna tab Cari untuk pesanan lama.",
             txt_no_requests: "Tiada permintaan baru.", txt_no_pending: "Tiada ketibaan baru.", txt_no_active: "Tiada alterasi aktif.", txt_no_completed: "Tiada pesanan selesai tempoh ini.",
             btn_accept: "Terima Pesanan", btn_reject: "Tolak",
             btn_mark_received: "Tanda Telah Diterima", btn_mark_completed: "Tanda Telah Siap", btn_cust_pickup: "Pelanggan Dah Ambil", btn_override: "Tanda Telah Dihantar (Override)",
             btn_wait_choice: "Menunggu Pilihan Pelanggan...", btn_wait_booking: "Menunggu Pelanggan Tempah...",
-            arriving: "Dalam Perjalanan", arrived: "TIBA", waiting_days: "Menunggu", Hari: "Hari",
+            arriving: "Dalam Perjalanan", arrived: "TIBA", waiting_days: "Menunggu", days: "Hari",
             title_find: "Cari Pesanan", ph_search: "Cari ID, Nama, atau Telefon...", txt_no_results: "Tiada hasil dijumpai.",
             title_settings: "Tetapan Hub", lbl_address: "Alamat Kedai", lbl_gps: "Koordinat GPS", btn_update_gps: "Kemaskini GPS", lbl_tel: "Telefon", lbl_capacity: "Kapasiti Maksimum Barisan", lbl_open: "Waktu Buka", lbl_close: "Waktu Tutup", lbl_status: "Status", opt_active: "Aktif (Terima Pesanan)", opt_inactive: "Tidak Aktif (Cuti)", btn_save: "Simpan Perubahan",
             alert_both: "Sila masukkan Telefon dan PIN.", alert_invalid: "Maklumat tidak sah", alert_sync_fail: "Gagal menyegerakkan data.", alert_err_update: "Ralat mengemaskini status.", alert_search_fail: "Carian gagal.", alert_gps_fail: "GPS gagal. Sila aktifkan lokasi.", alert_save_fail: "Gagal menyimpan.",
@@ -251,7 +260,16 @@
             wa_approved_lala: "*[KEMASKINI HUB ARABISTA]*\n- *Pesanan:* {id}\n- *Status:* Permintaan Diluluskan\n- *Tindakan Diperlukan:* Sila uruskan penghantaran\n\nTempah Lalamove anda di sini:\n{link}",
             wa_rejected: "*[KEMASKINI HUB ARABISTA]*\n- *Pesanan:* {id}\n- *Status:* Hub Tidak Tersedia\n\nHai, dukacita dimaklumkan hub kami sedang penuh atau tidak dapat menerima pesanan baru buat masa ini. Sila guna pautan ini untuk memilih hub lain:\n{link}",
             nav_orders: "Pesanan", nav_search: "Cari", nav_settings: "Tetapan",
-            confirm_update: "Kemaskini pesanan ini kepada: {status}?", edit_addr_warn: "Mengedit Alamat Kedai.\n\nPastikan ia sepadan dengan Koordinat GPS untuk routing Lalamove yang tepat."
+            confirm_update: "Kemaskini pesanan ini kepada: {status}?", edit_addr_warn: "Mengedit Alamat Kedai.\n\nPastikan ia sepadan dengan Koordinat GPS untuk routing Lalamove yang tepat.",
+            
+            // UI Translation Keys
+            txt_online: "Dalam Talian", txt_syncing_status: "Menyegerak...", status_completed: "Selesai",
+            badge_action: "Tindakan Diperlukan",
+            badge_walkin: "🚶 Walk-in", badge_lala: "🚚 Lalamove",
+            badge_in_lala: "🚚 Ke Hub: Lalamove", badge_in_walk: "🚶 Ke Hub: Walk-in / Drop-off",
+            badge_out_lala: "🚚 Ke Pelanggan: Lalamove", badge_out_self: "📦 Ke Pelanggan: Ambil Sendiri", badge_out_wait: "⏳ Outbound: Menunggu Pilihan",
+            stat_await_action: "Menunggu Tindakan Pelanggan", stat_await_drop: "Menunggu Drop-off Pelanggan", stat_rider_way: "Rider Dalam Perjalanan",
+            step_assigning: "Mencari", step_found: "Dijumpai", step_picked_up: "Diambil", step_delivered: "Selesai"
         }
     };
 
@@ -335,10 +353,10 @@
         const text = document.getElementById('statusText');
         if(isSyncing) { 
             dot.classList.add('syncing'); 
-            text.innerText = "Syncing..."; 
+            text.innerText = t[currentLang].txt_syncing_status; 
         } else { 
             dot.classList.remove('syncing'); 
-            text.innerText = "Online"; 
+            text.innerText = t[currentLang].txt_online; 
         }
     }
 
@@ -543,7 +561,7 @@
         const reqHeader = document.getElementById('header-requests-text');
         
         if (requests.length > 0) {
-            reqHeader.innerHTML = `${currentLang === 'bm' ? "Permintaan Baru" : "New Requests"} <span class="text-white font-bold ml-1 bg-red-500 px-2 rounded-full text-[10px] animate-pulse">${requests.length}</span>`;
+            reqHeader.innerHTML = `${t[currentLang].header_requests} <span class="text-white font-bold ml-1 bg-red-500 px-2 rounded-full text-[10px] animate-pulse">${requests.length}</span>`;
             reqList.classList.remove('hidden'); 
             reqIcon.classList.remove('rotate-180');
             
@@ -561,14 +579,14 @@
                 const rebookLink = `https://aqmalsalleh.github.io/arabista-site/alterations.html?rebook=${safeId}`;
 
                 let modeBadge = (o.logisticsMode === "Walk-in") 
-                    ? `<span class="text-[9px] bg-orange-500/20 text-orange-400 px-2 py-0.5 rounded border border-orange-500/30">🚶 Walk-in</span>` 
-                    : `<span class="text-[9px] bg-blue-500/20 text-blue-400 px-2 py-0.5 rounded border border-blue-500/30">🚚 Lalamove</span>`;
+                    ? `<span class="text-[9px] bg-orange-500/20 text-orange-400 px-2 py-0.5 rounded border border-orange-500/30">${t[currentLang].badge_walkin}</span>` 
+                    : `<span class="text-[9px] bg-blue-500/20 text-blue-400 px-2 py-0.5 rounded border border-blue-500/30">${t[currentLang].badge_lala}</span>`;
                 
                 let targetStatus = (o.logisticsMode === "Walk-in") ? "Pending Dropoff" : "Awaiting Dispatch";
 
                 reqHtml += `
                     <div class="bg-[#1A1B1E] border border-luxe/50 rounded-xl p-4 shadow-[0_0_15px_rgba(192,160,98,0.1)] relative overflow-hidden">
-                        <div class="absolute top-0 right-0 bg-luxe text-brand text-[9px] font-bold px-2 py-0.5 rounded-bl-lg uppercase">Action Required</div>
+                        <div class="absolute top-0 right-0 bg-luxe text-brand text-[9px] font-bold px-2 py-0.5 rounded-bl-lg uppercase">${t[currentLang].badge_action}</div>
                         <div class="mb-3">
                             <div class="flex items-center gap-2 mb-1">
                                 <span class="text-[10px] bg-white/10 px-2 py-0.5 rounded text-white/70 font-mono">${safeId}</span>
@@ -589,7 +607,7 @@
             });
             reqList.innerHTML = reqHtml; 
         } else {
-            reqHeader.innerText = currentLang === 'bm' ? "Permintaan Baru (Kelulusan)" : "New Requests (Approval)";
+            reqHeader.innerText = t[currentLang].header_requests;
             reqList.classList.add('hidden'); 
             reqIcon.classList.add('rotate-180'); 
             reqList.innerHTML = `<p class="text-white/30 text-xs text-center py-4">${t[currentLang].txt_no_requests}</p>`;
@@ -598,15 +616,14 @@
         const list = document.getElementById('list-pending'); 
         const icon = document.getElementById('icon-pending'); 
         const pendingHeader = document.getElementById('header-pending-text');
-        const headerTxt = currentLang === 'bm' ? "Jangkaan Tiba" : "Expected Arrivals";
         
         const arrivedCount = arrivals.filter(o => o.lalamoveStatus === "COMPLETED").length;
         
         if (arrivedCount > 0) {
-             pendingHeader.innerHTML = `${headerTxt} <span class="text-white font-bold ml-1 bg-red-500 px-2 rounded-full text-[10px] animate-pulse">${arrivals.length}</span>`;
+             pendingHeader.innerHTML = `${t[currentLang].header_pending} <span class="text-white font-bold ml-1 bg-red-500 px-2 rounded-full text-[10px] animate-pulse">${arrivals.length}</span>`;
              if(previousPendingCount !== -1 && arrivedCount > 0) playAlert(3); 
         } else {
-             pendingHeader.innerHTML = `${headerTxt} <span class="text-luxe font-bold ml-1">[ ${arrivals.length} ]</span>`;
+             pendingHeader.innerHTML = `${t[currentLang].header_pending} <span class="text-luxe font-bold ml-1">[ ${arrivals.length} ]</span>`;
         }
 
         if(arrivals.length === 0) { 
@@ -640,13 +657,13 @@
             let trackerHtml = "";
             
             let modeBadge = (o.direction === "Inbound" || o.lalamoveId || o.logisticsMode === "Lalamove") 
-                ? `<span class="text-[9px] bg-blue-500/20 text-blue-400 px-2 py-0.5 rounded border border-blue-500/30 mt-1 inline-block">🚚 Inbound: Lalamove</span>` 
-                : `<span class="text-[9px] bg-orange-500/20 text-orange-400 px-2 py-0.5 rounded border border-orange-500/30 mt-1 inline-block">🚶 Inbound: Walk-in / Drop-off</span>`;
+                ? `<span class="text-[9px] bg-blue-500/20 text-blue-400 px-2 py-0.5 rounded border border-blue-500/30 mt-1 inline-block">${t[currentLang].badge_in_lala}</span>` 
+                : `<span class="text-[9px] bg-orange-500/20 text-orange-400 px-2 py-0.5 rounded border border-orange-500/30 mt-1 inline-block">${t[currentLang].badge_in_walk}</span>`;
             
             if (o.status === "Awaiting Dispatch") {
-                statusBadge = `<span class="text-[9px] bg-yellow-500/10 text-yellow-400 px-2 py-0.5 rounded border border-yellow-500/20">Awaiting Customer Action</span>`;
+                statusBadge = `<span class="text-[9px] bg-yellow-500/10 text-yellow-400 px-2 py-0.5 rounded border border-yellow-500/20">${t[currentLang].stat_await_action}</span>`;
             } else if (o.status === "Pending Dropoff") {
-                statusBadge = `<span class="text-[9px] bg-yellow-500/10 text-yellow-400 px-2 py-0.5 rounded border border-yellow-500/20">Awaiting Customer Drop-off</span>`;
+                statusBadge = `<span class="text-[9px] bg-yellow-500/10 text-yellow-400 px-2 py-0.5 rounded border border-yellow-500/20">${t[currentLang].stat_await_drop}</span>`;
             } else if (o.status === "Dispatched") {
                  const displayStatus = o.lalamoveStatus || sessionStorage.getItem('lala_status_' + safeId) || 'ASSIGNING_DRIVER';
                  trackerHtml = `
@@ -661,7 +678,7 @@
                      statusBadge = `<span class="text-[9px] bg-green-500 text-brand font-bold px-2 py-0.5 rounded shadow-[0_0_10px_rgba(34,197,94,0.5)] animate-pulse">📢 ${t[currentLang].arrived}</span>`;
                      arrivedClass = "border-green-500/50 shadow-[0_0_15px_rgba(34,197,94,0.1)]";
                  } else {
-                     statusBadge = `<span class="text-[9px] bg-blue-500/10 text-blue-400 px-2 py-0.5 rounded border border-blue-500/20">Rider On The Way</span>`;
+                     statusBadge = `<span class="text-[9px] bg-blue-500/10 text-blue-400 px-2 py-0.5 rounded border border-blue-500/20">${t[currentLang].stat_rider_way}</span>`;
                  }
             }
 
@@ -691,9 +708,8 @@
     function renderActive(orders) {
         const list = document.getElementById('list-active'); 
         const icon = document.getElementById('icon-active');
-        const headerTxt = currentLang === 'bm' ? "Sedang Dijahit" : "Currently Altering";
         
-        document.getElementById('header-active-text').innerHTML = `${headerTxt} <span class="text-luxe font-bold ml-1">[ ${orders.length} ]</span>`;
+        document.getElementById('header-active-text').innerHTML = `${t[currentLang].header_active} <span class="text-luxe font-bold ml-1">[ ${orders.length} ]</span>`;
         
         if(orders.length === 0) { 
             list.classList.add('hidden'); 
@@ -724,9 +740,9 @@
             const ageBadge = daysOld >= 3 ? `<span class="text-[9px] bg-red-500/20 text-red-400 px-2 py-0.5 rounded shadow-sm border border-red-500/30">⏳ ${t[currentLang].waiting_days} ${daysOld} ${t[currentLang].days}</span>` : '';
             
             let modeBadge = "";
-            if (o.outbound === "Lalamove" || o.direction === "Outbound") modeBadge = `<span class="text-[9px] bg-purple-500/20 text-purple-400 px-2 py-0.5 rounded border border-purple-500/30 mt-1 inline-block">🚚 Outbound: Lalamove</span>`;
-            else if (o.outbound === "Self-Pickup") modeBadge = `<span class="text-[9px] bg-orange-500/20 text-orange-400 px-2 py-0.5 rounded border border-orange-500/30 mt-1 inline-block">📦 Outbound: Self-Pickup</span>`;
-            else modeBadge = `<span class="text-[9px] bg-gray-500/20 text-gray-400 px-2 py-0.5 rounded border border-gray-500/30 mt-1 inline-block">⏳ Outbound: Pending Choice</span>`;
+            if (o.outbound === "Lalamove" || o.direction === "Outbound") modeBadge = `<span class="text-[9px] bg-purple-500/20 text-purple-400 px-2 py-0.5 rounded border border-purple-500/30 mt-1 inline-block">${t[currentLang].badge_out_lala}</span>`;
+            else if (o.outbound === "Self-Pickup") modeBadge = `<span class="text-[9px] bg-orange-500/20 text-orange-400 px-2 py-0.5 rounded border border-orange-500/30 mt-1 inline-block">${t[currentLang].badge_out_self}</span>`;
+            else modeBadge = `<span class="text-[9px] bg-gray-500/20 text-gray-400 px-2 py-0.5 rounded border border-gray-500/30 mt-1 inline-block">${t[currentLang].badge_out_wait}</span>`;
 
             if (o.status === "In Progress") { 
                  actionHtml = `
@@ -799,7 +815,7 @@
     }
 
     function renderLalamoveSteps(status) {
-        const steps = [{label:'Assigning'},{label:'Found'},{label:'Picked Up'},{label:'Delivered'}];
+        const steps = [{label: t[currentLang].step_assigning},{label: t[currentLang].step_found},{label: t[currentLang].step_picked_up},{label: t[currentLang].step_delivered}];
         let activeIdx = 0;
         if(status === 'ON_GOING') activeIdx = 1; 
         if(status === 'PICKED_UP') activeIdx = 2; 
@@ -833,7 +849,7 @@
                             <span class="text-[10px] bg-white/10 px-2 py-0.5 rounded text-white/50 font-mono">${safeId}</span>
                             <span class="text-[10px] text-white/40">${formatDate(o.date)}</span>
                         </div>
-                        <span class="text-[10px] bg-blue-500/10 text-blue-400 px-2 py-0.5 rounded">Completed</span>
+                        <span class="text-[10px] bg-blue-500/10 text-blue-400 px-2 py-0.5 rounded">${t[currentLang].status_completed}</span>
                     </div>
                     <p class="font-bold text-sm text-white/80 mb-1">${safeName}</p>
                     <p class="text-[10px] text-white/40 whitespace-pre-line truncate">${safeItems}</p>
