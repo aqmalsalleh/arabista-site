@@ -199,7 +199,7 @@
   </div>
 
   <script>
-    const APP_VERSION = "1.7"; // Version bumped to enforce cache clear for new WA templates
+    const APP_VERSION = "1.8"; 
     const scriptURL = 'https://script.google.com/macros/s/AKfycbyrJFfuCrhAbdwzAj8uP4sSvFuzRzzzEFV5CHOCBSOK6OGlIXPtsf7-XEfjLHGnFZiyvw/exec';
     const trackerBaseUrl = 'https://aqmalsalleh.github.io/arabista-site/alteration-tracker.html?id=';
     const spinnerSvg = `<svg class="animate-spin h-4 w-4 inline mr-2 text-current" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>`;
@@ -225,6 +225,7 @@
             wa_completed: "*[ARABISTA HUB UPDATE]*\n- *Order:* {id}\n- *Status:* Alteration Completed\n- *Action Required:* Please make payment and choose delivery or pickup\n\nPay and make your selection here:\n{link}",
             wa_approved_walkin: "*[ARABISTA HUB UPDATE]*\n- *Order:* {id}\n- *Status:* Request Approved\n- *Action Required:* Please arrange drop-off\n\nView Hub location here:\n{link}",
             wa_approved_lala: "*[ARABISTA HUB UPDATE]*\n- *Order:* {id}\n- *Status:* Request Approved\n- *Action Required:* Please arrange delivery\n\nBook your Lalamove here:\n{link}",
+            wa_rejected: "*[ARABISTA HUB UPDATE]*\n- *Order:* {id}\n- *Status:* Hub Unavailable\n\nHi, unfortunately our hub is currently full or unavailable to take new orders. Please use this link to select another hub:\n{link}",
             nav_orders: "Orders", nav_search: "Search", nav_settings: "Settings",
             confirm_update: "Update this order to: {status}?", edit_addr_warn: "Editing Shop Address.\n\nPlease ensure this matches your exact GPS Coordinates for accurate Lalamove routing."
         },
@@ -238,7 +239,7 @@
             btn_accept: "Terima Pesanan", btn_reject: "Tolak",
             btn_mark_received: "Tanda Telah Diterima", btn_mark_completed: "Tanda Telah Siap", btn_cust_pickup: "Pelanggan Dah Ambil", btn_override: "Tanda Telah Dihantar (Override)",
             btn_wait_choice: "Menunggu Pilihan Pelanggan...", btn_wait_booking: "Menunggu Pelanggan Tempah...",
-            arriving: "Dalam Perjalanan", arrived: "TIBA", waiting_days: "Menunggu", days: "Hari",
+            arriving: "Dalam Perjalanan", arrived: "TIBA", waiting_days: "Menunggu", Hari: "Hari",
             title_find: "Cari Pesanan", ph_search: "Cari ID, Nama, atau Telefon...", txt_no_results: "Tiada hasil dijumpai.",
             title_settings: "Tetapan Hub", lbl_address: "Alamat Kedai", lbl_gps: "Koordinat GPS", btn_update_gps: "Kemaskini GPS", lbl_tel: "Telefon", lbl_capacity: "Kapasiti Maksimum Barisan", lbl_open: "Waktu Buka", lbl_close: "Waktu Tutup", lbl_status: "Status", opt_active: "Aktif (Terima Pesanan)", opt_inactive: "Tidak Aktif (Cuti)", btn_save: "Simpan Perubahan",
             alert_both: "Sila masukkan Telefon dan PIN.", alert_invalid: "Maklumat tidak sah", alert_sync_fail: "Gagal menyegerakkan data.", alert_err_update: "Ralat mengemaskini status.", alert_search_fail: "Carian gagal.", alert_gps_fail: "GPS gagal. Sila aktifkan lokasi.", alert_save_fail: "Gagal menyimpan.",
@@ -248,6 +249,7 @@
             wa_completed: "*[KEMASKINI HUB ARABISTA]*\n- *Pesanan:* {id}\n- *Status:* Alterasi Selesai\n- *Tindakan Diperlukan:* Sila buat bayaran dan pilih penghantaran atau ambil sendiri\n\nBuat bayaran dan pilihan anda di sini:\n{link}",
             wa_approved_walkin: "*[KEMASKINI HUB ARABISTA]*\n- *Pesanan:* {id}\n- *Status:* Permintaan Diluluskan\n- *Tindakan Diperlukan:* Sila uruskan drop-off\n\nLihat lokasi Hub di sini:\n{link}",
             wa_approved_lala: "*[KEMASKINI HUB ARABISTA]*\n- *Pesanan:* {id}\n- *Status:* Permintaan Diluluskan\n- *Tindakan Diperlukan:* Sila uruskan penghantaran\n\nTempah Lalamove anda di sini:\n{link}",
+            wa_rejected: "*[KEMASKINI HUB ARABISTA]*\n- *Pesanan:* {id}\n- *Status:* Hub Tidak Tersedia\n\nHai, dukacita dimaklumkan hub kami sedang penuh atau tidak dapat menerima pesanan baru buat masa ini. Sila guna pautan ini untuk memilih hub lain:\n{link}",
             nav_orders: "Pesanan", nav_search: "Cari", nav_settings: "Tetapan",
             confirm_update: "Kemaskini pesanan ini kepada: {status}?", edit_addr_warn: "Mengedit Alamat Kedai.\n\nPastikan ia sepadan dengan Koordinat GPS untuk routing Lalamove yang tepat."
         }
@@ -285,7 +287,6 @@
     document.addEventListener('DOMContentLoaded', () => { 
         const storedVersion = localStorage.getItem('arabista_app_version');
         if (storedVersion !== APP_VERSION) { 
-            // Silently clear old credentials without forcing a reload
             localStorage.removeItem('arabista_hub_name');
             localStorage.removeItem('arabista_hub_token');
             localStorage.setItem('arabista_app_version', APP_VERSION); 
@@ -304,7 +305,6 @@
             requestNotificationPermission();
             loadDashboard(); 
         } else {
-            // Fix: Just show the login screen instead of triggering logout()/reload
             document.getElementById('login-screen').classList.remove('hidden');
             document.getElementById('main-app').classList.add('hidden');
         }
@@ -519,7 +519,7 @@
                 });
                 
                 renderPending(data.orders.pending);
-renderActive(data.orders.inProgress.concat(data.orders.ready)); 
+                renderActive(data.orders.inProgress.concat(data.orders.ready)); 
                 
                 completedOrdersData = data.orders.completed || []; 
                 renderCompleted(); 
@@ -552,7 +552,7 @@ renderActive(data.orders.inProgress.concat(data.orders.ready));
                 const safeId = sanitizeHTML(o.id);
                 const safeName = sanitizeHTML(o.custName);
                 const safePhone = sanitizeHTML(o.custPhone);
-                const safeItems = sanitizeHTML(o.items).replace(/\[/g, '').replace(/\]/g, ''); // ADDED: Item Details
+                const safeItems = sanitizeHTML(o.items).replace(/\[/g, '').replace(/\]/g, ''); 
                 const jsId = escapeJS(safeId);
                 const jsName = escapeJS(safeName);
                 const jsPhone = escapeJS(safePhone);
@@ -577,7 +577,7 @@ renderActive(data.orders.inProgress.concat(data.orders.ready));
                             <p class="text-xs text-white/50 mt-1 mb-2 whitespace-pre-line">${safeItems}</p>
                         </div>
                         <div class="flex gap-2">
-                            <button onclick="updateStatus('${jsId}', 'Rejected', '${jsName}', '${jsPhone}', '', 0, this)" class="px-4 py-2 rounded-lg border border-red-500/30 text-red-400 text-xs font-bold hover:bg-red-500/10 transition">${t[currentLang].btn_reject}</button>
+                            <button onclick="updateStatus('${jsId}', 'Rejected', '${jsName}', '${jsPhone}', '${link}', 0, this)" class="px-4 py-2 rounded-lg border border-red-500/30 text-red-400 text-xs font-bold hover:bg-red-500/10 transition">${t[currentLang].btn_reject}</button>
                             <button onclick="updateStatus('${jsId}', '${targetStatus}', '${jsName}', '${jsPhone}', '${link}', 2, this)" class="flex-1 py-2 rounded-lg bg-green-500 text-brand text-xs font-bold hover:bg-green-400 transition shadow-soft flex justify-center items-center gap-2">
                                 <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> 
                                 ${t[currentLang].btn_accept}
@@ -855,7 +855,9 @@ renderActive(data.orders.inProgress.concat(data.orders.ready));
                 body: JSON.stringify({ action: "update_order_status", hub_name: hubName, token: hubToken, order_id: id, new_status: newStatus }) 
             });
             
-            if (milestone === 1) {
+            if (newStatus === "Rejected") {
+                sendWA(phone, t[currentLang].wa_rejected.replace('{id}', id).replace('{link}', link));
+            } else if (milestone === 1) {
                 sendWA(phone, t[currentLang].wa_received.replace('{id}', id).replace('{link}', link));
             } else if (milestone === 1.5) {
                 sendWA(phone, t[currentLang].wa_completed.replace('{id}', id).replace('{link}', link));
