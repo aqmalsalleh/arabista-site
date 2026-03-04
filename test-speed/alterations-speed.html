@@ -107,7 +107,7 @@
           </div>
 
           <div class="mt-4 flex justify-end">
-             <button onclick="confirmItems()" class="bg-luxe text-brand font-bold text-sm px-6 py-2 rounded-lg hover:bg-white transition" data-t="btn_next_loc">Next: Location</button>
+             <button id="btn-confirm-items" onclick="confirmItems()" class="bg-luxe text-brand font-bold text-sm px-6 py-2 rounded-lg hover:bg-white transition" data-t="btn_next_loc">Next: Location</button>
           </div>
         </div>
       </div>
@@ -279,7 +279,7 @@
             alert_order_not_found: "Order not found. Proceeding with manual entry.", alert_no_service: "Please select at least one service.", msg_processing: "Processing...", msg_translating: "Translating...", msg_locating: "Locating...", msg_searching_map: "Searching Map...", msg_search_failed: "Search Failed.", msg_reset_loc: "Please search for your location again or detect GPS.", msg_geo_notsupported: "Geolocation is not supported by your browser.", msg_db_error: "Database Error: ", lbl_saved_address: "Base Location",
             txt_rebook_title: "Retrieving Your Order", txt_rebook_desc: "Retrieving your previous booking. Please select another Hub.", btn_see_more_hubs: "See More Hubs",
             txt_busy_full: "BUSY / FULL", alert_gps_failed: "Failed to detect GPS location. Please ensure location services are enabled on your device.", msg_search_failed_icon: "❌ Search failed.", msg_gps_locked: "GPS Locked",
-            lbl_select_option: "Select...", lbl_yes: "Yes", lbl_no: "No", lbl_max: "Max:", lbl_order: "Order", txt_select_items: "Select Items to Alter:", txt_size_label: "Size:", alert_conn_error: "Connection error. Please try again.", txt_loading_hubs: "Loading Alteration Points...", txt_translating_gps: "Translating GPS...", txt_fast: "FAST", txt_api_error: "API Error", txt_out_of_area: "Out of Area"
+            lbl_select_option: "Select...", lbl_yes: "Yes", lbl_no: "No", lbl_max: "Max:", lbl_order: "Order", txt_select_items: "Select Items to Alter:", txt_size_label: "Size:", alert_conn_error: "Connection error. Please try again.", txt_loading_hubs: "Loading Alteration Points...", txt_translating_gps: "Translating GPS...", txt_fast: "FAST", txt_api_error: "API Error", txt_out_of_area: "Out of Area", txt_syncing_system: "Syncing..."
         },
         bm: { 
             page_title: "Servis Alterasi", page_subtitle: "Pilih item untuk dialter.", step1_title: "Pilih Item", btn_next_loc: "Seterusnya: Lokasi", lbl_cust_name: "Nama Pelanggan", placeholder_name: "cth. Siti Aishah", lbl_phone: "No. Telefon", placeholder_phone: "cth. 0123456789", lbl_design_code: "Kod Rekaan", lbl_size: "Saiz", btn_add_item: "Tambah Item Lain", alert_name: "Sila masukkan nama anda.", alert_phone: "Sila masukkan no. telefon anda.", alert_item_detail: "Sila pilih Kod Rekaan dan Saiz untuk semua item.", step2_title: "Sahkan Lokasi", 
@@ -290,7 +290,7 @@
             alert_order_not_found: "Pesanan tidak dijumpai. Teruskan dengan entri manual.", alert_no_service: "Sila pilih sekurang-kurangnya satu servis.", msg_processing: "Memproses...", msg_translating: "Menterjemah...", msg_locating: "Mengesan lokasi...", msg_searching_map: "Mencari Peta...", msg_search_failed: "Carian Gagal.", msg_reset_loc: "Sila cari lokasi anda semula atau kesan GPS.", msg_geo_notsupported: "Geolokasi tidak disokong oleh pelayar anda.", msg_db_error: "Ralat Pangkalan Data: ", lbl_saved_address: "Lokasi Asas",
             txt_rebook_title: "Mendapatkan Pesanan Anda", txt_rebook_desc: "Mendapatkan tempahan lepas anda. Sila pilih Hub yang baru.", btn_see_more_hubs: "Lihat Lebih Banyak Hub",
             txt_busy_full: "PENUH / SIBUK", alert_gps_failed: "Gagal mengesan lokasi GPS. Sila pastikan servis lokasi diaktifkan pada peranti anda.", msg_search_failed_icon: "❌ Carian gagal.", msg_gps_locked: "GPS Dikunci",
-            lbl_select_option: "Pilih...", lbl_yes: "Ya", lbl_no: "Tidak", lbl_max: "Maks:", lbl_order: "Pesanan", txt_select_items: "Pilih Item untuk Diubahsuai:", txt_size_label: "Saiz:", alert_conn_error: "Ralat sambungan. Sila cuba lagi.", txt_loading_hubs: "Memuatkan Pusat Alterasi...", txt_translating_gps: "Menterjemah GPS...", txt_fast: "PANTAS", txt_api_error: "Ralat API", txt_out_of_area: "Luar Kawasan"
+            lbl_select_option: "Pilih...", lbl_yes: "Ya", lbl_no: "Tidak", lbl_max: "Maks:", lbl_order: "Pesanan", txt_select_items: "Pilih Item untuk Diubahsuai:", txt_size_label: "Saiz:", alert_conn_error: "Ralat sambungan. Sila cuba lagi.", txt_loading_hubs: "Memuatkan Pusat Alterasi...", txt_translating_gps: "Menterjemah GPS...", txt_fast: "PANTAS", txt_api_error: "Ralat API", txt_out_of_area: "Luar Kawasan", txt_syncing_system: "Menyegerak..."
         }
     };
     
@@ -303,6 +303,9 @@
         hem: {price:12}, sleeve: {price:12}, 
         shoulder: {price:10}, pads: {price:6}
     };
+    
+    let isDataReady = false;
+    let backgroundFetchPromise = null;
 
     function setLang(lang) {
         currentLang = lang;
@@ -321,9 +324,9 @@
         }
     }
 
-    const BOOKING_VERSION = "1.5"; 
+    const BOOKING_VERSION = "1.6"; 
 
-    document.addEventListener('DOMContentLoaded', async () => {
+    document.addEventListener('DOMContentLoaded', () => {
         let hasCache = false;
         const cachedHubs = localStorage.getItem('arabista_cached_hubs');
         const cachedPricing = localStorage.getItem('arabista_cached_pricing');
@@ -333,6 +336,7 @@
                 hubs = JSON.parse(cachedHubs);
                 pricingData = JSON.parse(cachedPricing);
                 hasCache = true;
+                isDataReady = true;
             } catch(e) { hasCache = false; }
         }
 
@@ -358,96 +362,103 @@
             setTimeout(() => overlay.classList.remove('opacity-0'), 10);
         }
 
-        if (!fetchId && hasCache) {
+        // NON-BLOCKING UI: Instantly show manual form if no order link
+        if (!fetchId) {
             document.getElementById('step1-loading').classList.add('hidden'); 
-            document.getElementById('hub-list-loading').classList.add('hidden');
             document.getElementById('path-b-container').classList.remove('hidden'); 
             state.path = 'B';
             addManualItem();
         } else {
+            // Keep loading spinner for pre-existing orders
             document.getElementById('step1-loading').classList.remove('hidden'); 
             document.getElementById('hub-list-loading').classList.remove('hidden');
         }
         
-        try {
-            const fetchUrl = fetchId ? `${scriptURL}?order=${fetchId}` : scriptURL;
-            const res = await fetch(fetchUrl); 
-            const data = await res.json();
-            if (data.error) throw new Error(data.error);
-            
-            if (data.pricing && Object.keys(data.pricing).length > 0) {
-                pricingData = data.pricing;
-                localStorage.setItem('arabista_cached_pricing', JSON.stringify(pricingData));
-            }
-            
-            hubs = Array.isArray(data.hubs) ? data.hubs : [];
-            localStorage.setItem('arabista_cached_hubs', JSON.stringify(hubs));
-            
-            if (fetchId && data.orderData) {
-                state.path = 'A'; 
-                document.getElementById('step1-loading').classList.add('hidden'); 
-                document.getElementById('path-a-container').classList.remove('hidden');
-                document.getElementById('order-id-display').innerText = "#" + sanitizeHTML(data.orderData.orderRef);
+        // LAUNCH BACKGROUND FETCH
+        const fetchUrl = fetchId ? `${scriptURL}?order=${fetchId}` : scriptURL;
+        
+        backgroundFetchPromise = fetch(fetchUrl)
+            .then(res => res.json())
+            .then(data => {
+                if (data.error) throw new Error(data.error);
                 
-                document.getElementById('auto-cust-name').value = data.orderData.name; 
-                document.getElementById('auto-cust-phone').value = data.orderData.phone;
-                
-                let finalAddr = data.orderData.address;
-                if (rebookId && finalAddr.includes(',')) {
-                    const addrParts = finalAddr.split(',');
-                    state.unitNo = addrParts[0].trim();
-                    document.getElementById('gps-unit-input').value = state.unitNo;
-                    finalAddr = addrParts.slice(1).join(',').trim();
-                } else if (rebookId) {
-                    document.getElementById('gps-unit-input').value = "-";
-                    state.unitNo = "-";
+                if (data.pricing && Object.keys(data.pricing).length > 0) {
+                    pricingData = data.pricing;
+                    localStorage.setItem('arabista_cached_pricing', JSON.stringify(pricingData));
                 }
-                state.orderAddress = finalAddr; 
                 
-                const itemsList = document.getElementById('auto-items-list'); itemsList.innerHTML = '';
-                const rawItems = data.orderData.itemsRaw.split(','); let itemIdx = 0;
-                rawItems.forEach(itemStr => {
-                    const parts = itemStr.trim().split('|');
-                    if(parts.length >= 2) {
-                        const design = sanitizeHTML(parts[0].trim()); 
-                        const size = sanitizeHTML(parts[1].trim()); 
-                        const qty = parseInt(parts[2]) || 1;
-                        for(let q=0; q < qty; q++) {
-                            itemsList.innerHTML += `<label class="flex items-center gap-4 p-4 border border-white/10 rounded-xl hover:bg-white/5 cursor-pointer transition"><input type="checkbox" name="order-item" value="a-${itemIdx}" data-design="${design}" data-size="${size}" onchange="syncItemsA()" class="w-5 h-5 rounded border-white/30 text-luxe focus:ring-luxe bg-transparent" ${rebookId ? 'checked' : ''}><div><h3 class="font-display text-lg text-white">${design}</h3><p class="text-xs text-white/50">${t[currentLang].txt_size_label || "Size:"} ${size}</p></div></label>`;
-                            itemIdx++;
-                        }
-                    }
-                });
+                hubs = Array.isArray(data.hubs) ? data.hubs : [];
+                localStorage.setItem('arabista_cached_hubs', JSON.stringify(hubs));
+                isDataReady = true;
                 
-                if (rebookId) {
-                    syncItemsA();
-                    unlockStep(2);
-                    setTimeout(async () => { 
-                        await useOrderAddress();
-                        if (state.lat && state.lng && document.getElementById('gps-unit-input').value.trim() !== '') {
-                            confirmGPSDetails();
-                        }
-                        document.getElementById('step-3').scrollIntoView({behavior: 'smooth', block: 'start'});
+                if (fetchId) {
+                    if (data.orderData) {
+                        state.path = 'A'; 
+                        document.getElementById('step1-loading').classList.add('hidden'); 
+                        document.getElementById('path-a-container').classList.remove('hidden');
+                        document.getElementById('order-id-display').innerText = "#" + sanitizeHTML(data.orderData.orderRef);
                         
-                        const overlay = document.getElementById('rebook-overlay');
-                        overlay.classList.add('opacity-0');
-                        setTimeout(() => overlay.classList.add('hidden'), 500);
-                    }, 400);
+                        document.getElementById('auto-cust-name').value = data.orderData.name; 
+                        document.getElementById('auto-cust-phone').value = data.orderData.phone;
+                        
+                        let finalAddr = data.orderData.address;
+                        if (rebookId && finalAddr.includes(',')) {
+                            const addrParts = finalAddr.split(',');
+                            state.unitNo = addrParts[0].trim();
+                            document.getElementById('gps-unit-input').value = state.unitNo;
+                            finalAddr = addrParts.slice(1).join(',').trim();
+                        } else if (rebookId) {
+                            document.getElementById('gps-unit-input').value = "-";
+                            state.unitNo = "-";
+                        }
+                        state.orderAddress = finalAddr; 
+                        
+                        const itemsList = document.getElementById('auto-items-list'); itemsList.innerHTML = '';
+                        const rawItems = data.orderData.itemsRaw.split(','); let itemIdx = 0;
+                        rawItems.forEach(itemStr => {
+                            const parts = itemStr.trim().split('|');
+                            if(parts.length >= 2) {
+                                const design = sanitizeHTML(parts[0].trim()); 
+                                const size = sanitizeHTML(parts[1].trim()); 
+                                const qty = parseInt(parts[2]) || 1;
+                                for(let q=0; q < qty; q++) {
+                                    itemsList.innerHTML += `<label class="flex items-center gap-4 p-4 border border-white/10 rounded-xl hover:bg-white/5 cursor-pointer transition"><input type="checkbox" name="order-item" value="a-${itemIdx}" data-design="${design}" data-size="${size}" onchange="syncItemsA()" class="w-5 h-5 rounded border-white/30 text-luxe focus:ring-luxe bg-transparent" ${rebookId ? 'checked' : ''}><div><h3 class="font-display text-lg text-white">${design}</h3><p class="text-xs text-white/50">${t[currentLang].txt_size_label || "Size:"} ${size}</p></div></label>`;
+                                    itemIdx++;
+                                }
+                            }
+                        });
+                        
+                        if (rebookId) {
+                            syncItemsA();
+                            unlockStep(2);
+                            setTimeout(async () => { 
+                                await useOrderAddress();
+                                if (state.lat && state.lng && document.getElementById('gps-unit-input').value.trim() !== '') {
+                                    confirmGPSDetails();
+                                }
+                                document.getElementById('step-3').scrollIntoView({behavior: 'smooth', block: 'start'});
+                                
+                                const overlay = document.getElementById('rebook-overlay');
+                                overlay.classList.add('opacity-0');
+                                setTimeout(() => overlay.classList.add('hidden'), 500);
+                            }, 400);
+                        }
+                    } else {
+                        // Order not found fallback
+                        state.path = 'B'; 
+                        alert((t[currentLang].alert_order_not_found || "Order not found.") + " #" + fetchId);
+                        document.getElementById('step1-loading').classList.add('hidden'); 
+                        document.getElementById('path-b-container').classList.remove('hidden'); 
+                        addManualItem(); 
+                    }
                 }
-            } else if (!hasCache) {
-                state.path = 'B'; 
-                if (fetchId) alert((t[currentLang].alert_order_not_found || "Order not found.") + " #" + fetchId);
-                document.getElementById('path-b-container').classList.remove('hidden'); 
-                addManualItem(); 
-            }
-            
-            document.getElementById('step1-loading').classList.add('hidden'); 
-            document.getElementById('hub-list-loading').classList.add('hidden');
-            if(state.lat !== "" && state.lng !== "") renderHubs(); 
-            
-        } catch(e) { 
-            if (!hasCache) document.getElementById('step1-loading').innerText = (t[currentLang].msg_db_error || "Database Error: ") + e.message; 
-        }
+                
+                document.getElementById('hub-list-loading').classList.add('hidden');
+                if(state.lat !== "" && state.lng !== "") renderHubs(); 
+                
+            }).catch(e => { 
+                if (!hasCache) document.getElementById('step1-loading').innerHTML = `<span class="text-red-400">${(t[currentLang].msg_db_error || "Database Error: ") + e.message}</span>`; 
+            });
     });
 
     const designCodes = ['D01', 'D02', 'D03', 'D04', 'D05', 'D06', 'D07', 'W01', 'W02', 'W03', 'W04', 'W05', 'W06', 'Z01', 'Z02', 'Z03', 'Z04', 'Z05', 'Z06', 'Z07', 'Z08', 'M01', 'M02', 'M03'];
@@ -493,24 +504,46 @@
         }
     }
     
-    function confirmItems() {
+    async function confirmItems() {
+        const btn = document.getElementById('btn-confirm-items');
+        const origText = btn.innerHTML;
+
         if(state.path === 'A') { 
             syncItemsA(); 
             if(state.selectedItems.length === 0) return alert(t[currentLang].alert_no_items); 
-            unlockStep(2); 
-            document.getElementById('step-2').scrollIntoView({behavior: 'smooth', block: 'start'});
-            
-            setTimeout(() => { useOrderAddress(); }, 400);
         } else {
             if(!document.getElementById('manual-cust-name').value.trim()) return alert(t[currentLang].alert_name);
             if(!document.getElementById('manual-cust-phone').value.trim()) return alert(t[currentLang].alert_phone);
             syncItemsB(); 
             if(state.selectedItems.length === 0) return alert(t[currentLang].alert_item_detail);
-            unlockStep(2); 
-            document.getElementById('step-2').scrollIntoView({behavior: 'smooth', block: 'start'});
-            
-            setTimeout(() => { useGPS(); }, 400);
         }
+
+        // SPEED DEMON GUARD: Wait for background fetch to finish if user is extremely fast
+        if (!isDataReady && backgroundFetchPromise) {
+            btn.innerHTML = `${spinnerSvg} ${t[currentLang].txt_syncing_system || "Syncing..."}`;
+            btn.disabled = true;
+            btn.classList.add('opacity-70', 'cursor-not-allowed');
+            try {
+                await backgroundFetchPromise;
+            } catch(e) {
+                alert(t[currentLang].alert_conn_error || "Connection Error");
+                btn.innerHTML = origText;
+                btn.disabled = false;
+                btn.classList.remove('opacity-70', 'cursor-not-allowed');
+                return;
+            }
+            btn.innerHTML = origText;
+            btn.disabled = false;
+            btn.classList.remove('opacity-70', 'cursor-not-allowed');
+        }
+
+        unlockStep(2); 
+        document.getElementById('step-2').scrollIntoView({behavior: 'smooth', block: 'start'});
+        
+        setTimeout(() => { 
+            if(state.path === 'A') useOrderAddress(); 
+            else useGPS(); 
+        }, 400);
     }
 
     async function geocodeAddress(address) {
