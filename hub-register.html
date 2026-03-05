@@ -1,0 +1,468 @@
+<!doctype html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Arabista — Hub Partner Registration</title>
+  <meta name="description" content="Turn your tailoring skills into a steady stream of income. Join Malaysia's fastest-growing premium modestwear network.">
+  <meta name="theme-color" content="#0F0F10" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = { theme: { extend: { fontFamily: { display: ['"Cormorant Garamond"', 'serif'], sans: ['Inter', 'ui-sans-serif', 'system-ui'], }, colors: { brand: { DEFAULT: '#0F0F10' }, luxe: { DEFAULT: '#C0A062' }, }, boxShadow: { soft: '0 10px 40px rgba(0,0,0,0.2)' }, }, }, }
+  </script>
+  <style>
+    body { background-color: #0F0F10; color: white; overflow-x: hidden; }
+    .hide-scrollbar::-webkit-scrollbar { display: none; }
+    .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    .bottom-sheet { transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.32, 0.72, 0, 1); }
+    .bottom-sheet.open { transform: translateY(0); }
+    input[type="text"], input[type="tel"], select, textarea { 
+        background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); color: white; border-radius: 8px; padding: 12px 14px; width: 100%; font-size: 16px !important; transition: all 0.2s;
+    }
+    input:focus, select:focus, textarea:focus { outline: none; border-color: #C0A062; background: rgba(192,160,98,0.05); }
+    input[type="checkbox"] { width: 1.25rem; height: 1.25rem; accent-color: #C0A062; border-radius: 0.25rem; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.3); }
+    .calc-btn { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); width: 36px; height: 36px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 18px; color: white; transition: all 0.2s; }
+    .calc-btn:active { background: #C0A062; color: #0F0F10; border-color: #C0A062; }
+  </style>
+</head>
+<body class="antialiased selection:bg-luxe selection:text-brand pb-24">
+
+  <header class="fixed top-0 inset-x-0 z-40 backdrop-blur-md bg-brand/80 border-b border-white/10">
+    <div class="max-w-screen-xl mx-auto px-4 sm:px-6">
+      <div class="h-14 grid grid-cols-3 items-center">
+        <div class="col-span-1 flex items-center"><a href="index.html" class="font-display tracking-[0.18em] text-[14px] leading-none hover:text-luxe transition">ARABISTA</a></div>
+        <div class="col-span-1 flex items-center justify-center"><a href="index.html"><img src="images/logo-88.webp" alt="Arabista logo" class="h-11 w-auto"></a></div>
+        <div class="col-span-1 flex items-center justify-end gap-2 text-sm">
+           <div class="flex items-center gap-2 border border-white/20 rounded-lg px-2 py-1"><button onclick="setLang('en')" id="lang-en" class="text-xs font-bold text-luxe">EN</button><span class="text-white/20">|</span><button onclick="setLang('bm')" id="lang-bm" class="text-xs text-white/50 hover:text-white">BM</button></div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="pt-24 max-w-screen-md mx-auto">
+    <div class="px-4 sm:px-6 text-center mb-8">
+        <span class="text-[10px] font-bold uppercase tracking-widest text-luxe border border-luxe/30 bg-luxe/10 px-3 py-1 rounded-full mb-4 inline-block" data-t="txt_badge">Official Partner Program</span>
+        <h1 class="font-display text-4xl sm:text-5xl mb-4 leading-tight text-white" data-t="hero_title">Become an Arabista Alteration Hub</h1>
+        <p class="text-white/70 text-sm sm:text-base max-w-lg mx-auto" data-t="hero_subtitle">Turn your tailoring skills into a steady stream of income. Perfect for home-based tailors and alteration shops.</p>
+    </div>
+
+    <div class="flex overflow-x-auto snap-x snap-mandatory gap-4 px-4 sm:px-6 pb-6 hide-scrollbar">
+        <div class="snap-center shrink-0 w-[85vw] sm:w-[400px] aspect-square bg-white/5 border border-white/10 rounded-2xl overflow-hidden relative shadow-lg">
+            <video src="images/hub-video.mp4" autoplay loop muted playsinline class="w-full h-full object-cover"></video>
+            <div class="absolute bottom-3 left-3 bg-black/60 backdrop-blur px-3 py-1.5 rounded-lg border border-white/10 text-[10px] text-white font-medium flex items-center gap-2"><div class="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse"></div> <span data-t="lbl_media1">Hassle-Free Delivery</span></div>
+        </div>
+        <div class="snap-center shrink-0 w-[85vw] sm:w-[400px] aspect-square bg-white/5 border border-white/10 rounded-2xl overflow-hidden relative shadow-lg">
+            <img src="images/hub-img1.webp" class="w-full h-full object-cover" alt="Premium Setup">
+            <div class="absolute bottom-3 left-3 bg-black/60 backdrop-blur px-3 py-1.5 rounded-lg border border-white/10 text-[10px] text-white font-medium" data-t="lbl_media2">Premium Standard</div>
+        </div>
+        <div class="snap-center shrink-0 w-[85vw] sm:w-[400px] aspect-square bg-white/5 border border-white/10 rounded-2xl overflow-hidden relative shadow-lg">
+            <img src="images/hub-img2.webp" class="w-full h-full object-cover" alt="Financial Freedom">
+            <div class="absolute bottom-3 left-3 bg-black/60 backdrop-blur px-3 py-1.5 rounded-lg border border-white/10 text-[10px] text-white font-medium" data-t="lbl_media3">Financial Freedom</div>
+        </div>
+    </div>
+
+    <div class="px-4 sm:px-6 mb-12">
+        <div class="bg-white/5 border border-white/10 rounded-2xl p-6 space-y-5 shadow-soft">
+            <div class="flex gap-4 items-start">
+                <div class="w-10 h-10 rounded-full bg-luxe/10 text-luxe flex shrink-0 items-center justify-center"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg></div>
+                <div><h3 class="font-bold text-white mb-1" data-t="hook1_title">Consistent, Hassle-Free Jobs</h3><p class="text-sm text-white/70" data-t="hook1_desc">We send customers directly to you for standardized alterations. No complex custom sewing.</p></div>
+            </div>
+            <div class="flex gap-4 items-start">
+                <div class="w-10 h-10 rounded-full bg-luxe/10 text-luxe flex shrink-0 items-center justify-center"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path></svg></div>
+                <div><h3 class="font-bold text-white mb-1" data-t="hook2_title">Seamless Logistics</h3><p class="text-sm text-white/70" data-t="hook2_desc">Customers drop off items or we arrange Lalamove riders to deliver right to your doorstep.</p></div>
+            </div>
+            <div class="flex gap-4 items-start">
+                <div class="w-10 h-10 rounded-full bg-luxe/10 text-luxe flex shrink-0 items-center justify-center"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg></div>
+                <div><h3 class="font-bold text-white mb-1" data-t="hook3_title">Guaranteed & Fast Pay</h3><p class="text-sm text-white/70" data-t="hook3_desc">Fixed, transparent fees. Customers pay you directly upon completion.</p></div>
+            </div>
+            <div class="flex gap-4 items-start">
+                <div class="w-10 h-10 rounded-full bg-luxe/10 text-luxe flex shrink-0 items-center justify-center"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg></div>
+                <div><h3 class="font-bold text-white mb-1" data-t="hook4_title">Automated Portal</h3><p class="text-sm text-white/70" data-t="hook4_desc">Manage orders, update statuses, and track earnings instantly via our Partner Portal.</p></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="px-4 sm:px-6 mb-12">
+        <h2 class="font-display text-2xl text-white mb-4 text-center" data-t="title_services">Standardized Services</h2>
+        <ul class="space-y-3 bg-white/5 border border-white/10 rounded-2xl p-6 text-sm text-white/80 shadow-soft">
+            <li class="flex gap-3"><span class="text-luxe">✂️</span> <span data-t="srv_hem"><strong>Hemming:</strong> Straight cut and sew to adjust length.</span></li>
+            <li class="flex gap-3"><span class="text-luxe">✂️</span> <span data-t="srv_sleeve"><strong>Sleeve Alteration:</strong> Shorten and finish sleeves.</span></li>
+            <li class="flex gap-3"><span class="text-luxe">✂️</span> <span data-t="srv_shoulder"><strong>Shoulder Alteration:</strong> Adjust shoulder width.</span></li>
+            <li class="flex gap-3"><span class="text-luxe">✂️</span> <span data-t="srv_pads"><strong>Shoulder Pads:</strong> Simple pad insertion.</span></li>
+            <li class="flex gap-3 mt-4 pt-3 border-t border-white/10"><span class="text-luxe">✂️</span> <span data-t="srv_full"><strong>Full Body Package:</strong> A complete resizing that includes all services above.</span></li>
+        </ul>
+    </div>
+
+    <div class="px-4 sm:px-6 mb-12 relative z-10">
+        <div class="absolute inset-0 bg-gradient-to-b from-transparent to-luxe/5 blur-xl -z-10"></div>
+        <h2 class="font-display text-2xl text-white mb-2 text-center" data-t="title_calc">Income Calculator</h2>
+        <p class="text-xs text-white/50 text-center mb-6" data-t="desc_calc">Estimate your earnings based on daily output.</p>
+        
+        <div class="bg-[#111213] border border-luxe/30 rounded-3xl p-6 sm:p-8 shadow-[0_0_50px_rgba(192,160,98,0.1)] relative overflow-hidden">
+            <div class="absolute top-0 right-0 w-32 h-32 bg-luxe/10 rounded-full blur-3xl"></div>
+            
+            <div class="space-y-6 relative z-10">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-bold text-white mb-0.5" data-t="calc_full">Full Body Packages</p>
+                        <p class="text-[10px] text-luxe font-mono" id="disp-price-full">RM 30 / pc</p>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <button class="calc-btn" onclick="updateCalc('full', -1)">−</button>
+                        <span class="w-6 text-center font-bold text-lg text-white" id="qty-full">3</span>
+                        <button class="calc-btn" onclick="updateCalc('full', 1)">+</button>
+                    </div>
+                </div>
+                
+                <div class="border-t border-white/10 pt-6 flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-bold text-white mb-0.5" data-t="calc_minor">Minor Alterations</p>
+                        <p class="text-[10px] text-white/50" data-t="calc_minor_desc">(Hems, Sleeves, Shoulders)</p>
+                        <p class="text-[10px] text-luxe font-mono" id="disp-price-minor">Avg RM 12 / pc</p>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <button class="calc-btn" onclick="updateCalc('minor', -1)">−</button>
+                        <span class="w-6 text-center font-bold text-lg text-white" id="qty-minor">5</span>
+                        <button class="calc-btn" onclick="updateCalc('minor', 1)">+</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-8 bg-black/50 border border-white/10 rounded-2xl p-5 relative z-10">
+                <p class="text-[10px] uppercase tracking-widest text-white/50 mb-1 text-center" data-t="calc_est_monthly">Estimated Monthly Income</p>
+                <div class="text-center font-display text-4xl sm:text-5xl text-luxe font-bold mb-2 tracking-tight" id="calc-total">RM 3,600</div>
+                <p class="text-[10px] text-white/30 text-center text-center" data-t="calc_disclaimer">*Based on 24 working days/month.</p>
+            </div>
+        </div>
+    </div>
+  </main>
+
+  <div class="fixed bottom-0 inset-x-0 p-4 bg-[#0F0F10]/90 backdrop-blur-xl border-t border-white/10 z-30">
+      <div class="max-w-screen-md mx-auto">
+          <button onclick="openForm()" class="w-full bg-white text-brand font-bold py-4 rounded-xl hover:bg-luxe hover:text-white transition shadow-[0_0_30px_rgba(255,255,255,0.15)] text-lg flex justify-center items-center gap-2">
+              <span data-t="btn_register">Apply Now</span>
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+          </button>
+      </div>
+  </div>
+
+  <div id="form-overlay" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden opacity-0 transition-opacity duration-300" onclick="closeForm()"></div>
+  <div id="form-sheet" class="fixed bottom-0 inset-x-0 z-[60] bg-[#111213] border-t border-luxe/30 rounded-t-3xl max-h-[90vh] overflow-hidden flex flex-col bottom-sheet">
+      <div class="p-4 border-b border-white/5 flex justify-between items-center bg-[#111213] relative z-10">
+          <h2 class="font-display text-2xl text-white ml-2" data-t="form_title">Hub Application</h2>
+          <button onclick="closeForm()" class="p-2 text-white/50 hover:text-white bg-white/5 rounded-full"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
+      </div>
+      
+      <div class="p-6 overflow-y-auto hide-scrollbar space-y-6 pb-32">
+          
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+              <div>
+                  <label class="block text-xs text-white/70 uppercase tracking-widest mb-2" data-t="lbl_name">Full Name <span class="text-red-400">*</span></label>
+                  <input type="text" id="reg-name" placeholder="e.g. Siti Aishah">
+              </div>
+              <div>
+                  <label class="block text-xs text-white/70 uppercase tracking-widest mb-2" data-t="lbl_shop">Shop / Brand Name (Optional)</label>
+                  <input type="text" id="reg-shop" placeholder="e.g. Butik Aishah">
+              </div>
+          </div>
+          
+          <div>
+              <label class="block text-xs text-white/70 uppercase tracking-widest mb-2" data-t="lbl_phone">WhatsApp Number <span class="text-red-400">*</span></label>
+              <input type="tel" id="reg-phone" placeholder="e.g. 0123456789">
+          </div>
+
+          <div class="bg-white/5 border border-white/10 rounded-xl p-5 relative overflow-hidden">
+              <div class="absolute top-0 right-0 p-3 opacity-10"><svg class="w-16 h-16" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg></div>
+              <h3 class="text-sm font-bold text-white mb-4 relative z-10" data-t="lbl_loc_title">Workspace Location <span class="text-red-400">*</span></h3>
+              
+              <div id="gps-ui" class="relative z-10">
+                  <button type="button" onclick="getGPS()" id="btn-gps" class="w-full py-3 mb-4 bg-white/10 hover:bg-white/20 border border-dashed border-white/30 rounded-lg text-sm font-bold flex justify-center items-center gap-2 transition">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                      <span data-t="btn_detect_gps">Detect Current Location</span>
+                  </button>
+                  <p class="text-xs text-white/50 text-center mb-4 hidden" id="gps-result">...</p>
+                  
+                  <label class="block text-xs text-white/70 uppercase tracking-widest mb-2" data-t="lbl_unit">Unit / House / Lot No.</label>
+                  <input type="text" id="reg-unit" placeholder="e.g. No 42, Jalan Indah 1">
+              </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+              <div>
+                  <label class="block text-xs text-white/70 uppercase tracking-widest mb-2" data-t="lbl_capacity">Daily Capacity</label>
+                  <select id="reg-capacity">
+                      <option value="1-5 pieces/day" data-t="opt_cap1">1 - 5 pieces/day</option>
+                      <option value="6-15 pieces/day" data-t="opt_cap2">6 - 15 pieces/day</option>
+                      <option value="15+ pieces/day" data-t="opt_cap3">15+ pieces/day</option>
+                  </select>
+              </div>
+              <div>
+                  <label class="block text-xs text-white/70 uppercase tracking-widest mb-2" data-t="lbl_exp">Tailoring Experience</label>
+                  <select id="reg-exp">
+                      <option value="< 1 year" data-t="opt_exp1">Less than 1 year</option>
+                      <option value="1 - 3 years" data-t="opt_exp2">1 - 3 years</option>
+                      <option value="3 - 5 years" data-t="opt_exp3">3 - 5 years</option>
+                      <option value="5+ years" data-t="opt_exp4">5+ years</option>
+                  </select>
+              </div>
+          </div>
+
+          <div>
+              <label class="block text-xs text-white/70 uppercase tracking-widest mb-2" data-t="lbl_cert">Certifications (Optional)</label>
+              <input type="text" id="reg-cert" placeholder="e.g. GiatMara, Kemas, Epal">
+          </div>
+
+          <div class="bg-white/5 border border-white/10 rounded-xl p-5">
+              <label class="block text-xs text-white/70 uppercase tracking-widest mb-4" data-t="lbl_equipment">Equipment Owned <span class="text-red-400">*</span></label>
+              <div class="space-y-3">
+                  <label class="flex items-center gap-3 cursor-pointer group">
+                      <input type="checkbox" id="eq-straight" class="transition group-hover:border-luxe"><span class="text-sm" data-t="eq_straight">Industrial Straight Stitch Machine</span>
+                  </label>
+                  <label class="flex items-center gap-3 cursor-pointer group">
+                      <input type="checkbox" id="eq-overlock" class="transition group-hover:border-luxe"><span class="text-sm" data-t="eq_overlock">Overlock Machine (Jahit Tepi)</span>
+                  </label>
+                  <label class="flex items-center gap-3 cursor-pointer group">
+                      <input type="checkbox" id="eq-iron" class="transition group-hover:border-luxe"><span class="text-sm" data-t="eq_iron">Steam Iron Station</span>
+                  </label>
+              </div>
+          </div>
+
+          <div>
+              <label class="block text-xs text-white/70 uppercase tracking-widest mb-2" data-t="lbl_photo">Workspace Photo <span class="text-red-400">*</span></label>
+              <p class="text-[10px] text-white/50 mb-3" data-t="desc_photo">Please upload a clear photo of your sewing machine / setup.</p>
+              
+              <div class="relative border-2 border-dashed border-white/20 rounded-xl p-6 text-center hover:bg-white/5 hover:border-luxe/50 transition cursor-pointer" onclick="document.getElementById('reg-photo').click()">
+                  <input type="file" id="reg-photo" accept="image/*" class="hidden" onchange="handlePhotoSelect(event)">
+                  <div id="photo-preview-container" class="hidden flex flex-col items-center">
+                      <img id="photo-preview" src="" class="w-24 h-24 object-cover rounded-lg border border-white/20 mb-2 shadow-lg">
+                      <span class="text-[10px] text-green-400 font-bold bg-green-500/10 px-2 py-1 rounded" data-t="txt_photo_ready">Photo Ready</span>
+                  </div>
+                  <div id="photo-placeholder">
+                      <svg class="w-8 h-8 text-white/30 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                      <span class="text-sm text-luxe font-medium block" data-t="btn_upload">Tap to Upload</span>
+                  </div>
+              </div>
+          </div>
+
+          <button id="btn-submit" onclick="submitApplication()" class="w-full bg-luxe text-brand font-bold py-4 rounded-xl hover:bg-white transition shadow-soft flex justify-center items-center gap-2 mt-4">
+              <span data-t="btn_submit">Submit Application</span>
+          </button>
+      </div>
+  </div>
+
+  <div id="success-modal" class="fixed inset-0 z-[200] flex items-center justify-center bg-black/90 backdrop-blur-md hidden opacity-0 transition-opacity duration-300 px-4">
+      <div class="bg-[#111213] border border-luxe/50 rounded-2xl w-full max-w-sm p-8 text-center shadow-[0_0_50px_rgba(192,160,98,0.2)] transform scale-95 transition-transform duration-300" id="success-box">
+          <div class="w-16 h-16 rounded-full bg-green-500/20 text-green-400 flex items-center justify-center mx-auto mb-5">
+              <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+          </div>
+          <h3 class="font-display text-2xl text-white mb-2" data-t="modal_success_title">Application Received!</h3>
+          <p class="text-sm text-white/70 mb-6" data-t="modal_success_desc">Thank you for your interest in joining Arabista. Our team will review your application and contact you via WhatsApp shortly.</p>
+          <button onclick="window.location.href='index.html'" class="w-full bg-white/10 text-white font-bold py-3.5 rounded-xl hover:bg-white/20 transition" data-t="btn_close">Back to Home</button>
+      </div>
+  </div>
+
+  <script>
+    // --- DICTIONARY ---
+    const t = {
+        en: {
+            txt_badge: "Official Partner Program", hero_title: "Become an Arabista Alteration Hub", hero_subtitle: "Turn your tailoring skills into a steady stream of income. Perfect for home-based tailors and alteration shops.",
+            lbl_media1: "Hassle-Free Delivery", lbl_media2: "Premium Standard", lbl_media3: "Financial Freedom",
+            hook1_title: "Consistent, Hassle-Free Jobs", hook1_desc: "We send customers directly to you for standardized alterations. No complex custom sewing.", hook2_title: "Seamless Logistics", hook2_desc: "Customers drop off items or we arrange Lalamove riders to deliver right to your doorstep.", hook3_title: "Guaranteed & Fast Pay", hook3_desc: "Fixed, transparent fees. Customers pay you directly upon completion.", hook4_title: "Automated Portal", hook4_desc: "Manage orders, update statuses, and track earnings instantly via our Partner Portal.",
+            title_services: "Standardized Services", srv_hem: "<strong>Hemming:</strong> Straight cut and sew to adjust length.", srv_sleeve: "<strong>Sleeve Alteration:</strong> Shorten and finish sleeves.", srv_shoulder: "<strong>Shoulder Alteration:</strong> Adjust shoulder width.", srv_pads: "<strong>Shoulder Pads:</strong> Simple pad insertion.", srv_full: "<strong>Full Body Package:</strong> A complete resizing that includes all services above.",
+            title_calc: "Income Calculator", desc_calc: "Estimate your earnings based on daily output.", calc_full: "Full Body Packages", calc_minor: "Minor Alterations", calc_minor_desc: "(Hems, Sleeves, Shoulders)", calc_est_monthly: "Estimated Monthly Income", calc_disclaimer: "*Based on 24 working days/month.",
+            btn_register: "Apply Now", form_title: "Hub Application", lbl_name: "Full Name *", lbl_shop: "Shop / Brand Name (Optional)", lbl_phone: "WhatsApp Number *", lbl_loc_title: "Workspace Location *", btn_detect_gps: "Detect Current Location", lbl_unit: "Unit / House / Lot No.", lbl_capacity: "Daily Capacity", opt_cap1: "1 - 5 pieces/day", opt_cap2: "6 - 15 pieces/day", opt_cap3: "15+ pieces/day", lbl_exp: "Tailoring Experience", opt_exp1: "Less than 1 year", opt_exp2: "1 - 3 years", opt_exp3: "3 - 5 years", opt_exp4: "5+ years", lbl_cert: "Certifications (Optional)", lbl_equipment: "Equipment Owned *", eq_straight: "Industrial Straight Stitch Machine", eq_overlock: "Overlock Machine (Jahit Tepi)", eq_iron: "Steam Iron Station", lbl_photo: "Workspace Photo *", desc_photo: "Please upload a clear photo of your sewing machine / setup.", btn_upload: "Tap to Upload", txt_photo_ready: "Photo Ready", btn_submit: "Submit Application",
+            modal_success_title: "Application Received!", modal_success_desc: "Thank you for your interest in joining Arabista. Our team will review your application and contact you via WhatsApp shortly.", btn_close: "Back to Home",
+            alert_name: "Please enter your full name.", alert_phone: "Please enter your WhatsApp number.", alert_gps: "Please detect your GPS location.", alert_unit: "Please enter your unit/house number.", alert_eq: "Please select at least one equipment.", alert_photo: "Please upload a workspace photo.", alert_error: "Connection Error.", msg_locating: "Locating...", msg_locked: "GPS Locked", msg_submitting: "Submitting...", msg_geo_notsupported: "Geo not supported"
+        },
+        bm: {
+            txt_badge: "Program Rakan Rasmi", hero_title: "Jadi Hub Alterasi Arabista", hero_subtitle: "Jana pendapatan tetap dengan kemahiran menjahit anda. Sesuai untuk tukang jahit dari rumah atau kedai.",
+            lbl_media1: "Penghantaran Mudah", lbl_media2: "Standard Premium", lbl_media3: "Kebebasan Kewangan",
+            hook1_title: "Tugasan Tetap, Tanpa Pening", hook1_desc: "Kami hantar pelanggan kepada anda untuk alterasi standard. Tiada tempahan baju yang rumit.", hook2_title: "Logistik Lancar", hook2_desc: "Pelanggan hantar sendiri, atau kami uruskan rider Lalamove terus ke pintu rumah anda.", hook3_title: "Harga Tetap & Bayaran Pantas", hook3_desc: "Harga telus. Pelanggan bayar terus kepada anda sebaik siap.", hook4_title: "Sistem Portal Automatik", hook4_desc: "Urus tugasan, kemas kini status, dan jejak pendapatan pantas melalui Portal Rakan kami.",
+            title_services: "Servis Standard", srv_hem: "<strong>Potong Labuh:</strong> Potong lurus dan jahit untuk kemasan bawah.", srv_sleeve: "<strong>Potong Lengan:</strong> Pendekkan dan kemaskan hujung lengan.", srv_shoulder: "<strong>Kecilkan Bahu:</strong> Sesuaikan kelebaran bahu.", srv_pads: "<strong>Tambah Span:</strong> Masukkan span pada bahagian bahu.", srv_full: "<strong>Alter Keseluruhan:</strong> Pakej lengkap merangkumi semua servis di atas.",
+            title_calc: "Kalkulator Pendapatan", desc_calc: "Anggar pendapatan anda berdasarkan kapasiti harian.", calc_full: "Pakej Alter Keseluruhan", calc_minor: "Alterasi Minor", calc_minor_desc: "(Labuh, Lengan, Bahu)", calc_est_monthly: "Anggaran Pendapatan Bulanan", calc_disclaimer: "*Berdasarkan 24 hari bekerja sebulan.",
+            btn_register: "Daftar Sekarang", form_title: "Borang Pendaftaran", lbl_name: "Nama Penuh *", lbl_shop: "Nama Kedai / Jenama (Pilihan)", lbl_phone: "Nombor WhatsApp *", lbl_loc_title: "Lokasi Ruang Jahit *", btn_detect_gps: "Kesan Lokasi Semasa", lbl_unit: "No. Unit / Rumah", lbl_capacity: "Kapasiti Harian", opt_cap1: "1 - 5 helai sehari", opt_cap2: "6 - 15 helai sehari", opt_cap3: "15+ helai sehari", lbl_exp: "Pengalaman Menjahit", opt_exp1: "Kurang 1 tahun", opt_exp2: "1 - 3 tahun", opt_exp3: "3 - 5 tahun", opt_exp4: "Lebih 5 tahun", lbl_cert: "Sijil Kemahiran (Pilihan)", lbl_equipment: "Peralatan Sedia Ada *", eq_straight: "Mesin Jahit Lurus Industri", eq_overlock: "Mesin Jahit Tepi (Overlock)", eq_iron: "Seterika Wap (Steam Iron)", lbl_photo: "Gambar Ruang Jahitan *", desc_photo: "Sila muat naik gambar mesin jahit / ruang kerja anda dengan jelas.", btn_upload: "Klik untuk Muat Naik", txt_photo_ready: "Gambar Sedia", btn_submit: "Hantar Permohonan",
+            modal_success_title: "Permohonan Diterima!", modal_success_desc: "Terima kasih kerana berminat menyertai Arabista. Pasukan kami akan menyemak permohonan anda dan menghubungi anda di WhatsApp.", btn_close: "Kembali ke Utama",
+            alert_name: "Sila masukkan nama penuh anda.", alert_phone: "Sila masukkan nombor WhatsApp anda.", alert_gps: "Sila kesan lokasi GPS anda.", alert_unit: "Sila masukkan no. unit/rumah anda.", alert_eq: "Sila pilih sekurang-kurangnya satu peralatan.", alert_photo: "Sila muat naik gambar ruang jahitan.", alert_error: "Ralat Sambungan.", msg_locating: "Mengesan...", msg_locked: "GPS Dikunci", msg_submitting: "Menghantar...", msg_geo_notsupported: "Geo tidak disokong"
+        }
+    };
+
+    let currentLang = 'en';
+    
+    // Default prices (will update if fetched)
+    let pFull = 30; let pMinor = 12;
+    let qtyFull = 3; let qtyMinor = 5;
+    let base64Photo = "";
+    let appData = { lat: "", lng: "", address: "" };
+
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbyrJFfuCrhAbdwzAj8uP4sSvFuzRzzzEFV5CHOCBSOK6OGlIXPtsf7-XEfjLHGnFZiyvw/exec'; 
+
+    function setLang(lang) {
+        currentLang = lang;
+        document.querySelectorAll('[data-t]').forEach(el => { if(t[lang][el.getAttribute('data-t')]) el.innerHTML = t[lang][el.getAttribute('data-t')]; });
+        document.querySelectorAll('[data-t-placeholder]').forEach(el => { if(t[lang][el.getAttribute('data-t-placeholder')]) el.placeholder = t[lang][el.getAttribute('data-t-placeholder')]; });
+        document.getElementById('lang-en').className = lang === 'en' ? "text-xs font-bold text-luxe" : "text-xs text-white/50 hover:text-white";
+        document.getElementById('lang-bm').className = lang === 'bm' ? "text-xs font-bold text-luxe" : "text-xs text-white/50 hover:text-white";
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const userLang = navigator.language || navigator.userLanguage;
+        if (userLang && userLang.toLowerCase().startsWith('ms')) setLang('bm'); else setLang('en');
+        
+        // Fetch pricing quietly
+        fetch(scriptURL).then(r=>r.json()).then(d => {
+            if(d.pricing && d.pricing.full) {
+                pFull = d.pricing.full.price;
+                pMinor = Math.round((d.pricing.hem.price + d.pricing.sleeve.price + d.pricing.shoulder.price) / 3);
+                document.getElementById('disp-price-full').innerText = `RM ${pFull} / pc`;
+                document.getElementById('disp-price-minor').innerText = `Avg RM ${pMinor} / pc`;
+                calculateIncome();
+            }
+        }).catch(e=>{});
+        calculateIncome();
+    });
+
+    // --- CALCULATOR LOGIC ---
+    function updateCalc(type, val) {
+        if(type === 'full') { qtyFull += val; if(qtyFull < 0) qtyFull = 0; document.getElementById('qty-full').innerText = qtyFull; }
+        if(type === 'minor') { qtyMinor += val; if(qtyMinor < 0) qtyMinor = 0; document.getElementById('qty-minor').innerText = qtyMinor; }
+        calculateIncome();
+    }
+
+    function calculateIncome() {
+        const daily = (qtyFull * pFull) + (qtyMinor * pMinor);
+        const monthly = daily * 24; 
+        document.getElementById('calc-total').innerText = "RM " + monthly.toLocaleString();
+    }
+
+    // --- FORM LOGIC ---
+    function openForm() {
+        document.getElementById('form-overlay').classList.remove('hidden');
+        setTimeout(() => document.getElementById('form-overlay').classList.remove('opacity-0'), 10);
+        document.getElementById('form-sheet').classList.add('open');
+    }
+
+    function closeForm() {
+        document.getElementById('form-sheet').classList.remove('open');
+        document.getElementById('form-overlay').classList.add('opacity-0');
+        setTimeout(() => document.getElementById('form-overlay').classList.add('hidden'), 400);
+    }
+
+    function getGPS() {
+        if(!navigator.geolocation) return alert(t[currentLang].msg_geo_notsupported);
+        const btn = document.getElementById('btn-gps');
+        const resEl = document.getElementById('gps-result');
+        const origHTML = btn.innerHTML;
+        btn.innerHTML = `<svg class="animate-spin w-4 h-4 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> ${t[currentLang].msg_locating}`;
+        btn.disabled = true;
+
+        navigator.geolocation.getCurrentPosition(async (pos) => {
+            appData.lat = pos.coords.latitude; appData.lng = pos.coords.longitude;
+            btn.innerHTML = `<svg class="w-4 h-4 mr-2 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> ${t[currentLang].msg_locked}`;
+            try {
+                const res = await fetch(`${scriptURL}?action=reverse_geocode&lat=${appData.lat}&lng=${appData.lng}`);
+                const data = await res.json();
+                appData.address = data.address || `${appData.lat}, ${appData.lng}`;
+                resEl.innerText = appData.address;
+                resEl.classList.remove('hidden');
+            } catch(e) { appData.address = `${appData.lat}, ${appData.lng}`; resEl.innerText = appData.address; resEl.classList.remove('hidden'); }
+        }, (err) => { btn.innerHTML = origHTML; btn.disabled = false; alert("GPS Error: " + err.message); });
+    }
+
+    function handlePhotoSelect(e) {
+        const file = e.target.files[0];
+        if(!file) return;
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = event => {
+            const img = new Image();
+            img.src = event.target.result;
+            img.onload = () => {
+                const canvas = document.createElement('canvas');
+                const MAX_WIDTH = 800; // Compress heavily
+                const scaleSize = MAX_WIDTH / img.width;
+                canvas.width = MAX_WIDTH;
+                canvas.height = img.height * scaleSize;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                base64Photo = canvas.toDataURL('image/jpeg', 0.6); // 60% quality jpeg
+                
+                document.getElementById('photo-placeholder').classList.add('hidden');
+                document.getElementById('photo-preview-container').classList.remove('hidden');
+                document.getElementById('photo-preview').src = base64Photo;
+            }
+        }
+    }
+
+    async function submitApplication() {
+        const name = document.getElementById('reg-name').value.trim();
+        const shop = document.getElementById('reg-shop').value.trim();
+        const phone = document.getElementById('reg-phone').value.trim();
+        const unit = document.getElementById('reg-unit').value.trim();
+        const cap = document.getElementById('reg-capacity').value;
+        const exp = document.getElementById('reg-exp').value;
+        const cert = document.getElementById('reg-cert').value.trim();
+        
+        const eqStraight = document.getElementById('eq-straight').checked;
+        const eqOverlock = document.getElementById('eq-overlock').checked;
+        const eqIron = document.getElementById('eq-iron').checked;
+
+        if(!name) return alert(t[currentLang].alert_name);
+        if(!phone) return alert(t[currentLang].alert_phone);
+        if(!appData.lat) return alert(t[currentLang].alert_gps);
+        if(!unit) return alert(t[currentLang].alert_unit);
+        if(!eqStraight && !eqOverlock && !eqIron) return alert(t[currentLang].alert_eq);
+        if(!base64Photo) return alert(t[currentLang].alert_photo);
+
+        let equipmentList = [];
+        if(eqStraight) equipmentList.push("Straight Stitch");
+        if(eqOverlock) equipmentList.push("Overlock");
+        if(eqIron) equipmentList.push("Steam Iron");
+
+        const btn = document.getElementById('btn-submit');
+        const origText = btn.innerHTML;
+        btn.innerHTML = `<svg class="animate-spin h-5 w-5 inline mr-2 text-brand" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> ${t[currentLang].msg_submitting}`;
+        btn.disabled = true;
+
+        const payload = {
+            action: "hub_application",
+            name: name,
+            shop: shop,
+            phone: phone,
+            address: `${unit}, ${appData.address}`,
+            lat: appData.lat,
+            lng: appData.lng,
+            capacity: cap,
+            experience: exp,
+            certifications: cert,
+            equipment: equipmentList.join(", "),
+            photo_base64: base64Photo.split(',')[1] // Strip the data URL prefix for Apps Script
+        };
+
+        try {
+            const res = await fetch(scriptURL, { 
+                method: 'POST', 
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify(payload) 
+            });
+            const data = await res.json();
+            
+            if (data.status === "success") {
+                const modal = document.getElementById('success-modal');
+                const box = document.getElementById('success-box');
+                modal.classList.remove('hidden');
+                setTimeout(() => { modal.classList.remove('opacity-0'); box.classList.remove('scale-95'); }, 10);
+            } else {
+                alert(data.message || t[currentLang].alert_error);
+                btn.innerHTML = origText; btn.disabled = false;
+            }
+        } catch (error) {
+            alert(t[currentLang].alert_error);
+            btn.innerHTML = origText; btn.disabled = false;
+        }
+    }
+  </script>
+</body>
+</html>
