@@ -48,6 +48,11 @@
 </head>
 <body class="antialiased selection:bg-luxe selection:text-brand">
 
+  <div id="initial-loader" class="fixed inset-0 z-[999] bg-[#0F0F10] flex flex-col items-center justify-center transition-opacity duration-500">
+      <img src="images/logo-88.webp" alt="Arabista" class="w-24 h-24 animate-pulse mb-4 opacity-80">
+      <p class="text-luxe font-display tracking-[0.2em] text-lg animate-pulse">ARABISTA</p>
+  </div>
+
   <header class="fixed top-0 inset-x-0 z-50 backdrop-blur bg-brand/80 border-b border-white/10">
     <div class="max-w-screen-xl mx-auto px-4 sm:px-6">
       <div class="h-14 grid grid-cols-3 items-center">
@@ -74,11 +79,6 @@
             <input type="text" id="search-input" placeholder="e.g. ALT-0226-ABCD">
             <button id="btn-search" onclick="searchTracker()" class="w-full mt-4 bg-luxe text-brand font-bold py-3 rounded-xl hover:bg-white transition flex justify-center items-center" data-t="btn_track">Track Order</button>
         </div>
-    </div>
-
-    <div id="loading-panel" class="hidden text-center mt-20 flex-1 flex flex-col items-center justify-center fade-in">
-        <svg class="animate-spin h-8 w-8 text-luxe mx-auto mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-        <p class="text-white/50" data-t="txt_loading">Locating your order details...</p>
     </div>
 
     <div id="tracker-panel" class="hidden fade-in">
@@ -147,6 +147,22 @@
           </div>
       </div>
   </template>
+
+  <div id="outbound-pay-check-modal" class="fixed inset-0 z-[200] flex items-center justify-center bg-black/90 backdrop-blur-md hidden opacity-0 transition-opacity duration-300 px-4">
+    <div class="bg-[#111213] border border-orange-500/50 rounded-2xl w-full max-w-sm p-8 transform scale-95 transition-transform duration-300 text-center shadow-[0_0_50px_rgba(249,115,22,0.1)] relative" id="outbound-pay-check-box">
+        <button onclick="closePayCheckModal()" class="absolute top-4 right-4 text-white/30 hover:text-white transition"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
+        
+        <div class="w-16 h-16 rounded-full bg-orange-500/20 text-orange-400 flex items-center justify-center mx-auto mb-4">
+            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+        </div>
+        <h3 class="font-display text-2xl text-white mb-2" data-t="modal_pay_check_title">Alteration Fee Check</h3>
+        <p class="text-sm text-white/70 mb-6 leading-relaxed" data-t="modal_pay_check_desc">Have you paid the hub for the alteration services yet? You must pay the hub before arranging delivery.</p>
+        <div class="space-y-3">
+            <button onclick="confirmPaidAndBook()" class="w-full bg-luxe text-brand font-bold py-3.5 rounded-xl hover:bg-white transition shadow-soft" data-t="btn_yes_paid">Yes, I Have Paid</button>
+            <button onclick="closePayCheckAndViewQR()" class="w-full border border-white/10 text-white font-bold py-3.5 rounded-xl hover:bg-white/5 transition" data-t="btn_not_yet_qr">Not Yet, View QR</button>
+        </div>
+    </div>
+  </div>
 
   <div id="hub-pay-modal" class="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-md hidden opacity-0 transition-opacity duration-300 px-4">
     <div class="bg-[#111213] border border-luxe/50 rounded-2xl w-full max-w-sm p-8 transform scale-95 transition-transform duration-300 text-center shadow-[0_0_50px_rgba(192,160,98,0.1)] relative" id="hub-pay-box">
@@ -302,6 +318,7 @@
     let currentStops = null;
     let currentLang = 'en';
     let isIncomingOrder = false; 
+    let pendingOutboundChoice = '';
 
     const t = {
         en: {
@@ -320,14 +337,18 @@
             wa_hub_pay: "*[ALTERATION PAYMENT]*\n- *Order:* {id}\n- *Amount:* {total}\n- *Paid To:* Arabista Hub\n\nReceipt attached below.",
             wa_hq_pay: "*[DELIVERY PAYMENT]*\n- *Order:* {id}\n- *Amount:* {total}\n- *Paid To:* Arabista HQ\n- *Link:* {link}\n\nReceipt attached below.",
             
-            // New UI Dictionary additions
             status_assigned_to: "Assigned to: ", txt_rejected_title: "Order Rejected", txt_rejected_desc: "Unfortunately, the Hub is currently unable to accept your request (likely due to high volume or closing time).", btn_choose_another: "Choose Another Hub", txt_waiting_approval: "Your request is waiting for Hub's approval. If it takes too long, you can re-notify them.", btn_renotify: "Re-notify Hub via WhatsApp", txt_please_dropoff: "Please drop off your items at the hub.", txt_lala_live: "Lalamove Live Status", txt_tab_orig: "Original", txt_tab_gps: "GPS", txt_tab_manual: "Manual",
             stage_pending_approval: "Pending Approval", stage_awaiting_dispatch: "Awaiting Dispatch", stage_inbound_dispatched: "Inbound Dispatched", stage_in_progress: "In Progress", stage_ready_for_return: "Ready for Return", stage_pending_dropoff: "Pending Dropoff", stage_outbound_dispatched: "Outbound Dispatched", stage_completed: "Completed", stage_dispatched: "Dispatched",
             step_assigning: "Assigning", step_found: "Found", step_picked_up: "Picked Up", step_delivered: "Delivered",
             modal_booked_title: "Driver Booked!", modal_booked_desc: "Your Lalamove rider has been successfully scheduled. Please notify the Hub.", btn_notify_hub_wa: "Notify Hub via WhatsApp", btn_skip_reload: "Skip & Reload Tracker",
             wa_lala_booked: "*[LALAMOVE BOOKED]*\n- *Order ID:* {id}\n- *Direction:* {dir}\n\nA Lalamove rider has been booked. You can track the live status here:\n{link}",
             dir_inbound: "Inbound to Hub", dir_outbound: "Outbound to Customer",
-            modal_title_pickup: "Confirm Pickup Location", modal_title_delivery: "Confirm Delivery Location", lbl_location: "Location", txt_saved_address: "Saved Address"
+            modal_title_pickup: "Confirm Pickup Location", modal_title_delivery: "Confirm Delivery Location", lbl_location: "Location", txt_saved_address: "Saved Address",
+            
+            modal_pay_check_title: "Alteration Fee Check", 
+            modal_pay_check_desc: "Have you paid the hub for the alteration services yet? You must pay the hub before arranging delivery.", 
+            btn_yes_paid: "Yes, I Have Paid", 
+            btn_not_yet_qr: "Not Yet, View QR"
         },
         bm: {
             page_title: "Jejak Tempahan", page_subtitle: "Masukkan ID tempahan unik anda di bawah.", lbl_id: "ID Tempahan", btn_track: "Jejak Pesanan", txt_loading: "Mencari butiran tempahan...", btn_share: "Kongsi Pautan", lbl_items: "Item untuk Diubahsuai:", section_status: "Status Terkini", btn_refresh: "Segar Semula", back_home: "Kembali ke Utama", btn_nav_hub: "Pandu Arah ke Hub",
@@ -345,14 +366,18 @@
             wa_hub_pay: "*[BAYARAN ALTERASI]*\n- *Pesanan:* {id}\n- *Jumlah:* {total}\n- *Dibayar Kepada:* Arabista Hub\n\nResit dilampirkan di bawah.",
             wa_hq_pay: "*[BAYARAN PENGHANTARAN]*\n- *Pesanan:* {id}\n- *Jumlah:* {total}\n- *Dibayar Kepada:* Arabista HQ\n- *Pautan:* {link}\n\nResit dilampirkan di bawah.",
             
-            // New UI Dictionary additions
             status_assigned_to: "Ditetapkan kepada: ", txt_rejected_title: "Pesanan Ditolak", txt_rejected_desc: "Dukacita dimaklumkan, Hub tidak dapat menerima pesanan anda buat masa ini (mungkin kerana terlalu sibuk atau sudah tutup).", btn_choose_another: "Pilih Hub Lain", txt_waiting_approval: "Pesanan anda sedang menunggu kelulusan Hub. Jika terlalu lama, anda boleh maklumkan mereka semula.", btn_renotify: "Maklumkan Hub melalui WhatsApp", txt_please_dropoff: "Sila hantar (drop-off) barang anda di Hub.", txt_lala_live: "Status Terkini Lalamove", txt_tab_orig: "Asal", txt_tab_gps: "GPS", txt_tab_manual: "Manual",
             stage_pending_approval: "Menunggu Kelulusan", stage_awaiting_dispatch: "Menunggu Pickup", stage_inbound_dispatched: "Rider Ditempah (Ke Hub)", stage_in_progress: "Sedang Dijahit", stage_ready_for_return: "Sedia Diambil/Dihantar", stage_pending_dropoff: "Menunggu Drop-off", stage_outbound_dispatched: "Rider Ditempah (Ke Pelanggan)", stage_completed: "Selesai", stage_dispatched: "Dihantar",
             step_assigning: "Mencari", step_found: "Dijumpai", step_picked_up: "Diambil", step_delivered: "Selesai",
             modal_booked_title: "Rider Ditempah!", modal_booked_desc: "Rider Lalamove anda telah berjaya dijadualkan. Sila maklumkan kepada Hub.", btn_notify_hub_wa: "Maklumkan Hub via WhatsApp", btn_skip_reload: "Langkau & Muat Semula",
             wa_lala_booked: "*[LALAMOVE DITEMPAH]*\n- *Pesanan:* {id}\n- *Hala Tuju:* {dir}\n\nRider Lalamove telah ditempah. Anda boleh menjejak status terkini di sini:\n{link}",
             dir_inbound: "Ke Hub (Inbound)", dir_outbound: "Ke Pelanggan (Outbound)",
-            modal_title_pickup: "Sahkan Lokasi Pengambilan", modal_title_delivery: "Sahkan Lokasi Penghantaran", lbl_location: "Lokasi", txt_saved_address: "Alamat Tersimpan"
+            modal_title_pickup: "Sahkan Lokasi Pengambilan", modal_title_delivery: "Sahkan Lokasi Penghantaran", lbl_location: "Lokasi", txt_saved_address: "Alamat Tersimpan",
+            
+            modal_pay_check_title: "Semakan Bayaran Alterasi", 
+            modal_pay_check_desc: "Adakah anda telah membayar hub untuk servis alterasi? Anda mesti membayar hub sebelum menempah penghantaran.", 
+            btn_yes_paid: "Ya, Saya Sudah Bayar", 
+            btn_not_yet_qr: "Belum, Lihat QR"
         }
     };
 
@@ -372,7 +397,7 @@
         }
     }
 
-    const TRACKER_VERSION = "1.1"; 
+    const TRACKER_VERSION = "1.2"; 
 
     document.addEventListener('DOMContentLoaded', () => { 
         const storedVersion = localStorage.getItem('arabista_tracker_version');
@@ -389,18 +414,29 @@
 
         const urlParams = new URLSearchParams(window.location.search);
         const rawId = urlParams.get('id');
+        
+        const loader = document.getElementById('initial-loader');
+        
         if (rawId) { 
             const safeId = sanitizeHTML(rawId);
-            document.getElementById('loading-panel').classList.remove('hidden'); 
             fetchTrackingData(safeId); 
         } else { 
             document.getElementById('search-panel').classList.remove('hidden'); 
+            if (loader) {
+                loader.classList.add('opacity-0');
+                setTimeout(() => loader.classList.add('hidden'), 500);
+            }
         }
     });
 
     function searchTracker() {
         const val = document.getElementById('search-input').value.trim().toUpperCase();
         if(!val) return alert(t[currentLang].alert_enter_id);
+        
+        const btn = document.getElementById('btn-search');
+        btn.innerHTML = `${spinnerSvg} ${t[currentLang].msg_searching || "Searching..."}`;
+        btn.disabled = true;
+        
         window.location.href = `alteration-tracker.html?id=${encodeURIComponent(val)}`;
     }
 
@@ -418,7 +454,12 @@
             const res = await fetch(`${scriptURL}?track_id=${encodeURIComponent(id)}`);
             const data = await res.json();
             
-            if (!isSilent) document.getElementById('loading-panel').classList.add('hidden');
+            const loader = document.getElementById('initial-loader');
+            if (!isSilent && loader && !loader.classList.contains('hidden')) {
+                loader.classList.add('opacity-0');
+                setTimeout(() => loader.classList.add('hidden'), 500);
+            }
+
             if (data.error) { 
                 if(!isSilent) { alert(t[currentLang].alert_order_not_found); document.getElementById('search-panel').classList.remove('hidden'); }
                 return; 
@@ -451,7 +492,15 @@
             renderDashboard();
         } catch (error) { 
             console.error(error);
-            if(!isSilent) alert(t[currentLang].alert_conn_error); 
+            if(!isSilent) {
+                alert(t[currentLang].alert_conn_error); 
+                const loader = document.getElementById('initial-loader');
+                if (loader && !loader.classList.contains('hidden')) {
+                    loader.classList.add('opacity-0');
+                    setTimeout(() => loader.classList.add('hidden'), 500);
+                }
+                document.getElementById('search-panel').classList.remove('hidden'); 
+            }
         }
     }
     
@@ -636,7 +685,7 @@
                         <p class="text-[10px] text-red-400 font-bold mb-3 p-2 bg-red-500/10 border border-red-500/20 rounded">${t[currentLang].txt_pay_alt_warn}</p>
 
                         <div class="flex gap-2">
-                             <button onclick="triggerOutbound('Lalamove')" class="flex-1 py-3 rounded-xl bg-luxe text-brand text-xs font-bold hover:bg-white transition shadow-soft flex justify-center items-center">${t[currentLang].btn_lalamove}</button>
+                             <button onclick="promptPayCheck('Lalamove')" class="flex-1 py-3 rounded-xl bg-luxe text-brand text-xs font-bold hover:bg-white transition shadow-soft flex justify-center items-center">${t[currentLang].btn_lalamove}</button>
                              <button onclick="setReturnChoice('Self-Pickup', this)" class="flex-1 py-3 rounded-xl border border-luxe text-luxe text-xs font-bold hover:bg-luxe/20 transition flex justify-center items-center">${t[currentLang].btn_self_pickup}</button>
                         </div>`;
                     }
@@ -718,6 +767,36 @@
         if(status === 'PICKED_UP') activeIdx = 2; 
         if(status === 'COMPLETED') activeIdx = 3;
         return steps.map((s, i) => `<div class="lala-step ${i <= activeIdx ? (i === activeIdx ? 'active' : 'completed') : ''}"><div class="lala-dot"></div><span class="lala-label">${s.label}</span></div>`).join('');
+    }
+
+    function promptPayCheck(choice) {
+        pendingOutboundChoice = choice;
+        const modal = document.getElementById('outbound-pay-check-modal');
+        const box = document.getElementById('outbound-pay-check-box');
+        modal.classList.remove('hidden');
+        setTimeout(() => { modal.classList.remove('opacity-0'); box.classList.remove('scale-95'); }, 10);
+    }
+
+    function closePayCheckModal() {
+        const modal = document.getElementById('outbound-pay-check-modal');
+        const box = document.getElementById('outbound-pay-check-box');
+        modal.classList.add('opacity-0');
+        box.classList.add('scale-95');
+        setTimeout(() => { modal.classList.add('hidden'); }, 300);
+    }
+
+    function closePayCheckAndViewQR() {
+        closePayCheckModal();
+        setTimeout(() => { openHubPayModal(true); }, 300);
+    }
+
+    function confirmPaidAndBook() {
+        closePayCheckModal();
+        setTimeout(() => { 
+            if (pendingOutboundChoice === 'Lalamove') {
+                triggerOutbound('Lalamove'); 
+            }
+        }, 300);
     }
 
     function showModalStep(n) {
@@ -987,7 +1066,7 @@
         let payload = { action: "get_lalamove_quote" };
         if (isIncomingOrder) {
             payload.pickupLat = custData.lat; payload.pickupLng = custData.lng; payload.pickupAddress = custData.address;
-            payload.dropoffLat = hubData.lat; payload.dropoffLng = hubData.lng; payload.dropoffAddress = currentData.hubName + " (Hub)";
+            payload.dropoffLat = hubData.lat; payload.dropoffLat = hubData.lat; payload.dropoffLng = hubData.lng; payload.dropoffAddress = currentData.hubName + " (Hub)";
         } else {
             payload.pickupLat = hubData.lat; payload.pickupLng = hubData.lng; payload.pickupAddress = currentData.hubName + " (Hub)";
             payload.dropoffLat = custData.lat; payload.dropoffLng = custData.lng; payload.dropoffAddress = custData.address;
