@@ -26,7 +26,6 @@
     input[type="checkbox"] { width: 1.25rem; height: 1.25rem; accent-color: #C0A062; border-radius: 0.25rem; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.3); }
     .calc-btn { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); width: 36px; height: 36px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 18px; color: white; transition: all 0.2s; }
     .calc-btn:active { background: #C0A062; color: #0F0F10; border-color: #C0A062; }
-    /* Desktop dragging state for carousel */
     .carousel-container.active { cursor: grabbing; cursor: -webkit-grabbing; }
   </style>
 </head>
@@ -35,8 +34,8 @@
   <header class="fixed top-0 inset-x-0 z-40 backdrop-blur-md bg-brand/80 border-b border-white/10">
     <div class="max-w-screen-xl mx-auto px-4 sm:px-6">
       <div class="h-14 grid grid-cols-3 items-center">
-        <div class="col-span-1 flex items-center"><a href="index.html" class="font-display tracking-[0.18em] text-[14px] leading-none hover:text-luxe transition">ARABISTA</a></div>
-        <div class="col-span-1 flex items-center justify-center"><a href="index.html"><img src="images/logo-88.webp" alt="Arabista logo" class="h-11 w-auto"></a></div>
+        <div class="col-span-1 flex items-center"><div class="font-display tracking-[0.18em] text-[14px] leading-none text-white">ARABISTA</div></div>
+        <div class="col-span-1 flex items-center justify-center"><div><img src="images/logo-88.webp" alt="Arabista logo" class="h-11 w-auto"></div></div>
         <div class="col-span-1 flex items-center justify-end gap-2 text-sm">
            <div class="flex items-center gap-2 border border-white/20 rounded-lg px-2 py-1"><button onclick="setLang('en')" id="lang-en" class="text-xs font-bold text-luxe">EN</button><span class="text-white/20">|</span><button onclick="setLang('bm')" id="lang-bm" class="text-xs text-white/50 hover:text-white">BM</button></div>
         </div>
@@ -45,25 +44,29 @@
   </header>
 
   <main class="pt-24 max-w-screen-md mx-auto">
-    <div class="px-4 sm:px-6 text-center mb-8">
+    <div class="px-4 sm:px-6 text-center mb-6">
         <span class="text-[10px] font-bold uppercase tracking-widest text-luxe border border-luxe/30 bg-luxe/10 px-3 py-1 rounded-full mb-4 inline-block" data-t="txt_badge">Official Partner Program</span>
         <h1 class="font-display text-4xl sm:text-5xl mb-4 leading-tight text-white" data-t="hero_title">Become an Arabista Alteration Hub</h1>
         <p class="text-white/70 text-sm sm:text-base max-w-lg mx-auto font-medium" data-t="hero_subtitle">Earn a steady additional income of up to RM 3,000+ per month. Perfect for home-based tailors and alteration shops.</p>
     </div>
 
-    <div id="media-carousel" class="carousel-container flex overflow-x-auto snap-x snap-mandatory gap-4 px-4 sm:px-6 pb-6 hide-scrollbar cursor-grab">
-        <div class="snap-center shrink-0 w-[85vw] sm:w-[400px] aspect-square bg-white/5 border border-white/10 rounded-2xl overflow-hidden relative shadow-lg pointer-events-none">
-            <video src="images/hub-video.mp4" autoplay loop muted playsinline class="w-full h-full object-cover pointer-events-auto"></video>
-            <div class="absolute bottom-3 left-3 bg-black/60 backdrop-blur px-3 py-1.5 rounded-lg border border-white/10 text-[10px] text-white font-medium flex items-center gap-2"><div class="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse"></div> <span data-t="lbl_media1">Hassle-Free Delivery</span></div>
-        </div>
-        <div class="snap-center shrink-0 w-[85vw] sm:w-[400px] aspect-square bg-white/5 border border-white/10 rounded-2xl overflow-hidden relative shadow-lg pointer-events-none">
+    <div id="media-carousel" class="carousel-container flex overflow-x-auto snap-x snap-mandatory gap-4 px-4 sm:px-6 pb-8 pt-4 hide-scrollbar cursor-grab items-center">
+        
+        <div class="carousel-item snap-center shrink-0 w-[75vw] sm:w-[320px] aspect-square bg-white/5 border border-white/10 rounded-2xl overflow-hidden relative shadow-lg pointer-events-none transition-all duration-500 ease-out opacity-40 scale-[0.85] blur-[2px]">
             <img src="images/hub-img1.webp" class="w-full h-full object-cover pointer-events-auto" alt="Premium Standard">
             <div class="absolute bottom-3 left-3 bg-black/60 backdrop-blur px-3 py-1.5 rounded-lg border border-white/10 text-[10px] text-white font-medium" data-t="lbl_media2">Premium Standard</div>
         </div>
-        <div class="snap-center shrink-0 w-[85vw] sm:w-[400px] aspect-square bg-white/5 border border-white/10 rounded-2xl overflow-hidden relative shadow-lg pointer-events-none">
+        
+        <div class="carousel-item snap-center shrink-0 w-[75vw] sm:w-[320px] aspect-square bg-white/5 border border-white/10 rounded-2xl overflow-hidden relative shadow-lg pointer-events-none transition-all duration-500 ease-out">
+            <video src="images/hub-video.mp4" autoplay loop muted playsinline class="w-full h-full object-cover pointer-events-auto"></video>
+            <div class="absolute bottom-3 left-3 bg-black/60 backdrop-blur px-3 py-1.5 rounded-lg border border-white/10 text-[10px] text-white font-medium flex items-center gap-2"><div class="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse"></div> <span data-t="lbl_media1">Hassle-Free Delivery</span></div>
+        </div>
+        
+        <div class="carousel-item snap-center shrink-0 w-[75vw] sm:w-[320px] aspect-square bg-white/5 border border-white/10 rounded-2xl overflow-hidden relative shadow-lg pointer-events-none transition-all duration-500 ease-out opacity-40 scale-[0.85] blur-[2px]">
             <img src="images/hub-img2.webp" class="w-full h-full object-cover pointer-events-auto" alt="Financial Freedom">
             <div class="absolute bottom-3 left-3 bg-black/60 backdrop-blur px-3 py-1.5 rounded-lg border border-white/10 text-[10px] text-white font-medium" data-t="lbl_media3">Financial Freedom</div>
         </div>
+
     </div>
 
     <div class="px-4 sm:px-6 mb-12">
@@ -210,9 +213,9 @@
       
       <div class="p-4 sm:p-6 overflow-y-auto hide-scrollbar pb-32 max-w-md mx-auto w-full">
           
-          <div class="mb-6 bg-white/5 border border-white/10 rounded-2xl p-5">
-              <h3 class="text-sm font-bold text-white mb-4 border-b border-white/10 pb-3 flex items-center gap-2"><span class="bg-luxe text-brand w-5 h-5 flex items-center justify-center rounded-full text-xs">1</span> <span data-t="step_personal">Personal Details</span></h3>
-              <div class="space-y-4">
+          <div id="step-1-card" class="mb-4 bg-white/5 border border-luxe/50 shadow-[0_0_20px_rgba(192,160,98,0.1)] rounded-2xl p-5 transition-all duration-300">
+              <h3 class="text-sm font-bold text-white mb-4 border-b border-white/10 pb-3 flex items-center gap-2 cursor-pointer" onclick="openStep(1)"><span class="bg-luxe text-brand w-5 h-5 flex items-center justify-center rounded-full text-xs">1</span> <span data-t="step_personal">Personal Details</span></h3>
+              <div id="step-1-body" class="space-y-4">
                   <div>
                       <label class="block text-xs text-white/70 uppercase tracking-widest mb-2" data-t="lbl_name">Full Name <span class="text-red-400">*</span></label>
                       <input type="text" id="reg-name" placeholder="e.g. Siti Aishah">
@@ -225,102 +228,112 @@
                       <label class="block text-xs text-white/70 uppercase tracking-widest mb-2" data-t="lbl_phone">WhatsApp Number <span class="text-red-400">*</span></label>
                       <input type="tel" id="reg-phone" placeholder="e.g. 0123456789">
                   </div>
+                  <button onclick="openStep(2)" class="w-full bg-white/10 text-white font-bold py-3.5 rounded-xl hover:bg-white/20 transition mt-2 flex justify-center items-center gap-2">
+                      <span data-t="btn_next_step2">Next: Workspace Location</span> <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                  </button>
               </div>
           </div>
 
-          <div class="mb-6 bg-white/5 border border-white/10 rounded-2xl p-5">
-              <h3 class="text-sm font-bold text-white mb-4 border-b border-white/10 pb-3 flex items-center gap-2"><span class="bg-luxe text-brand w-5 h-5 flex items-center justify-center rounded-full text-xs">2</span> <span data-t="step_workspace">Workspace & Capacity</span></h3>
+          <div id="step-2-card" class="mb-4 bg-white/5 border border-white/10 rounded-2xl p-5 opacity-60 scale-[0.98] transition-all duration-300">
+              <h3 class="text-sm font-bold text-white mb-4 border-b border-white/10 pb-3 flex items-center gap-2 cursor-pointer" onclick="openStep(2)"><span class="bg-luxe text-brand w-5 h-5 flex items-center justify-center rounded-full text-xs">2</span> <span data-t="step_workspace">Workspace & Capacity</span></h3>
               
-              <div class="mb-5">
-                  <label class="block text-xs text-white/70 uppercase tracking-widest mb-3" data-t="lbl_loc_title">Location for Pickups <span class="text-red-400">*</span></label>
-                  
-                  <div class="bg-black/30 border border-white/5 rounded-xl p-4 mb-4">
-                      <p class="text-[10px] text-white/50 uppercase tracking-widest mb-2" data-t="txt_detected_gps">Detected Location:</p>
-                      <p class="text-sm text-white font-medium mb-3 whitespace-pre-wrap" id="gps-detected-text">...</p>
-                      <div id="map-verify-link" class="mb-4"></div>
-                      <label class="block text-xs text-white/70 uppercase tracking-widest mb-2" data-t="lbl_unit">Unit / House / Lot No. <span class="text-red-400">*</span></label>
-                      <input type="text" id="reg-unit" placeholder="e.g. Unit 15-1 or House 42">
-                  </div>
+              <div id="step-2-body" class="hidden">
+                  <div class="mb-5">
+                      <label class="block text-xs text-white/70 uppercase tracking-widest mb-3" data-t="lbl_loc_title">Workspace Location <span class="text-red-400">*</span></label>
+                      
+                      <div class="bg-black/30 border border-white/5 rounded-xl p-4 mb-4">
+                          <p class="text-[10px] text-white/50 uppercase tracking-widest mb-2" data-t="txt_detected_gps">Detected Location:</p>
+                          <p class="text-sm text-white font-medium mb-3 whitespace-pre-wrap" id="gps-detected-text">...</p>
+                          <div id="map-verify-link" class="mb-4"></div>
+                          <label class="block text-xs text-white/70 uppercase tracking-widest mb-2" data-t="lbl_unit">Unit / House / Lot No. <span class="text-red-400">*</span></label>
+                          <input type="text" id="reg-unit" placeholder="e.g. Unit 15-1 or House 42">
+                      </div>
 
-                  <div class="pt-4 border-t border-white/10">
-                      <p class="text-[10px] text-white/50 uppercase tracking-widest mb-3" data-t="txt_loc_inaccurate">Location Search:</p>
-                      <button type="button" onclick="getGPS()" id="btn-gps" class="w-full py-2.5 mb-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg text-xs font-bold text-white transition flex items-center justify-center gap-2">
-                          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
-                          <span data-t="btn_detect_gps">Detect Current GPS</span>
-                      </button>
-                      <div class="flex gap-2">
-                          <input type="text" id="manual-search-input" class="flex-1 !py-2 !text-sm" placeholder="Search building / street...">
-                          <button id="btn-manual-find" onclick="geocodeManual()" class="px-4 bg-white/10 text-white text-xs font-bold rounded-lg hover:bg-white/20 transition">Search</button>
+                      <div class="pt-4 border-t border-white/10">
+                          <p class="text-[10px] text-white/50 uppercase tracking-widest mb-3" data-t="txt_loc_inaccurate">Location inaccurate? Search below:</p>
+                          <button type="button" onclick="getGPS()" id="btn-gps" class="w-full py-2.5 mb-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg text-xs font-bold text-white transition flex items-center justify-center gap-2">
+                              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                              <span data-t="btn_detect_gps">Detect Current GPS</span>
+                          </button>
+                          <div class="flex gap-2">
+                              <input type="text" id="manual-search-input" class="flex-1 !py-2 !text-sm" placeholder="Search building / street...">
+                              <button id="btn-manual-find" onclick="geocodeManual()" class="px-4 bg-white/10 text-white text-xs font-bold rounded-lg hover:bg-white/20 transition">Search</button>
+                          </div>
                       </div>
                   </div>
-              </div>
 
-              <div class="grid grid-cols-2 gap-4 border-t border-white/10 pt-5">
-                  <div>
-                      <label class="block text-[10px] text-white/70 uppercase tracking-widest mb-2" data-t="lbl_capacity">Daily Capacity</label>
-                      <select id="reg-capacity" class="!text-sm !py-2">
-                          <option value="1-5 pieces/day" data-t="opt_cap1">1 - 5 pieces</option>
-                          <option value="6-15 pieces/day" data-t="opt_cap2">6 - 15 pieces</option>
-                          <option value="15+ pieces/day" data-t="opt_cap3">15+ pieces</option>
-                      </select>
+                  <div class="grid grid-cols-2 gap-4 border-t border-white/10 pt-5 mb-5">
+                      <div>
+                          <label class="block text-[10px] text-white/70 uppercase tracking-widest mb-2" data-t="lbl_capacity">Daily Capacity</label>
+                          <select id="reg-capacity" class="!text-sm !py-2">
+                              <option value="1-5 pieces/day" data-t="opt_cap1">1 - 5 pieces</option>
+                              <option value="6-15 pieces/day" data-t="opt_cap2">6 - 15 pieces</option>
+                              <option value="15+ pieces/day" data-t="opt_cap3">15+ pieces</option>
+                          </select>
+                      </div>
+                      <div>
+                          <label class="block text-[10px] text-white/70 uppercase tracking-widest mb-2" data-t="lbl_exp">Experience</label>
+                          <select id="reg-exp" class="!text-sm !py-2">
+                              <option value="< 1 year" data-t="opt_exp1">< 1 year</option>
+                              <option value="1 - 3 years" data-t="opt_exp2">1 - 3 years</option>
+                              <option value="3 - 5 years" data-t="opt_exp3">3 - 5 years</option>
+                              <option value="5+ years" data-t="opt_exp4">5+ years</option>
+                          </select>
+                      </div>
                   </div>
-                  <div>
-                      <label class="block text-[10px] text-white/70 uppercase tracking-widest mb-2" data-t="lbl_exp">Experience</label>
-                      <select id="reg-exp" class="!text-sm !py-2">
-                          <option value="< 1 year" data-t="opt_exp1">< 1 year</option>
-                          <option value="1 - 3 years" data-t="opt_exp2">1 - 3 years</option>
-                          <option value="3 - 5 years" data-t="opt_exp3">3 - 5 years</option>
-                          <option value="5+ years" data-t="opt_exp4">5+ years</option>
-                      </select>
-                  </div>
+                  <button onclick="openStep(3)" class="w-full bg-white/10 text-white font-bold py-3.5 rounded-xl hover:bg-white/20 transition mt-2 flex justify-center items-center gap-2">
+                      <span data-t="btn_next_step3">Next: Cert & Equipment</span> <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                  </button>
               </div>
           </div>
 
-          <div class="mb-6 bg-white/5 border border-white/10 rounded-2xl p-5">
-              <h3 class="text-sm font-bold text-white mb-4 border-b border-white/10 pb-3 flex items-center gap-2"><span class="bg-luxe text-brand w-5 h-5 flex items-center justify-center rounded-full text-xs">3</span> <span data-t="step_qual">Equipment & Media</span></h3>
+          <div id="step-3-card" class="mb-6 bg-white/5 border border-white/10 rounded-2xl p-5 opacity-60 scale-[0.98] transition-all duration-300">
+              <h3 class="text-sm font-bold text-white mb-4 border-b border-white/10 pb-3 flex items-center gap-2 cursor-pointer" onclick="openStep(3)"><span class="bg-luxe text-brand w-5 h-5 flex items-center justify-center rounded-full text-xs">3</span> <span data-t="step_qual">Professional Cert & Equipment</span></h3>
               
-              <div class="mb-5">
-                  <label class="block text-xs text-white/70 uppercase tracking-widest mb-2" data-t="lbl_cert">Certifications (Optional)</label>
-                  <input type="text" id="reg-cert" placeholder="e.g. GiatMara, Kemas, Epal">
-              </div>
-
-              <div class="mb-5 bg-black/30 border border-white/5 rounded-xl p-4">
-                  <label class="block text-xs text-white/70 uppercase tracking-widest mb-4" data-t="lbl_equipment">Equipment Owned <span class="text-red-400">*</span></label>
-                  <div class="space-y-3 mb-4">
-                      <label class="flex items-center gap-3 cursor-pointer group">
-                          <input type="checkbox" id="eq-straight" class="transition group-hover:border-luxe"><span class="text-sm text-white/90" data-t="eq_straight">Industrial Straight Stitch Machine</span>
-                      </label>
-                      <label class="flex items-center gap-3 cursor-pointer group">
-                          <input type="checkbox" id="eq-overlock" class="transition group-hover:border-luxe"><span class="text-sm text-white/90" data-t="eq_overlock">Overlock Machine (Jahit Tepi)</span>
-                      </label>
-                      <label class="flex items-center gap-3 cursor-pointer group">
-                          <input type="checkbox" id="eq-iron" class="transition group-hover:border-luxe"><span class="text-sm text-white/90" data-t="eq_iron">Steam Iron Station</span>
-                      </label>
+              <div id="step-3-body" class="hidden">
+                  <div class="mb-5">
+                      <label class="block text-xs text-white/70 uppercase tracking-widest mb-2" data-t="lbl_cert">Certifications (Optional)</label>
+                      <input type="text" id="reg-cert" placeholder="e.g. GiatMara, Kemas, Epal">
                   </div>
-                  <textarea id="reg-eq-notes" rows="2" class="text-sm" placeholder="Other equipment or specific machine models... (Optional)" data-t-placeholder="ph_eq_notes"></textarea>
-              </div>
 
-              <div>
-                  <label class="block text-xs text-white/70 uppercase tracking-widest mb-2" data-t="lbl_photo">Workspace Photo <span class="text-red-400">*</span></label>
-                  <p class="text-[10px] text-white/50 mb-3" data-t="desc_photo">Please upload a clear photo of your sewing machine / setup.</p>
+                  <div class="mb-5 bg-black/30 border border-white/5 rounded-xl p-4">
+                      <label class="block text-xs text-white/70 uppercase tracking-widest mb-4" data-t="lbl_equipment">Equipment Owned <span class="text-red-400">*</span></label>
+                      <div class="space-y-3 mb-4">
+                          <label class="flex items-center gap-3 cursor-pointer group">
+                              <input type="checkbox" id="eq-straight" class="transition group-hover:border-luxe"><span class="text-sm text-white/90" data-t="eq_straight">Industrial Straight Stitch Machine</span>
+                          </label>
+                          <label class="flex items-center gap-3 cursor-pointer group">
+                              <input type="checkbox" id="eq-overlock" class="transition group-hover:border-luxe"><span class="text-sm text-white/90" data-t="eq_overlock">Overlock Machine (Jahit Tepi)</span>
+                          </label>
+                          <label class="flex items-center gap-3 cursor-pointer group">
+                              <input type="checkbox" id="eq-iron" class="transition group-hover:border-luxe"><span class="text-sm text-white/90" data-t="eq_iron">Steam Iron Station</span>
+                          </label>
+                      </div>
+                      <textarea id="reg-eq-notes" rows="2" class="text-sm" placeholder="Other equipment or specific machine models... (Optional)" data-t-placeholder="ph_eq_notes"></textarea>
+                  </div>
+
+                  <div>
+                      <label class="block text-xs text-white/70 uppercase tracking-widest mb-2" data-t="lbl_photo">Workspace Photo <span class="text-red-400">*</span></label>
+                      <p class="text-[10px] text-white/50 mb-3" data-t="desc_photo">Please upload a clear photo of your sewing machine / setup.</p>
+                      
+                      <div class="relative border-2 border-dashed border-white/20 rounded-xl p-6 text-center hover:bg-white/5 hover:border-luxe/50 transition cursor-pointer bg-black/30" onclick="document.getElementById('reg-photo').click()">
+                          <input type="file" id="reg-photo" accept="image/*" class="hidden" onchange="handlePhotoSelect(event)">
+                          <div id="photo-preview-container" class="hidden flex flex-col items-center">
+                              <img id="photo-preview" src="" class="w-24 h-24 object-cover rounded-lg border border-white/20 mb-2 shadow-lg">
+                              <span class="text-[10px] text-green-400 font-bold bg-green-500/10 px-2 py-1 rounded" data-t="txt_photo_ready">Photo Ready</span>
+                          </div>
+                          <div id="photo-placeholder">
+                              <svg class="w-8 h-8 text-white/30 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                              <span class="text-sm text-luxe font-medium block" data-t="btn_upload">Tap to Upload Photo</span>
+                          </div>
+                      </div>
+                  </div>
                   
-                  <div class="relative border-2 border-dashed border-white/20 rounded-xl p-6 text-center hover:bg-white/5 hover:border-luxe/50 transition cursor-pointer bg-black/30" onclick="document.getElementById('reg-photo').click()">
-                      <input type="file" id="reg-photo" accept="image/*" class="hidden" onchange="handlePhotoSelect(event)">
-                      <div id="photo-preview-container" class="hidden flex flex-col items-center">
-                          <img id="photo-preview" src="" class="w-24 h-24 object-cover rounded-lg border border-white/20 mb-2 shadow-lg">
-                          <span class="text-[10px] text-green-400 font-bold bg-green-500/10 px-2 py-1 rounded" data-t="txt_photo_ready">Photo Ready</span>
-                      </div>
-                      <div id="photo-placeholder">
-                          <svg class="w-8 h-8 text-white/30 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                          <span class="text-sm text-luxe font-medium block" data-t="btn_upload">Tap to Upload Photo</span>
-                      </div>
-                  </div>
+                  <button id="btn-submit" onclick="submitApplication()" class="w-full bg-luxe text-brand font-bold py-4 rounded-xl hover:bg-white transition shadow-[0_0_20px_rgba(192,160,98,0.3)] flex justify-center items-center gap-2 mt-6">
+                      <span data-t="btn_submit">Submit Application</span>
+                  </button>
               </div>
           </div>
-
-          <button id="btn-submit" onclick="submitApplication()" class="w-full bg-luxe text-brand font-bold py-4 rounded-xl hover:bg-white transition shadow-[0_0_20px_rgba(192,160,98,0.3)] flex justify-center items-center gap-2 mt-2">
-              <span data-t="btn_submit">Submit Application</span>
-          </button>
       </div>
   </div>
 
@@ -331,7 +344,7 @@
           </div>
           <h3 class="font-display text-2xl text-white mb-2" data-t="modal_success_title">Application Received!</h3>
           <p class="text-sm text-white/70 mb-6" data-t="modal_success_desc">Thank you for your interest in joining Arabista. Our team will review your application and contact you via WhatsApp shortly.</p>
-          <button onclick="window.location.href='index.html'" class="w-full bg-white/10 text-white font-bold py-3.5 rounded-xl hover:bg-white/20 transition" data-t="btn_close">Back to Home</button>
+          <button onclick="window.location.reload()" class="w-full bg-white/10 text-white font-bold py-3.5 rounded-xl hover:bg-white/20 transition" data-t="btn_done">Done</button>
       </div>
   </div>
 
@@ -345,9 +358,10 @@
             title_services: "Standardized Services", srv_hem: "Alter Length", srv_sleeve: "Alter Sleeves", srv_shoulder: "Alter Shoulders", srv_pads: "Add Shoulder Pads", srv_full: "Full Body Package",
             title_calc: "Income Calculator", desc_calc: "Estimate your earnings based on daily output.", calc_full: "Full Body Packages", calc_hem: "Alter Length", calc_sleeve: "Alter Sleeves", calc_shoulder: "Alter Shoulders", calc_pads: "Add Shoulder Pads", calc_est_monthly: "Estimated Monthly Income", calc_disclaimer: "*Based on 24 working days/month.",
             btn_register: "Apply Now", form_title: "Hub Application", 
-            step_personal: "Personal Details", step_workspace: "Workspace & Capacity", step_qual: "Equipment & Media",
-            lbl_name: "Full Name *", lbl_shop: "Shop / Brand Name (Optional)", lbl_phone: "WhatsApp Number *", lbl_loc_title: "Location for Pickups *", txt_detected_gps: "Detected Location:", txt_loc_inaccurate: "Location Search:", btn_detect_gps: "Detect Current GPS", lbl_unit: "Unit / House / Lot No. *", lbl_capacity: "Daily Capacity", opt_cap1: "1 - 5 pieces", opt_cap2: "6 - 15 pieces", opt_cap3: "15+ pieces", lbl_exp: "Experience", opt_exp1: "< 1 year", opt_exp2: "1 - 3 years", opt_exp3: "3 - 5 years", opt_exp4: "5+ years", lbl_cert: "Certifications (Optional)", lbl_equipment: "Equipment Owned *", eq_straight: "Industrial Straight Stitch Machine", eq_overlock: "Overlock Machine (Jahit Tepi)", eq_iron: "Steam Iron Station", ph_eq_notes: "Other equipment or specific machine models... (Optional)", lbl_photo: "Workspace Photo *", desc_photo: "Please upload a clear photo of your sewing machine / setup.", btn_upload: "Tap to Upload Photo", txt_photo_ready: "Photo Ready", btn_submit: "Submit Application",
-            modal_success_title: "Application Received!", modal_success_desc: "Thank you for your interest in joining Arabista. Our team will review your application and contact you via WhatsApp shortly.", btn_close: "Back to Home",
+            step_personal: "Personal Details", step_workspace: "Workspace & Capacity", step_qual: "Professional Cert & Equipment",
+            btn_next_step2: "Next: Workspace Location", btn_next_step3: "Next: Cert & Equipment", btn_done: "Done",
+            lbl_name: "Full Name *", lbl_shop: "Shop / Brand Name (Optional)", lbl_phone: "WhatsApp Number *", lbl_loc_title: "Workspace Location *", txt_detected_gps: "Detected Location:", txt_loc_inaccurate: "Location inaccurate? Search below:", btn_detect_gps: "Detect Current GPS", lbl_unit: "Unit / House / Lot No. *", lbl_capacity: "Daily Capacity", opt_cap1: "1 - 5 pieces", opt_cap2: "6 - 15 pieces", opt_cap3: "15+ pieces", lbl_exp: "Experience", opt_exp1: "< 1 year", opt_exp2: "1 - 3 years", opt_exp3: "3 - 5 years", opt_exp4: "5+ years", lbl_cert: "Certifications (Optional)", lbl_equipment: "Equipment Owned *", eq_straight: "Industrial Straight Stitch Machine", eq_overlock: "Overlock Machine (Jahit Tepi)", eq_iron: "Steam Iron Station", ph_eq_notes: "Other equipment or specific machine models... (Optional)", lbl_photo: "Workspace Photo *", desc_photo: "Please upload a clear photo of your sewing machine / setup.", btn_upload: "Tap to Upload Photo", txt_photo_ready: "Photo Ready", btn_submit: "Submit Application",
+            modal_success_title: "Application Received!", modal_success_desc: "Thank you for your interest in joining Arabista. Our team will review your application and contact you via WhatsApp shortly.",
             alert_name: "Please enter your full name.", alert_phone: "Please enter your WhatsApp number.", alert_gps: "Please map your location using GPS or Search.", alert_unit: "Please enter your unit/house number.", alert_eq: "Please select at least one equipment.", alert_photo: "Please upload a workspace photo.", alert_error: "Connection Error.", msg_locating: "Locating...", msg_searching: "Searching...", msg_locked: "GPS Locked", msg_submitting: "Submitting...", msg_geo_notsupported: "Geo not supported", txt_view_on_map: "View on Map"
         },
         bm: {
@@ -357,9 +371,10 @@
             title_services: "Servis Standard", srv_hem: "Potong Labuh", srv_sleeve: "Potong Lengan", srv_shoulder: "Kecilkan Bahu", srv_pads: "Tambah Span", srv_full: "Pakej Alter Keseluruhan",
             title_calc: "Kalkulator Pendapatan", desc_calc: "Anggar pendapatan anda berdasarkan kapasiti harian.", calc_full: "Pakej Alter Keseluruhan", calc_hem: "Potong Labuh", calc_sleeve: "Potong Lengan", calc_shoulder: "Kecilkan Bahu", calc_pads: "Tambah Span", calc_est_monthly: "Anggaran Pendapatan Bulanan", calc_disclaimer: "*Berdasarkan 24 hari bekerja sebulan.",
             btn_register: "Daftar Sekarang", form_title: "Borang Pendaftaran", 
-            step_personal: "Butiran Peribadi", step_workspace: "Lokasi & Kapasiti", step_qual: "Peralatan & Gambar",
-            lbl_name: "Nama Penuh *", lbl_shop: "Nama Kedai / Jenama (Pilihan)", lbl_phone: "Nombor WhatsApp *", lbl_loc_title: "Lokasi Pickup *", txt_detected_gps: "Lokasi Dikesan:", txt_loc_inaccurate: "Carian Lokasi:", btn_detect_gps: "Kesan GPS Semasa", lbl_unit: "No. Unit / Rumah *", lbl_capacity: "Kapasiti Harian", opt_cap1: "1 - 5 helai", opt_cap2: "6 - 15 helai", opt_cap3: "15+ helai", lbl_exp: "Pengalaman", opt_exp1: "< 1 tahun", opt_exp2: "1 - 3 tahun", opt_exp3: "3 - 5 tahun", opt_exp4: "Lebih 5 tahun", lbl_cert: "Sijil Kemahiran (Pilihan)", lbl_equipment: "Peralatan Sedia Ada *", eq_straight: "Mesin Jahit Lurus Industri", eq_overlock: "Mesin Jahit Tepi (Overlock)", eq_iron: "Seterika Wap (Steam Iron)", ph_eq_notes: "Mesin lain atau spesifikasi tertentu... (Pilihan)", lbl_photo: "Gambar Ruang Jahitan *", desc_photo: "Sila muat naik gambar mesin jahit / ruang kerja anda dengan jelas.", btn_upload: "Klik untuk Muat Naik Gambar", txt_photo_ready: "Gambar Sedia", btn_submit: "Hantar Permohonan",
-            modal_success_title: "Permohonan Diterima!", modal_success_desc: "Terima kasih kerana berminat menyertai Arabista. Pasukan kami akan menyemak permohonan anda dan menghubungi anda di WhatsApp.", btn_close: "Kembali ke Utama",
+            step_personal: "Butiran Peribadi", step_workspace: "Lokasi Ruang Jahitan", step_qual: "Sijil Profesional & Peralatan",
+            btn_next_step2: "Seterusnya: Lokasi Ruang Jahitan", btn_next_step3: "Seterusnya: Sijil & Peralatan", btn_done: "Selesai",
+            lbl_name: "Nama Penuh *", lbl_shop: "Nama Kedai / Jenama (Pilihan)", lbl_phone: "Nombor WhatsApp *", lbl_loc_title: "Lokasi Ruang Jahitan *", txt_detected_gps: "Lokasi Dikesan:", txt_loc_inaccurate: "Lokasi tidak tepat? Cari di bawah:", btn_detect_gps: "Kesan GPS Semasa", lbl_unit: "No. Unit / Rumah *", lbl_capacity: "Kapasiti Harian", opt_cap1: "1 - 5 helai", opt_cap2: "6 - 15 helai", opt_cap3: "15+ helai", lbl_exp: "Pengalaman", opt_exp1: "< 1 tahun", opt_exp2: "1 - 3 tahun", opt_exp3: "3 - 5 tahun", opt_exp4: "Lebih 5 tahun", lbl_cert: "Sijil Kemahiran (Pilihan)", lbl_equipment: "Peralatan Sedia Ada *", eq_straight: "Mesin Jahit Lurus Industri", eq_overlock: "Mesin Jahit Tepi (Overlock)", eq_iron: "Seterika Wap (Steam Iron)", ph_eq_notes: "Mesin lain atau spesifikasi tertentu... (Pilihan)", lbl_photo: "Gambar Ruang Jahitan *", desc_photo: "Sila muat naik gambar mesin jahit / ruang kerja anda dengan jelas.", btn_upload: "Klik untuk Muat Naik Gambar", txt_photo_ready: "Gambar Sedia", btn_submit: "Hantar Permohonan",
+            modal_success_title: "Permohonan Diterima!", modal_success_desc: "Terima kasih kerana berminat menyertai Arabista. Pasukan kami akan menyemak permohonan anda dan menghubungi anda di WhatsApp.",
             alert_name: "Sila masukkan nama penuh anda.", alert_phone: "Sila masukkan nombor WhatsApp anda.", alert_gps: "Sila kesan lokasi anda melalui GPS atau Carian.", alert_unit: "Sila masukkan no. unit/rumah anda.", alert_eq: "Sila pilih sekurang-kurangnya satu peralatan.", alert_photo: "Sila muat naik gambar ruang jahitan.", alert_error: "Ralat Sambungan.", msg_locating: "Mengesan...", msg_searching: "Mencari Peta...", msg_locked: "GPS Dikunci", msg_submitting: "Menghantar...", msg_geo_notsupported: "Geo tidak disokong", txt_view_on_map: "Lihat Peta"
         }
     };
@@ -384,13 +399,36 @@
         const userLang = navigator.language || navigator.userLanguage;
         if (userLang && userLang.toLowerCase().startsWith('ms')) setLang('bm'); else setLang('en');
         
-        // Desktop Drag to Scroll logic for Carousel
-        const slider = document.getElementById('media-carousel');
+        // Spotlight Carousel Logic
+        const carousel = document.getElementById('media-carousel');
+        const items = carousel.querySelectorAll('.carousel-item');
+        
+        // Scroll to video (center item) smoothly on load
+        setTimeout(() => {
+            const scrollPos = items[1].offsetLeft - (carousel.clientWidth / 2) + (items[1].clientWidth / 2);
+            carousel.scrollTo({ left: scrollPos, behavior: 'smooth' });
+        }, 100);
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.remove('opacity-40', 'scale-[0.85]', 'blur-[2px]');
+                    entry.target.classList.add('opacity-100', 'scale-100', 'blur-none');
+                } else {
+                    entry.target.classList.add('opacity-40', 'scale-[0.85]', 'blur-[2px]');
+                    entry.target.classList.remove('opacity-100', 'scale-100', 'blur-none');
+                }
+            });
+        }, { root: carousel, threshold: 0.65 });
+
+        items.forEach(item => observer.observe(item));
+
+        // Desktop Drag to Scroll logic
         let isDown = false; let startX; let scrollLeft;
-        slider.addEventListener('mousedown', (e) => { isDown = true; slider.classList.add('active'); startX = e.pageX - slider.offsetLeft; scrollLeft = slider.scrollLeft; });
-        slider.addEventListener('mouseleave', () => { isDown = false; slider.classList.remove('active'); });
-        slider.addEventListener('mouseup', () => { isDown = false; slider.classList.remove('active'); });
-        slider.addEventListener('mousemove', (e) => { if(!isDown) return; e.preventDefault(); const x = e.pageX - slider.offsetLeft; const walk = (x - startX) * 1.5; slider.scrollLeft = scrollLeft - walk; });
+        carousel.addEventListener('mousedown', (e) => { isDown = true; carousel.classList.add('active'); startX = e.pageX - carousel.offsetLeft; scrollLeft = carousel.scrollLeft; });
+        carousel.addEventListener('mouseleave', () => { isDown = false; carousel.classList.remove('active'); });
+        carousel.addEventListener('mouseup', () => { isDown = false; carousel.classList.remove('active'); });
+        carousel.addEventListener('mousemove', (e) => { if(!isDown) return; e.preventDefault(); const x = e.pageX - carousel.offsetLeft; const walk = (x - startX) * 1.5; carousel.scrollLeft = scrollLeft - walk; });
 
         fetch(scriptURL).then(r=>r.json()).then(d => {
             if(d.pricing && d.pricing.full) {
@@ -418,8 +456,53 @@
         document.getElementById('calc-total').innerText = "RM " + monthly.toLocaleString();
     }
 
-    function openForm() { document.getElementById('form-overlay').classList.remove('hidden'); setTimeout(() => document.getElementById('form-overlay').classList.remove('opacity-0'), 10); document.getElementById('form-sheet').classList.add('open'); }
-    function closeForm() { document.getElementById('form-sheet').classList.remove('open'); document.getElementById('form-overlay').classList.add('opacity-0'); setTimeout(() => document.getElementById('form-overlay').classList.add('hidden'), 400); }
+    function openForm() { 
+        document.getElementById('form-overlay').classList.remove('hidden'); 
+        setTimeout(() => document.getElementById('form-overlay').classList.remove('opacity-0'), 10); 
+        document.getElementById('form-sheet').classList.add('open'); 
+    }
+    
+    function closeForm() { 
+        document.getElementById('form-sheet').classList.remove('open'); 
+        document.getElementById('form-overlay').classList.add('opacity-0'); 
+        setTimeout(() => document.getElementById('form-overlay').classList.add('hidden'), 400); 
+    }
+
+    // Wizard Navigation Logic
+    function openStep(targetStep) {
+        if(targetStep === 2) {
+            const name = document.getElementById('reg-name').value.trim();
+            const phone = document.getElementById('reg-phone').value.trim();
+            if(!name) return alert(t[currentLang].alert_name);
+            if(!phone) return alert(t[currentLang].alert_phone);
+            if(!appData.lat) setTimeout(() => getGPS(), 300); // Auto-GPS on step 2 open
+        }
+        if(targetStep === 3) {
+            const name = document.getElementById('reg-name').value.trim();
+            const phone = document.getElementById('reg-phone').value.trim();
+            if(!name || !phone) { alert(t[currentLang].alert_name); return openStep(1); }
+            const unit = document.getElementById('reg-unit').value.trim();
+            if(!appData.lat) return alert(t[currentLang].alert_gps);
+            if(!unit) return alert(t[currentLang].alert_unit);
+        }
+
+        [1,2,3].forEach(i => {
+            const card = document.getElementById(`step-${i}-card`);
+            const body = document.getElementById(`step-${i}-body`);
+            body.classList.add('hidden');
+            card.classList.add('opacity-60', 'scale-[0.98]', 'border-white/10');
+            card.classList.remove('border-luxe/50', 'shadow-[0_0_20px_rgba(192,160,98,0.1)]');
+        });
+
+        const targetCard = document.getElementById(`step-${targetStep}-card`);
+        const targetBody = document.getElementById(`step-${targetStep}-body`);
+        
+        targetBody.classList.remove('hidden');
+        targetCard.classList.remove('opacity-60', 'scale-[0.98]', 'border-white/10');
+        targetCard.classList.add('border-luxe/50', 'shadow-[0_0_20px_rgba(192,160,98,0.1)]');
+        
+        setTimeout(() => targetCard.scrollIntoView({behavior: 'smooth', block: 'start'}), 100);
+    }
 
     function getGPS() {
         if(!navigator.geolocation) return alert(t[currentLang].msg_geo_notsupported);
