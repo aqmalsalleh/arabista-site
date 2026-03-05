@@ -33,8 +33,8 @@
     }
     input:focus, select:focus, textarea:focus { outline: none; border-color: #C0A062; background: rgba(192,160,98,0.05); }
     input[type="checkbox"] { width: 1.25rem; height: 1.25rem; accent-color: #C0A062; border-radius: 0.25rem; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.3); }
-    .calc-btn { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); width: 36px; height: 36px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 18px; color: white; transition: all 0.2s; }
-    .calc-btn:active { background: #C0A062; color: #0F0F10; border-color: #C0A062; }
+    .calc-btn { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: bold; color: white; transition: all 0.2s; }
+    .calc-btn:active { background: #C0A062; color: #0F0F10; border-color: #C0A062; transform: scale(0.95); }
     .carousel-container.active { cursor: grabbing; cursor: -webkit-grabbing; }
   </style>
 </head>
@@ -56,128 +56,148 @@
     <div class="px-4 sm:px-6 text-center mb-6">
         <span class="text-[10px] font-bold uppercase tracking-widest text-luxe border border-luxe/30 bg-luxe/10 px-3 py-1 rounded-full mb-4 inline-block" data-t="txt_badge">Official Partner Program</span>
         <h1 class="font-display text-4xl sm:text-5xl mb-4 leading-tight text-white" data-t="hero_title">Become an Arabista Alteration Hub</h1>
-        <p class="text-white/70 text-sm sm:text-base max-w-lg mx-auto font-medium" data-t="hero_subtitle">Earn a steady additional income of up to RM 3,000+ per month. Perfect for home-based tailors and alteration shops.</p>
+        <p class="text-white/80 text-sm sm:text-base max-w-lg mx-auto font-medium leading-relaxed" data-t="hero_subtitle">Be our alteration hub partner and earn up to RM 3,000+ every month with zero effort—we bring the customers right to your door. No fees. No hassles.</p>
     </div>
 
-    <div id="media-carousel" class="carousel-container flex overflow-x-auto snap-x snap-mandatory gap-4 px-[10vw] sm:px-[calc(50%-160px)] pb-8 pt-4 hide-scrollbar cursor-grab items-center">
+    <div class="relative w-full group max-w-screen-xl mx-auto">
+        <button onclick="scrollCarousel(-1)" class="hidden md:flex absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-black/60 hover:bg-luxe/90 border border-white/20 hover:border-luxe rounded-full items-center justify-center text-white transition-all z-20 backdrop-blur opacity-0 group-hover:opacity-100 shadow-lg">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+        </button>
+
+        <div id="media-carousel" class="carousel-container flex overflow-x-auto snap-x snap-mandatory gap-4 px-[10vw] sm:px-[calc(50%-160px)] pb-8 pt-4 hide-scrollbar cursor-grab items-center">
+            
+            <div class="carousel-item snap-center shrink-0 w-[80vw] sm:w-[320px] aspect-[4/5] bg-white/5 border border-white/10 rounded-2xl overflow-hidden relative shadow-lg pointer-events-none transition-all duration-500 ease-out opacity-40 scale-[0.85] blur-[2px]">
+                <img src="images/hub-story1.webp" class="w-full h-full object-cover pointer-events-auto" alt="Consistent Jobs">
+                <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent pointer-events-none"></div>
+                <div class="absolute bottom-0 inset-x-0 p-5 pointer-events-none">
+                    <span class="text-luxe font-bold text-xs uppercase tracking-widest mb-1 block" data-t="lbl_benefit1">Benefit 1</span>
+                    <h3 class="text-white font-display text-2xl mb-1" data-t="hook1_title">Consistent, Hassle-Free Jobs</h3>
+                    <p class="text-white/70 text-xs leading-relaxed" data-t="hook1_desc">We send customers directly to you for standardized alterations. No complex custom sewing.</p>
+                </div>
+            </div>
+
+            <div class="carousel-item snap-center shrink-0 w-[80vw] sm:w-[320px] aspect-[4/5] bg-white/5 border border-white/10 rounded-2xl overflow-hidden relative shadow-lg pointer-events-none transition-all duration-500 ease-out opacity-40 scale-[0.85] blur-[2px]">
+                <img src="images/hub-story2.webp" class="w-full h-full object-cover pointer-events-auto" alt="Seamless Logistics">
+                <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent pointer-events-none"></div>
+                <div class="absolute bottom-0 inset-x-0 p-5 pointer-events-none">
+                    <span class="text-luxe font-bold text-xs uppercase tracking-widest mb-1 block" data-t="lbl_benefit2">Benefit 2</span>
+                    <h3 class="text-white font-display text-2xl mb-1" data-t="hook2_title">Seamless Logistics</h3>
+                    <p class="text-white/70 text-xs leading-relaxed" data-t="hook2_desc">Customers drop off items or we arrange Lalamove riders to deliver right to your doorstep.</p>
+                </div>
+            </div>
+
+            <div class="carousel-item snap-center shrink-0 w-[80vw] sm:w-[320px] aspect-[4/5] bg-white/5 border border-white/10 rounded-2xl overflow-hidden relative shadow-lg pointer-events-none transition-all duration-500 ease-out opacity-40 scale-[0.85] blur-[2px]">
+                <img src="images/hub-story3.webp" class="w-full h-full object-cover pointer-events-auto" alt="Guaranteed Pay">
+                <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent pointer-events-none"></div>
+                <div class="absolute bottom-0 inset-x-0 p-5 pointer-events-none">
+                    <span class="text-luxe font-bold text-xs uppercase tracking-widest mb-1 block" data-t="lbl_benefit3">Benefit 3</span>
+                    <h3 class="text-white font-display text-2xl mb-1" data-t="hook3_title">Guaranteed & Fast Pay</h3>
+                    <p class="text-white/70 text-xs leading-relaxed" data-t="hook3_desc">Fixed, transparent fees. Customers pay you directly upon completion.</p>
+                </div>
+            </div>
+
+            <div class="carousel-item snap-center shrink-0 w-[80vw] sm:w-[320px] aspect-[4/5] bg-white/5 border border-white/10 rounded-2xl overflow-hidden relative shadow-lg pointer-events-none transition-all duration-500 ease-out opacity-40 scale-[0.85] blur-[2px]">
+                <img src="images/hub-story4.webp" class="w-full h-full object-cover pointer-events-auto" alt="Automated Portal">
+                <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent pointer-events-none"></div>
+                <div class="absolute bottom-0 inset-x-0 p-5 pointer-events-none">
+                    <span class="text-luxe font-bold text-xs uppercase tracking-widest mb-1 block" data-t="lbl_benefit4">Benefit 4</span>
+                    <h3 class="text-white font-display text-2xl mb-1" data-t="hook4_title">Automated Portal</h3>
+                    <p class="text-white/70 text-xs leading-relaxed" data-t="hook4_desc">Manage orders, update statuses, and track earnings instantly via our Partner Portal.</p>
+                </div>
+            </div>
+
+        </div>
         
-        <div class="carousel-item snap-center shrink-0 w-[80vw] sm:w-[320px] aspect-[4/5] bg-white/5 border border-white/10 rounded-2xl overflow-hidden relative shadow-lg pointer-events-none transition-all duration-500 ease-out opacity-40 scale-[0.85] blur-[2px]">
-            <img src="images/hub-story1.webp" class="w-full h-full object-cover pointer-events-auto" alt="Consistent Jobs">
-            <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent pointer-events-none"></div>
-            <div class="absolute bottom-0 inset-x-0 p-5 pointer-events-none">
-                <span class="text-luxe font-bold text-xs uppercase tracking-widest mb-1 block">Step 1</span>
-                <h3 class="text-white font-display text-2xl mb-1" data-t="hook1_title">Consistent, Hassle-Free Jobs</h3>
-                <p class="text-white/70 text-xs leading-relaxed" data-t="hook1_desc">We send customers directly to you for standardized alterations. No complex custom sewing.</p>
-            </div>
-        </div>
-
-        <div class="carousel-item snap-center shrink-0 w-[80vw] sm:w-[320px] aspect-[4/5] bg-white/5 border border-white/10 rounded-2xl overflow-hidden relative shadow-lg pointer-events-none transition-all duration-500 ease-out opacity-40 scale-[0.85] blur-[2px]">
-            <img src="images/hub-story2.webp" class="w-full h-full object-cover pointer-events-auto" alt="Seamless Logistics">
-            <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent pointer-events-none"></div>
-            <div class="absolute bottom-0 inset-x-0 p-5 pointer-events-none">
-                <span class="text-luxe font-bold text-xs uppercase tracking-widest mb-1 block">Step 2</span>
-                <h3 class="text-white font-display text-2xl mb-1" data-t="hook2_title">Seamless Logistics</h3>
-                <p class="text-white/70 text-xs leading-relaxed" data-t="hook2_desc">Customers drop off items or we arrange Lalamove riders to deliver right to your doorstep.</p>
-            </div>
-        </div>
-
-        <div class="carousel-item snap-center shrink-0 w-[80vw] sm:w-[320px] aspect-[4/5] bg-white/5 border border-white/10 rounded-2xl overflow-hidden relative shadow-lg pointer-events-none transition-all duration-500 ease-out opacity-40 scale-[0.85] blur-[2px]">
-            <img src="images/hub-story3.webp" class="w-full h-full object-cover pointer-events-auto" alt="Guaranteed Pay">
-            <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent pointer-events-none"></div>
-            <div class="absolute bottom-0 inset-x-0 p-5 pointer-events-none">
-                <span class="text-luxe font-bold text-xs uppercase tracking-widest mb-1 block">Step 3</span>
-                <h3 class="text-white font-display text-2xl mb-1" data-t="hook3_title">Guaranteed & Fast Pay</h3>
-                <p class="text-white/70 text-xs leading-relaxed" data-t="hook3_desc">Fixed, transparent fees. Customers pay you directly upon completion.</p>
-            </div>
-        </div>
-
-        <div class="carousel-item snap-center shrink-0 w-[80vw] sm:w-[320px] aspect-[4/5] bg-white/5 border border-white/10 rounded-2xl overflow-hidden relative shadow-lg pointer-events-none transition-all duration-500 ease-out opacity-40 scale-[0.85] blur-[2px]">
-            <img src="images/hub-story4.webp" class="w-full h-full object-cover pointer-events-auto" alt="Automated Portal">
-            <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent pointer-events-none"></div>
-            <div class="absolute bottom-0 inset-x-0 p-5 pointer-events-none">
-                <span class="text-luxe font-bold text-xs uppercase tracking-widest mb-1 block">Step 4</span>
-                <h3 class="text-white font-display text-2xl mb-1" data-t="hook4_title">Automated Portal</h3>
-                <p class="text-white/70 text-xs leading-relaxed" data-t="hook4_desc">Manage orders, update statuses, and track earnings instantly via our Partner Portal.</p>
-            </div>
-        </div>
-
+        <button onclick="scrollCarousel(1)" class="hidden md:flex absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-black/60 hover:bg-luxe/90 border border-white/20 hover:border-luxe rounded-full items-center justify-center text-white transition-all z-20 backdrop-blur opacity-0 group-hover:opacity-100 shadow-lg">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+        </button>
     </div>
 
-    <div class="px-4 sm:px-6 mb-12 relative z-10">
+    <div class="px-4 sm:px-6 mb-12 relative z-10 mt-4">
         <div class="absolute inset-0 bg-gradient-to-b from-transparent to-luxe/5 blur-xl -z-10"></div>
-        <h2 class="font-display text-2xl text-white mb-2 text-center" data-t="title_calc">Service Menu & Earnings Simulator</h2>
+        <h2 class="font-display text-2xl sm:text-3xl text-white mb-2 text-center" data-t="title_calc">Service Menu & Earnings Calculator</h2>
         <p class="text-xs text-white/50 text-center mb-6" data-t="desc_calc">Adjust your daily capacity to calculate potential income.</p>
         
-        <div class="bg-[#111213] border border-luxe/30 rounded-3xl p-6 sm:p-8 shadow-[0_0_50px_rgba(192,160,98,0.1)] relative overflow-hidden">
-            <div class="absolute top-0 right-0 w-32 h-32 bg-luxe/10 rounded-full blur-3xl"></div>
+        <div class="bg-[#111213] border border-luxe/30 rounded-3xl p-5 sm:p-8 shadow-[0_0_50px_rgba(192,160,98,0.1)] relative overflow-hidden">
+            <div class="absolute top-0 inset-x-0 h-40 bg-gradient-to-b from-luxe/10 to-transparent"></div>
             
-            <div class="space-y-4 relative z-10">
-                <div class="flex items-center justify-between pb-4 border-b border-white/10">
-                    <div class="flex-1 pr-2">
-                        <p class="text-sm font-bold text-white flex items-center gap-2"><span class="text-luxe">✂️</span> <span data-t="srv_full">Full Body Alteration</span></p>
-                        <p class="text-[10px] text-luxe font-mono mt-1 ml-[1.6rem]" id="calc-price-full">RM 30 / pc</p>
-                    </div>
-                    <div class="flex items-center gap-2 sm:gap-3">
-                        <button class="calc-btn" onclick="updateCalc('full', -1)">−</button>
-                        <span class="w-6 text-center font-bold text-lg text-white" id="qty-full">3</span>
-                        <button class="calc-btn" onclick="updateCalc('full', 1)">+</button>
-                    </div>
-                </div>
-                
-                <div class="flex items-center justify-between pb-4 border-b border-white/10">
-                    <div class="flex-1 pr-2">
-                        <p class="text-sm font-bold text-white flex items-center gap-2"><span class="text-luxe">✂️</span> <span data-t="srv_hem">Alter Length</span></p>
-                        <p class="text-[10px] text-luxe font-mono mt-1 ml-[1.6rem]" id="calc-price-hem">RM 12 / pc</p>
-                    </div>
-                    <div class="flex items-center gap-2 sm:gap-3">
-                        <button class="calc-btn" onclick="updateCalc('hem', -1)">−</button>
-                        <span class="w-6 text-center font-bold text-lg text-white" id="qty-hem">2</span>
-                        <button class="calc-btn" onclick="updateCalc('hem', 1)">+</button>
-                    </div>
-                </div>
+            <div class="relative z-10 text-center pb-6 sm:pb-8 border-b border-luxe/20 mb-6">
+                <p class="text-[10px] sm:text-xs uppercase tracking-widest text-luxe font-bold mb-2" data-t="calc_est_monthly">Estimated Monthly Income</p>
+                <div class="font-display text-5xl sm:text-6xl text-white font-bold tracking-tight transition-all duration-300 drop-shadow-[0_0_20px_rgba(192,160,98,0.3)]" id="calc-total">RM 3,696</div>
+                <p class="text-[10px] text-white/40 mt-3" data-t="calc_disclaimer">*Based on 24 working days/month.</p>
+            </div>
 
-                <div class="flex items-center justify-between pb-4 border-b border-white/10">
-                    <div class="flex-1 pr-2">
-                        <p class="text-sm font-bold text-white flex items-center gap-2"><span class="text-luxe">✂️</span> <span data-t="srv_sleeve">Alter Sleeves</span></p>
-                        <p class="text-[10px] text-luxe font-mono mt-1 ml-[1.6rem]" id="calc-price-sleeve">RM 12 / pc</p>
-                    </div>
-                    <div class="flex items-center gap-2 sm:gap-3">
-                        <button class="calc-btn" onclick="updateCalc('sleeve', -1)">−</button>
-                        <span class="w-6 text-center font-bold text-lg text-white" id="qty-sleeve">2</span>
-                        <button class="calc-btn" onclick="updateCalc('sleeve', 1)">+</button>
-                    </div>
-                </div>
-
-                <div class="flex items-center justify-between pb-4 border-b border-white/10">
-                    <div class="flex-1 pr-2">
-                        <p class="text-sm font-bold text-white flex items-center gap-2"><span class="text-luxe">✂️</span> <span data-t="srv_shoulder">Alter Shoulders</span></p>
-                        <p class="text-[10px] text-luxe font-mono mt-1 ml-[1.6rem]" id="calc-price-shoulder">RM 10 / pc</p>
-                    </div>
-                    <div class="flex items-center gap-2 sm:gap-3">
-                        <button class="calc-btn" onclick="updateCalc('shoulder', -1)">−</button>
-                        <span class="w-6 text-center font-bold text-lg text-white" id="qty-shoulder">1</span>
-                        <button class="calc-btn" onclick="updateCalc('shoulder', 1)">+</button>
-                    </div>
-                </div>
-
+            <div class="relative z-10 bg-white/5 border border-luxe/20 rounded-2xl p-4 sm:p-5 mb-5 shadow-lg">
                 <div class="flex items-center justify-between">
-                    <div class="flex-1 pr-2">
-                        <p class="text-sm font-bold text-white flex items-center gap-2"><span class="text-luxe">✂️</span> <span data-t="srv_pads">Add Shoulder Pads</span></p>
-                        <p class="text-[10px] text-luxe font-mono mt-1 ml-[1.6rem]" id="calc-price-pads">RM 6 / pc</p>
+                    <div class="flex-1 pr-4">
+                        <p class="text-base sm:text-lg font-bold text-white mb-1" data-t="srv_full">Full Body Alteration</p>
+                        <p class="text-[10px] sm:text-xs text-white/50 leading-tight mb-2" data-t="desc_full">Includes length, sleeves, shoulders, and pads.</p>
+                        <p class="text-xs text-luxe font-mono font-bold bg-luxe/10 inline-block px-2 py-1 rounded" id="calc-price-full">RM 30 / pc</p>
                     </div>
-                    <div class="flex items-center gap-2 sm:gap-3">
-                        <button class="calc-btn" onclick="updateCalc('pads', -1)">−</button>
-                        <span class="w-6 text-center font-bold text-lg text-white" id="qty-pads">1</span>
-                        <button class="calc-btn" onclick="updateCalc('pads', 1)">+</button>
+                    <div class="flex items-center gap-2 bg-black/40 rounded-xl p-1.5 border border-white/10">
+                        <button class="calc-btn w-9 h-9 sm:w-10 sm:h-10 text-lg hover:bg-white/10" onclick="updateCalc('full', -1)">−</button>
+                        <span class="w-6 text-center font-bold text-lg text-white" id="qty-full">3</span>
+                        <button class="calc-btn w-9 h-9 sm:w-10 sm:h-10 text-lg hover:bg-white/10" onclick="updateCalc('full', 1)">+</button>
                     </div>
                 </div>
             </div>
 
-            <div class="mt-8 bg-black/50 border border-white/10 rounded-2xl p-5 relative z-10">
-                <p class="text-[10px] uppercase tracking-widest text-white/50 mb-1 text-center" data-t="calc_est_monthly">Estimated Monthly Income</p>
-                <div class="text-center font-display text-4xl sm:text-5xl text-luxe font-bold mb-2 tracking-tight transition-all duration-300" id="calc-total">RM 3,696</div>
-                <p class="text-[10px] text-white/30 text-center" data-t="calc_disclaimer">*Based on 24 working days/month.</p>
+            <div class="flex items-center gap-4 mb-4 relative z-10 opacity-70">
+                <div class="h-px bg-white/10 flex-1"></div>
+                <span class="text-[10px] uppercase tracking-widest text-white/50 font-bold" data-t="lbl_alacarte">A La Carte Services</span>
+                <div class="h-px bg-white/10 flex-1"></div>
             </div>
+            
+            <div class="space-y-2 relative z-10">
+                <div class="flex items-center justify-between p-3 hover:bg-white/5 rounded-xl transition border border-transparent hover:border-white/5">
+                    <div class="flex-1 pr-2">
+                        <p class="text-sm sm:text-base font-bold text-white mb-0.5" data-t="srv_hem">Alter Length</p>
+                        <p class="text-[10px] text-luxe font-mono" id="calc-price-hem">RM 12 / pc</p>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <button class="calc-btn w-8 h-8 text-base bg-white/5 hover:bg-white/10 border-none" onclick="updateCalc('hem', -1)">−</button>
+                        <span class="w-6 text-center font-bold text-base text-white" id="qty-hem">2</span>
+                        <button class="calc-btn w-8 h-8 text-base bg-white/5 hover:bg-white/10 border-none" onclick="updateCalc('hem', 1)">+</button>
+                    </div>
+                </div>
+
+                <div class="flex items-center justify-between p-3 hover:bg-white/5 rounded-xl transition border border-transparent hover:border-white/5">
+                    <div class="flex-1 pr-2">
+                        <p class="text-sm sm:text-base font-bold text-white mb-0.5" data-t="srv_sleeve">Alter Sleeves</p>
+                        <p class="text-[10px] text-luxe font-mono" id="calc-price-sleeve">RM 12 / pc</p>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <button class="calc-btn w-8 h-8 text-base bg-white/5 hover:bg-white/10 border-none" onclick="updateCalc('sleeve', -1)">−</button>
+                        <span class="w-6 text-center font-bold text-base text-white" id="qty-sleeve">2</span>
+                        <button class="calc-btn w-8 h-8 text-base bg-white/5 hover:bg-white/10 border-none" onclick="updateCalc('sleeve', 1)">+</button>
+                    </div>
+                </div>
+
+                <div class="flex items-center justify-between p-3 hover:bg-white/5 rounded-xl transition border border-transparent hover:border-white/5">
+                    <div class="flex-1 pr-2">
+                        <p class="text-sm sm:text-base font-bold text-white mb-0.5" data-t="srv_shoulder">Alter Shoulders</p>
+                        <p class="text-[10px] text-luxe font-mono" id="calc-price-shoulder">RM 10 / pc</p>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <button class="calc-btn w-8 h-8 text-base bg-white/5 hover:bg-white/10 border-none" onclick="updateCalc('shoulder', -1)">−</button>
+                        <span class="w-6 text-center font-bold text-base text-white" id="qty-shoulder">1</span>
+                        <button class="calc-btn w-8 h-8 text-base bg-white/5 hover:bg-white/10 border-none" onclick="updateCalc('shoulder', 1)">+</button>
+                    </div>
+                </div>
+
+                <div class="flex items-center justify-between p-3 hover:bg-white/5 rounded-xl transition border border-transparent hover:border-white/5">
+                    <div class="flex-1 pr-2">
+                        <p class="text-sm sm:text-base font-bold text-white mb-0.5" data-t="srv_pads">Add Shoulder Pads</p>
+                        <p class="text-[10px] text-luxe font-mono" id="calc-price-pads">RM 6 / pc</p>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <button class="calc-btn w-8 h-8 text-base bg-white/5 hover:bg-white/10 border-none" onclick="updateCalc('pads', -1)">−</button>
+                        <span class="w-6 text-center font-bold text-base text-white" id="qty-pads">1</span>
+                        <button class="calc-btn w-8 h-8 text-base bg-white/5 hover:bg-white/10 border-none" onclick="updateCalc('pads', 1)">+</button>
+                    </div>
+                </div>
+            </div>
+
         </div>
     </div>
 
@@ -361,15 +381,18 @@
     // --- DICTIONARY ---
     const t = {
         en: {
-            txt_badge: "Official Partner Program", hero_title: "Become an Arabista Alteration Hub", hero_subtitle: "Earn a steady additional income of up to RM 3,000+ per month. Perfect for home-based tailors and alteration shops.",
+            txt_badge: "Official Partner Program", hero_title: "Become an Arabista Alteration Hub", 
+            hero_subtitle: "Be our alteration hub partner and earn up to RM 3,000+ every month with zero effort—we bring the customers right to your door. No fees. No hassles.",
             
+            lbl_benefit1: "Benefit 1", lbl_benefit2: "Benefit 2", lbl_benefit3: "Benefit 3", lbl_benefit4: "Benefit 4",
             hook1_title: "Consistent, Hassle-Free Jobs", hook1_desc: "We send customers directly to you for standardized alterations. No complex custom sewing.", 
             hook2_title: "Seamless Logistics", hook2_desc: "Customers drop off items or we arrange Lalamove riders to deliver right to your doorstep.", 
             hook3_title: "Guaranteed & Fast Pay", hook3_desc: "Fixed, transparent fees. Customers pay you directly upon completion.", 
             hook4_title: "Automated Portal", hook4_desc: "Manage orders, update statuses, and track earnings instantly via our Partner Portal.",
             
-            title_calc: "Service Menu & Earnings Simulator", desc_calc: "Adjust your daily capacity to calculate potential income.", title_why_join: "Why Partner With Us?",
-            srv_full: "Full Body Alteration", srv_hem: "Alter Length", srv_sleeve: "Alter Sleeves", srv_shoulder: "Alter Shoulders", srv_pads: "Add Shoulder Pads", 
+            title_calc: "Service Menu & Earnings Calculator", desc_calc: "Adjust your daily capacity to calculate potential income.", title_why_join: "Why Partner With Us?",
+            srv_full: "Full Body Alteration", desc_full: "Includes length, sleeves, shoulders, and pads.", lbl_alacarte: "A La Carte Services",
+            srv_hem: "Alter Length", srv_sleeve: "Alter Sleeves", srv_shoulder: "Alter Shoulders", srv_pads: "Add Shoulder Pads", 
             calc_est_monthly: "Estimated Monthly Income", calc_disclaimer: "*Based on 24 working days/month.",
             
             btn_register: "Apply Now", form_title: "Hub Application", 
@@ -380,15 +403,18 @@
             alert_name: "Please enter your full name.", alert_phone: "Please enter your WhatsApp number.", alert_gps: "Please map your location using GPS or Search.", alert_unit: "Please enter your unit/house number.", alert_eq: "Please select at least one equipment.", alert_photo: "Please upload a workspace photo.", alert_error: "Connection Error.", msg_locating: "Locating...", msg_searching: "Searching...", msg_locked: "GPS Locked", msg_submitting: "Submitting...", msg_geo_notsupported: "Geo not supported", txt_view_on_map: "View on Map"
         },
         bm: {
-            txt_badge: "Program Rakan Rasmi", hero_title: "Jadi Hub Alterasi Arabista", hero_subtitle: "Jana pendapatan tambahan sehingga RM 3,000+ sebulan. Sesuai untuk tukang jahit dari rumah atau kedai.",
+            txt_badge: "Program Rakan Rasmi", hero_title: "Jadi Hub Alterasi Arabista", 
+            hero_subtitle: "Jadi rakan hub alterasi kami dan jana sehingga RM 3,000+ setiap bulan tanpa usaha keras—kami bawa pelanggan terus ke pintu anda. Tiada yuran. Tiada masalah.",
             
+            lbl_benefit1: "Manfaat 1", lbl_benefit2: "Manfaat 2", lbl_benefit3: "Manfaat 3", lbl_benefit4: "Manfaat 4",
             hook1_title: "Standard Alterasi", hook1_desc: "Kami hantar pelanggan kepada anda untuk alterasi standard. Tiada tempahan baju yang rumit.", 
             hook2_title: "Penghantaran Mudah", hook2_desc: "Pelanggan hantar sendiri, atau kami uruskan rider Lalamove terus ke pintu rumah anda.", 
             hook3_title: "Harga Tetap & Bayaran Pantas", hook3_desc: "Harga standard di semua hub. Pelanggan bayar terus kepada anda sebaik siap.", 
             hook4_title: "Sistem Portal Automatik", hook4_desc: "Urus tugasan, kemas kini status, dan jejak pendapatan pantas melalui Portal Rakan kami.",
             
-            title_calc: "Menu Servis & Simulasi Pendapatan", desc_calc: "Laras kapasiti harian anda untuk mengira potensi pendapatan.", title_why_join: "Kenapa Sertai Arabista?",
-            srv_full: "Alter Keseluruhan Baju", srv_hem: "Alter Labuh", srv_sleeve: "Alter Lengan", srv_shoulder: "Alter Bahu", srv_pads: "Tambah Span", 
+            title_calc: "Menu Servis & Kalkulator Pendapatan", desc_calc: "Laras kapasiti harian anda untuk mengira potensi pendapatan.", title_why_join: "Kenapa Sertai Arabista?",
+            srv_full: "Alter Keseluruhan Baju", desc_full: "Termasuk labuh, lengan, bahu, dan span.", lbl_alacarte: "Servis A La Carte",
+            srv_hem: "Alter Labuh", srv_sleeve: "Alter Lengan", srv_shoulder: "Alter Bahu", srv_pads: "Tambah Span", 
             calc_est_monthly: "Anggaran Pendapatan Bulanan", calc_disclaimer: "*Berdasarkan 24 hari bekerja sebulan.",
             
             btn_register: "Daftar Sekarang", form_title: "Borang Pendaftaran", 
@@ -455,6 +481,12 @@
         calculateIncome();
     });
 
+    function scrollCarousel(dir) {
+        const carousel = document.getElementById('media-carousel');
+        const scrollAmount = window.innerWidth < 768 ? window.innerWidth * 0.8 : 340; 
+        carousel.scrollBy({ left: dir * scrollAmount, behavior: 'smooth' });
+    }
+
     function updateCalc(type, val) {
         if(type === 'full') { qtyFull += val; if(qtyFull < 0) qtyFull = 0; document.getElementById('qty-full').innerText = qtyFull; }
         if(type === 'hem') { qtyHem += val; if(qtyHem < 0) qtyHem = 0; document.getElementById('qty-hem').innerText = qtyHem; }
@@ -469,13 +501,15 @@
         const monthly = daily * 24; 
         
         const totalEl = document.getElementById('calc-total');
-        totalEl.classList.remove('scale-110', 'text-white');
+        totalEl.classList.remove('scale-110', 'text-luxe', 'drop-shadow-[0_0_30px_rgba(192,160,98,0.8)]');
         void totalEl.offsetWidth; // trigger reflow
-        totalEl.classList.add('scale-110', 'text-white');
+        totalEl.classList.add('scale-110', 'text-luxe', 'drop-shadow-[0_0_30px_rgba(192,160,98,0.8)]');
         
         totalEl.innerText = "RM " + monthly.toLocaleString();
         
-        setTimeout(() => totalEl.classList.remove('scale-110', 'text-white'), 300);
+        setTimeout(() => {
+            totalEl.classList.remove('scale-110', 'text-luxe', 'drop-shadow-[0_0_30px_rgba(192,160,98,0.8)]');
+        }, 300);
     }
 
     function openForm() { 
