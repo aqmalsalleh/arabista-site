@@ -87,12 +87,27 @@
 
     <div class="px-4 sm:px-6 mb-12">
         <h2 class="font-display text-2xl text-white mb-4 text-center" data-t="title_services">Standardized Services</h2>
-        <ul class="space-y-3 bg-white/5 border border-white/10 rounded-2xl p-6 text-sm text-white/80 shadow-soft">
-            <li class="flex gap-3"><span class="text-luxe">✂️</span> <span data-t="srv_hem"><strong>Hemming:</strong> Straight cut and sew to adjust length.</span></li>
-            <li class="flex gap-3"><span class="text-luxe">✂️</span> <span data-t="srv_sleeve"><strong>Sleeve Alteration:</strong> Shorten and finish sleeves.</span></li>
-            <li class="flex gap-3"><span class="text-luxe">✂️</span> <span data-t="srv_shoulder"><strong>Shoulder Alteration:</strong> Adjust shoulder width.</span></li>
-            <li class="flex gap-3"><span class="text-luxe">✂️</span> <span data-t="srv_pads"><strong>Shoulder Pads:</strong> Simple pad insertion.</span></li>
-            <li class="flex gap-3 mt-4 pt-3 border-t border-white/10"><span class="text-luxe">✂️</span> <span data-t="srv_full"><strong>Full Body Package:</strong> A complete resizing that includes all services above.</span></li>
+        <ul class="space-y-4 bg-white/5 border border-white/10 rounded-2xl p-6 text-sm text-white/80 shadow-soft">
+            <li class="flex justify-between items-start gap-4">
+                <div class="flex gap-3"><span class="text-luxe mt-0.5">✂️</span> <span data-t="srv_hem"><strong>Hemming:</strong> Straight cut and sew to adjust length.</span></div>
+                <span class="text-luxe font-mono font-bold whitespace-nowrap bg-white/5 px-2 py-0.5 rounded" id="list-price-hem">RM 12</span>
+            </li>
+            <li class="flex justify-between items-start gap-4">
+                <div class="flex gap-3"><span class="text-luxe mt-0.5">✂️</span> <span data-t="srv_sleeve"><strong>Sleeve Alteration:</strong> Shorten and finish sleeves.</span></div>
+                <span class="text-luxe font-mono font-bold whitespace-nowrap bg-white/5 px-2 py-0.5 rounded" id="list-price-sleeve">RM 12</span>
+            </li>
+            <li class="flex justify-between items-start gap-4">
+                <div class="flex gap-3"><span class="text-luxe mt-0.5">✂️</span> <span data-t="srv_shoulder"><strong>Shoulder Alteration:</strong> Adjust shoulder width.</span></div>
+                <span class="text-luxe font-mono font-bold whitespace-nowrap bg-white/5 px-2 py-0.5 rounded" id="list-price-shoulder">RM 10</span>
+            </li>
+            <li class="flex justify-between items-start gap-4">
+                <div class="flex gap-3"><span class="text-luxe mt-0.5">✂️</span> <span data-t="srv_pads"><strong>Shoulder Pads:</strong> Simple pad insertion.</span></div>
+                <span class="text-luxe font-mono font-bold whitespace-nowrap bg-white/5 px-2 py-0.5 rounded" id="list-price-pads">RM 6</span>
+            </li>
+            <li class="flex justify-between items-start gap-4 mt-4 pt-4 border-t border-white/10">
+                <div class="flex gap-3"><span class="text-luxe mt-0.5">✂️</span> <span data-t="srv_full"><strong>Full Body Package:</strong> A complete resizing that includes all services above.</span></div>
+                <span class="text-luxe font-mono font-bold whitespace-nowrap bg-white/5 px-2 py-0.5 rounded" id="list-price-full">RM 30</span>
+            </li>
         </ul>
     </div>
 
@@ -104,11 +119,11 @@
         <div class="bg-[#111213] border border-luxe/30 rounded-3xl p-6 sm:p-8 shadow-[0_0_50px_rgba(192,160,98,0.1)] relative overflow-hidden">
             <div class="absolute top-0 right-0 w-32 h-32 bg-luxe/10 rounded-full blur-3xl"></div>
             
-            <div class="space-y-6 relative z-10">
-                <div class="flex items-center justify-between">
+            <div class="space-y-5 relative z-10">
+                <div class="flex items-center justify-between pb-5 border-b border-white/10">
                     <div>
                         <p class="text-sm font-bold text-white mb-0.5" data-t="calc_full">Full Body Packages</p>
-                        <p class="text-[10px] text-luxe font-mono" id="disp-price-full">RM 30 / pc</p>
+                        <p class="text-[10px] text-luxe font-mono" id="calc-price-full">RM 30 / pc</p>
                     </div>
                     <div class="flex items-center gap-3">
                         <button class="calc-btn" onclick="updateCalc('full', -1)">−</button>
@@ -117,23 +132,58 @@
                     </div>
                 </div>
                 
-                <div class="border-t border-white/10 pt-6 flex items-center justify-between">
+                <div class="flex items-center justify-between">
                     <div>
-                        <p class="text-sm font-bold text-white mb-0.5" data-t="calc_minor">Minor Alterations</p>
-                        <p class="text-[10px] text-white/50" data-t="calc_minor_desc">(Hems, Sleeves, Shoulders)</p>
-                        <p class="text-[10px] text-luxe font-mono" id="disp-price-minor">Avg RM 12 / pc</p>
+                        <p class="text-sm font-bold text-white mb-0.5" data-t="calc_hem">Hemming</p>
+                        <p class="text-[10px] text-luxe font-mono" id="calc-price-hem">RM 12 / pc</p>
                     </div>
                     <div class="flex items-center gap-3">
-                        <button class="calc-btn" onclick="updateCalc('minor', -1)">−</button>
-                        <span class="w-6 text-center font-bold text-lg text-white" id="qty-minor">5</span>
-                        <button class="calc-btn" onclick="updateCalc('minor', 1)">+</button>
+                        <button class="calc-btn" onclick="updateCalc('hem', -1)">−</button>
+                        <span class="w-6 text-center font-bold text-lg text-white" id="qty-hem">2</span>
+                        <button class="calc-btn" onclick="updateCalc('hem', 1)">+</button>
+                    </div>
+                </div>
+
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-bold text-white mb-0.5" data-t="calc_sleeve">Sleeves</p>
+                        <p class="text-[10px] text-luxe font-mono" id="calc-price-sleeve">RM 12 / pc</p>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <button class="calc-btn" onclick="updateCalc('sleeve', -1)">−</button>
+                        <span class="w-6 text-center font-bold text-lg text-white" id="qty-sleeve">2</span>
+                        <button class="calc-btn" onclick="updateCalc('sleeve', 1)">+</button>
+                    </div>
+                </div>
+
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-bold text-white mb-0.5" data-t="calc_shoulder">Shoulders</p>
+                        <p class="text-[10px] text-luxe font-mono" id="calc-price-shoulder">RM 10 / pc</p>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <button class="calc-btn" onclick="updateCalc('shoulder', -1)">−</button>
+                        <span class="w-6 text-center font-bold text-lg text-white" id="qty-shoulder">1</span>
+                        <button class="calc-btn" onclick="updateCalc('shoulder', 1)">+</button>
+                    </div>
+                </div>
+
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-bold text-white mb-0.5" data-t="calc_pads">Shoulder Pads</p>
+                        <p class="text-[10px] text-luxe font-mono" id="calc-price-pads">RM 6 / pc</p>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <button class="calc-btn" onclick="updateCalc('pads', -1)">−</button>
+                        <span class="w-6 text-center font-bold text-lg text-white" id="qty-pads">1</span>
+                        <button class="calc-btn" onclick="updateCalc('pads', 1)">+</button>
                     </div>
                 </div>
             </div>
 
             <div class="mt-8 bg-black/50 border border-white/10 rounded-2xl p-5 relative z-10">
                 <p class="text-[10px] uppercase tracking-widest text-white/50 mb-1 text-center" data-t="calc_est_monthly">Estimated Monthly Income</p>
-                <div class="text-center font-display text-4xl sm:text-5xl text-luxe font-bold mb-2 tracking-tight" id="calc-total">RM 3,600</div>
+                <div class="text-center font-display text-4xl sm:text-5xl text-luxe font-bold mb-2 tracking-tight" id="calc-total">RM 3,696</div>
                 <p class="text-[10px] text-white/30 text-center text-center" data-t="calc_disclaimer">*Based on 24 working days/month.</p>
             </div>
         </div>
@@ -272,7 +322,7 @@
             lbl_media1: "Hassle-Free Delivery", lbl_media2: "Premium Standard", lbl_media3: "Financial Freedom",
             hook1_title: "Consistent, Hassle-Free Jobs", hook1_desc: "We send customers directly to you for standardized alterations. No complex custom sewing.", hook2_title: "Seamless Logistics", hook2_desc: "Customers drop off items or we arrange Lalamove riders to deliver right to your doorstep.", hook3_title: "Guaranteed & Fast Pay", hook3_desc: "Fixed, transparent fees. Customers pay you directly upon completion.", hook4_title: "Automated Portal", hook4_desc: "Manage orders, update statuses, and track earnings instantly via our Partner Portal.",
             title_services: "Standardized Services", srv_hem: "<strong>Hemming:</strong> Straight cut and sew to adjust length.", srv_sleeve: "<strong>Sleeve Alteration:</strong> Shorten and finish sleeves.", srv_shoulder: "<strong>Shoulder Alteration:</strong> Adjust shoulder width.", srv_pads: "<strong>Shoulder Pads:</strong> Simple pad insertion.", srv_full: "<strong>Full Body Package:</strong> A complete resizing that includes all services above.",
-            title_calc: "Income Calculator", desc_calc: "Estimate your earnings based on daily output.", calc_full: "Full Body Packages", calc_minor: "Minor Alterations", calc_minor_desc: "(Hems, Sleeves, Shoulders)", calc_est_monthly: "Estimated Monthly Income", calc_disclaimer: "*Based on 24 working days/month.",
+            title_calc: "Income Calculator", desc_calc: "Estimate your earnings based on daily output.", calc_full: "Full Body Packages", calc_hem: "Hemming", calc_sleeve: "Sleeves", calc_shoulder: "Shoulders", calc_pads: "Shoulder Pads", calc_est_monthly: "Estimated Monthly Income", calc_disclaimer: "*Based on 24 working days/month.",
             btn_register: "Apply Now", form_title: "Hub Application", lbl_name: "Full Name *", lbl_shop: "Shop / Brand Name (Optional)", lbl_phone: "WhatsApp Number *", lbl_loc_title: "Workspace Location *", btn_detect_gps: "Detect Current Location", lbl_unit: "Unit / House / Lot No.", lbl_capacity: "Daily Capacity", opt_cap1: "1 - 5 pieces/day", opt_cap2: "6 - 15 pieces/day", opt_cap3: "15+ pieces/day", lbl_exp: "Tailoring Experience", opt_exp1: "Less than 1 year", opt_exp2: "1 - 3 years", opt_exp3: "3 - 5 years", opt_exp4: "5+ years", lbl_cert: "Certifications (Optional)", lbl_equipment: "Equipment Owned *", eq_straight: "Industrial Straight Stitch Machine", eq_overlock: "Overlock Machine (Jahit Tepi)", eq_iron: "Steam Iron Station", lbl_photo: "Workspace Photo *", desc_photo: "Please upload a clear photo of your sewing machine / setup.", btn_upload: "Tap to Upload", txt_photo_ready: "Photo Ready", btn_submit: "Submit Application",
             modal_success_title: "Application Received!", modal_success_desc: "Thank you for your interest in joining Arabista. Our team will review your application and contact you via WhatsApp shortly.", btn_close: "Back to Home",
             alert_name: "Please enter your full name.", alert_phone: "Please enter your WhatsApp number.", alert_gps: "Please detect your GPS location.", alert_unit: "Please enter your unit/house number.", alert_eq: "Please select at least one equipment.", alert_photo: "Please upload a workspace photo.", alert_error: "Connection Error.", msg_locating: "Locating...", msg_locked: "GPS Locked", msg_submitting: "Submitting...", msg_geo_notsupported: "Geo not supported"
@@ -282,7 +332,7 @@
             lbl_media1: "Penghantaran Mudah", lbl_media2: "Standard Premium", lbl_media3: "Kebebasan Kewangan",
             hook1_title: "Tugasan Tetap, Tanpa Pening", hook1_desc: "Kami hantar pelanggan kepada anda untuk alterasi standard. Tiada tempahan baju yang rumit.", hook2_title: "Logistik Lancar", hook2_desc: "Pelanggan hantar sendiri, atau kami uruskan rider Lalamove terus ke pintu rumah anda.", hook3_title: "Harga Tetap & Bayaran Pantas", hook3_desc: "Harga telus. Pelanggan bayar terus kepada anda sebaik siap.", hook4_title: "Sistem Portal Automatik", hook4_desc: "Urus tugasan, kemas kini status, dan jejak pendapatan pantas melalui Portal Rakan kami.",
             title_services: "Servis Standard", srv_hem: "<strong>Potong Labuh:</strong> Potong lurus dan jahit untuk kemasan bawah.", srv_sleeve: "<strong>Potong Lengan:</strong> Pendekkan dan kemaskan hujung lengan.", srv_shoulder: "<strong>Kecilkan Bahu:</strong> Sesuaikan kelebaran bahu.", srv_pads: "<strong>Tambah Span:</strong> Masukkan span pada bahagian bahu.", srv_full: "<strong>Alter Keseluruhan:</strong> Pakej lengkap merangkumi semua servis di atas.",
-            title_calc: "Kalkulator Pendapatan", desc_calc: "Anggar pendapatan anda berdasarkan kapasiti harian.", calc_full: "Pakej Alter Keseluruhan", calc_minor: "Alterasi Minor", calc_minor_desc: "(Labuh, Lengan, Bahu)", calc_est_monthly: "Anggaran Pendapatan Bulanan", calc_disclaimer: "*Berdasarkan 24 hari bekerja sebulan.",
+            title_calc: "Kalkulator Pendapatan", desc_calc: "Anggar pendapatan anda berdasarkan kapasiti harian.", calc_full: "Pakej Alter Keseluruhan", calc_hem: "Potong Labuh", calc_sleeve: "Potong Lengan", calc_shoulder: "Kecilkan Bahu", calc_pads: "Tambah Span", calc_est_monthly: "Anggaran Pendapatan Bulanan", calc_disclaimer: "*Berdasarkan 24 hari bekerja sebulan.",
             btn_register: "Daftar Sekarang", form_title: "Borang Pendaftaran", lbl_name: "Nama Penuh *", lbl_shop: "Nama Kedai / Jenama (Pilihan)", lbl_phone: "Nombor WhatsApp *", lbl_loc_title: "Lokasi Ruang Jahit *", btn_detect_gps: "Kesan Lokasi Semasa", lbl_unit: "No. Unit / Rumah", lbl_capacity: "Kapasiti Harian", opt_cap1: "1 - 5 helai sehari", opt_cap2: "6 - 15 helai sehari", opt_cap3: "15+ helai sehari", lbl_exp: "Pengalaman Menjahit", opt_exp1: "Kurang 1 tahun", opt_exp2: "1 - 3 tahun", opt_exp3: "3 - 5 tahun", opt_exp4: "Lebih 5 tahun", lbl_cert: "Sijil Kemahiran (Pilihan)", lbl_equipment: "Peralatan Sedia Ada *", eq_straight: "Mesin Jahit Lurus Industri", eq_overlock: "Mesin Jahit Tepi (Overlock)", eq_iron: "Seterika Wap (Steam Iron)", lbl_photo: "Gambar Ruang Jahitan *", desc_photo: "Sila muat naik gambar mesin jahit / ruang kerja anda dengan jelas.", btn_upload: "Klik untuk Muat Naik", txt_photo_ready: "Gambar Sedia", btn_submit: "Hantar Permohonan",
             modal_success_title: "Permohonan Diterima!", modal_success_desc: "Terima kasih kerana berminat menyertai Arabista. Pasukan kami akan menyemak permohonan anda dan menghubungi anda di WhatsApp.", btn_close: "Kembali ke Utama",
             alert_name: "Sila masukkan nama penuh anda.", alert_phone: "Sila masukkan nombor WhatsApp anda.", alert_gps: "Sila kesan lokasi GPS anda.", alert_unit: "Sila masukkan no. unit/rumah anda.", alert_eq: "Sila pilih sekurang-kurangnya satu peralatan.", alert_photo: "Sila muat naik gambar ruang jahitan.", alert_error: "Ralat Sambungan.", msg_locating: "Mengesan...", msg_locked: "GPS Dikunci", msg_submitting: "Menghantar...", msg_geo_notsupported: "Geo tidak disokong"
@@ -292,8 +342,8 @@
     let currentLang = 'en';
     
     // Default prices (will update if fetched)
-    let pFull = 30; let pMinor = 12;
-    let qtyFull = 3; let qtyMinor = 5;
+    let pFull = 30, pHem = 12, pSleeve = 12, pShoulder = 10, pPads = 6;
+    let qtyFull = 3, qtyHem = 2, qtySleeve = 2, qtyShoulder = 1, qtyPads = 1;
     let base64Photo = "";
     let appData = { lat: "", lng: "", address: "" };
 
@@ -315,9 +365,25 @@
         fetch(scriptURL).then(r=>r.json()).then(d => {
             if(d.pricing && d.pricing.full) {
                 pFull = d.pricing.full.price;
-                pMinor = Math.round((d.pricing.hem.price + d.pricing.sleeve.price + d.pricing.shoulder.price) / 3);
-                document.getElementById('disp-price-full').innerText = `RM ${pFull} / pc`;
-                document.getElementById('disp-price-minor').innerText = `Avg RM ${pMinor} / pc`;
+                pHem = d.pricing.hem.price;
+                pSleeve = d.pricing.sleeve.price;
+                pShoulder = d.pricing.shoulder.price;
+                pPads = d.pricing.pads.price;
+                
+                // Update List Prices
+                document.getElementById('list-price-full').innerText = `RM ${pFull}`;
+                document.getElementById('list-price-hem').innerText = `RM ${pHem}`;
+                document.getElementById('list-price-sleeve').innerText = `RM ${pSleeve}`;
+                document.getElementById('list-price-shoulder').innerText = `RM ${pShoulder}`;
+                document.getElementById('list-price-pads').innerText = `RM ${pPads}`;
+
+                // Update Calc Prices
+                document.getElementById('calc-price-full').innerText = `RM ${pFull} / pc`;
+                document.getElementById('calc-price-hem').innerText = `RM ${pHem} / pc`;
+                document.getElementById('calc-price-sleeve').innerText = `RM ${pSleeve} / pc`;
+                document.getElementById('calc-price-shoulder').innerText = `RM ${pShoulder} / pc`;
+                document.getElementById('calc-price-pads').innerText = `RM ${pPads} / pc`;
+
                 calculateIncome();
             }
         }).catch(e=>{});
@@ -327,12 +393,15 @@
     // --- CALCULATOR LOGIC ---
     function updateCalc(type, val) {
         if(type === 'full') { qtyFull += val; if(qtyFull < 0) qtyFull = 0; document.getElementById('qty-full').innerText = qtyFull; }
-        if(type === 'minor') { qtyMinor += val; if(qtyMinor < 0) qtyMinor = 0; document.getElementById('qty-minor').innerText = qtyMinor; }
+        if(type === 'hem') { qtyHem += val; if(qtyHem < 0) qtyHem = 0; document.getElementById('qty-hem').innerText = qtyHem; }
+        if(type === 'sleeve') { qtySleeve += val; if(qtySleeve < 0) qtySleeve = 0; document.getElementById('qty-sleeve').innerText = qtySleeve; }
+        if(type === 'shoulder') { qtyShoulder += val; if(qtyShoulder < 0) qtyShoulder = 0; document.getElementById('qty-shoulder').innerText = qtyShoulder; }
+        if(type === 'pads') { qtyPads += val; if(qtyPads < 0) qtyPads = 0; document.getElementById('qty-pads').innerText = qtyPads; }
         calculateIncome();
     }
 
     function calculateIncome() {
-        const daily = (qtyFull * pFull) + (qtyMinor * pMinor);
+        const daily = (qtyFull * pFull) + (qtyHem * pHem) + (qtySleeve * pSleeve) + (qtyShoulder * pShoulder) + (qtyPads * pPads);
         const monthly = daily * 24; 
         document.getElementById('calc-total').innerText = "RM " + monthly.toLocaleString();
     }
