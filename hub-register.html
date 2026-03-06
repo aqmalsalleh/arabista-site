@@ -705,6 +705,11 @@
             const data = await res.json();
             
             if (data.status === "success") {
+                // --- TIKTOK PIXEL TRIGGER START ---
+                if (typeof ttq !== 'undefined') {
+                    ttq.track('CompleteRegistration');
+                }
+                // --- TIKTOK PIXEL TRIGGER END ---
                 const modal = document.getElementById('success-modal');
                 const box = document.getElementById('success-box');
                 modal.classList.remove('hidden');
