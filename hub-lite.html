@@ -44,7 +44,7 @@
     <div class="text-center mb-6 mt-2">
         <span class="text-[10px] font-bold uppercase tracking-widest text-luxe border border-luxe/30 bg-luxe/10 px-3 py-1 rounded-full mb-4 inline-block">Kerja Dari Rumah</span>
         <h1 class="font-display text-4xl mb-3 leading-tight text-white">Sertai Team Jahitan Arabista</h1>
-        <p class="text-white/70 text-sm font-medium leading-relaxed">Dapatkan pesanan setiap hari terus ke telefon anda. Semua sistem kami adalah automatik. Anda cuma tinggal jahit je!</p>
+        <p class="text-white/70 text-sm font-medium leading-relaxed">Hanya duduk rumah dan tunggu order alter masuk daripada kami. Kami uruskan semua penghantaran. Anda cuma jahit je!</p>
     </div>
 
     <div class="mb-8 p-5 bg-[#111213] border border-luxe/30 rounded-2xl shadow-[0_0_20px_rgba(192,160,98,0.1)] relative overflow-hidden">
@@ -58,7 +58,7 @@
                 <div class="w-9 h-9 rounded-full bg-brand border border-luxe text-luxe flex items-center justify-center mb-2 shadow-lg">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
                 </div>
-                <span class="text-[10px] font-medium text-center text-white/80 leading-tight">Terima<br>Pesanan</span>
+                <span class="text-[10px] font-medium text-center text-white/80 leading-tight">Terima<br>Order</span>
             </div>
             <div class="relative z-10 flex flex-col items-center w-1/4">
                 <div class="w-9 h-9 rounded-full bg-brand border border-luxe text-luxe flex items-center justify-center mb-2 shadow-lg">
@@ -70,7 +70,7 @@
                 <div class="w-9 h-9 rounded-full bg-brand border border-luxe text-luxe flex items-center justify-center mb-2 shadow-lg">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
                 </div>
-                <span class="text-[10px] font-medium text-center text-white/80 leading-tight">Jahit<br>(Alterasi)</span>
+                <span class="text-[10px] font-medium text-center text-white/80 leading-tight">Anda<br>Jahit</span>
             </div>
             <div class="relative z-10 flex flex-col items-center w-1/4">
                 <div class="w-9 h-9 rounded-full bg-brand border border-luxe text-luxe flex items-center justify-center mb-2 shadow-lg">
@@ -147,7 +147,8 @@
     const scriptURL = 'https://script.google.com/macros/s/AKfycbyrJFfuCrhAbdwzAj8uP4sSvFuzRzzzEFV5CHOCBSOK6OGlIXPtsf7-XEfjLHGnFZiyvw/exec'; 
 
     function contactWhatsApp() {
-        const msg = "Assalamualaikum Arabista, saya berminat nak jadi Rakan Hub Alterasi.";
+        // KEMASKINI 2: MESEJ WHATSAPP BARU
+        const msg = "Assalamualaikum, saya berminat nak join team alteration Arabista";
         window.open(`https://wa.me/${adminWhatsApp}?text=${encodeURIComponent(msg)}`, '_blank');
         
         // Fire Pixel event for WhatsApp click
@@ -189,6 +190,7 @@
             const data = await res.json();
             
             if (data.status === "success") {
+                // TIKTOK PIXEL TRACKING - COMPLETE REGISTRATION
                 if (typeof ttq !== 'undefined') { ttq.track('CompleteRegistration'); }
                 
                 const modal = document.getElementById('success-modal');
