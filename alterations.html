@@ -736,8 +736,19 @@ async function useOrderAddress() {
                 const straightLine = getDist(state.lat, state.lng, h.lat, h.lng); h.dist = straightLine * 1.4; 
             } else { h.dist = 5.0; }
             h.fee = Math.ceil(5 + (h.dist * 1.0)); 
+            
+            // PRE-CALCULATE FULL STATUS
+            h.isFull = h.backlog >= h.max_capacity;
         });
-        hubs.sort((a,b) => a.dist - b.dist);
+        
+        // TWO-TIER SORTING LOGIC: Availability first, then Distance
+        hubs.sort((a,b) => {
+            if (a.isFull === b.isFull) {
+                return a.dist - b.dist; // Sort by distance if both are open, or both are full
+            }
+            return a.isFull ? 1 : -1; // Push full hubs to the bottom
+        });
+        
         let filteredHubs = hubs.filter(h => h.dist <= 20);
         const totalValidHubs = filteredHubs.length;
         
@@ -746,7 +757,7 @@ async function useOrderAddress() {
         
         const list = document.getElementById('hub-list'); list.innerHTML = '';
         filteredHubs.forEach(h => {
-            const isFull = h.backlog >= h.max_capacity; 
+            const isFull = h.isFull; 
             const isSelected = state.hubId === h.id; 
             const status = checkHubStatus(h);
             const safeHubName = sanitizeHTML(h.name);
