@@ -406,10 +406,7 @@
     document.addEventListener('DOMContentLoaded', () => { 
         const storedVersion = localStorage.getItem('arabista_tracker_version');
         if (storedVersion !== TRACKER_VERSION) { 
-            // Only update the version key, DO NOT clear the whole local storage
             localStorage.setItem('arabista_tracker_version', TRACKER_VERSION); 
-            window.location.reload(true); // Force hard reload from server
-            return; 
         }
 
         const userLang = navigator.language || navigator.userLanguage;

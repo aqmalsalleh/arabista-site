@@ -315,14 +315,16 @@
             .replace(/"/g, '\\"');
     }
 
+    const APP_VERSION = "2.1"; 
+    
     document.addEventListener('DOMContentLoaded', () => { 
         const storedVersion = localStorage.getItem('arabista_app_version');
         if (storedVersion !== APP_VERSION) { 
             localStorage.removeItem('arabista_hub_name');
             localStorage.removeItem('arabista_hub_token');
             localStorage.setItem('arabista_app_version', APP_VERSION); 
-            window.location.reload(true); // Force hard reload
-            return; 
+            hubName = "";
+            hubToken = "";
         }
         
         const userLang = navigator.language || navigator.userLanguage;

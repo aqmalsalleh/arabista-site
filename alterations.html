@@ -328,10 +328,7 @@
     document.addEventListener('DOMContentLoaded', () => {
         const storedVersion = localStorage.getItem('arabista_booking_version');
         if (storedVersion !== BOOKING_VERSION) { 
-            // Only update the version key, DO NOT clear the whole local storage
             localStorage.setItem('arabista_booking_version', BOOKING_VERSION); 
-            window.location.reload(true); // Force hard reload from server
-            return; 
         }
 
         const userLang = navigator.language || navigator.userLanguage;
