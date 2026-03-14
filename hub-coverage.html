@@ -34,7 +34,7 @@
 
 <body class="bg-brand text-white font-sans h-screen flex flex-col overflow-hidden relative">
 
-  <header class="bg-brand/90 backdrop-blur-md border-b border-white/10 p-4 flex justify-between items-center z-10 relative shadow-md shrink-0">
+  <header class="bg-brand/90 backdrop-blur-md border-b border-white/10 p-4 flex justify-between items-center z-20 relative shadow-md shrink-0">
     <div>
         <h1 class="font-display text-2xl font-semibold tracking-wide text-white leading-tight">ARABISTA</h1>
         <p id="god-mode-trigger" class="text-xs text-luxe tracking-widest uppercase cursor-default select-none">Coverage Map</p>
@@ -48,30 +48,32 @@
     </div>
   </header>
 
-  <div class="absolute top-24 left-4 z-10 w-[calc(100%-2rem)] md:w-80 space-y-3 pointer-events-none">
-      
-      <button onclick="locateUser()" class="pointer-events-auto w-full bg-brand-light border border-white/10 hover:border-luxe/50 text-white shadow-lg rounded-lg p-3 flex items-center justify-center transition-all">
-          <svg class="w-5 h-5 text-luxe mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.243-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
-          Find Hubs Near Me
+  <div class="absolute top-20 right-4 z-10 flex flex-col items-end space-y-3 pointer-events-none mt-2">
+      <button onclick="locateUser()" class="pointer-events-auto w-11 h-11 bg-brand-light/95 backdrop-blur-md border border-white/10 hover:border-luxe/50 text-luxe shadow-lg rounded-full flex items-center justify-center transition-all">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.243-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
       </button>
 
-      <div class="pointer-events-auto bg-brand-light border border-white/10 shadow-lg rounded-lg overflow-hidden transition-all">
-          <button onclick="toggleRadius()" class="w-full flex justify-between items-center p-3 text-xs text-white/90 font-medium uppercase tracking-wider hover:bg-white/5">
-              <span class="flex items-center">⚙️ Coverage Range</span>
-              <span id="radius-display" class="text-luxe font-bold">5 KM</span>
+      <div class="pointer-events-auto flex flex-col items-end relative">
+          <button onclick="toggleRadius()" class="w-11 h-11 bg-brand-light/95 backdrop-blur-md border border-white/10 hover:border-luxe/50 text-luxe shadow-lg rounded-full flex items-center justify-center transition-all">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
           </button>
-          <div id="radius-content" class="px-4 pb-4 hidden">
-              <input type="range" id="radius-slider" min="1" max="15" value="5" class="w-full h-1 bg-white/20 rounded-lg appearance-none cursor-pointer accent-luxe mt-2" oninput="updateRadius(this.value)">
+          
+          <div id="radius-content" class="hidden absolute top-12 right-0 w-48 bg-brand-light/95 backdrop-blur-md border border-white/10 shadow-2xl rounded-xl p-4 transition-all origin-top-right">
+              <div class="flex justify-between text-[10px] text-white/70 font-medium mb-3 uppercase tracking-wider">
+                  <span>Radius Range</span>
+                  <span id="radius-display" class="text-luxe font-bold">1 KM</span>
+              </div>
+              <input type="range" id="radius-slider" min="1" max="15" value="1" class="w-full h-1 bg-white/20 rounded-lg appearance-none cursor-pointer accent-luxe" oninput="updateRadius(this.value)">
           </div>
       </div>
   </div>
 
   <div id="map" class="flex-grow w-full h-full"></div>
 
-  <div id="hub-modal" class="fixed inset-x-4 bottom-32 md:inset-auto md:top-1/2 md:left-1/2 md:-translate-x-1/2 md:-translate-y-1/2 md:w-80 bg-brand-light border border-luxe shadow-2xl rounded-xl z-30 hidden flex-col transition-all">
+  <div id="hub-modal" class="fixed inset-x-4 bottom-32 md:inset-auto md:bottom-10 md:right-10 md:w-80 bg-brand-light border border-luxe shadow-2xl rounded-xl z-30 hidden flex-col transition-all">
       <div class="flex justify-between items-center border-b border-white/10 p-4 bg-brand/50 rounded-t-xl">
           <h3 id="modal-title" class="font-display font-bold text-xl text-luxe">Hub Name</h3>
-          <button onclick="closeModal()" class="text-white/40 hover:text-white text-xl leading-none">&times;</button>
+          <button onclick="closeModal()" class="text-white/40 hover:text-white text-2xl leading-none">×</button>
       </div>
       <div class="p-4 space-y-3">
           <div id="modal-status"></div>
@@ -89,11 +91,9 @@
       </div>
   </div>
 
-  <div id="cta-box" class="fixed bottom-10 left-0 right-0 px-4 z-20 flex justify-center transition-all duration-300 pointer-events-none">
+  <div id="cta-box" class="fixed bottom-8 left-0 right-0 px-4 z-20 flex justify-center transition-all duration-300 pointer-events-none">
       <div class="relative bg-brand-light/95 backdrop-blur-md border border-luxe/30 shadow-[0_10px_40px_rgba(0,0,0,0.8)] rounded-xl p-5 max-w-sm w-full text-center pointer-events-auto">
-          <button onclick="document.getElementById('cta-box').style.display='none'" class="absolute top-2 right-3 text-white/40 hover:text-white p-1 text-lg font-bold leading-none">
-              &times;
-          </button>
+          <button onclick="document.getElementById('cta-box').style.display='none'" class="absolute top-2 right-3 text-white/40 hover:text-white p-1 text-lg font-bold leading-none">×</button>
           <p class="text-sm text-white/90 mb-4 mt-1 pr-4 pl-4 leading-relaxed">No hubs in your area? Claim this zone and dominate the local market.</p>
           <a href="hub-lite.html" class="block w-full bg-luxe hover:bg-luxe-hover text-brand font-semibold py-3 rounded-lg transition-colors shadow-[0_0_15px_rgba(192,160,98,0.2)]">
               Become a Hub Partner
@@ -109,12 +109,13 @@
     let markers = [];
     let circles = [];
     let godMode = false;
-    let currentRadius = 5000;
+    let currentRadius = 1000; // Updated default to 1KM
 
-    // --- DARK THEME MAP STYLE (Clean Grid, No POIs) ---
+    // --- DARK THEME MAP STYLE (Clean Grid, No POIs, No Highway Badges) ---
     const arabistaMapStyle = [
         { featureType: "poi", elementType: "all", stylers: [{ visibility: "off" }] },
         { featureType: "transit", elementType: "all", stylers: [{ visibility: "off" }] },
+        { featureType: "road", elementType: "labels.icon", stylers: [{ visibility: "off" }] }, // Erases E7/E27 Highway Badges
         { elementType: "geometry", stylers: [{ color: "#1A1A1C" }] },
         { elementType: "labels.text.stroke", stylers: [{ color: "#1A1A1C" }] },
         { elementType: "labels.text.fill", stylers: [{ color: "#746855" }] },
@@ -139,12 +140,10 @@
             styles: arabistaMapStyle,
             disableDefaultUI: true,
             zoomControl: true,
-            clickableIcons: false // Turns off clicking random businesses
+            clickableIcons: false 
         });
 
-        // Click on empty map closes custom modal
         map.addListener("click", closeModal);
-
         await fetchHubData();
     }
 
@@ -169,24 +168,25 @@
         markers = []; circles = [];
 
         hubs.forEach(hub => {
-            const position = { lat: hub.lat, lng: hub.lng };
+            const position = { lat: parseFloat(hub.lat), lng: parseFloat(hub.lng) };
             
-            // 1. Classic Google Marker with custom SVG config
+            // Luxe SVG Teardrop Pin
             const marker = new google.maps.Marker({
                 position: position,
                 map: map,
                 icon: {
-                    path: google.maps.SymbolPath.CIRCLE,
-                    scale: 8,
+                    path: "M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z",
                     fillColor: "#C0A062",
                     fillOpacity: 1,
-                    strokeWeight: 2,
-                    strokeColor: "#0F0F10"
+                    strokeWeight: 1.5,
+                    strokeColor: "#0F0F10",
+                    scale: 1.5,
+                    anchor: new google.maps.Point(12, 22)
                 },
                 title: hub.name
             });
 
-            // 2. Draw the Coverage Radius
+            // Coverage Radius
             const circle = new google.maps.Circle({
                 strokeColor: "#C0A062",
                 strokeOpacity: 0.8,
@@ -198,7 +198,7 @@
                 radius: currentRadius
             });
 
-            // 3. Open Custom Modal on Click
+            // Open Custom Modal on Click
             marker.addListener("click", () => {
                 openModal(hub);
             });
@@ -209,7 +209,6 @@
     }
 
     // --- CUSTOM UI CONTROLS ---
-
     function toggleRadius() {
         const content = document.getElementById('radius-content');
         content.classList.toggle('hidden');
@@ -230,8 +229,7 @@
             : `<span class="text-xs bg-green-500/20 text-green-400 px-2 py-1 rounded border border-green-500/30 font-semibold tracking-wide">OPEN FOR ORDERS</span>`;
         document.getElementById('modal-status').innerHTML = statusBadge;
 
-        // Auto-generate Google Maps routing link
-        const navLink = `https://www.google.com/maps/dir/?api=1&destination=${hub.lat},${hub.lng}`;
+        const navLink = `https://www.google.com/maps/dir/?api=1&destination=$${hub.lat},${hub.lng}`;
         document.getElementById('modal-nav-btn').href = navLink;
 
         const godModeBox = document.getElementById('modal-god-mode');
@@ -243,18 +241,20 @@
             godModeBox.classList.add('hidden');
         }
 
-        // Show modal and hide CTA Box to prevent overlapping on mobile
         document.getElementById('hub-modal').classList.remove('hidden');
         document.getElementById('hub-modal').classList.add('flex');
         document.getElementById('cta-box').style.display = 'none';
         
-        // Pan map slightly up to make room for modal on mobile
-        map.panTo({ lat: hub.lat - 0.05, lng: hub.lng });
+        // Perfectly center the map exactly on the hub coordinates
+        map.panTo({ lat: parseFloat(hub.lat), lng: parseFloat(hub.lng) });
     }
 
     function closeModal() {
         document.getElementById('hub-modal').classList.add('hidden');
         document.getElementById('hub-modal').classList.remove('flex');
+        
+        // Optional: Hide the radius slider if it was left open
+        document.getElementById('radius-content').classList.add('hidden');
     }
 
     function locateUser() {
