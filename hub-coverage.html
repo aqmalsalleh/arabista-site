@@ -30,49 +30,11 @@
         } 
     }
   </script>
-  <style>
-    /* 1. Eliminate Default InfoWindow Padding & Style */
-    .gm-style .gm-style-iw-c {
-        background-color: #1A1A1C !important;
-        border: 1px solid #C0A062 !important;
-        border-radius: 8px !important;
-        padding: 0px !important; /* Removes the ugly top gap */
-        color: white !important;
-    }
-    .gm-style .gm-style-iw-tc::after { background: #1A1A1C !important; }
-    /* Re-apply padding strictly to our content box */
-    .gm-style-iw-d { overflow: hidden !important; padding: 16px !important; } 
-    /* Style and reposition the close 'X' button */
-    .gm-ui-hover-effect { 
-        filter: invert(1); 
-        top: 6px !important; 
-        right: 6px !important;
-        background: rgba(15, 15, 16, 0.8) !important;
-        border-radius: 50% !important;
-    }
-
-    /* 2. Pulsating Radar Animation for Hub Pins */
-    .pulse-marker {
-        width: 16px;
-        height: 16px;
-        background-color: #C0A062;
-        border-radius: 50%;
-        border: 2px solid #0F0F10;
-        box-shadow: 0 0 0 0 rgba(192, 160, 98, 0.7);
-        animation: pulse-ring 2s infinite cubic-bezier(0.66, 0, 0, 1);
-        cursor: pointer;
-    }
-    @keyframes pulse-ring {
-        0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(192, 160, 98, 0.8); }
-        70% { transform: scale(1); box-shadow: 0 0 0 15px rgba(192, 160, 98, 0); }
-        100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(192, 160, 98, 0); }
-    }
-  </style>
 </head>
 
 <body class="bg-brand text-white font-sans h-screen flex flex-col overflow-hidden relative">
 
-  <header class="bg-brand/90 backdrop-blur-md border-b border-white/10 p-4 flex justify-between items-center z-10 relative shadow-md">
+  <header class="bg-brand/90 backdrop-blur-md border-b border-white/10 p-4 flex justify-between items-center z-10 relative shadow-md shrink-0">
     <div>
         <h1 class="font-display text-2xl font-semibold tracking-wide text-white leading-tight">ARABISTA</h1>
         <p id="god-mode-trigger" class="text-xs text-luxe tracking-widest uppercase cursor-default select-none">Coverage Map</p>
@@ -86,31 +48,54 @@
     </div>
   </header>
 
-  <div class="absolute top-24 left-4 z-10 w-[calc(100%-2rem)] md:w-80 space-y-3">
-      <button onclick="locateUser()" class="w-full bg-brand-light border border-white/10 hover:border-luxe/50 text-white shadow-lg rounded-lg p-3 flex items-center justify-center transition-all">
+  <div class="absolute top-24 left-4 z-10 w-[calc(100%-2rem)] md:w-80 space-y-3 pointer-events-none">
+      
+      <button onclick="locateUser()" class="pointer-events-auto w-full bg-brand-light border border-white/10 hover:border-luxe/50 text-white shadow-lg rounded-lg p-3 flex items-center justify-center transition-all">
           <svg class="w-5 h-5 text-luxe mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.243-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
           Find Hubs Near Me
       </button>
 
-      <div class="bg-brand-light border border-white/10 shadow-lg rounded-lg p-4">
-          <div class="flex justify-between text-xs text-white/70 font-medium mb-3 uppercase tracking-wider">
-              <span>Coverage Radius</span>
+      <div class="pointer-events-auto bg-brand-light border border-white/10 shadow-lg rounded-lg overflow-hidden transition-all">
+          <button onclick="toggleRadius()" class="w-full flex justify-between items-center p-3 text-xs text-white/90 font-medium uppercase tracking-wider hover:bg-white/5">
+              <span class="flex items-center">⚙️ Coverage Range</span>
               <span id="radius-display" class="text-luxe font-bold">5 KM</span>
+          </button>
+          <div id="radius-content" class="px-4 pb-4 hidden">
+              <input type="range" id="radius-slider" min="1" max="15" value="5" class="w-full h-1 bg-white/20 rounded-lg appearance-none cursor-pointer accent-luxe mt-2" oninput="updateRadius(this.value)">
           </div>
-          <input type="range" id="radius-slider" min="1" max="15" value="5" class="w-full h-1 bg-white/20 rounded-lg appearance-none cursor-pointer accent-luxe" oninput="updateRadius(this.value)">
       </div>
   </div>
 
   <div id="map" class="flex-grow w-full h-full"></div>
 
-  <div id="cta-box" class="absolute bottom-8 left-0 right-0 px-4 z-10 flex justify-center transition-all duration-300 pointer-events-none">
-      <div class="relative bg-brand-light/95 backdrop-blur-md border border-luxe/30 shadow-2xl rounded-xl p-5 max-w-sm w-full text-center pointer-events-auto">
-          <button onclick="document.getElementById('cta-box').style.display='none'" class="absolute top-1 right-2 text-white/40 hover:text-white p-2 text-lg font-bold">
-              ✕
-          </button>
+  <div id="hub-modal" class="fixed inset-x-4 bottom-32 md:inset-auto md:top-1/2 md:left-1/2 md:-translate-x-1/2 md:-translate-y-1/2 md:w-80 bg-brand-light border border-luxe shadow-2xl rounded-xl z-30 hidden flex-col transition-all">
+      <div class="flex justify-between items-center border-b border-white/10 p-4 bg-brand/50 rounded-t-xl">
+          <h3 id="modal-title" class="font-display font-bold text-xl text-luxe">Hub Name</h3>
+          <button onclick="closeModal()" class="text-white/40 hover:text-white text-xl leading-none">&times;</button>
+      </div>
+      <div class="p-4 space-y-3">
+          <div id="modal-status"></div>
+          <p class="text-sm text-white/80">⏰ Operates: <span id="modal-hours"></span></p>
           
-          <p class="text-sm text-white/90 mb-4 mt-2 pr-4 pl-4 leading-relaxed">No hubs in your area? Claim this zone and dominate the local market.</p>
-          <a href="hub-lite.html" class="block w-full bg-luxe hover:bg-luxe-hover text-brand font-semibold py-3 rounded-lg transition-colors shadow-[0_0_15px_rgba(192,160,98,0.3)]">
+          <div id="modal-god-mode" class="hidden mt-3 pt-3 border-t border-white/10">
+              <p class="text-xs text-red-400 font-bold mb-1 tracking-wider uppercase">🛡️ HQ Data</p>
+              <p id="modal-phone" class="text-sm text-white/90 font-mono"></p>
+              <p id="modal-address" class="text-xs text-white/60 mt-2 leading-relaxed"></p>
+          </div>
+
+          <a id="modal-nav-btn" href="#" target="_blank" class="flex items-center justify-center w-full py-2.5 mt-4 rounded-lg border border-luxe text-luxe hover:bg-luxe hover:text-brand transition-colors font-medium">
+              📍 Navigate to Hub
+          </a>
+      </div>
+  </div>
+
+  <div id="cta-box" class="fixed bottom-10 left-0 right-0 px-4 z-20 flex justify-center transition-all duration-300 pointer-events-none">
+      <div class="relative bg-brand-light/95 backdrop-blur-md border border-luxe/30 shadow-[0_10px_40px_rgba(0,0,0,0.8)] rounded-xl p-5 max-w-sm w-full text-center pointer-events-auto">
+          <button onclick="document.getElementById('cta-box').style.display='none'" class="absolute top-2 right-3 text-white/40 hover:text-white p-1 text-lg font-bold leading-none">
+              &times;
+          </button>
+          <p class="text-sm text-white/90 mb-4 mt-1 pr-4 pl-4 leading-relaxed">No hubs in your area? Claim this zone and dominate the local market.</p>
+          <a href="hub-lite.html" class="block w-full bg-luxe hover:bg-luxe-hover text-brand font-semibold py-3 rounded-lg transition-colors shadow-[0_0_15px_rgba(192,160,98,0.2)]">
               Become a Hub Partner
           </a>
       </div>
@@ -125,11 +110,10 @@
     let circles = [];
     let godMode = false;
     let currentRadius = 5000;
-    let infoWindow;
 
-    // --- DARK THEME MAP STYLE (Clean Grid) ---
+    // --- DARK THEME MAP STYLE (Clean Grid, No POIs) ---
     const arabistaMapStyle = [
-        { featureType: "poi", elementType: "all", stylers: [{ visibility: "off" }] }, // Hides all generic landmarks
+        { featureType: "poi", elementType: "all", stylers: [{ visibility: "off" }] },
         { featureType: "transit", elementType: "all", stylers: [{ visibility: "off" }] },
         { elementType: "geometry", stylers: [{ color: "#1A1A1C" }] },
         { elementType: "labels.text.stroke", stylers: [{ color: "#1A1A1C" }] },
@@ -155,11 +139,12 @@
             styles: arabistaMapStyle,
             disableDefaultUI: true,
             zoomControl: true,
-            clickableIcons: false, // Prevents clicking on random background map items
-            mapId: "DEMO_MAP_ID" // Required to enable Advanced Markers
+            clickableIcons: false // Turns off clicking random businesses
         });
 
-        infoWindow = new google.maps.InfoWindow();
+        // Click on empty map closes custom modal
+        map.addListener("click", closeModal);
+
         await fetchHubData();
     }
 
@@ -179,26 +164,29 @@
     }
 
     function plotHubs() {
-        markers.forEach(m => m.map = null);
+        markers.forEach(m => m.setMap(null));
         circles.forEach(c => c.setMap(null));
         markers = []; circles = [];
 
         hubs.forEach(hub => {
             const position = { lat: hub.lat, lng: hub.lng };
             
-            // 1. Create the glowing HTML Div
-            const pinElement = document.createElement('div');
-            pinElement.className = 'pulse-marker';
-
-            // 2. Attach it to the map as an Advanced Marker
-            const marker = new google.maps.marker.AdvancedMarkerElement({
-                map: map,
+            // 1. Classic Google Marker with custom SVG config
+            const marker = new google.maps.Marker({
                 position: position,
-                content: pinElement,
+                map: map,
+                icon: {
+                    path: google.maps.SymbolPath.CIRCLE,
+                    scale: 8,
+                    fillColor: "#C0A062",
+                    fillOpacity: 1,
+                    strokeWeight: 2,
+                    strokeColor: "#0F0F10"
+                },
                 title: hub.name
             });
 
-            // 3. Draw the Coverage Radius
+            // 2. Draw the Coverage Radius
             const circle = new google.maps.Circle({
                 strokeColor: "#C0A062",
                 strokeOpacity: 0.8,
@@ -210,35 +198,9 @@
                 radius: currentRadius
             });
 
-            // 4. Info Card Click Event
-            pinElement.addEventListener("click", () => {
-                let statusBadge = hub.backlog >= hub.max_capacity 
-                    ? `<span class="text-xs bg-red-500/20 text-red-400 px-2 py-1 rounded border border-red-500/30 font-semibold tracking-wide">BUSY / FULL</span>`
-                    : `<span class="text-xs bg-green-500/20 text-green-400 px-2 py-1 rounded border border-green-500/30 font-semibold tracking-wide">OPEN FOR ORDERS</span>`;
-
-                let content = `
-                    <div class="min-w-[180px] font-sans">
-                        <h3 class="font-display font-bold text-xl text-luxe mb-2">${hub.name}</h3>
-                        <div class="mb-3">${statusBadge}</div>
-                        <p class="text-sm text-white/80 mb-1">⏰ Operates: ${hub.open} - ${hub.close}</p>
-                `;
-
-                if(godMode) {
-                    content += `
-                        <div class="mt-3 pt-3 border-t border-white/10">
-                            <p class="text-xs text-red-400 font-bold mb-1 tracking-wider uppercase">🛡️ HQ Data</p>
-                            <p class="text-sm text-white/90 font-mono">📞 ${hub.phone}</p>
-                            <p class="text-xs text-white/60 mt-2 leading-relaxed">${hub.address}</p>
-                        </div>
-                    `;
-                } else {
-                    let maskedAddress = hub.address.split(',').slice(-2).join(', ').trim(); 
-                    content += `<p class="text-xs text-white/50 mt-2">📍 Area: ${maskedAddress}</p>`;
-                }
-
-                content += `</div>`;
-                infoWindow.setContent(content);
-                infoWindow.open({ anchor: marker, map, shouldFocus: false });
+            // 3. Open Custom Modal on Click
+            marker.addListener("click", () => {
+                openModal(hub);
             });
 
             markers.push(marker);
@@ -246,10 +208,53 @@
         });
     }
 
+    // --- CUSTOM UI CONTROLS ---
+
+    function toggleRadius() {
+        const content = document.getElementById('radius-content');
+        content.classList.toggle('hidden');
+    }
+
     function updateRadius(val) {
         document.getElementById('radius-display').innerText = val + " KM";
         currentRadius = parseInt(val) * 1000;
         circles.forEach(c => c.setRadius(currentRadius));
+    }
+
+    function openModal(hub) {
+        document.getElementById('modal-title').innerText = hub.name;
+        document.getElementById('modal-hours').innerText = `${hub.open} - ${hub.close}`;
+        
+        let statusBadge = hub.backlog >= hub.max_capacity 
+            ? `<span class="text-xs bg-red-500/20 text-red-400 px-2 py-1 rounded border border-red-500/30 font-semibold tracking-wide">BUSY / FULL</span>`
+            : `<span class="text-xs bg-green-500/20 text-green-400 px-2 py-1 rounded border border-green-500/30 font-semibold tracking-wide">OPEN FOR ORDERS</span>`;
+        document.getElementById('modal-status').innerHTML = statusBadge;
+
+        // Auto-generate Google Maps routing link
+        const navLink = `https://www.google.com/maps/dir/?api=1&destination=${hub.lat},${hub.lng}`;
+        document.getElementById('modal-nav-btn').href = navLink;
+
+        const godModeBox = document.getElementById('modal-god-mode');
+        if(godMode) {
+            godModeBox.classList.remove('hidden');
+            document.getElementById('modal-phone').innerText = `📞 ${hub.phone}`;
+            document.getElementById('modal-address').innerText = hub.address;
+        } else {
+            godModeBox.classList.add('hidden');
+        }
+
+        // Show modal and hide CTA Box to prevent overlapping on mobile
+        document.getElementById('hub-modal').classList.remove('hidden');
+        document.getElementById('hub-modal').classList.add('flex');
+        document.getElementById('cta-box').style.display = 'none';
+        
+        // Pan map slightly up to make room for modal on mobile
+        map.panTo({ lat: hub.lat - 0.05, lng: hub.lng });
+    }
+
+    function closeModal() {
+        document.getElementById('hub-modal').classList.add('hidden');
+        document.getElementById('hub-modal').classList.remove('flex');
     }
 
     function locateUser() {
@@ -260,13 +265,10 @@
                     map.setCenter(pos);
                     map.setZoom(13);
                     
-                    const userDot = document.createElement('div');
-                    userDot.style.cssText = "width: 14px; height: 14px; background-color: #4285F4; border-radius: 50%; border: 2px solid white; box-shadow: 0 0 10px rgba(66, 133, 244, 0.5);";
-                    
-                    new google.maps.marker.AdvancedMarkerElement({
-                        map: map,
+                    new google.maps.Marker({
                         position: pos,
-                        content: userDot,
+                        map: map,
+                        icon: { path: google.maps.SymbolPath.CIRCLE, scale: 6, fillColor: "#4285F4", fillOpacity: 1, strokeWeight: 2, strokeColor: "#ffffff" },
                         title: "You are here"
                     });
                 },
@@ -275,18 +277,19 @@
         } else { alert("Your browser doesn't support geolocation."); }
     }
 
+    // --- HQ GOD MODE LISTENER ---
     document.getElementById('god-mode-trigger').addEventListener('dblclick', () => {
         if(godMode) {
             godMode = false;
             alert("God Mode Deactivated.");
-            infoWindow.close();
+            closeModal();
             return;
         }
         const pin = prompt("Enter HQ Master PIN:");
         if(pin === "7777") {
             godMode = true;
             alert("🛡️ God Mode Activated. Full addresses and phone numbers unlocked.");
-            infoWindow.close(); 
+            closeModal(); 
         } else if (pin !== null) {
             alert("Access Denied.");
         }
@@ -294,6 +297,6 @@
 
   </script>
 
-  <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBobNKxxSv_0cTX-EH5cuhF-HKiOHHmuB8&libraries=marker&callback=initMap"></script>
+  <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBobNKxxSv_0cTX-EH5cuhF-HKiOHHmuB8&callback=initMap"></script>
 </body>
 </html>
