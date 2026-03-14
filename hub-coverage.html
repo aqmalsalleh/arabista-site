@@ -48,17 +48,20 @@
     </div>
   </header>
 
-  <div class="absolute top-20 right-4 z-10 flex flex-col items-end space-y-3 pointer-events-none mt-2">
-      <button onclick="locateUser()" class="pointer-events-auto w-11 h-11 bg-brand-light/95 backdrop-blur-md border border-white/10 hover:border-luxe/50 text-luxe shadow-lg rounded-full flex items-center justify-center transition-all">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.243-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+  <div class="absolute top-24 left-4 right-20 md:right-auto md:w-80 z-10 pointer-events-none">
+      <button onclick="locateUser()" class="pointer-events-auto w-full bg-brand-light/95 backdrop-blur-md border border-white/10 hover:border-luxe/50 text-white shadow-lg rounded-lg p-3 flex items-center justify-center transition-all">
+          <svg class="w-5 h-5 text-luxe mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.243-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+          <span class="text-sm font-medium">Find Hubs Near Me</span>
       </button>
+  </div>
 
+  <div class="absolute top-24 right-4 z-10 flex flex-col items-end space-y-3 pointer-events-none">
       <div class="pointer-events-auto flex flex-col items-end relative">
-          <button onclick="toggleRadius()" class="w-11 h-11 bg-brand-light/95 backdrop-blur-md border border-white/10 hover:border-luxe/50 text-luxe shadow-lg rounded-full flex items-center justify-center transition-all">
+          <button onclick="toggleRadius()" class="w-12 h-12 bg-brand-light/95 backdrop-blur-md border border-white/10 hover:border-luxe/50 text-luxe shadow-lg rounded-full flex items-center justify-center transition-all">
               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
           </button>
           
-          <div id="radius-content" class="hidden absolute top-12 right-0 w-48 bg-brand-light/95 backdrop-blur-md border border-white/10 shadow-2xl rounded-xl p-4 transition-all origin-top-right">
+          <div id="radius-content" class="hidden absolute top-14 right-0 w-48 bg-brand-light/95 backdrop-blur-md border border-white/10 shadow-2xl rounded-xl p-4 transition-all origin-top-right">
               <div class="flex justify-between text-[10px] text-white/70 font-medium mb-3 uppercase tracking-wider">
                   <span>Radius Range</span>
                   <span id="radius-display" class="text-luxe font-bold">1 KM</span>
@@ -91,9 +94,13 @@
       </div>
   </div>
 
-  <div id="cta-box" class="fixed bottom-8 left-0 right-0 px-4 z-20 flex justify-center transition-all duration-300 pointer-events-none">
+  <button id="cta-fab" onclick="showCTA()" class="fixed bottom-8 left-4 z-20 w-12 h-12 bg-luxe hover:bg-luxe-hover text-brand shadow-[0_0_15px_rgba(192,160,98,0.4)] rounded-full flex items-center justify-center transition-all duration-500 transform scale-0 opacity-0">
+      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+  </button>
+
+  <div id="cta-box" class="fixed bottom-8 left-0 right-0 px-4 z-20 flex justify-center transition-all duration-500 transform translate-y-32 opacity-0 pointer-events-none">
       <div class="relative bg-brand-light/95 backdrop-blur-md border border-luxe/30 shadow-[0_10px_40px_rgba(0,0,0,0.8)] rounded-xl p-5 max-w-sm w-full text-center pointer-events-auto">
-          <button onclick="document.getElementById('cta-box').style.display='none'" class="absolute top-2 right-3 text-white/40 hover:text-white p-1 text-lg font-bold leading-none">×</button>
+          <button onclick="hideCTA()" class="absolute top-2 right-3 text-white/40 hover:text-white p-1 text-lg font-bold leading-none">×</button>
           <p class="text-sm text-white/90 mb-4 mt-1 pr-4 pl-4 leading-relaxed">No hubs in your area? Claim this zone and dominate the local market.</p>
           <a href="hub-lite.html" class="block w-full bg-luxe hover:bg-luxe-hover text-brand font-semibold py-3 rounded-lg transition-colors shadow-[0_0_15px_rgba(192,160,98,0.2)]">
               Become a Hub Partner
@@ -109,23 +116,24 @@
     let markers = [];
     let circles = [];
     let godMode = false;
-    let currentRadius = 1000; // Updated default to 1KM
+    let currentRadius = 1000;
 
-    // --- DARK THEME MAP STYLE (Clean Grid, No POIs, No Highway Badges) ---
+    // --- DARK THEME MAP STYLE (Muted Cities, Hidden POIs) ---
     const arabistaMapStyle = [
         { featureType: "poi", elementType: "all", stylers: [{ visibility: "off" }] },
         { featureType: "transit", elementType: "all", stylers: [{ visibility: "off" }] },
-        { featureType: "road", elementType: "labels.icon", stylers: [{ visibility: "off" }] }, // Erases E7/E27 Highway Badges
+        { featureType: "road", elementType: "labels.icon", stylers: [{ visibility: "off" }] }, 
         { elementType: "geometry", stylers: [{ color: "#1A1A1C" }] },
         { elementType: "labels.text.stroke", stylers: [{ color: "#1A1A1C" }] },
         { elementType: "labels.text.fill", stylers: [{ color: "#746855" }] },
-        { featureType: "administrative.locality", elementType: "labels.text.fill", stylers: [{ color: "#C0A062" }] },
+        // Muted City Names for Contrast
+        { featureType: "administrative.locality", elementType: "labels.text.fill", stylers: [{ color: "#d1d5db" }] },
         { featureType: "road", elementType: "geometry", stylers: [{ color: "#2c2c2f" }] },
         { featureType: "road", elementType: "geometry.stroke", stylers: [{ color: "#212a37" }] },
         { featureType: "road", elementType: "labels.text.fill", stylers: [{ color: "#9ca5b3" }] },
         { featureType: "road.highway", elementType: "geometry", stylers: [{ color: "#3c3c40" }] },
         { featureType: "road.highway", elementType: "geometry.stroke", stylers: [{ color: "#1f2835" }] },
-        { featureType: "road.highway", elementType: "labels.text.fill", stylers: [{ color: "#f3d19c" }] },
+        { featureType: "road.highway", elementType: "labels.text.fill", stylers: [{ color: "#8b939e" }] },
         { featureType: "water", elementType: "geometry", stylers: [{ color: "#0F0F10" }] },
         { featureType: "water", elementType: "labels.text.fill", stylers: [{ color: "#515c6d" }] },
         { featureType: "water", elementType: "labels.text.stroke", stylers: [{ color: "#17263c" }] }
@@ -170,7 +178,6 @@
         hubs.forEach(hub => {
             const position = { lat: parseFloat(hub.lat), lng: parseFloat(hub.lng) };
             
-            // Luxe SVG Teardrop Pin
             const marker = new google.maps.Marker({
                 position: position,
                 map: map,
@@ -186,7 +193,6 @@
                 title: hub.name
             });
 
-            // Coverage Radius
             const circle = new google.maps.Circle({
                 strokeColor: "#C0A062",
                 strokeOpacity: 0.8,
@@ -198,7 +204,6 @@
                 radius: currentRadius
             });
 
-            // Open Custom Modal on Click
             marker.addListener("click", () => {
                 openModal(hub);
             });
@@ -208,7 +213,8 @@
         });
     }
 
-    // --- CUSTOM UI CONTROLS ---
+    // --- UI CONTROLS ---
+
     function toggleRadius() {
         const content = document.getElementById('radius-content');
         content.classList.toggle('hidden');
@@ -220,6 +226,40 @@
         circles.forEach(c => c.setRadius(currentRadius));
     }
 
+    // --- CTA ANIMATIONS ---
+    function showCTA() {
+        const box = document.getElementById('cta-box');
+        const fab = document.getElementById('cta-fab');
+        
+        // Hide FAB
+        fab.classList.replace('scale-100', 'scale-0');
+        fab.classList.replace('opacity-100', 'opacity-0');
+        
+        // Show Box
+        box.classList.replace('translate-y-32', 'translate-y-0');
+        box.classList.replace('opacity-0', 'opacity-100');
+        box.classList.remove('pointer-events-none');
+    }
+
+    function hideCTA() {
+        const box = document.getElementById('cta-box');
+        const fab = document.getElementById('cta-fab');
+        
+        // Hide Box
+        box.classList.replace('translate-y-0', 'translate-y-32');
+        box.classList.replace('opacity-100', 'opacity-0');
+        box.classList.add('pointer-events-none');
+        
+        // Show FAB
+        fab.classList.replace('scale-0', 'scale-100');
+        fab.classList.replace('opacity-0', 'opacity-100');
+    }
+
+    // Trigger Initial CTA Show after 3 seconds
+    window.addEventListener('load', () => {
+        setTimeout(() => { showCTA(); }, 3000);
+    });
+
     function openModal(hub) {
         document.getElementById('modal-title').innerText = hub.name;
         document.getElementById('modal-hours').innerText = `${hub.open} - ${hub.close}`;
@@ -229,7 +269,7 @@
             : `<span class="text-xs bg-green-500/20 text-green-400 px-2 py-1 rounded border border-green-500/30 font-semibold tracking-wide">OPEN FOR ORDERS</span>`;
         document.getElementById('modal-status').innerHTML = statusBadge;
 
-        const navLink = `https://www.google.com/maps/dir/?api=1&destination=$${hub.lat},${hub.lng}`;
+        const navLink = `https://www.google.com/maps/dir/?api=1&destination=LAT,LNG{hub.lat},${hub.lng}`;
         document.getElementById('modal-nav-btn').href = navLink;
 
         const godModeBox = document.getElementById('modal-god-mode');
@@ -241,20 +281,17 @@
             godModeBox.classList.add('hidden');
         }
 
+        // Show modal and elegantly hide the CTA box to prevent screen clutter
         document.getElementById('hub-modal').classList.remove('hidden');
         document.getElementById('hub-modal').classList.add('flex');
-        document.getElementById('cta-box').style.display = 'none';
+        hideCTA();
         
-        // Perfectly center the map exactly on the hub coordinates
         map.panTo({ lat: parseFloat(hub.lat), lng: parseFloat(hub.lng) });
     }
 
     function closeModal() {
         document.getElementById('hub-modal').classList.add('hidden');
         document.getElementById('hub-modal').classList.remove('flex');
-        
-        // Optional: Hide the radius slider if it was left open
-        document.getElementById('radius-content').classList.add('hidden');
     }
 
     function locateUser() {
@@ -277,7 +314,6 @@
         } else { alert("Your browser doesn't support geolocation."); }
     }
 
-    // --- HQ GOD MODE LISTENER ---
     document.getElementById('god-mode-trigger').addEventListener('dblclick', () => {
         if(godMode) {
             godMode = false;
