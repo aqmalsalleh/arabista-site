@@ -30,6 +30,30 @@
         } 
     }
   </script>
+  <style>
+    /* Override Google Maps InfoWindow default styling */
+    .gm-style .gm-style-iw-c {
+        background-color: #1A1A1C !important;
+        border: 1px solid #C0A062 !important;
+        border-radius: 8px !important;
+        padding: 0 !important;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.5) !important;
+    }
+    .gm-style .gm-style-iw-tc::after {
+        background: #1A1A1C !important;
+    }
+    .gm-style-iw-d {
+        overflow: hidden !important;
+        padding: 12px 30px 12px 14px !important; /* Leave right padding for the X */
+    }
+    .gm-ui-hover-effect {
+        filter: invert(1);
+        top: 6px !important;
+        right: 6px !important;
+        background: rgba(255,255,255,0.1) !important;
+        border-radius: 50% !important;
+    }
+  </style>
 </head>
 
 <body class="bg-brand text-white font-sans h-screen flex flex-col overflow-hidden relative">
@@ -49,7 +73,7 @@
   </header>
 
   <div class="absolute top-24 left-4 right-20 md:right-auto md:w-80 z-10 pointer-events-none">
-      <button onclick="locateUser()" class="pointer-events-auto w-full bg-brand-light/95 backdrop-blur-md border border-white/10 hover:border-luxe/50 text-white shadow-lg rounded-lg p-3 flex items-center justify-center transition-all">
+      <button id="btn-locate" onclick="locateUser()" class="pointer-events-auto w-full bg-brand-light/95 backdrop-blur-md border border-white/10 hover:border-luxe/50 text-white shadow-lg rounded-lg p-3 flex items-center justify-center transition-all">
           <svg class="w-5 h-5 text-luxe mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.243-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
           <span class="text-sm font-medium">Find Hubs Near Me</span>
       </button>
@@ -94,16 +118,12 @@
       </div>
   </div>
 
-  <div class="fixed bottom-8 left-4 z-20 pointer-events-none">
-      <div class="relative pointer-events-auto">
-          <button id="cta-fab" onclick="showCTA()" class="w-14 h-14 bg-luxe hover:bg-luxe-hover text-brand shadow-[0_0_20px_rgba(192,160,98,0.5)] rounded-full flex items-center justify-center transition-all duration-300 transform scale-100 opacity-100">
-              <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
-          </button>
-          <span id="cta-badge" class="absolute -top-3 -right-2 bg-red-600 border border-brand text-white text-[10px] font-bold px-2.5 py-1 rounded-full animate-pulse shadow-lg whitespace-nowrap">
-              Join Network
-          </span>
-      </div>
-  </div>
+  <button id="cta-fab" onclick="showCTA()" class="fixed bottom-8 left-4 z-20 w-14 h-14 bg-luxe hover:bg-luxe-hover text-brand shadow-[0_0_20px_rgba(192,160,98,0.5)] rounded-full flex items-center justify-center transition-all duration-300 transform scale-100 opacity-100 cursor-pointer">
+      <svg class="w-7 h-7 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+      <span id="cta-badge" class="absolute -top-2 -right-8 bg-white border border-luxe/50 text-brand text-[10px] font-bold px-2.5 py-1 rounded-full animate-pulse shadow-[0_0_10px_rgba(255,255,255,0.5)] whitespace-nowrap pointer-events-none">
+          Join Network
+      </span>
+  </button>
 
   <div id="cta-box" class="fixed bottom-8 left-0 right-0 px-4 z-30 flex justify-center transition-all duration-500 transform translate-y-32 opacity-0 pointer-events-none">
       <div class="relative bg-brand-light/95 backdrop-blur-md border border-luxe/30 shadow-[0_10px_40px_rgba(0,0,0,0.8)] rounded-xl p-5 max-w-sm w-full text-center pointer-events-auto">
@@ -242,7 +262,8 @@
         // Hide FAB
         fab.classList.replace('scale-100', 'scale-0');
         fab.classList.replace('opacity-100', 'opacity-0');
-        badge.style.display = 'none'; // Hide badge when opened
+        fab.classList.add('pointer-events-none');
+        badge.style.display = 'none'; 
         
         // Show Box
         box.classList.replace('translate-y-32', 'translate-y-0');
@@ -262,6 +283,7 @@
         // Show FAB
         fab.classList.replace('scale-0', 'scale-100');
         fab.classList.replace('opacity-0', 'opacity-100');
+        fab.classList.remove('pointer-events-none');
     }
 
     function openModal(hub) {
@@ -274,7 +296,7 @@
         document.getElementById('modal-status').innerHTML = statusBadge;
 
         // FIXED URL: Official Google Maps Navigation API
-        const navLink = `https://www.google.com/maps/dir/?api=1&destination=${hub.lat},${hub.lng}`;
+        const navLink = `https://www.google.com/maps/dir/?api=1&destination=$${parseFloat(hub.lat)},${parseFloat(hub.lng)}`;
         document.getElementById('modal-nav-btn').href = navLink;
 
         const godModeBox = document.getElementById('modal-god-mode');
@@ -299,9 +321,22 @@
     }
 
     function locateUser() {
+        const btn = document.getElementById('btn-locate');
+        const origHTML = btn.innerHTML;
+        
+        // Start Pulsating State
+        btn.innerHTML = `<svg class="animate-spin w-5 h-5 text-luxe mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg><span class="text-sm font-medium">Locating...</span>`;
+        btn.disabled = true;
+        btn.classList.add('animate-pulse');
+
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(
                 (position) => {
+                    // Revert Button State
+                    btn.innerHTML = origHTML;
+                    btn.disabled = false;
+                    btn.classList.remove('animate-pulse');
+
                     const pos = { lat: position.coords.latitude, lng: position.coords.longitude };
                     
                     // Street-level Zoom
@@ -323,9 +358,9 @@
                     // Commanding Tooltip
                     const userInfoWindow = new google.maps.InfoWindow({
                         content: `
-                            <div style="padding: 6px 10px; text-align: center; font-family: 'Inter', sans-serif;">
-                                <p style="color: #d93025; font-weight: 800; font-size: 15px; margin-bottom: 2px; text-transform: uppercase; letter-spacing: 0.5px;">📍 Is this you?</p>
-                                <p style="color: #0F0F10; font-size: 13px; font-weight: 600;">Drag this pin to your EXACT location.</p>
+                            <div style="font-family: 'Inter', sans-serif; min-width: 160px;">
+                                <p style="color: #C0A062; font-weight: 800; font-size: 14px; margin-bottom: 2px; text-transform: uppercase; letter-spacing: 0.5px;">📍 Is this you?</p>
+                                <p style="color: #ffffff; opacity: 0.8; font-size: 12px; font-weight: 500;">Drag this pin to your EXACT location.</p>
                             </div>
                         `
                     });
@@ -343,10 +378,20 @@
                     });
 
                 },
-                () => { alert("Location access denied or unavailable."); },
+                () => { 
+                    btn.innerHTML = origHTML;
+                    btn.disabled = false;
+                    btn.classList.remove('animate-pulse');
+                    alert("Location access denied or unavailable."); 
+                },
                 { enableHighAccuracy: true } // Forces GPS chip for precision
             );
-        } else { alert("Your browser doesn't support geolocation."); }
+        } else { 
+            btn.innerHTML = origHTML;
+            btn.disabled = false;
+            btn.classList.remove('animate-pulse');
+            alert("Your browser doesn't support geolocation."); 
+        }
     }
 
     // --- HQ GOD MODE LISTENER ---
