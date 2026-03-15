@@ -31,8 +31,8 @@
     .gm-style-iw-d { overflow: hidden !important; padding: 12px 30px 12px 14px !important; }
     .gm-ui-hover-effect { filter: invert(1); top: 6px !important; right: 6px !important; background: rgba(255,255,255,0.1) !important; border-radius: 50% !important; }
 
-    /* HIDE GOOGLE UI ELEMENTS */
-    .gmnoprint, .gm-style-cc, .gm-bundled-control, a[href^="https://maps.google.com/maps"] { display: none !important; opacity: 0 !important; pointer-events: none !important; }
+    /* HIDE GOOGLE UI ELEMENTS (Strictly Enforced) */
+    .gmnoprint, .gm-style-cc, .gm-bundled-control, a[href^="https://maps.google.com/maps"], a[href^="http://googleusercontent.com/maps.google.com/"] { display: none !important; opacity: 0 !important; pointer-events: none !important; }
 
     /* Custom Form & UI Styles */
     .hide-scrollbar::-webkit-scrollbar { display: none; }
@@ -47,6 +47,14 @@
 
 <body class="bg-brand text-white font-sans h-screen flex flex-col overflow-hidden relative">
 
+  <div id="rebook-overlay" class="fixed inset-0 z-[200] bg-brand flex flex-col items-center justify-center hidden opacity-0 transition-opacity duration-500">
+      <div class="w-16 h-16 rounded-full bg-luxe/10 text-luxe flex items-center justify-center mx-auto mb-5 shadow-[0_0_30px_rgba(192,160,98,0.2)]">
+          <svg class="w-8 h-8 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+      </div>
+      <h2 class="font-display text-2xl text-white mb-2" data-t="txt_rebook_title">Retrieving Your Order</h2>
+      <p class="text-sm text-white/50 text-center px-6" data-t="txt_rebook_desc">Retrieving your previous booking. Please select another Hub.</p>
+  </div>
+
   <header class="bg-brand/90 backdrop-blur-md border-b border-white/10 p-4 flex justify-between items-center z-20 relative shadow-md shrink-0">
     <div>
         <h1 class="font-display text-2xl font-semibold tracking-wide text-white leading-tight">ARABISTA</h1>
@@ -55,15 +63,20 @@
     <div class="flex items-center gap-3">
         <div id="status-indicator" class="text-xs font-medium text-white/50 flex items-center">
             <svg class="animate-spin h-4 w-4 mr-2 text-luxe" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-            Syncing...
+            <span data-t="txt_syncing_system">Syncing...</span>
+        </div>
+        <div class="flex items-center gap-2 border border-white/20 rounded-lg px-2 py-1">
+            <button onclick="setLang('en')" id="lang-en" class="text-xs font-bold text-luxe">EN</button>
+            <span class="text-white/20">|</span>
+            <button onclick="setLang('bm')" id="lang-bm" class="text-xs text-white/50 hover:text-white">BM</button>
         </div>
     </div>
   </header>
 
   <div id="control-locate" class="absolute top-24 left-4 right-20 md:right-auto md:w-80 z-10 pointer-events-none transition-all duration-300">
-      <button id="btn-locate" onclick="locateUser()" class="pointer-events-auto w-full bg-brand-light/95 backdrop-blur-md border border-white/10 hover:border-luxe/50 text-white shadow-lg rounded-lg p-3 flex items-center justify-center transition-all">
+      <button id="btn-locate" onclick="locateUser()" class="pointer-events-auto w-full bg-brand-light/95 backdrop-blur-md border border-white/10 hover:border-luxe/50 text-white shadow-lg rounded-lg p-3 flex items-center justify-center transition-all duration-300">
           <svg class="w-5 h-5 text-luxe mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.243-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
-          <span class="text-sm font-medium">Find Hubs Near Me</span>
+          <span class="text-sm font-medium" data-t="btn_find_hubs">Find Hubs Near Me</span>
       </button>
   </div>
 
@@ -82,8 +95,8 @@
   <div id="map" class="flex-grow w-full h-full"></div>
 
   <div id="tut-banner" class="fixed top-40 inset-x-4 md:w-96 md:mx-auto z-50 bg-white/95 backdrop-blur-md text-brand font-bold px-5 py-3.5 rounded-xl shadow-[0_10px_30px_rgba(0,0,0,0.8)] border border-luxe hidden flex-col items-center justify-center transition-all duration-500 transform -translate-y-10 opacity-0 text-center">
-      <span id="tut-text" class="text-[15px]">Step 1: Click 'Find Hubs Near Me'</span>
-      <button id="tut-btn-dismiss" onclick="dismissTut2()" class="hidden mt-3 bg-brand hover:bg-brand-light text-luxe px-6 py-2 rounded-lg text-sm transition w-full">I Understand</button>
+      <span id="tut-text" class="text-[15px]" data-t="tut_step1_title">Step 1: Click 'Find Hubs Near Me'</span>
+      <button id="tut-btn-dismiss" onclick="dismissTut2()" class="hidden mt-3 bg-brand hover:bg-brand-light text-luxe px-6 py-2 rounded-lg text-sm transition w-full" data-t="btn_understand">I Understand</button>
   </div>
 
   <div id="hub-modal" class="fixed inset-x-4 bottom-32 md:inset-auto md:bottom-10 md:right-10 md:w-[340px] bg-brand-light border border-luxe shadow-2xl rounded-xl z-30 hidden flex-col transition-all">
@@ -93,26 +106,29 @@
       </div>
       <div class="p-4 space-y-3">
           <div id="modal-status"></div>
-          <p class="text-[13px] text-white/80"><span class="text-[10px] uppercase tracking-widest text-white/40">Operating Hours:</span> <br><span id="modal-hours"></span></p>
-          
+          <div class="flex items-start gap-2 text-white/80 mt-2">
+              <svg class="w-4 h-4 text-white/40 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+              <div class="text-[13px] leading-snug"><span class="text-[10px] uppercase tracking-widest text-white/40 font-bold block mb-0.5" data-t="txt_operating_hours">Operating Hours:</span><span id="modal-hours" class="font-medium"></span></div>
+          </div>
           <div id="modal-action-area"></div>
       </div>
   </div>
 
   <div id="confirm-location-modal" class="fixed inset-x-4 bottom-12 md:bottom-10 md:left-1/2 md:-translate-x-1/2 md:w-80 bg-brand-light border border-luxe shadow-2xl rounded-xl z-50 hidden flex-col transition-all">
       <div class="p-5 text-center">
-          <p class="text-luxe font-extrabold text-sm tracking-wider uppercase mb-1">IS THIS YOU?</p>
-          <p class="text-white/80 text-sm mb-5 font-medium">Drag the blue pin to your EXACT location.</p>
-          <button onclick="confirmLocation()" class="w-full bg-luxe hover:bg-luxe-hover text-brand font-bold py-3 rounded-lg transition-colors shadow-[0_0_15px_rgba(192,160,98,0.2)]">Confirm Location</button>
+          <p class="text-luxe font-extrabold text-sm tracking-wider uppercase mb-1" data-t="txt_is_this_you">IS THIS YOU?</p>
+          <p class="text-white/80 text-sm mb-5 font-medium" data-t="txt_drag_pin">Drag the blue pin to your EXACT location.</p>
+          <button onclick="confirmLocation()" class="w-full bg-luxe hover:bg-luxe-hover text-brand font-bold py-3 rounded-lg transition-colors shadow-[0_0_15px_rgba(192,160,98,0.2)]" data-t="btn_confirm_loc">Confirm Location</button>
       </div>
   </div>
 
   <div id="fab-container" class="fixed bottom-12 left-4 z-40 flex flex-col gap-4 pointer-events-none transition-all duration-300">
+      
       <div class="relative pointer-events-auto">
           <button onclick="startBooking()" class="w-14 h-14 bg-brand-light border border-luxe hover:bg-luxe hover:text-brand text-luxe shadow-[0_0_20px_rgba(192,160,98,0.3)] rounded-full flex items-center justify-center transition-all duration-300 transform scale-100 opacity-100 cursor-pointer group">
               <svg class="w-6 h-6 pointer-events-none transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09l2.846.813-.846.813a4.5 4.5 0 00-3.09 3.09z" /></svg>
           </button>
-          <span class="absolute top-1/2 -translate-y-1/2 left-16 bg-white border border-luxe/50 text-luxe text-[11px] font-bold px-3.5 py-1.5 rounded-full shadow-[0_0_15px_rgba(255,255,255,0.2)] whitespace-nowrap pointer-events-none animate-pulse">
+          <span class="absolute top-1/2 -translate-y-1/2 left-16 bg-white border border-luxe/50 text-luxe text-[11px] font-bold px-3.5 py-1.5 rounded-full shadow-[0_0_15px_rgba(255,255,255,0.2)] whitespace-nowrap pointer-events-none animate-pulse" data-t="btn_book_alt">
               Book Alteration
           </span>
       </div>
@@ -121,7 +137,7 @@
           <button onclick="showCTA()" class="w-14 h-14 bg-luxe hover:bg-luxe-hover text-brand shadow-[0_0_20px_rgba(192,160,98,0.5)] rounded-full flex items-center justify-center transition-all duration-300 transform scale-100 opacity-100 cursor-pointer">
               <svg class="w-6 h-6 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
           </button>
-          <span id="cta-badge" class="absolute top-1/2 -translate-y-1/2 left-16 bg-white border border-luxe/50 text-luxe text-[11px] font-bold px-3.5 py-1.5 rounded-full shadow-[0_0_15px_rgba(255,255,255,0.2)] whitespace-nowrap pointer-events-none animate-pulse">
+          <span id="cta-badge" class="absolute top-1/2 -translate-y-1/2 left-16 bg-white border border-luxe/50 text-luxe text-[11px] font-bold px-3.5 py-1.5 rounded-full shadow-[0_0_15px_rgba(255,255,255,0.2)] whitespace-nowrap pointer-events-none animate-pulse" data-t="txt_join">
               Join Network
           </span>
       </div>
@@ -130,8 +146,8 @@
   <div id="cta-box" class="fixed bottom-12 left-0 right-0 px-4 z-50 flex justify-center transition-all duration-500 transform translate-y-32 opacity-0 pointer-events-none">
       <div id="cta-inner-box" class="relative bg-brand-light/95 backdrop-blur-md border border-luxe/30 shadow-[0_10px_40px_rgba(0,0,0,0.8)] rounded-xl p-5 max-w-sm w-full text-center pointer-events-none">
           <button onclick="hideCTA()" class="absolute top-2 right-3 text-white/40 hover:text-white p-2 text-2xl font-bold leading-none">×</button>
-          <p class="text-sm text-white/90 mb-4 mt-2 pr-4 pl-4 leading-relaxed font-medium">No hubs in your area? Claim this zone and dominate the local market.</p>
-          <a href="hub-lite.html" class="block w-full bg-luxe hover:bg-luxe-hover text-brand font-semibold py-3.5 rounded-lg transition-colors shadow-[0_0_15px_rgba(192,160,98,0.2)]">Become a Hub Partner</a>
+          <p class="text-sm text-white/90 mb-4 mt-2 pr-4 pl-4 leading-relaxed font-medium" data-t="txt_b2b_hook">No hubs in your area? Claim this zone and dominate the local market.</p>
+          <a href="hub-lite.html" class="block w-full bg-luxe hover:bg-luxe-hover text-brand font-semibold py-3.5 rounded-lg transition-colors shadow-[0_0_15px_rgba(192,160,98,0.2)]" data-t="btn_partner">Become a Hub Partner</a>
       </div>
   </div>
 
@@ -139,7 +155,7 @@
   <div id="booking-sheet" class="fixed bottom-0 inset-x-0 z-[70] bg-[#111213] border-t border-luxe/30 rounded-t-3xl max-h-[90vh] overflow-hidden flex flex-col bottom-sheet">
       <div class="p-4 border-b border-white/5 flex justify-between items-center bg-[#111213] relative z-10 max-w-screen-md mx-auto w-full">
           <div>
-              <h2 class="font-display text-2xl text-white ml-2 leading-none">Book Alteration</h2>
+              <h2 class="font-display text-2xl text-white ml-2 leading-none" data-t="form_title">Book Alteration</h2>
               <p class="text-xs text-luxe ml-2 mt-1 font-medium" id="sheet-hub-name">Hub Name</p>
           </div>
           <button onclick="closeBookingSheet()" class="p-2 text-white/50 hover:text-white bg-white/5 rounded-full transition"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
@@ -148,45 +164,53 @@
       <div class="p-4 sm:p-6 overflow-y-auto hide-scrollbar pb-32 max-w-screen-md mx-auto w-full">
           
           <div class="mb-6 bg-white/5 border border-luxe/50 shadow-[0_0_20px_rgba(192,160,98,0.1)] rounded-2xl p-5">
-              <h3 class="text-sm font-bold text-white mb-4 border-b border-white/10 pb-3 flex items-center gap-2"><span class="bg-luxe text-brand w-5 h-5 flex items-center justify-center rounded-full text-xs">1</span> Details & Items</h3>
+              <h3 class="text-sm font-bold text-white mb-4 border-b border-white/10 pb-3 flex items-center gap-2"><span class="bg-luxe text-brand w-5 h-5 flex items-center justify-center rounded-full text-xs">1</span> <span data-t="step_personal">Details & Items</span></h3>
               
-              <div id="path-b-container" class="space-y-4 mb-4">
-                  <div><label class="block text-xs text-white/70 uppercase tracking-widest mb-2">Customer Name <span class="text-red-400">*</span></label><input type="text" id="manual-cust-name" placeholder="e.g. Siti Aishah"></div>
-                  <div><label class="block text-xs text-white/70 uppercase tracking-widest mb-2">WhatsApp No. <span class="text-red-400">*</span></label><input type="tel" id="manual-cust-phone" placeholder="e.g. 0123456789"></div>
-                  
-                  <div id="lala-unit-container" class="hidden mt-4 bg-orange-500/10 border border-orange-500/30 p-4 rounded-xl">
-                      <label class="block text-xs text-orange-200 uppercase tracking-widest mb-2">Unit / House / Lot No. <span class="text-red-400">*</span></label>
-                      <input type="text" id="lala-unit-no" class="!bg-black/50 !border-orange-500/50 focus:!border-orange-500 text-white" placeholder="e.g. Unit 15-1 or House 42">
-                  </div>
+              <div id="path-a-container" class="hidden space-y-4 mb-4">
+                  <p class="text-xs text-white/50 mb-2"><span data-t="lbl_order">Order</span> <span id="order-id-display" class="font-mono text-luxe ml-2"></span></p>
+                  <div><label class="block text-xs text-white/70 uppercase tracking-widest mb-2" data-t="lbl_cust_name">Customer Name</label><input type="text" id="auto-cust-name" class="bg-white/10 text-white/50 cursor-not-allowed" readonly></div>
+                  <div><label class="block text-xs text-white/70 uppercase tracking-widest mb-2" data-t="lbl_phone">Telephone No.</label><input type="tel" id="auto-cust-phone" class="bg-white/10 text-white/50 cursor-not-allowed" readonly></div>
+                  <p class="text-sm text-white/70 mt-4 mb-2" data-t="txt_select_items">Select Items to Alter:</p>
+                  <div class="grid gap-3" id="auto-items-list"></div>
+              </div>
 
-                  <p class="text-sm text-white/70 mt-4 mb-2">Items to Alter:</p>
+              <div id="path-b-container" class="space-y-4 mb-4">
+                  <div><label class="block text-xs text-white/70 uppercase tracking-widest mb-2" data-t="lbl_cust_name">Customer Name <span class="text-red-400">*</span></label><input type="text" id="manual-cust-name" placeholder="e.g. Siti Aishah" data-t-placeholder="placeholder_name"></div>
+                  <div><label class="block text-xs text-white/70 uppercase tracking-widest mb-2" data-t="lbl_phone">WhatsApp No. <span class="text-red-400">*</span></label><input type="tel" id="manual-cust-phone" placeholder="e.g. 0123456789" data-t-placeholder="placeholder_phone"></div>
+                  <p class="text-sm text-white/70 mt-4 mb-2" data-t="txt_select_items">Items to Alter:</p>
                   <div id="manual-items-list" class="space-y-3"></div>
                   <button onclick="addManualItem()" class="text-luxe text-sm font-bold flex items-center gap-2 hover:text-white transition mt-2">
                       <span class="bg-luxe/10 p-1.5 rounded-md"><svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg></span>
-                      Add Another Item
+                      <span data-t="btn_add_item">Add Another Item</span>
                   </button>
+              </div>
+
+              <div id="lala-unit-container" class="hidden mt-4 bg-orange-500/10 border border-orange-500/30 p-4 rounded-xl">
+                  <label class="block text-xs text-orange-200 uppercase tracking-widest mb-2" data-t="label_unit">Unit / House / Lot No. <span class="text-red-400">*</span></label>
+                  <input type="text" id="lala-unit-no" class="!bg-black/50 !border-orange-500/50 focus:!border-orange-500 text-white" placeholder="e.g. Unit 15-1 or House 42" data-t-placeholder="placeholder_unit">
               </div>
           </div>
 
           <div class="bg-white/5 border border-white/10 rounded-2xl p-5 relative">
-              <h3 class="text-sm font-bold text-white mb-4 border-b border-white/10 pb-3 flex items-center gap-2"><span class="bg-luxe text-brand w-5 h-5 flex items-center justify-center rounded-full text-xs">2</span> Services & Checkout</h3>
-              <p class="text-xs text-white/50 mb-4" id="measure-instruction">Drop-In selected. No measurements needed.</p>
+              <h3 class="text-sm font-bold text-white mb-4 border-b border-white/10 pb-3 flex items-center gap-2"><span class="bg-luxe text-brand w-5 h-5 flex items-center justify-center rounded-full text-xs">2</span> <span data-t="step_services">Services & Checkout</span></h3>
+              <p class="text-xs text-white/50 mb-4" id="measure-instruction" data-t="txt_measure_walkin">Drop-In selected. No measurements needed.</p>
               
               <div id="services-container" class="space-y-6 mb-6"></div>
 
               <div class="border-t border-white/10 pt-6">
                   <div class="mb-4 space-y-3">
-                      <div class="flex justify-between text-sm text-white/70"><span>Alteration Services</span><span id="cost-services" class="font-bold text-white">RM 0</span></div>
+                      <div class="flex justify-between text-sm text-white/70"><span data-t="lbl_services_cost">Alteration Services</span><span id="cost-services" class="font-bold text-white">RM 0</span></div>
                       <div class="flex justify-between text-sm text-orange-300 bg-orange-500/10 p-3 rounded-lg border border-orange-500/20 hidden" id="delivery-fee-box">
-                          <span>Lalamove delivery fee to be paid to Arabista</span><span id="cost-delivery" class="font-bold">RM 0.00</span>
+                          <span data-t="lbl_delivery_cost">Lalamove delivery fee to be paid to Arabista</span>
+                          <span id="cost-delivery" class="font-bold">RM 0.00</span>
                       </div>
                   </div>
                   <div class="flex justify-between items-end mb-6 pt-4 border-t border-white/10">
-                      <span class="text-white font-bold">Total to Pay Hub</span>
+                      <span class="text-white font-bold" data-t="label_total_est">Total to Pay Hub</span>
                       <div class="text-right"><span class="font-display text-4xl text-luxe font-bold" id="grand-total">RM 0</span></div>
                   </div>
                   <button id="btn-final-submit" onclick="submitOrder()" class="w-full bg-luxe text-brand font-bold py-4 rounded-xl hover:bg-white transition shadow-[0_0_20px_rgba(192,160,98,0.3)] flex justify-center items-center gap-2">
-                      Confirm Booking
+                      <span data-t="btn_confirm">Confirm Booking</span>
                   </button>
               </div>
           </div>
@@ -196,12 +220,12 @@
 
   <div id="measurement-modal" class="fixed inset-0 z-[80] flex items-center justify-center bg-black/80 backdrop-blur-sm hidden opacity-0 transition-opacity duration-300 px-4">
     <div class="bg-[#111213] border border-luxe/50 rounded-2xl w-full max-w-md p-6 max-h-[90vh] overflow-y-auto hide-scrollbar transform scale-95 transition-transform duration-300" id="modal-content-box">
-        <h3 class="font-display text-2xl text-white mb-1">Provide Measurements</h3>
+        <h3 class="font-display text-2xl text-white mb-1" data-t="modal_meas_title">Provide Measurements</h3>
         <p class="text-xs text-white/50 mb-6" id="modal-meas-subtitle">Provide your measurements for</p>
         <div id="modal-fields" class="space-y-4"></div>
         <div class="mt-8 flex gap-3">
-            <button onclick="closeMeasurementModal()" class="flex-1 px-4 py-3 rounded-xl border border-white/10 hover:bg-white/5 text-white/70 transition text-sm font-bold">Cancel</button>
-            <button onclick="saveMeasurements()" class="flex-1 px-4 py-3 rounded-xl bg-luxe text-brand hover:bg-white transition text-sm font-bold shadow-[0_0_15px_rgba(192,160,98,0.3)]">Save Measurements</button>
+            <button onclick="closeMeasurementModal()" class="flex-1 px-4 py-3 rounded-xl border border-white/10 hover:bg-white/5 text-white/70 transition text-sm font-bold" data-t="btn_cancel">Cancel</button>
+            <button onclick="saveMeasurements()" class="flex-1 px-4 py-3 rounded-xl bg-luxe text-brand hover:bg-white transition text-sm font-bold shadow-[0_0_15px_rgba(192,160,98,0.3)]" data-t="btn_save">Save Measurements</button>
         </div>
     </div>
   </div>
@@ -209,13 +233,13 @@
   <div id="success-modal" class="fixed inset-0 z-[90] flex items-center justify-center bg-black/90 backdrop-blur-md hidden opacity-0 transition-opacity duration-300 px-4">
     <div class="bg-[#111213] border border-luxe/50 rounded-2xl w-full max-w-sm p-8 transform scale-95 transition-transform duration-300 text-center shadow-[0_0_50px_rgba(192,160,98,0.2)]" id="success-box">
         <div class="w-16 h-16 rounded-full bg-green-500/20 text-green-400 flex items-center justify-center mx-auto mb-5"><svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg></div>
-        <h3 class="font-display text-2xl text-white mb-2">Booking Successful!</h3>
-        <p class="text-sm text-white/70 mb-4">Your Alteration Order ID is:</p>
+        <h3 class="font-display text-2xl text-white mb-2" data-t="modal_success_title">Booking Successful!</h3>
+        <p class="text-sm text-white/70 mb-4" data-t="modal_success_desc">Your Alteration Order ID is:</p>
         <div class="bg-black/50 border border-white/10 rounded-lg py-3 px-4 mb-4 select-all">
             <p class="font-mono text-xl text-luxe font-bold tracking-widest" id="display-alt-id">ALT-0000-XXXX</p>
         </div>
-        <p class="text-xs text-red-400 mb-6 font-medium uppercase tracking-wider">⚠️ Please screenshot this ID</p>
-        <button onclick="window.location.reload()" class="w-full bg-luxe text-brand font-bold py-3.5 rounded-xl hover:bg-white transition shadow-soft">Finish</button>
+        <p class="text-xs text-red-400 mb-6 font-medium uppercase tracking-wider" data-t="modal_success_warn">⚠️ Please screenshot this ID</p>
+        <button onclick="goToTracker()" class="w-full bg-luxe text-brand font-bold py-3.5 rounded-xl hover:bg-white transition shadow-soft" data-t="btn_track">Track My Order</button>
     </div>
   </div>
 
@@ -223,19 +247,89 @@
     const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyrJFfuCrhAbdwzAj8uP4sSvFuzRzzzEFV5CHOCBSOK6OGlIXPtsf7-XEfjLHGnFZiyvw/exec';
     const spinnerSvg = `<svg class="animate-spin h-4 w-4 inline mr-2 text-current" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>`;
 
+    // --- FULL TRANSLATION DICTIONARY ---
+    const t = {
+        en: {
+            btn_find_hubs: "Find Hubs Near Me", txt_join: "Join Network", txt_b2b_hook: "No hubs in your area? Claim this zone and dominate the local market.", btn_partner: "Become a Hub Partner", btn_book_alt: "Book Alteration",
+            tut_step1_title: "Step 1: Click 'Find Hubs Near Me'", tut_step2_title: "Step 2: Drag the pin to your EXACT building", tut_step3_title: "Step 3: Select Hub", btn_understand: "I Understand", btn_cancel: "Cancel",
+            txt_is_this_you: "IS THIS YOU?", txt_drag_pin: "Drag the blue pin to your EXACT location.", btn_confirm_loc: "Confirm Location", txt_operating_hours: "Operating Hours:",
+            txt_nav_hub: "Navigate to Hub", txt_drop_in: "Drop-In", txt_free: "Free", txt_lalamove: "Lalamove", txt_calculating: "Calculating...", txt_out_of_area: "Out of Area",
+            form_title: "Book Alteration", step_personal: "Details & Items", lbl_order: "Order", lbl_cust_name: "Customer Name *", placeholder_name: "e.g. Siti Aishah", lbl_phone: "WhatsApp No. *", placeholder_phone: "e.g. 0123456789", label_unit: "Unit / House / Lot No. *", placeholder_unit: "e.g. Unit 15-1 or House 42", txt_select_items: "Items to Alter:", btn_add_item: "Add Another Item",
+            lbl_design_code: "Design Code", lbl_size: "Size", txt_size_label: "Size:",
+            step_services: "Services & Checkout", txt_measure_walkin: "Drop-In selected. No measurements needed.", txt_measure_lala: "Lalamove selected. Please provide measurements.",
+            srv_full: "Full Body Alteration", srv_hem: "Alter Length", srv_sleeve: "Alter Sleeves", srv_shoulder: "Alter Shoulders", srv_pads: "Add Shoulder Pads", txt_value: "Value", txt_yousave: "You Save", btn_add_meas: "Add Measurements (Required)", btn_edit_meas: "Measurements Saved (Edit)",
+            lbl_services_cost: "Alteration Services", lbl_delivery_cost: "Lalamove delivery fee to be paid to Arabista", label_total_est: "Total to Pay Hub", btn_confirm: "Confirm Booking",
+            modal_meas_title: "Provide Measurements", lbl_length: "Length (inches)", lbl_sleeve: "Sleeves (inches)", lbl_shoulder: "Shoulders (inches)", lbl_pads: "Shoulder Pads", lbl_max: "Max:", lbl_select_option: "Select...", lbl_yes: "Yes", lbl_no: "No", btn_save: "Save Measurements",
+            modal_success_title: "Booking Successful!", modal_success_desc: "Your Alteration Order ID is:", modal_success_warn: "⚠️ Please screenshot this ID", btn_track: "Track My Order",
+            alert_name: "Please enter your name.", alert_phone: "Please enter your phone number.", alert_unit: "Please enter your Unit/House No.", alert_no_hub: "Please select a Hub.", alert_no_service: "Please select at least one service.", alert_measure: "Please fill in measurements for all required items.", alert_max: "must be strictly less than original size", alert_max_full: "must be less than or equal to original size", alert_full_equal: "At least one measurement must be reduced.", txt_no_items_step4: "No items selected.",
+            txt_syncing_system: "Syncing...", txt_open: "OPEN", txt_closed: "CLOSED", txt_closes_at: "Closes", txt_opens_at: "Opens", txt_rebook_title: "Retrieving Your Order", txt_rebook_desc: "Retrieving your previous booking. Please select another Hub."
+        },
+        bm: {
+            btn_find_hubs: "Cari Hub Berdekatan", txt_join: "Sertai Rangkaian", txt_b2b_hook: "Tiada hub di kawasan anda? Jadilah yang pertama dan kuasai pasaran.", btn_partner: "Daftar Hub Rakan", btn_book_alt: "Tempah Alterasi",
+            tut_step1_title: "Langkah 1: Klik 'Cari Hub'", tut_step2_title: "Langkah 2: Tarik pin tepat ke bangunan anda", tut_step3_title: "Langkah 3: Pilih Hub", btn_understand: "Saya Faham", btn_cancel: "Batal",
+            txt_is_this_you: "ADAKAH INI LOKASI ANDA?", txt_drag_pin: "Tarik pin biru tepat ke lokasi anda.", btn_confirm_loc: "Sahkan Lokasi", txt_operating_hours: "Waktu Operasi:",
+            txt_nav_hub: "Pandu Arah ke Hub", txt_drop_in: "Hantar Sendiri", txt_free: "Percuma", txt_lalamove: "Lalamove", txt_calculating: "Mengira...", txt_out_of_area: "Luar Kawasan",
+            form_title: "Tempahan Alterasi", step_personal: "Butiran & Item", lbl_order: "Pesanan", lbl_cust_name: "Nama Pelanggan *", placeholder_name: "cth. Siti Aishah", lbl_phone: "No. WhatsApp *", placeholder_phone: "cth. 0123456789", label_unit: "No. Unit / Rumah / Lot *", placeholder_unit: "cth. Unit 15-1 atau Rumah 42", txt_select_items: "Item Untuk Dialter:", btn_add_item: "Tambah Item Lain",
+            lbl_design_code: "Kod Rekaan", lbl_size: "Saiz", txt_size_label: "Saiz:",
+            step_services: "Servis & Pembayaran", txt_measure_walkin: "Drop-In dipilih. Tiada ukuran diperlukan.", txt_measure_lala: "Lalamove dipilih. Sila masukkan ukuran.",
+            srv_full: "Alter Keseluruhan", srv_hem: "Alter Labuh", srv_sleeve: "Alter Lengan", srv_shoulder: "Alter Bahu", srv_pads: "Tambah Span", txt_value: "Nilai", txt_yousave: "Anda Jimat", btn_add_meas: "Masukkan Ukuran (Wajib)", btn_edit_meas: "Ukuran Disimpan (Ubah)",
+            lbl_services_cost: "Servis Alterasi", lbl_delivery_cost: "Caj Lalamove perlu dibayar kepada Arabista", label_total_est: "Jumlah Dibayar ke Hub", btn_confirm: "Sahkan Tempahan",
+            modal_meas_title: "Masukkan Ukuran", lbl_length: "Labuh (inci)", lbl_sleeve: "Lengan (inci)", lbl_shoulder: "Bahu (inci)", lbl_pads: "Span Bahu", lbl_max: "Maks:", lbl_select_option: "Pilih...", lbl_yes: "Ya", lbl_no: "Tidak", btn_save: "Simpan Ukuran",
+            modal_success_title: "Tempahan Berjaya!", modal_success_desc: "ID Tempahan Alterasi anda ialah:", modal_success_warn: "⚠️ Sila screenshot ID ini", btn_track: "Jejak Tempahan Saya",
+            alert_name: "Sila masukkan nama.", alert_phone: "Sila masukkan no. telefon.", alert_unit: "Sila masukkan No. Unit/Rumah anda.", alert_no_hub: "Sila pilih Hub.", alert_no_service: "Sila pilih servis.", alert_measure: "Sila lengkapkan ukuran.", alert_max: "mesti kurang dari saiz asal", alert_max_full: "mesti kurang atau sama dengan saiz asal", alert_full_equal: "Sekurang-kurangnya satu ukuran mesti dikurangkan.", txt_no_items_step4: "Tiada item dipilih.",
+            txt_syncing_system: "Menyegerak...", txt_open: "BUKA", txt_closed: "TUTUP", txt_closes_at: "Tutup jam", txt_opens_at: "Buka jam", txt_rebook_title: "Mendapatkan Pesanan Anda", txt_rebook_desc: "Mendapatkan tempahan lepas anda. Sila pilih Hub yang baru."
+        }
+    };
+
+    let currentLang = 'en';
     let map, userLocationMarker = null;
     let hubs = [], markers = [], circles = [], currentRadius = 1000;
     
     // --- BOOKING STATE ---
     let bookingMode = false;
+    let isDataReady = false;
+    let backgroundFetchPromise = null;
     let generatedAltId = "";
     let editingItemId = null;
     let pricingData = { full: {price:30, value:40, savings:10}, hem: {price:12}, sleeve: {price:12}, shoulder: {price:10}, pads: {price:6} };
-    let state = { selectedItems: [], lat: "", lng: "", address: "", unitNo: "", mode: 'walkin', hubId: null, hubLat: 0, hubLng: 0, deliveryCost: 0, servicesTotal: 0, measurements: {}, logisticsSchedule: '' };
+    let state = { path: 'B', selectedItems: [], lat: "", lng: "", address: "", unitNo: "", mode: 'walkin', hubId: null, hubLat: 0, hubLng: 0, deliveryCost: 0, servicesTotal: 0, measurements: {}, logisticsSchedule: '' };
 
     const designCodes = ['D01', 'D02', 'D03', 'D04', 'D05', 'D06', 'D07', 'W01', 'W02', 'W03', 'W04', 'W05', 'W06', 'Z01', 'Z02', 'Z03', 'Z04', 'Z05', 'Z06', 'Z07', 'Z08', 'M01', 'M02', 'M03'];
     const sizes = ['XS', 'S', 'M', 'L', 'XL', 'XXL', 'XXXL'];
     const sizeChart = { 'XS': { length: 55, sleeve: 22, shoulder: 14 }, 'S': { length: 55, sleeve: 22, shoulder: 15 }, 'M': { length: 57, sleeve: 23, shoulder: 16 }, 'L': { length: 60, sleeve: 23.5, shoulder: 16.5 }, 'XL': { length: 60, sleeve: 23.5, shoulder: 17.5 }, 'XXL': { length: 60, sleeve: 23.5, shoulder: 18 }, 'XXXL': { length: 60, sleeve: 23.5, shoulder: 19 } };
+
+    // Utility Functions
+    function sanitizeHTML(str) { return String(str).replace(/&/g, "&").replace(/</g, "<").replace(/>/g, ">"); }
+    function sanitizePhone(phone) { let p = phone.replace(/\D/g, ''); if (p.startsWith('0')) p = '6' + p; else if (!p.startsWith('60') && p.length >= 9) p = '60' + p; return p; }
+    function getDist(lat1,lon1,lat2,lon2) { var R=6371, dLat=d2r(lat2-lat1), dLon=d2r(lon2-lon1); var a=Math.sin(dLat/2)*Math.sin(dLat/2)+Math.cos(d2r(lat1))*Math.cos(d2r(lat2))*Math.sin(dLon/2)*Math.sin(dLon/2); return R*(2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a))); }
+    function d2r(d){return d*(Math.PI/180)}
+
+    function setLang(lang) {
+        currentLang = lang;
+        document.querySelectorAll('[data-t]').forEach(el => { if(t[lang][el.getAttribute('data-t')]) el.innerHTML = t[lang][el.getAttribute('data-t')]; });
+        document.querySelectorAll('[data-t-placeholder]').forEach(el => { if(t[lang][el.getAttribute('data-t-placeholder')]) el.placeholder = t[lang][el.getAttribute('data-t-placeholder')]; });
+        document.querySelectorAll('.design-select option:first-child').forEach(opt => opt.innerText = t[lang].lbl_design_code);
+        document.querySelectorAll('.size-select option:first-child').forEach(opt => opt.innerText = t[lang].lbl_size);
+        document.getElementById('lang-en').className = lang === 'en' ? "text-xs font-bold text-luxe" : "text-xs text-white/50 hover:text-white";
+        document.getElementById('lang-bm').className = lang === 'bm' ? "text-xs font-bold text-luxe" : "text-xs text-white/50 hover:text-white";
+        updateMeasurementInstruction(); if(state.selectedItems.length > 0) renderServices();
+    }
+
+    function formatTime(timeStr) {
+        if(!timeStr) return "";
+        let [h, m] = timeStr.split(':'); let hours = parseInt(h); const ampm = hours >= 12 ? 'PM' : 'AM';
+        hours = hours % 12; hours = hours ? hours : 12; return `${hours}:${m} ${ampm}`;
+    }
+
+    function checkHubStatus(hub) {
+        if(!hub || !hub.days) return { isOpen: false, text: t[currentLang].txt_closed }; 
+        const now = new Date(); const currentDay = now.getDay(); const currentTimeNum = now.getHours() + (now.getMinutes() / 60);
+        const operatingDays = hub.days.split(',').map(Number);
+        const [openH, openM] = hub.open.split(':').map(Number); const [closeH, closeM] = hub.close.split(':').map(Number);
+        const openTimeNum = openH + ((openM||0) / 60); const closeTimeNum = closeH + ((closeM||0) / 60);
+        const isOpen = operatingDays.includes(currentDay) && currentTimeNum >= openTimeNum && currentTimeNum < closeTimeNum;
+        return { isOpen, text: isOpen ? `${t[currentLang].txt_open} (${t[currentLang].txt_closes_at} ${formatTime(hub.close)})` : `${t[currentLang].txt_closed} (${t[currentLang].txt_opens_at} ${formatTime(hub.open)})` };
+    }
 
     // --- MAP INITIALIZATION ---
     const arabistaMapStyle = [
@@ -266,13 +360,56 @@
         });
         map.addListener("click", closeModal);
         
-        try {
-            const res = await fetch(SCRIPT_URL);
-            const data = await res.json();
-            if(data.pricing) pricingData = data.pricing;
-            if(data.hubs) { hubs = data.hubs; plotHubs(); document.getElementById('status-indicator').innerHTML = `<span class="text-green-500">● Live Network</span>`; }
-            addManualItem(); // Prepare empty booking form
-        } catch (e) { document.getElementById('status-indicator').innerHTML = `<span class="text-red-500">Connection Failed</span>`; }
+        const urlParams = new URLSearchParams(window.location.search);
+        const orderId = sanitizeHTML(urlParams.get('order'));
+        const rebookId = sanitizeHTML(urlParams.get('rebook'));
+        const fetchId = orderId || rebookId;
+
+        if (rebookId) {
+            const overlay = document.getElementById('rebook-overlay');
+            overlay.classList.remove('hidden');
+            setTimeout(() => overlay.classList.remove('opacity-0'), 10);
+        }
+
+        const fetchUrl = fetchId ? `${SCRIPT_URL}?order=${fetchId}` : SCRIPT_URL;
+        
+        backgroundFetchPromise = fetch(fetchUrl)
+            .then(res => res.json())
+            .then(data => {
+                if(data.pricing) pricingData = data.pricing;
+                if(data.hubs) { hubs = data.hubs; plotHubs(); document.getElementById('status-indicator').innerHTML = `<span class="text-green-500">● Live Network</span>`; }
+                
+                if (fetchId && data.orderData) {
+                    state.path = 'A'; 
+                    document.getElementById('path-a-container').classList.remove('hidden');
+                    document.getElementById('path-b-container').classList.add('hidden');
+                    document.getElementById('order-id-display').innerText = "#" + sanitizeHTML(data.orderData.orderRef);
+                    document.getElementById('auto-cust-name').value = data.orderData.name; 
+                    document.getElementById('auto-cust-phone').value = data.orderData.phone;
+                    
+                    const itemsList = document.getElementById('auto-items-list'); itemsList.innerHTML = '';
+                    const rawItems = data.orderData.itemsRaw.split(','); let itemIdx = 0;
+                    rawItems.forEach(itemStr => {
+                        const parts = itemStr.trim().split('|');
+                        if(parts.length >= 2) {
+                            const design = sanitizeHTML(parts[0].trim()); const size = sanitizeHTML(parts[1].trim()); const qty = parseInt(parts[2]) || 1;
+                            for(let q=0; q < qty; q++) {
+                                itemsList.innerHTML += `<label class="flex items-center gap-4 p-4 border border-white/10 rounded-xl hover:bg-white/5 cursor-pointer transition"><input type="checkbox" name="order-item" value="a-${itemIdx}" data-design="${design}" data-size="${size}" onchange="syncItemsA()" class="w-5 h-5 rounded border-white/30 text-luxe focus:ring-luxe bg-transparent" ${rebookId ? 'checked' : ''}><div><h3 class="font-display text-lg text-white">${design}</h3><p class="text-xs text-white/50">${t[currentLang].txt_size_label} ${size}</p></div></label>`;
+                                itemIdx++;
+                            }
+                        }
+                    });
+                    if (rebookId) {
+                        syncItemsA();
+                        const overlay = document.getElementById('rebook-overlay');
+                        overlay.classList.add('opacity-0');
+                        setTimeout(() => { overlay.classList.add('hidden'); startBooking(); }, 500);
+                    }
+                } else {
+                    addManualItem(); 
+                }
+                isDataReady = true;
+            }).catch(e => { document.getElementById('status-indicator').innerHTML = `<span class="text-red-500">Connection Failed</span>`; });
     }
 
     function plotHubs() {
@@ -313,27 +450,26 @@
     function startBooking() {
         bookingMode = true;
         hideCTA();
-        document.getElementById('fab-container').classList.add('hidden'); // Hide Fabs during tutorial
+        document.getElementById('fab-container').classList.add('hidden'); 
         const banner = document.getElementById('tut-banner');
-        document.getElementById('tut-text').innerText = "Step 1: Click 'Find Hubs Near Me'";
+        document.getElementById('tut-text').innerText = t[currentLang].tut_step1_title;
         document.getElementById('tut-btn-dismiss').classList.add('hidden');
         banner.classList.remove('hidden');
         setTimeout(() => { banner.classList.replace('-translate-y-10', 'translate-y-0'); banner.classList.replace('opacity-0', 'opacity-100'); }, 10);
-        document.getElementById('btn-locate').classList.add('animate-pulse', 'ring-2', 'ring-luxe'); // Highlight button
+        document.getElementById('btn-locate').classList.add('animate-pulse', 'ring-2', 'ring-luxe'); 
     }
 
     function dismissTut2() {
         const banner = document.getElementById('tut-banner');
         banner.classList.replace('translate-y-0', '-translate-y-10'); banner.classList.replace('opacity-100', 'opacity-0');
         setTimeout(() => { banner.classList.add('hidden'); }, 300);
-        // Once Step 2 is dismissed, show the Confimation Modal safely
         document.getElementById('confirm-location-modal').classList.remove('hidden'); 
         document.getElementById('confirm-location-modal').classList.add('flex');
     }
 
     function showStep3Card() {
         const banner = document.getElementById('tut-banner');
-        document.getElementById('tut-text').innerText = "Step 3: Select Hub";
+        document.getElementById('tut-text').innerText = t[currentLang].tut_step3_title;
         document.getElementById('tut-btn-dismiss').classList.add('hidden');
         banner.classList.remove('hidden');
         banner.classList.add('animate-pulse');
@@ -344,7 +480,7 @@
         const btn = document.getElementById('btn-locate'); 
         const origHTML = btn.innerHTML;
         btn.classList.remove('animate-pulse', 'ring-2', 'ring-luxe');
-        btn.innerHTML = `<svg class="animate-spin w-5 h-5 text-luxe mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg><span class="text-sm font-medium">Locating...</span>`;
+        btn.innerHTML = `${spinnerSvg}<span class="text-sm font-medium">Locating...</span>`;
         btn.disabled = true; btn.classList.add('animate-pulse');
 
         if (navigator.geolocation) {
@@ -367,7 +503,7 @@
 
                     if(bookingMode) {
                         const banner = document.getElementById('tut-banner');
-                        document.getElementById('tut-text').innerText = "Step 2: Drag the pin exactly to your building";
+                        document.getElementById('tut-text').innerText = t[currentLang].tut_step2_title;
                         document.getElementById('tut-btn-dismiss').classList.remove('hidden');
                     } else {
                         document.getElementById('confirm-location-modal').classList.remove('hidden'); document.getElementById('confirm-location-modal').classList.add('flex');
@@ -396,28 +532,24 @@
         const actionArea = document.getElementById('modal-action-area');
         
         if (bookingMode && hub.backlog < hub.max_capacity) {
-            // Hide Tutorial Banner
             const banner = document.getElementById('tut-banner');
             banner.classList.replace('translate-y-0', '-translate-y-10'); banner.classList.replace('opacity-100', 'opacity-0');
             setTimeout(() => banner.classList.add('hidden'), 500);
 
-            // Inject Instant Booking Buttons with Loading State for Lalamove
             actionArea.innerHTML = `
                 <div class="mt-4 pt-4 border-t border-white/10 space-y-2">
                     <button onclick="selectLogistics(${hub.id}, 'walkin')" class="w-full py-3 bg-luxe/10 border border-luxe text-white rounded-lg flex justify-between px-4 items-center hover:bg-luxe hover:text-brand transition shadow-soft">
-                        <span class="font-bold text-[15px] flex items-center gap-2"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 21v-7.5a.75.75 0 01.75-.75h3a.75.75 0 01.75.75V21m-4.5 0H2.36m11.14 0H18m0 0h3.64m-1.39 0V9.349m-16.5 11.65V9.35m0 0a3.001 3.001 0 003.75-.615A2.993 2.993 0 009.75 9.75c.896 0 1.7-.393 2.25-1.016a2.993 2.993 0 002.25 1.016c.896 0 1.7-.393 2.25-1.016a3.001 3.001 0 003.75.614m-16.5 0a3.004 3.004 0 01-.621-4.72L4.318 3.44A1.5 1.5 0 015.378 3h13.243a1.5 1.5 0 011.06.44l1.19 1.189a3 3 0 01-.621 4.72m-13.5 8.65h3.75a.75.75 0 00.75-.75V13.5a.75.75 0 00-.75-.75H6.75a.75.75 0 00-.75.75v3.75c0 .415.336.75.75.75z" /></svg> Drop-In</span>
-                        <span class="text-xs font-bold text-luxe px-2 py-1 bg-brand/50 rounded border border-white/5">Free</span>
+                        <span class="font-bold text-[15px] flex items-center gap-2"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 21v-7.5a.75.75 0 01.75-.75h3a.75.75 0 01.75.75V21m-4.5 0H2.36m11.14 0H18m0 0h3.64m-1.39 0V9.349m-16.5 11.65V9.35m0 0a3.001 3.001 0 003.75-.615A2.993 2.993 0 009.75 9.75c.896 0 1.7-.393 2.25-1.016a2.993 2.993 0 002.25 1.016c.896 0 1.7-.393 2.25-1.016a3.001 3.001 0 003.75.614m-16.5 0a3.004 3.004 0 01-.621-4.72L4.318 3.44A1.5 1.5 0 015.378 3h13.243a1.5 1.5 0 011.06.44l1.19 1.189a3 3 0 01-.621 4.72m-13.5 8.65h3.75a.75.75 0 00.75-.75V13.5a.75.75 0 00-.75-.75H6.75a.75.75 0 00-.75.75v3.75c0 .415.336.75.75.75z" /></svg> <span data-t="txt_drop_in">${t[currentLang].txt_drop_in}</span></span>
+                        <span class="text-xs font-bold text-luxe px-2 py-1 bg-brand/50 rounded border border-white/5" data-t="txt_free">${t[currentLang].txt_free}</span>
                     </button>
                     <button onclick="selectLogistics(${hub.id}, 'lalamove')" class="w-full py-3 bg-orange-500/10 border border-orange-500/50 text-white rounded-lg flex justify-between px-4 items-center hover:bg-orange-500 hover:text-white transition shadow-soft group">
-                        <span class="font-bold text-[15px] group-hover:text-white text-orange-400 flex items-center gap-2"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 00-3.213-9.193 2.056 2.056 0 00-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177v-.958c0-.568-.422-1.048-.987-1.106a48.554 48.554 0 00-10.026 0 1.106 1.106 0 00-.987 1.106v7.635m12-6.677v6.677m0 4.5v-4.5m0 0h-12" /></svg> Lalamove</span>
+                        <span class="font-bold text-[15px] group-hover:text-white text-orange-400 flex items-center gap-2"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 00-3.213-9.193 2.056 2.056 0 00-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177v-.958c0-.568-.422-1.048-.987-1.106a48.554 48.554 0 00-10.026 0 1.106 1.106 0 00-.987 1.106v7.635m12-6.677v6.677m0 4.5v-4.5m0 0h-12" /></svg> <span data-t="txt_lalamove">${t[currentLang].txt_lalamove}</span></span>
                         <span id="lala-quote-disp" class="text-xs font-bold bg-brand text-orange-300 px-2 py-1 rounded border border-orange-500/20 animate-pulse flex items-center gap-1">${spinnerSvg}</span>
                     </button>
                 </div>
             `;
-            // Instantly open modal so user sees loading state
             document.getElementById('hub-modal').classList.remove('hidden'); document.getElementById('hub-modal').classList.add('flex'); hideCTA();
             
-            // Fetch Lalamove Quote in background
             if(state.lat && state.lng) {
                 try {
                     const res = await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: "get_lalamove_quote", pickupLat: state.lat, pickupLng: state.lng, pickupAddress: state.address, dropoffLat: hub.lat, dropoffLng: hub.lng, dropoffAddress: hub.address }) });
@@ -428,21 +560,17 @@
                         state.deliveryCost = parseFloat(d.amount);
                         quoteDisp.innerHTML = `RM ${state.deliveryCost.toFixed(2)}`;
                     } else {
-                        quoteDisp.innerHTML = d.message?.includes("OUT_OF_SERVICE") ? "Out of Area" : "API Error";
+                        quoteDisp.innerHTML = d.message?.includes("OUT_OF_SERVICE") ? t[currentLang].txt_out_of_area : "API Error";
                         quoteDisp.classList.replace('text-orange-300', 'text-red-400');
                         quoteDisp.classList.replace('border-orange-500/20', 'border-red-500/20');
                     }
-                } catch(e) {
-                    document.getElementById('lala-quote-disp').innerHTML = "Error";
-                }
+                } catch(e) { document.getElementById('lala-quote-disp').innerHTML = "Error"; }
             }
         } else {
-            // Standard Navigation Mode
-            const navLink = `https://www.google.com/maps/search/?api=1&query=${parseFloat(hub.lat)},${parseFloat(hub.lng)}`;
-            actionArea.innerHTML = `<a href="${navLink}" target="_blank" class="flex items-center justify-center w-full py-3 mt-4 rounded-lg border border-luxe text-luxe hover:bg-luxe hover:text-brand transition-colors font-bold text-[15px]">NAVIGATE TO HUB</a>`;
+            const navLink = `https://www.google.com/maps/search/?api=1&query=$${parseFloat(hub.lat)},${parseFloat(hub.lng)}`;
+            actionArea.innerHTML = `<a href="${navLink}" target="_blank" class="flex items-center justify-center w-full py-3 mt-4 rounded-lg border border-luxe text-luxe hover:bg-luxe hover:text-brand transition-colors font-bold text-[15px]" data-t="txt_nav_hub">${t[currentLang].txt_nav_hub}</a>`;
             document.getElementById('hub-modal').classList.remove('hidden'); document.getElementById('hub-modal').classList.add('flex'); hideCTA(); 
         }
-
         map.panTo({ lat: parseFloat(hub.lat), lng: parseFloat(hub.lng) });
     }
 
@@ -462,47 +590,36 @@
             document.getElementById('lala-unit-container').classList.remove('hidden');
         }
         
-        closeModal();
-        openBookingSheet();
-        updateMeasurementInstruction();
-        renderServices();
+        closeModal(); openBookingSheet(); updateMeasurementInstruction(); renderServices();
     }
 
-    function openBookingSheet() { 
-        document.getElementById('booking-overlay').classList.remove('hidden'); 
-        setTimeout(() => document.getElementById('booking-overlay').classList.remove('opacity-0'), 10); 
-        document.getElementById('booking-sheet').classList.add('open'); 
-    }
-    
-    function closeBookingSheet() { 
-        document.getElementById('booking-sheet').classList.remove('open'); 
-        document.getElementById('booking-overlay').classList.add('opacity-0'); 
-        setTimeout(() => document.getElementById('booking-overlay').classList.add('hidden'), 400); 
-    }
+    function openBookingSheet() { document.getElementById('booking-overlay').classList.remove('hidden'); setTimeout(() => document.getElementById('booking-overlay').classList.remove('opacity-0'), 10); document.getElementById('booking-sheet').classList.add('open'); }
+    function closeBookingSheet() { document.getElementById('booking-sheet').classList.remove('open'); document.getElementById('booking-overlay').classList.add('opacity-0'); setTimeout(() => document.getElementById('booking-overlay').classList.add('hidden'), 400); }
 
     function addManualItem() {
         const list = document.getElementById('manual-items-list'); const idx = list.children.length;
-        let designOpts = `<option value="" class="text-black">Design Code</option>`; designCodes.forEach(code => designOpts += `<option value="${code}" class="text-black">${code}</option>`);
-        let sizeOpts = `<option value="" class="text-black">Size</option>`; sizes.forEach(sz => sizeOpts += `<option value="${sz}" class="text-black">${sz}</option>`);
+        let designOpts = `<option value="" class="text-black" data-t="lbl_design_code">${t[currentLang].lbl_design_code}</option>`; designCodes.forEach(code => designOpts += `<option value="${code}" class="text-black">${code}</option>`);
+        let sizeOpts = `<option value="" class="text-black" data-t="lbl_size">${t[currentLang].lbl_size}</option>`; sizes.forEach(sz => sizeOpts += `<option value="${sz}" class="text-black">${sz}</option>`);
         const row = document.createElement('div'); row.className = "flex gap-2 items-center manual-item-row"; row.dataset.id = 'm' + idx;
         row.innerHTML = `<div class="flex-1"><select class="design-select w-full" onchange="syncItemsB()">${designOpts}</select></div><div class="w-24"><select class="size-select w-full" onchange="syncItemsB()">${sizeOpts}</select></div>${idx > 0 ? `<button onclick="this.parentElement.remove(); syncItemsB();" class="text-white/40 hover:text-red-400 p-2 transition"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>` : `<div class="w-9"></div>`}`;
         list.appendChild(row);
     }
     
+    function syncItemsA() { const newSelected = []; document.querySelectorAll('input[name="order-item"]:checked').forEach(cb => { newSelected.push({ id: cb.value, name: cb.getAttribute('data-design'), size: cb.getAttribute('data-size') }); if(!state.measurements[cb.value]) state.measurements[cb.value] = { length:'', sleeve:'', shoulder:'', pads:'' }; }); state.selectedItems = newSelected; renderServices(); calculateTotal(); }
     function syncItemsB() { const newSelected = []; document.querySelectorAll('.manual-item-row').forEach((row, idx) => { const d = row.querySelector('.design-select').value; const s = row.querySelector('.size-select').value; if(d && s) { newSelected.push({ id: 'm' + idx, name: d, size: s }); if(!state.measurements['m'+idx]) state.measurements['m'+idx] = { length:'', sleeve:'', shoulder:'', pads:'' }; } }); state.selectedItems = newSelected; renderServices(); calculateTotal(); }
 
-    function updateMeasurementInstruction() { const el = document.getElementById('measure-instruction'); el.innerText = state.mode === 'walkin' ? "Drop-In selected. No measurements needed." : "Lalamove selected. Please provide measurements."; if(state.mode === 'lalamove') el.classList.replace('text-white/50', 'text-luxe'); else el.classList.replace('text-luxe', 'text-white/50'); }
+    function updateMeasurementInstruction() { const el = document.getElementById('measure-instruction'); el.innerText = state.mode === 'walkin' ? t[currentLang].txt_measure_walkin : t[currentLang].txt_measure_lala; if(state.mode === 'lalamove') el.classList.replace('text-white/50', 'text-luxe'); else el.classList.replace('text-luxe', 'text-white/50'); }
 
     function renderServices() {
         const container = document.getElementById('services-container'); 
-        if(state.selectedItems.length === 0) { container.innerHTML = `<p class="text-white/50 text-sm py-4 text-center border border-dashed border-white/10 rounded-xl">No items selected.</p>`; return; }
+        if(state.selectedItems.length === 0) { container.innerHTML = `<p class="text-white/50 text-sm py-4 text-center border border-dashed border-white/10 rounded-xl" data-t="txt_no_items_step4">${t[currentLang].txt_no_items_step4}</p>`; return; }
         container.innerHTML = '';
         const pFull = pricingData.full; const pHem = pricingData.hem; const pSleeve = pricingData.sleeve; const pShoulder = pricingData.shoulder; const pPads = pricingData.pads;
 
         state.selectedItems.forEach(item => {
             const block = document.createElement('div'); block.className = "bg-black/30 border border-white/5 rounded-xl overflow-hidden relative";
-            const header = `<div class="bg-white/5 p-4 border-b border-white/5 font-display text-lg flex justify-between items-center"><span class="text-white font-bold">${item.name}</span><span class="text-xs font-sans text-luxe border border-luxe/30 px-2 py-1 bg-luxe/10 rounded font-bold">Size: ${item.size}</span></div>`;
-            const body = `<div class="p-4 space-y-3"><div class="border border-luxe/50 rounded-xl p-4 bg-gradient-to-br from-luxe/10 to-transparent hover:border-luxe transition relative group"><div class="absolute -top-2.5 right-4 bg-luxe text-brand text-[9px] font-bold px-2 py-0.5 rounded shadow-lg uppercase tracking-wider">Value RM ${pFull.value || 40} | You Save RM ${pFull.savings || 10}</div><label class="flex items-start gap-3 cursor-pointer"><input type="checkbox" id="cb-${item.id}-full" value="${pFull.price || 30}" class="mt-1 w-5 h-5 rounded border-luxe/50 text-luxe focus:ring-luxe bg-transparent srv-cb transition" onchange="handleSrvCheck('${item.id}', 'full')"><div class="flex-1"><div class="flex justify-between items-center"><span class="text-[15px] font-bold text-white group-hover:text-luxe transition">Full Body Alteration</span><span class="text-luxe font-bold text-lg">RM ${pFull.price || 30}</span></div></div></label></div><div class="grid grid-cols-2 gap-3 pt-2"><div class="border border-white/10 rounded-lg p-3 hover:border-luxe/50 transition bg-white/5" id="wrap-${item.id}-hem"><label class="flex items-center gap-3 cursor-pointer"><input type="checkbox" id="cb-${item.id}-hem" value="${pHem.price || 12}" class="w-4 h-4 rounded border-white/30 text-luxe bg-transparent srv-cb" onchange="handleSrvCheck('${item.id}', 'hem')"><div class="flex-1 flex justify-between text-sm"><span>Alter Length</span> <span class="text-white/50 font-bold">RM${pHem.price || 12}</span></div></label></div><div class="border border-white/10 rounded-lg p-3 hover:border-luxe/50 transition bg-white/5" id="wrap-${item.id}-sleeve"><label class="flex items-center gap-3 cursor-pointer"><input type="checkbox" id="cb-${item.id}-sleeve" value="${pSleeve.price || 12}" class="w-4 h-4 rounded border-white/30 text-luxe bg-transparent srv-cb" onchange="handleSrvCheck('${item.id}', 'sleeve')"><div class="flex-1 flex justify-between text-sm"><span>Alter Sleeves</span> <span class="text-white/50 font-bold">RM${pSleeve.price || 12}</span></div></label></div><div class="border border-white/10 rounded-lg p-3 hover:border-luxe/50 transition bg-white/5" id="wrap-${item.id}-shoulder"><label class="flex items-center gap-3 cursor-pointer"><input type="checkbox" id="cb-${item.id}-shoulder" value="${pShoulder.price || 10}" class="w-4 h-4 rounded border-white/30 text-luxe bg-transparent srv-cb" onchange="handleSrvCheck('${item.id}', 'shoulder')"><div class="flex-1 flex justify-between text-sm"><span>Alter Shoulders</span> <span class="text-white/50 font-bold">RM${pShoulder.price || 10}</span></div></label></div><div class="border border-white/10 rounded-lg p-3 hover:border-luxe/50 transition bg-white/5" id="wrap-${item.id}-pads"><label class="flex items-center gap-3 cursor-pointer"><input type="checkbox" id="cb-${item.id}-pads" value="${pPads.price || 6}" class="w-4 h-4 rounded border-white/30 text-luxe bg-transparent srv-cb" onchange="handleSrvCheck('${item.id}', 'pads')"><div class="flex-1 flex justify-between text-sm"><span>Add Shoulder Pads</span> <span class="text-white/50 font-bold">RM${pPads.price || 6}</span></div></label></div></div><div id="btn-container-${item.id}" class="hidden pt-4 border-t border-white/10 mt-4"><button onclick="openMeasurementModal('${item.id}')" id="meas-btn-${item.id}" class="w-full py-3 rounded-xl border border-luxe bg-luxe/10 text-luxe text-sm font-bold flex justify-center items-center gap-2 hover:bg-luxe hover:text-brand transition"><svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg><span>Add Measurements (Required)</span></button></div></div>`;
+            const header = `<div class="bg-white/5 p-4 border-b border-white/5 font-display text-lg flex justify-between items-center"><span class="text-white font-bold">${item.name}</span><span class="text-xs font-sans text-luxe border border-luxe/30 px-2 py-1 bg-luxe/10 rounded font-bold">${t[currentLang].txt_size_label} ${item.size}</span></div>`;
+            const body = `<div class="p-4 space-y-3"><div class="border border-luxe/50 rounded-xl p-4 bg-gradient-to-br from-luxe/10 to-transparent hover:border-luxe transition relative group"><div class="absolute -top-2.5 right-4 bg-luxe text-brand text-[9px] font-bold px-2 py-0.5 rounded shadow-lg uppercase tracking-wider">${t[currentLang].txt_value} RM ${pFull.value} | ${t[currentLang].txt_yousave} RM ${pFull.savings}</div><label class="flex items-start gap-3 cursor-pointer"><input type="checkbox" id="cb-${item.id}-full" value="${pFull.price}" class="mt-1 w-5 h-5 rounded border-luxe/50 text-luxe focus:ring-luxe bg-transparent srv-cb transition" onchange="handleSrvCheck('${item.id}', 'full')"><div class="flex-1"><div class="flex justify-between items-center"><span class="text-[15px] font-bold text-white group-hover:text-luxe transition" data-t="srv_full">${t[currentLang].srv_full}</span><span class="text-luxe font-bold text-lg">RM ${pFull.price}</span></div></div></label></div><div class="grid grid-cols-2 gap-3 pt-2"><div class="border border-white/10 rounded-lg p-3 hover:border-luxe/50 transition bg-white/5" id="wrap-${item.id}-hem"><label class="flex items-center gap-3 cursor-pointer"><input type="checkbox" id="cb-${item.id}-hem" value="${pHem.price}" class="w-4 h-4 rounded border-white/30 text-luxe bg-transparent srv-cb" onchange="handleSrvCheck('${item.id}', 'hem')"><div class="flex-1 flex justify-between text-sm"><span data-t="srv_hem">${t[currentLang].srv_hem}</span> <span class="text-white/50 font-bold">RM${pHem.price}</span></div></label></div><div class="border border-white/10 rounded-lg p-3 hover:border-luxe/50 transition bg-white/5" id="wrap-${item.id}-sleeve"><label class="flex items-center gap-3 cursor-pointer"><input type="checkbox" id="cb-${item.id}-sleeve" value="${pSleeve.price}" class="w-4 h-4 rounded border-white/30 text-luxe bg-transparent srv-cb" onchange="handleSrvCheck('${item.id}', 'sleeve')"><div class="flex-1 flex justify-between text-sm"><span data-t="srv_sleeve">${t[currentLang].srv_sleeve}</span> <span class="text-white/50 font-bold">RM${pSleeve.price}</span></div></label></div><div class="border border-white/10 rounded-lg p-3 hover:border-luxe/50 transition bg-white/5" id="wrap-${item.id}-shoulder"><label class="flex items-center gap-3 cursor-pointer"><input type="checkbox" id="cb-${item.id}-shoulder" value="${pShoulder.price}" class="w-4 h-4 rounded border-white/30 text-luxe bg-transparent srv-cb" onchange="handleSrvCheck('${item.id}', 'shoulder')"><div class="flex-1 flex justify-between text-sm"><span data-t="srv_shoulder">${t[currentLang].srv_shoulder}</span> <span class="text-white/50 font-bold">RM${pShoulder.price}</span></div></label></div><div class="border border-white/10 rounded-lg p-3 hover:border-luxe/50 transition bg-white/5" id="wrap-${item.id}-pads"><label class="flex items-center gap-3 cursor-pointer"><input type="checkbox" id="cb-${item.id}-pads" value="${pPads.price}" class="w-4 h-4 rounded border-white/30 text-luxe bg-transparent srv-cb" onchange="handleSrvCheck('${item.id}', 'pads')"><div class="flex-1 flex justify-between text-sm"><span data-t="srv_pads">${t[currentLang].srv_pads}</span> <span class="text-white/50 font-bold">RM${pPads.price}</span></div></label></div></div><div id="btn-container-${item.id}" class="hidden pt-4 border-t border-white/10 mt-4"><button onclick="openMeasurementModal('${item.id}')" id="meas-btn-${item.id}" class="w-full py-3 rounded-xl border border-luxe bg-luxe/10 text-luxe text-sm font-bold flex justify-center items-center gap-2 hover:bg-luxe hover:text-brand transition"><svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg><span data-t="btn_add_meas">${t[currentLang].btn_add_meas}</span></button></div></div>`;
             block.innerHTML = header + body; container.appendChild(block); handleSrvCheck(item.id, 'init', true);
         });
     }
@@ -530,18 +647,14 @@
         if(needsMeas) {
             btnContainer.classList.remove('hidden'); const btn = document.getElementById(`meas-btn-${itemId}`); const data = state.measurements[itemId];
             const isFilled = (document.getElementById(`cb-${itemId}-full`)?.checked && data.length && data.sleeve && data.shoulder) || (document.getElementById(`cb-${itemId}-hem`)?.checked && data.length) || (document.getElementById(`cb-${itemId}-sleeve`)?.checked && data.sleeve) || (document.getElementById(`cb-${itemId}-shoulder`)?.checked && data.shoulder);
-            if(isFilled) { btn.className = "w-full py-3 rounded-xl border border-green-500/50 bg-green-500/10 text-green-400 text-sm font-bold flex justify-center items-center gap-2 hover:bg-green-500/20 transition shadow-lg"; btn.innerHTML = `<svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" /></svg> <span>Measurements Saved (Edit)</span>`; } 
-            else { btn.className = "w-full py-3 rounded-xl border border-luxe bg-luxe text-brand text-sm font-bold flex justify-center items-center gap-2 hover:bg-white transition shadow-[0_0_15px_rgba(192,160,98,0.3)]"; btn.innerHTML = `<svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg> <span>Add Measurements (Required)</span>`; }
+            if(isFilled) { btn.className = "w-full py-3 rounded-xl border border-green-500/50 bg-green-500/10 text-green-400 text-sm font-bold flex justify-center items-center gap-2 hover:bg-green-500/20 transition shadow-lg"; btn.innerHTML = `<svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" /></svg> <span data-t="btn_edit_meas">${t[currentLang].btn_edit_meas}</span>`; } 
+            else { btn.className = "w-full py-3 rounded-xl border border-luxe bg-luxe text-brand text-sm font-bold flex justify-center items-center gap-2 hover:bg-white transition shadow-[0_0_15px_rgba(192,160,98,0.3)]"; btn.innerHTML = `<svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg> <span data-t="btn_add_meas">${t[currentLang].btn_add_meas}</span>`; }
         } else { btnContainer.classList.add('hidden'); }
     }
 
     function calculateTotal() { 
         state.servicesTotal = 0; 
-        document.querySelectorAll('.srv-cb:checked').forEach(cb => {
-            if(!cb.disabled) {
-                state.servicesTotal += parseFloat(cb.value || 0); 
-            }
-        }); 
+        document.querySelectorAll('.srv-cb:checked').forEach(cb => { if(!cb.disabled) state.servicesTotal += parseInt(cb.value); }); 
         
         document.getElementById('cost-services').innerText = "RM " + state.servicesTotal;
         if(state.mode === 'lalamove') { document.getElementById('delivery-fee-box').classList.remove('hidden'); document.getElementById('cost-delivery').innerText = "RM " + state.deliveryCost.toFixed(2); } 
@@ -551,13 +664,13 @@
 
     function openMeasurementModal(itemId) {
         editingItemId = itemId; const item = state.selectedItems.find(i => i.id === itemId); const limit = sizeChart[item.size] || sizeChart['M']; 
-        document.getElementById('modal-meas-subtitle').innerText = `${item.name} (Size: ${item.size})`;
+        document.getElementById('modal-meas-subtitle').innerText = `${item.name} (${t[currentLang].txt_size_label} ${item.size})`;
         const fieldsDiv = document.getElementById('modal-fields'); fieldsDiv.innerHTML = ''; const m = state.measurements[itemId]; const isFull = document.getElementById(`cb-${itemId}-full`).checked;
-        const buildInput = (key, labelKey, maxVal, type="number") => { const op = isFull ? '<=' : '<'; return `<div><label class="block text-sm text-white/70 mb-2 font-medium">${labelKey} ${maxVal ? `<span class="text-luxe font-mono text-xs">(Max: ${maxVal}")</span>` : ''}</label>${type === 'select' ? `<select id="mod-${key}"><option value="" class="text-black">Select...</option><option value="Yes" class="text-black" ${m[key]==='Yes'?'selected':''}>Yes</option><option value="No" class="text-black" ${m[key]==='No'?'selected':''}>No</option></select>` : `<input type="number" id="mod-${key}" value="${m[key]}" placeholder="${maxVal ? op+' '+maxVal : ''}">`}</div>`; };
-        if(isFull || document.getElementById(`cb-${itemId}-hem`)?.checked) fieldsDiv.innerHTML += buildInput('length', 'Length (inches)', limit.length, 'number');
-        if(isFull || document.getElementById(`cb-${itemId}-sleeve`)?.checked) fieldsDiv.innerHTML += buildInput('sleeve', 'Sleeves (inches)', limit.sleeve, 'number');
-        if(isFull || document.getElementById(`cb-${itemId}-shoulder`)?.checked) fieldsDiv.innerHTML += buildInput('shoulder', 'Shoulders (inches)', limit.shoulder, 'number');
-        if(isFull) fieldsDiv.innerHTML += buildInput('pads', 'Shoulder Pads', null, 'select');
+        const buildInput = (key, labelKey, maxVal, type="number") => { const op = isFull ? '<=' : '<'; return `<div><label class="block text-sm text-white/70 mb-2 font-medium">${t[currentLang][labelKey] + (maxVal ? ` <span class="text-luxe font-mono text-xs">(${t[currentLang].lbl_max} ${maxVal}")</span>` : '')}</label>${type === 'select' ? `<select id="mod-${key}"><option value="" class="text-black">${t[currentLang].lbl_select_option}</option><option value="Yes" class="text-black" ${m[key]==='Yes'?'selected':''}>${t[currentLang].lbl_yes}</option><option value="No" class="text-black" ${m[key]==='No'?'selected':''}>${t[currentLang].lbl_no}</option></select>` : `<input type="number" id="mod-${key}" value="${m[key]}" placeholder="${maxVal ? op+' '+maxVal : ''}">`}</div>`; };
+        if(isFull || document.getElementById(`cb-${itemId}-hem`)?.checked) fieldsDiv.innerHTML += buildInput('length', 'lbl_length', limit.length, 'number');
+        if(isFull || document.getElementById(`cb-${itemId}-sleeve`)?.checked) fieldsDiv.innerHTML += buildInput('sleeve', 'lbl_sleeve', limit.sleeve, 'number');
+        if(isFull || document.getElementById(`cb-${itemId}-shoulder`)?.checked) fieldsDiv.innerHTML += buildInput('shoulder', 'lbl_shoulder', limit.shoulder, 'number');
+        if(isFull) fieldsDiv.innerHTML += buildInput('pads', 'lbl_pads', null, 'select');
         const modal = document.getElementById('measurement-modal'); const box = document.getElementById('modal-content-box'); modal.classList.remove('hidden'); setTimeout(() => { modal.classList.remove('opacity-0'); box.classList.remove('scale-95'); }, 10);
     }
 
@@ -569,14 +682,14 @@
         const isFull = document.getElementById(`cb-${editingItemId}-full`).checked; let errorMsg = "";
         if (isFull) {
             let isAllEqual = true;
-            if(lenEl && lenEl.value) { if(parseFloat(lenEl.value) > limit.length) errorMsg += `- Length must be less than or equal to original size (${limit.length}").\n`; if(parseFloat(lenEl.value) < limit.length) isAllEqual = false; }
-            if(slvEl && slvEl.value) { if(parseFloat(slvEl.value) > limit.sleeve) errorMsg += `- Sleeves must be less than or equal to original size (${limit.sleeve}").\n`; if(parseFloat(slvEl.value) < limit.sleeve) isAllEqual = false; }
-            if(shdEl && shdEl.value) { if(parseFloat(shdEl.value) > limit.shoulder) errorMsg += `- Shoulders must be less than or equal to original size (${limit.shoulder}").\n`; if(parseFloat(shdEl.value) < limit.shoulder) isAllEqual = false; }
-            if (errorMsg === "" && isAllEqual && lenEl && lenEl.value && slvEl && slvEl.value && shdEl && shdEl.value) errorMsg += "At least one measurement must be reduced.\n";
+            if(lenEl && lenEl.value) { if(parseFloat(lenEl.value) > limit.length) errorMsg += `- ${t[currentLang].lbl_length} ${t[currentLang].alert_max_full} (${limit.length}").\n`; if(parseFloat(lenEl.value) < limit.length) isAllEqual = false; }
+            if(slvEl && slvEl.value) { if(parseFloat(slvEl.value) > limit.sleeve) errorMsg += `- ${t[currentLang].lbl_sleeve} ${t[currentLang].alert_max_full} (${limit.sleeve}").\n`; if(parseFloat(slvEl.value) < limit.sleeve) isAllEqual = false; }
+            if(shdEl && shdEl.value) { if(parseFloat(shdEl.value) > limit.shoulder) errorMsg += `- ${t[currentLang].lbl_shoulder} ${t[currentLang].alert_max_full} (${limit.shoulder}").\n`; if(parseFloat(shdEl.value) < limit.shoulder) isAllEqual = false; }
+            if (errorMsg === "" && isAllEqual && lenEl && lenEl.value && slvEl && slvEl.value && shdEl && shdEl.value) errorMsg += t[currentLang].alert_full_equal + "\n";
         } else {
-            if(lenEl && lenEl.value && parseFloat(lenEl.value) >= limit.length) errorMsg += `- Length must be strictly less than original size (${limit.length}").\n`;
-            if(slvEl && slvEl.value && parseFloat(slvEl.value) >= limit.sleeve) errorMsg += `- Sleeves must be strictly less than original size (${limit.sleeve}").\n`;
-            if(shdEl && shdEl.value && parseFloat(shdEl.value) >= limit.shoulder) errorMsg += `- Shoulders must be strictly less than original size (${limit.shoulder}").\n`;
+            if(lenEl && lenEl.value && parseFloat(lenEl.value) >= limit.length) errorMsg += `- ${t[currentLang].lbl_length} ${t[currentLang].alert_max} (${limit.length}").\n`;
+            if(slvEl && slvEl.value && parseFloat(slvEl.value) >= limit.sleeve) errorMsg += `- ${t[currentLang].lbl_sleeve} ${t[currentLang].alert_max} (${limit.sleeve}").\n`;
+            if(shdEl && shdEl.value && parseFloat(shdEl.value) >= limit.shoulder) errorMsg += `- ${t[currentLang].lbl_shoulder} ${t[currentLang].alert_max} (${limit.shoulder}").\n`;
         }
         if(errorMsg !== "") return alert(errorMsg);
         if(lenEl) m.length = lenEl.value; if(slvEl) m.sleeve = slvEl.value; if(shdEl) m.shoulder = shdEl.value; if(padEl) m.pads = padEl.value;
@@ -584,21 +697,21 @@
     }
 
     async function submitOrder() {
-        syncItemsB();
+        if(state.path === 'B') syncItemsB(); else syncItemsA();
         
-        const custName = document.getElementById('manual-cust-name').value.trim();
-        const rawPhone = document.getElementById('manual-cust-phone').value.trim();
+        const custName = state.path === 'A' ? document.getElementById('auto-cust-name').value : document.getElementById('manual-cust-name').value.trim();
+        const rawPhone = state.path === 'A' ? document.getElementById('auto-cust-phone').value : document.getElementById('manual-cust-phone').value.trim();
         
-        if(!custName) return alert("Please enter your name.");
-        if(!rawPhone) return alert("Please enter your phone number.");
+        if(!custName) return alert(t[currentLang].alert_name);
+        if(!rawPhone) return alert(t[currentLang].alert_phone);
         
         if(state.mode === 'lalamove') {
             state.unitNo = document.getElementById('lala-unit-no').value.trim();
-            if(!state.unitNo) return alert("Please enter your Unit / House / Lot No.");
+            if(!state.unitNo) return alert(t[currentLang].alert_unit);
         }
 
-        if(state.selectedItems.length === 0) return alert("Please select items to alter in Step 1.");
-        if(state.servicesTotal === 0) return alert("Please select at least one alteration service.");
+        if(state.selectedItems.length === 0) return alert(t[currentLang].alert_no_service);
+        if(state.servicesTotal === 0) return alert(t[currentLang].alert_no_service);
 
         if(state.mode === 'lalamove') {
             let valid = true;
@@ -608,7 +721,7 @@
                 if(document.getElementById(`cb-${id}-sleeve`)?.checked && !m.sleeve) valid = false;
                 if(document.getElementById(`cb-${id}-shoulder`)?.checked && !m.shoulder) valid = false;
             });
-            if(!valid) return alert("Please fill in measurements for all required items.");
+            if(!valid) return alert(t[currentLang].alert_measure);
         }
 
         const btn = document.getElementById('btn-final-submit');
@@ -630,10 +743,10 @@
         const hubData = hubs.find(h => h.id === state.hubId);
         
         const payload = {
-            action: "hub_application",
-            Order_Type: "Website",
-            Order_Ref: "Manual",
-            Customer_Name: custName, Phone_No: rawPhone.replace(/\D/g, ''),
+            action: "hub_application", // Reusing the same endpoint, backend routes via Order_Type
+            Order_Type: state.path === 'A' ? "Website" : "Public",
+            Order_Ref: state.path === 'A' ? document.getElementById('order-id-display').innerText.replace('#', '') : "Manual",
+            Customer_Name: custName, Phone_No: sanitizePhone(rawPhone),
             Address_Details: state.unitNo ? `${state.unitNo}, ${state.address}` : state.address, 
             Customer_Lat: state.lat, Customer_Lng: state.lng,
             Logistics_Mode: state.mode === 'walkin' ? "Walk-in" : "Lalamove",
@@ -658,15 +771,15 @@
         }
     }
 
-    // --- HQ GOD MODE LISTENER ---
+    function goToTracker() { if (generatedAltId) window.location.href = "alteration-tracker.html?id=" + encodeURIComponent(generatedAltId) + "&new=true"; }
+
+    // --- GOD MODE LISTENER ---
     document.getElementById('god-mode-trigger').addEventListener('dblclick', () => {
         const pin = prompt("Enter HQ Master PIN:");
         if(pin === "7777") {
             document.getElementById('radius-fab-container').classList.remove('hidden');
             alert("🛡️ God Mode Activated. Coverage Radius Control unlocked.");
-        } else if (pin !== null) {
-            alert("Access Denied.");
-        }
+        } else if (pin !== null) alert("Access Denied.");
     });
 
   </script>
