@@ -52,14 +52,6 @@
         70% { transform: translate(40px, -15px) scale(1); opacity: 0; }
         100% { transform: translate(0, 0) scale(1); opacity: 0; }
     }
-    #anim-pin { animation: pin-simulate 2.5s infinite ease-in-out; }
-    @keyframes pin-simulate {
-        0% { transform: translate(0, -10px); }
-        20% { transform: translate(0, -15px); }
-        50% { transform: translate(40px, -30px); }
-        70% { transform: translate(40px, -10px); }
-        100% { transform: translate(0, -10px); }
-    }
   </style>
 </head>
 
@@ -121,20 +113,18 @@
       </div>
   </div>
 
-  <div id="tut-step-2" class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-[220px] z-50 hidden flex-col items-center pointer-events-none transition-all duration-500 opacity-0">
+  <div id="tut-step-2" class="fixed bottom-1/2 left-1/2 -translate-x-1/2 mb-16 z-50 hidden flex-col items-center pointer-events-none transition-all duration-500 opacity-0">
       <div class="bg-brand-light/95 backdrop-blur-md border border-luxe shadow-[0_10px_30px_rgba(0,0,0,0.8)] rounded-xl p-4 text-center pointer-events-auto flex flex-col items-center w-64 relative">
            <button onclick="cancelBookingMode()" class="absolute top-2 right-3 text-white/40 hover:text-white text-xl leading-none">×</button>
-           
            <div class="h-16 w-full flex justify-center items-center mb-3 overflow-hidden relative rounded-lg bg-black/30 border border-white/5">
                 <div class="absolute inset-0 flex items-center justify-center pointer-events-none opacity-20">
                     <div class="w-full border-t border-dashed border-white"></div><div class="h-full border-l border-dashed border-white absolute"></div>
                 </div>
-                <img id="anim-pin" src="data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2024%2036%22%3E%3Cpath%20fill%3D%22%234285F4%22%20stroke%3D%22%23ffffff%22%20stroke-width%3D%222%22%20d%3D%22M12%202C8.13%202%205%205.13%205%209c0%205.25%207%2013%207%2013s7-7.75%207-13c0-3.87-3.13-7-7-7z%22/%3E%3C/svg%3E" class="w-5 h-8 absolute z-10" style="transform: translateY(-10px)">
+                <img src="data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2024%2036%22%3E%3Cpath%20fill%3D%22%234285F4%22%20stroke%3D%22%23ffffff%22%20stroke-width%3D%222%22%20d%3D%22M12%202C8.13%202%205%205.13%205%209c0%205.25%207%2013%207%2013s7-7.75%207-13c0-3.87-3.13-7-7-7z%22/%3E%3C/svg%3E" class="w-5 h-8 absolute z-10" style="transform: translateY(-10px)">
                 <div class="ghost-hand absolute z-20" style="margin-top: 15px; margin-left: 20px;">
                     <svg class="w-7 h-7 text-white drop-shadow-[0_2px_10px_rgba(0,0,0,0.8)]" fill="currentColor" viewBox="0 0 24 24"><path d="M9 11.24V7.5a2.5 2.5 0 015 0v3.74c1.21-.81 3-2.74 3-2.74a1.5 1.5 0 012.12 2.12l-5.65 5.66A2 2 0 0112.05 17H9a2 2 0 01-2-2v-4a2.5 2.5 0 012-2.5z"/></svg>
                 </div>
            </div>
-
            <p class="font-display text-lg text-luxe font-bold pr-2 leading-tight" data-t="tut_step2_title">Step 2: Verify Location</p>
            <p class="text-xs text-white/80 mt-1 pr-2" data-t="tut_step2_desc">Drag the pin exactly to your building</p>
       </div>
@@ -168,7 +158,7 @@
       </div>
   </div>
 
-  <div id="confirm-location-modal" class="fixed top-1/2 left-1/2 -translate-x-1/2 translate-y-[60px] w-[90%] max-w-[320px] bg-brand-light border border-luxe shadow-2xl rounded-xl z-50 hidden flex-col transition-all duration-500 opacity-0 relative">
+  <div id="confirm-location-modal" class="fixed top-1/2 left-1/2 -translate-x-1/2 mt-16 w-11/12 max-w-xs bg-brand-light border border-luxe shadow-2xl rounded-xl z-50 hidden flex-col relative">
       <button onclick="cancelBookingMode()" class="absolute top-2 right-3 text-white/40 hover:text-white text-xl leading-none">×</button>
       <div class="p-4 text-center">
           <p class="text-luxe font-extrabold text-xs tracking-wider uppercase mb-1" data-t="txt_is_this_you">IS THIS YOU?</p>
@@ -178,7 +168,6 @@
   </div>
 
   <div id="fab-container" class="fixed bottom-12 left-4 z-40 flex flex-col gap-4 pointer-events-none transition-all duration-300">
-      
       <div class="relative pointer-events-auto">
           <button onclick="startBooking()" class="w-14 h-14 bg-luxe hover:bg-luxe-hover text-brand shadow-[0_0_20px_rgba(192,160,98,0.5)] rounded-full flex items-center justify-center transition-all duration-300 transform scale-100 opacity-100 cursor-pointer group">
               <svg class="w-6 h-6 pointer-events-none transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="20" y1="4" x2="8.12" y2="15.88"/><line x1="14.47" y1="14.48" x2="20" y2="20"/><line x1="8.12" y1="8.12" x2="12" y2="12"/></svg>
@@ -528,16 +517,16 @@
         if (step1) step1.classList.replace('opacity-100', 'opacity-0');
         if (step2) step2.classList.replace('opacity-100', 'opacity-0');
         if (step3) step3.classList.replace('opacity-100', 'opacity-0');
-        if (confirmModal) confirmModal.classList.replace('opacity-100', 'opacity-0');
         
+        if (confirmModal) {
+            confirmModal.classList.add('hidden');
+            confirmModal.classList.remove('flex');
+        }
+
         setTimeout(() => {
             if (step1) step1.classList.add('hidden');
             if (step2) step2.classList.add('hidden');
             if (step3) step3.classList.add('hidden');
-            if (confirmModal) {
-                confirmModal.classList.add('hidden');
-                confirmModal.classList.remove('flex');
-            }
             document.getElementById('fab-container').classList.remove('hidden'); 
         }, 500);
 
@@ -584,7 +573,6 @@
                         const confirmModal = document.getElementById('confirm-location-modal');
                         confirmModal.classList.remove('hidden'); 
                         confirmModal.classList.add('flex'); 
-                        setTimeout(() => confirmModal.classList.replace('opacity-0', 'opacity-100'), 10);
                         closeModal(); 
                         hideCTA(); 
                     });
@@ -597,8 +585,8 @@
                         }
                         const confirmModal = document.getElementById('confirm-location-modal');
                         if(confirmModal && !confirmModal.classList.contains('hidden')) {
-                            confirmModal.classList.replace('opacity-100', 'opacity-0');
-                            setTimeout(() => { confirmModal.classList.add('hidden'); confirmModal.classList.remove('flex'); }, 300);
+                            confirmModal.classList.add('hidden'); 
+                            confirmModal.classList.remove('flex');
                         }
                     });
 
@@ -609,7 +597,6 @@
                         const confirmModal = document.getElementById('confirm-location-modal');
                         confirmModal.classList.remove('hidden'); 
                         confirmModal.classList.add('flex'); 
-                        setTimeout(() => confirmModal.classList.replace('opacity-0', 'opacity-100'), 10);
                     });
 
                     if(bookingMode) {
@@ -624,7 +611,6 @@
                     const confirmModal = document.getElementById('confirm-location-modal');
                     confirmModal.classList.remove('hidden'); 
                     confirmModal.classList.add('flex');
-                    setTimeout(() => confirmModal.classList.replace('opacity-0', 'opacity-100'), 10);
                 },
                 () => { btn.innerHTML = origHTML; btn.disabled = false; btn.classList.remove('animate-pulse'); alert("Location access denied."); },
                 { enableHighAccuracy: true } 
@@ -635,8 +621,8 @@
     function confirmLocation() {
         const confirmModal = document.getElementById('confirm-location-modal');
         if(confirmModal && !confirmModal.classList.contains('hidden')) {
-            confirmModal.classList.replace('opacity-100', 'opacity-0');
-            setTimeout(() => { confirmModal.classList.add('hidden'); confirmModal.classList.remove('flex'); }, 500);
+            confirmModal.classList.add('hidden'); 
+            confirmModal.classList.remove('flex');
         }
         
         const step2 = document.getElementById('tut-step-2');
