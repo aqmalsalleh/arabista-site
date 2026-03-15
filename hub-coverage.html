@@ -287,8 +287,7 @@
             : `<span class="text-xs bg-green-500/20 text-green-400 px-2 py-1 rounded border border-green-500/30 font-semibold tracking-wide">OPEN FOR ORDERS</span>`;
         document.getElementById('modal-status').innerHTML = statusBadge;
 
-        // FIXED: Universal Native Maps Direction URL
-        const navLink = `https://www.google.com/maps/dir/?api=1&destination=${parseFloat(hub.lat)},${parseFloat(hub.lng)}`;
+        const navLink = `https://www.google.com/maps/dir/?api=1&destination=...{parseFloat(hub.lat)},${parseFloat(hub.lng)}`;
         document.getElementById('modal-nav-btn').href = navLink;
 
         const godModeBox = document.getElementById('modal-god-mode');
@@ -337,41 +336,43 @@
                     
                     if(userLocationMarker) userLocationMarker.setMap(null);
 
-                    // Draggable Blue Teardrop Pin
+                    // --- THE SOLID BLUE TEARDROP PIN FIX ---
+                    // By using an inline SVG string, we guarantee a solid pin shape with no center hole
+                    // and a perfectly matched physical bounding box for effortless mobile clicking.
+                    const svgBluePin = 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 36" width="32" height="48"><path fill="#4285F4" stroke="#ffffff" stroke-width="2" d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/></svg>');
+
                     userLocationMarker = new google.maps.Marker({
                         position: pos,
                         map: map,
                         draggable: true,
                         icon: {
-                            path: "M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z",
-                            fillColor: "#4285F4",
-                            fillOpacity: 1,
-                            strokeWeight: 1.5,
-                            strokeColor: "#ffffff",
-                            scale: 1.5,
-                            anchor: new google.maps.Point(12, 22)
+                            url: svgBluePin,
+                            scaledSize: new google.maps.Size(32, 48),
+                            anchor: new google.maps.Point(16, 48)
                         },
                         title: "Your Location",
                         zIndex: 9999
                     });
 
-                    // Add Re-Click Listener to Blue Pin
+                    // THE RE-CLICK LOGIC
                     userLocationMarker.addListener('click', () => {
                         map.setZoom(16);
                         map.panTo(userLocationMarker.getPosition());
                         document.getElementById('confirm-location-modal').classList.remove('hidden');
                         document.getElementById('confirm-location-modal').classList.add('flex');
-                        closeModal();
-                        hideCTA();
+                        closeModal(); // Hide hub modal if open
+                        hideCTA();    // Hide CTA box if open
                     });
 
                     // Show Custom Confirm Location Modal
                     document.getElementById('confirm-location-modal').classList.remove('hidden');
                     document.getElementById('confirm-location-modal').classList.add('flex');
 
-                    // Allow user to reposition camera via drag
+                    // RE-OPEN BOX AFTER DRAG
                     userLocationMarker.addListener('dragend', () => {
                         map.panTo(userLocationMarker.getPosition());
+                        document.getElementById('confirm-location-modal').classList.remove('hidden');
+                        document.getElementById('confirm-location-modal').classList.add('flex');
                     });
 
                 },
