@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0" />
-  <title>Arabista — Hub Coverage Map</title>
+  <title>Arabista — Hub Coverage & Booking</title>
   <meta name="theme-color" content="#0F0F10" />
   
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
@@ -18,18 +18,32 @@
     tailwind.config = { 
         theme: { 
             extend: { 
-                fontFamily: { 
-                    display: ['"Cormorant Garamond"', 'serif'], 
-                    sans: ['Inter', 'ui-sans-serif', 'system-ui'], 
-                }, 
-                colors: { 
-                    brand: { DEFAULT: '#0F0F10', light: '#1A1A1C' }, 
-                    luxe: { DEFAULT: '#C0A062', hover: '#D4B87A' } 
-                } 
+                fontFamily: { display: ['"Cormorant Garamond"', 'serif'], sans: ['Inter', 'ui-sans-serif', 'system-ui'], }, 
+                colors: { brand: { DEFAULT: '#0F0F10', light: '#1A1A1C' }, luxe: { DEFAULT: '#C0A062', hover: '#D4B87A' } } 
             } 
         } 
     }
   </script>
+  <style>
+    /* Google Maps InfoWindow Override */
+    .gm-style .gm-style-iw-c { background-color: #1A1A1C !important; border: 1px solid #C0A062 !important; border-radius: 8px !important; padding: 0 !important; box-shadow: 0 10px 25px rgba(0,0,0,0.5) !important; }
+    .gm-style .gm-style-iw-tc::after { background: #1A1A1C !important; }
+    .gm-style-iw-d { overflow: hidden !important; padding: 12px 30px 12px 14px !important; }
+    .gm-ui-hover-effect { filter: invert(1); top: 6px !important; right: 6px !important; background: rgba(255,255,255,0.1) !important; border-radius: 50% !important; }
+
+    /* Custom Form & UI Styles */
+    .hide-scrollbar::-webkit-scrollbar { display: none; }
+    .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    .bottom-sheet { transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.32, 0.72, 0, 1); }
+    .bottom-sheet.open { transform: translateY(0); }
+    input[type="text"], input[type="tel"], input[type="number"], select { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); color: white; border-radius: 8px; padding: 10px 14px; width: 100%; font-size: 16px !important; transition: all 0.2s; }
+    input:focus, select:focus { outline: none; border-color: #C0A062; background: rgba(192,160,98,0.05); }
+    input[type="checkbox"] { width: 1.25rem; height: 1.25rem; accent-color: #C0A062; border-radius: 0.25rem; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.3); }
+    
+    /* Tutorial Ghost Pin Animation */
+    .ghost-hand { animation: drag-simulate 3s infinite ease-in-out; }
+    @keyframes drag-simulate { 0% { transform: translate(0, 0) scale(1); opacity: 0; } 20% { transform: translate(0, 0) scale(0.9); opacity: 1; } 60% { transform: translate(40px, -40px) scale(0.9); opacity: 1; } 80% { transform: translate(40px, -40px) scale(1); opacity: 0; } 100% { transform: translate(0, 0) scale(1); opacity: 0; } }
+  </style>
 </head>
 
 <body class="bg-brand text-white font-sans h-screen flex flex-col overflow-hidden relative">
@@ -39,19 +53,19 @@
         <h1 class="font-display text-2xl font-semibold tracking-wide text-white leading-tight">ARABISTA</h1>
         <p id="god-mode-trigger" class="text-xs text-luxe tracking-widest uppercase cursor-default select-none">Coverage Map</p>
     </div>
-    <div id="status-indicator" class="text-xs font-medium text-white/50 flex items-center">
-        <svg class="animate-spin h-4 w-4 mr-2 text-luxe" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-        </svg>
-        Syncing Hubs...
+    <div class="flex items-center gap-3">
+        <div id="status-indicator" class="text-xs font-medium text-white/50 flex items-center">
+            <svg class="animate-spin h-4 w-4 mr-2 text-luxe" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+            Syncing Hubs...
+        </div>
+        <div class="flex items-center gap-2 border border-white/20 rounded-lg px-2 py-1"><button onclick="setLang('en')" id="lang-en" class="text-xs font-bold text-luxe">EN</button><span class="text-white/20">|</span><button onclick="setLang('bm')" id="lang-bm" class="text-xs text-white/50 hover:text-white">BM</button></div>
     </div>
   </header>
 
-  <div class="absolute top-24 left-4 right-20 md:right-auto md:w-80 z-10 pointer-events-none">
+  <div id="control-locate" class="absolute top-24 left-4 right-20 md:right-auto md:w-80 z-10 pointer-events-none transition-all duration-300">
       <button id="btn-locate" onclick="locateUser()" class="pointer-events-auto w-full bg-brand-light/95 backdrop-blur-md border border-white/10 hover:border-luxe/50 text-white shadow-lg rounded-lg p-3 flex items-center justify-center transition-all">
           <svg class="w-5 h-5 text-luxe mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.243-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
-          <span class="text-sm font-medium">Find Hubs Near Me</span>
+          <span class="text-sm font-medium" data-t="btn_find_hubs">Find Hubs Near Me</span>
       </button>
   </div>
 
@@ -60,12 +74,8 @@
           <button onclick="toggleRadius()" class="w-12 h-12 bg-brand-light/95 backdrop-blur-md border border-white/10 hover:border-luxe/50 text-luxe shadow-lg rounded-full flex items-center justify-center transition-all">
               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
           </button>
-          
           <div id="radius-content" class="hidden absolute top-14 right-0 w-48 bg-brand-light/95 backdrop-blur-md border border-white/10 shadow-2xl rounded-xl p-4 transition-all origin-top-right">
-              <div class="flex justify-between text-[10px] text-white/70 font-medium mb-3 uppercase tracking-wider">
-                  <span>Radius Range</span>
-                  <span id="radius-display" class="text-luxe font-bold">1 KM</span>
-              </div>
+              <div class="flex justify-between text-[10px] text-white/70 font-medium mb-3 uppercase tracking-wider"><span>Radius Range</span><span id="radius-display" class="text-luxe font-bold">1 KM</span></div>
               <input type="range" id="radius-slider" min="1" max="15" value="1" class="w-full h-1 bg-white/20 rounded-lg appearance-none cursor-pointer accent-luxe" oninput="updateRadius(this.value)">
           </div>
       </div>
@@ -73,7 +83,36 @@
 
   <div id="map" class="flex-grow w-full h-full"></div>
 
-  <div id="hub-modal" class="fixed inset-x-4 bottom-32 md:inset-auto md:bottom-10 md:right-10 md:w-80 bg-brand-light border border-luxe shadow-2xl rounded-xl z-30 hidden flex-col transition-all">
+  <div id="tut-step-1" class="fixed inset-0 z-60 bg-black/80 backdrop-blur-sm hidden flex-col transition-opacity duration-300 opacity-0 pointer-events-none">
+      <div class="absolute top-40 left-4 md:left-20">
+          <svg class="w-12 h-12 text-luxe animate-bounce mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"></path></svg>
+          <p class="text-white font-display text-2xl" data-t="tut_step1_title">Step 1: Locate Yourself</p>
+          <p class="text-white/80 text-sm max-w-xs mt-1" data-t="tut_step1_desc">Tap 'Find Hubs Near Me' and click 'Allow' to let us find your precise location for accurate Lalamove rates.</p>
+      </div>
+      <button onclick="cancelBookingMode()" class="absolute bottom-10 left-1/2 -translate-x-1/2 text-white/50 underline text-sm pointer-events-auto" data-t="btn_cancel">Cancel Booking</button>
+  </div>
+
+  <div id="tut-step-2" class="fixed inset-0 z-60 bg-black/80 backdrop-blur-sm hidden flex-col items-center justify-center transition-opacity duration-300 opacity-0">
+      <div class="relative w-32 h-32 mb-6">
+          <div class="absolute inset-0 flex items-center justify-center"><img src="data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2024%2036%22%3E%3Cpath%20fill%3D%22%234285F4%22%20stroke%3D%22%23ffffff%22%20stroke-width%3D%222%22%20d%3D%22M12%202C8.13%202%205%205.13%205%209c0%205.25%207%2013%207%2013s7-7.75%207-13c0-3.87-3.13-7-7-7z%22/%3E%3C/svg%3E" class="w-12 h-16 opacity-50"></div>
+          <div class="absolute inset-0 flex items-center justify-center ghost-hand">
+              <svg class="w-10 h-10 text-white drop-shadow-lg" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/></svg>
+              <svg class="w-8 h-8 text-luxe absolute bottom-0 right-0 -mr-4 -mb-4" fill="currentColor" viewBox="0 0 24 24"><path d="M9 11.24V7.5a2.5 2.5 0 015 0v3.74c1.21-.81 3-2.74 3-2.74a1.5 1.5 0 012.12 2.12l-5.65 5.66A2 2 0 0112.05 17H9a2 2 0 01-2-2v-4a2.5 2.5 0 012-2.5z"/></svg>
+          </div>
+      </div>
+      <p class="text-white font-display text-3xl mb-2 text-center" data-t="tut_step2_title">Step 2: Be Exact</p>
+      <p class="text-white/80 text-sm max-w-xs text-center mb-8" data-t="tut_step2_desc">Drag the blue pin exactly to your house or building to ensure the delivery rider finds you.</p>
+      <button onclick="dismissTut2()" class="bg-luxe hover:bg-luxe-hover text-brand font-bold py-3 px-10 rounded-xl shadow-lg transition-all" data-t="btn_understand">I Understand</button>
+  </div>
+
+  <div id="tut-step-3-banner" class="fixed top-20 inset-x-4 md:w-96 md:mx-auto z-50 bg-luxe/90 backdrop-blur-md text-brand font-bold px-4 py-3 rounded-xl shadow-lg border border-luxe hidden flex items-center justify-between transition-all duration-500 transform -translate-y-20 opacity-0">
+      <div class="flex items-center gap-3">
+          <span class="w-6 h-6 rounded-full bg-brand text-luxe flex items-center justify-center text-xs">3</span>
+          <span class="text-sm" data-t="tut_step3_title">Browse circles & tap a Hub</span>
+      </div>
+  </div>
+
+  <div id="hub-modal" class="fixed inset-x-4 bottom-32 md:inset-auto md:bottom-10 md:right-10 md:w-[340px] bg-brand-light border border-luxe shadow-2xl rounded-xl z-30 hidden flex-col transition-all">
       <div class="flex justify-between items-center border-b border-white/10 p-4 bg-brand/50 rounded-t-xl">
           <h3 id="modal-title" class="font-display font-bold text-xl text-luxe">Hub Name</h3>
           <button onclick="closeModal()" class="text-white/40 hover:text-white text-2xl leading-none">×</button>
@@ -88,51 +127,205 @@
               <p id="modal-address" class="text-xs text-white/60 mt-2 leading-relaxed"></p>
           </div>
 
-          <a id="modal-nav-btn" href="#" target="_blank" class="flex items-center justify-center w-full py-2.5 mt-4 rounded-lg border border-luxe text-luxe hover:bg-luxe hover:text-brand transition-colors font-medium">
-              📍 Navigate to Hub
-          </a>
+          <div id="modal-action-area"></div>
       </div>
   </div>
 
   <div id="confirm-location-modal" class="fixed inset-x-4 bottom-12 md:bottom-10 md:left-1/2 md:-translate-x-1/2 md:w-80 bg-brand-light border border-luxe shadow-2xl rounded-xl z-50 hidden flex-col transition-all">
       <div class="p-5 text-center">
-          <p class="text-luxe font-extrabold text-sm tracking-wider uppercase mb-1">📍 Is this you?</p>
-          <p class="text-white/80 text-sm mb-5 font-medium">Drag the blue pin to your EXACT location.</p>
-          <button onclick="confirmLocation()" class="w-full bg-luxe hover:bg-luxe-hover text-brand font-bold py-3 rounded-lg transition-colors shadow-[0_0_15px_rgba(192,160,98,0.2)]">
-              Confirm Location
-          </button>
+          <p class="text-luxe font-extrabold text-sm tracking-wider uppercase mb-1" data-t="txt_is_this_you">📍 Is this you?</p>
+          <p class="text-white/80 text-sm mb-5 font-medium" data-t="txt_drag_pin">Drag the blue pin to your EXACT location.</p>
+          <button onclick="confirmLocation()" class="w-full bg-luxe hover:bg-luxe-hover text-brand font-bold py-3 rounded-lg transition-colors shadow-[0_0_15px_rgba(192,160,98,0.2)]" data-t="btn_confirm_loc">Confirm Location</button>
       </div>
   </div>
 
-  <button id="cta-fab" onclick="showCTA()" class="fixed bottom-12 left-4 z-40 w-14 h-14 bg-luxe hover:bg-luxe-hover text-brand shadow-[0_0_20px_rgba(192,160,98,0.5)] rounded-full flex items-center justify-center transition-all duration-300 transform scale-100 opacity-100 cursor-pointer">
-      <svg class="w-7 h-7 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
-      <span id="cta-badge" class="absolute -top-2 -right-8 bg-white border border-luxe/50 text-brand text-[10px] font-bold px-2.5 py-1 rounded-full animate-pulse shadow-[0_0_10px_rgba(255,255,255,0.5)] whitespace-nowrap pointer-events-none">
-          Join Network
-      </span>
-  </button>
+  <div id="fab-container" class="fixed bottom-12 left-4 z-40 flex flex-col gap-4 pointer-events-none transition-all duration-300">
+      
+      <div class="relative pointer-events-auto">
+          <button onclick="startBooking()" class="w-14 h-14 bg-brand-light border border-luxe/50 hover:bg-luxe hover:text-brand text-luxe shadow-[0_0_20px_rgba(192,160,98,0.3)] rounded-full flex items-center justify-center transition-all duration-300 transform scale-100 opacity-100 cursor-pointer group">
+              <svg class="w-6 h-6 pointer-events-none transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M14.121 14.121L19 19m-4.879-4.879l-2.122 2.122m2.122-2.122l-2.122-2.122m-4.242 4.242l2.122-2.122m0 0L5 5m4.879 4.879l-2.122 2.122m2.122-2.122l2.122-2.122"></path><circle cx="6" cy="6" r="2"></circle><circle cx="6" cy="18" r="2"></circle></svg>
+          </button>
+          <span class="absolute top-1/2 -translate-y-1/2 left-16 bg-white border border-luxe/50 text-brand text-[11px] font-bold px-3 py-1.5 rounded-lg shadow-[0_0_10px_rgba(255,255,255,0.2)] whitespace-nowrap pointer-events-none" data-t="btn_book_alt">
+              Book Alteration
+          </span>
+      </div>
+
+      <div class="relative pointer-events-auto">
+          <button onclick="showCTA()" class="w-14 h-14 bg-luxe hover:bg-luxe-hover text-brand shadow-[0_0_20px_rgba(192,160,98,0.5)] rounded-full flex items-center justify-center transition-all duration-300 transform scale-100 opacity-100 cursor-pointer">
+              <svg class="w-7 h-7 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+          </button>
+          <span id="cta-badge" class="absolute -top-2 -right-2 bg-red-500 border border-brand text-white text-[10px] font-bold px-2 py-0.5 rounded-full animate-pulse shadow-lg whitespace-nowrap pointer-events-none" data-t="txt_join">
+              Join
+          </span>
+      </div>
+  </div>
 
   <div id="cta-box" class="fixed bottom-12 left-0 right-0 px-4 z-50 flex justify-center transition-all duration-500 transform translate-y-32 opacity-0 pointer-events-none">
       <div id="cta-inner-box" class="relative bg-brand-light/95 backdrop-blur-md border border-luxe/30 shadow-[0_10px_40px_rgba(0,0,0,0.8)] rounded-xl p-5 max-w-sm w-full text-center pointer-events-none">
           <button onclick="hideCTA()" class="absolute top-2 right-3 text-white/40 hover:text-white p-2 text-2xl font-bold leading-none">×</button>
-          <p class="text-sm text-white/90 mb-4 mt-2 pr-4 pl-4 leading-relaxed font-medium">No hubs in your area? Claim this zone and dominate the local market.</p>
-          <a href="hub-lite.html" class="block w-full bg-luxe hover:bg-luxe-hover text-brand font-semibold py-3.5 rounded-lg transition-colors shadow-[0_0_15px_rgba(192,160,98,0.2)]">
-              Become a Hub Partner
-          </a>
+          <p class="text-sm text-white/90 mb-4 mt-2 pr-4 pl-4 leading-relaxed font-medium" data-t="txt_b2b_hook">No hubs in your area? Claim this zone and dominate the local market.</p>
+          <a href="hub-lite.html" class="block w-full bg-luxe hover:bg-luxe-hover text-brand font-semibold py-3.5 rounded-lg transition-colors shadow-[0_0_15px_rgba(192,160,98,0.2)]" data-t="btn_partner">Become a Hub Partner</a>
       </div>
+  </div>
+
+  <div id="booking-overlay" class="fixed inset-0 z-[65] bg-black/80 backdrop-blur-sm hidden opacity-0 transition-opacity duration-300" onclick="closeBookingSheet()"></div>
+  <div id="booking-sheet" class="fixed bottom-0 inset-x-0 z-[70] bg-[#111213] border-t border-luxe/30 rounded-t-3xl max-h-[90vh] overflow-hidden flex flex-col bottom-sheet">
+      <div class="p-4 border-b border-white/5 flex justify-between items-center bg-[#111213] relative z-10 max-w-screen-md mx-auto w-full">
+          <div>
+              <h2 class="font-display text-2xl text-white ml-2 leading-none" data-t="form_title">Book Alteration</h2>
+              <p class="text-xs text-luxe ml-2 mt-1 font-medium" id="sheet-hub-name">Hub Name</p>
+          </div>
+          <button onclick="closeBookingSheet()" class="p-2 text-white/50 hover:text-white bg-white/5 rounded-full transition"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
+      </div>
+      
+      <div class="p-4 sm:p-6 overflow-y-auto hide-scrollbar pb-32 max-w-screen-md mx-auto w-full">
+          
+          <div class="mb-6 bg-white/5 border border-luxe/50 shadow-[0_0_20px_rgba(192,160,98,0.1)] rounded-2xl p-5">
+              <h3 class="text-sm font-bold text-white mb-4 border-b border-white/10 pb-3 flex items-center gap-2"><span class="bg-luxe text-brand w-5 h-5 flex items-center justify-center rounded-full text-xs">1</span> <span data-t="step_personal">Details & Items</span></h3>
+              
+              <div id="path-a-container" class="hidden space-y-4 mb-4">
+                  <p class="text-xs text-white/50 mb-2"><span data-t="lbl_order">Order</span> <span id="order-id-display"></span></p>
+                  <div><label class="block text-xs text-white/70 uppercase tracking-widest mb-2" data-t="lbl_cust_name">Customer Name</label><input type="text" id="auto-cust-name" class="bg-white/10 text-white/50 cursor-not-allowed" readonly></div>
+                  <div><label class="block text-xs text-white/70 uppercase tracking-widest mb-2" data-t="lbl_phone">Telephone No.</label><input type="tel" id="auto-cust-phone" class="bg-white/10 text-white/50 cursor-not-allowed" readonly></div>
+                  <p class="text-sm text-white/70 mt-4 mb-2" data-t="txt_select_items">Select Items to Alter:</p>
+                  <div class="grid gap-3" id="auto-items-list"></div>
+              </div>
+
+              <div id="path-b-container" class="space-y-4 mb-4">
+                  <div><label class="block text-xs text-white/70 uppercase tracking-widest mb-2" data-t="lbl_cust_name">Customer Name <span class="text-red-400">*</span></label><input type="text" id="manual-cust-name" placeholder="e.g. Siti Aishah" data-t-placeholder="placeholder_name"></div>
+                  <div><label class="block text-xs text-white/70 uppercase tracking-widest mb-2" data-t="lbl_phone">WhatsApp No. <span class="text-red-400">*</span></label><input type="tel" id="manual-cust-phone" placeholder="e.g. 0123456789" data-t-placeholder="placeholder_phone"></div>
+                  <p class="text-sm text-white/70 mt-4 mb-2" data-t="txt_select_items">Items to Alter:</p>
+                  <div id="manual-items-list" class="space-y-3"></div>
+                  <button onclick="addManualItem()" class="text-luxe text-sm font-bold flex items-center gap-2 hover:text-white transition mt-2">
+                      <span class="bg-luxe/10 p-1.5 rounded-md"><svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg></span>
+                      <span data-t="btn_add_item">Add Another Item</span>
+                  </button>
+              </div>
+          </div>
+
+          <div class="bg-white/5 border border-white/10 rounded-2xl p-5 relative">
+              <h3 class="text-sm font-bold text-white mb-4 border-b border-white/10 pb-3 flex items-center gap-2"><span class="bg-luxe text-brand w-5 h-5 flex items-center justify-center rounded-full text-xs">2</span> <span data-t="step_services">Services & Checkout</span></h3>
+              <p class="text-xs text-white/50 mb-4" id="measure-instruction" data-t="txt_measure_walkin">Drop-In selected. No measurements needed.</p>
+              
+              <div id="services-container" class="space-y-6 mb-6"></div>
+
+              <div class="border-t border-white/10 pt-6">
+                  <div class="mb-4 space-y-3">
+                      <div class="flex justify-between text-sm text-white/70"><span data-t="lbl_services_cost">Alteration Services</span><span id="cost-services" class="font-bold text-white">RM 0</span></div>
+                      <div class="flex justify-between text-sm text-orange-300 bg-orange-500/10 p-3 rounded-lg border border-orange-500/20 hidden" id="delivery-fee-box">
+                          <span data-t="lbl_delivery_cost">Lalamove delivery fee to be paid to Arabista</span>
+                          <span id="cost-delivery" class="font-bold">RM 0.00</span>
+                      </div>
+                  </div>
+                  <div class="flex justify-between items-end mb-6 pt-4 border-t border-white/10">
+                      <span class="text-white font-bold" data-t="label_total_est">Total to Pay Hub</span>
+                      <div class="text-right"><span class="font-display text-4xl text-luxe font-bold" id="grand-total">RM 0</span></div>
+                  </div>
+                  <button id="btn-final-submit" onclick="submitOrder()" class="w-full bg-luxe text-brand font-bold py-4 rounded-xl hover:bg-white transition shadow-[0_0_20px_rgba(192,160,98,0.3)] flex justify-center items-center gap-2">
+                      <span data-t="btn_confirm">Confirm Booking</span>
+                  </button>
+              </div>
+          </div>
+
+      </div>
+  </div>
+
+  <div id="measurement-modal" class="fixed inset-0 z-[80] flex items-center justify-center bg-black/80 backdrop-blur-sm hidden opacity-0 transition-opacity duration-300 px-4">
+    <div class="bg-[#111213] border border-luxe/50 rounded-2xl w-full max-w-md p-6 max-h-[90vh] overflow-y-auto hide-scrollbar transform scale-95 transition-transform duration-300" id="modal-content-box">
+        <h3 class="font-display text-2xl text-white mb-1" data-t="modal_meas_title">Provide Measurements</h3>
+        <p class="text-xs text-white/50 mb-6" id="modal-meas-subtitle">Provide your measurements for</p>
+        <div id="modal-fields" class="space-y-4"></div>
+        <div class="mt-8 flex gap-3">
+            <button onclick="closeMeasurementModal()" class="flex-1 px-4 py-3 rounded-xl border border-white/10 hover:bg-white/5 text-white/70 transition text-sm font-bold" data-t="btn_cancel">Cancel</button>
+            <button onclick="saveMeasurements()" class="flex-1 px-4 py-3 rounded-xl bg-luxe text-brand hover:bg-white transition text-sm font-bold shadow-[0_0_15px_rgba(192,160,98,0.3)]" data-t="btn_save">Save Measurements</button>
+        </div>
+    </div>
+  </div>
+
+  <div id="success-modal" class="fixed inset-0 z-[90] flex items-center justify-center bg-black/90 backdrop-blur-md hidden opacity-0 transition-opacity duration-300 px-4">
+    <div class="bg-[#111213] border border-luxe/50 rounded-2xl w-full max-w-sm p-8 transform scale-95 transition-transform duration-300 text-center shadow-[0_0_50px_rgba(192,160,98,0.2)]" id="success-box">
+        <div class="w-16 h-16 rounded-full bg-green-500/20 text-green-400 flex items-center justify-center mx-auto mb-5"><svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg></div>
+        <h3 class="font-display text-2xl text-white mb-2" data-t="modal_success_title">Booking Successful!</h3>
+        <p class="text-sm text-white/70 mb-4" data-t="modal_success_desc">Your Alteration Order ID is:</p>
+        <div class="bg-black/50 border border-white/10 rounded-lg py-3 px-4 mb-4 select-all">
+            <p class="font-mono text-xl text-luxe font-bold tracking-widest" id="display-alt-id">ALT-0000-XXXX</p>
+        </div>
+        <p class="text-xs text-red-400 mb-6 font-medium uppercase tracking-wider" data-t="modal_success_warn">⚠️ Please screenshot this ID</p>
+        <button onclick="goToTracker()" class="w-full bg-luxe text-brand font-bold py-3.5 rounded-xl hover:bg-white transition shadow-soft" data-t="btn_track">Track My Order</button>
+    </div>
   </div>
 
   <script>
     const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyrJFfuCrhAbdwzAj8uP4sSvFuzRzzzEFV5CHOCBSOK6OGlIXPtsf7-XEfjLHGnFZiyvw/exec';
-    
-    let map;
-    let hubs = [];
-    let markers = [];
-    let circles = [];
-    let godMode = false;
-    let currentRadius = 1000;
-    let userLocationMarker = null;
+    const spinnerSvg = `<svg class="animate-spin h-4 w-4 inline mr-2 text-current" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>`;
 
-    // --- DARK THEME MAP STYLE (Muted Cities, Hidden POIs) ---
+    const t = {
+        en: {
+            btn_find_hubs: "Find Hubs Near Me", txt_join: "Join", txt_b2b_hook: "No hubs in your area? Claim this zone and dominate the local market.", btn_partner: "Become a Hub Partner", btn_book_alt: "Book Alteration",
+            tut_step1_title: "Step 1: Locate Yourself", tut_step1_desc: "Tap 'Find Hubs Near Me' and click 'Allow' to let us find your precise location for accurate Lalamove rates.",
+            tut_step2_title: "Step 2: Be Exact", tut_step2_desc: "Drag the blue pin exactly to your house or building to ensure the delivery rider finds you.", btn_understand: "I Understand",
+            tut_step3_title: "Step 3: Browse circles & tap a Hub", btn_cancel: "Cancel Booking",
+            txt_is_this_you: "📍 Is this you?", txt_drag_pin: "Drag the blue pin to your EXACT location.", btn_confirm_loc: "Confirm Location",
+            txt_nav_hub: "📍 Navigate to Hub", txt_drop_in: "🚶 Drop-In Yourself", txt_free: "Free", txt_lalamove: "🚚 Lalamove", txt_calculating: "Calculating...", txt_out_of_area: "Out of Area",
+            form_title: "Book Alteration", step_personal: "Details & Items", lbl_order: "Order", lbl_cust_name: "Customer Name *", placeholder_name: "e.g. Siti Aishah", lbl_phone: "WhatsApp No. *", placeholder_phone: "e.g. 0123456789", txt_select_items: "Items to Alter:", btn_add_item: "Add Another Item",
+            lbl_design_code: "Design Code", lbl_size: "Size", txt_size_label: "Size:",
+            step_services: "Services & Checkout", txt_measure_walkin: "Drop-In selected. No measurements needed.", txt_measure_lala: "Lalamove selected. Please provide measurements.",
+            srv_full: "Full Body Alteration", srv_hem: "Alter Length", srv_sleeve: "Alter Sleeves", srv_shoulder: "Alter Shoulders", srv_pads: "Add Shoulder Pads", txt_value: "Value", txt_yousave: "You Save", btn_add_meas: "Add Measurements (Required)", btn_edit_meas: "Measurements Saved (Edit)",
+            lbl_services_cost: "Alteration Services", lbl_delivery_cost: "Lalamove delivery fee to be paid to Arabista", label_total_est: "Total to Pay Hub", btn_confirm: "Confirm Booking",
+            modal_meas_title: "Provide Measurements", lbl_length: "Length (inches)", lbl_sleeve: "Sleeves (inches)", lbl_shoulder: "Shoulders (inches)", lbl_pads: "Shoulder Pads", lbl_max: "Max:", lbl_select_option: "Select...", lbl_yes: "Yes", lbl_no: "No", btn_save: "Save Measurements",
+            modal_success_title: "Booking Successful!", modal_success_desc: "Your Alteration Order ID is:", modal_success_warn: "⚠️ Please screenshot this ID", btn_track: "Track My Order",
+            alert_name: "Please enter your name.", alert_phone: "Please enter your phone number.", alert_no_hub: "Please select a Hub.", alert_no_service: "Please select at least one service.", alert_measure: "Please fill in measurements for all required items.", alert_max: "must be less than original size", alert_max_full: "must be less than or equal to original size", alert_full_equal: "At least one measurement must be reduced.", txt_no_items_step4: "No items selected."
+        },
+        bm: {
+            btn_find_hubs: "Cari Hub Berdekatan", txt_join: "Sertai", txt_b2b_hook: "Tiada hub di kawasan anda? Jadilah yang pertama dan kuasai pasaran.", btn_partner: "Daftar Hub Rakan", btn_book_alt: "Tempah Alterasi",
+            tut_step1_title: "Langkah 1: Kesan Lokasi", tut_step1_desc: "Ketik 'Cari Hub' dan klik 'Benarkan' untuk lokasi GPS yang tepat bagi kadar Lalamove.",
+            tut_step2_title: "Langkah 2: Tepatkan Pin", tut_step2_desc: "Tarik pin biru tepat ke bangunan anda supaya rider Lalamove mudah mencari anda.", btn_understand: "Saya Faham",
+            tut_step3_title: "Langkah 3: Pilih Bulatan Hub", btn_cancel: "Batal Tempahan",
+            txt_is_this_you: "📍 Adakah ini lokasi anda?", txt_drag_pin: "Tarik pin biru tepat ke lokasi anda.", btn_confirm_loc: "Sahkan Lokasi",
+            txt_nav_hub: "📍 Pandu Arah ke Hub", txt_drop_in: "🚶 Hantar Sendiri (Drop-In)", txt_free: "Percuma", txt_lalamove: "🚚 Lalamove", txt_calculating: "Mengira...", txt_out_of_area: "Luar Kawasan",
+            form_title: "Tempahan Alterasi", step_personal: "Butiran & Item", lbl_order: "Pesanan", lbl_cust_name: "Nama Pelanggan *", placeholder_name: "cth. Siti Aishah", lbl_phone: "No. WhatsApp *", placeholder_phone: "cth. 0123456789", txt_select_items: "Item Untuk Dialter:", btn_add_item: "Tambah Item Lain",
+            lbl_design_code: "Kod Rekaan", lbl_size: "Saiz", txt_size_label: "Saiz:",
+            step_services: "Servis & Pembayaran", txt_measure_walkin: "Drop-In dipilih. Tiada ukuran diperlukan.", txt_measure_lala: "Lalamove dipilih. Sila masukkan ukuran.",
+            srv_full: "Alter Keseluruhan", srv_hem: "Alter Labuh", srv_sleeve: "Alter Lengan", srv_shoulder: "Alter Bahu", srv_pads: "Tambah Span", txt_value: "Nilai", txt_yousave: "Anda Jimat", btn_add_meas: "Masukkan Ukuran (Wajib)", btn_edit_meas: "Ukuran Disimpan (Ubah)",
+            lbl_services_cost: "Servis Alterasi", lbl_delivery_cost: "Caj Lalamove perlu dibayar kepada Arabista", label_total_est: "Jumlah Dibayar ke Hub", btn_confirm: "Sahkan Tempahan",
+            modal_meas_title: "Masukkan Ukuran", lbl_length: "Labuh (inci)", lbl_sleeve: "Lengan (inci)", lbl_shoulder: "Bahu (inci)", lbl_pads: "Span Bahu", lbl_max: "Maks:", lbl_select_option: "Pilih...", lbl_yes: "Ya", lbl_no: "Tidak", btn_save: "Simpan Ukuran",
+            modal_success_title: "Tempahan Berjaya!", modal_success_desc: "ID Tempahan Alterasi anda ialah:", modal_success_warn: "⚠️ Sila screenshot ID ini", btn_track: "Jejak Tempahan Saya",
+            alert_name: "Sila masukkan nama.", alert_phone: "Sila masukkan no. telefon.", alert_no_hub: "Sila pilih Hub.", alert_no_service: "Sila pilih servis.", alert_measure: "Sila lengkapkan ukuran.", alert_max: "mesti kurang dari saiz asal", alert_max_full: "mesti kurang atau sama dengan saiz asal", alert_full_equal: "Sekurang-kurangnya satu ukuran mesti dikurangkan.", txt_no_items_step4: "Tiada item dipilih."
+        }
+    };
+
+    let currentLang = 'en';
+    let map, userLocationMarker = null, infoWindow = null;
+    let hubs = [], markers = [], circles = [], currentRadius = 1000;
+    
+    // --- BOOKING STATE ---
+    let bookingMode = false;
+    let isDataReady = false;
+    let generatedAltId = "";
+    let editingItemId = null;
+    let pricingData = { full: {price:30, value:40, savings:10}, hem: {price:12}, sleeve: {price:12}, shoulder: {price:10}, pads: {price:6} };
+    let state = { path: 'B', selectedItems: [], lat: "", lng: "", address: "", unitNo: "", mode: 'walkin', hubId: null, hubLat: 0, hubLng: 0, deliveryCost: 0, servicesTotal: 0, measurements: {}, logisticsSchedule: '' };
+
+    const designCodes = ['D01', 'D02', 'D03', 'D04', 'D05', 'D06', 'D07', 'W01', 'W02', 'W03', 'W04', 'W05', 'W06', 'Z01', 'Z02', 'Z03', 'Z04', 'Z05', 'Z06', 'Z07', 'Z08', 'M01', 'M02', 'M03'];
+    const sizes = ['XS', 'S', 'M', 'L', 'XL', 'XXL', 'XXXL'];
+    const sizeChart = { 'XS': { length: 55, sleeve: 22, shoulder: 14 }, 'S': { length: 55, sleeve: 22, shoulder: 15 }, 'M': { length: 57, sleeve: 23, shoulder: 16 }, 'L': { length: 60, sleeve: 23.5, shoulder: 16.5 }, 'XL': { length: 60, sleeve: 23.5, shoulder: 17.5 }, 'XXL': { length: 60, sleeve: 23.5, shoulder: 18 }, 'XXXL': { length: 60, sleeve: 23.5, shoulder: 19 } };
+
+    // Utility Functions
+    function sanitizeHTML(str) { return String(str).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
+    function sanitizePhone(phone) { let p = phone.replace(/\D/g, ''); if (p.startsWith('0')) p = '6' + p; else if (!p.startsWith('60') && p.length >= 9) p = '60' + p; return p; }
+
+    function setLang(lang) {
+        currentLang = lang;
+        document.querySelectorAll('[data-t]').forEach(el => { if(t[lang][el.getAttribute('data-t')]) el.innerHTML = t[lang][el.getAttribute('data-t')]; });
+        document.querySelectorAll('[data-t-placeholder]').forEach(el => { if(t[lang][el.getAttribute('data-t-placeholder')]) el.placeholder = t[lang][el.getAttribute('data-t-placeholder')]; });
+        document.querySelectorAll('.design-select option:first-child').forEach(opt => opt.innerText = t[lang].lbl_design_code);
+        document.querySelectorAll('.size-select option:first-child').forEach(opt => opt.innerText = t[lang].lbl_size);
+        document.getElementById('lang-en').className = lang === 'en' ? "text-xs font-bold text-luxe" : "text-xs text-white/50 hover:text-white";
+        document.getElementById('lang-bm').className = lang === 'bm' ? "text-xs font-bold text-luxe" : "text-xs text-white/50 hover:text-white";
+        updateMeasurementInstruction(); if(state.selectedItems.length > 0) renderServices();
+    }
+
+    // --- MAP INITIALIZATION ---
     const arabistaMapStyle = [
         { featureType: "poi", elementType: "all", stylers: [{ visibility: "off" }] },
         { featureType: "transit", elementType: "all", stylers: [{ visibility: "off" }] },
@@ -154,276 +347,404 @@
 
     async function initMap() {
         const klCenter = { lat: 3.1390, lng: 101.6869 };
-        
-        map = new google.maps.Map(document.getElementById("map"), {
-            zoom: 11,
-            center: klCenter,
-            styles: arabistaMapStyle,
-            disableDefaultUI: true,
-            zoomControl: true,
-            clickableIcons: false 
-        });
-
+        map = new google.maps.Map(document.getElementById("map"), { zoom: 11, center: klCenter, styles: arabistaMapStyle, disableDefaultUI: true, zoomControl: true, clickableIcons: false });
         map.addListener("click", closeModal);
-        await fetchHubData();
-    }
+        
+        // Check URL for pre-existing order
+        const urlParams = new URLSearchParams(window.location.search);
+        const orderId = sanitizeHTML(urlParams.get('order'));
+        const fetchUrl = orderId ? `${SCRIPT_URL}?order=${orderId}` : SCRIPT_URL;
 
-    async function fetchHubData() {
+        if(orderId) startBooking(); // Auto-start tutorial/booking if accessed via link
+
         try {
-            const res = await fetch(SCRIPT_URL);
+            const res = await fetch(fetchUrl);
             const data = await res.json();
-            if(data.hubs) {
-                hubs = data.hubs;
-                document.getElementById('status-indicator').innerHTML = `<span class="text-green-500">● Live Network</span>`;
-                plotHubs();
+            if(data.pricing) pricingData = data.pricing;
+            if(data.hubs) { hubs = data.hubs; plotHubs(); document.getElementById('status-indicator').innerHTML = `<span class="text-green-500">● Live Network</span>`; }
+            
+            // Populate auto-order data
+            if(orderId && data.orderData) {
+                state.path = 'A';
+                document.getElementById('path-a-container').classList.remove('hidden');
+                document.getElementById('path-b-container').classList.add('hidden');
+                document.getElementById('order-id-display').innerText = "#" + sanitizeHTML(data.orderData.orderRef);
+                document.getElementById('auto-cust-name').value = data.orderData.name; 
+                document.getElementById('auto-cust-phone').value = data.orderData.phone;
+                
+                const itemsList = document.getElementById('auto-items-list'); itemsList.innerHTML = '';
+                const rawItems = data.orderData.itemsRaw.split(','); let itemIdx = 0;
+                rawItems.forEach(itemStr => {
+                    const parts = itemStr.trim().split('|');
+                    if(parts.length >= 2) {
+                        const design = sanitizeHTML(parts[0].trim()); const size = sanitizeHTML(parts[1].trim()); const qty = parseInt(parts[2]) || 1;
+                        for(let q=0; q < qty; q++) {
+                            itemsList.innerHTML += `<label class="flex items-center gap-4 p-4 border border-white/10 rounded-xl hover:bg-white/5 cursor-pointer transition"><input type="checkbox" name="order-item" value="a-${itemIdx}" data-design="${design}" data-size="${size}" onchange="syncItemsA()" class="w-5 h-5 rounded border-white/30 text-luxe focus:ring-luxe bg-transparent"><div><h3 class="font-display text-lg text-white">${design}</h3><p class="text-xs text-white/50">${t[currentLang].txt_size_label} ${size}</p></div></label>`;
+                            itemIdx++;
+                        }
+                    }
+                });
+            } else {
+                addManualItem(); // Path B fallback
             }
-        } catch (error) {
-            console.error(error);
-            document.getElementById('status-indicator').innerHTML = `<span class="text-red-500">Connection Failed</span>`;
-        }
+            isDataReady = true;
+        } catch (e) { document.getElementById('status-indicator').innerHTML = `<span class="text-red-500">Connection Failed</span>`; }
     }
 
     function plotHubs() {
-        markers.forEach(m => m.setMap(null));
-        circles.forEach(c => c.setMap(null));
-        markers = []; circles = [];
-
+        markers.forEach(m => m.setMap(null)); circles.forEach(c => c.setMap(null)); markers = []; circles = [];
         hubs.forEach(hub => {
-            const position = { lat: parseFloat(hub.lat), lng: parseFloat(hub.lng) };
-            
+            const pos = { lat: parseFloat(hub.lat), lng: parseFloat(hub.lng) };
             const marker = new google.maps.Marker({
-                position: position,
-                map: map,
-                icon: {
-                    path: "M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z",
-                    fillColor: "#C0A062",
-                    fillOpacity: 1,
-                    strokeWeight: 1.5,
-                    strokeColor: "#0F0F10",
-                    scale: 1.5,
-                    anchor: new google.maps.Point(12, 22)
-                },
-                title: hub.name
+                position: pos, map: map, title: hub.name,
+                icon: { path: "M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z", fillColor: "#C0A062", fillOpacity: 1, strokeWeight: 1.5, strokeColor: "#0F0F10", scale: 1.5, anchor: new google.maps.Point(12, 22) }
             });
-
-            const circle = new google.maps.Circle({
-                strokeColor: "#C0A062",
-                strokeOpacity: 0.8,
-                strokeWeight: 1,
-                fillColor: "#C0A062",
-                fillOpacity: 0.1,
-                map: map,
-                center: position,
-                radius: currentRadius
-            });
-
-            marker.addListener("click", () => {
-                openModal(hub);
-            });
-
-            markers.push(marker);
-            circles.push(circle);
+            const circle = new google.maps.Circle({ strokeColor: "#C0A062", strokeOpacity: 0.8, strokeWeight: 1, fillColor: "#C0A062", fillOpacity: 0.1, map: map, center: pos, radius: currentRadius });
+            marker.addListener("click", () => openModal(hub));
+            markers.push(marker); circles.push(circle);
         });
     }
 
     // --- UI CONTROLS ---
+    function toggleRadius() { document.getElementById('radius-content').classList.toggle('hidden'); }
+    function updateRadius(val) { document.getElementById('radius-display').innerText = val + " KM"; currentRadius = parseInt(val) * 1000; circles.forEach(c => c.setRadius(currentRadius)); }
 
-    function toggleRadius() {
-        const content = document.getElementById('radius-content');
-        content.classList.toggle('hidden');
-    }
-
-    function updateRadius(val) {
-        document.getElementById('radius-display').innerText = val + " KM";
-        currentRadius = parseInt(val) * 1000;
-        circles.forEach(c => c.setRadius(currentRadius));
-    }
-
-    // --- CTA ANIMATIONS & FIXES ---
+    // --- CTA / FAB LOGIC ---
     function showCTA() {
-        const box = document.getElementById('cta-box');
-        const innerBox = document.getElementById('cta-inner-box');
-        const fab = document.getElementById('cta-fab');
-        const badge = document.getElementById('cta-badge');
-        
-        // Hide FAB
-        fab.classList.replace('scale-100', 'scale-0');
-        fab.classList.replace('opacity-100', 'opacity-0');
-        fab.classList.add('pointer-events-none');
-        badge.style.display = 'none'; 
-        
-        // Show Box and restore pointer events to inner box so it's clickable
-        box.classList.replace('translate-y-32', 'translate-y-0');
-        box.classList.replace('opacity-0', 'opacity-100');
-        box.classList.remove('pointer-events-none');
-        innerBox.classList.remove('pointer-events-none');
-        innerBox.classList.add('pointer-events-auto');
+        document.getElementById('cta-box').classList.replace('translate-y-32', 'translate-y-0'); document.getElementById('cta-box').classList.replace('opacity-0', 'opacity-100'); document.getElementById('cta-box').classList.remove('pointer-events-none');
+        document.getElementById('cta-inner-box').classList.replace('pointer-events-none', 'pointer-events-auto');
+        document.getElementById('fab-container').classList.add('opacity-0', 'pointer-events-none');
     }
-
     function hideCTA() {
-        const box = document.getElementById('cta-box');
-        const innerBox = document.getElementById('cta-inner-box');
-        const fab = document.getElementById('cta-fab');
-        
-        // Hide Box and COMPLETELY STRIP pointer events from inner box so it never blocks clicks
-        box.classList.replace('translate-y-0', 'translate-y-32');
-        box.classList.replace('opacity-100', 'opacity-0');
-        box.classList.add('pointer-events-none');
-        innerBox.classList.remove('pointer-events-auto');
-        innerBox.classList.add('pointer-events-none');
-        
-        // Show FAB
-        fab.classList.replace('scale-0', 'scale-100');
-        fab.classList.replace('opacity-0', 'opacity-100');
-        fab.classList.remove('pointer-events-none');
+        document.getElementById('cta-box').classList.replace('translate-y-0', 'translate-y-32'); document.getElementById('cta-box').classList.replace('opacity-100', 'opacity-0'); document.getElementById('cta-box').classList.add('pointer-events-none');
+        document.getElementById('cta-inner-box').classList.replace('pointer-events-auto', 'pointer-events-none');
+        document.getElementById('fab-container').classList.remove('opacity-0', 'pointer-events-none');
     }
 
-    function openModal(hub) {
-        document.getElementById('modal-title').innerText = hub.name;
-        document.getElementById('modal-hours').innerText = `${hub.open} - ${hub.close}`;
-        
-        let statusBadge = hub.backlog >= hub.max_capacity 
-            ? `<span class="text-xs bg-red-500/20 text-red-400 px-2 py-1 rounded border border-red-500/30 font-semibold tracking-wide">BUSY / FULL</span>`
-            : `<span class="text-xs bg-green-500/20 text-green-400 px-2 py-1 rounded border border-green-500/30 font-semibold tracking-wide">OPEN FOR ORDERS</span>`;
-        document.getElementById('modal-status').innerHTML = statusBadge;
-
-        const navLink = `https://www.google.com/maps/dir/?api=1&destination=...{parseFloat(hub.lat)},${parseFloat(hub.lng)}`;
-        document.getElementById('modal-nav-btn').href = navLink;
-
-        const godModeBox = document.getElementById('modal-god-mode');
-        if(godMode) {
-            godModeBox.classList.remove('hidden');
-            document.getElementById('modal-phone').innerText = `📞 ${hub.phone}`;
-            document.getElementById('modal-address').innerText = hub.address;
-        } else {
-            godModeBox.classList.add('hidden');
-        }
-
-        document.getElementById('hub-modal').classList.remove('hidden');
-        document.getElementById('hub-modal').classList.add('flex');
+    // --- BOOKING TUTORIAL LOGIC ---
+    function startBooking() {
+        bookingMode = true;
         hideCTA();
-        
-        map.panTo({ lat: parseFloat(hub.lat), lng: parseFloat(hub.lng) });
+        document.getElementById('fab-container').classList.add('hidden'); // Hide Fabs during tutorial
+        document.getElementById('tut-step-1').classList.remove('hidden'); document.getElementById('tut-step-1').classList.add('flex');
+        setTimeout(() => { document.getElementById('tut-step-1').classList.replace('opacity-0', 'opacity-100'); }, 10);
+        document.getElementById('control-locate').classList.add('z-[70]'); // Lift button above dark overlay
     }
 
-    function closeModal() {
-        document.getElementById('hub-modal').classList.add('hidden');
-        document.getElementById('hub-modal').classList.remove('flex');
+    function cancelBookingMode() {
+        bookingMode = false;
+        document.getElementById('tut-step-1').classList.replace('opacity-100', 'opacity-0');
+        setTimeout(() => { document.getElementById('tut-step-1').classList.replace('flex', 'hidden'); document.getElementById('control-locate').classList.remove('z-[70]'); document.getElementById('fab-container').classList.remove('hidden'); }, 300);
+    }
+
+    function dismissTut2() {
+        document.getElementById('tut-step-2').classList.replace('opacity-100', 'opacity-0');
+        setTimeout(() => { document.getElementById('tut-step-2').classList.replace('flex', 'hidden'); }, 300);
     }
 
     function locateUser() {
-        const btn = document.getElementById('btn-locate');
-        const origHTML = btn.innerHTML;
-        
-        // Start Pulsating State
+        const btn = document.getElementById('btn-locate'); const origHTML = btn.innerHTML;
         btn.innerHTML = `<svg class="animate-spin w-5 h-5 text-luxe mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg><span class="text-sm font-medium">Locating...</span>`;
-        btn.disabled = true;
-        btn.classList.add('animate-pulse');
+        btn.disabled = true; btn.classList.add('animate-pulse');
 
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(
-                (position) => {
-                    // Revert Button State
-                    btn.innerHTML = origHTML;
-                    btn.disabled = false;
-                    btn.classList.remove('animate-pulse');
-
+                async (position) => {
+                    btn.innerHTML = origHTML; btn.disabled = false; btn.classList.remove('animate-pulse');
                     const pos = { lat: position.coords.latitude, lng: position.coords.longitude };
                     
-                    // Street-level Zoom
-                    map.setZoom(16);
-                    map.setCenter(pos);
-                    
+                    // Reverse geocode for Lalamove payload
+                    try { const res = await fetch(`${SCRIPT_URL}?action=reverse_geocode&lat=${pos.lat}&lng=${pos.lng}`); const d = await res.json(); state.address = d.address || "Customer Location"; } catch(e) { state.address = "Customer Location"; }
+                    state.lat = pos.lat; state.lng = pos.lng;
+
+                    map.setZoom(16); map.setCenter(pos);
                     if(userLocationMarker) userLocationMarker.setMap(null);
 
-                    // --- THE SOLID BLUE TEARDROP PIN FIX ---
-                    // By using an inline SVG string, we guarantee a solid pin shape with no center hole
-                    // and a perfectly matched physical bounding box for effortless mobile clicking.
                     const svgBluePin = 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 36" width="32" height="48"><path fill="#4285F4" stroke="#ffffff" stroke-width="2" d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/></svg>');
+                    userLocationMarker = new google.maps.Marker({ position: pos, map: map, draggable: true, icon: { url: svgBluePin, scaledSize: new google.maps.Size(32, 48), anchor: new google.maps.Point(16, 48) }, zIndex: 9999 });
 
-                    userLocationMarker = new google.maps.Marker({
-                        position: pos,
-                        map: map,
-                        draggable: true,
-                        icon: {
-                            url: svgBluePin,
-                            scaledSize: new google.maps.Size(32, 48),
-                            anchor: new google.maps.Point(16, 48)
-                        },
-                        title: "Your Location",
-                        zIndex: 9999
-                    });
+                    userLocationMarker.addListener('click', () => { map.setZoom(16); map.panTo(userLocationMarker.getPosition()); document.getElementById('confirm-location-modal').classList.remove('hidden'); document.getElementById('confirm-location-modal').classList.add('flex'); closeModal(); hideCTA(); });
+                    userLocationMarker.addListener('dragend', () => { map.panTo(userLocationMarker.getPosition()); state.lat = userLocationMarker.getPosition().lat(); state.lng = userLocationMarker.getPosition().lng(); document.getElementById('confirm-location-modal').classList.remove('hidden'); document.getElementById('confirm-location-modal').classList.add('flex'); });
 
-                    // THE RE-CLICK LOGIC
-                    userLocationMarker.addListener('click', () => {
-                        map.setZoom(16);
-                        map.panTo(userLocationMarker.getPosition());
-                        document.getElementById('confirm-location-modal').classList.remove('hidden');
-                        document.getElementById('confirm-location-modal').classList.add('flex');
-                        closeModal(); // Hide hub modal if open
-                        hideCTA();    // Hide CTA box if open
-                    });
+                    document.getElementById('confirm-location-modal').classList.remove('hidden'); document.getElementById('confirm-location-modal').classList.add('flex');
 
-                    // Show Custom Confirm Location Modal
-                    document.getElementById('confirm-location-modal').classList.remove('hidden');
-                    document.getElementById('confirm-location-modal').classList.add('flex');
-
-                    // RE-OPEN BOX AFTER DRAG
-                    userLocationMarker.addListener('dragend', () => {
-                        map.panTo(userLocationMarker.getPosition());
-                        document.getElementById('confirm-location-modal').classList.remove('hidden');
-                        document.getElementById('confirm-location-modal').classList.add('flex');
-                    });
-
+                    // Tutorial Progression
+                    if(bookingMode) {
+                        document.getElementById('tut-step-1').classList.replace('opacity-100', 'opacity-0');
+                        setTimeout(() => { document.getElementById('tut-step-1').classList.replace('flex', 'hidden'); document.getElementById('control-locate').classList.remove('z-[70]'); }, 300);
+                        document.getElementById('tut-step-2').classList.remove('hidden'); document.getElementById('tut-step-2').classList.add('flex');
+                        setTimeout(() => { document.getElementById('tut-step-2').classList.replace('opacity-0', 'opacity-100'); }, 10);
+                    }
                 },
-                () => { 
-                    btn.innerHTML = origHTML;
-                    btn.disabled = false;
-                    btn.classList.remove('animate-pulse');
-                    alert("Location access denied or unavailable."); 
-                },
-                { enableHighAccuracy: true } // Forces GPS chip for precision
+                () => { btn.innerHTML = origHTML; btn.disabled = false; btn.classList.remove('animate-pulse'); alert("Location access denied."); },
+                { enableHighAccuracy: true } 
             );
-        } else { 
-            btn.innerHTML = origHTML;
-            btn.disabled = false;
-            btn.classList.remove('animate-pulse');
-            alert("Your browser doesn't support geolocation."); 
-        }
+        } else { btn.innerHTML = origHTML; btn.disabled = false; btn.classList.remove('animate-pulse'); alert("Geolocation unsupported."); }
     }
 
-    // --- ZOOM OUT AND CLOSE CONFIRMATION MODAL ---
     function confirmLocation() {
-        document.getElementById('confirm-location-modal').classList.add('hidden');
-        document.getElementById('confirm-location-modal').classList.remove('flex');
+        document.getElementById('confirm-location-modal').classList.add('hidden'); document.getElementById('confirm-location-modal').classList.remove('flex');
+        map.setZoom(13); if(userLocationMarker) map.panTo(userLocationMarker.getPosition());
         
-        map.setZoom(13); // Zoom out perfectly to see network
-        
-        if(userLocationMarker) {
-            map.panTo(userLocationMarker.getPosition());
+        if(bookingMode) {
+            const banner = document.getElementById('tut-step-3-banner');
+            banner.classList.remove('hidden');
+            setTimeout(() => { banner.classList.replace('-translate-y-20', 'translate-y-0'); banner.classList.replace('opacity-0', 'opacity-100'); }, 10);
         }
     }
 
-    // --- HQ GOD MODE LISTENER ---
-    document.getElementById('god-mode-trigger').addEventListener('dblclick', () => {
-        if(godMode) {
-            godMode = false;
-            alert("God Mode Deactivated.");
-            closeModal();
-            return;
+    // --- HUB MODAL & API LOGIC ---
+    async function openModal(hub) {
+        document.getElementById('modal-title').innerText = hub.name;
+        document.getElementById('modal-hours').innerText = `${hub.open} - ${hub.close}`;
+        
+        let statusBadge = hub.backlog >= hub.max_capacity ? `<span class="text-xs bg-red-500/20 text-red-400 px-2 py-1 rounded border border-red-500/30 font-semibold tracking-wide">BUSY / FULL</span>` : `<span class="text-xs bg-green-500/20 text-green-400 px-2 py-1 rounded border border-green-500/30 font-semibold tracking-wide">OPEN FOR ORDERS</span>`;
+        document.getElementById('modal-status').innerHTML = statusBadge;
+        
+        const actionArea = document.getElementById('modal-action-area');
+        
+        if (bookingMode && hub.backlog < hub.max_capacity) {
+            // Hide Tutorial Banner
+            const banner = document.getElementById('tut-step-3-banner');
+            banner.classList.replace('translate-y-0', '-translate-y-20'); banner.classList.replace('opacity-100', 'opacity-0');
+            setTimeout(() => banner.classList.add('hidden'), 500);
+
+            // Inject Booking Buttons
+            actionArea.innerHTML = `
+                <div class="mt-4 pt-4 border-t border-white/10 space-y-2">
+                    <button onclick="selectLogistics(${hub.id}, 'walkin')" class="w-full py-3 bg-luxe/10 border border-luxe text-white rounded-lg flex justify-between px-4 items-center hover:bg-luxe hover:text-brand transition shadow-soft">
+                        <span class="font-bold text-[15px]" data-t="txt_drop_in">${t[currentLang].txt_drop_in}</span>
+                        <span class="text-xs font-bold text-luxe px-2 py-1 bg-brand/50 rounded" data-t="txt_free">${t[currentLang].txt_free}</span>
+                    </button>
+                    <button onclick="selectLogistics(${hub.id}, 'lalamove')" class="w-full py-3 bg-orange-500/10 border border-orange-500/50 text-white rounded-lg flex justify-between px-4 items-center hover:bg-orange-500 hover:text-white transition shadow-soft group">
+                        <span class="font-bold text-[15px] group-hover:text-white text-orange-400" data-t="txt_lalamove">${t[currentLang].txt_lalamove}</span>
+                        <span id="lala-quote-disp" class="text-xs font-bold bg-brand/50 text-orange-300 px-2 py-1 rounded animate-pulse" data-t="txt_calculating">${t[currentLang].txt_calculating}</span>
+                    </button>
+                </div>
+            `;
+            // Fetch Lalamove Quote
+            if(state.lat && state.lng) {
+                try {
+                    const res = await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: "get_lalamove_quote", pickupLat: state.lat, pickupLng: state.lng, pickupAddress: state.address, dropoffLat: hub.lat, dropoffLng: hub.lng, dropoffAddress: hub.address }) });
+                    const d = await res.json();
+                    const quoteDisp = document.getElementById('lala-quote-disp');
+                    quoteDisp.classList.remove('animate-pulse');
+                    if(d.status === "success") {
+                        state.deliveryCost = parseFloat(d.amount);
+                        quoteDisp.innerText = `RM ${state.deliveryCost.toFixed(2)}`;
+                    } else {
+                        quoteDisp.innerText = d.message?.includes("OUT_OF_SERVICE") ? t[currentLang].txt_out_of_area : "API Error";
+                        quoteDisp.classList.replace('text-orange-300', 'text-red-400');
+                    }
+                } catch(e) {}
+            }
+        } else {
+            // Standard Navigation Mode
+            const navLink = `https://www.google.com/maps/dir/?api=1&destination=...${parseFloat(hub.lat)},${parseFloat(hub.lng)}`;
+            actionArea.innerHTML = `<a href="${navLink}" target="_blank" class="flex items-center justify-center w-full py-3 mt-4 rounded-lg border border-luxe text-luxe hover:bg-luxe hover:text-brand transition-colors font-bold text-[15px]" data-t="txt_nav_hub">${t[currentLang].txt_nav_hub}</a>`;
         }
-        const pin = prompt("Enter HQ Master PIN:");
-        if(pin === "7777") {
-            godMode = true;
-            alert("🛡️ God Mode Activated. Full addresses and phone numbers unlocked.");
-            closeModal(); 
-        } else if (pin !== null) {
-            alert("Access Denied.");
+
+        document.getElementById('hub-modal').classList.remove('hidden'); document.getElementById('hub-modal').classList.add('flex');
+        hideCTA(); map.panTo({ lat: parseFloat(hub.lat), lng: parseFloat(hub.lng) });
+    }
+
+    function closeModal() { document.getElementById('hub-modal').classList.add('hidden'); document.getElementById('hub-modal').classList.remove('flex'); }
+
+    // --- BOOKING BOTTOM SHEET LOGIC ---
+    function selectLogistics(hubId, mode) {
+        state.hubId = hubId; state.mode = mode;
+        const hub = hubs.find(h => h.id === hubId);
+        state.hubLat = hub.lat; state.hubLng = hub.lng;
+        document.getElementById('sheet-hub-name').innerText = hub.name;
+        if(mode === 'walkin') state.deliveryCost = 0;
+        
+        closeModal();
+        openBookingSheet();
+        updateMeasurementInstruction();
+        renderServices();
+    }
+
+    function openBookingSheet() { 
+        document.getElementById('booking-overlay').classList.remove('hidden'); 
+        setTimeout(() => document.getElementById('booking-overlay').classList.remove('opacity-0'), 10); 
+        document.getElementById('booking-sheet').classList.add('open'); 
+    }
+    
+    function closeBookingSheet() { 
+        document.getElementById('booking-sheet').classList.remove('open'); 
+        document.getElementById('booking-overlay').classList.add('opacity-0'); 
+        setTimeout(() => document.getElementById('booking-overlay').classList.add('hidden'), 400); 
+    }
+
+    function addManualItem() {
+        const list = document.getElementById('manual-items-list'); const idx = list.children.length;
+        let designOpts = `<option value="" class="text-black" data-t="lbl_design_code">${t[currentLang].lbl_design_code}</option>`; designCodes.forEach(code => designOpts += `<option value="${code}" class="text-black">${code}</option>`);
+        let sizeOpts = `<option value="" class="text-black" data-t="lbl_size">${t[currentLang].lbl_size}</option>`; sizes.forEach(sz => sizeOpts += `<option value="${sz}" class="text-black">${sz}</option>`);
+        const row = document.createElement('div'); row.className = "flex gap-2 items-center manual-item-row"; row.dataset.id = 'm' + idx;
+        row.innerHTML = `<div class="flex-1"><select class="design-select w-full" onchange="syncItemsB()">${designOpts}</select></div><div class="w-24"><select class="size-select w-full" onchange="syncItemsB()">${sizeOpts}</select></div>${idx > 0 ? `<button onclick="this.parentElement.remove(); syncItemsB();" class="text-white/40 hover:text-red-400 p-2 transition"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>` : `<div class="w-9"></div>`}`;
+        list.appendChild(row);
+    }
+    
+    function syncItemsA() { const newSelected = []; document.querySelectorAll('input[name="order-item"]:checked').forEach(cb => { newSelected.push({ id: cb.value, name: cb.getAttribute('data-design'), size: cb.getAttribute('data-size') }); if(!state.measurements[cb.value]) state.measurements[cb.value] = { length:'', sleeve:'', shoulder:'', pads:'' }; }); state.selectedItems = newSelected; renderServices(); calculateTotal(); }
+    function syncItemsB() { const newSelected = []; document.querySelectorAll('.manual-item-row').forEach((row, idx) => { const d = row.querySelector('.design-select').value; const s = row.querySelector('.size-select').value; if(d && s) { newSelected.push({ id: 'm' + idx, name: d, size: s }); if(!state.measurements['m'+idx]) state.measurements['m'+idx] = { length:'', sleeve:'', shoulder:'', pads:'' }; } }); state.selectedItems = newSelected; renderServices(); calculateTotal(); }
+
+    function updateMeasurementInstruction() { const el = document.getElementById('measure-instruction'); el.innerText = state.mode === 'walkin' ? t[currentLang].txt_measure_walkin : t[currentLang].txt_measure_lala; if(state.mode === 'lalamove') el.classList.replace('text-white/50', 'text-luxe'); else el.classList.replace('text-luxe', 'text-white/50'); }
+
+    function renderServices() {
+        const container = document.getElementById('services-container'); 
+        if(state.selectedItems.length === 0) { container.innerHTML = `<p class="text-white/50 text-sm py-4 text-center border border-dashed border-white/10 rounded-xl" data-t="txt_no_items_step4">${t[currentLang].txt_no_items_step4}</p>`; return; }
+        container.innerHTML = '';
+        const pFull = pricingData.full; const pHem = pricingData.hem; const pSleeve = pricingData.sleeve; const pShoulder = pricingData.shoulder; const pPads = pricingData.pads;
+
+        state.selectedItems.forEach(item => {
+            const block = document.createElement('div'); block.className = "bg-black/30 border border-white/5 rounded-xl overflow-hidden relative";
+            const header = `<div class="bg-white/5 p-4 border-b border-white/5 font-display text-lg flex justify-between items-center"><span class="text-white font-bold">${item.name}</span><span class="text-xs font-sans text-luxe border border-luxe/30 px-2 py-1 bg-luxe/10 rounded font-bold">${t[currentLang].txt_size_label} ${item.size}</span></div>`;
+            const body = `<div class="p-4 space-y-3"><div class="border border-luxe/50 rounded-xl p-4 bg-gradient-to-br from-luxe/10 to-transparent hover:border-luxe transition relative group"><div class="absolute -top-2.5 right-4 bg-luxe text-brand text-[9px] font-bold px-2 py-0.5 rounded shadow-lg uppercase tracking-wider">${t[currentLang].txt_value} RM ${pFull.value} | ${t[currentLang].txt_yousave} RM ${pFull.savings}</div><label class="flex items-start gap-3 cursor-pointer"><input type="checkbox" id="cb-${item.id}-full" value="${pFull.price}" class="mt-1 w-5 h-5 rounded border-luxe/50 text-luxe focus:ring-luxe bg-transparent srv-cb transition" onchange="handleSrvCheck('${item.id}', 'full')"><div class="flex-1"><div class="flex justify-between items-center"><span class="text-[15px] font-bold text-white group-hover:text-luxe transition" data-t="srv_full">${t[currentLang].srv_full}</span><span class="text-luxe font-bold text-lg">RM ${pFull.price}</span></div></div></label></div><div class="grid grid-cols-2 gap-3 pt-2"><div class="border border-white/10 rounded-lg p-3 hover:border-luxe/50 transition bg-white/5" id="wrap-${item.id}-hem"><label class="flex items-center gap-3 cursor-pointer"><input type="checkbox" id="cb-${item.id}-hem" value="${pHem.price}" class="w-4 h-4 rounded border-white/30 text-luxe bg-transparent srv-cb" onchange="handleSrvCheck('${item.id}', 'hem')"><div class="flex-1 flex justify-between text-sm"><span data-t="srv_hem">${t[currentLang].srv_hem}</span> <span class="text-white/50 font-bold">RM${pHem.price}</span></div></label></div><div class="border border-white/10 rounded-lg p-3 hover:border-luxe/50 transition bg-white/5" id="wrap-${item.id}-sleeve"><label class="flex items-center gap-3 cursor-pointer"><input type="checkbox" id="cb-${item.id}-sleeve" value="${pSleeve.price}" class="w-4 h-4 rounded border-white/30 text-luxe bg-transparent srv-cb" onchange="handleSrvCheck('${item.id}', 'sleeve')"><div class="flex-1 flex justify-between text-sm"><span data-t="srv_sleeve">${t[currentLang].srv_sleeve}</span> <span class="text-white/50 font-bold">RM${pSleeve.price}</span></div></label></div><div class="border border-white/10 rounded-lg p-3 hover:border-luxe/50 transition bg-white/5" id="wrap-${item.id}-shoulder"><label class="flex items-center gap-3 cursor-pointer"><input type="checkbox" id="cb-${item.id}-shoulder" value="${pShoulder.price}" class="w-4 h-4 rounded border-white/30 text-luxe bg-transparent srv-cb" onchange="handleSrvCheck('${item.id}', 'shoulder')"><div class="flex-1 flex justify-between text-sm"><span data-t="srv_shoulder">${t[currentLang].srv_shoulder}</span> <span class="text-white/50 font-bold">RM${pShoulder.price}</span></div></label></div><div class="border border-white/10 rounded-lg p-3 hover:border-luxe/50 transition bg-white/5" id="wrap-${item.id}-pads"><label class="flex items-center gap-3 cursor-pointer"><input type="checkbox" id="cb-${item.id}-pads" value="${pPads.price}" class="w-4 h-4 rounded border-white/30 text-luxe bg-transparent srv-cb" onchange="handleSrvCheck('${item.id}', 'pads')"><div class="flex-1 flex justify-between text-sm"><span data-t="srv_pads">${t[currentLang].srv_pads}</span> <span class="text-white/50 font-bold">RM${pPads.price}</span></div></label></div></div><div id="btn-container-${item.id}" class="hidden pt-4 border-t border-white/10 mt-4"><button onclick="openMeasurementModal('${item.id}')" id="meas-btn-${item.id}" class="w-full py-3 rounded-xl border border-luxe bg-luxe/10 text-luxe text-sm font-bold flex justify-center items-center gap-2 hover:bg-luxe hover:text-brand transition"><svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg><span data-t="btn_add_meas">${t[currentLang].btn_add_meas}</span></button></div></div>`;
+            block.innerHTML = header + body; container.appendChild(block); handleSrvCheck(item.id, 'init', true);
+        });
+    }
+
+    function handleSrvCheck(itemId, srvId, isInit = false) {
+        const fullCb = document.getElementById(`cb-${itemId}-full`); if(!fullCb) return; const m = state.measurements[itemId];
+        if (!isInit) {
+            if (srvId === 'full' && !fullCb.checked) { m.length = ''; m.sleeve = ''; m.shoulder = ''; m.pads = ''; }
+            else if (srvId === 'hem' && !document.getElementById(`cb-${itemId}-hem`).checked) m.length = '';
+            else if (srvId === 'sleeve' && !document.getElementById(`cb-${itemId}-sleeve`).checked) m.sleeve = '';
+            else if (srvId === 'shoulder' && !document.getElementById(`cb-${itemId}-shoulder`).checked) m.shoulder = '';
+            else if (srvId === 'pads' && !document.getElementById(`cb-${itemId}-pads`).checked) m.pads = '';
         }
-    });
+        ['hem', 'sleeve', 'shoulder', 'pads'].forEach(sub => {
+            const subCb = document.getElementById(`cb-${itemId}-${sub}`); const subWrap = document.getElementById(`wrap-${itemId}-${sub}`);
+            if(fullCb.checked) { if(subCb) { subCb.checked = false; subCb.disabled = true; } if(subWrap) { subWrap.classList.add('opacity-40', 'pointer-events-none'); subWrap.style.textDecoration = 'line-through'; } } 
+            else { if(subCb) subCb.disabled = false; if(subWrap) { subWrap.classList.remove('opacity-40', 'pointer-events-none'); subWrap.style.textDecoration = 'none'; } }
+        });
+        if(!isInit) calculateTotal(); updateMeasurementBtn(itemId);
+    }
+
+    function updateMeasurementBtn(itemId) {
+        const btnContainer = document.getElementById(`btn-container-${itemId}`); if(state.mode !== 'lalamove') { btnContainer.classList.add('hidden'); return; }
+        const needsMeas = ['full', 'hem', 'sleeve', 'shoulder'].some(id => document.getElementById(`cb-${itemId}-${id}`)?.checked);
+        if(needsMeas) {
+            btnContainer.classList.remove('hidden'); const btn = document.getElementById(`meas-btn-${itemId}`); const data = state.measurements[itemId];
+            const isFilled = (document.getElementById(`cb-${itemId}-full`)?.checked && data.length && data.sleeve && data.shoulder) || (document.getElementById(`cb-${itemId}-hem`)?.checked && data.length) || (document.getElementById(`cb-${itemId}-sleeve`)?.checked && data.sleeve) || (document.getElementById(`cb-${itemId}-shoulder`)?.checked && data.shoulder);
+            if(isFilled) { btn.className = "w-full py-3 rounded-xl border border-green-500/50 bg-green-500/10 text-green-400 text-sm font-bold flex justify-center items-center gap-2 hover:bg-green-500/20 transition shadow-lg"; btn.innerHTML = `<svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" /></svg> <span data-t="btn_edit_meas">${t[currentLang].btn_edit_meas}</span>`; } 
+            else { btn.className = "w-full py-3 rounded-xl border border-luxe bg-luxe text-brand text-sm font-bold flex justify-center items-center gap-2 hover:bg-white transition shadow-[0_0_15px_rgba(192,160,98,0.3)]"; btn.innerHTML = `<svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg> <span data-t="btn_add_meas">${t[currentLang].btn_add_meas}</span>`; }
+        } else { btnContainer.classList.add('hidden'); }
+    }
+
+    function calculateTotal() { 
+        state.servicesTotal = 0; document.querySelectorAll('.srv-cb:checked').forEach(cb => state.servicesTotal += parseInt(cb.value)); 
+        document.getElementById('cost-services').innerText = "RM " + state.servicesTotal;
+        if(state.mode === 'lalamove') { document.getElementById('delivery-fee-box').classList.remove('hidden'); document.getElementById('cost-delivery').innerText = "RM " + state.deliveryCost.toFixed(2); } 
+        else { document.getElementById('delivery-fee-box').classList.add('hidden'); }
+        document.getElementById('grand-total').innerText = "RM " + state.servicesTotal; 
+    }
+
+    function openMeasurementModal(itemId) {
+        editingItemId = itemId; const item = state.selectedItems.find(i => i.id === itemId); const limit = sizeChart[item.size] || sizeChart['M']; 
+        document.getElementById('modal-meas-subtitle').innerText = `${item.name} (${t[currentLang].txt_size_label} ${item.size})`;
+        const fieldsDiv = document.getElementById('modal-fields'); fieldsDiv.innerHTML = ''; const m = state.measurements[itemId]; const isFull = document.getElementById(`cb-${itemId}-full`).checked;
+        const buildInput = (key, labelKey, maxVal, type="number") => { const op = isFull ? '<=' : '<'; return `<div><label class="block text-sm text-white/70 mb-2 font-medium">${t[currentLang][labelKey] + (maxVal ? ` <span class="text-luxe font-mono text-xs">(${t[currentLang].lbl_max} ${maxVal}")</span>` : '')}</label>${type === 'select' ? `<select id="mod-${key}"><option value="" class="text-black">${t[currentLang].lbl_select_option}</option><option value="Yes" class="text-black" ${m[key]==='Yes'?'selected':''}>${t[currentLang].lbl_yes}</option><option value="No" class="text-black" ${m[key]==='No'?'selected':''}>${t[currentLang].lbl_no}</option></select>` : `<input type="number" id="mod-${key}" value="${m[key]}" placeholder="${maxVal ? op+' '+maxVal : ''}">`}</div>`; };
+        if(isFull || document.getElementById(`cb-${itemId}-hem`)?.checked) fieldsDiv.innerHTML += buildInput('length', 'lbl_length', limit.length, 'number');
+        if(isFull || document.getElementById(`cb-${itemId}-sleeve`)?.checked) fieldsDiv.innerHTML += buildInput('sleeve', 'lbl_sleeve', limit.sleeve, 'number');
+        if(isFull || document.getElementById(`cb-${itemId}-shoulder`)?.checked) fieldsDiv.innerHTML += buildInput('shoulder', 'lbl_shoulder', limit.shoulder, 'number');
+        if(isFull) fieldsDiv.innerHTML += buildInput('pads', 'lbl_pads', null, 'select');
+        const modal = document.getElementById('measurement-modal'); const box = document.getElementById('modal-content-box'); modal.classList.remove('hidden'); setTimeout(() => { modal.classList.remove('opacity-0'); box.classList.remove('scale-95'); }, 10);
+    }
+
+    function closeMeasurementModal() { const modal = document.getElementById('measurement-modal'); const box = document.getElementById('modal-content-box'); modal.classList.add('opacity-0'); box.classList.add('scale-95'); setTimeout(() => { modal.classList.add('hidden'); }, 300); }
+    
+    function saveMeasurements() {
+        if(!editingItemId) return; const item = state.selectedItems.find(i => i.id === editingItemId); const limit = sizeChart[item.size] || sizeChart['M']; const m = state.measurements[editingItemId];
+        const lenEl = document.getElementById('mod-length'); const slvEl = document.getElementById('mod-sleeve'); const shdEl = document.getElementById('mod-shoulder'); const padEl = document.getElementById('mod-pads');
+        const isFull = document.getElementById(`cb-${editingItemId}-full`).checked; let errorMsg = "";
+        if (isFull) {
+            let isAllEqual = true;
+            if(lenEl && lenEl.value) { if(parseFloat(lenEl.value) > limit.length) errorMsg += `- ${t[currentLang].lbl_length} ${t[currentLang].alert_max_full} (${limit.length}").\n`; if(parseFloat(lenEl.value) < limit.length) isAllEqual = false; }
+            if(slvEl && slvEl.value) { if(parseFloat(slvEl.value) > limit.sleeve) errorMsg += `- ${t[currentLang].lbl_sleeve} ${t[currentLang].alert_max_full} (${limit.sleeve}").\n`; if(parseFloat(slvEl.value) < limit.sleeve) isAllEqual = false; }
+            if(shdEl && shdEl.value) { if(parseFloat(shdEl.value) > limit.shoulder) errorMsg += `- ${t[currentLang].lbl_shoulder} ${t[currentLang].alert_max_full} (${limit.shoulder}").\n`; if(parseFloat(shdEl.value) < limit.shoulder) isAllEqual = false; }
+            if (errorMsg === "" && isAllEqual && lenEl && lenEl.value && slvEl && slvEl.value && shdEl && shdEl.value) errorMsg += t[currentLang].alert_full_equal + "\n";
+        } else {
+            if(lenEl && lenEl.value && parseFloat(lenEl.value) >= limit.length) errorMsg += `- ${t[currentLang].lbl_length} ${t[currentLang].alert_max} (${limit.length}").\n`;
+            if(slvEl && slvEl.value && parseFloat(slvEl.value) >= limit.sleeve) errorMsg += `- ${t[currentLang].lbl_sleeve} ${t[currentLang].alert_max} (${limit.sleeve}").\n`;
+            if(shdEl && shdEl.value && parseFloat(shdEl.value) >= limit.shoulder) errorMsg += `- ${t[currentLang].lbl_shoulder} ${t[currentLang].alert_max} (${limit.shoulder}").\n`;
+        }
+        if(errorMsg !== "") return alert(errorMsg);
+        if(lenEl) m.length = lenEl.value; if(slvEl) m.sleeve = slvEl.value; if(shdEl) m.shoulder = shdEl.value; if(padEl) m.pads = padEl.value;
+        updateMeasurementBtn(editingItemId); closeMeasurementModal();
+    }
+
+    async function submitOrder() {
+        if(state.path === 'B') syncItemsB(); else syncItemsA();
+        
+        const custName = state.path === 'A' ? document.getElementById('auto-cust-name').value : document.getElementById('manual-cust-name').value.trim();
+        const rawPhone = state.path === 'A' ? document.getElementById('auto-cust-phone').value : document.getElementById('manual-cust-phone').value.trim();
+        
+        if(!custName) return alert(t[currentLang].alert_name);
+        if(!rawPhone) return alert(t[currentLang].alert_phone);
+        if(state.selectedItems.length === 0) return alert(t[currentLang].alert_no_service);
+        if(state.servicesTotal === 0) return alert(t[currentLang].alert_no_service);
+
+        if(state.mode === 'lalamove') {
+            let valid = true;
+            state.selectedItems.forEach(item => { const id = item.id; const m = state.measurements[id];
+                if(document.getElementById(`cb-${id}-full`)?.checked && (!m.length || !m.sleeve || !m.shoulder || !m.pads)) valid = false;
+                if(document.getElementById(`cb-${id}-hem`)?.checked && !m.length) valid = false;
+                if(document.getElementById(`cb-${id}-sleeve`)?.checked && !m.sleeve) valid = false;
+                if(document.getElementById(`cb-${id}-shoulder`)?.checked && !m.shoulder) valid = false;
+            });
+            if(!valid) return alert(t[currentLang].alert_measure);
+        }
+
+        const btn = document.getElementById('btn-final-submit');
+        const originalText = btn.innerHTML; 
+        btn.innerHTML = `${spinnerSvg} Processing...`; btn.disabled = true; btn.classList.add('opacity-70', 'cursor-not-allowed');
+
+        let itemDetailsStr = ""; let serviceKeysArray = []; 
+        state.selectedItems.forEach(item => {
+            let servicesArr = []; const m = state.measurements[item.id];
+            if(document.getElementById(`cb-${item.id}-full`)?.checked) { servicesArr.push(`Full Body (L:${m.length||'-'} S:${m.sleeve||'-'} Sh:${m.shoulder||'-'} Pads:${m.pads||'-'})`); serviceKeysArray.push('full'); } else {
+                if(document.getElementById(`cb-${item.id}-hem`)?.checked) { servicesArr.push(`Hem (L:${m.length})`); serviceKeysArray.push('hem'); }
+                if(document.getElementById(`cb-${item.id}-sleeve`)?.checked) { servicesArr.push(`Sleeves (S:${m.sleeve})`); serviceKeysArray.push('sleeve'); }
+                if(document.getElementById(`cb-${item.id}-shoulder`)?.checked) { servicesArr.push(`Shoulders (Sh:${m.shoulder})`); serviceKeysArray.push('shoulder'); }
+                if(document.getElementById(`cb-${item.id}-pads`)?.checked) { servicesArr.push(`Pads`); serviceKeysArray.push('pads'); }
+            }
+            if(servicesArr.length > 0) itemDetailsStr += "[" + item.name + " | " + item.size + "] : " + servicesArr.join(', ') + "\n";
+        });
+
+        const hubData = hubs.find(h => h.id === state.hubId);
+        
+        const payload = {
+            action: "hub_application", // Reusing the same endpoint, backend will route if we add Order_Type
+            Order_Type: state.path === 'A' ? "Website" : "Public",
+            Order_Ref: state.path === 'A' ? document.getElementById('order-id-display').innerText.replace('#', '') : "Manual",
+            Customer_Name: custName, Phone_No: sanitizePhone(rawPhone),
+            Address_Details: state.address || "", Customer_Lat: state.lat, Customer_Lng: state.lng,
+            Logistics_Mode: state.mode === 'walkin' ? "Walk-in" : "Lalamove",
+            Hub_Name: hubData.name, Logistics_Schedule: state.logisticsSchedule,
+            Delivery_Fee: state.mode === 'walkin' ? "RM 0" : "RM " + state.deliveryCost.toFixed(2),
+            Services_Total: "RM " + state.servicesTotal, Grand_Total: "RM " + state.servicesTotal,
+            Item_Details: itemDetailsStr.trim(), Service_Keys: serviceKeysArray 
+        };
+
+        try {
+            const res = await fetch(SCRIPT_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(payload) });
+            const responseData = await res.json();
+            if (responseData.status === "success" || responseData.alteration_id) {
+                generatedAltId = responseData.alteration_id || "ALT-NEW";
+                document.getElementById('display-alt-id').innerText = generatedAltId;
+                document.getElementById('success-modal').classList.remove('hidden');
+                setTimeout(() => { document.getElementById('success-modal').classList.remove('opacity-0'); document.getElementById('success-box').classList.remove('scale-95'); }, 10);
+            } else { throw new Error(responseData.message); }
+        } catch (error) {
+            alert("Connection error. Please try again.");
+            btn.innerHTML = originalText; btn.disabled = false; btn.classList.remove('opacity-70', 'cursor-not-allowed');
+        }
+    }
+
+    function goToTracker() { if (generatedAltId) window.location.href = "alteration-tracker.html?id=" + encodeURIComponent(generatedAltId) + "&new=true"; }
 
   </script>
-
   <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBobNKxxSv_0cTX-EH5cuhF-HKiOHHmuB8&callback=initMap"></script>
 </body>
 </html>
