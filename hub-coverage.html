@@ -65,14 +65,6 @@
 
 <body class="bg-brand text-white font-sans h-screen flex flex-col overflow-hidden relative">
 
-  <div id="startup-overlay" class="fixed inset-0 z-[100] bg-brand flex flex-col items-center justify-center transition-opacity duration-500">
-      <div class="w-16 h-16 rounded-full bg-luxe/10 text-luxe flex items-center justify-center mx-auto mb-5 shadow-[0_0_30px_rgba(192,160,98,0.2)]">
-          <svg class="w-8 h-8 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-      </div>
-      <h2 class="font-display text-2xl text-white mb-2" data-t="txt_loading_network">Loading Network</h2>
-      <p class="text-sm text-white/50 text-center px-6" data-t="txt_fetching_hubs">Fetching live Alteration Hubs...</p>
-  </div>
-
   <div id="rebook-overlay" class="fixed inset-0 z-[200] bg-brand flex flex-col items-center justify-center hidden opacity-0 transition-opacity duration-500">
       <div class="w-16 h-16 rounded-full bg-luxe/10 text-luxe flex items-center justify-center mx-auto mb-5 shadow-[0_0_30px_rgba(192,160,98,0.2)]">
           <svg class="w-8 h-8 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
@@ -120,7 +112,7 @@
 
   <div id="map" class="flex-grow w-full h-full"></div>
 
-  <div id="tut-step-1" class="fixed top-40 left-1/2 -translate-x-1/2 z-50 hidden flex-col items-center gap-3 pointer-events-none transition-all duration-500 opacity-0">
+  <div id="tut-step-1" class="fixed top-20 left-1/2 -translate-x-1/2 z-50 hidden flex-col items-center gap-3 pointer-events-none transition-all duration-500 opacity-0">
       <svg class="w-10 h-10 text-luxe animate-bounce drop-shadow-[0_0_15px_rgba(192,160,98,0.8)]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 10l7-7m0 0l7 7m-7-7v18"></path></svg>
       <div class="bg-brand-light/95 backdrop-blur-md border border-luxe shadow-[0_10px_30px_rgba(0,0,0,0.8)] rounded-xl p-5 text-center pointer-events-auto relative w-72">
            <button onclick="cancelBookingMode()" class="absolute top-2 right-3 text-white/40 hover:text-white text-xl leading-none">×</button>
@@ -129,7 +121,7 @@
       </div>
   </div>
 
-  <div id="tut-step-2" class="fixed top-32 left-1/2 -translate-x-1/2 z-50 hidden flex-col items-center pointer-events-none transition-all duration-500 opacity-0">
+  <div id="tut-step-2" class="fixed top-20 left-1/2 -translate-x-1/2 z-50 hidden flex-col items-center pointer-events-none transition-all duration-500 opacity-0">
       <div class="bg-brand-light/95 backdrop-blur-md border border-luxe shadow-[0_10px_30px_rgba(0,0,0,0.8)] rounded-xl p-5 text-center pointer-events-auto flex flex-col items-center w-72 relative">
            <button onclick="cancelBookingMode()" class="absolute top-2 right-3 text-white/40 hover:text-white text-xl leading-none">×</button>
            
@@ -148,7 +140,7 @@
       </div>
   </div>
 
-  <div id="tut-step-3" class="fixed top-32 left-1/2 -translate-x-1/2 z-50 hidden flex-col items-center pointer-events-none transition-all duration-500 opacity-0">
+  <div id="tut-step-3" class="fixed top-20 left-1/2 -translate-x-1/2 z-50 hidden flex-col items-center pointer-events-none transition-all duration-500 opacity-0">
       <div class="bg-brand-light/95 backdrop-blur-md border border-luxe shadow-[0_10px_30px_rgba(0,0,0,0.8)] rounded-xl p-5 text-center pointer-events-auto flex flex-col items-center w-72 relative">
            <button onclick="cancelBookingMode()" class="absolute top-2 right-3 text-white/40 hover:text-white text-xl leading-none">×</button>
            <div class="relative w-16 h-16 mb-2 flex items-center justify-center">
@@ -176,7 +168,7 @@
       </div>
   </div>
 
-  <div id="confirm-location-modal" class="fixed inset-x-4 bottom-12 md:bottom-10 md:left-1/2 md:-translate-x-1/2 md:w-80 bg-brand-light border border-luxe shadow-2xl rounded-xl z-50 hidden flex-col transition-all relative">
+  <div id="confirm-location-modal" class="fixed inset-x-4 bottom-24 md:bottom-10 md:left-1/2 md:-translate-x-1/2 md:w-80 bg-brand-light border border-luxe shadow-2xl rounded-xl z-50 hidden flex-col transition-all relative">
       <button onclick="cancelBookingMode()" class="absolute top-3 right-3 text-white/40 hover:text-white text-xl leading-none">×</button>
       <div class="p-5 text-center">
           <p class="text-luxe font-extrabold text-sm tracking-wider uppercase mb-1" data-t="txt_is_this_you">IS THIS YOU?</p>
@@ -443,13 +435,6 @@
                 if(data.pricing) pricingData = data.pricing;
                 if(data.hubs) { hubs = data.hubs; plotHubs(); document.getElementById('status-indicator').innerHTML = `<span class="text-green-500">● Live Network</span>`; }
                 
-                // Hide the Startup Overlay smoothly
-                const startupOverlay = document.getElementById('startup-overlay');
-                if(startupOverlay) {
-                    startupOverlay.classList.add('opacity-0');
-                    setTimeout(() => startupOverlay.classList.add('hidden'), 500);
-                }
-
                 if (fetchId && data.orderData) {
                     state.path = 'A'; 
                     document.getElementById('path-a-container').classList.remove('hidden');
@@ -588,6 +573,9 @@
                     state.lat = pos.lat; state.lng = pos.lng;
 
                     map.setZoom(16); map.setCenter(pos);
+                    // PUSH CAMERA DOWN SO PIN ISN'T HIDDEN BY TUTORIAL
+                    map.panBy(0, -60);
+                    
                     if(userLocationMarker) userLocationMarker.setMap(null);
 
                     const svgBluePin = 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 36" width="32" height="48"><path fill="#4285F4" stroke="#ffffff" stroke-width="2" d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/></svg>');
@@ -596,6 +584,7 @@
                     userLocationMarker.addListener('click', () => { 
                         map.setZoom(16); 
                         map.panTo(userLocationMarker.getPosition()); 
+                        map.panBy(0, -60);
                         document.getElementById('confirm-location-modal').classList.remove('hidden'); 
                         document.getElementById('confirm-location-modal').classList.add('flex'); 
                         closeModal(); 
@@ -612,6 +601,7 @@
 
                     userLocationMarker.addListener('dragend', () => { 
                         map.panTo(userLocationMarker.getPosition()); 
+                        map.panBy(0, -60);
                         state.lat = userLocationMarker.getPosition().lat(); 
                         state.lng = userLocationMarker.getPosition().lng(); 
                         document.getElementById('confirm-location-modal').classList.remove('hidden'); 
@@ -842,8 +832,6 @@
     }
 
     async function submitOrder() {
-        if(state.path === 'B') syncItemsB(); else syncItemsA();
-        
         const custName = state.path === 'A' ? document.getElementById('auto-cust-name').value : document.getElementById('manual-cust-name').value.trim();
         const rawPhone = state.path === 'A' ? document.getElementById('auto-cust-phone').value : document.getElementById('manual-cust-phone').value.trim();
         
@@ -857,7 +845,7 @@
 
         if(state.selectedItems.length === 0) return alert(t[currentLang].alert_no_service);
         
-        // Re-calculate to be completely sure before submission check
+        // Final sanity check for total
         calculateTotal();
         if(state.servicesTotal === 0) return alert(t[currentLang].alert_no_service);
 
@@ -890,7 +878,6 @@
 
         const hubData = hubs.find(h => h.id === state.hubId);
         
-        // IMPORTANT: Action parameter removed to properly trigger submitNewOrder on backend
         const payload = {
             Order_Type: state.path === 'A' ? "Website" : "Public",
             Order_Ref: state.path === 'A' ? document.getElementById('order-id-display').innerText.replace('#', '') : "Manual",
