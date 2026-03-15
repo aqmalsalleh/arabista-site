@@ -30,30 +30,6 @@
         } 
     }
   </script>
-  <style>
-    /* Override Google Maps InfoWindow default styling */
-    .gm-style .gm-style-iw-c {
-        background-color: #1A1A1C !important;
-        border: 1px solid #C0A062 !important;
-        border-radius: 8px !important;
-        padding: 0 !important;
-        box-shadow: 0 10px 25px rgba(0,0,0,0.5) !important;
-    }
-    .gm-style .gm-style-iw-tc::after {
-        background: #1A1A1C !important;
-    }
-    .gm-style-iw-d {
-        overflow: hidden !important;
-        padding: 12px 30px 12px 14px !important; /* Leave right padding for the X */
-    }
-    .gm-ui-hover-effect {
-        filter: invert(1);
-        top: 6px !important;
-        right: 6px !important;
-        background: rgba(255,255,255,0.1) !important;
-        border-radius: 50% !important;
-    }
-  </style>
 </head>
 
 <body class="bg-brand text-white font-sans h-screen flex flex-col overflow-hidden relative">
@@ -118,14 +94,24 @@
       </div>
   </div>
 
-  <button id="cta-fab" onclick="showCTA()" class="fixed bottom-8 left-4 z-20 w-14 h-14 bg-luxe hover:bg-luxe-hover text-brand shadow-[0_0_20px_rgba(192,160,98,0.5)] rounded-full flex items-center justify-center transition-all duration-300 transform scale-100 opacity-100 cursor-pointer">
+  <div id="confirm-location-modal" class="fixed inset-x-4 bottom-12 md:bottom-10 md:left-1/2 md:-translate-x-1/2 md:w-80 bg-brand-light border border-luxe shadow-2xl rounded-xl z-50 hidden flex-col transition-all">
+      <div class="p-5 text-center">
+          <p class="text-luxe font-extrabold text-sm tracking-wider uppercase mb-1">📍 Is this you?</p>
+          <p class="text-white/80 text-sm mb-5 font-medium">Drag the blue pin to your EXACT location.</p>
+          <button onclick="confirmLocation()" class="w-full bg-luxe hover:bg-luxe-hover text-brand font-bold py-3 rounded-lg transition-colors shadow-[0_0_15px_rgba(192,160,98,0.2)]">
+              Confirm Location
+          </button>
+      </div>
+  </div>
+
+  <button id="cta-fab" onclick="showCTA()" class="fixed bottom-12 left-4 z-40 w-14 h-14 bg-luxe hover:bg-luxe-hover text-brand shadow-[0_0_20px_rgba(192,160,98,0.5)] rounded-full flex items-center justify-center transition-all duration-300 transform scale-100 opacity-100 cursor-pointer">
       <svg class="w-7 h-7 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
       <span id="cta-badge" class="absolute -top-2 -right-8 bg-white border border-luxe/50 text-brand text-[10px] font-bold px-2.5 py-1 rounded-full animate-pulse shadow-[0_0_10px_rgba(255,255,255,0.5)] whitespace-nowrap pointer-events-none">
           Join Network
       </span>
   </button>
 
-  <div id="cta-box" class="fixed bottom-8 left-0 right-0 px-4 z-30 flex justify-center transition-all duration-500 transform translate-y-32 opacity-0 pointer-events-none">
+  <div id="cta-box" class="fixed bottom-12 left-0 right-0 px-4 z-50 flex justify-center transition-all duration-500 transform translate-y-32 opacity-0 pointer-events-none">
       <div class="relative bg-brand-light/95 backdrop-blur-md border border-luxe/30 shadow-[0_10px_40px_rgba(0,0,0,0.8)] rounded-xl p-5 max-w-sm w-full text-center pointer-events-auto">
           <button onclick="hideCTA()" class="absolute top-2 right-3 text-white/40 hover:text-white p-2 text-2xl font-bold leading-none">×</button>
           <p class="text-sm text-white/90 mb-4 mt-2 pr-4 pl-4 leading-relaxed font-medium">No hubs in your area? Claim this zone and dominate the local market.</p>
@@ -295,8 +281,8 @@
             : `<span class="text-xs bg-green-500/20 text-green-400 px-2 py-1 rounded border border-green-500/30 font-semibold tracking-wide">OPEN FOR ORDERS</span>`;
         document.getElementById('modal-status').innerHTML = statusBadge;
 
-        // FIXED URL: Official Google Maps Navigation API
-        const navLink = `https://www.google.com/maps/dir/?api=1&destination=$${parseFloat(hub.lat)},${parseFloat(hub.lng)}`;
+        // PERFECTED UNIVERSAL MAPS ROUTING LINK
+        const navLink = `https://www.google.com/maps/dir/?api=1&destination=${parseFloat(hub.lat)},${parseFloat(hub.lng)}`;
         document.getElementById('modal-nav-btn').href = navLink;
 
         const godModeBox = document.getElementById('modal-god-mode');
@@ -355,25 +341,12 @@
                         zIndex: 9999
                     });
 
-                    // Commanding Tooltip
-                    const userInfoWindow = new google.maps.InfoWindow({
-                        content: `
-                            <div style="font-family: 'Inter', sans-serif; min-width: 160px;">
-                                <p style="color: #C0A062; font-weight: 800; font-size: 14px; margin-bottom: 2px; text-transform: uppercase; letter-spacing: 0.5px;">📍 Is this you?</p>
-                                <p style="color: #ffffff; opacity: 0.8; font-size: 12px; font-weight: 500;">Drag this pin to your EXACT location.</p>
-                            </div>
-                        `
-                    });
+                    // Show Custom Confirm Location Modal
+                    document.getElementById('confirm-location-modal').classList.remove('hidden');
+                    document.getElementById('confirm-location-modal').classList.add('flex');
 
-                    userInfoWindow.open(map, userLocationMarker);
-
-                    // Auto-close tooltip when dragged, reopen when dropped
-                    userLocationMarker.addListener('dragstart', () => {
-                        userInfoWindow.close();
-                    });
-                    
+                    // Allow user to reposition camera via drag
                     userLocationMarker.addListener('dragend', () => {
-                        userInfoWindow.open(map, userLocationMarker);
                         map.panTo(userLocationMarker.getPosition());
                     });
 
@@ -391,6 +364,18 @@
             btn.disabled = false;
             btn.classList.remove('animate-pulse');
             alert("Your browser doesn't support geolocation."); 
+        }
+    }
+
+    // --- ZOOM OUT AND CLOSE CONFIRMATION MODAL ---
+    function confirmLocation() {
+        document.getElementById('confirm-location-modal').classList.add('hidden');
+        document.getElementById('confirm-location-modal').classList.remove('flex');
+        
+        map.setZoom(13); // Zoom out perfectly to see network
+        
+        if(userLocationMarker) {
+            map.panTo(userLocationMarker.getPosition());
         }
     }
 
