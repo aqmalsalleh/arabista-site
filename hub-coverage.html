@@ -112,7 +112,7 @@
   </button>
 
   <div id="cta-box" class="fixed bottom-12 left-0 right-0 px-4 z-50 flex justify-center transition-all duration-500 transform translate-y-32 opacity-0 pointer-events-none">
-      <div class="relative bg-brand-light/95 backdrop-blur-md border border-luxe/30 shadow-[0_10px_40px_rgba(0,0,0,0.8)] rounded-xl p-5 max-w-sm w-full text-center pointer-events-auto">
+      <div id="cta-inner-box" class="relative bg-brand-light/95 backdrop-blur-md border border-luxe/30 shadow-[0_10px_40px_rgba(0,0,0,0.8)] rounded-xl p-5 max-w-sm w-full text-center pointer-events-none">
           <button onclick="hideCTA()" class="absolute top-2 right-3 text-white/40 hover:text-white p-2 text-2xl font-bold leading-none">×</button>
           <p class="text-sm text-white/90 mb-4 mt-2 pr-4 pl-4 leading-relaxed font-medium">No hubs in your area? Claim this zone and dominate the local market.</p>
           <a href="hub-lite.html" class="block w-full bg-luxe hover:bg-luxe-hover text-brand font-semibold py-3.5 rounded-lg transition-colors shadow-[0_0_15px_rgba(192,160,98,0.2)]">
@@ -239,9 +239,10 @@
         circles.forEach(c => c.setRadius(currentRadius));
     }
 
-    // --- CTA ANIMATIONS ---
+    // --- CTA ANIMATIONS & FIXES ---
     function showCTA() {
         const box = document.getElementById('cta-box');
+        const innerBox = document.getElementById('cta-inner-box');
         const fab = document.getElementById('cta-fab');
         const badge = document.getElementById('cta-badge');
         
@@ -251,20 +252,25 @@
         fab.classList.add('pointer-events-none');
         badge.style.display = 'none'; 
         
-        // Show Box
+        // Show Box and restore pointer events to inner box so it's clickable
         box.classList.replace('translate-y-32', 'translate-y-0');
         box.classList.replace('opacity-0', 'opacity-100');
         box.classList.remove('pointer-events-none');
+        innerBox.classList.remove('pointer-events-none');
+        innerBox.classList.add('pointer-events-auto');
     }
 
     function hideCTA() {
         const box = document.getElementById('cta-box');
+        const innerBox = document.getElementById('cta-inner-box');
         const fab = document.getElementById('cta-fab');
         
-        // Hide Box
+        // Hide Box and COMPLETELY STRIP pointer events from inner box so it never blocks clicks
         box.classList.replace('translate-y-0', 'translate-y-32');
         box.classList.replace('opacity-100', 'opacity-0');
         box.classList.add('pointer-events-none');
+        innerBox.classList.remove('pointer-events-auto');
+        innerBox.classList.add('pointer-events-none');
         
         // Show FAB
         fab.classList.replace('scale-0', 'scale-100');
@@ -281,7 +287,7 @@
             : `<span class="text-xs bg-green-500/20 text-green-400 px-2 py-1 rounded border border-green-500/30 font-semibold tracking-wide">OPEN FOR ORDERS</span>`;
         document.getElementById('modal-status').innerHTML = statusBadge;
 
-        // PERFECTED UNIVERSAL MAPS ROUTING LINK
+        // FIXED: Universal Native Maps Direction URL
         const navLink = `https://www.google.com/maps/dir/?api=1&destination=${parseFloat(hub.lat)},${parseFloat(hub.lng)}`;
         document.getElementById('modal-nav-btn').href = navLink;
 
@@ -331,14 +337,32 @@
                     
                     if(userLocationMarker) userLocationMarker.setMap(null);
 
-                    // Draggable Blue Pin
+                    // Draggable Blue Teardrop Pin
                     userLocationMarker = new google.maps.Marker({
                         position: pos,
                         map: map,
                         draggable: true,
-                        icon: { path: google.maps.SymbolPath.CIRCLE, scale: 9, fillColor: "#4285F4", fillOpacity: 1, strokeWeight: 3, strokeColor: "#ffffff" },
+                        icon: {
+                            path: "M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z",
+                            fillColor: "#4285F4",
+                            fillOpacity: 1,
+                            strokeWeight: 1.5,
+                            strokeColor: "#ffffff",
+                            scale: 1.5,
+                            anchor: new google.maps.Point(12, 22)
+                        },
                         title: "Your Location",
                         zIndex: 9999
+                    });
+
+                    // Add Re-Click Listener to Blue Pin
+                    userLocationMarker.addListener('click', () => {
+                        map.setZoom(16);
+                        map.panTo(userLocationMarker.getPosition());
+                        document.getElementById('confirm-location-modal').classList.remove('hidden');
+                        document.getElementById('confirm-location-modal').classList.add('flex');
+                        closeModal();
+                        hideCTA();
                     });
 
                     // Show Custom Confirm Location Modal
