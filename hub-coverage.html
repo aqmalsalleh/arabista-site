@@ -317,7 +317,7 @@
             lbl_services_cost: "Alteration Services", lbl_delivery_cost: "Lalamove delivery fee to be paid to Arabista", label_total_est: "Total to Pay Hub", btn_confirm: "Confirm Booking",
             modal_meas_title: "Provide Measurements", lbl_length: "Length (inches)", lbl_sleeve: "Sleeves (inches)", lbl_shoulder: "Shoulders (inches)", lbl_pads: "Shoulder Pads", lbl_max: "Max:", lbl_select_option: "Select...", lbl_yes: "Yes", lbl_no: "No", btn_save: "Save Measurements",
             modal_success_title: "Booking Successful!", modal_success_desc: "Your Alteration Order ID is:", modal_success_warn: "⚠️ Please screenshot this ID", btn_track: "Track My Order",
-            alert_name: "Please enter your name.", alert_phone: "Please enter your phone number.", alert_unit: "Please enter your Unit/House No.", alert_no_hub: "Please select a Hub.", alert_no_service: "Please select at least one service (e.g. Alter Length).", alert_measure: "Please fill in measurements for all required items.", alert_max: "must be strictly less than original size", alert_max_full: "must be less than or equal to original size", alert_full_equal: "At least one measurement must be reduced.", txt_no_items_step4: "Please select Design Code and Size for your items.",
+            alert_name: "Please enter your name.", alert_phone: "Please enter your phone number.", alert_unit: "Please enter your Unit/House No.", alert_no_hub: "Please select a Hub.", alert_no_service: "Please select at least one service.", alert_measure: "Please fill in measurements for all required items.", alert_max: "must be strictly less than original size", alert_max_full: "must be less than or equal to original size", alert_full_equal: "At least one measurement must be reduced.", txt_no_items_step4: "No items selected.",
             txt_syncing_system: "Syncing...", txt_open: "OPEN", txt_closed: "CLOSED", txt_closes_at: "Closes", txt_opens_at: "Opens", txt_rebook_title: "Retrieving Your Order", txt_rebook_desc: "Retrieving your previous booking. Please select another Hub."
         },
         bm: {
@@ -333,7 +333,7 @@
             lbl_services_cost: "Servis Alterasi", lbl_delivery_cost: "Caj Lalamove perlu dibayar kepada Arabista", label_total_est: "Jumlah Dibayar ke Hub", btn_confirm: "Sahkan Tempahan",
             modal_meas_title: "Masukkan Ukuran", lbl_length: "Labuh (inci)", lbl_sleeve: "Lengan (inci)", lbl_shoulder: "Bahu (inci)", lbl_pads: "Span Bahu", lbl_max: "Maks:", lbl_select_option: "Pilih...", lbl_yes: "Ya", lbl_no: "Tidak", btn_save: "Simpan Ukuran",
             modal_success_title: "Tempahan Berjaya!", modal_success_desc: "ID Tempahan Alterasi anda ialah:", modal_success_warn: "⚠️ Sila screenshot ID ini", btn_track: "Jejak Tempahan Saya",
-            alert_name: "Sila masukkan nama.", alert_phone: "Sila masukkan no. telefon.", alert_unit: "Sila masukkan No. Unit/Rumah anda.", alert_no_hub: "Sila pilih Hub.", alert_no_service: "Sila pilih sekurang-kurangnya satu servis (cth. Alter Labuh).", alert_measure: "Sila lengkapkan ukuran.", alert_max: "mesti kurang dari saiz asal", alert_max_full: "mesti kurang atau sama dengan saiz asal", alert_full_equal: "Sekurang-kurangnya satu ukuran mesti dikurangkan.", txt_no_items_step4: "Sila pilih Kod Rekaan dan Saiz untuk item anda.",
+            alert_name: "Sila masukkan nama.", alert_phone: "Sila masukkan no. telefon.", alert_unit: "Sila masukkan No. Unit/Rumah anda.", alert_no_hub: "Sila pilih Hub.", alert_no_service: "Sila pilih servis.", alert_measure: "Sila lengkapkan ukuran.", alert_max: "mesti kurang dari saiz asal", alert_max_full: "mesti kurang atau sama dengan saiz asal", alert_full_equal: "Sekurang-kurangnya satu ukuran mesti dikurangkan.", txt_no_items_step4: "Tiada item dipilih.",
             txt_syncing_system: "Menyegerak...", txt_open: "BUKA", txt_closed: "TUTUP", txt_closes_at: "Tutup jam", txt_opens_at: "Buka jam", txt_rebook_title: "Mendapatkan Pesanan Anda", txt_rebook_desc: "Mendapatkan tempahan lepas anda. Sila pilih Hub yang baru."
         }
     };
@@ -523,24 +523,24 @@
         const step1 = document.getElementById('tut-step-1');
         const step2 = document.getElementById('tut-step-2');
         const step3 = document.getElementById('tut-step-3');
-        const confirmModal = document.getElementById('confirm-location-modal');
         
         if (step1) step1.classList.replace('opacity-100', 'opacity-0');
         if (step2) step2.classList.replace('opacity-100', 'opacity-0');
         if (step3) step3.classList.replace('opacity-100', 'opacity-0');
-        if (confirmModal) confirmModal.classList.replace('opacity-100', 'opacity-0');
         
         setTimeout(() => {
             if (step1) step1.classList.add('hidden');
             if (step2) step2.classList.add('hidden');
             if (step3) step3.classList.add('hidden');
-            if (confirmModal) {
-                confirmModal.classList.add('hidden');
-                confirmModal.classList.remove('flex');
-            }
             document.getElementById('fab-container').classList.remove('hidden'); 
         }, 500);
 
+        const confirmModal = document.getElementById('confirm-location-modal');
+        if (confirmModal) {
+            confirmModal.classList.add('hidden');
+            confirmModal.classList.remove('flex');
+        }
+        
         document.getElementById('btn-locate').classList.remove('animate-pulse', 'ring-2', 'ring-luxe');
         if(map) map.setZoom(11);
     }
@@ -564,7 +564,6 @@
                 async (position) => {
                     const pos = { lat: position.coords.latitude, lng: position.coords.longitude };
                     
-                    // NEW: "Translating GPS..." State
                     btn.innerHTML = `${spinnerSvg}<span class="text-sm font-medium" data-t="txt_translating_gps">${t[currentLang].txt_translating_gps || 'Translating GPS...'}</span>`;
 
                     try { const res = await fetch(`${SCRIPT_URL}?action=reverse_geocode&lat=${pos.lat}&lng=${pos.lng}`); const d = await res.json(); state.address = d.address || "Customer Location"; } catch(e) { state.address = "Customer Location"; }
@@ -573,7 +572,6 @@
                     state.lat = pos.lat; state.lng = pos.lng;
 
                     map.setZoom(16); map.setCenter(pos);
-                    
                     if(userLocationMarker) userLocationMarker.setMap(null);
 
                     const svgBluePin = 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 36" width="32" height="48"><path fill="#4285F4" stroke="#ffffff" stroke-width="2" d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/></svg>');
@@ -581,11 +579,9 @@
 
                     userLocationMarker.addListener('click', () => { 
                         map.setZoom(16); 
-                        map.panTo(userLocationMarker.getPosition());
-                        const confirmModal = document.getElementById('confirm-location-modal');
-                        confirmModal.classList.remove('hidden'); 
-                        confirmModal.classList.add('flex'); 
-                        setTimeout(() => confirmModal.classList.replace('opacity-0', 'opacity-100'), 10);
+                        map.panTo(userLocationMarker.getPosition()); 
+                        document.getElementById('confirm-location-modal').classList.remove('hidden'); 
+                        document.getElementById('confirm-location-modal').classList.add('flex'); 
                         closeModal(); 
                         hideCTA(); 
                     });
@@ -596,21 +592,14 @@
                             step2.classList.replace('opacity-100', 'opacity-0');
                             setTimeout(() => { step2.classList.add('hidden'); }, 500);
                         }
-                        const confirmModal = document.getElementById('confirm-location-modal');
-                        if(confirmModal && !confirmModal.classList.contains('hidden')) {
-                            confirmModal.classList.replace('opacity-100', 'opacity-0');
-                            setTimeout(() => { confirmModal.classList.add('hidden'); confirmModal.classList.remove('flex'); }, 300);
-                        }
                     });
 
                     userLocationMarker.addListener('dragend', () => { 
-                        map.panTo(userLocationMarker.getPosition());
+                        map.panTo(userLocationMarker.getPosition()); 
                         state.lat = userLocationMarker.getPosition().lat(); 
                         state.lng = userLocationMarker.getPosition().lng(); 
-                        const confirmModal = document.getElementById('confirm-location-modal');
-                        confirmModal.classList.remove('hidden'); 
-                        confirmModal.classList.add('flex'); 
-                        setTimeout(() => confirmModal.classList.replace('opacity-0', 'opacity-100'), 10);
+                        document.getElementById('confirm-location-modal').classList.remove('hidden'); 
+                        document.getElementById('confirm-location-modal').classList.add('flex'); 
                     });
 
                     if(bookingMode) {
@@ -622,10 +611,7 @@
                         setTimeout(() => { step2.classList.replace('opacity-0', 'opacity-100'); }, 10);
                     }
                     
-                    const confirmModal = document.getElementById('confirm-location-modal');
-                    confirmModal.classList.remove('hidden'); 
-                    confirmModal.classList.add('flex');
-                    setTimeout(() => confirmModal.classList.replace('opacity-0', 'opacity-100'), 10);
+                    document.getElementById('confirm-location-modal').classList.remove('hidden'); document.getElementById('confirm-location-modal').classList.add('flex');
                 },
                 () => { btn.innerHTML = origHTML; btn.disabled = false; btn.classList.remove('animate-pulse'); alert("Location access denied."); },
                 { enableHighAccuracy: true } 
@@ -634,11 +620,7 @@
     }
 
     function confirmLocation() {
-        const confirmModal = document.getElementById('confirm-location-modal');
-        if(confirmModal && !confirmModal.classList.contains('hidden')) {
-            confirmModal.classList.replace('opacity-100', 'opacity-0');
-            setTimeout(() => { confirmModal.classList.add('hidden'); confirmModal.classList.remove('flex'); }, 500);
-        }
+        document.getElementById('confirm-location-modal').classList.add('hidden'); document.getElementById('confirm-location-modal').classList.remove('flex');
         
         const step2 = document.getElementById('tut-step-2');
         if(step2 && !step2.classList.contains('hidden')) {
@@ -660,8 +642,7 @@
         
         const actionArea = document.getElementById('modal-action-area');
         
-        // Premium Icon Row
-        const navLink = `https://www.google.com/maps/dir/?api=1&destination=${parseFloat(hub.lat)},${parseFloat(hub.lng)}`;
+        const navLink = `http://googleusercontent.com/maps.google.com/maps?daddr=${parseFloat(hub.lat)},${parseFloat(hub.lng)}`;
         const waLink = "https://wa.me/" + sanitizePhone(hub.phone || "");
         const callLink = "tel:" + sanitizePhone(hub.phone || "");
 
@@ -857,6 +838,7 @@
 
         if(state.selectedItems.length === 0) return alert(t[currentLang].txt_no_items_step4 || "Please select Design Code and Size for your items.");
         
+        // Final sanity check for total
         calculateTotal();
         if(state.servicesTotal === 0) return alert(t[currentLang].alert_no_service || "Please select at least one alteration service (e.g. Alter Length).");
 
