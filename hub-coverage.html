@@ -154,7 +154,7 @@
       </div>
   </div>
 
-  <div id="hub-modal" class="fixed inset-x-4 bottom-32 md:inset-auto md:bottom-10 md:right-10 md:w-[340px] bg-brand-light border border-luxe shadow-2xl rounded-xl z-30 hidden flex-col transition-all">
+  <div id="hub-modal" class="fixed inset-x-4 bottom-32 md:inset-auto md:bottom-10 md:right-10 md:w-[340px] bg-brand-light border border-luxe shadow-2xl rounded-xl z-[60] hidden flex-col transition-all">
       <div class="flex justify-between items-center border-b border-white/10 p-4 bg-brand/50 rounded-t-xl">
           <h3 id="modal-title" class="font-display font-bold text-xl text-luxe">Hub Name</h3>
           <button onclick="closeModal()" class="text-white/40 hover:text-white text-2xl leading-none">×</button>
@@ -162,17 +162,17 @@
       <div class="p-4 space-y-3">
           <div id="modal-status"></div>
           <div class="flex items-start gap-2 text-white/80 mt-2">
-              <svg class="w-4 h-4 text-white/40 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-              <div class="text-[13px] leading-snug"><span class="text-[10px] uppercase tracking-widest text-white/40 font-bold block mb-0.5" data-t="txt_operating_hours">Operating Hours:</span><span id="modal-hours" class="font-medium"></span></div>
+              <div class="text-[13px] leading-snug"><span class="text-[10px] uppercase tracking-widest text-white/40 font-bold block mb-0.5" data-t="txt_operating_hours">Operating Hours:</span><span id="modal-hours" class="font-medium text-white/90"></span></div>
           </div>
           <div id="modal-action-area"></div>
       </div>
   </div>
 
-  <div id="confirm-location-modal" class="fixed inset-x-4 bottom-12 md:bottom-10 md:left-1/2 md:-translate-x-1/2 md:w-80 bg-brand-light border border-luxe shadow-2xl rounded-xl z-50 hidden flex-col transition-all">
+  <div id="confirm-location-modal" class="fixed inset-x-4 bottom-12 md:bottom-10 md:left-1/2 md:-translate-x-1/2 md:w-80 bg-brand-light border border-luxe shadow-2xl rounded-xl z-50 hidden flex-col transition-all relative">
+      <button onclick="cancelBookingMode()" class="absolute top-3 right-3 text-white/40 hover:text-white text-xl leading-none">×</button>
       <div class="p-5 text-center">
           <p class="text-luxe font-extrabold text-sm tracking-wider uppercase mb-1" data-t="txt_is_this_you">IS THIS YOU?</p>
-          <p class="text-white/80 text-sm mb-5 font-medium" data-t="txt_drag_pin">Drag the blue pin to your EXACT location.</p>
+          <p class="text-white/80 text-sm mb-5 font-medium pr-2 pl-2" data-t="txt_drag_pin">Drag the blue pin to your EXACT location.</p>
           <button onclick="confirmLocation()" class="w-full bg-luxe hover:bg-luxe-hover text-brand font-bold py-3 rounded-lg transition-colors shadow-[0_0_15px_rgba(192,160,98,0.2)]" data-t="btn_confirm_loc">Confirm Location</button>
       </div>
   </div>
@@ -180,8 +180,8 @@
   <div id="fab-container" class="fixed bottom-12 left-4 z-40 flex flex-col gap-4 pointer-events-none transition-all duration-300">
       
       <div class="relative pointer-events-auto">
-          <button onclick="startBooking()" class="w-14 h-14 bg-brand-light border border-luxe hover:bg-luxe hover:text-brand text-luxe shadow-[0_0_20px_rgba(192,160,98,0.3)] rounded-full flex items-center justify-center transition-all duration-300 transform scale-100 opacity-100 cursor-pointer group">
-              <svg class="w-6 h-6 pointer-events-none transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09l2.846.813-.846.813a4.5 4.5 0 00-3.09 3.09z" /></svg>
+          <button onclick="startBooking()" class="w-14 h-14 bg-luxe hover:bg-luxe-hover text-brand shadow-[0_0_20px_rgba(192,160,98,0.5)] rounded-full flex items-center justify-center transition-all duration-300 transform scale-100 opacity-100 cursor-pointer group">
+              <svg class="w-6 h-6 pointer-events-none transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><circle cx="6" cy="6" r="3"></circle><circle cx="6" cy="18" r="3"></circle><line x1="20" y1="4" x2="8.12" y2="15.88"></line><line x1="14.47" y1="14.48" x2="20" y2="20"></line><line x1="8.12" y1="8.12" x2="12" y2="12"></line></svg>
           </button>
           <span class="absolute top-1/2 -translate-y-1/2 left-16 bg-white border border-luxe/50 text-brand text-[11px] font-bold px-3.5 py-1.5 rounded-full shadow-[0_0_15px_rgba(255,255,255,0.2)] whitespace-nowrap pointer-events-none animate-pulse" data-t="btn_book_alt">
               Book Alteration
@@ -305,10 +305,11 @@
     // --- FULL TRANSLATION DICTIONARY ---
     const t = {
         en: {
+            txt_loading_network: "Loading Network", txt_fetching_hubs: "Fetching live Alteration Hubs...", txt_translating_gps: "Translating GPS...",
             btn_find_hubs: "Find Hubs Near Me", txt_join: "Join Network", txt_b2b_hook: "No hubs in your area? Claim this zone and dominate the local market.", btn_partner: "Become a Hub Partner", btn_book_alt: "Book Alteration",
             tut_step1_title: "Step 1: Locate Yourself", tut_step1_desc: "Tap 'Find Hubs Near Me'", tut_step2_title: "Step 2: Verify Location", tut_step2_desc: "Drag the pin exactly to your building", tut_step3_title: "Step 3: Select Hub", tut_step3_desc: "Tap any gold pin to view hub details.", btn_understand: "I Understand", btn_cancel: "Cancel",
             txt_is_this_you: "IS THIS YOU?", txt_drag_pin: "Drag the blue pin to your EXACT location.", btn_confirm_loc: "Confirm Location", txt_operating_hours: "Operating Hours:",
-            txt_nav_hub: "Navigate to Hub", txt_drop_in: "Drop-In", txt_free: "Free", txt_lalamove: "Lalamove", txt_calculating: "Calculating...", txt_out_of_area: "Out of Area",
+            txt_nav_hub: "Navigate", txt_drop_in: "Drop-In", txt_free: "Free", txt_lalamove: "Lalamove", txt_calculating: "Calculating...", txt_out_of_area: "Out of Area",
             form_title: "Book Alteration", step_personal: "Details & Items", lbl_order: "Order", lbl_cust_name: "Customer Name *", placeholder_name: "e.g. Siti Aishah", lbl_phone: "WhatsApp No. *", placeholder_phone: "e.g. 0123456789", label_unit: "Unit / House / Lot No. *", placeholder_unit: "e.g. Unit 15-1 or House 42", txt_select_items: "Items to Alter:", btn_add_item: "Add Another Item",
             lbl_design_code: "Design Code", lbl_size: "Size", txt_size_label: "Size:",
             step_services: "Services & Checkout", txt_measure_walkin: "Drop-In selected. No measurements needed.", txt_measure_lala: "Lalamove selected. Please provide measurements.",
@@ -316,14 +317,15 @@
             lbl_services_cost: "Alteration Services", lbl_delivery_cost: "Lalamove delivery fee to be paid to Arabista", label_total_est: "Total to Pay Hub", btn_confirm: "Confirm Booking",
             modal_meas_title: "Provide Measurements", lbl_length: "Length (inches)", lbl_sleeve: "Sleeves (inches)", lbl_shoulder: "Shoulders (inches)", lbl_pads: "Shoulder Pads", lbl_max: "Max:", lbl_select_option: "Select...", lbl_yes: "Yes", lbl_no: "No", btn_save: "Save Measurements",
             modal_success_title: "Booking Successful!", modal_success_desc: "Your Alteration Order ID is:", modal_success_warn: "⚠️ Please screenshot this ID", btn_track: "Track My Order",
-            alert_name: "Please enter your name.", alert_phone: "Please enter your phone number.", alert_unit: "Please enter your Unit/House No.", alert_no_hub: "Please select a Hub.", alert_no_service: "Please select at least one service.", alert_measure: "Please fill in measurements for all required items.", alert_max: "must be strictly less than original size", alert_max_full: "must be less than or equal to original size", alert_full_equal: "At least one measurement must be reduced.", txt_no_items_step4: "No items selected.",
+            alert_name: "Please enter your name.", alert_phone: "Please enter your phone number.", alert_unit: "Please enter your Unit/House No.", alert_no_hub: "Please select a Hub.", alert_no_service: "Please select at least one service (e.g. Alter Length).", alert_measure: "Please fill in measurements for all required items.", alert_max: "must be strictly less than original size", alert_max_full: "must be less than or equal to original size", alert_full_equal: "At least one measurement must be reduced.", txt_no_items_step4: "Please select Design Code and Size for your items.",
             txt_syncing_system: "Syncing...", txt_open: "OPEN", txt_closed: "CLOSED", txt_closes_at: "Closes", txt_opens_at: "Opens", txt_rebook_title: "Retrieving Your Order", txt_rebook_desc: "Retrieving your previous booking. Please select another Hub."
         },
         bm: {
+            txt_loading_network: "Memuatkan Rangkaian", txt_fetching_hubs: "Mendapatkan Pusat Alterasi...", txt_translating_gps: "Menterjemah GPS...",
             btn_find_hubs: "Cari Hub Berdekatan", txt_join: "Sertai Rangkaian", txt_b2b_hook: "Tiada hub di kawasan anda? Jadilah yang pertama dan kuasai pasaran.", btn_partner: "Daftar Hub Rakan", btn_book_alt: "Tempah Alterasi",
             tut_step1_title: "Langkah 1: Kesan Lokasi", tut_step1_desc: "Ketik butang 'Cari Hub'", tut_step2_title: "Langkah 2: Sahkan Lokasi", tut_step2_desc: "Tarik pin tepat ke bangunan anda", tut_step3_title: "Langkah 3: Pilih Hub", tut_step3_desc: "Ketik mana-mana pin emas.", btn_understand: "Saya Faham", btn_cancel: "Batal",
             txt_is_this_you: "ADAKAH INI LOKASI ANDA?", txt_drag_pin: "Tarik pin biru tepat ke lokasi anda.", btn_confirm_loc: "Sahkan Lokasi", txt_operating_hours: "Waktu Operasi:",
-            txt_nav_hub: "Pandu Arah ke Hub", txt_drop_in: "Hantar Sendiri", txt_free: "Percuma", txt_lalamove: "Lalamove", txt_calculating: "Mengira...", txt_out_of_area: "Luar Kawasan",
+            txt_nav_hub: "Pandu Arah", txt_drop_in: "Hantar Sendiri", txt_free: "Percuma", txt_lalamove: "Lalamove", txt_calculating: "Mengira...", txt_out_of_area: "Luar Kawasan",
             form_title: "Tempahan Alterasi", step_personal: "Butiran & Item", lbl_order: "Pesanan", lbl_cust_name: "Nama Pelanggan *", placeholder_name: "cth. Siti Aishah", lbl_phone: "No. WhatsApp *", placeholder_phone: "cth. 0123456789", label_unit: "No. Unit / Rumah / Lot *", placeholder_unit: "cth. Unit 15-1 atau Rumah 42", txt_select_items: "Item Untuk Dialter:", btn_add_item: "Tambah Item Lain",
             lbl_design_code: "Kod Rekaan", lbl_size: "Saiz", txt_size_label: "Saiz:",
             step_services: "Servis & Pembayaran", txt_measure_walkin: "Drop-In dipilih. Tiada ukuran diperlukan.", txt_measure_lala: "Lalamove dipilih. Sila masukkan ukuran.",
@@ -331,14 +333,14 @@
             lbl_services_cost: "Servis Alterasi", lbl_delivery_cost: "Caj Lalamove perlu dibayar kepada Arabista", label_total_est: "Jumlah Dibayar ke Hub", btn_confirm: "Sahkan Tempahan",
             modal_meas_title: "Masukkan Ukuran", lbl_length: "Labuh (inci)", lbl_sleeve: "Lengan (inci)", lbl_shoulder: "Bahu (inci)", lbl_pads: "Span Bahu", lbl_max: "Maks:", lbl_select_option: "Pilih...", lbl_yes: "Ya", lbl_no: "Tidak", btn_save: "Simpan Ukuran",
             modal_success_title: "Tempahan Berjaya!", modal_success_desc: "ID Tempahan Alterasi anda ialah:", modal_success_warn: "⚠️ Sila screenshot ID ini", btn_track: "Jejak Tempahan Saya",
-            alert_name: "Sila masukkan nama.", alert_phone: "Sila masukkan no. telefon.", alert_unit: "Sila masukkan No. Unit/Rumah anda.", alert_no_hub: "Sila pilih Hub.", alert_no_service: "Sila pilih servis.", alert_measure: "Sila lengkapkan ukuran.", alert_max: "mesti kurang dari saiz asal", alert_max_full: "mesti kurang atau sama dengan saiz asal", alert_full_equal: "Sekurang-kurangnya satu ukuran mesti dikurangkan.", txt_no_items_step4: "Tiada item dipilih.",
+            alert_name: "Sila masukkan nama.", alert_phone: "Sila masukkan no. telefon.", alert_unit: "Sila masukkan No. Unit/Rumah anda.", alert_no_hub: "Sila pilih Hub.", alert_no_service: "Sila pilih sekurang-kurangnya satu servis (cth. Alter Labuh).", alert_measure: "Sila lengkapkan ukuran.", alert_max: "mesti kurang dari saiz asal", alert_max_full: "mesti kurang atau sama dengan saiz asal", alert_full_equal: "Sekurang-kurangnya satu ukuran mesti dikurangkan.", txt_no_items_step4: "Sila pilih Kod Rekaan dan Saiz untuk item anda.",
             txt_syncing_system: "Menyegerak...", txt_open: "BUKA", txt_closed: "TUTUP", txt_closes_at: "Tutup jam", txt_opens_at: "Buka jam", txt_rebook_title: "Mendapatkan Pesanan Anda", txt_rebook_desc: "Mendapatkan tempahan lepas anda. Sila pilih Hub yang baru."
         }
     };
 
     let currentLang = 'en';
     let map, userLocationMarker = null;
-    let hubs = [], markers = [], circles = [], currentRadius = 0; // Default NO radius circle
+    let hubs = [], markers = [], circles = [], currentRadius = 0; 
     
     // --- BOOKING STATE ---
     let bookingMode = false;
@@ -353,7 +355,7 @@
     const sizes = ['XS', 'S', 'M', 'L', 'XL', 'XXL', 'XXXL'];
     const sizeChart = { 'XS': { length: 55, sleeve: 22, shoulder: 14 }, 'S': { length: 55, sleeve: 22, shoulder: 15 }, 'M': { length: 57, sleeve: 23, shoulder: 16 }, 'L': { length: 60, sleeve: 23.5, shoulder: 16.5 }, 'XL': { length: 60, sleeve: 23.5, shoulder: 17.5 }, 'XXL': { length: 60, sleeve: 23.5, shoulder: 18 }, 'XXXL': { length: 60, sleeve: 23.5, shoulder: 19 } };
 
-    // Utility Functions (Fixed null sanitization bug)
+    // Utility Functions 
     function sanitizeHTML(str) { if (!str || str === "null") return ""; return String(str).replace(/&/g, "&").replace(/</g, "<").replace(/>/g, ">"); }
     function sanitizePhone(phone) { let p = phone.replace(/\D/g, ''); if (p.startsWith('0')) p = '6' + p; else if (!p.startsWith('60') && p.length >= 9) p = '60' + p; return p; }
 
@@ -521,24 +523,24 @@
         const step1 = document.getElementById('tut-step-1');
         const step2 = document.getElementById('tut-step-2');
         const step3 = document.getElementById('tut-step-3');
+        const confirmModal = document.getElementById('confirm-location-modal');
         
         if (step1) step1.classList.replace('opacity-100', 'opacity-0');
         if (step2) step2.classList.replace('opacity-100', 'opacity-0');
         if (step3) step3.classList.replace('opacity-100', 'opacity-0');
+        if (confirmModal) confirmModal.classList.replace('opacity-100', 'opacity-0');
         
         setTimeout(() => {
             if (step1) step1.classList.add('hidden');
             if (step2) step2.classList.add('hidden');
             if (step3) step3.classList.add('hidden');
+            if (confirmModal) {
+                confirmModal.classList.add('hidden');
+                confirmModal.classList.remove('flex');
+            }
             document.getElementById('fab-container').classList.remove('hidden'); 
         }, 500);
 
-        const confirmModal = document.getElementById('confirm-location-modal');
-        if (confirmModal) {
-            confirmModal.classList.add('hidden');
-            confirmModal.classList.remove('flex');
-        }
-        
         document.getElementById('btn-locate').classList.remove('animate-pulse', 'ring-2', 'ring-luxe');
         if(map) map.setZoom(11);
     }
@@ -553,19 +555,25 @@
         const btn = document.getElementById('btn-locate'); 
         const origHTML = btn.innerHTML;
         btn.classList.remove('animate-pulse', 'ring-2', 'ring-luxe');
+        
         btn.innerHTML = `${spinnerSvg}<span class="text-sm font-medium">Locating...</span>`;
         btn.disabled = true; btn.classList.add('animate-pulse');
 
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(
                 async (position) => {
-                    btn.innerHTML = origHTML; btn.disabled = false; btn.classList.remove('animate-pulse');
                     const pos = { lat: position.coords.latitude, lng: position.coords.longitude };
                     
+                    // NEW: "Translating GPS..." State
+                    btn.innerHTML = `${spinnerSvg}<span class="text-sm font-medium" data-t="txt_translating_gps">${t[currentLang].txt_translating_gps || 'Translating GPS...'}</span>`;
+
                     try { const res = await fetch(`${SCRIPT_URL}?action=reverse_geocode&lat=${pos.lat}&lng=${pos.lng}`); const d = await res.json(); state.address = d.address || "Customer Location"; } catch(e) { state.address = "Customer Location"; }
+                    
+                    btn.innerHTML = origHTML; btn.disabled = false; btn.classList.remove('animate-pulse');
                     state.lat = pos.lat; state.lng = pos.lng;
 
                     map.setZoom(16); map.setCenter(pos);
+                    
                     if(userLocationMarker) userLocationMarker.setMap(null);
 
                     const svgBluePin = 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 36" width="32" height="48"><path fill="#4285F4" stroke="#ffffff" stroke-width="2" d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/></svg>');
@@ -573,9 +581,11 @@
 
                     userLocationMarker.addListener('click', () => { 
                         map.setZoom(16); 
-                        map.panTo(userLocationMarker.getPosition()); 
-                        document.getElementById('confirm-location-modal').classList.remove('hidden'); 
-                        document.getElementById('confirm-location-modal').classList.add('flex'); 
+                        map.panTo(userLocationMarker.getPosition());
+                        const confirmModal = document.getElementById('confirm-location-modal');
+                        confirmModal.classList.remove('hidden'); 
+                        confirmModal.classList.add('flex'); 
+                        setTimeout(() => confirmModal.classList.replace('opacity-0', 'opacity-100'), 10);
                         closeModal(); 
                         hideCTA(); 
                     });
@@ -586,27 +596,36 @@
                             step2.classList.replace('opacity-100', 'opacity-0');
                             setTimeout(() => { step2.classList.add('hidden'); }, 500);
                         }
+                        const confirmModal = document.getElementById('confirm-location-modal');
+                        if(confirmModal && !confirmModal.classList.contains('hidden')) {
+                            confirmModal.classList.replace('opacity-100', 'opacity-0');
+                            setTimeout(() => { confirmModal.classList.add('hidden'); confirmModal.classList.remove('flex'); }, 300);
+                        }
                     });
 
                     userLocationMarker.addListener('dragend', () => { 
-                        map.panTo(userLocationMarker.getPosition()); 
+                        map.panTo(userLocationMarker.getPosition());
                         state.lat = userLocationMarker.getPosition().lat(); 
                         state.lng = userLocationMarker.getPosition().lng(); 
-                        document.getElementById('confirm-location-modal').classList.remove('hidden'); 
-                        document.getElementById('confirm-location-modal').classList.add('flex'); 
+                        const confirmModal = document.getElementById('confirm-location-modal');
+                        confirmModal.classList.remove('hidden'); 
+                        confirmModal.classList.add('flex'); 
+                        setTimeout(() => confirmModal.classList.replace('opacity-0', 'opacity-100'), 10);
                     });
 
                     if(bookingMode) {
                         document.getElementById('tut-step-1').classList.replace('opacity-100', 'opacity-0');
                         setTimeout(() => { document.getElementById('tut-step-1').classList.add('hidden'); }, 500);
                         
-                        // Show floating Step 2 Animation above pin
                         const step2 = document.getElementById('tut-step-2');
                         step2.classList.remove('hidden');
                         setTimeout(() => { step2.classList.replace('opacity-0', 'opacity-100'); }, 10);
                     }
                     
-                    document.getElementById('confirm-location-modal').classList.remove('hidden'); document.getElementById('confirm-location-modal').classList.add('flex');
+                    const confirmModal = document.getElementById('confirm-location-modal');
+                    confirmModal.classList.remove('hidden'); 
+                    confirmModal.classList.add('flex');
+                    setTimeout(() => confirmModal.classList.replace('opacity-0', 'opacity-100'), 10);
                 },
                 () => { btn.innerHTML = origHTML; btn.disabled = false; btn.classList.remove('animate-pulse'); alert("Location access denied."); },
                 { enableHighAccuracy: true } 
@@ -615,7 +634,11 @@
     }
 
     function confirmLocation() {
-        document.getElementById('confirm-location-modal').classList.add('hidden'); document.getElementById('confirm-location-modal').classList.remove('flex');
+        const confirmModal = document.getElementById('confirm-location-modal');
+        if(confirmModal && !confirmModal.classList.contains('hidden')) {
+            confirmModal.classList.replace('opacity-100', 'opacity-0');
+            setTimeout(() => { confirmModal.classList.add('hidden'); confirmModal.classList.remove('flex'); }, 500);
+        }
         
         const step2 = document.getElementById('tut-step-2');
         if(step2 && !step2.classList.contains('hidden')) {
@@ -637,13 +660,32 @@
         
         const actionArea = document.getElementById('modal-action-area');
         
+        // Premium Icon Row
+        const navLink = `https://www.google.com/maps/dir/?api=1&destination=${parseFloat(hub.lat)},${parseFloat(hub.lng)}`;
+        const waLink = "https://wa.me/" + sanitizePhone(hub.phone || "");
+        const callLink = "tel:" + sanitizePhone(hub.phone || "");
+
+        const iconRowHtml = `
+            <div class="flex justify-center gap-5 mt-4 pt-4 border-t border-white/10">
+                <a href="${navLink}" target="_blank" class="w-11 h-11 rounded-full bg-white/5 hover:bg-luxe hover:text-brand border border-white/10 text-white flex items-center justify-center transition-all shadow-lg" title="Navigate">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.243-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                </a>
+                <a href="${waLink}" target="_blank" class="w-11 h-11 rounded-full bg-white/5 hover:bg-[#25D366] hover:text-white hover:border-[#25D366] border border-white/10 text-white flex items-center justify-center transition-all shadow-lg" title="WhatsApp">
+                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.305-.883-.653-1.48-1.459-1.653-1.756-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+                </a>
+                <a href="${callLink}" class="w-11 h-11 rounded-full bg-white/5 hover:bg-white hover:text-brand border border-white/10 text-white flex items-center justify-center transition-all shadow-lg" title="Call">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg>
+                </a>
+            </div>
+        `;
+
         if (bookingMode && hub.backlog < hub.max_capacity) {
             const banner = document.getElementById('tut-step-3');
             banner.classList.replace('opacity-100', 'opacity-0');
             setTimeout(() => banner.classList.add('hidden'), 500);
 
-            actionArea.innerHTML = `
-                <div class="mt-4 pt-4 border-t border-white/10 space-y-2">
+            actionArea.innerHTML = iconRowHtml + `
+                <div class="mt-4 space-y-2">
                     <button onclick="selectLogistics(${hub.id}, 'walkin')" class="w-full py-3 bg-luxe/10 border border-luxe text-white rounded-lg flex justify-between px-4 items-center hover:bg-luxe hover:text-brand transition shadow-soft">
                         <span class="font-bold text-[15px] flex items-center gap-2"><span data-t="txt_drop_in">${t[currentLang].txt_drop_in}</span></span>
                         <span class="text-xs font-bold text-luxe px-2 py-1 bg-brand/50 rounded border border-white/5" data-t="txt_free">${t[currentLang].txt_free}</span>
@@ -673,8 +715,7 @@
                 } catch(e) { document.getElementById('lala-quote-disp').innerHTML = "Error"; }
             }
         } else {
-            const navLink = `https://www.google.com/maps/search/?api=1&query=${parseFloat(hub.lat)},${parseFloat(hub.lng)}`;
-            actionArea.innerHTML = `<a href="${navLink}" target="_blank" class="flex items-center justify-center w-full py-3 mt-4 rounded-lg border border-luxe text-luxe hover:bg-luxe hover:text-brand transition-colors font-bold text-[15px]" data-t="txt_nav_hub">${t[currentLang].txt_nav_hub}</a>`;
+            actionArea.innerHTML = iconRowHtml;
             document.getElementById('hub-modal').classList.remove('hidden'); document.getElementById('hub-modal').classList.add('flex'); hideCTA(); 
         }
         map.panTo({ lat: parseFloat(hub.lat), lng: parseFloat(hub.lng) });
@@ -814,8 +855,10 @@
             if(!state.unitNo) return alert(t[currentLang].alert_unit);
         }
 
-        if(state.selectedItems.length === 0) return alert(t[currentLang].alert_no_service);
-        if(state.servicesTotal === 0) return alert(t[currentLang].alert_no_service);
+        if(state.selectedItems.length === 0) return alert(t[currentLang].txt_no_items_step4 || "Please select Design Code and Size for your items.");
+        
+        calculateTotal();
+        if(state.servicesTotal === 0) return alert(t[currentLang].alert_no_service || "Please select at least one alteration service (e.g. Alter Length).");
 
         if(state.mode === 'lalamove') {
             let valid = true;
@@ -847,7 +890,6 @@
         const hubData = hubs.find(h => h.id === state.hubId);
         
         const payload = {
-            action: "hub_application", // Reusing backend endpoint, routed via Order_Type
             Order_Type: state.path === 'A' ? "Website" : "Public",
             Order_Ref: state.path === 'A' ? document.getElementById('order-id-display').innerText.replace('#', '') : "Manual",
             Customer_Name: custName, Phone_No: sanitizePhone(rawPhone),
