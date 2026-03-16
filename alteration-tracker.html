@@ -47,6 +47,9 @@
     .lala-label { font-size: 8px; color: rgba(255,255,255,0.3); text-transform: uppercase; letter-spacing: 0.5px; line-height: 1.2; }
     .lala-step.active .lala-label { color: #C0A062; font-weight: bold; }
     .lala-step.completed .lala-label { color: #4ade80; }
+
+    /* Map UI Hiding */
+    .gmnoprint, .gm-style-cc, .gm-bundled-control { display: none !important; opacity: 0 !important; pointer-events: none !important; }
   </style>
 </head>
 <body class="antialiased selection:bg-luxe selection:text-brand">
@@ -203,13 +206,12 @@
             <div class="bg-white/5 border border-white/10 rounded-lg p-3 mb-4 text-[10px] text-white/70 space-y-2">
                 <p class="font-bold text-luxe uppercase tracking-wider">📍 <span data-t="txt_accuracy_check">Location Accuracy Check</span></p>
                 <p>• <span data-t="txt_opt_1"><strong>Option 1:</strong> Use the "Original Address" if it perfectly matches your location.</span></p>
-                <p>• <span data-t="txt_opt_2"><strong>Option 2:</strong> Detect new GPS or Search Map if you are at a different location.</span></p>
+                <p>• <span data-t="txt_opt_2"><strong>Option 2:</strong> Pinpoint your exact building on the Map if you are at a different location.</span></p>
             </div>
 
-            <div class="grid grid-cols-3 gap-2 mb-4 bg-black/50 p-1 rounded-xl border border-white/10" id="address-tabs">
+            <div class="grid grid-cols-2 gap-2 mb-4 bg-black/50 p-1 rounded-xl border border-white/10" id="address-tabs">
                 <button onclick="toggleLocMethod('orig')" id="tab-orig" class="text-[10px] font-bold py-2 rounded-lg bg-white/10 text-white transition" data-t="txt_tab_orig">Original</button>
-                <button onclick="toggleLocMethod('gps')" id="tab-gps" class="text-[10px] font-bold py-2 rounded-lg bg-transparent text-white/50 hover:text-white transition" data-t="txt_tab_gps">GPS</button>
-                <button onclick="toggleLocMethod('manual')" id="tab-manual" class="text-[10px] font-bold py-2 rounded-lg bg-transparent text-white/50 hover:text-white transition" data-t="txt_tab_manual">Manual</button>
+                <button onclick="toggleLocMethod('map')" id="tab-map" class="text-[10px] font-bold py-2 rounded-lg bg-transparent text-white/50 hover:text-white transition" data-t="txt_tab_map">Pin on Map</button>
             </div>
 
             <div id="view-orig" class="mb-4">
@@ -220,20 +222,19 @@
                 <button id="btn-orig-book" onclick="getQuotation('orig')" class="w-full bg-luxe text-brand font-bold py-3 rounded-xl hover:bg-white transition mt-2 shadow-soft" data-t="btn_check_book">Check Price & Book</button>
             </div>
 
-            <div id="view-gps" class="mb-4 hidden">
-                <button onclick="getGPS()" class="w-full py-3 border border-dashed border-luxe/50 text-luxe bg-luxe/5 rounded-xl text-sm font-bold flex items-center justify-center gap-2 hover:bg-luxe/10 transition" id="btn-get-gps">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
-                    <span id="gps-btn-text" data-t="btn_detect_loc">Detect My Location</span>
-                </button>
-                <p class="text-[10px] text-white/40 mt-2 text-center" id="gps-status" data-t="txt_gps_signal">GPS signal required for accuracy.</p>
-            </div>
-
-            <div id="view-manual" class="hidden mb-4">
-                <input type="text" id="manual-addr-input" placeholder="Search Building / Street..." class="mb-2">
-                <button onclick="geocodeManual()" id="btn-manual-search" class="w-full py-2 bg-white/10 text-white text-xs font-bold rounded-lg hover:bg-white/20 transition flex items-center justify-center" data-t="btn_search_map">
-                    Search Map
-                </button>
-                <p class="text-[10px] text-luxe mt-2 hidden font-mono" id="manual-status">Found: ...</p>
+            <div id="view-map" class="hidden mb-4 relative">
+                <p class="text-[10px] text-white/40 mb-2 text-center" data-t="txt_map_instruct">Drag the blue pin to your exact location.</p>
+                
+                <div class="relative w-full h-48 rounded-xl overflow-hidden border border-white/10 mb-2">
+                    <div id="tracker-map" class="w-full h-full bg-[#1A1A1C]"></div>
+                    <button onclick="locateUserOnMap()" class="absolute bottom-2 right-2 bg-brand/90 backdrop-blur border border-white/20 p-2.5 rounded-lg shadow-lg hover:border-luxe transition text-luxe z-10" title="Detect Location">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                    </button>
+                </div>
+                
+                <div class="bg-black/50 border border-white/5 rounded-lg p-2.5 text-xs text-white/70 min-h-[44px] flex items-center justify-center text-center leading-snug" id="map-address-display">
+                    ...
+                </div>
             </div>
 
             <div class="space-y-3 border-t border-white/10 pt-4 opacity-50 pointer-events-none transition-opacity hidden" id="addr-fields">
@@ -316,12 +317,15 @@
     
     let currentData = null;
     let hubData = { phone: "", lat: 0, lng: 0 }; 
-    let custData = { lat: 0, lng: 0, address: "" }; 
+    let custData = { lat: 0, lng: 0, address: "", mapAddress: "" }; 
     let activeQuoteId = null;
     let currentStops = null;
     let currentLang = 'en';
     let isIncomingOrder = false; 
     let pendingOutboundChoice = '';
+
+    let trackerMap = null;
+    let trackerMarker = null;
 
     const t = {
         en: {
@@ -330,17 +334,21 @@
             confirmed_title: "Selection Confirmed", confirmed_lala: "Lalamove Selected.", confirmed_self: "Self-Pickup Selected.",
             success_title: "Alteration Completed", success_desc: "Thank you for using our service. If you have any inquiries regarding your alteration, please contact the hub.", btn_contact: "Contact Hub", btn_call: "Call Hub",
             track_lala: "Track Lalamove Map", btn_cancel_rider: "Cancel Lalamove Booking", confirm_cancel_rider: "Are you sure you want to cancel the rider? This action cannot be undone.", txt_canceling: "Canceling...",
-            txt_accuracy_check: "Location Accuracy Check", txt_opt_1: "<strong>Option 1:</strong> Use the 'Original Address' if it matches your location perfectly.", txt_opt_2: "<strong>Option 2:</strong> Detect new GPS or Search Map if you are at a different location.",
-            txt_use_orig: "Use the address you provided during the initial booking.", btn_check_book: "Check Price & Book", btn_detect_loc: "Detect My Location", txt_gps_signal: "GPS signal required for accuracy.", btn_search_map: "Search Map", lbl_unit: "Unit / House No.", lbl_building: "Building / Street (Optional)", modal_est_fee: "Estimated Delivery Fee", txt_pay_cash: "Pay Cash directly to the Lalamove Rider.", btn_call_rider: "Call Rider Now", btn_cancel: "Cancel",
+            txt_accuracy_check: "Location Accuracy Check", 
+            txt_opt_1: "<strong>Option 1:</strong> Use the 'Original Address' if it matches your location perfectly.", 
+            txt_opt_2: "<strong>Option 2:</strong> Pinpoint your exact building on the Map if you are at a different location.",
+            txt_use_orig: "Use the address you provided during the initial booking.", btn_check_book: "Check Price & Book", 
+            txt_tab_map: "Pin on Map", txt_map_instruct: "Drag the blue pin to your exact location.", 
+            btn_detect_loc: "Detect My Location", txt_gps_signal: "GPS signal required for accuracy.", btn_search_map: "Search Map", lbl_unit: "Unit / House No.", lbl_building: "Building / Street (Optional)", modal_est_fee: "Estimated Delivery Fee", txt_pay_cash: "Pay Cash directly to the Lalamove Rider.", btn_call_rider: "Call Rider Now", btn_cancel: "Cancel",
             txt_alt_fee_title: "Alteration Fee Payment", txt_alt_fee_desc: "Your item is ready! Please pay the alteration fee to the Hub below.", btn_wa_hub: "Send Receipt to Hub", txt_hub_paid_thanks: "Thank you! Please select your return method below:", txt_hq_qr_title: "Lalamove Delivery Payment", txt_hq_qr_desc: "Please pay the delivery fee to Arabista HQ.", txt_pay_hq: "Scan to pay, then send receipt via WhatsApp.", btn_wa_hq: "Send Receipt to HQ", txt_view_map: "View on Google Maps", txt_receipt_sent: "Receipt Sent!", txt_action_pay: "Payment Required for Alteration", btn_pay_alt: "Pay Alteration Fee", btn_view_hub_qr: "View Hub QR Code Again", btn_close: "Close", txt_click_enlarge: "Click QR to enlarge", txt_save_instruction: "Long press or screenshot to save",
             
             txt_step1: "Step 1", txt_step2: "Step 2: Please ensure the Lalamove fee has been paid", txt_pay_alt_warn: "Please ensure the alteration fee has been paid to the hub before arranging Lalamove or Self-Pickup.",
-            alert_enter_id: "Please enter an Alteration ID.", alert_order_not_found: "Order not found.", alert_conn_error: "Connection Error.", alert_enter_unit: "Please enter Unit / House Number.", alert_locate_gps: "Please locate GPS or Search Map first.", alert_fee_error: "Fee Error: ", alert_error: "Error", alert_driver_booked: "Driver Booked!", alert_failed: "Failed: ", alert_cancel_failed: "Cancel Failed: ", alert_error_canceling: "Error canceling.", alert_copied: "Copied to clipboard!",
+            alert_enter_id: "Please enter an Alteration ID.", alert_order_not_found: "Order not found.", alert_conn_error: "Connection Error.", alert_enter_unit: "Please enter Unit / House Number.", alert_locate_gps: "Please pin your location on the map first.", alert_fee_error: "Fee Error: ", alert_error: "Error", alert_driver_booked: "Driver Booked!", alert_failed: "Failed: ", alert_cancel_failed: "Cancel Failed: ", alert_error_canceling: "Error canceling.", alert_copied: "Copied to clipboard!",
             msg_calculating: "Calculating...", msg_locating: "Locating...", msg_searching: "Searching...", msg_translating: "Translating...", msg_booking: "Booking...", msg_retry: "Retry", msg_gps_acquiring: "📡 Acquiring exact satellite coordinates...", msg_gps_locked: "GPS Locked:", msg_pin_dropped: "✅ Pin Dropped:", msg_location_not_found: "❌ Location not found.", msg_search_failed: "❌ Search failed.", msg_wait: "Wait...", msg_geo_notsupported: "Geo not supported",
             wa_hub_pay: "*[ALTERATION PAYMENT]*\n- *Order:* {id}\n- *Amount:* {total}\n- *Paid To:* Arabista Hub\n\nReceipt attached below.",
             wa_hq_pay: "*[DELIVERY PAYMENT]*\n- *Order:* {id}\n- *Amount:* {total}\n- *Paid To:* Arabista HQ\n- *Link:* {link}\n\nReceipt attached below.",
             
-            status_assigned_to: "Assigned to: ", txt_rejected_title: "Order Rejected", txt_rejected_desc: "Unfortunately, the Hub is currently unable to accept your request (likely due to high volume or closing time).", btn_choose_another: "Choose Another Hub", txt_waiting_approval: "Your request is waiting for Hub's approval. If it takes too long, you can re-notify them.", btn_renotify: "Re-notify Hub via WhatsApp", txt_please_dropoff: "Please drop off your items at the hub.", txt_lala_live: "Lalamove Live Status", txt_tab_orig: "Original", txt_tab_gps: "GPS", txt_tab_manual: "Manual",
+            status_assigned_to: "Assigned to: ", txt_rejected_title: "Order Rejected", txt_rejected_desc: "Unfortunately, the Hub is currently unable to accept your request (likely due to high volume or closing time).", btn_choose_another: "Choose Another Hub", txt_waiting_approval: "Your request is waiting for Hub's approval. If it takes too long, you can re-notify them.", btn_renotify: "Re-notify Hub via WhatsApp", txt_please_dropoff: "Please drop off your items at the hub.", txt_lala_live: "Lalamove Live Status", txt_tab_orig: "Original", 
             stage_pending_approval: "Pending Approval", stage_awaiting_dispatch: "Awaiting Dispatch", stage_inbound_dispatched: "Inbound Dispatched", stage_in_progress: "In Progress", stage_ready_for_return: "Ready for Return", stage_pending_dropoff: "Pending Dropoff", stage_outbound_dispatched: "Outbound Dispatched", stage_completed: "Completed", stage_dispatched: "Dispatched",
             step_assigning: "Assigning", step_found: "Found", step_picked_up: "Picked Up", step_delivered: "Delivered",
             modal_booked_title: "Driver Booked!", modal_booked_desc: "Your Lalamove rider has been successfully scheduled. Please notify the Hub.", btn_notify_hub_wa: "Notify Hub via WhatsApp", btn_skip_reload: "Skip & Reload Tracker",
@@ -359,17 +367,21 @@
             confirmed_title: "Pilihan Disahkan", confirmed_lala: "Lalamove Dipilih.", confirmed_self: "Ambil Sendiri Dipilih.",
             success_title: "Alterasi Selesai", success_desc: "Terima kasih kerana menggunakan servis kami. Jika anda mempunyai sebarang pertanyaan, sila hubungi hub.", btn_contact: "Hubungi Hub", btn_call: "Telefon Hub",
             track_lala: "Jejak Peta Lalamove", btn_cancel_rider: "Batal Tempahan Lalamove", confirm_cancel_rider: "Adakah anda pasti mahu membatalkan rider? Tindakan ini tidak boleh diubah.", txt_canceling: "Membatalkan...",
-            txt_accuracy_check: "Semakan Ketepatan Lokasi", txt_opt_1: "<strong>Pilihan 1:</strong> Guna 'Alamat Asal' jika ia menepati lokasi anda dengan tepat.", txt_opt_2: "<strong>Pilihan 2:</strong> Kesan GPS baru atau Cari Peta jika anda berada di lokasi berbeza.",
-            txt_use_orig: "Guna alamat yang anda berikan semasa tempahan awal.", btn_check_book: "Semak Harga & Tempah", btn_detect_loc: "Kesan Lokasi Saya", txt_gps_signal: "Isyarat GPS diperlukan untuk ketepatan.", btn_search_map: "Cari Peta", lbl_unit: "No. Unit / Rumah", lbl_building: "Bangunan / Jalan (Pilihan)", modal_est_fee: "Anggaran Caj Penghantaran", txt_pay_cash: "Bayar Tunai terus kepada Rider Lalamove.", btn_call_rider: "Panggil Rider Sekarang", btn_cancel: "Batal",
+            txt_accuracy_check: "Semakan Ketepatan Lokasi", 
+            txt_opt_1: "<strong>Pilihan 1:</strong> Guna 'Alamat Asal' jika ia menepati lokasi anda dengan tepat.", 
+            txt_opt_2: "<strong>Pilihan 2:</strong> Letakkan pin di Peta jika anda berada di lokasi berbeza.",
+            txt_use_orig: "Guna alamat yang anda berikan semasa tempahan awal.", btn_check_book: "Semak Harga & Tempah", 
+            txt_tab_map: "Pin di Peta", txt_map_instruct: "Tarik pin biru tepat ke lokasi anda.", 
+            btn_detect_loc: "Kesan Lokasi Saya", txt_gps_signal: "Isyarat GPS diperlukan untuk ketepatan.", btn_search_map: "Cari Peta", lbl_unit: "No. Unit / Rumah", lbl_building: "Bangunan / Jalan (Pilihan)", modal_est_fee: "Anggaran Caj Penghantaran", txt_pay_cash: "Bayar Tunai terus kepada Rider Lalamove.", btn_call_rider: "Panggil Rider Sekarang", btn_cancel: "Batal",
             txt_alt_fee_title: "Bayaran Caj Alterasi", txt_alt_fee_desc: "Barang anda telah siap! Sila bayar caj alterasi kepada Hub di bawah.", btn_wa_hub: "Hantar Resit ke Hub", txt_hub_paid_thanks: "Terima kasih! Sila pilih kaedah penghantaran di bawah:", txt_hq_qr_title: "Bayaran Lalamove", txt_hq_qr_desc: "Sila bayar caj penghantaran kepada Arabista HQ.", txt_pay_hq: "Imbas untuk bayar, dan hantar resit di WhatsApp.", btn_wa_hq: "Hantar Resit ke HQ", txt_view_map: "Lihat di Google Maps", txt_receipt_sent: "Resit Dihantar!", txt_action_pay: "Bayaran Alterasi Diperlukan", btn_pay_alt: "Bayar Caj Alterasi", btn_view_hub_qr: "Lihat Semula QR Hub", btn_close: "Tutup", txt_click_enlarge: "Klik QR untuk besarkan", txt_save_instruction: "Tekan lama atau screenshot untuk simpan",
             
             txt_step1: "Langkah 1", txt_step2: "Langkah 2: Sila pastikan caj Lalamove telah dibayar", txt_pay_alt_warn: "Sila pastikan caj alterasi telah dibayar kepada hub sebelum menempah Lalamove atau Ambil Sendiri.",
-            alert_enter_id: "Sila masukkan ID Tempahan.", alert_order_not_found: "Tempahan tidak dijumpai.", alert_conn_error: "Ralat Sambungan.", alert_enter_unit: "Sila masukkan No. Unit / Rumah.", alert_locate_gps: "Sila kesan GPS atau Cari Peta dahulu.", alert_fee_error: "Ralat Caj: ", alert_error: "Ralat", alert_driver_booked: "Rider Berjaya Ditempah!", alert_failed: "Gagal: ", alert_cancel_failed: "Gagal Batal: ", alert_error_canceling: "Ralat membatalkan.", alert_copied: "Disalin ke papan keratan!",
+            alert_enter_id: "Sila masukkan ID Tempahan.", alert_order_not_found: "Tempahan tidak dijumpai.", alert_conn_error: "Ralat Sambungan.", alert_enter_unit: "Sila masukkan No. Unit / Rumah.", alert_locate_gps: "Sila letakkan pin lokasi di peta dahulu.", alert_fee_error: "Ralat Caj: ", alert_error: "Ralat", alert_driver_booked: "Rider Berjaya Ditempah!", alert_failed: "Gagal: ", alert_cancel_failed: "Gagal Batal: ", alert_error_canceling: "Ralat membatalkan.", alert_copied: "Disalin ke papan keratan!",
             msg_calculating: "Mengira...", msg_locating: "Mengescan...", msg_searching: "Mencari...", msg_translating: "Menterjemah...", msg_booking: "Menempah...", msg_retry: "Cuba Lagi", msg_gps_acquiring: "📡 Mendapatkan koordinat satelit yang tepat...", msg_gps_locked: "GPS Dikunci:", msg_pin_dropped: "✅ Pin Diletakkan:", msg_location_not_found: "❌ Lokasi tidak dijumpai.", msg_search_failed: "❌ Carian gagal.", msg_wait: "Tunggu...", msg_geo_notsupported: "Geo tidak disokong",
             wa_hub_pay: "*[BAYARAN ALTERASI]*\n- *Pesanan:* {id}\n- *Jumlah:* {total}\n- *Dibayar Kepada:* Arabista Hub\n\nResit dilampirkan di bawah.",
             wa_hq_pay: "*[BAYARAN PENGHANTARAN]*\n- *Pesanan:* {id}\n- *Jumlah:* {total}\n- *Dibayar Kepada:* Arabista HQ\n- *Pautan:* {link}\n\nResit dilampirkan di bawah.",
             
-            status_assigned_to: "Ditetapkan kepada: ", txt_rejected_title: "Pesanan Ditolak", txt_rejected_desc: "Dukacita dimaklumkan, Hub tidak dapat menerima pesanan anda buat masa ini (mungkin kerana terlalu sibuk atau sudah tutup).", btn_choose_another: "Pilih Hub Lain", txt_waiting_approval: "Pesanan anda sedang menunggu kelulusan Hub. Jika terlalu lama, anda boleh maklumkan mereka semula.", btn_renotify: "Maklumkan Hub melalui WhatsApp", txt_please_dropoff: "Sila hantar (drop-off) barang anda di Hub.", txt_lala_live: "Status Terkini Lalamove", txt_tab_orig: "Asal", txt_tab_gps: "GPS", txt_tab_manual: "Manual",
+            status_assigned_to: "Ditetapkan kepada: ", txt_rejected_title: "Pesanan Ditolak", txt_rejected_desc: "Dukacita dimaklumkan, Hub tidak dapat menerima pesanan anda buat masa ini (mungkin kerana terlalu sibuk atau sudah tutup).", btn_choose_another: "Pilih Hub Lain", txt_waiting_approval: "Pesanan anda sedang menunggu kelulusan Hub. Jika terlalu lama, anda boleh maklumkan mereka semula.", btn_renotify: "Maklumkan Hub melalui WhatsApp", txt_please_dropoff: "Sila hantar (drop-off) barang anda di Hub.", txt_lala_live: "Status Terkini Lalamove", txt_tab_orig: "Asal", 
             stage_pending_approval: "Menunggu Kelulusan", stage_awaiting_dispatch: "Menunggu Pickup", stage_inbound_dispatched: "Rider Ditempah (Ke Hub)", stage_in_progress: "Sedang Dijahit", stage_ready_for_return: "Sedia Diambil/Dihantar", stage_pending_dropoff: "Menunggu Drop-off", stage_outbound_dispatched: "Rider Ditempah (Ke Pelanggan)", stage_completed: "Selesai", stage_dispatched: "Dihantar",
             step_assigning: "Mencari", step_found: "Dijumpai", step_picked_up: "Diambil", step_delivered: "Selesai",
             modal_booked_title: "Rider Ditempah!", modal_booked_desc: "Rider Lalamove anda telah berjaya dijadualkan. Sila maklumkan kepada Hub.", btn_notify_hub_wa: "Maklumkan Hub via WhatsApp", btn_skip_reload: "Langkau & Muat Semula",
@@ -400,12 +412,11 @@
         }
     }
 
-    const TRACKER_VERSION = "1.3"; 
+    const TRACKER_VERSION = "1.4"; 
 
     document.addEventListener('DOMContentLoaded', () => { 
         const storedVersion = localStorage.getItem('arabista_tracker_version');
         if (storedVersion !== TRACKER_VERSION) { 
-            // Safely update the version key without wiping out logins or causing reload loops
             localStorage.setItem('arabista_tracker_version', TRACKER_VERSION); 
         }
 
@@ -871,6 +882,124 @@
         renderDashboard(); 
     }
 
+    function toggleLocMethod(method) {
+        ['orig', 'map'].forEach(m => {
+            const btn = document.getElementById('tab-'+m);
+            if(btn) btn.className = "text-[10px] font-bold py-2 rounded-lg transition " + (method===m ? "bg-white/10 text-white border border-transparent" : "bg-transparent text-white/50 border border-white/10 hover:text-white");
+            const view = document.getElementById('view-'+m);
+            if(view) { if(method===m) view.classList.remove('hidden'); else view.classList.add('hidden'); }
+        });
+        
+        if (method === 'orig') {
+            document.getElementById('addr-fields').classList.add('hidden');
+        } else {
+            document.getElementById('addr-fields').classList.remove('hidden', 'opacity-50', 'pointer-events-none');
+            // Initialize map if it hasn't been created yet
+            if(!trackerMap && window.google) initTrackerMap();
+            if(trackerMap) {
+                // Force map to recalculate its size since it was hidden
+                setTimeout(() => {
+                    google.maps.event.trigger(trackerMap, 'resize');
+                    if(trackerMarker) trackerMap.panTo(trackerMarker.getPosition());
+                }, 100);
+            }
+        }
+    }
+
+    function initTrackerMap() {
+        if(trackerMap) return;
+        
+        // Default to original address coords, or fallback to KL center
+        const centerPos = (currentData && currentData.originalLat) 
+            ? { lat: parseFloat(currentData.originalLat), lng: parseFloat(currentData.originalLng) } 
+            : { lat: 3.1390, lng: 101.6869 };
+            
+        trackerMap = new google.maps.Map(document.getElementById("tracker-map"), { 
+            zoom: 16, center: centerPos, 
+            disableDefaultUI: true, clickableIcons: false, keyboardShortcuts: false,
+            styles: [
+                { elementType: "geometry", stylers: [{ color: "#1A1A1C" }] },
+                { elementType: "labels.text.stroke", stylers: [{ color: "#1A1A1C" }] },
+                { elementType: "labels.text.fill", stylers: [{ color: "#746855" }] },
+                { featureType: "road", elementType: "geometry", stylers: [{ color: "#2c2c2f" }] },
+                { featureType: "water", elementType: "geometry", stylers: [{ color: "#0F0F10" }] },
+            ] 
+        });
+        
+        const svgBluePin = 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 36" width="32" height="48"><path fill="#4285F4" stroke="#ffffff" stroke-width="2" d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/></svg>');
+        
+        trackerMarker = new google.maps.Marker({ 
+            position: centerPos, map: trackerMap, draggable: true, 
+            icon: { url: svgBluePin, scaledSize: new google.maps.Size(32, 48), anchor: new google.maps.Point(16, 48) } 
+        });
+
+        // Trigger geocode when user stops dragging the pin
+        trackerMarker.addListener('dragend', () => {
+            const pos = trackerMarker.getPosition();
+            trackerMap.panTo(pos);
+            updateTrackerLocation(pos.lat(), pos.lng());
+        });
+        
+        // Initialize the text box with current location
+        updateTrackerLocation(centerPos.lat, centerPos.lng, true);
+    }
+    
+    async function updateTrackerLocation(lat, lng, skipGeocode = false) {
+        custData.lat = lat; custData.lng = lng;
+        const disp = document.getElementById('map-address-display');
+        const btnConfirm = document.getElementById('btn-new-book');
+        
+        if(btnConfirm) {
+            btnConfirm.classList.add('opacity-50', 'pointer-events-none', 'animate-pulse');
+            btnConfirm.innerText = t[currentLang].msg_translating || "Translating...";
+        }
+
+        if(skipGeocode && currentData && currentData.originalAddress) {
+            custData.address = currentData.originalAddress;
+            disp.innerHTML = `<span class="text-green-400 mr-1">✅</span> ${sanitizeHTML(custData.address)}`;
+            if(btnConfirm) {
+                btnConfirm.classList.remove('opacity-50', 'pointer-events-none', 'animate-pulse');
+                btnConfirm.innerText = t[currentLang].btn_check_book || "Check Price & Book";
+            }
+            return;
+        }
+
+        disp.innerHTML = `${spinnerSvg} <span class="animate-pulse text-white/50">${t[currentLang].msg_translating || "Translating..."}</span>`;
+        
+        try {
+            const res = await fetch(`${scriptURL}?action=reverse_geocode&lat=${lat}&lng=${lng}`);
+            const data = await res.json();
+            custData.address = data.address || `${lat.toFixed(5)}, ${lng.toFixed(5)}`;
+            disp.innerHTML = `<span class="text-green-400 mr-1">✅</span> ${sanitizeHTML(custData.address)}`;
+        } catch(e) {
+            custData.address = `${lat.toFixed(5)}, ${lng.toFixed(5)}`;
+            disp.innerText = custData.address;
+        }
+        
+        if(btnConfirm) {
+            btnConfirm.classList.remove('opacity-50', 'pointer-events-none', 'animate-pulse');
+            btnConfirm.innerText = t[currentLang].btn_check_book || "Check Price & Book";
+        }
+    }
+    
+    function locateUserOnMap() {
+        if(!navigator.geolocation) return alert(t[currentLang].msg_geo_notsupported || "Geo not supported");
+        
+        const disp = document.getElementById('map-address-display');
+        disp.innerHTML = `${spinnerSvg} <span class="animate-pulse text-luxe">${t[currentLang].msg_locating || "Locating..."}</span>`;
+        
+        navigator.geolocation.getCurrentPosition((pos) => {
+            const newPos = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+            trackerMap.setCenter(newPos);
+            trackerMap.setZoom(17);
+            trackerMarker.setPosition(newPos);
+            updateTrackerLocation(newPos.lat, newPos.lng);
+        }, () => {
+            alert("Location access denied.");
+            disp.innerText = custData.address || "Location access denied.";
+        }, { enableHighAccuracy: true });
+    }
+
     async function loadOriginalAddress() {
         const origContainer = document.getElementById('orig-addr-text');
         const raw = currentData.originalAddress || "";
@@ -918,7 +1047,7 @@
             toggleLocMethod('orig');
         } else {
             document.getElementById('tab-orig').classList.add('hidden');
-            toggleLocMethod('gps');
+            toggleLocMethod('map');
         }
     }
     
@@ -932,103 +1061,6 @@
         isIncomingOrder = false; 
         goToStep2(); 
         document.getElementById('modal-addr-title').innerText = t[currentLang].modal_title_delivery; 
-    }
-
-    function toggleLocMethod(method) {
-        ['orig', 'gps', 'manual'].forEach(m => {
-            const btn = document.getElementById('tab-'+m);
-            if(btn) btn.className = "text-[10px] font-bold py-2 rounded-lg transition " + (method===m ? "bg-white/10 text-white border border-transparent" : "bg-transparent text-white/50 border border-white/10 hover:text-white");
-            const view = document.getElementById('view-'+m);
-            if(view) { if(method===m) view.classList.remove('hidden'); else view.classList.add('hidden'); }
-        });
-        
-        if (method === 'orig') document.getElementById('addr-fields').classList.add('hidden');
-        else document.getElementById('addr-fields').classList.remove('hidden', 'opacity-50', 'pointer-events-none');
-    }
-    
-    function getGPS() {
-        if(!navigator.geolocation) return alert(t[currentLang].msg_geo_notsupported || "Geo not supported");
-        const btn = document.getElementById('btn-get-gps');
-        const statusTxt = document.getElementById('gps-status');
-        btn.innerHTML = `${spinnerSvg} ${t[currentLang].msg_locating || "Locating..."}`;
-        btn.disabled = true;
-        statusTxt.innerHTML = t[currentLang].msg_gps_acquiring || "📡 Acquiring exact satellite coordinates...";
-        statusTxt.classList.add('animate-pulse', 'text-luxe');
-
-        const btnConfirm = document.getElementById('btn-new-book');
-        if(btnConfirm) {
-            btnConfirm.classList.add('opacity-50', 'pointer-events-none', 'animate-pulse');
-            btnConfirm.innerText = t[currentLang].msg_translating || "Translating...";
-        }
-
-        navigator.geolocation.getCurrentPosition(async (pos) => {
-            custData.lat = pos.coords.latitude; custData.lng = pos.coords.longitude;
-            setTimeout(async () => {
-                btn.innerHTML = `<svg class="w-4 h-4 mr-2 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> ${t[currentLang].btn_detect_loc || "Detect My Location"}`;
-                btn.disabled = false;
-                statusTxt.classList.remove('animate-pulse', 'text-luxe');
-                try {
-                    const res = await fetch(`${scriptURL}?action=reverse_geocode&lat=${custData.lat}&lng=${custData.lng}`);
-                    const data = await res.json();
-                    if(data.address) statusTxt.innerHTML = `<span class="text-green-400 font-bold block">${t[currentLang].msg_gps_locked || "GPS Locked:"}</span> ${sanitizeHTML(data.address)}`;
-                    else statusTxt.innerText = `GPS: ${custData.lat.toFixed(5)}, ${custData.lng.toFixed(5)}`;
-                } catch(e) {}
-                
-                if(btnConfirm) {
-                    btnConfirm.classList.remove('opacity-50', 'pointer-events-none', 'animate-pulse');
-                    btnConfirm.innerText = t[currentLang].btn_check_book || "Check Price & Book";
-                }
-            }, 1500); 
-        }, (err) => {
-             btn.innerHTML = t[currentLang].btn_detect_loc || "Detect My Location"; btn.disabled = false; 
-             if(btnConfirm) {
-                 btnConfirm.classList.remove('opacity-50', 'pointer-events-none', 'animate-pulse');
-                 btnConfirm.innerText = t[currentLang].btn_check_book || "Check Price & Book";
-             }
-             alert("GPS Error: " + err.message);
-        });
-    }
-    
-    async function geocodeManual() {
-        const addr = document.getElementById('manual-addr-input').value.trim();
-        if(!addr) return;
-        const btn = document.getElementById('btn-manual-search');
-        btn.innerHTML = `${spinnerSvg} ${t[currentLang].msg_searching || "Searching..."}`;
-        btn.classList.add('animate-pulse');
-        btn.disabled = true;
-        
-        const btnConfirm = document.getElementById('btn-new-book');
-        if(btnConfirm) {
-            btnConfirm.classList.add('opacity-50', 'pointer-events-none', 'animate-pulse');
-            btnConfirm.innerText = t[currentLang].msg_searching || "Searching...";
-        }
-        
-        try {
-            const res = await fetch(`${scriptURL}?action=geocode&address=${encodeURIComponent(addr)}`);
-            const data = await res.json();
-            btn.innerHTML = t[currentLang].btn_search_map || "Search Map";
-            btn.classList.remove('animate-pulse');
-            btn.disabled = false;
-            
-            if(data.lat) { 
-                custData.lat = data.lat; custData.lng = data.lng; 
-                const stat = document.getElementById('manual-status');
-                stat.classList.remove('hidden');
-                stat.innerHTML = `<span class="text-green-400 font-bold">${t[currentLang].msg_pin_dropped || "✅ Pin Dropped:"}</span> ${sanitizeHTML(data.formatted_address || data.lat)}`;
-            } else {
-                document.getElementById('manual-status').classList.remove('hidden');
-                document.getElementById('manual-status').innerText = t[currentLang].msg_location_not_found || "❌ Location not found.";
-            }
-        } catch(e) {
-            btn.innerHTML = t[currentLang].btn_search_map || "Search Map"; 
-            btn.classList.remove('animate-pulse'); 
-            btn.disabled = false;
-        }
-        
-        if(btnConfirm) {
-            btnConfirm.classList.remove('opacity-50', 'pointer-events-none', 'animate-pulse');
-            btnConfirm.innerText = t[currentLang].btn_check_book || "Check Price & Book";
-        }
     }
 
     async function getQuotation(method = 'new') {
@@ -1187,5 +1219,7 @@
         }
     }
   </script>
+  
+  <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBobNKxxSv_0cTX-EH5cuhF-HKiOHHmuB8"></script>
 </body>
 </html>
