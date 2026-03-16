@@ -886,16 +886,7 @@
             }
         }
 
-        origContainer.innerHTML = `<div class="animate-pulse text-white/50 text-xs py-2">${t[currentLang].msg_translating || "Translating..."}</div>`;
-
         let prettyAddress = sanitizeHTML(restPart);
-        if(currentData.originalLat && currentData.originalLng) {
-            try {
-                const res = await fetch(`${scriptURL}?action=reverse_geocode&lat=${currentData.originalLat}&lng=${currentData.originalLng}`);
-                const data = await res.json();
-                if(data.address) prettyAddress = sanitizeHTML(data.address);
-            } catch(e) {}
-        }
 
         origContainer.innerHTML = `
             <div class="mb-3 border-b border-white/10 pb-3">
@@ -923,11 +914,6 @@
     function goToStep2() { 
         showModalStep(2); 
         if (currentData.originalLat && currentData.originalAddress) {
-            const btnOrigBook = document.getElementById('btn-orig-book');
-            if(btnOrigBook) {
-                btnOrigBook.classList.add('animate-pulse', 'opacity-50', 'pointer-events-none');
-                btnOrigBook.innerText = t[currentLang].msg_translating || "Translating...";
-            }
             loadOriginalAddress();
             toggleLocMethod('orig');
         } else {
