@@ -1,0 +1,1225 @@
+<!doctype html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Arabista — Alteration Tracker</title>
+  <meta name="theme-color" content="#0F0F10" />
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
+
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://www.arabistaofficial.com/alteration-tracker.html" />
+  <meta property="og:title" content="Arabista — Alteration Tracker" />
+  <meta property="og:description" content="Track the live status of your Arabista alteration order, manage payments, and view Lalamove delivery updates in real-time." />
+  <meta property="og:image" content="https://www.arabistaofficial.com/images/social-preview.jpg" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = { theme: { extend: { fontFamily: { display: ['"Cormorant Garamond"', 'serif'], sans: ['Inter', 'ui-sans-serif', 'system-ui'], }, colors: { brand: { DEFAULT: '#0F0F10' }, luxe: { DEFAULT: '#C0A062' }, } } }, }
+  </script>
+  <style>
+    body { background-color: #0F0F10; color: white; }
+    .fade-in { animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    input[type="text"] { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); color: white; border-radius: 8px; padding: 12px 16px; width: 100%; transition: all 0.2s; font-size: 16px !important; }
+    input[type="text"]:focus { outline: none; border-color: #C0A062; background: rgba(192,160,98,0.05); }
+    .timeline-dot { width: 12px; height: 12px; border-radius: 50%; background: #333; z-index: 10; position: relative; transition: all 0.3s;}
+    .timeline-dot.active { background: #C0A062; box-shadow: 0 0 10px rgba(192,160,98,0.5); }
+    .timeline-dot.completed { background: #4ade80; }
+    .timeline-line { position: absolute; left: 5px; top: 12px; bottom: -24px; width: 2px; background: #333; z-index: 0; transition: all 0.3s;}
+    .timeline-line.active { background: #4ade80; }
+    .last-step .timeline-line { display: none; }
+    
+    .lala-step { flex: 1; text-align: center; position: relative; z-index: 1; }
+    .lala-step::before { content: ''; position: absolute; top: 5px; left: -50%; right: 50%; height: 2px; background: #333; z-index: -1; }
+    .lala-step:first-child::before { display: none; }
+    .lala-step.active::before, .lala-step.completed::before { background: #4ade80; }
+    .lala-dot { width: 10px; height: 10px; background: #333; border-radius: 50%; margin: 0 auto 8px; transition: all 0.3s; }
+    .lala-step.active .lala-dot { background: #C0A062; box-shadow: 0 0 8px rgba(192,160,98,0.6); transform: scale(1.2); }
+    .lala-step.completed .lala-dot { background: #4ade80; }
+    .lala-label { font-size: 8px; color: rgba(255,255,255,0.3); text-transform: uppercase; letter-spacing: 0.5px; line-height: 1.2; }
+    .lala-step.active .lala-label { color: #C0A062; font-weight: bold; }
+    .lala-step.completed .lala-label { color: #4ade80; }
+
+    /* Map UI Hiding */
+    .gmnoprint, .gm-style-cc, .gm-bundled-control { display: none !important; opacity: 0 !important; pointer-events: none !important; }
+  </style>
+</head>
+<body class="antialiased selection:bg-luxe selection:text-brand">
+
+  <div id="initial-loader" class="fixed inset-0 z-[999] bg-[#0F0F10] flex flex-col items-center justify-center transition-opacity duration-500">
+      <img src="images/logo-88.webp" alt="Arabista" class="w-24 h-24 animate-pulse mb-4 opacity-80">
+      <p class="text-luxe font-display tracking-[0.2em] text-lg animate-pulse">ARABISTA</p>
+  </div>
+
+  <header class="fixed top-0 inset-x-0 z-50 backdrop-blur bg-brand/80 border-b border-white/10">
+    <div class="max-w-screen-xl mx-auto px-4 sm:px-6">
+      <div class="h-14 grid grid-cols-3 items-center">
+        <div class="col-span-1 flex items-center"><a href="index.html" class="font-display tracking-[0.18em] text-[14px] leading-none hover:text-luxe transition">ARABISTA</a></div>
+        <div class="col-span-1 flex items-center justify-center"><a href="index.html"><img src="images/logo-88.webp" alt="Arabista logo" class="h-11 w-auto" width="88" height="88"></a></div>
+        <div class="col-span-1 flex items-center justify-end gap-3 text-sm">
+            <div class="flex items-center gap-2 border border-white/20 rounded-lg px-2 py-1 h-8">
+                <button onclick="setLang('en')" id="lang-en" class="text-xs font-bold text-luxe">EN</button>
+                <span class="text-white/20 text-[10px]">|</span>
+                <button onclick="setLang('bm')" id="lang-bm" class="text-xs text-white/50 hover:text-white transition">BM</button>
+            </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="pt-24 pb-20 max-w-screen-sm mx-auto px-4 sm:px-6 min-h-screen flex flex-col">
+    
+    <div id="search-panel" class="hidden text-center mt-10 fade-in">
+        <h1 class="font-display text-3xl mb-3" data-t="page_title">Track Alteration</h1>
+        <p class="text-white/50 text-sm mb-8" data-t="page_subtitle">Enter your unique tracking ID below.</p>
+        <div class="bg-white/5 border border-white/10 p-6 rounded-xl text-left">
+            <label class="block text-xs text-white/70 mb-2 uppercase tracking-widest" data-t="lbl_id">Alteration ID</label>
+            <input type="text" id="search-input" placeholder="e.g. ALT-0226-ABCD">
+            <button id="btn-search" onclick="searchTracker()" class="w-full mt-4 bg-luxe text-brand font-bold py-3 rounded-xl hover:bg-white transition flex justify-center items-center" data-t="btn_track">Track Order</button>
+        </div>
+    </div>
+
+    <div id="tracker-panel" class="hidden fade-in">
+        <div class="flex justify-between items-end mb-6">
+            <div>
+                <p class="text-xs text-luxe uppercase tracking-widest mb-1" data-t="lbl_id">Order ID</p>
+                <h1 class="font-mono text-2xl font-bold" id="display-id">...</h1>
+            </div>
+            <button onclick="shareLink()" class="flex items-center gap-2 text-xs font-medium bg-white/10 hover:bg-white/20 border border-white/10 px-3 py-1.5 rounded transition">
+                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"></path></svg> <span data-t="btn_share">Share Link</span>
+            </button>
+        </div>
+
+        <div class="bg-white/5 border border-white/10 rounded-xl p-5 mb-8">
+            <p class="text-sm font-medium mb-1" id="display-name">...</p>
+            <p class="text-xs text-white/50 mb-3" id="display-hub">Assigned to: ...</p>
+            
+            <div id="hub-map-link" class="hidden mb-3">
+                 <a href="#" target="_blank" id="btn-drive-hub" rel="noopener noreferrer" class="inline-flex items-center gap-2 text-xs font-bold text-brand bg-white/80 px-3 py-1.5 rounded hover:bg-white transition">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"></path></svg>
+                    <span data-t="btn_nav_hub">Navigate to Hub</span>
+                 </a>
+            </div>
+
+            <div class="border-t border-white/10 pt-3">
+                <p class="text-xs text-white/40 mb-1" data-t="lbl_items">Items for Alteration:</p>
+                <p class="text-sm text-white/80 whitespace-pre-line" id="display-items">...</p>
+            </div>
+        </div>
+
+        <div class="flex justify-between items-center mb-4">
+            <h2 class="font-display text-xl" data-t="section_status">Tracking Status</h2>
+            <button onclick="refreshTracker()" id="btn-refresh" class="flex items-center gap-1.5 text-xs font-bold text-luxe bg-luxe/10 hover:bg-luxe hover:text-brand px-3 py-1.5 rounded-lg transition border border-luxe/30 shadow-sm">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                <span data-t="btn_refresh">Refresh</span>
+            </button>
+        </div>
+        
+        <div class="space-y-6 relative ml-2" id="timeline-container"></div>
+    </div>
+  </main>
+
+  <template id="tpl-resolved-box">
+      <div class="mt-4 p-4 bg-white/5 border border-white/10 rounded-xl flex items-start gap-3 fade-in relative z-20">
+          <svg class="w-5 h-5 text-luxe shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+          <div><p class="text-sm font-bold text-white mb-1" data-t="confirmed_title">Selection Confirmed</p><p class="text-xs text-white/50 resolved-desc">...</p></div>
+      </div>
+  </template>
+
+  <template id="tpl-success-box">
+      <div class="mt-4 p-6 bg-green-500/10 border border-green-500/30 rounded-2xl text-center fade-in shadow-[0_0_20px_rgba(74,222,128,0.1)] relative z-20">
+          <div class="w-14 h-14 rounded-full bg-green-500/20 text-green-400 flex items-center justify-center mx-auto mb-4">
+              <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+          </div>
+          <h3 class="text-green-400 font-bold mb-2 text-xl font-display" data-t="success_title">Alteration Completed</h3>
+          <p class="text-sm text-green-200/80 mb-6" data-t="success_desc">Thank you for using our service. If you have any inquiries regarding your alteration, please contact the hub.</p>
+          <div class="flex gap-3 justify-center mt-2">
+              <a href="#" class="contact-hub-btn-call flex-1 inline-flex justify-center items-center gap-2 px-4 py-3 rounded-xl bg-white/10 text-white font-bold text-sm hover:bg-white/20 transition shadow-soft">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg> 
+                  <span data-t="btn_call">Call Hub</span>
+              </a>
+              <a href="#" class="contact-hub-btn-wa flex-1 inline-flex justify-center items-center gap-2 px-4 py-3 rounded-xl bg-[#25D366] text-white font-bold text-sm hover:bg-[#1EBE57] transition shadow-soft">
+                  <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 00-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
+                  WhatsApp
+              </a>
+          </div>
+      </div>
+  </template>
+
+  <div id="outbound-pay-check-modal" class="fixed inset-0 z-[200] flex items-center justify-center bg-black/90 backdrop-blur-md hidden opacity-0 transition-opacity duration-300 px-4">
+    <div class="bg-[#111213] border border-orange-500/50 rounded-2xl w-full max-w-sm p-8 transform scale-95 transition-transform duration-300 text-center shadow-[0_0_50px_rgba(249,115,22,0.1)] relative" id="outbound-pay-check-box">
+        <button onclick="closePayCheckModal()" class="absolute top-4 right-4 text-white/30 hover:text-white transition"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
+        
+        <div class="w-16 h-16 rounded-full bg-orange-500/20 text-orange-400 flex items-center justify-center mx-auto mb-4">
+            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+        </div>
+        <h3 class="font-display text-2xl text-white mb-2" data-t="modal_pay_check_title">Alteration Fee Check</h3>
+        <p class="text-sm text-white/70 mb-6 leading-relaxed" data-t="modal_pay_check_desc">Have you paid the hub for the alteration services yet? You must pay the hub before arranging delivery.</p>
+        <div class="space-y-3">
+            <button onclick="confirmPaidAndBook()" class="w-full bg-luxe text-brand font-bold py-3.5 rounded-xl hover:bg-white transition shadow-soft" data-t="btn_yes_paid">Yes, I Have Paid</button>
+            <button onclick="closePayCheckAndViewQR()" class="w-full border border-white/10 text-white font-bold py-3.5 rounded-xl hover:bg-white/5 transition" data-t="btn_not_yet_qr">Not Yet, View QR</button>
+        </div>
+    </div>
+  </div>
+
+  <div id="hub-pay-modal" class="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-md hidden opacity-0 transition-opacity duration-300 px-4">
+    <div class="bg-[#111213] border border-luxe/50 rounded-2xl w-full max-w-sm p-8 transform scale-95 transition-transform duration-300 text-center shadow-[0_0_50px_rgba(192,160,98,0.1)] relative" id="hub-pay-box">
+        <button onclick="closeHubPayModal()" class="absolute top-4 right-4 text-white/30 hover:text-white transition"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
+        <div class="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-transparent via-luxe to-transparent"></div>
+        
+        <h4 class="font-bold text-white mb-1 text-xl font-display mt-2" data-t="txt_alt_fee_title">Alteration Fee Payment</h4>
+        <p class="text-[11px] text-white/50 mb-5" data-t="txt_alt_fee_desc">Your item is ready! Please pay the alteration fee to the Hub below.</p>
+        
+        <div class="bg-white p-2 rounded-lg inline-block mb-1 shadow-md cursor-pointer relative group" onclick="openFullscreenQR(document.getElementById('modal-hub-qr').src)">
+            <img id="modal-hub-qr" src="images/hub-1-qr.webp" alt="Hub QR Code" class="w-32 h-32 object-contain transition duration-300 group-hover:opacity-60">
+            <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition duration-300">
+                <svg class="w-8 h-8 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"></path></svg>
+            </div>
+        </div>
+        <p class="text-[9px] text-white/40 mb-3 uppercase tracking-widest cursor-pointer hover:text-white transition" onclick="openFullscreenQR(document.getElementById('modal-hub-qr').src)" data-t="txt_click_enlarge">Click QR to enlarge</p>
+        
+        <div class="text-3xl font-bold text-luxe mb-6" id="modal-hub-fee">RM 0.00</div>
+        
+        <button id="btn-modal-hub-wa" onclick="notifyHubPayment()" class="w-full py-3.5 bg-[#25D366] text-white text-sm font-bold rounded-xl hover:bg-[#1EBE57] transition shadow-soft flex justify-center items-center gap-2">
+            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 00-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
+            <span data-t="btn_wa_hub">Send Receipt to Hub</span>
+        </button>
+    </div>
+  </div>
+
+  <div id="action-modal" class="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-md hidden opacity-0 transition-opacity duration-300 px-4">
+    <div class="bg-[#111213] border border-luxe/50 rounded-2xl w-full max-w-sm p-8 transform scale-95 transition-transform duration-300 text-center shadow-[0_0_50px_rgba(192,160,98,0.1)] relative" id="action-modal-box">
+        
+        <button onclick="closeModal()" class="absolute top-4 right-4 text-white/30 hover:text-white transition"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
+
+        <div id="modal-step-2" class="text-left">
+            <h3 class="font-display text-xl text-white mb-2 text-center" id="modal-addr-title">Confirm Delivery Location</h3>
+            
+            <div class="bg-white/5 border border-white/10 rounded-lg p-3 mb-4 text-[10px] text-white/70 space-y-2">
+                <p class="font-bold text-luxe uppercase tracking-wider">📍 <span data-t="txt_accuracy_check">Location Accuracy Check</span></p>
+                <p>• <span data-t="txt_opt_1"><strong>Option 1:</strong> Use the "Original Address" if it perfectly matches your location.</span></p>
+                <p>• <span data-t="txt_opt_2"><strong>Option 2:</strong> Pinpoint your exact building on the Map if you are at a different location.</span></p>
+            </div>
+
+            <div class="grid grid-cols-2 gap-2 mb-4 bg-black/50 p-1 rounded-xl border border-white/10" id="address-tabs">
+                <button onclick="toggleLocMethod('orig')" id="tab-orig" class="text-[10px] font-bold py-2 rounded-lg bg-white/10 text-white transition" data-t="txt_tab_orig">Original</button>
+                <button onclick="toggleLocMethod('map')" id="tab-map" class="text-[10px] font-bold py-2 rounded-lg bg-transparent text-white/50 hover:text-white transition" data-t="txt_tab_map">Pin on Map</button>
+            </div>
+
+            <div id="view-orig" class="mb-4">
+                <p class="text-[10px] text-white/40 mb-2" data-t="txt_use_orig">Use the address you provided during the initial booking.</p>
+                <div class="p-4 bg-white/5 border border-white/10 rounded-xl mb-3 relative" id="orig-addr-text">
+                    ...
+                </div>
+                <button id="btn-orig-book" onclick="getQuotation('orig')" class="w-full bg-luxe text-brand font-bold py-3 rounded-xl hover:bg-white transition mt-2 shadow-soft" data-t="btn_check_book">Check Price & Book</button>
+            </div>
+
+            <div id="view-map" class="hidden mb-4 relative">
+                <p class="text-[10px] text-white/40 mb-2 text-center" data-t="txt_map_instruct">Drag the blue pin to your exact location.</p>
+                
+                <div class="relative w-full h-48 rounded-xl overflow-hidden border border-white/10 mb-2">
+                    <div id="tracker-map" class="w-full h-full bg-[#1A1A1C]"></div>
+                    <button onclick="locateUserOnMap()" class="absolute bottom-2 right-2 bg-brand/90 backdrop-blur border border-white/20 p-2.5 rounded-lg shadow-lg hover:border-luxe transition text-luxe z-10" title="Detect Location">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                    </button>
+                </div>
+                
+                <div class="bg-black/50 border border-white/5 rounded-lg p-2.5 text-xs text-white/70 min-h-[44px] flex items-center justify-center text-center leading-snug" id="map-address-display">
+                    ...
+                </div>
+            </div>
+
+            <div class="space-y-3 border-t border-white/10 pt-4 opacity-50 pointer-events-none transition-opacity hidden" id="addr-fields">
+                <div>
+                    <label class="text-xs text-white/50 uppercase tracking-wider block mb-1" data-t="lbl_unit">Unit / House No. <span class="text-red-400">*</span></label>
+                    <input type="text" id="input-unit" placeholder="e.g. Unit 15-2 or House 40">
+                </div>
+                <div>
+                    <label class="text-xs text-white/50 uppercase tracking-wider block mb-1" data-t="lbl_building">Building / Street (Optional)</label>
+                    <input type="text" id="input-building" placeholder="e.g. Galaxy Apartments">
+                </div>
+                <button id="btn-new-book" onclick="getQuotation('new')" class="w-full bg-luxe text-brand font-bold py-3 rounded-xl hover:bg-white transition mt-2" data-t="btn_check_book">Check Price & Book</button>
+            </div>
+        </div>
+
+        <div id="modal-step-3" class="hidden text-center">
+            <h3 class="font-display text-xl text-white mb-1" data-t="txt_hq_qr_title">Lalamove Delivery Payment</h3>
+            <p class="text-[11px] text-white/50 mb-3" data-t="txt_hq_qr_desc">Please pay the delivery fee to Arabista HQ.</p>
+            
+            <div class="bg-white p-2 rounded-lg inline-block mb-1 shadow-lg cursor-pointer relative group" onclick="openFullscreenQR('images/qr-pay.webp')">
+                <img src="images/qr-pay.webp" alt="Arabista HQ QR" class="w-32 h-32 object-contain transition duration-300 group-hover:opacity-60">
+                <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition duration-300">
+                    <svg class="w-8 h-8 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"></path></svg>
+                </div>
+            </div>
+            <p class="text-[9px] text-white/40 mb-3 uppercase tracking-widest cursor-pointer hover:text-white transition" onclick="openFullscreenQR('images/qr-pay.webp')" data-t="txt_click_enlarge">Click QR to enlarge</p>
+            
+            <h1 class="text-3xl font-bold text-luxe mb-1" id="quote-amount">RM 0.00</h1>
+            <p class="text-[10px] text-orange-300 font-bold mb-4 bg-orange-500/10 px-3 py-1.5 rounded inline-block border border-orange-500/20" data-t="txt_pay_hq">Scan to pay, then send receipt via WhatsApp.</p>
+            
+            <div class="text-left mb-1.5"><span class="text-xs font-bold text-white/70" data-t="txt_step1">Step 1</span></div>
+            <button onclick="notifyHQPayment()" class="w-full bg-[#25D366] text-white font-bold py-3.5 rounded-xl hover:bg-[#1EBE57] transition shadow-soft flex justify-center items-center gap-2 mb-4" id="btn-wa-hq">
+                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 00-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
+                <span data-t="btn_wa_hq">Send Receipt to HQ</span>
+            </button>
+            
+            <div class="text-left mb-1.5"><span class="text-xs font-bold text-white/70" data-t="txt_step2">Step 2: Please ensure the Lalamove fee has been paid</span></div>
+            <button onclick="bookRider()" class="w-full bg-orange-500 text-white font-bold py-3.5 rounded-xl hover:bg-orange-400 transition shadow-[0_0_20px_rgba(249,115,22,0.3)] flex justify-center items-center gap-2 opacity-50 pointer-events-none" id="btn-final-book">
+                <span data-t="btn_call_rider">Call Rider Now</span>
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+            </button>
+            
+            <button onclick="closeModal()" class="mt-4 text-[10px] text-white/30 underline hover:text-white uppercase tracking-widest" data-t="btn_cancel">Cancel</button>
+        </div>
+
+    </div>
+  </div>
+
+  <div id="fullscreen-qr-modal" class="fixed inset-0 z-[200] flex flex-col items-center justify-center bg-black/95 backdrop-blur-sm hidden opacity-0 transition-opacity duration-300 px-6 py-10" onclick="closeFullscreenQR()">
+      <button class="absolute top-6 right-6 text-white/50 hover:text-white bg-white/10 hover:bg-white/20 p-2 rounded-full transition"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
+      <div class="bg-white p-4 rounded-2xl shadow-[0_0_50px_rgba(255,255,255,0.1)] transform scale-95 transition-transform duration-300 max-w-sm w-full flex justify-center items-center" id="fullscreen-qr-box" onclick="event.stopPropagation()">
+          <img id="fullscreen-qr-img" src="" class="w-full h-auto object-contain rounded-xl max-h-[60vh]">
+      </div>
+      <p class="mt-8 text-white/60 text-sm font-medium animate-pulse" data-t="txt_save_instruction">Long press or screenshot to save</p>
+  </div>
+
+  <script>
+    function sanitizeHTML(str) {
+        if (!str) return "";
+        return String(str)
+            .replace(/&/g, "&" + "amp;")
+            .replace(/</g, "&" + "lt;")
+            .replace(/>/g, "&" + "gt;")
+            .replace(/"/g, "&" + "quot;")
+            .replace(/'/g, "&" + "#39;");
+    }
+
+    function escapeJS(str) {
+        if (!str) return "";
+        return String(str)
+            .replace(/\\/g, '\\\\')
+            .replace(/'/g, "\\" + "'")
+            .replace(/"/g, '\\"');
+    }
+
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbyrJFfuCrhAbdwzAj8uP4sSvFuzRzzzEFV5CHOCBSOK6OGlIXPtsf7-XEfjLHGnFZiyvw/exec'; 
+    const trackerBaseUrl = window.location.origin + window.location.pathname + '?id=';
+    const spinnerSvg = `<svg class="animate-spin h-4 w-4 inline mr-2 text-current" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>`;
+    const miniSpinnerSvg = `<svg class="animate-spin h-3.5 w-3.5 inline text-current" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>`;
+    
+    let currentData = null;
+    let hubData = { phone: "", lat: 0, lng: 0 }; 
+    let custData = { lat: 0, lng: 0, address: "", mapAddress: "" }; 
+    let activeQuoteId = null;
+    let currentStops = null;
+    let currentLang = 'en';
+    let isIncomingOrder = false; 
+    let pendingOutboundChoice = '';
+
+    let trackerMap = null;
+    let trackerMarker = null;
+
+    const t = {
+        en: {
+            page_title: "Track Alteration", page_subtitle: "Enter your unique tracking ID below.", lbl_id: "Alteration ID", btn_track: "Track Order", txt_loading: "Locating your order details...", btn_share: "Share Link", lbl_items: "Items for Alteration:", section_status: "Tracking Status", btn_refresh: "Refresh Status", back_home: "Back to Home", btn_nav_hub: "Navigate to Hub",
+            action_title: "Action Required", action_desc_incoming: "Your order is approved! Please arrange delivery to the Hub.", action_desc_ready: "Your items are ready! Please arrange retrieval.", btn_self_pickup: "I will Self-Pickup", btn_lalamove: "Book Lalamove Rider",
+            confirmed_title: "Selection Confirmed", confirmed_lala: "Lalamove Selected.", confirmed_self: "Self-Pickup Selected.",
+            success_title: "Alteration Completed", success_desc: "Thank you for using our service. If you have any inquiries regarding your alteration, please contact the hub.", btn_contact: "Contact Hub", btn_call: "Call Hub",
+            track_lala: "Track Lalamove Map", btn_cancel_rider: "Cancel Lalamove Booking", confirm_cancel_rider: "Are you sure you want to cancel the rider? This action cannot be undone.", txt_canceling: "Canceling...",
+            txt_accuracy_check: "Location Accuracy Check", 
+            txt_opt_1: "<strong>Option 1:</strong> Use the 'Original Address' if it matches your location perfectly.", 
+            txt_opt_2: "<strong>Option 2:</strong> Pinpoint your exact building on the Map if you are at a different location.",
+            txt_use_orig: "Use the address you provided during the initial booking.", btn_check_book: "Check Price & Book", 
+            txt_tab_map: "Pin on Map", txt_map_instruct: "Drag the blue pin to your exact location.", 
+            btn_detect_loc: "Detect My Location", txt_gps_signal: "GPS signal required for accuracy.", btn_search_map: "Search Map", lbl_unit: "Unit / House No.", lbl_building: "Building / Street (Optional)", modal_est_fee: "Estimated Delivery Fee", txt_pay_cash: "Pay Cash directly to the Lalamove Rider.", btn_call_rider: "Call Rider Now", btn_cancel: "Cancel",
+            txt_alt_fee_title: "Alteration Fee Payment", txt_alt_fee_desc: "Your item is ready! Please pay the alteration fee to the Hub below.", btn_wa_hub: "Send Receipt to Hub", txt_hub_paid_thanks: "Thank you! Please select your return method below:", txt_hq_qr_title: "Lalamove Delivery Payment", txt_hq_qr_desc: "Please pay the delivery fee to Arabista HQ.", txt_pay_hq: "Scan to pay, then send receipt via WhatsApp.", btn_wa_hq: "Send Receipt to HQ", txt_view_map: "View on Google Maps", txt_receipt_sent: "Receipt Sent!", txt_action_pay: "Payment Required for Alteration", btn_pay_alt: "Pay Alteration Fee", btn_view_hub_qr: "View Hub QR Code Again", btn_close: "Close", txt_click_enlarge: "Click QR to enlarge", txt_save_instruction: "Long press or screenshot to save",
+            
+            txt_step1: "Step 1", txt_step2: "Step 2: Please ensure the Lalamove fee has been paid", txt_pay_alt_warn: "Please ensure the alteration fee has been paid to the hub before arranging Lalamove or Self-Pickup.",
+            alert_enter_id: "Please enter an Alteration ID.", alert_order_not_found: "Order not found.", alert_conn_error: "Connection Error.", alert_enter_unit: "Please enter Unit / House Number.", alert_locate_gps: "Please pin your location on the map first.", alert_fee_error: "Fee Error: ", alert_error: "Error", alert_driver_booked: "Driver Booked!", alert_failed: "Failed: ", alert_cancel_failed: "Cancel Failed: ", alert_error_canceling: "Error canceling.", alert_copied: "Copied to clipboard!",
+            msg_calculating: "Calculating...", msg_locating: "Locating...", msg_searching: "Searching...", msg_translating: "Translating...", msg_booking: "Booking...", msg_retry: "Retry", msg_gps_acquiring: "📡 Acquiring exact satellite coordinates...", msg_gps_locked: "GPS Locked:", msg_pin_dropped: "✅ Pin Dropped:", msg_location_not_found: "❌ Location not found.", msg_search_failed: "❌ Search failed.", msg_wait: "Wait...", msg_geo_notsupported: "Geo not supported",
+            wa_hub_pay: "*[ALTERATION PAYMENT]*\n- *Order:* {id}\n- *Amount:* {total}\n- *Paid To:* Arabista Hub\n\nReceipt attached below.",
+            wa_hq_pay: "*[DELIVERY PAYMENT]*\n- *Order:* {id}\n- *Amount:* {total}\n- *Paid To:* Arabista HQ\n- *Link:* {link}\n\nReceipt attached below.",
+            
+            status_assigned_to: "Assigned to: ", txt_rejected_title: "Order Rejected", txt_rejected_desc: "Unfortunately, the Hub is currently unable to accept your request (likely due to high volume or closing time).", btn_choose_another: "Choose Another Hub", txt_waiting_approval: "Your request is waiting for Hub's approval. If it takes too long, you can re-notify them.", btn_renotify: "Re-notify Hub via WhatsApp", txt_please_dropoff: "Please drop off your items at the hub.", txt_lala_live: "Lalamove Live Status", txt_tab_orig: "Original", 
+            stage_pending_approval: "Pending Approval", stage_awaiting_dispatch: "Awaiting Dispatch", stage_inbound_dispatched: "Inbound Dispatched", stage_in_progress: "In Progress", stage_ready_for_return: "Ready for Return", stage_pending_dropoff: "Pending Dropoff", stage_outbound_dispatched: "Outbound Dispatched", stage_completed: "Completed", stage_dispatched: "Dispatched",
+            step_assigning: "Assigning", step_found: "Found", step_picked_up: "Picked Up", step_delivered: "Delivered",
+            modal_booked_title: "Driver Booked!", modal_booked_desc: "Your Lalamove rider has been successfully scheduled. Please notify the Hub.", btn_notify_hub_wa: "Notify Hub via WhatsApp", btn_skip_reload: "Skip & Reload Tracker",
+            wa_lala_booked: "*[LALAMOVE BOOKED]*\n- *Order ID:* {id}\n- *Direction:* {dir}\n\nA Lalamove rider has been booked. You can track the live status here:\n{link}",
+            dir_inbound: "Inbound to Hub", dir_outbound: "Outbound to Customer",
+            modal_title_pickup: "Confirm Pickup Location", modal_title_delivery: "Confirm Delivery Location", lbl_location: "Location", txt_saved_address: "Saved Address",
+            
+            modal_pay_check_title: "Alteration Fee Check", 
+            modal_pay_check_desc: "Have you paid the hub for the alteration services yet? You must pay the hub before arranging delivery.", 
+            btn_yes_paid: "Yes, I Have Paid", 
+            btn_not_yet_qr: "Not Yet, View QR"
+        },
+        bm: {
+            page_title: "Jejak Tempahan", page_subtitle: "Masukkan ID tempahan unik anda di bawah.", lbl_id: "ID Tempahan", btn_track: "Jejak Pesanan", txt_loading: "Mencari butiran tempahan...", btn_share: "Kongsi Pautan", lbl_items: "Item untuk Diubahsuai:", section_status: "Status Terkini", btn_refresh: "Segar Semula", back_home: "Kembali ke Utama", btn_nav_hub: "Pandu Arah ke Hub",
+            action_title: "Tindakan Diperlukan", action_desc_incoming: "Pesanan diluluskan! Sila hantar barang ke Hub.", action_desc_ready: "Barang anda telah siap! Sila aturkan pengambilan.", btn_self_pickup: "Saya Ambil Sendiri", btn_lalamove: "Tempah Lalamove",
+            confirmed_title: "Pilihan Disahkan", confirmed_lala: "Lalamove Dipilih.", confirmed_self: "Ambil Sendiri Dipilih.",
+            success_title: "Alterasi Selesai", success_desc: "Terima kasih kerana menggunakan servis kami. Jika anda mempunyai sebarang pertanyaan, sila hubungi hub.", btn_contact: "Hubungi Hub", btn_call: "Telefon Hub",
+            track_lala: "Jejak Peta Lalamove", btn_cancel_rider: "Batal Tempahan Lalamove", confirm_cancel_rider: "Adakah anda pasti mahu membatalkan rider? Tindakan ini tidak boleh diubah.", txt_canceling: "Membatalkan...",
+            txt_accuracy_check: "Semakan Ketepatan Lokasi", 
+            txt_opt_1: "<strong>Pilihan 1:</strong> Guna 'Alamat Asal' jika ia menepati lokasi anda dengan tepat.", 
+            txt_opt_2: "<strong>Pilihan 2:</strong> Letakkan pin di Peta jika anda berada di lokasi berbeza.",
+            txt_use_orig: "Guna alamat yang anda berikan semasa tempahan awal.", btn_check_book: "Semak Harga & Tempah", 
+            txt_tab_map: "Pin di Peta", txt_map_instruct: "Tarik pin biru tepat ke lokasi anda.", 
+            btn_detect_loc: "Kesan Lokasi Saya", txt_gps_signal: "Isyarat GPS diperlukan untuk ketepatan.", btn_search_map: "Cari Peta", lbl_unit: "No. Unit / Rumah", lbl_building: "Bangunan / Jalan (Pilihan)", modal_est_fee: "Anggaran Caj Penghantaran", txt_pay_cash: "Bayar Tunai terus kepada Rider Lalamove.", btn_call_rider: "Panggil Rider Sekarang", btn_cancel: "Batal",
+            txt_alt_fee_title: "Bayaran Caj Alterasi", txt_alt_fee_desc: "Barang anda telah siap! Sila bayar caj alterasi kepada Hub di bawah.", btn_wa_hub: "Hantar Resit ke Hub", txt_hub_paid_thanks: "Terima kasih! Sila pilih kaedah penghantaran di bawah:", txt_hq_qr_title: "Bayaran Lalamove", txt_hq_qr_desc: "Sila bayar caj penghantaran kepada Arabista HQ.", txt_pay_hq: "Imbas untuk bayar, dan hantar resit di WhatsApp.", btn_wa_hq: "Hantar Resit ke HQ", txt_view_map: "Lihat di Google Maps", txt_receipt_sent: "Resit Dihantar!", txt_action_pay: "Bayaran Alterasi Diperlukan", btn_pay_alt: "Bayar Caj Alterasi", btn_view_hub_qr: "Lihat Semula QR Hub", btn_close: "Tutup", txt_click_enlarge: "Klik QR untuk besarkan", txt_save_instruction: "Tekan lama atau screenshot untuk simpan",
+            
+            txt_step1: "Langkah 1", txt_step2: "Langkah 2: Sila pastikan caj Lalamove telah dibayar", txt_pay_alt_warn: "Sila pastikan caj alterasi telah dibayar kepada hub sebelum menempah Lalamove atau Ambil Sendiri.",
+            alert_enter_id: "Sila masukkan ID Tempahan.", alert_order_not_found: "Tempahan tidak dijumpai.", alert_conn_error: "Ralat Sambungan.", alert_enter_unit: "Sila masukkan No. Unit / Rumah.", alert_locate_gps: "Sila letakkan pin lokasi di peta dahulu.", alert_fee_error: "Ralat Caj: ", alert_error: "Ralat", alert_driver_booked: "Rider Berjaya Ditempah!", alert_failed: "Gagal: ", alert_cancel_failed: "Gagal Batal: ", alert_error_canceling: "Ralat membatalkan.", alert_copied: "Disalin ke papan keratan!",
+            msg_calculating: "Mengira...", msg_locating: "Mengescan...", msg_searching: "Mencari...", msg_translating: "Menterjemah...", msg_booking: "Menempah...", msg_retry: "Cuba Lagi", msg_gps_acquiring: "📡 Mendapatkan koordinat satelit yang tepat...", msg_gps_locked: "GPS Dikunci:", msg_pin_dropped: "✅ Pin Diletakkan:", msg_location_not_found: "❌ Lokasi tidak dijumpai.", msg_search_failed: "❌ Carian gagal.", msg_wait: "Tunggu...", msg_geo_notsupported: "Geo tidak disokong",
+            wa_hub_pay: "*[BAYARAN ALTERASI]*\n- *Pesanan:* {id}\n- *Jumlah:* {total}\n- *Dibayar Kepada:* Arabista Hub\n\nResit dilampirkan di bawah.",
+            wa_hq_pay: "*[BAYARAN PENGHANTARAN]*\n- *Pesanan:* {id}\n- *Jumlah:* {total}\n- *Dibayar Kepada:* Arabista HQ\n- *Pautan:* {link}\n\nResit dilampirkan di bawah.",
+            
+            status_assigned_to: "Ditetapkan kepada: ", txt_rejected_title: "Pesanan Ditolak", txt_rejected_desc: "Dukacita dimaklumkan, Hub tidak dapat menerima pesanan anda buat masa ini (mungkin kerana terlalu sibuk atau sudah tutup).", btn_choose_another: "Pilih Hub Lain", txt_waiting_approval: "Pesanan anda sedang menunggu kelulusan Hub. Jika terlalu lama, anda boleh maklumkan mereka semula.", btn_renotify: "Maklumkan Hub melalui WhatsApp", txt_please_dropoff: "Sila hantar (drop-off) barang anda di Hub.", txt_lala_live: "Status Terkini Lalamove", txt_tab_orig: "Asal", 
+            stage_pending_approval: "Menunggu Kelulusan", stage_awaiting_dispatch: "Menunggu Pickup", stage_inbound_dispatched: "Rider Ditempah (Ke Hub)", stage_in_progress: "Sedang Dijahit", stage_ready_for_return: "Sedia Diambil/Dihantar", stage_pending_dropoff: "Menunggu Drop-off", stage_outbound_dispatched: "Rider Ditempah (Ke Pelanggan)", stage_completed: "Selesai", stage_dispatched: "Dihantar",
+            step_assigning: "Mencari", step_found: "Dijumpai", step_picked_up: "Diambil", step_delivered: "Selesai",
+            modal_booked_title: "Rider Ditempah!", modal_booked_desc: "Rider Lalamove anda telah berjaya dijadualkan. Sila maklumkan kepada Hub.", btn_notify_hub_wa: "Maklumkan Hub via WhatsApp", btn_skip_reload: "Langkau & Muat Semula",
+            wa_lala_booked: "*[LALAMOVE DITEMPAH]*\n- *Pesanan:* {id}\n- *Hala Tuju:* {dir}\n\nRider Lalamove telah ditempah. Anda boleh menjejak status terkini di sini:\n{link}",
+            dir_inbound: "Ke Hub (Inbound)", dir_outbound: "Ke Pelanggan (Outbound)",
+            modal_title_pickup: "Sahkan Lokasi Pengambilan", modal_title_delivery: "Sahkan Lokasi Penghantaran", lbl_location: "Lokasi", txt_saved_address: "Alamat Tersimpan",
+            
+            modal_pay_check_title: "Semakan Bayaran Alterasi", 
+            modal_pay_check_desc: "Adakah anda telah membayar hub untuk servis alterasi? Anda mesti membayar hub sebelum menempah penghantaran.", 
+            btn_yes_paid: "Ya, Saya Sudah Bayar", 
+            btn_not_yet_qr: "Belum, Lihat QR"
+        }
+    };
+
+    function setLang(lang) {
+        currentLang = lang;
+        document.querySelectorAll('[data-t]').forEach(el => { if(t[lang][el.getAttribute('data-t')]) el.innerHTML = t[lang][el.getAttribute('data-t')]; });
+        
+        const btnEn = document.getElementById('lang-en'); const btnBm = document.getElementById('lang-bm');
+        if(btnEn && btnBm) {
+            btnEn.className = lang === 'en' ? "text-xs font-bold text-luxe" : "text-xs text-white/50 hover:text-white transition";
+            btnBm.className = lang === 'bm' ? "text-xs font-bold text-luxe" : "text-xs text-white/50 hover:text-white transition";
+        }
+        
+        if(currentData) {
+            document.getElementById('display-hub').innerText = `${t[currentLang].status_assigned_to}${sanitizeHTML(currentData.hubName)}`;
+            buildTimeline(currentData.orderStatus);
+        }
+    }
+
+    const TRACKER_VERSION = "1.4"; 
+
+    document.addEventListener('DOMContentLoaded', () => { 
+        const storedVersion = localStorage.getItem('arabista_tracker_version');
+        if (storedVersion !== TRACKER_VERSION) { 
+            localStorage.setItem('arabista_tracker_version', TRACKER_VERSION); 
+        }
+
+        const userLang = navigator.language || navigator.userLanguage;
+        if (userLang && userLang.toLowerCase().startsWith('ms')) setLang('bm'); else setLang('en');
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const rawId = urlParams.get('id');
+        
+        const loader = document.getElementById('initial-loader');
+        
+        if (rawId) { 
+            const safeId = sanitizeHTML(rawId);
+            fetchTrackingData(safeId); 
+        } else { 
+            document.getElementById('search-panel').classList.remove('hidden'); 
+            if (loader) {
+                loader.classList.add('opacity-0');
+                setTimeout(() => loader.classList.add('hidden'), 500);
+            }
+        }
+    });
+
+    function searchTracker() {
+        const val = document.getElementById('search-input').value.trim().toUpperCase();
+        if(!val) return alert(t[currentLang].alert_enter_id);
+        
+        const btn = document.getElementById('btn-search');
+        btn.innerHTML = `${spinnerSvg} ${t[currentLang].msg_searching || "Searching..."}`;
+        btn.disabled = true;
+        
+        window.location.href = `alteration-tracker.html?id=${encodeURIComponent(val)}`;
+    }
+
+    function triggerInitialWhatsApp() {
+        if(!currentData || !hubData) return;
+        let cleanPhone = hubData.phone ? hubData.phone.replace(/[^0-9]/g, '') : "60123456789"; 
+        if (cleanPhone.startsWith('0')) cleanPhone = '6' + cleanPhone;
+        const link = trackerBaseUrl + encodeURIComponent(currentData.alterationId);
+        const msg = `*[NEW ALTERATION REQUEST]*\n- *Order ID:* ${currentData.alterationId}\n- *Customer:* ${currentData.customerName}\n\nI have submitted a new alteration request. Please review and approve it:\n${link}`;
+        window.open(`https://wa.me/${cleanPhone}?text=${encodeURIComponent(msg)}`, '_blank');
+    }
+
+    async function fetchTrackingData(id, isSilent = false) {
+        try {
+            const res = await fetch(`${scriptURL}?track_id=${encodeURIComponent(id)}`);
+            const data = await res.json();
+            
+            const loader = document.getElementById('initial-loader');
+            if (!isSilent && loader && !loader.classList.contains('hidden')) {
+                loader.classList.add('opacity-0');
+                setTimeout(() => loader.classList.add('hidden'), 500);
+            }
+
+            if (data.error) { 
+                if(!isSilent) { alert(t[currentLang].alert_order_not_found); document.getElementById('search-panel').classList.remove('hidden'); }
+                return; 
+            }
+            
+            currentData = data.trackData;
+            
+            if (data.hubs && data.hubs.length > 0) {
+                const h = data.hubs.find(x => x.name === currentData.hubName);
+                if (h) { 
+                    hubData = { phone: h.phone, lat: h.lat, lng: h.lng }; 
+                }
+            }
+
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('new') === 'true') {
+                triggerInitialWhatsApp();
+                const newUrl = window.location.protocol + "//" + window.location.host + window.location.pathname + '?id=' + encodeURIComponent(id);
+                window.history.replaceState({path:newUrl}, '', newUrl);
+            }
+            
+            if (currentData.lalamoveStatus) {
+                sessionStorage.setItem('lala_status_' + sanitizeHTML(currentData.alterationId), sanitizeHTML(currentData.lalamoveStatus));
+            }
+            
+            if (currentData.lalamoveOrderId && currentData.lalamoveStatus !== "COMPLETED" && currentData.lalamoveStatus !== "CANCELED") {
+                await fetchLiveLalamoveStatus(currentData.alterationId);
+            }
+            
+            renderDashboard();
+        } catch (error) { 
+            console.error(error);
+            if(!isSilent) {
+                alert(t[currentLang].alert_conn_error); 
+                const loader = document.getElementById('initial-loader');
+                if (loader && !loader.classList.contains('hidden')) {
+                    loader.classList.add('opacity-0');
+                    setTimeout(() => loader.classList.add('hidden'), 500);
+                }
+                document.getElementById('search-panel').classList.remove('hidden'); 
+            }
+        }
+    }
+    
+    async function fetchLiveLalamoveStatus(trackId) {
+        try {
+            const res = await fetch(`${scriptURL}?action=get_lalamove_status&track_id=${encodeURIComponent(trackId)}`, {method: 'POST', body: JSON.stringify({action: 'get_lalamove_status', track_id: trackId})});
+            const data = await res.json();
+            if(data.status === 'success' && data.lalamove_status) {
+                currentData.lalamoveStatus = data.lalamove_status;
+                sessionStorage.setItem('lala_status_' + sanitizeHTML(trackId), sanitizeHTML(data.lalamove_status));
+            }
+        } catch(e) {}
+    }
+
+    async function refreshTracker() {
+        if (!currentData || !currentData.alterationId) return;
+        const btn = document.getElementById('btn-refresh');
+        const origHTML = btn.innerHTML;
+        btn.innerHTML = `${miniSpinnerSvg} <span data-t="btn_refresh">${t[currentLang].btn_refresh}</span>`;
+        btn.disabled = true;
+        btn.classList.add('opacity-50', 'cursor-not-allowed');
+        
+        await fetchTrackingData(currentData.alterationId, true);
+        
+        btn.innerHTML = origHTML;
+        btn.disabled = false;
+        btn.classList.remove('opacity-50', 'cursor-not-allowed');
+    }
+
+    function renderDashboard() {
+        if (currentData.orderStatus === "Rejected") {
+            document.getElementById('tracker-panel').classList.remove('hidden');
+            document.getElementById('tracker-panel').innerHTML = `
+                <div class="bg-red-500/10 border border-red-500/30 rounded-xl p-6 text-center fade-in mt-10 shadow-[0_0_20px_rgba(239,68,68,0.1)]">
+                    <div class="w-14 h-14 rounded-full bg-red-500/20 text-red-400 flex items-center justify-center mx-auto mb-4">
+                        <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                    </div>
+                    <h3 class="text-red-400 font-bold mb-2 text-2xl font-display">${t[currentLang].txt_rejected_title}</h3>
+                    <p class="text-sm text-white/70 mb-6 leading-relaxed">${t[currentLang].txt_rejected_desc}</p>
+                    <button onclick="window.location.href='alterations.html?rebook=' + encodeURIComponent(currentData.alterationId)" class="w-full bg-red-500 text-white font-bold py-3.5 rounded-xl hover:bg-red-400 transition shadow-[0_0_20px_rgba(239,68,68,0.2)] text-sm">
+                        ${t[currentLang].btn_choose_another}
+                    </button>
+                </div>
+            `;
+            return;
+        }
+
+        document.getElementById('search-panel').classList.add('hidden');
+        document.getElementById('tracker-panel').classList.remove('hidden');
+        document.getElementById('display-id').innerText = sanitizeHTML(currentData.alterationId);
+        document.getElementById('display-name').innerText = sanitizeHTML(currentData.customerName);
+        document.getElementById('display-hub').innerText = `${t[currentLang].status_assigned_to}${sanitizeHTML(currentData.hubName)}`;
+        document.getElementById('display-items').innerText = sanitizeHTML(currentData.itemDetails).replace(/\[/g, '').replace(/\]/g, '');
+        
+        checkRecoveryState();
+        
+        buildTimeline(currentData.orderStatus);
+    }
+    
+    function checkRecoveryState() {
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('book_rider') === 'true') {
+            const savedQuote = localStorage.getItem('lala_quote_' + currentData.alterationId);
+            const savedStops = localStorage.getItem('lala_stops_' + currentData.alterationId);
+            const savedAmt = localStorage.getItem('lala_amt_' + currentData.alterationId);
+            const savedInbound = localStorage.getItem('lala_is_inbound_' + currentData.alterationId);
+            
+            if (savedQuote && savedStops) {
+                activeQuoteId = savedQuote;
+                currentStops = JSON.parse(savedStops);
+                isIncomingOrder = savedInbound === 'true';
+                document.getElementById('quote-amount').innerText = savedAmt || "";
+                
+                showModalStep(3);
+                const bookBtn = document.getElementById('btn-final-book');
+                bookBtn.classList.remove('opacity-50', 'pointer-events-none');
+                
+                const waBtn = document.getElementById('btn-wa-hq');
+                waBtn.classList.replace('bg-[#25D366]', 'bg-white/10');
+                waBtn.classList.replace('text-white', 'text-white/50');
+                waBtn.innerHTML = `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> <span data-t="txt_receipt_sent">${t[currentLang].txt_receipt_sent || "Receipt Sent!"}</span>`;
+                
+                localStorage.removeItem('lala_quote_' + currentData.alterationId);
+                localStorage.removeItem('lala_stops_' + currentData.alterationId);
+                localStorage.removeItem('lala_amt_' + currentData.alterationId);
+                localStorage.removeItem('lala_is_inbound_' + currentData.alterationId);
+            }
+            
+            const newUrl = window.location.protocol + "//" + window.location.host + window.location.pathname + '?id=' + encodeURIComponent(currentData.alterationId);
+            window.history.replaceState({path:newUrl}, '', newUrl);
+        }
+    }
+
+    function buildTimeline(status) {
+        let stages = [];
+        
+        let isLalaIn = (currentData.logisticsMode === "Lalamove" || currentData.logisticsDirection === "Inbound" || status === "Awaiting Dispatch" || (status === "Dispatched" && currentData.logisticsDirection !== "Outbound"));
+        
+        if (isLalaIn) {
+            stages = ["Pending Approval", "Awaiting Dispatch", "Inbound Dispatched", "In Progress", "Ready for Return"];
+        } else {
+            stages = ["Pending Approval", "Pending Dropoff", "In Progress", "Ready for Return"];
+        }
+
+        if (currentData.outboundChoice === "Lalamove" || currentData.logisticsDirection === "Outbound") {
+            stages.push("Outbound Dispatched", "Completed");
+        } else {
+            stages.push("Completed");
+        }
+
+        let mappedStatus = status;
+        if (status === "Dispatched") {
+            if (currentData.logisticsDirection === "Outbound" || currentData.outboundChoice === "Lalamove") mappedStatus = "Outbound Dispatched";
+            else mappedStatus = "Inbound Dispatched";
+        }
+        
+        let currentIdx = stages.indexOf(mappedStatus);
+        if (currentIdx === -1) {
+            if (status === "Completed") currentIdx = stages.length - 1;
+            else currentIdx = 0;
+        } 
+
+        let html = '';
+        stages.forEach((stage, idx) => {
+            let isCurrent = idx === currentIdx;
+            let dotClass = idx < currentIdx ? "completed" : (isCurrent ? "active" : "");
+            let extraText = "";
+
+            if (stage === "Pending Approval" && isCurrent) {
+                extraText = `
+                <div class="mt-2 text-[11px] text-white/50 mb-3">${t[currentLang].txt_waiting_approval}</div>
+                <button onclick="triggerInitialWhatsApp()" class="w-full py-2.5 bg-[#25D366] text-white text-xs font-bold rounded-lg hover:bg-[#1EBE57] transition shadow-soft flex justify-center items-center gap-2">
+                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 00-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
+                    ${t[currentLang].btn_renotify}
+                </button>`;
+            }
+            
+            if (stage === "Pending Dropoff" && isCurrent) {
+                if (hubData && hubData.lat && hubData.lng) {
+                    extraText = `
+                    <div class="mt-2 text-xs text-white/70 mb-3">${t[currentLang].txt_please_dropoff}</div>
+                    <a href="https://www.google.com/maps/search/?api=1&query=` + parseFloat(hubData.lat) + `,` + parseFloat(hubData.lng) + `" target="_blank" rel="noopener noreferrer" class="w-full inline-flex justify-center items-center gap-2 text-xs font-bold text-brand bg-white/80 py-2.5 rounded hover:bg-white transition shadow-soft">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"></path></svg>
+                        <span>${t[currentLang].btn_nav_hub}</span>
+                    </a>`;
+                }
+            }
+
+            if (stage === "Awaiting Dispatch" && isCurrent) {
+                isIncomingOrder = true;
+                extraText = `
+                <div class="mt-2 text-xs text-white/70 mb-3">${t[currentLang].action_desc_incoming}</div>
+                <button onclick="startIncomingBooking()" class="w-full py-2 bg-orange-500 text-white text-xs font-bold rounded hover:bg-orange-400 transition animate-pulse">${t[currentLang].btn_lalamove}</button>`;
+            }
+
+            if (stage === "Ready for Return" && isCurrent) {
+                isIncomingOrder = false;
+                if (!currentData.outboundChoice) {
+                    
+                    let hasPaidHub = sessionStorage.getItem('paid_hub_' + sanitizeHTML(currentData.alterationId)) === 'true';
+                    
+                    if (!hasPaidHub) {
+                        extraText = `
+                        <div class="mt-2 text-xs text-white/70 mb-3">${t[currentLang].txt_action_pay}</div>
+                        <button onclick="openHubPayModal()" class="w-full py-3 bg-luxe text-brand text-sm font-bold rounded-xl hover:bg-white transition animate-pulse shadow-[0_0_15px_rgba(192,160,98,0.3)] flex justify-center items-center gap-2">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"></path></svg> 
+                            <span>${t[currentLang].btn_pay_alt}</span>
+                        </button>
+                        `;
+                        if(!window.hubModalShown) {
+                            window.hubModalShown = true;
+                            setTimeout(() => { openHubPayModal(); }, 600);
+                        }
+                    } else {
+                        extraText = `
+                        <div class="mt-2 text-xs text-green-400 mb-3 font-bold flex items-center gap-1">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> 
+                            <span>${t[currentLang].txt_hub_paid_thanks}</span>
+                        </div>
+                        <button onclick="openHubPayModal(true)" class="w-full py-2 mb-3 border border-white/10 text-white/50 text-xs font-bold rounded-lg hover:bg-white/5 transition">${t[currentLang].btn_view_hub_qr}</button>
+                        
+                        <p class="text-[10px] text-red-400 font-bold mb-3 p-2 bg-red-500/10 border border-red-500/20 rounded">${t[currentLang].txt_pay_alt_warn}</p>
+
+                        <div class="flex gap-2">
+                             <button onclick="promptPayCheck('Lalamove')" class="flex-1 py-3 rounded-xl bg-luxe text-brand text-xs font-bold hover:bg-white transition shadow-soft flex justify-center items-center">${t[currentLang].btn_lalamove}</button>
+                             <button onclick="setReturnChoice('Self-Pickup', this)" class="flex-1 py-3 rounded-xl border border-luxe text-luxe text-xs font-bold hover:bg-luxe/20 transition flex justify-center items-center">${t[currentLang].btn_self_pickup}</button>
+                        </div>`;
+                    }
+                } else {
+                    const boxTpl = document.getElementById('tpl-resolved-box');
+                    const box = boxTpl.content.cloneNode(true);
+                    let desc = currentData.outboundChoice === 'Lalamove' ? t[currentLang].confirmed_lala : t[currentLang].confirmed_self;
+                    box.querySelector('.resolved-desc').innerText = desc;
+                    const div = document.createElement('div'); div.appendChild(box); 
+                    extraText = div.innerHTML;
+
+                    if (currentData.outboundChoice === 'Self-Pickup' && hubData && hubData.lat && hubData.lng) {
+                        extraText += `
+                        <a href="https://www.google.com/maps/search/?api=1&query=` + parseFloat(hubData.lat) + `,` + parseFloat(hubData.lng) + `" target="_blank" rel="noopener noreferrer" class="mt-3 w-full inline-flex justify-center items-center gap-2 text-xs font-bold text-brand bg-white/80 py-2.5 rounded hover:bg-white transition shadow-soft">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"></path></svg>
+                            <span>${t[currentLang].btn_nav_hub}</span>
+                        </a>`;
+                    }
+                }
+            }
+
+            if ((stage === "Inbound Dispatched" || stage === "Outbound Dispatched") && isCurrent) {
+                const displayStatus = currentData.lalamoveStatus || sessionStorage.getItem('lala_status_' + sanitizeHTML(currentData.alterationId)) || 'ASSIGNING_DRIVER';
+                
+                let cancelBtnHtml = "";
+                if (displayStatus !== "COMPLETED" && displayStatus !== "CANCELED") {
+                    cancelBtnHtml = `<button onclick="cancelRider()" class="mt-3 w-full py-2 border border-red-500/50 text-red-400 text-xs font-bold rounded hover:bg-red-500/10 transition">${t[currentLang].btn_cancel_rider}</button>`;
+                }
+                
+                extraText += `<div class="mt-4 bg-white/5 rounded-lg p-3 border border-white/10">
+                    <p class="text-[10px] text-white/40 uppercase tracking-widest mb-3">${t[currentLang].txt_lala_live}</p>
+                    <div class="flex justify-between items-center text-center">${renderLalamoveSteps(sanitizeHTML(displayStatus))}</div>
+                    ${currentData.trackingUrl ? `<a href="${sanitizeHTML(currentData.trackingUrl)}" target="_blank" class="mt-4 block w-full text-center text-xs font-bold text-brand bg-luxe py-2 rounded hover:bg-white transition">${t[currentLang].track_lala} →</a>` : ''}
+                    ${cancelBtnHtml}
+                </div>`;
+            }
+            
+            if (stage === "Completed" && isCurrent) {
+                 const boxTpl = document.getElementById('tpl-success-box');
+                 const box = boxTpl.content.cloneNode(true);
+                 
+                 let cleanPhone = hubData.phone ? hubData.phone.replace(/[^0-9]/g, '') : "60123456789"; 
+                 if (cleanPhone.startsWith('0')) cleanPhone = '6' + cleanPhone;
+                 
+                 box.querySelector('.contact-hub-btn-call').href = `tel:+${cleanPhone}`;
+                 box.querySelector('.contact-hub-btn-wa').href = `https://wa.me/${cleanPhone}`;
+                 
+                 const div = document.createElement('div'); div.appendChild(box); extraText = div.innerHTML;
+            }
+            
+            const stageMap = {
+                "Pending Approval": t[currentLang].stage_pending_approval,
+                "Awaiting Dispatch": t[currentLang].stage_awaiting_dispatch,
+                "Inbound Dispatched": t[currentLang].stage_inbound_dispatched,
+                "In Progress": t[currentLang].stage_in_progress,
+                "Ready for Return": t[currentLang].stage_ready_for_return,
+                "Pending Dropoff": t[currentLang].stage_pending_dropoff,
+                "Outbound Dispatched": t[currentLang].stage_outbound_dispatched,
+                "Completed": t[currentLang].stage_completed,
+                "Dispatched": t[currentLang].stage_dispatched
+            };
+            
+            let displayStageName = stageMap[mappedStatus] || mappedStatus;
+            let displayStageLabel = stageMap[stage] || stage;
+            
+            if (stage === "Inbound Dispatched" || stage === "Outbound Dispatched") {
+                displayStageLabel = t[currentLang].stage_dispatched;
+            }
+
+            html += `<div class="relative pl-6 pb-8 ${idx === stages.length - 1 ? 'last-step' : ''}"><div class="timeline-line ${idx < currentIdx ? 'active' : ''}"></div><div class="absolute left-0 top-1 timeline-dot ${dotClass}"></div><h4 class="text-sm font-bold ${isCurrent ? 'text-green-400' : 'text-white/30'}">${displayStageLabel}</h4>${extraText}</div>`;
+        });
+        document.getElementById('timeline-container').innerHTML = html;
+    }
+
+    function renderLalamoveSteps(status) {
+        const steps = [{label: t[currentLang].step_assigning},{label: t[currentLang].step_found},{label: t[currentLang].step_picked_up},{label: t[currentLang].step_delivered}];
+        let activeIdx = 0;
+        if(status === 'ON_GOING') activeIdx = 1; 
+        if(status === 'PICKED_UP') activeIdx = 2; 
+        if(status === 'COMPLETED') activeIdx = 3;
+        return steps.map((s, i) => `<div class="lala-step ${i <= activeIdx ? (i === activeIdx ? 'active' : 'completed') : ''}"><div class="lala-dot"></div><span class="lala-label">${s.label}</span></div>`).join('');
+    }
+
+    function promptPayCheck(choice) {
+        pendingOutboundChoice = choice;
+        const modal = document.getElementById('outbound-pay-check-modal');
+        const box = document.getElementById('outbound-pay-check-box');
+        modal.classList.remove('hidden');
+        setTimeout(() => { modal.classList.remove('opacity-0'); box.classList.remove('scale-95'); }, 10);
+    }
+
+    function closePayCheckModal() {
+        const modal = document.getElementById('outbound-pay-check-modal');
+        const box = document.getElementById('outbound-pay-check-box');
+        modal.classList.add('opacity-0');
+        box.classList.add('scale-95');
+        setTimeout(() => { modal.classList.add('hidden'); }, 300);
+    }
+
+    function closePayCheckAndViewQR() {
+        closePayCheckModal();
+        setTimeout(() => { openHubPayModal(true); }, 300);
+    }
+
+    function confirmPaidAndBook() {
+        closePayCheckModal();
+        setTimeout(() => { 
+            if (pendingOutboundChoice === 'Lalamove') {
+                triggerOutbound('Lalamove'); 
+            }
+        }, 300);
+    }
+
+    function showModalStep(n) {
+        const modal = document.getElementById('action-modal'); const box = document.getElementById('action-modal-box');
+        modal.classList.remove('hidden'); modal.classList.remove('opacity-0'); 
+        document.querySelectorAll('[id^="modal-step-"]').forEach(el => el.classList.add('hidden'));
+        const stepEl = document.getElementById(`modal-step-${n}`);
+        if(stepEl) stepEl.classList.remove('hidden');
+        setTimeout(() => { box.classList.remove('scale-95'); }, 10);
+    }
+    
+    function closeModal() { 
+        const modal = document.getElementById('action-modal'); const box = document.getElementById('action-modal-box');
+        modal.classList.add('opacity-0'); box.classList.add('scale-95');
+        setTimeout(() => { modal.classList.add('hidden'); }, 300); 
+    }
+
+    function openFullscreenQR(src) {
+        const modal = document.getElementById('fullscreen-qr-modal');
+        const box = document.getElementById('fullscreen-qr-box');
+        document.getElementById('fullscreen-qr-img').src = src;
+        modal.classList.remove('hidden');
+        setTimeout(() => { modal.classList.remove('opacity-0'); box.classList.remove('scale-95'); }, 10);
+    }
+    
+    function closeFullscreenQR() {
+        const modal = document.getElementById('fullscreen-qr-modal');
+        const box = document.getElementById('fullscreen-qr-box');
+        modal.classList.add('opacity-0'); box.classList.add('scale-95');
+        setTimeout(() => { modal.classList.add('hidden'); }, 300);
+    }
+
+    function openHubPayModal(isReview = false) {
+        document.getElementById('modal-hub-qr').src = sanitizeHTML(currentData.hubQr || 'images/hub-1-qr.webp');
+        document.getElementById('modal-hub-fee').innerText = sanitizeHTML(currentData.servicesTotal);
+        const modal = document.getElementById('hub-pay-modal');
+        const box = document.getElementById('hub-pay-box');
+        modal.classList.remove('hidden');
+        setTimeout(() => { modal.classList.remove('opacity-0'); box.classList.remove('scale-95'); }, 10);
+        
+        const btn = document.getElementById('btn-modal-hub-wa');
+        if(isReview) {
+            btn.innerHTML = `<span>${t[currentLang].btn_close}</span>`;
+            btn.onclick = closeHubPayModal;
+            btn.classList.replace('bg-[#25D366]', 'bg-white/10');
+            btn.classList.replace('hover:bg-[#1EBE57]', 'hover:bg-white/20');
+        } else {
+            btn.innerHTML = `<svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 00-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
+            <span>${t[currentLang].btn_wa_hub}</span>`;
+            btn.onclick = notifyHubPayment;
+            btn.classList.replace('bg-white/10', 'bg-[#25D366]');
+            btn.classList.replace('hover:bg-white/20', 'hover:bg-[#1EBE57]');
+        }
+    }
+
+    function closeHubPayModal() {
+        const modal = document.getElementById('hub-pay-modal');
+        const box = document.getElementById('hub-pay-box');
+        modal.classList.add('opacity-0');
+        box.classList.add('scale-95');
+        setTimeout(() => { modal.classList.add('hidden'); }, 300);
+    }
+
+    function notifyHubPayment() {
+        sessionStorage.setItem('paid_hub_' + sanitizeHTML(currentData.alterationId), 'true');
+        const phone = currentData.hubPhone || "60192482084"; 
+        let cleanPhone = phone.replace(/[^0-9]/g, ''); 
+        if (cleanPhone.startsWith('0')) cleanPhone = '6' + cleanPhone;
+        const msg = (t[currentLang].wa_hub_pay || "").replace('{id}', currentData.alterationId).replace('{total}', currentData.servicesTotal);
+        window.open(`https://wa.me/${cleanPhone}?text=${encodeURIComponent(msg)}`, '_blank');
+        closeHubPayModal();
+        renderDashboard(); 
+    }
+
+    function toggleLocMethod(method) {
+        ['orig', 'map'].forEach(m => {
+            const btn = document.getElementById('tab-'+m);
+            if(btn) btn.className = "text-[10px] font-bold py-2 rounded-lg transition " + (method===m ? "bg-white/10 text-white border border-transparent" : "bg-transparent text-white/50 border border-white/10 hover:text-white");
+            const view = document.getElementById('view-'+m);
+            if(view) { if(method===m) view.classList.remove('hidden'); else view.classList.add('hidden'); }
+        });
+        
+        if (method === 'orig') {
+            document.getElementById('addr-fields').classList.add('hidden');
+        } else {
+            document.getElementById('addr-fields').classList.remove('hidden', 'opacity-50', 'pointer-events-none');
+            // Initialize map if it hasn't been created yet
+            if(!trackerMap && window.google) initTrackerMap();
+            if(trackerMap) {
+                // Force map to recalculate its size since it was hidden
+                setTimeout(() => {
+                    google.maps.event.trigger(trackerMap, 'resize');
+                    if(trackerMarker) trackerMap.panTo(trackerMarker.getPosition());
+                }, 100);
+            }
+        }
+    }
+
+    function initTrackerMap() {
+        if(trackerMap) return;
+        
+        // Default to original address coords, or fallback to KL center
+        const centerPos = (currentData && currentData.originalLat) 
+            ? { lat: parseFloat(currentData.originalLat), lng: parseFloat(currentData.originalLng) } 
+            : { lat: 3.1390, lng: 101.6869 };
+            
+        trackerMap = new google.maps.Map(document.getElementById("tracker-map"), { 
+            zoom: 16, center: centerPos, 
+            disableDefaultUI: true, clickableIcons: false, keyboardShortcuts: false,
+            styles: [
+                { elementType: "geometry", stylers: [{ color: "#1A1A1C" }] },
+                { elementType: "labels.text.stroke", stylers: [{ color: "#1A1A1C" }] },
+                { elementType: "labels.text.fill", stylers: [{ color: "#746855" }] },
+                { featureType: "road", elementType: "geometry", stylers: [{ color: "#2c2c2f" }] },
+                { featureType: "water", elementType: "geometry", stylers: [{ color: "#0F0F10" }] },
+            ] 
+        });
+        
+        const svgBluePin = 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 36" width="32" height="48"><path fill="#4285F4" stroke="#ffffff" stroke-width="2" d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/></svg>');
+        
+        trackerMarker = new google.maps.Marker({ 
+            position: centerPos, map: trackerMap, draggable: true, 
+            icon: { url: svgBluePin, scaledSize: new google.maps.Size(32, 48), anchor: new google.maps.Point(16, 48) } 
+        });
+
+        // Trigger geocode when user stops dragging the pin
+        trackerMarker.addListener('dragend', () => {
+            const pos = trackerMarker.getPosition();
+            trackerMap.panTo(pos);
+            updateTrackerLocation(pos.lat(), pos.lng());
+        });
+        
+        // Initialize the text box with current location
+        updateTrackerLocation(centerPos.lat, centerPos.lng, true);
+    }
+    
+    async function updateTrackerLocation(lat, lng, skipGeocode = false) {
+        custData.lat = lat; custData.lng = lng;
+        const disp = document.getElementById('map-address-display');
+        const btnConfirm = document.getElementById('btn-new-book');
+        
+        if(btnConfirm) {
+            btnConfirm.classList.add('opacity-50', 'pointer-events-none', 'animate-pulse');
+            btnConfirm.innerText = t[currentLang].msg_translating || "Translating...";
+        }
+
+        if(skipGeocode && currentData && currentData.originalAddress) {
+            custData.address = currentData.originalAddress;
+            disp.innerHTML = `<span class="text-green-400 mr-1">✅</span> ${sanitizeHTML(custData.address)}`;
+            if(btnConfirm) {
+                btnConfirm.classList.remove('opacity-50', 'pointer-events-none', 'animate-pulse');
+                btnConfirm.innerText = t[currentLang].btn_check_book || "Check Price & Book";
+            }
+            return;
+        }
+
+        disp.innerHTML = `${spinnerSvg} <span class="animate-pulse text-white/50">${t[currentLang].msg_translating || "Translating..."}</span>`;
+        
+        try {
+            const res = await fetch(`${scriptURL}?action=reverse_geocode&lat=${lat}&lng=${lng}`);
+            const data = await res.json();
+            custData.address = data.address || `${lat.toFixed(5)}, ${lng.toFixed(5)}`;
+            disp.innerHTML = `<span class="text-green-400 mr-1">✅</span> ${sanitizeHTML(custData.address)}`;
+        } catch(e) {
+            custData.address = `${lat.toFixed(5)}, ${lng.toFixed(5)}`;
+            disp.innerText = custData.address;
+        }
+        
+        if(btnConfirm) {
+            btnConfirm.classList.remove('opacity-50', 'pointer-events-none', 'animate-pulse');
+            btnConfirm.innerText = t[currentLang].btn_check_book || "Check Price & Book";
+        }
+    }
+    
+    function locateUserOnMap() {
+        if(!navigator.geolocation) return alert(t[currentLang].msg_geo_notsupported || "Geo not supported");
+        
+        const disp = document.getElementById('map-address-display');
+        disp.innerHTML = `${spinnerSvg} <span class="animate-pulse text-luxe">${t[currentLang].msg_locating || "Locating..."}</span>`;
+        
+        navigator.geolocation.getCurrentPosition((pos) => {
+            const newPos = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+            trackerMap.setCenter(newPos);
+            trackerMap.setZoom(17);
+            trackerMarker.setPosition(newPos);
+            updateTrackerLocation(newPos.lat, newPos.lng);
+        }, () => {
+            alert("Location access denied.");
+            disp.innerText = custData.address || "Location access denied.";
+        }, { enableHighAccuracy: true });
+    }
+
+    async function loadOriginalAddress() {
+        const origContainer = document.getElementById('orig-addr-text');
+        const raw = currentData.originalAddress || "";
+        let unitPart = "";
+        let restPart = raw;
+        
+        if(raw.includes(',')) {
+            unitPart = raw.substring(0, raw.indexOf(',')).trim();
+            restPart = raw.substring(raw.indexOf(',')+1).trim();
+            if(restPart.includes('GPS:')) {
+                restPart = restPart.substring(0, restPart.indexOf('GPS:')).trim();
+                if(restPart.endsWith(',')) restPart = restPart.substring(0, restPart.length - 1).trim();
+            }
+        }
+
+        let prettyAddress = sanitizeHTML(restPart);
+
+        origContainer.innerHTML = `
+            <div class="mb-3 border-b border-white/10 pb-3">
+                <span class="text-[10px] uppercase tracking-widest text-white/40 block mb-0.5" data-t="lbl_unit">${t[currentLang].lbl_unit || "Unit No."}</span>
+                <span class="text-sm font-bold text-white">${sanitizeHTML(unitPart) || t[currentLang].txt_saved_address || 'Saved Address'}</span>
+            </div>
+            <div class="mb-4">
+                <span class="text-[10px] uppercase tracking-widest text-white/40 block mb-0.5" data-t="lbl_location">${t[currentLang].lbl_location || "Location"}</span>
+                <span class="text-xs text-white/80 leading-relaxed">${prettyAddress}</span>
+            </div>
+            <a href="https://www.google.com/maps/search/?api=1&query=` + parseFloat(currentData.originalLat) + `,` + parseFloat(currentData.originalLng) + `" target="_blank" rel="noopener noreferrer" class="w-full flex justify-center items-center gap-2 text-[11px] font-bold text-luxe bg-luxe/10 hover:bg-luxe hover:text-brand border border-luxe/30 py-2.5 rounded-lg transition">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                <span>${t[currentLang].txt_view_map || "View on Google Maps"}</span>
+                <span class="font-mono opacity-50">(${parseFloat(currentData.originalLat).toFixed(4)}, ${parseFloat(currentData.originalLng).toFixed(4)})</span>
+            </a>
+        `;
+        
+        const btnOrigBook = document.getElementById('btn-orig-book');
+        if(btnOrigBook) {
+            btnOrigBook.classList.remove('animate-pulse', 'opacity-50', 'pointer-events-none');
+            btnOrigBook.innerText = t[currentLang].btn_check_book || "Check Price & Book";
+        }
+    }
+
+    function goToStep2() { 
+        showModalStep(2); 
+        if (currentData.originalLat && currentData.originalAddress) {
+            loadOriginalAddress();
+            toggleLocMethod('orig');
+        } else {
+            document.getElementById('tab-orig').classList.add('hidden');
+            toggleLocMethod('map');
+        }
+    }
+    
+    function startIncomingBooking() { 
+        isIncomingOrder = true; 
+        goToStep2(); 
+        document.getElementById('modal-addr-title').innerText = t[currentLang].modal_title_pickup; 
+    }
+    
+    function triggerOutbound(choice) { 
+        isIncomingOrder = false; 
+        goToStep2(); 
+        document.getElementById('modal-addr-title').innerText = t[currentLang].modal_title_delivery; 
+    }
+
+    async function getQuotation(method = 'new') {
+        const btn = (method === 'orig') ? document.getElementById('btn-orig-book') : document.getElementById('btn-new-book');
+        const origText = btn.innerText; 
+        btn.innerText = t[currentLang].msg_calculating || "Calculating..."; 
+        btn.disabled = true;
+
+        if (method === 'orig') {
+            custData.lat = currentData.originalLat;
+            custData.lng = currentData.originalLng;
+            custData.address = currentData.originalAddress;
+        } else {
+            const unit = document.getElementById('input-unit').value.trim();
+            const building = document.getElementById('input-building').value.trim();
+            if(!unit) { alert(t[currentLang].alert_enter_unit); btn.innerText = origText; btn.disabled = false; return; }
+            custData.address = building ? `${unit}, ${building}` : unit;
+            if(!custData.lat) { alert(t[currentLang].alert_locate_gps); btn.innerText = origText; btn.disabled = false; return; }
+        }
+
+        let payload = { action: "get_lalamove_quote" };
+        if (isIncomingOrder) {
+            payload.pickupLat = custData.lat; payload.pickupLng = custData.lng; payload.pickupAddress = custData.address;
+            payload.dropoffLat = hubData.lat; payload.dropoffLat = hubData.lat; payload.dropoffLng = hubData.lng; payload.dropoffAddress = currentData.hubName + " (Hub)";
+        } else {
+            payload.pickupLat = hubData.lat; payload.pickupLng = hubData.lng; payload.pickupAddress = currentData.hubName + " (Hub)";
+            payload.dropoffLat = custData.lat; payload.dropoffLng = custData.lng; payload.dropoffAddress = custData.address;
+        }
+
+        try {
+            const res = await fetch(scriptURL, { method: 'POST', body: JSON.stringify(payload) });
+            const data = await res.json();
+            if(data.status === "success") {
+                activeQuoteId = data.quotationId; currentStops = data.stops;
+                document.getElementById('quote-amount').innerHTML = `${sanitizeHTML(data.currency)} ${sanitizeHTML(data.amount)}`;
+                showModalStep(3);
+            } else { alert((t[currentLang].alert_fee_error || "Fee Error: ") + (data.message || "Unknown")); }
+            btn.innerText = origText; btn.disabled = false;
+        } catch(e) { alert(t[currentLang].alert_error); btn.innerText = origText; btn.disabled = false; }
+    }
+
+    function notifyHQPayment() {
+        const hqPhone = "60126913286";
+        const amt = document.getElementById('quote-amount').innerText;
+        
+        localStorage.setItem('lala_quote_' + currentData.alterationId, activeQuoteId);
+        localStorage.setItem('lala_stops_' + currentData.alterationId, JSON.stringify(currentStops));
+        localStorage.setItem('lala_amt_' + currentData.alterationId, amt);
+        localStorage.setItem('lala_is_inbound_' + currentData.alterationId, isIncomingOrder);
+        
+        const linkWithParam = trackerBaseUrl + encodeURIComponent(currentData.alterationId) + "&book_rider=true";
+        const msg = (t[currentLang].wa_hq_pay || "").replace('{id}', currentData.alterationId).replace('{total}', amt).replace('{link}', linkWithParam);
+        
+        window.open(`https://wa.me/${hqPhone}?text=${encodeURIComponent(msg)}`, '_blank');
+        
+        const bookBtn = document.getElementById('btn-final-book');
+        bookBtn.classList.remove('opacity-50', 'pointer-events-none');
+        
+        const waBtn = document.getElementById('btn-wa-hq');
+        waBtn.classList.replace('bg-[#25D366]', 'bg-white/10');
+        waBtn.classList.replace('text-white', 'text-white/50');
+        waBtn.innerHTML = `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> <span>${t[currentLang].txt_receipt_sent || "Receipt Sent!"}</span>`;
+    }
+
+    async function bookRider() {
+        const btn = document.getElementById('btn-final-book');
+        btn.innerHTML = `${spinnerSvg} ${t[currentLang].msg_booking || "Booking..."}`; btn.disabled = true;
+        let payload = {
+            action: "book_lalamove_order",
+            quotationId: activeQuoteId,
+            trackId: currentData.alterationId,
+            senderStopId: currentStops[0].stopId,
+            recipientStopId: currentStops[1].stopId
+        };
+        const cPhone = currentData.customerPhone || "60123456789";
+        if (isIncomingOrder) {
+            payload.direction = "Inbound";
+            payload.senderName = currentData.customerName; payload.senderPhone = cPhone; 
+            payload.recipientName = currentData.hubName; payload.recipientPhone = hubData.phone;
+        } else {
+            payload.direction = "Outbound";
+            payload.senderName = currentData.hubName; payload.senderPhone = hubData.phone;
+            payload.recipientName = currentData.customerName; payload.recipientPhone = cPhone;
+        }
+        try {
+            const res = await fetch(scriptURL, { method: 'POST', body: JSON.stringify(payload) });
+            const data = await res.json();
+            if(data.status === "success") { 
+                showDriverBookedModal(isIncomingOrder, data.tracking_url); 
+            }
+            else { alert((t[currentLang].alert_failed || "Failed: ") + data.message); btn.innerHTML = t[currentLang].msg_retry || "Retry"; btn.disabled = false; }
+        } catch(e) { alert(t[currentLang].alert_error); btn.innerHTML = t[currentLang].msg_retry || "Retry"; btn.disabled = false;}
+    }
+    
+    function showDriverBookedModal(isInbound, trackingUrl) {
+        closeModal(); 
+        const div = document.createElement('div');
+        div.id = 'driver-booked-modal';
+        div.className = 'fixed inset-0 z-[300] flex items-center justify-center bg-black/90 backdrop-blur-md px-4 fade-in';
+        
+        const dirText = isInbound ? t[currentLang].dir_inbound : t[currentLang].dir_outbound;
+        const msg = (t[currentLang].wa_lala_booked || "").replace('{id}', currentData.alterationId).replace('{dir}', dirText).replace('{link}', trackingUrl);
+        
+        let cleanPhone = hubData.phone ? hubData.phone.replace(/[^0-9]/g, '') : "60123456789"; 
+        if (cleanPhone.startsWith('0')) cleanPhone = '6' + cleanPhone;
+        const waLink = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(msg)}`;
+
+        div.innerHTML = `
+            <div class="bg-[#111213] border border-green-500/50 rounded-2xl w-full max-w-sm p-8 text-center shadow-[0_0_50px_rgba(34,197,94,0.1)]">
+                <div class="w-16 h-16 rounded-full bg-green-500/20 text-green-400 flex items-center justify-center mx-auto mb-4">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                </div>
+                <h3 class="text-green-400 font-bold mb-2 text-2xl font-display">${t[currentLang].modal_booked_title}</h3>
+                <p class="text-sm text-white/70 mb-6">${t[currentLang].modal_booked_desc}</p>
+                <a href="${waLink}" target="_blank" onclick="setTimeout(()=>window.location.reload(), 1000)" class="w-full bg-[#25D366] text-white font-bold py-3.5 rounded-xl hover:bg-[#1EBE57] transition shadow-soft flex justify-center items-center gap-2 mb-3">
+                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 00-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
+                    ${t[currentLang].btn_notify_hub_wa}
+                </a>
+                <button onclick="window.location.reload()" class="text-xs text-white/40 hover:text-white transition underline">${t[currentLang].btn_skip_reload}</button>
+            </div>
+        `;
+        document.body.appendChild(div);
+    }
+    
+    async function cancelRider() {
+        if(!confirm(t[currentLang].confirm_cancel_rider)) return;
+        try {
+            const res = await fetch(scriptURL, { method: 'POST', body: JSON.stringify({ action: "cancel_lalamove_order", track_id: currentData.alterationId }) });
+            const data = await res.json();
+            if(data.status === "success") { window.location.reload(); }
+            else { alert((t[currentLang].alert_cancel_failed || "Cancel Failed: ") + data.message); }
+        } catch(e) { alert(t[currentLang].alert_error_canceling); }
+    }
+    
+    function setReturnChoice(choice, btn) { 
+        if (btn) {
+            btn.innerHTML = `${spinnerSvg} ${t[currentLang].msg_wait || "Wait..."}`;
+            btn.classList.add('animate-pulse', 'opacity-70', 'pointer-events-none');
+            btn.disabled = true;
+        }
+        fetch(scriptURL, { 
+            method: 'POST', 
+            body: JSON.stringify({ action: "update_outbound", alteration_id: currentData.alterationId, outbound_choice: choice }) 
+        }).then(() => window.location.reload()); 
+    }
+    
+    function shareLink() { 
+        if (navigator.share) {
+            navigator.share({
+                title: 'Arabista Alteration Tracker',
+                url: window.location.href
+            }).catch(console.error);
+        } else {
+            navigator.clipboard.writeText(window.location.href); 
+            alert(t[currentLang].alert_copied); 
+        }
+    }
+  </script>
+  
+  <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBobNKxxSv_0cTX-EH5cuhF-HKiOHHmuB8"></script>
+</body>
+</html>
