@@ -835,11 +835,11 @@
                     const custAddress = state.unitNo ? `${sanitizeHTML(state.unitNo)}, ${document.getElementById('final-address').innerText}` : "Customer Location";
                     const payload = {
                         action: "get_lalamove_quote",
-                        pickupLat: state.lat, 
-                        pickupLng: state.lng,
+                        pickupLat: parseFloat(state.lat).toFixed(6), 
+                        pickupLng: parseFloat(state.lng).toFixed(6),
                         pickupAddress: custAddress, 
-                        dropoffLat: state.hubLat, 
-                        dropoffLng: state.hubLng,
+                        dropoffLat: parseFloat(state.hubLat).toFixed(6), 
+                        dropoffLng: parseFloat(state.hubLng).toFixed(6),
                         dropoffAddress: hub.address
                     };
                     const res = await fetch(scriptURL, { method: 'POST', body: JSON.stringify(payload) });
