@@ -425,13 +425,45 @@
             setTimeout(() => overlay.classList.remove('opacity-0'), 10);
         }
 
+        // STALE-WHILE-REVALIDATE: Hydrate from cache instantly (0ms, no spinner needed)
+        const CACHE_KEY = 'arabista_network_data';
+        try {
+            const _cached = sessionStorage.getItem(CACHE_KEY);
+            if (_cached) {
+                const c = JSON.parse(_cached);
+                if (Array.isArray(c.hubs) && c.hubs.length > 0) {
+                    hubs = c.hubs;
+                    plotHubs();
+                    isDataReady = true;
+                    document.getElementById('status-indicator').innerHTML = `<span class="text-white/40">● Cached</span>`;
+                }
+                if (c.pricing && Object.keys(c.pricing).length > 0) pricingData = c.pricing;
+            }
+        } catch(e) {}
+
         const fetchUrl = fetchId ? `${SCRIPT_URL}?order=${fetchId}` : SCRIPT_URL;
         
         backgroundFetchPromise = fetch(fetchUrl)
             .then(res => res.json())
             .then(data => {
+                const freshHubs = Array.isArray(data.hubs) ? data.hubs : hubs;
+
+                // Silently persist fresh network data to cache
+                try {
+                    sessionStorage.setItem(CACHE_KEY, JSON.stringify({
+                        hubs: freshHubs,
+                        pricing: data.pricing || pricingData
+                    }));
+                } catch(e) {}
+
                 if(data.pricing) pricingData = data.pricing;
-                if(data.hubs) { hubs = data.hubs; plotHubs(); document.getElementById('status-indicator').innerHTML = `<span class="text-green-500">● Live Network</span>`; }
+                if(data.hubs) {
+                    const hubsChanged = JSON.stringify(data.hubs) !== JSON.stringify(hubs);
+                    hubs = data.hubs;
+                    // Only re-plot if hubs actually changed (silent update)
+                    if (hubsChanged) plotHubs();
+                    document.getElementById('status-indicator').innerHTML = `<span class="text-green-500">● Live Network</span>`;
+                }
                 
                 if (fetchId && data.orderData) {
                     state.path = 'A'; 

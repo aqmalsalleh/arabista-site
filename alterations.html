@@ -351,7 +351,22 @@
             document.getElementById('hub-list-loading').classList.remove('hidden');
         }
         
-        // LAUNCH BACKGROUND FETCH
+        // STALE-WHILE-REVALIDATE: Hydrate from cache instantly (0ms, no spinner needed)
+        const CACHE_KEY = 'arabista_network_data';
+        try {
+            const _cached = sessionStorage.getItem(CACHE_KEY);
+            if (_cached) {
+                const c = JSON.parse(_cached);
+                if (Array.isArray(c.hubs) && c.hubs.length > 0) {
+                    hubs = c.hubs;
+                    isDataReady = true;
+                    document.getElementById('hub-list-loading').classList.add('hidden');
+                }
+                if (c.pricing && Object.keys(c.pricing).length > 0) pricingData = c.pricing;
+            }
+        } catch(e) {}
+
+        // LAUNCH BACKGROUND FETCH (always fires — keeps cache fresh)
         const fetchUrl = fetchId ? `${scriptURL}?order=${fetchId}` : scriptURL;
         
         backgroundFetchPromise = fetch(fetchUrl)
@@ -363,7 +378,18 @@
                     pricingData = data.pricing;
                 }
                 
-                hubs = Array.isArray(data.hubs) ? data.hubs : [];
+                const freshHubs = Array.isArray(data.hubs) ? data.hubs : [];
+
+                // Silently persist fresh network data to cache
+                try {
+                    sessionStorage.setItem(CACHE_KEY, JSON.stringify({
+                        hubs: freshHubs,
+                        pricing: data.pricing || pricingData
+                    }));
+                } catch(e) {}
+
+                const hubsChanged = JSON.stringify(freshHubs) !== JSON.stringify(hubs);
+                hubs = freshHubs;
                 isDataReady = true;
                 
                 if (fetchId) {
@@ -428,7 +454,8 @@
                 }
                 
                 document.getElementById('hub-list-loading').classList.add('hidden');
-                if(state.lat !== "" && state.lng !== "") renderHubs(); 
+                // Silent re-render: only re-render if hub data changed and user already has a location
+                if (hubsChanged && state.lat !== "" && state.lng !== "") renderHubs(); 
                 
             }).catch(e => { 
                 document.getElementById('step1-loading').innerHTML = `<span class="text-red-400">${(t[currentLang].msg_db_error || "Database Error: ") + e.message}</span>`; 
