@@ -956,7 +956,7 @@
 
         if(skipGeocode && currentData && currentData.originalAddress) {
             custData.address = currentData.originalAddress;
-            disp.innerHTML = `<span class="text-green-400 mr-1">✅</span> ${sanitizeHTML(custData.address)}`;
+            if(disp) disp.innerHTML = `<span class="text-green-400 mr-1">✅</span> ${sanitizeHTML(custData.address)}`;
             if(btnConfirm) {
                 btnConfirm.classList.remove('opacity-50', 'pointer-events-none', 'animate-pulse');
                 btnConfirm.innerText = t[currentLang].btn_check_book || "Check Price & Book";
@@ -964,16 +964,27 @@
             return;
         }
 
-        disp.innerHTML = `${spinnerSvg} <span class="animate-pulse text-white/50">${t[currentLang].msg_translating || "Translating..."}</span>`;
+        if(disp) disp.innerHTML = `${spinnerSvg} <span class="animate-pulse text-white/50">${t[currentLang].msg_translating || "Translating..."}</span>`;
         
+        // Safety check: If Google Maps hasn't loaded, fallback to raw GPS
+        if (typeof google === 'undefined' || typeof google.maps === 'undefined') {
+            custData.address = `${parseFloat(lat).toFixed(5)}, ${parseFloat(lng).toFixed(5)}`;
+            if(disp) disp.innerText = custData.address;
+            if(btnConfirm) {
+                btnConfirm.classList.remove('opacity-50', 'pointer-events-none', 'animate-pulse');
+                btnConfirm.innerText = t[currentLang].btn_check_book || "Check Price & Book";
+            }
+            return;
+        }
+
         const geocoder = new google.maps.Geocoder();
         geocoder.geocode({ location: { lat: parseFloat(lat), lng: parseFloat(lng) } }, (results, status) => {
             if (status === "OK" && results[0]) {
                 custData.address = results[0].formatted_address;
-                disp.innerHTML = `<span class="text-green-400 mr-1">✅</span> ${sanitizeHTML(custData.address)}`;
+                if(disp) disp.innerHTML = `<span class="text-green-400 mr-1">✅</span> ${sanitizeHTML(custData.address)}`;
             } else {
-                custData.address = `${lat.toFixed(5)}, ${lng.toFixed(5)}`;
-                disp.innerText = custData.address;
+                custData.address = `${parseFloat(lat).toFixed(5)}, ${parseFloat(lng).toFixed(5)}`;
+                if(disp) disp.innerText = custData.address;
             }
             
             if(btnConfirm) {
