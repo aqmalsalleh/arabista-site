@@ -1095,11 +1095,19 @@
 
         let payload = { action: "get_lalamove_quote" };
         if (isIncomingOrder) {
-            payload.pickupLat = custData.lat; payload.pickupLng = custData.lng; payload.pickupAddress = custData.address;
-            payload.dropoffLat = hubData.lat; payload.dropoffLat = hubData.lat; payload.dropoffLng = hubData.lng; payload.dropoffAddress = currentData.hubName + " (Hub)";
+            payload.pickupLat = parseFloat(custData.lat).toFixed(6); 
+            payload.pickupLng = parseFloat(custData.lng).toFixed(6); 
+            payload.pickupAddress = custData.address;
+            payload.dropoffLat = parseFloat(hubData.lat).toFixed(6); 
+            payload.dropoffLng = parseFloat(hubData.lng).toFixed(6); 
+            payload.dropoffAddress = currentData.hubName + " (Hub)";
         } else {
-            payload.pickupLat = hubData.lat; payload.pickupLng = hubData.lng; payload.pickupAddress = currentData.hubName + " (Hub)";
-            payload.dropoffLat = custData.lat; payload.dropoffLng = custData.lng; payload.dropoffAddress = custData.address;
+            payload.pickupLat = parseFloat(hubData.lat).toFixed(6); 
+            payload.pickupLng = parseFloat(hubData.lng).toFixed(6); 
+            payload.pickupAddress = currentData.hubName + " (Hub)";
+            payload.dropoffLat = parseFloat(custData.lat).toFixed(6); 
+            payload.dropoffLng = parseFloat(custData.lng).toFixed(6); 
+            payload.dropoffAddress = custData.address;
         }
 
         try {
