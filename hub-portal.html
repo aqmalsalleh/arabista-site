@@ -57,6 +57,12 @@
     .lala-label { font-size: 8px; color: rgba(255,255,255,0.3); text-transform: uppercase; font-weight: 600; line-height: 1.1; display: block; }
     .lala-step.active .lala-label { color: #C0A062; }
     .lala-step.completed .lala-label { color: #22c55e; }
+
+    /* Toast notifications */
+    .toast { animation: toastIn 0.3s cubic-bezier(0.16,1,0.3,1) forwards; }
+    .toast.out { animation: toastOut 0.25s cubic-bezier(0.7,0,0.84,0) forwards; }
+    @keyframes toastIn { from { opacity: 0; transform: translateY(14px) scale(0.96); } to { opacity: 1; transform: translateY(0) scale(1); } }
+    @keyframes toastOut { from { opacity: 1; transform: translateY(0) scale(1); } to { opacity: 0; transform: translateY(14px) scale(0.96); } }
   </style>
 </head>
 <body class="antialiased h-[100dvh] flex flex-col overflow-hidden">
@@ -210,6 +216,8 @@
       </nav>
   </div>
 
+  <div id="toast-container" class="fixed bottom-24 inset-x-0 z-[999] flex flex-col items-center gap-2 pointer-events-none px-4"></div>
+
   <script>
     const APP_VERSION = "2.1"; 
     const scriptURL = 'https://script.google.com/macros/s/AKfycbyrJFfuCrhAbdwzAj8uP4sSvFuzRzzzEFV5CHOCBSOK6OGlIXPtsf7-XEfjLHGnFZiyvw/exec';
@@ -294,6 +302,26 @@
     let currentLang = 'en';
     
     let lastSyncTime = 0;
+    let autoRefreshTimer = null;
+
+    // --- TOAST NOTIFICATION ---
+    function showToast(message, type = 'error') {
+        const container = document.getElementById('toast-container');
+        const toast = document.createElement('div');
+        const colors = type === 'error'
+            ? 'bg-[#2a0f0f]/95 border-red-500/40 text-red-300'
+            : 'bg-[#0f2a0f]/95 border-green-500/40 text-green-300';
+        const icon = type === 'error'
+            ? `<svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>`
+            : `<svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>`;
+        toast.className = `toast pointer-events-auto w-full max-w-sm backdrop-blur-md border rounded-xl px-4 py-3 shadow-xl flex items-center gap-3 ${colors}`;
+        toast.innerHTML = `${icon}<span class="text-sm font-medium leading-snug">${message}</span>`;
+        container.appendChild(toast);
+        setTimeout(() => {
+            toast.classList.add('out');
+            setTimeout(() => toast.remove(), 260);
+        }, 4200);
+    }
 
     // --- SECURITY UTILITIES ---
     function sanitizeHTML(str) {
@@ -334,7 +362,8 @@
             document.getElementById('main-app').classList.remove('hidden'); 
             document.getElementById('header-hub-name').innerText = sanitizeHTML(hubName); 
             requestNotificationPermission();
-            loadDashboard(); 
+            loadDashboard();
+            startAutoRefresh();
         } else {
             document.getElementById('login-screen').classList.remove('hidden');
             document.getElementById('main-app').classList.add('hidden');
@@ -359,6 +388,20 @@
         
         const activeOrders = document.getElementById('list-active').innerHTML;
         if(activeOrders.length > 200) loadDashboard(true, true);
+    }
+
+    function startAutoRefresh() {
+        stopAutoRefresh();
+        autoRefreshTimer = setInterval(() => {
+            // Only poll when the dashboard tab is visible — avoids wasted GAS calls
+            if (hubName && hubToken && document.getElementById('tab-dashboard').classList.contains('active')) {
+                loadDashboard(true, false);
+            }
+        }, 60000);
+    }
+
+    function stopAutoRefresh() {
+        if (autoRefreshTimer !== null) { clearInterval(autoRefreshTimer); autoRefreshTimer = null; }
     }
 
     function updateConnectionStatus(isSyncing) {
@@ -483,7 +526,8 @@
                 document.getElementById('header-hub-name').innerText = sanitizeHTML(hubName); 
                 
                 requestNotificationPermission();
-                loadDashboard(false, true); 
+                loadDashboard(false, true);
+                startAutoRefresh();
             } else { 
                 throw new Error(data.message || t[currentLang].alert_invalid); 
             }
@@ -495,7 +539,8 @@
         }
     }
 
-    function logout() { 
+    function logout() {
+        stopAutoRefresh();
         localStorage.removeItem('arabista_hub_name'); 
         localStorage.removeItem('arabista_hub_token'); 
         window.location.reload(); 
@@ -873,19 +918,31 @@
 
     async function updateStatus(id, newStatus, custName, phone, link, milestone, btn) {
         if(!confirm(t[currentLang].confirm_update.replace('{status}', newStatus))) return;
-        
-        const orig = btn.innerHTML; 
-        btn.innerHTML = `${spinnerSvg} ${t[currentLang].msg_updating}`; 
-        btn.disabled = true; 
-        btn.classList.add('opacity-70', 'cursor-not-allowed');
-        
+
+        // Capture card and its DOM position before touching anything
+        const card = btn.closest('div.rounded-xl');
+        const cardParent = card ? card.parentElement : null;
+        const cardNextSibling = card ? card.nextElementSibling : null;
+        let removeTimer = null;
+
+        // OPTIMISTIC: immediately fade and collapse the card
+        if (card) {
+            card.style.transition = 'opacity 0.2s ease, transform 0.2s ease';
+            card.style.opacity = '0';
+            card.style.transform = 'scale(0.97)';
+            removeTimer = setTimeout(() => { if (card.parentElement) card.remove(); }, 220);
+        }
+
         try {
-            await fetch(scriptURL, { 
-                method: 'POST', 
-                headers: { 'Content-Type': 'text/plain;charset=utf-8' }, 
-                body: JSON.stringify({ action: "update_order_status", hub_name: hubName, token: hubToken, order_id: id, new_status: newStatus }) 
+            const res = await fetch(scriptURL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify({ action: "update_order_status", hub_name: hubName, token: hubToken, order_id: id, new_status: newStatus })
             });
-            
+            const data = await res.json();
+            if (data.status === 'error') throw new Error(data.message);
+
+            // Fetch confirmed — fire WhatsApp then do a silent background re-sync
             if (newStatus === "Rejected") {
                 sendWA(phone, t[currentLang].wa_rejected.replace('{id}', id).replace('{link}', link));
             } else if (milestone === 1) {
@@ -899,13 +956,30 @@
                     sendWA(phone, t[currentLang].wa_approved_lala.replace('{id}', id).replace('{link}', link));
                 }
             }
-            
-            loadDashboard(false, true); 
-        } catch (e) { 
-            alert(t[currentLang].alert_err_update); 
-            btn.innerHTML = orig; 
-            btn.disabled = false; 
-            btn.classList.remove('opacity-70', 'cursor-not-allowed'); 
+
+            loadDashboard(true, true);
+
+        } catch (e) {
+            // REVERT: cancel pending DOM removal and animate the card back in
+            clearTimeout(removeTimer);
+            if (card) {
+                if (!card.parentElement && cardParent) {
+                    // Card was already detached — re-insert at original position
+                    if (cardNextSibling && cardNextSibling.parentElement === cardParent) {
+                        cardParent.insertBefore(card, cardNextSibling);
+                    } else {
+                        cardParent.appendChild(card);
+                    }
+                }
+                requestAnimationFrame(() => {
+                    card.style.opacity = '1';
+                    card.style.transform = 'scale(1)';
+                });
+            }
+
+            const detail = (e.message && e.message.length < 100 && !e.message.includes('undefined'))
+                ? e.message : t[currentLang].alert_err_update;
+            showToast(detail);
         }
     }
 
