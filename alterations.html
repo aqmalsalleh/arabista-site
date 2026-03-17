@@ -126,13 +126,6 @@
               
               <p class="text-sm text-white font-medium mb-3 whitespace-pre-wrap" id="location-status">...</p>
               
-              <div id="map-verify-link" class="mb-5"></div>
-
-              <label class="block text-sm text-white/70 mb-2" data-t="label_unit">Unit / House / Lot No. <span class="text-red-400">*</span></label>
-              <input type="text" id="gps-unit-input" class="w-full mb-5" placeholder="e.g. Unit 15-1 or House 42" data-t-placeholder="placeholder_unit">
-              
-              <button id="btn-confirm-loc" onclick="confirmGPSDetails()" class="w-full py-3.5 rounded-xl bg-luxe text-brand text-sm font-bold hover:bg-white transition shadow-[0_0_15px_rgba(192,160,98,0.3)]" data-t="btn_confirm_loc">Confirm Location</button>
-              
               <div id="fallback-search-box" class="hidden mt-6 pt-5 border-t border-white/10">
                   <p class="text-white/60 text-sm mb-4 mt-2">Location inaccurate? Drag the pin on the map to your exact location:</p>
                   <div class="relative w-full h-48 rounded-xl overflow-hidden border border-white/10 mb-2 hidden" id="map-container">
@@ -142,6 +135,12 @@
                       </button>
                   </div>
               </div>
+          </div>
+
+          <div class="fade-in bg-white/5 border border-white/10 rounded-xl p-5 mb-2">
+              <label class="block text-sm text-white/70 mb-2" data-t="label_unit">Unit / House / Lot No. <span class="text-red-400">*</span></label>
+              <input type="text" id="gps-unit-input" class="w-full mb-5" placeholder="e.g. Unit 15-1 or House 42" data-t-placeholder="placeholder_unit">
+              <button id="btn-confirm-loc" onclick="confirmGPSDetails()" class="w-full py-3.5 rounded-xl bg-luxe text-brand text-sm font-bold hover:bg-white transition shadow-[0_0_15px_rgba(192,160,98,0.3)]" data-t="btn_confirm_loc">Confirm Location</button>
           </div>
 
           <div id="validated-loc" class="hidden mt-2 p-3 bg-luxe/10 border border-luxe/30 rounded-lg flex justify-between items-center">
@@ -532,7 +531,6 @@
         if(!state.orderAddress) state.orderAddress = "Kuala Lumpur, Malaysia";
 
         document.getElementById('gps-details-panel').classList.remove('hidden');
-        document.getElementById('map-verify-link').innerHTML = '';
         document.getElementById('fallback-search-box').classList.remove('hidden');
 
         const btnConfirm = document.getElementById('btn-confirm-loc');
@@ -555,7 +553,6 @@
                 state.lat = pos.lat();
                 state.lng = pos.lng();
                 document.getElementById('location-status').innerText = results[0].formatted_address || state.orderAddress;
-                document.getElementById('map-verify-link').innerHTML = `<a href="https://www.google.com/maps/search/?api=1&query=${state.lat},${state.lng}" target="_blank" class="w-full flex justify-center items-center gap-2 text-[11px] font-bold text-luxe bg-luxe/10 hover:bg-luxe hover:text-brand border border-luxe/30 py-2.5 rounded-lg transition"><span>${t[currentLang].txt_view_on_map || "View on Google Maps"}</span></a>`;
                 initLocMap(state.lat, state.lng);
             } else {
                 document.getElementById('location-status').innerText = state.orderAddress;
@@ -662,7 +659,6 @@
                 state.lat = lat;
                 state.lng = lng;
                 document.getElementById('location-status').innerHTML = `✅ Location set: <strong class="text-white">${address}</strong>`;
-                document.getElementById('map-verify-link').innerHTML = `<a href="https://www.google.com/maps/search/?api=1&query=${state.lat},${state.lng}" target="_blank" class="w-full flex justify-center items-center gap-2 text-[11px] font-bold text-luxe bg-luxe/10 hover:bg-luxe hover:text-brand border border-luxe/30 py-2.5 rounded-lg transition"><span>${t[currentLang].txt_view_on_map || "View on Google Maps"}</span></a>`;
                 initLocMap(lat, lng);
             } else {
                 state.lat = lat;
@@ -714,7 +710,6 @@
         
         document.getElementById('gps-details-panel').classList.remove('hidden'); 
         document.getElementById('location-status').innerText = t[currentLang].msg_reset_loc || "Please search for your location again or detect GPS.";
-        document.getElementById('map-verify-link').innerHTML = '';
         document.getElementById('gps-unit-input').value = ''; 
         document.getElementById('fallback-search-box').classList.remove('hidden');
         
