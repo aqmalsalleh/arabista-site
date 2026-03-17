@@ -944,7 +944,7 @@
         updateTrackerLocation(centerPos.lat, centerPos.lng, true);
     }
     
-    async function updateTrackerLocation(lat, lng, skipGeocode = false) {
+    function updateTrackerLocation(lat, lng, skipGeocode = false) {
         custData.lat = lat; custData.lng = lng;
         const disp = document.getElementById('map-address-display');
         const btnConfirm = document.getElementById('btn-new-book');
@@ -966,20 +966,21 @@
 
         disp.innerHTML = `${spinnerSvg} <span class="animate-pulse text-white/50">${t[currentLang].msg_translating || "Translating..."}</span>`;
         
-        try {
-            const res = await fetch(`${scriptURL}?action=reverse_geocode&lat=${lat}&lng=${lng}`);
-            const data = await res.json();
-            custData.address = data.address || `${lat.toFixed(5)}, ${lng.toFixed(5)}`;
-            disp.innerHTML = `<span class="text-green-400 mr-1">✅</span> ${sanitizeHTML(custData.address)}`;
-        } catch(e) {
-            custData.address = `${lat.toFixed(5)}, ${lng.toFixed(5)}`;
-            disp.innerText = custData.address;
-        }
-        
-        if(btnConfirm) {
-            btnConfirm.classList.remove('opacity-50', 'pointer-events-none', 'animate-pulse');
-            btnConfirm.innerText = t[currentLang].btn_check_book || "Check Price & Book";
-        }
+        const geocoder = new google.maps.Geocoder();
+        geocoder.geocode({ location: { lat: parseFloat(lat), lng: parseFloat(lng) } }, (results, status) => {
+            if (status === "OK" && results[0]) {
+                custData.address = results[0].formatted_address;
+                disp.innerHTML = `<span class="text-green-400 mr-1">✅</span> ${sanitizeHTML(custData.address)}`;
+            } else {
+                custData.address = `${lat.toFixed(5)}, ${lng.toFixed(5)}`;
+                disp.innerText = custData.address;
+            }
+            
+            if(btnConfirm) {
+                btnConfirm.classList.remove('opacity-50', 'pointer-events-none', 'animate-pulse');
+                btnConfirm.innerText = t[currentLang].btn_check_book || "Check Price & Book";
+            }
+        });
     }
     
     function locateUserOnMap() {
