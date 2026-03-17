@@ -407,8 +407,8 @@
                         if (rebookId) {
                             syncItemsA();
                             unlockStep(2);
-                            setTimeout(async () => { 
-                                await useOrderAddress();
+                            setTimeout(() => { 
+                                useOrderAddress();
                                 if (state.lat && state.lng && document.getElementById('gps-unit-input').value.trim() !== '') {
                                     confirmGPSDetails();
                                 }
@@ -520,61 +520,52 @@
         }, 400);
     }
 
-    async function geocodeAddress(address) {
-        try {
-            let res = await fetch(`${scriptURL}?action=geocode&address=${encodeURIComponent(address)}`); 
-            let data = await res.json();
-            if(data && data.lat && data.lng) return data;
-            
-            const parts = address.split(',');
-            if(parts.length > 1) {
-                res = await fetch(`${scriptURL}?action=geocode&address=${encodeURIComponent(parts.slice(1).join(',').trim())}`); 
-                data = await res.json();
-                if(data && data.lat && data.lng) return data;
-            }
-        } catch(e) {}
-        return null;
+    // --- Unified, crash-proof location logic ---
+    function useGPS() {
+        document.getElementById('gps-details-panel').classList.remove('hidden');
+        document.getElementById('fallback-search-box').classList.remove('hidden');
+        document.getElementById('location-status').innerHTML = `<div class="animate-pulse text-white/50 text-sm py-1">${spinnerSvg} Locating...</div>`;
+        getUserLocation();
     }
 
-    async function useOrderAddress() { 
+    function useOrderAddress() {
         if(!state.orderAddress) state.orderAddress = "Kuala Lumpur, Malaysia";
-        
+
         document.getElementById('gps-details-panel').classList.remove('hidden');
         document.getElementById('map-verify-link').innerHTML = '';
-        document.getElementById('fallback-search-box').classList.add('hidden');
-        
+        document.getElementById('fallback-search-box').classList.remove('hidden');
+
         const btnConfirm = document.getElementById('btn-confirm-loc');
         btnConfirm.classList.add('opacity-50', 'pointer-events-none', 'animate-pulse');
         btnConfirm.innerText = t[currentLang].txt_pinpointing || "Mapping...";
-        
+
         document.getElementById('location-status').innerHTML = `<div class="animate-pulse text-white/50 text-sm py-1">${t[currentLang].txt_pinpointing || "Mapping..."}</div>`;
 
-        const coords = await geocodeAddress(state.orderAddress);
-        
-        if(coords) {
-            state.lat = coords.lat; state.lng = coords.lng;
-            document.getElementById('location-status').innerText = coords.formatted_address || state.orderAddress; 
-            
-            document.getElementById('map-verify-link').innerHTML = '<a href="https://www.google.com/maps/search/?api=1&query=' + state.lat + ',' + state.lng + '" target="_blank" class="w-full flex justify-center items-center gap-2 text-[11px] font-bold text-luxe bg-luxe/10 hover:bg-luxe hover:text-brand border border-luxe/30 py-2.5 rounded-lg transition"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg><span>' + (t[currentLang].txt_view_on_map || "View on Google Maps") + '</span><span class="font-mono opacity-50">(' + parseFloat(state.lat).toFixed(4) + ', ' + parseFloat(state.lng).toFixed(4) + ')</span></a>';
-            
-            // Ensure the map actually wakes up and drops a pin for this order
-            initLocMap(state.lat, state.lng);
-        } else {
+        if (typeof google === 'undefined' || typeof google.maps === 'undefined') {
             document.getElementById('location-status').innerText = state.orderAddress;
-            alert(t[currentLang].alert_geocode_fail);
-            // Fallback to KL center if we can't find the address so the map doesn't break
-            initLocMap(3.1390, 101.6869);
+            btnConfirm.classList.remove('opacity-50', 'pointer-events-none', 'animate-pulse');
+            btnConfirm.innerText = t[currentLang].btn_confirm_loc;
+            return;
         }
-        
-        btnConfirm.classList.remove('opacity-50', 'pointer-events-none', 'animate-pulse');
-        btnConfirm.innerText = t[currentLang].btn_confirm_loc;
-        document.getElementById('fallback-search-box').classList.remove('hidden');
+
+        const geocoder = new google.maps.Geocoder();
+        geocoder.geocode({ address: state.orderAddress }, (results, status) => {
+            if (status === "OK" && results[0]) {
+                const pos = results[0].geometry.location;
+                state.lat = pos.lat();
+                state.lng = pos.lng();
+                document.getElementById('location-status').innerText = results[0].formatted_address || state.orderAddress;
+                document.getElementById('map-verify-link').innerHTML = `<a href="https://www.google.com/maps/search/?api=1&query=${state.lat},${state.lng}" target="_blank" class="w-full flex justify-center items-center gap-2 text-[11px] font-bold text-luxe bg-luxe/10 hover:bg-luxe hover:text-brand border border-luxe/30 py-2.5 rounded-lg transition"><span>${t[currentLang].txt_view_on_map || "View on Google Maps"}</span></a>`;
+                initLocMap(state.lat, state.lng);
+            } else {
+                document.getElementById('location-status').innerText = state.orderAddress;
+                initLocMap(3.1390, 101.6869);
+            }
+            btnConfirm.classList.remove('opacity-50', 'pointer-events-none', 'animate-pulse');
+            btnConfirm.innerText = t[currentLang].btn_confirm_loc;
+        });
     }
-    
-    function useGPS() {
-        getUserLocation();
-    }
-    
+
     // Replaced manual search with interactive Google Map pin.
     let locMap = null;
     let locMarker = null;
@@ -582,10 +573,12 @@
     let userLng = 0;
     let userState = "";
 
+    async function geocodeAddress(address) {
+        // Kept for compatibility (legacy callsites) — now handled by Google Geocoder in useOrderAddress().
+        return null;
+    }
+
     function getUserLocation() {
-        const btn = document.getElementById('btn-get-location');
-        if (btn) { btn.innerHTML = spinnerSvg + "Locating..."; btn.disabled = true; }
-        
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(
                 (position) => {
@@ -594,16 +587,16 @@
                     fetchGeocode(userLat, userLng);
                 },
                 () => {
-                    alert("Please enable location access or drag the pin on the map.");
-                    if (btn) { btn.innerHTML = "Detect My Location"; btn.disabled = false; }
+                    document.getElementById('location-status').innerHTML = `📍 Please drag the pin to set your location.`;
                     userLat = 3.1390; userLng = 101.6869;
                     initLocMap(userLat, userLng);
                 },
                 { enableHighAccuracy: true }
             );
         } else {
-            alert("Geolocation is not supported by this browser.");
-            if (btn) { btn.innerHTML = "Detect My Location"; btn.disabled = false; }
+            document.getElementById('location-status').innerHTML = `📍 Geolocation not supported. Please drag the pin.`;
+            userLat = 3.1390; userLng = 101.6869;
+            initLocMap(userLat, userLng);
         }
     }
 
@@ -613,16 +606,19 @@
 
     function initLocMap(lat, lng) {
         document.getElementById('map-container').classList.remove('hidden');
+
+        if (typeof google === 'undefined' || typeof google.maps === 'undefined') return;
+
         if (locMap) {
             const pos = { lat: parseFloat(lat), lng: parseFloat(lng) };
             locMap.panTo(pos);
             locMarker.setPosition(pos);
             return;
         }
-        
+
         const centerPos = { lat: parseFloat(lat), lng: parseFloat(lng) };
-        locMap = new google.maps.Map(document.getElementById("location-map"), { 
-            zoom: 16, center: centerPos, 
+        locMap = new google.maps.Map(document.getElementById("location-map"), {
+            zoom: 16, center: centerPos,
             disableDefaultUI: true, clickableIcons: false, keyboardShortcuts: false,
             styles: [
                 { elementType: "geometry", stylers: [{ color: "#1A1A1C" }] },
@@ -630,14 +626,14 @@
                 { elementType: "labels.text.fill", stylers: [{ color: "#746855" }] },
                 { featureType: "road", elementType: "geometry", stylers: [{ color: "#2c2c2f" }] },
                 { featureType: "water", elementType: "geometry", stylers: [{ color: "#0F0F10" }] },
-            ] 
+            ]
         });
-        
+
         const svgBluePin = 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 36" width="32" height="48"><path fill="#4285F4" stroke="#ffffff" stroke-width="2" d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/></svg>');
-        
-        locMarker = new google.maps.Marker({ 
-            position: centerPos, map: locMap, draggable: true, 
-            icon: { url: svgBluePin, scaledSize: new google.maps.Size(32, 48), anchor: new google.maps.Point(16, 48) } 
+
+        locMarker = new google.maps.Marker({
+            position: centerPos, map: locMap, draggable: true,
+            icon: { url: svgBluePin, scaledSize: new google.maps.Size(32, 48), anchor: new google.maps.Point(16, 48) }
         });
 
         locMarker.addListener('dragend', () => {
@@ -645,38 +641,35 @@
             locMap.panTo(pos);
             userLat = pos.lat();
             userLng = pos.lng();
-            
+
             document.getElementById('location-status').innerHTML = `${spinnerSvg} Translating...`;
             fetchGeocode(userLat, userLng);
         });
     }
 
     function fetchGeocode(lat, lng) {
-        const btn = document.getElementById('btn-get-location');
-        if (btn) { btn.innerHTML = spinnerSvg + "Translating..."; btn.disabled = true; }
-        
+        if (typeof google === 'undefined' || typeof google.maps === 'undefined') {
+            state.lat = lat; state.lng = lng;
+            document.getElementById('location-status').innerHTML = `📍 GPS: ${parseFloat(lat).toFixed(5)}, ${parseFloat(lng).toFixed(5)}`;
+            initLocMap(lat, lng);
+            return;
+        }
+
         const geocoder = new google.maps.Geocoder();
         geocoder.geocode({ location: { lat: parseFloat(lat), lng: parseFloat(lng) } }, (results, status) => {
             if (status === "OK" && results[0]) {
                 const address = results[0].formatted_address;
                 state.lat = lat;
                 state.lng = lng;
-                
                 document.getElementById('location-status').innerHTML = `✅ Location set: <strong class="text-white">${address}</strong>`;
-                
-                const mapLink = '<a href="https://www.google.com/maps/search/?api=1&query=' + state.lat + ',' + state.lng + '" target="_blank" class="w-full flex justify-center items-center gap-2 text-[11px] font-bold text-luxe bg-luxe/10 hover:bg-luxe hover:text-brand border border-luxe/30 py-2.5 rounded-lg transition"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg><span>' + (t[currentLang].txt_view_on_map || "View on Google Maps") + '</span><span class="font-mono opacity-50">(' + parseFloat(state.lat).toFixed(4) + ', ' + parseFloat(state.lng).toFixed(4) + ')</span></a>';
-                
-                document.getElementById('map-verify-link').innerHTML = mapLink;
-                
+                document.getElementById('map-verify-link').innerHTML = `<a href="https://www.google.com/maps/search/?api=1&query=${state.lat},${state.lng}" target="_blank" class="w-full flex justify-center items-center gap-2 text-[11px] font-bold text-luxe bg-luxe/10 hover:bg-luxe hover:text-brand border border-luxe/30 py-2.5 rounded-lg transition"><span>${t[currentLang].txt_view_on_map || "View on Google Maps"}</span></a>`;
                 initLocMap(lat, lng);
             } else {
-                alert("Could not detect address from location.");
-                document.getElementById('location-status').innerHTML = `📍 GPS: ${lat.toFixed(5)}, ${lng.toFixed(5)}`;
                 state.lat = lat;
                 state.lng = lng;
+                document.getElementById('location-status').innerHTML = `📍 GPS: ${parseFloat(lat).toFixed(5)}, ${parseFloat(lng).toFixed(5)}`;
                 initLocMap(lat, lng);
             }
-            if (btn) { btn.innerHTML = "Detect My Location"; btn.disabled = false; }
         });
     }
 
