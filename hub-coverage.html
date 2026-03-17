@@ -402,9 +402,12 @@
         map = new google.maps.Map(document.getElementById("map"), { 
             zoom: 11, center: klCenter, styles: arabistaMapStyle, 
             disableDefaultUI: true, zoomControl: false, keyboardShortcuts: false, fullscreenControl: false,
-            clickableIcons: false 
+            clickableIcons: false, gestureHandling: "greedy"
         });
-        map.addListener("click", closeModal);
+        map.addListener("click", (e) => {
+            closeModal();
+            updateUserPin(e.latLng);
+        });
         
         const urlParams = new URLSearchParams(window.location.search);
         const rawOrder = urlParams.get('order');
@@ -518,16 +521,13 @@
         bookingMode = false;
         
         const step1 = document.getElementById('tut-step-1');
-        const step2 = document.getElementById('tut-step-2');
         const step3 = document.getElementById('tut-step-3');
         
         if (step1) step1.classList.replace('opacity-100', 'opacity-0');
-        if (step2) step2.classList.replace('opacity-100', 'opacity-0');
         if (step3) step3.classList.replace('opacity-100', 'opacity-0');
         
         setTimeout(() => {
             if (step1) step1.classList.add('hidden');
-            if (step2) step2.classList.add('hidden');
             if (step3) step3.classList.add('hidden');
             document.getElementById('fab-container').classList.remove('hidden'); 
         }, 500);
@@ -544,69 +544,56 @@
         setTimeout(() => { banner.classList.replace('opacity-0', 'opacity-100'); }, 10);
     }
 
+    function updateUserPin(pos) {
+        state.lat = typeof pos.lat === 'function' ? pos.lat() : pos.lat;
+        state.lng = typeof pos.lng === 'function' ? pos.lng() : pos.lng;
+        const rawPos = { lat: parseFloat(state.lat), lng: parseFloat(state.lng) };
+
+        if(!userLocationMarker) {
+            const svgBluePin = 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 36" width="32" height="48"><path fill="#4285F4" stroke="#ffffff" stroke-width="2" d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/></svg>');
+            userLocationMarker = new google.maps.Marker({ map: map, draggable: true, icon: { url: svgBluePin, scaledSize: new google.maps.Size(32, 48), anchor: new google.maps.Point(16, 48) }, zIndex: 9999 });
+            userLocationMarker.addListener('dragend', () => { map.panTo(userLocationMarker.getPosition()); updateUserPin(userLocationMarker.getPosition()); });
+            userLocationMarker.addListener('click', () => { map.panTo(userLocationMarker.getPosition()); document.getElementById('confirm-location-modal').classList.remove('hidden'); document.getElementById('confirm-location-modal').classList.add('flex'); hideCTA(); });
+        }
+        
+        userLocationMarker.setPosition(rawPos); map.panTo(rawPos);
+        
+        const modal = document.getElementById('confirm-location-modal');
+        modal.classList.remove('hidden'); modal.classList.add('flex');
+        
+        // Dynamic Tutorial Toggle
+        if(bookingMode) {
+            document.getElementById('booking-tutorial-anim').classList.remove('hidden');
+            document.getElementById('booking-tutorial-anim').classList.add('flex');
+            const step1 = document.getElementById('tut-step-1');
+            if(step1) { step1.classList.replace('opacity-100', 'opacity-0'); setTimeout(() => step1.classList.add('hidden'), 500); }
+        } else {
+            document.getElementById('booking-tutorial-anim').classList.add('hidden');
+            document.getElementById('booking-tutorial-anim').classList.remove('flex');
+        }
+
+        // Silent Frontend Geocoding (No waiting)
+        if (typeof google !== 'undefined' && google.maps.Geocoder) {
+            new google.maps.Geocoder().geocode({ location: rawPos }, (results, status) => {
+                if (status === "OK" && results[0]) state.address = results[0].formatted_address;
+                else state.address = "Customer Location";
+            });
+        }
+    }
+
     function locateUser() {
         const btn = document.getElementById('btn-locate'); 
         const origHTML = btn.innerHTML;
         btn.classList.remove('animate-pulse', 'ring-2', 'ring-luxe');
-        
         btn.innerHTML = `${spinnerSvg}<span class="text-sm font-medium">Locating...</span>`;
         btn.disabled = true; btn.classList.add('animate-pulse');
 
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(
-                async (position) => {
-                    const pos = { lat: position.coords.latitude, lng: position.coords.longitude };
-                    
-                    // UPDATED 2: "Translating GPS..." State
-                    btn.innerHTML = `${spinnerSvg}<span class="text-sm font-medium" data-t="txt_translating_gps">${t[currentLang].txt_translating_gps || 'Translating GPS...'}</span>`;
-
-                    try { const res = await fetch(`${SCRIPT_URL}?action=reverse_geocode&lat=${pos.lat}&lng=${pos.lng}`); const d = await res.json(); state.address = d.address || "Customer Location"; } catch(e) { state.address = "Customer Location"; }
-                    
-                    // Restore original HTML after fetch
+                (position) => {
                     btn.innerHTML = origHTML; btn.disabled = false; btn.classList.remove('animate-pulse');
-                    state.lat = pos.lat; state.lng = pos.lng;
-
-                    map.setZoom(16); map.setCenter(pos);
-                    if(userLocationMarker) userLocationMarker.setMap(null);
-
-                    const svgBluePin = 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 36" width="32" height="48"><path fill="#4285F4" stroke="#ffffff" stroke-width="2" d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/></svg>');
-                    userLocationMarker = new google.maps.Marker({ position: pos, map: map, draggable: true, icon: { url: svgBluePin, scaledSize: new google.maps.Size(32, 48), anchor: new google.maps.Point(16, 48) }, zIndex: 9999 });
-
-                    userLocationMarker.addListener('click', () => { 
-                        map.setZoom(16); 
-                        map.panTo(userLocationMarker.getPosition()); 
-                        document.getElementById('confirm-location-modal').classList.remove('hidden'); 
-                        document.getElementById('confirm-location-modal').classList.add('flex'); 
-                        closeModal(); 
-                        hideCTA(); 
-                    });
-
-                    userLocationMarker.addListener('dragstart', () => {
-                        const step2 = document.getElementById('tut-step-2');
-                        if(step2 && !step2.classList.contains('hidden')) {
-                            step2.classList.replace('opacity-100', 'opacity-0');
-                            setTimeout(() => { step2.classList.add('hidden'); }, 500);
-                        }
-                    });
-
-                    userLocationMarker.addListener('dragend', () => { 
-                        map.panTo(userLocationMarker.getPosition()); 
-                        state.lat = userLocationMarker.getPosition().lat(); 
-                        state.lng = userLocationMarker.getPosition().lng(); 
-                        document.getElementById('confirm-location-modal').classList.remove('hidden'); 
-                        document.getElementById('confirm-location-modal').classList.add('flex'); 
-                    });
-
-                    if(bookingMode) {
-                        document.getElementById('tut-step-1').classList.replace('opacity-100', 'opacity-0');
-                        setTimeout(() => { document.getElementById('tut-step-1').classList.add('hidden'); }, 500);
-                        
-                        const step2 = document.getElementById('tut-step-2');
-                        step2.classList.remove('hidden');
-                        setTimeout(() => { step2.classList.replace('opacity-0', 'opacity-100'); }, 10);
-                    }
-                    
-                    document.getElementById('confirm-location-modal').classList.remove('hidden'); document.getElementById('confirm-location-modal').classList.add('flex');
+                    map.setZoom(16);
+                    updateUserPin({ lat: position.coords.latitude, lng: position.coords.longitude });
                 },
                 () => { btn.innerHTML = origHTML; btn.disabled = false; btn.classList.remove('animate-pulse'); alert("Location access denied."); },
                 { enableHighAccuracy: true } 
@@ -616,13 +603,6 @@
 
     function confirmLocation() {
         closeConfirmLocationModal();
-        
-        const step2 = document.getElementById('tut-step-2');
-        if(step2 && !step2.classList.contains('hidden')) {
-            step2.classList.replace('opacity-100', 'opacity-0');
-            setTimeout(() => { step2.classList.add('hidden'); }, 500);
-        }
-
         map.setZoom(13); if(userLocationMarker) map.panTo(userLocationMarker.getPosition());
         if(bookingMode) { showStep3Card(); }
     }
@@ -677,7 +657,18 @@
             
             if(state.lat && state.lng) {
                 try {
-                    const res = await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: "get_lalamove_quote", pickupLat: state.lat, pickupLng: state.lng, pickupAddress: state.address, dropoffLat: hub.lat, dropoffLng: hub.lng, dropoffAddress: hub.address }) });
+                    const res = await fetch(SCRIPT_URL, { 
+                        method: 'POST', 
+                        body: JSON.stringify({ 
+                            action: "get_lalamove_quote", 
+                            pickupLat: parseFloat(state.lat).toFixed(6), 
+                            pickupLng: parseFloat(state.lng).toFixed(6), 
+                            pickupAddress: state.address, 
+                            dropoffLat: parseFloat(hub.lat).toFixed(6), 
+                            dropoffLng: parseFloat(hub.lng).toFixed(6), 
+                            dropoffAddress: hub.address 
+                        }) 
+                    });
                     const d = await res.json();
                     const quoteDisp = document.getElementById('lala-quote-disp');
                     quoteDisp.classList.remove('animate-pulse');
@@ -873,7 +864,7 @@
             Order_Ref: state.path === 'A' ? document.getElementById('order-id-display').innerText.replace('#', '') : "Manual",
             Customer_Name: custName, Phone_No: sanitizePhone(rawPhone),
             Address_Details: state.unitNo ? `${state.unitNo}, ${state.address}` : state.address, 
-            Customer_Lat: state.lat, Customer_Lng: state.lng,
+            Customer_Lat: parseFloat(state.lat).toFixed(6), Customer_Lng: parseFloat(state.lng).toFixed(6),
             Logistics_Mode: state.mode === 'walkin' ? "Walk-in" : "Lalamove",
             Hub_Name: hubData.name, Logistics_Schedule: state.logisticsSchedule,
             Delivery_Fee: state.mode === 'walkin' ? "RM 0" : "RM " + state.deliveryCost.toFixed(2),
