@@ -150,11 +150,14 @@
       </div>
   </div>
 
-  <div id="confirm-location-modal" class="fixed inset-x-4 bottom-12 md:bottom-10 md:left-1/2 md:-translate-x-1/2 md:w-80 bg-brand-light border border-luxe shadow-2xl rounded-xl z-50 hidden flex-col transition-all">
+  <div id="confirm-location-modal" class="fixed inset-x-6 bottom-16 md:bottom-12 md:left-1/2 md:-translate-x-1/2 md:w-72 bg-brand-light/95 border border-luxe shadow-2xl rounded-2xl z-50 hidden flex-col transition-all">
       <button onclick="cancelBookingMode()" class="absolute top-2 right-3 text-white/40 hover:text-white text-2xl leading-none">&times;</button>
       
-      <div id="booking-tutorial-anim" class="hidden flex-col items-center pt-6 pb-2">
-          <div class="h-16 w-full flex justify-center items-center relative">
+      <div id="booking-tutorial-anim" class="hidden flex-col items-center pt-4 pb-2">
+          <div class="h-20 w-full flex justify-center items-center relative rounded-t-2xl overflow-hidden border-b border-white/10 bg-gradient-to-br from-[#111214] via-[#15171a] to-[#0b0c0e]">
+              <div class="absolute inset-0 opacity-20 pointer-events-none">
+                  <div class="w-full h-full bg-[radial-gradient(circle_at_0_0,#ffffff22,transparent_55%),radial-gradient(circle_at_100%_0,#ffffff11,transparent_60%)]"></div>
+              </div>
               <img id="anim-pin" src="data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2024%2036%22%3E%3Cpath%20fill%3D%22%234285F4%22%20stroke%3D%22%23ffffff%22%20stroke-width%3D%222%22%20d%3D%22M12%202C8.13%202%205%205.13%205%209c0%205.25%207%2013%207%2013s7-7.75%207-13c0-3.87-3.13-7-7-7z%22/%3E%3C/svg%3E" class="w-6 h-9 absolute z-10" style="transform: translateY(-5px)">
               <div class="ghost-hand absolute z-20" style="margin-top: 15px; margin-left: 20px;">
                   <svg class="w-8 h-8 text-white drop-shadow-[0_2px_10px_rgba(0,0,0,0.8)]" fill="currentColor" viewBox="0 0 24 24"><path d="M9 11.24V7.5a2.5 2.5 0 015 0v3.74c1.21-.81 3-2.74 3-2.74a1.5 1.5 0 012.12 2.12l-5.65 5.66A2 2 0 0112.05 17H9a2 2 0 01-2-2v-4a2.5 2.5 0 012-2.5z"/></svg>
@@ -162,10 +165,10 @@
           </div>
       </div>
   
-      <div class="p-5 text-center pt-4">
-          <p class="text-luxe font-extrabold text-sm tracking-wider uppercase mb-1" data-t="txt_is_this_you">IS THIS YOU?</p>
-          <p class="text-white/80 text-sm mb-5 font-medium">Confirm your exact location.</p>
-          <button onclick="confirmLocation()" class="w-full bg-luxe hover:bg-luxe-hover text-brand font-bold py-3 rounded-lg transition-colors shadow-[0_0_15px_rgba(192,160,98,0.2)]" data-t="btn_confirm_loc">Confirm</button>
+      <div class="px-4 pb-4 pt-3 text-center">
+          <p class="text-luxe font-extrabold text-[11px] tracking-[0.18em] uppercase mb-1" data-t="txt_is_this_you">IS THIS YOU?</p>
+          <p class="text-white/80 text-xs mb-4 font-medium leading-snug">Drag the blue pin to your exact building, then confirm.</p>
+          <button onclick="confirmLocation()" class="w-full bg-luxe hover:bg-luxe-hover text-brand font-bold py-2.5 rounded-lg text-sm transition-colors shadow-[0_0_12px_rgba(192,160,98,0.25)]" data-t="btn_confirm_loc">Confirm</button>
       </div>
   </div>
 
@@ -556,7 +559,12 @@
             userLocationMarker.addListener('click', () => { map.panTo(userLocationMarker.getPosition()); document.getElementById('confirm-location-modal').classList.remove('hidden'); document.getElementById('confirm-location-modal').classList.add('flex'); hideCTA(); });
         }
         
-        userLocationMarker.setPosition(rawPos); map.panTo(rawPos);
+        userLocationMarker.setPosition(rawPos); 
+        map.panTo(rawPos);
+        // Nudge view up so pin sits above the bottom sheet
+        if (map && typeof map.panBy === 'function') {
+            map.panBy(0, 80);
+        }
         
         const modal = document.getElementById('confirm-location-modal');
         modal.classList.remove('hidden'); modal.classList.add('flex');
