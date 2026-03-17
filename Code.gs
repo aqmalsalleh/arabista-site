@@ -65,49 +65,142 @@ function doPost(e) {
 
 // --- 3. GET ROUTER ---
 function doGet(e) {
-  // CORS Headers
-  const output = ContentService.createTextOutput();
-  
   try {
-    const action = e.parameter.action;
-
-    // 1. Handle Order Retrieval (for pre-filled alterations)
-    if (e.parameter.order) {
-      const orderId = e.parameter.order;
-      const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Orders");
-      const data = sheet.getDataRange().getValues();
-      
-      let orderData = null;
-      for (let i = 1; i < data.length; i++) {
-        if (data[i][0] == orderId) { 
-          orderData = {
-            orderRef: data[i][0],
-            name: data[i][1],
-            phone: data[i][2],
-            address: data[i][3],
-            itemsRaw: data[i][5] 
+    const ss = SpreadsheetApp.getActiveSpreadsheet();
+    const result = { hubs: [], orderData: null, trackData: null, pricing: {} };
+    const pricingSheet = ss.getSheetByName("Pricing");
+    if (pricingSheet) {
+      const pData = pricingSheet.getDataRange().getDisplayValues();
+      for (let i = 1; i < pData.length; i++) {
+        let svc = String(pData[i][0]).trim();
+        if (svc) {
+          let key = svc.toLowerCase();
+          if (key.includes('full')) key = 'full';
+          else if (key.includes('hem')) key = 'hem';
+          else if (key.includes('sleeve')) key = 'sleeve';
+          else if (key.includes('shoulder')) key = 'shoulder';
+          else if (key.includes('pad')) key = 'pads';
+          result.pricing[key] = {
+            service: svc,
+            price: parseFloat(pData[i][1].replace(/[^\d.-]/g, '')) || 0,
+            value: parseFloat(pData[i][2].replace(/[^\d.-]/g, '')) || 0,
+            savings: parseFloat(pData[i][3].replace(/[^\d.-]/g, '')) || 0
           };
-          break;
         }
       }
-      return ContentService.createTextOutput(JSON.stringify({
-        hubs: getHubs(),
-        pricing: getPricing(),
-        orderData: orderData
-      })).setMimeType(ContentService.MimeType.JSON);
     }
 
-    // 2. Default: Return Hubs & Pricing
-    return ContentService.createTextOutput(JSON.stringify({
-      hubs: getHubs(),
-      pricing: getPricing()
-    })).setMimeType(ContentService.MimeType.JSON);
+    if (e.parameter.track_id) {
+      const ioSheet = ss.getSheetByName("Incoming_Orders");
+      const search = ioSheet.getRange("B:B").createTextFinder(e.parameter.track_id).matchEntireCell(true).findNext();
+      if (search) {
+        const rowData = ioSheet.getRange(search.getRow(), 1, 1, 23).getDisplayValues()[0];
+        let currentStatus = rowData[16];
+        if (currentStatus === "Dispatched / Picked Up") currentStatus = "Completed";
+        
+        let hubPhone = "";
+        let hubQr = "images/hub-1-qr.webp"; 
+        const hubSheetForLookup = ss.getSheetByName("Active_Hubs");
+        if(hubSheetForLookup) {
+            const hDataLookup = hubSheetForLookup.getDataRange().getDisplayValues();
+            for (let i = 1; i < hDataLookup.length; i++) {
+                if (hDataLookup[i][1] === rowData[10]) { 
+                    hubPhone = hDataLookup[i][3];
+                    if (hDataLookup[i][12]) { 
+                        hubQr = hDataLookup[i][12];
+                    }
+                    break;
+                }
+            }
+        }
 
-  } catch (error) {
-    return ContentService.createTextOutput(JSON.stringify({
-      error: error.toString()
-    })).setMimeType(ContentService.MimeType.JSON);
-  }
+        result.trackData = {
+          alterationId: rowData[1], 
+          customerName: rowData[4], 
+          customerPhone: rowData[5],
+          originalAddress: rowData[6], 
+          originalLat: rowData[7],     
+          originalLng: rowData[8],     
+          hubName: rowData[10], 
+          hubPhone: hubPhone,         
+          hubQr: hubQr,               
+          itemDetails: rowData[15], 
+          orderStatus: currentStatus, 
+          servicesTotal: rowData[13], 
+          returnEligibility: rowData[17], 
+          outboundChoice: rowData[18], 
+          trackingUrl: rowData[19],
+          lalamoveOrderId: rowData[20], 
+          logisticsDirection: rowData[21],
+          lalamoveStatus: rowData[22] 
+        };
+      } else { result.error = "Tracking ID not found."; }
+    }
+
+    const hubSheet = ss.getSheetByName("Active_Hubs");
+    const hData = hubSheet.getDataRange().getDisplayValues();
+    const ioSheet = ss.getSheetByName("Incoming_Orders");
+    
+    const allOrders = ioSheet ? ioSheet.getDataRange().getValues() : [];
+    const backlog = {};
+    for (let i = 1; i < allOrders.length; i++) {
+      let s = String(allOrders[i][16]);
+      if (["Pending Dropoff", "Pending Approval", "Awaiting Dispatch", "In Progress", "Ready for Return"].includes(s)) {
+        let h = String(allOrders[i][10]);
+        backlog[h] = (backlog[h] || 0) + 1;
+      }
+    }
+
+    for (let i = 1; i < hData.length; i++) {
+      if (hData[i][9] === "Active") {
+        result.hubs.push({
+          id: parseInt(hData[i][0]), name: hData[i][1], address: hData[i][2], phone: hData[i][3],
+          lat: parseFloat(hData[i][4]), lng: parseFloat(hData[i][5]), days: hData[i][6],
+          open: hData[i][7], close: hData[i][8], max_capacity: parseInt(hData[i][11]) || 10,
+          backlog: backlog[hData[i][1]] || 0
+        });
+      }
+    }
+
+    if (e.parameter.order) {
+      const query = String(e.parameter.order).trim();
+      if (query.startsWith("ALT-")) {
+        const ioSheet = ss.getSheetByName("Incoming_Orders");
+        if (ioSheet) {
+          const search = ioSheet.getRange("B:B").createTextFinder(query).matchEntireCell(true).findNext();
+          if (search) {
+            const d = ioSheet.getRange(search.getRow(), 1, 1, 16).getDisplayValues()[0];
+            let parsedItems = [];
+            const itemLines = String(d[15]).split('\n');
+            itemLines.forEach(line => {
+              const match = line.match(/\[(.*?)\]/);
+              if (match && match[1]) {
+                parsedItems.push(match[1].trim() + " | 1");
+              }
+            });
+            result.orderData = { 
+                orderRef: d[3] || query, 
+                name: d[4], 
+                phone: d[5], 
+                address: d[6], 
+                itemsRaw: parsedItems.join(", ") 
+            };
+          }
+        }
+      } else {
+        const oSheet = ss.getSheetByName("Website_Orders");
+        if (oSheet) {
+          const search = oSheet.getRange("A:A").createTextFinder(query).matchEntireCell(true).findNext();
+          if (search) {
+            const d = oSheet.getRange(search.getRow(), 1, 1, 5).getDisplayValues()[0];
+            result.orderData = { orderRef: d[0], name: d[1], phone: d[2], address: d[3], itemsRaw: d[4] };
+          }
+        }
+      }
+    }
+    
+    return sendJSON(result);
+  } catch (error) { return sendJSON({ error: error.toString() }); }
 }
 
 // --- 4. LALAMOVE INTEGRATION ---
