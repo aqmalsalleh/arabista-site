@@ -618,6 +618,7 @@ function submitHubApplication(data, ss, timestamp) {
 function submitNewOrder(data, ss, timestamp) {
   const sheet = ss.getSheetByName("Incoming_Orders");
   const altId = generateAlterationId();
+  const formatCoord = (val) => { const n = parseFloat(val); return isNaN(n) ? "" : n.toFixed(6); };
   
   let returnEligibility = "N/A", status = "Pending Approval"; 
   let direction = ""; 
@@ -665,8 +666,8 @@ function submitNewOrder(data, ss, timestamp) {
       data.Customer_Name || "", 
       data.Phone_No || "", 
       data.Address_Details || "", 
-      data.Customer_Lat || "", 
-      data.Customer_Lng || "", 
+      formatCoord(data.Customer_Lat), 
+      formatCoord(data.Customer_Lng), 
       data.Logistics_Mode || "", 
       data.Hub_Name || "", 
       data.Logistics_Schedule || "", 
