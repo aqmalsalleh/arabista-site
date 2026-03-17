@@ -121,25 +121,6 @@
       </div>
   </div>
 
-  <div id="tut-step-2" class="fixed top-32 left-1/2 -translate-x-1/2 z-50 hidden flex-col items-center pointer-events-none transition-all duration-500 opacity-0">
-      <div class="bg-brand-light/95 backdrop-blur-md border border-luxe shadow-[0_10px_30px_rgba(0,0,0,0.8)] rounded-xl p-5 text-center pointer-events-auto flex flex-col items-center w-72 relative">
-           <button onclick="cancelBookingMode()" class="absolute top-2 right-3 text-white/40 hover:text-white text-xl leading-none">×</button>
-           
-           <div class="h-24 w-full flex justify-center items-center mb-3 overflow-hidden relative rounded-lg bg-black/30 border border-white/5">
-                <div class="absolute inset-0 flex items-center justify-center pointer-events-none opacity-20">
-                    <div class="w-full border-t border-dashed border-white"></div><div class="h-full border-l border-dashed border-white absolute"></div>
-                </div>
-                <img id="anim-pin" src="data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2024%2036%22%3E%3Cpath%20fill%3D%22%234285F4%22%20stroke%3D%22%23ffffff%22%20stroke-width%3D%222%22%20d%3D%22M12%202C8.13%202%205%205.13%205%209c0%205.25%207%2013%207%2013s7-7.75%207-13c0-3.87-3.13-7-7-7z%22/%3E%3C/svg%3E" class="w-6 h-9 absolute z-10" style="transform: translateY(-10px)">
-                <div class="ghost-hand absolute z-20" style="margin-top: 15px; margin-left: 20px;">
-                    <svg class="w-8 h-8 text-white drop-shadow-[0_2px_10px_rgba(0,0,0,0.8)]" fill="currentColor" viewBox="0 0 24 24"><path d="M9 11.24V7.5a2.5 2.5 0 015 0v3.74c1.21-.81 3-2.74 3-2.74a1.5 1.5 0 012.12 2.12l-5.65 5.66A2 2 0 0112.05 17H9a2 2 0 01-2-2v-4a2.5 2.5 0 012-2.5z"/></svg>
-                </div>
-           </div>
-
-           <p class="font-display text-xl text-luxe font-bold pr-2" data-t="tut_step2_title">Step 2: Verify Location</p>
-           <p class="text-sm text-white/80 mt-1 pr-2" data-t="tut_step2_desc">Drag the pin exactly to your building</p>
-      </div>
-  </div>
-
   <div id="tut-step-3" class="fixed top-32 left-1/2 -translate-x-1/2 z-50 hidden flex-col items-center pointer-events-none transition-all duration-500 opacity-0">
       <div class="bg-brand-light/95 backdrop-blur-md border border-luxe shadow-[0_10px_30px_rgba(0,0,0,0.8)] rounded-xl p-5 text-center pointer-events-auto flex flex-col items-center w-72 relative">
            <button onclick="cancelBookingMode()" class="absolute top-2 right-3 text-white/40 hover:text-white text-xl leading-none">×</button>
@@ -170,11 +151,21 @@
   </div>
 
   <div id="confirm-location-modal" class="fixed inset-x-4 bottom-12 md:bottom-10 md:left-1/2 md:-translate-x-1/2 md:w-80 bg-brand-light border border-luxe shadow-2xl rounded-xl z-50 hidden flex-col transition-all">
-      <button onclick="closeConfirmLocationModal()" class="absolute top-2 right-3 text-white/40 hover:text-white text-2xl leading-none">&times;</button>
-      <div class="p-5 text-center pt-6">
+      <button onclick="cancelBookingMode()" class="absolute top-2 right-3 text-white/40 hover:text-white text-2xl leading-none">&times;</button>
+      
+      <div id="booking-tutorial-anim" class="hidden flex-col items-center pt-6 pb-2">
+          <div class="h-16 w-full flex justify-center items-center relative">
+              <img id="anim-pin" src="data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2024%2036%22%3E%3Cpath%20fill%3D%22%234285F4%22%20stroke%3D%22%23ffffff%22%20stroke-width%3D%222%22%20d%3D%22M12%202C8.13%202%205%205.13%205%209c0%205.25%207%2013%207%2013s7-7.75%207-13c0-3.87-3.13-7-7-7z%22/%3E%3C/svg%3E" class="w-6 h-9 absolute z-10" style="transform: translateY(-5px)">
+              <div class="ghost-hand absolute z-20" style="margin-top: 15px; margin-left: 20px;">
+                  <svg class="w-8 h-8 text-white drop-shadow-[0_2px_10px_rgba(0,0,0,0.8)]" fill="currentColor" viewBox="0 0 24 24"><path d="M9 11.24V7.5a2.5 2.5 0 015 0v3.74c1.21-.81 3-2.74 3-2.74a1.5 1.5 0 012.12 2.12l-5.65 5.66A2 2 0 0112.05 17H9a2 2 0 01-2-2v-4a2.5 2.5 0 012-2.5z"/></svg>
+              </div>
+          </div>
+      </div>
+  
+      <div class="p-5 text-center pt-4">
           <p class="text-luxe font-extrabold text-sm tracking-wider uppercase mb-1" data-t="txt_is_this_you">IS THIS YOU?</p>
-          <p class="text-white/80 text-sm mb-5 font-medium" data-t="txt_drag_pin">Drag the blue pin to your EXACT location.</p>
-          <button onclick="confirmLocation()" class="w-full bg-luxe hover:bg-luxe-hover text-brand font-bold py-3 rounded-lg transition-colors shadow-[0_0_15px_rgba(192,160,98,0.2)]" data-t="btn_confirm_loc">Confirm Location</button>
+          <p class="text-white/80 text-sm mb-5 font-medium">Confirm your exact location.</p>
+          <button onclick="confirmLocation()" class="w-full bg-luxe hover:bg-luxe-hover text-brand font-bold py-3 rounded-lg transition-colors shadow-[0_0_15px_rgba(192,160,98,0.2)]" data-t="btn_confirm_loc">Confirm</button>
       </div>
   </div>
 
