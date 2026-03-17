@@ -327,6 +327,13 @@
     let trackerMap = null;
     let trackerMarker = null;
 
+    // --- STATE PERSISTENCE & POLLING ---
+    const CACHE_ID_KEY = 'arabista_tracker_id';
+    const CACHE_DATA_PREFIX = 'arabista_tracker_cache_';
+    const TERMINAL_STATUSES = ['Completed', 'Rejected'];
+    const POLL_INTERVAL_MS = 30000; // 30 s — respectful of GAS quotas, still feels live
+    let pollingTimer = null;
+
     const t = {
         en: {
             page_title: "Track Alteration", page_subtitle: "Enter your unique tracking ID below.", lbl_id: "Alteration ID", btn_track: "Track Order", txt_loading: "Locating your order details...", btn_share: "Share Link", lbl_items: "Items for Alteration:", section_status: "Tracking Status", btn_refresh: "Refresh Status", back_home: "Back to Home", btn_nav_hub: "Navigate to Hub",
@@ -428,14 +435,58 @@
         
         const loader = document.getElementById('initial-loader');
         
-        if (rawId) { 
+        if (rawId) {
             const safeId = sanitizeHTML(rawId);
-            fetchTrackingData(safeId); 
-        } else { 
-            document.getElementById('search-panel').classList.remove('hidden'); 
-            if (loader) {
-                loader.classList.add('opacity-0');
-                setTimeout(() => loader.classList.add('hidden'), 500);
+            // Persist so the user can return without re-typing
+            try { localStorage.setItem(CACHE_ID_KEY, safeId); } catch(e) {}
+
+            // Optimistic UI: render cached payload instantly, then revalidate in background
+            let rendered = false;
+            try {
+                const _c = localStorage.getItem(CACHE_DATA_PREFIX + safeId);
+                if (_c) {
+                    const cached = JSON.parse(_c);
+                    if (cached && cached.alterationId) {
+                        currentData = cached;
+                        renderDashboard();
+                        rendered = true;
+                        if (loader) { loader.classList.add('opacity-0'); setTimeout(() => loader.classList.add('hidden'), 300); }
+                    }
+                }
+            } catch(e) {}
+            fetchTrackingData(safeId, rendered);
+
+        } else {
+            // No URL param — try to restore the last-tracked order automatically
+            let savedId = null;
+            try { savedId = localStorage.getItem(CACHE_ID_KEY); } catch(e) {}
+
+            if (savedId) {
+                // Push ID into the URL so sharing and refreshing both work
+                const restoredUrl = `${window.location.protocol}//${window.location.host}${window.location.pathname}?id=${encodeURIComponent(savedId)}`;
+                window.history.replaceState({}, '', restoredUrl);
+
+                let rendered = false;
+                try {
+                    const _c = localStorage.getItem(CACHE_DATA_PREFIX + savedId);
+                    if (_c) {
+                        const cached = JSON.parse(_c);
+                        if (cached && cached.alterationId) {
+                            currentData = cached;
+                            renderDashboard();
+                            rendered = true;
+                            if (loader) { loader.classList.add('opacity-0'); setTimeout(() => loader.classList.add('hidden'), 300); }
+                        }
+                    }
+                } catch(e) {}
+                fetchTrackingData(savedId, rendered);
+
+            } else {
+                document.getElementById('search-panel').classList.remove('hidden');
+                if (loader) {
+                    loader.classList.add('opacity-0');
+                    setTimeout(() => loader.classList.add('hidden'), 500);
+                }
             }
         }
     });
@@ -476,7 +527,14 @@
                 return; 
             }
             
+            // Snapshot previous state for change-detection before overwriting
+            const prevStatus = currentData ? currentData.orderStatus : null;
+            const prevLalaStatus = currentData ? currentData.lalamoveStatus : null;
+
             currentData = data.trackData;
+
+            // Persist fresh payload to localStorage cache
+            try { localStorage.setItem(CACHE_DATA_PREFIX + sanitizeHTML(currentData.alterationId), JSON.stringify(currentData)); } catch(e) {}
             
             if (data.hubs && data.hubs.length > 0) {
                 const h = data.hubs.find(x => x.name === currentData.hubName);
@@ -499,8 +557,16 @@
             if (currentData.lalamoveOrderId && currentData.lalamoveStatus !== "COMPLETED" && currentData.lalamoveStatus !== "CANCELED") {
                 await fetchLiveLalamoveStatus(currentData.alterationId);
             }
-            
-            renderDashboard();
+
+            // Smart re-render: always for initial loads; for silent background polls,
+            // only re-render if the order or Lalamove status actually changed
+            const hasChanged = currentData.orderStatus !== prevStatus || currentData.lalamoveStatus !== prevLalaStatus;
+            if (!isSilent || hasChanged) {
+                renderDashboard();
+            }
+
+            // Start (or restart) the background polling loop
+            startPolling(currentData.alterationId);
         } catch (error) { 
             console.error(error);
             if(!isSilent) {
@@ -539,6 +605,22 @@
         btn.innerHTML = origHTML;
         btn.disabled = false;
         btn.classList.remove('opacity-50', 'cursor-not-allowed');
+    }
+
+    function startPolling(id) {
+        stopPolling();
+        if (!currentData || TERMINAL_STATUSES.includes(currentData.orderStatus)) return;
+        pollingTimer = setInterval(() => {
+            if (!currentData || TERMINAL_STATUSES.includes(currentData.orderStatus)) {
+                stopPolling();
+                return;
+            }
+            fetchTrackingData(currentData.alterationId, true);
+        }, POLL_INTERVAL_MS);
+    }
+
+    function stopPolling() {
+        if (pollingTimer !== null) { clearInterval(pollingTimer); pollingTimer = null; }
     }
 
     function renderDashboard() {
