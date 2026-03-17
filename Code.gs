@@ -209,8 +209,11 @@ function getLalamoveQuotation(data) {
   const formatCoord = (val) => { const num = parseFloat(val); return isNaN(num) ? "0.000000" : num.toFixed(6); };
   const pLat = formatCoord(data.pickupLat); const pLng = formatCoord(data.pickupLng);
   const dLat = formatCoord(data.dropoffLat); const dLng = formatCoord(data.dropoffLng);
-  const pAddr = (data.pickupAddress && String(data.pickupAddress).trim().length > 0) ? String(data.pickupAddress).substring(0, 200) : "Pickup Location";
-  const dAddr = (data.dropoffAddress && String(data.dropoffAddress).trim().length > 0) ? String(data.dropoffAddress).substring(0, 200) : "Dropoff Location";
+
+  // Aggressive sanitization to prevent HMAC byte mismatches
+  const cleanStr = (str) => String(str || "").replace(/[^\x20-\x7E]/g, "").trim().substring(0, 200);
+  const pAddr = cleanStr(data.pickupAddress) || "Pickup Location";
+  const dAddr = cleanStr(data.dropoffAddress) || "Dropoff Location";
 
   const body = {
     "data": {
@@ -219,17 +222,17 @@ function getLalamoveQuotation(data) {
         { "coordinates": { "lat": pLat, "lng": pLng }, "address": pAddr },
         { "coordinates": { "lat": dLat, "lng": dLng }, "address": dAddr }
       ],
-      "item": { "quantity": "1", "weight": "LESS_THAN_3_KG", "categories": ["OFFICE_ITEM"], "handlingInstructions": [] },
+      "item": { "quantity": "1", "weight": "LESS_THAN_3_KG", "categories": ["OFFICE_ITEM"] },
       "isRouteOptimized": false
     }
   };
-  
+
   const response = callLalamoveAPI("POST", "/v3/quotations", body);
   if (response.code === 201) {
     const resData = JSON.parse(response.body);
     return sendJSON({ status: "success", amount: resData.data.priceBreakdown.total, currency: "MYR", quotationId: resData.data.quotationId, stops: resData.data.stops });
   } else {
-    return sendJSON({ status: "error", message: response.body }); 
+    return sendJSON({ status: "error", message: response.body });
   }
 }
 
@@ -385,8 +388,8 @@ function getLiveLalamoveStatus(data, ss) {
 }
 
 function callLalamoveAPI(method, path, bodyObj) {
-  const key = LALA_KEY;
-  const secret = LALA_SECRET;
+  const key = String(LALA_KEY).trim();     // Destroys invisible copy-paste spaces
+  const secret = String(LALA_SECRET).trim(); // Destroys invisible copy-paste spaces
   if (!key || !secret) throw new Error("API Keys not set.");
 
   const time = new Date().getTime().toString();
@@ -398,7 +401,12 @@ function callLalamoveAPI(method, path, bodyObj) {
 
   const options = {
     "method": method,
-    "headers": { "Authorization": `hmac ${token}`, "Market": MARKET, "Content-Type": "application/json", "Accept": "application/json" },
+    "headers": { 
+      "Authorization": `hmac ${token}`, 
+      "Market": MARKET, 
+      "Content-Type": "application/json", 
+      "Accept": "application/json" 
+    },
     "muteHttpExceptions": true 
   };
   
