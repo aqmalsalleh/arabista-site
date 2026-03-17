@@ -8,8 +8,6 @@
 // --- CONFIGURATION ---
 const LALA_BASE_URL = "https://rest.sandbox.lalamove.com"; 
 const MARKET = "MY"; 
-const LALA_KEY = "pk_test_a1c901387ccc301b39cd320f5c2f922a";
-const LALA_SECRET = "sk_test_MspR+9MsiTOXRz2lxtkklZYqNqcgKkbCzLZBxNIYSkj2TbxLyR6QN8RIwrQLKSRx";
 
 // --- 1. SETUP ---
 function setupLalamoveKeys() {
@@ -388,8 +386,8 @@ function getLiveLalamoveStatus(data, ss) {
 }
 
 function callLalamoveAPI(method, path, bodyObj) {
-  const key = String(LALA_KEY).trim();
-  const secret = String(LALA_SECRET).trim();
+  const key = String(PropertiesService.getScriptProperties().getProperty('LALA_KEY') || "").trim();
+  const secret = String(PropertiesService.getScriptProperties().getProperty('LALA_SECRET') || "").trim();
   if (!key || !secret) throw new Error("API Keys not set.");
 
   const time = new Date().getTime().toString();
