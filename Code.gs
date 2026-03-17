@@ -388,14 +388,16 @@ function getLiveLalamoveStatus(data, ss) {
 }
 
 function callLalamoveAPI(method, path, bodyObj) {
-  const key = String(LALA_KEY).trim();     // Destroys invisible copy-paste spaces
-  const secret = String(LALA_SECRET).trim(); // Destroys invisible copy-paste spaces
+  const key = String(LALA_KEY).trim();
+  const secret = String(LALA_SECRET).trim();
   if (!key || !secret) throw new Error("API Keys not set.");
 
   const time = new Date().getTime().toString();
   const bodyStr = bodyObj ? JSON.stringify(bodyObj) : '';
   const rawSignature = `${time}\r\n${method}\r\n${path}\r\n\r\n${bodyStr}`;
-  const signatureBytes = Utilities.computeHmacSha256Signature(rawSignature, secret);
+
+  // Force strict UTF-8 encoding for the signature byte array
+  const signatureBytes = Utilities.computeHmacSha256Signature(rawSignature, secret, Utilities.Charset.UTF_8);
   const signature = signatureBytes.reduce((str, byte) => str + (byte < 0 ? byte + 256 : byte).toString(16).padStart(2, '0'), '');
   const token = `${key}:${time}:${signature}`;
 
@@ -404,7 +406,7 @@ function callLalamoveAPI(method, path, bodyObj) {
     "headers": { 
       "Authorization": `hmac ${token}`, 
       "Market": MARKET, 
-      "Content-Type": "application/json", 
+      "Content-Type": "application/json; charset=UTF-8", 
       "Accept": "application/json" 
     },
     "muteHttpExceptions": true 
