@@ -450,7 +450,7 @@
                         currentData = cached;
                         renderDashboard();
                         rendered = true;
-                        if (loader) { loader.classList.add('opacity-0'); setTimeout(() => loader.classList.add('hidden'), 300); }
+                        // Loader stays visible — hideSyncBanner() in the fetch finally block dismisses it
                     }
                 }
             } catch(e) {}
@@ -476,7 +476,7 @@
                             currentData = cached;
                             renderDashboard();
                             rendered = true;
-                            if (loader) { loader.classList.add('opacity-0'); setTimeout(() => loader.classList.add('hidden'), 300); }
+                            // Loader stays visible — hideSyncBanner() in the fetch finally block dismisses it
                         }
                     }
                 } catch(e) {}
@@ -628,19 +628,17 @@
     }
 
     function showSyncBanner() {
-        if (document.getElementById('sync-banner')) return;
-        const panel = document.getElementById('tracker-panel');
-        if (!panel || panel.classList.contains('hidden')) return;
-        const banner = document.createElement('div');
-        banner.id = 'sync-banner';
-        banner.className = 'flex items-center gap-2 bg-white/5 border border-white/10 rounded-lg px-3 py-2 mb-4 text-xs text-white/40';
-        banner.innerHTML = `<svg class="animate-spin w-3 h-3 shrink-0 text-luxe" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg><span>Syncing latest status…</span>`;
-        panel.prepend(banner);
+        // Keep the full-screen pulsating loader visible while stale cache is shown
+        const loader = document.getElementById('initial-loader');
+        if (loader) loader.classList.remove('hidden', 'opacity-0');
     }
 
     function hideSyncBanner() {
-        const b = document.getElementById('sync-banner');
-        if (b) b.remove();
+        // Fade out the loader exactly like the initial page-load dismissal
+        const loader = document.getElementById('initial-loader');
+        if (!loader || loader.classList.contains('hidden')) return;
+        loader.classList.add('opacity-0');
+        setTimeout(() => loader.classList.add('hidden'), 500);
     }
 
     function renderDashboard() {
