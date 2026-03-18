@@ -644,6 +644,7 @@
         locMap = new google.maps.Map(document.getElementById("location-map"), {
             zoom: 16, center: centerPos,
             disableDefaultUI: true, clickableIcons: false, keyboardShortcuts: false,
+            gestureHandling: "greedy",
             styles: [
                 { elementType: "geometry", stylers: [{ color: "#1A1A1C" }] },
                 { elementType: "labels.text.stroke", stylers: [{ color: "#1A1A1C" }] },
@@ -660,14 +661,23 @@
             icon: { url: svgBluePin, scaledSize: new google.maps.Size(32, 48), anchor: new google.maps.Point(16, 48) }
         });
 
-        locMarker.addListener('dragend', () => {
-            const pos = locMarker.getPosition();
-            locMap.panTo(pos);
-            userLat = pos.lat();
-            userLng = pos.lng();
-
+        // Shared handler for both drag-end and tap-to-place
+        const updatePin = (latLng) => {
+            locMarker.setPosition(latLng);
+            locMap.panTo(latLng);
+            userLat = latLng.lat();
+            userLng = latLng.lng();
             document.getElementById('location-status').innerHTML = `${spinnerSvg} Translating...`;
             fetchGeocode(userLat, userLng);
+        };
+
+        locMarker.addListener('dragend', () => {
+            updatePin(locMarker.getPosition());
+        });
+
+        // Tap anywhere on the map to instantly relocate the pin
+        locMap.addListener('click', (e) => {
+            updatePin(e.latLng);
         });
     }
 

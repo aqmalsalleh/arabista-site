@@ -1227,6 +1227,15 @@
         waBtn.innerHTML = `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> <span>${t[currentLang].txt_receipt_sent || "Receipt Sent!"}</span>`;
     }
 
+    // Mirrors Code.gs formatPhone — ensures e.164 format so Lalamove never gets bare "+60"
+    function normalisePhone(raw) {
+        let clean = String(raw || "").replace(/[^0-9]/g, '');
+        if (!clean) return "+60123456789";   // safe fallback; never produces "+60"
+        if (clean.startsWith("60")) return "+" + clean;
+        if (clean.startsWith("01")) return "+6" + clean;
+        return "+60" + clean;
+    }
+
     async function bookRider() {
         const btn = document.getElementById('btn-final-book');
         btn.innerHTML = `${spinnerSvg} ${t[currentLang].msg_booking || "Booking..."}`; btn.disabled = true;
@@ -1237,14 +1246,15 @@
             senderStopId: currentStops[0].stopId,
             recipientStopId: currentStops[1].stopId
         };
-        const cPhone = currentData.customerPhone || "60123456789";
+        const cPhone = normalisePhone(currentData.customerPhone);
+        const hPhone = normalisePhone(hubData.phone);
         if (isIncomingOrder) {
             payload.direction = "Inbound";
             payload.senderName = currentData.customerName; payload.senderPhone = cPhone; 
-            payload.recipientName = currentData.hubName; payload.recipientPhone = hubData.phone;
+            payload.recipientName = currentData.hubName; payload.recipientPhone = hPhone;
         } else {
             payload.direction = "Outbound";
-            payload.senderName = currentData.hubName; payload.senderPhone = hubData.phone;
+            payload.senderName = currentData.hubName; payload.senderPhone = hPhone;
             payload.recipientName = currentData.customerName; payload.recipientPhone = cPhone;
         }
         try {
