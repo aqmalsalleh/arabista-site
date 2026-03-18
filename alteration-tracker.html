@@ -360,6 +360,7 @@
             step_assigning: "Assigning", step_found: "Found", step_picked_up: "Picked Up", step_delivered: "Delivered",
             modal_booked_title: "Driver Booked!", modal_booked_desc: "Your Lalamove rider has been successfully scheduled. Please notify the Hub.", btn_notify_hub_wa: "Notify Hub via WhatsApp", btn_skip_reload: "Skip & Reload Tracker",
             wa_lala_booked: "*[LALAMOVE BOOKED]*\n- *Order ID:* {id}\n- *Direction:* {dir}\n\nA Lalamove rider has been booked. You can track the live status here:\n{link}",
+            wa_self_pickup_choice: "*[ARABISTA TRACKER UPDATE]*\n- *Order:* {id}\n- *Action:* Customer will Self-Pickup\n\nThe customer has confirmed they will collect their item in person. Please prepare the item for handover.\n\nTrack order here:\n{link}",
             dir_inbound: "Inbound to Hub", dir_outbound: "Outbound to Customer",
             modal_title_pickup: "Confirm Pickup Location", modal_title_delivery: "Confirm Delivery Location", lbl_location: "Location", txt_saved_address: "Saved Address",
             
@@ -393,6 +394,7 @@
             step_assigning: "Mencari", step_found: "Dijumpai", step_picked_up: "Diambil", step_delivered: "Selesai",
             modal_booked_title: "Rider Ditempah!", modal_booked_desc: "Rider Lalamove anda telah berjaya dijadualkan. Sila maklumkan kepada Hub.", btn_notify_hub_wa: "Maklumkan Hub via WhatsApp", btn_skip_reload: "Langkau & Muat Semula",
             wa_lala_booked: "*[LALAMOVE DITEMPAH]*\n- *Pesanan:* {id}\n- *Hala Tuju:* {dir}\n\nRider Lalamove telah ditempah. Anda boleh menjejak status terkini di sini:\n{link}",
+            wa_self_pickup_choice: "*[KEMASKINI TRACKER ARABISTA]*\n- *Pesanan:* {id}\n- *Tindakan:* Pelanggan Ambil Sendiri\n\nPelanggan telah mengesahkan mereka akan datang sendiri mengambil barang. Sila sediakan barang untuk diserahkan.\n\nJejak pesanan di sini:\n{link}",
             dir_inbound: "Ke Hub (Inbound)", dir_outbound: "Ke Pelanggan (Outbound)",
             modal_title_pickup: "Sahkan Lokasi Pengambilan", modal_title_delivery: "Sahkan Lokasi Penghantaran", lbl_location: "Lokasi", txt_saved_address: "Alamat Tersimpan",
             
@@ -1373,16 +1375,40 @@
         } catch(e) { alert(t[currentLang].alert_error_canceling); }
     }
     
-    function setReturnChoice(choice, btn) { 
+    async function setReturnChoice(choice, btn) { 
         if (btn) {
             btn.innerHTML = `${spinnerSvg} ${t[currentLang].msg_wait || "Wait..."}`;
             btn.classList.add('animate-pulse', 'opacity-70', 'pointer-events-none');
             btn.disabled = true;
         }
-        fetch(scriptURL, { 
-            method: 'POST', 
-            body: JSON.stringify({ action: "update_outbound", alteration_id: currentData.alterationId, outbound_choice: choice }) 
-        }).then(() => window.location.reload()); 
+        try {
+            await fetch(scriptURL, { 
+                method: 'POST', 
+                body: JSON.stringify({ action: "update_outbound", alteration_id: currentData.alterationId, outbound_choice: choice }) 
+            });
+            // Notify hub immediately before reloading
+            if (choice === 'Self-Pickup') notifyHubSelfPickup();
+            window.location.reload();
+        } catch(e) {
+            // Re-enable the button so the user can retry
+            if (btn) {
+                btn.innerHTML = t[currentLang].btn_self_pickup || "I will Self-Pickup";
+                btn.classList.remove('animate-pulse', 'opacity-70', 'pointer-events-none');
+                btn.disabled = false;
+            }
+            alert(t[currentLang].alert_error || "Error. Please try again.");
+        }
+    }
+
+    function notifyHubSelfPickup() {
+        if (!hubData || !hubData.phone) return;
+        let cleanPhone = hubData.phone.replace(/[^0-9]/g, '');
+        if (cleanPhone.startsWith('0')) cleanPhone = '6' + cleanPhone;
+        const link = trackerBaseUrl + encodeURIComponent(currentData.alterationId);
+        const msg = (t[currentLang].wa_self_pickup_choice || "")
+            .replace('{id}', currentData.alterationId)
+            .replace('{link}', link);
+        window.open(`https://wa.me/${cleanPhone}?text=${encodeURIComponent(msg)}`, '_blank');
     }
     
     function shareLink() { 
