@@ -399,8 +399,10 @@ function getLiveLalamoveStatus(data, ss) {
 }
 
 function callLalamoveAPI(method, path, bodyObj) {
-  const key = String(PropertiesService.getScriptProperties().getProperty('LALA_KEY') || "").trim();
-  const secret = String(PropertiesService.getScriptProperties().getProperty('LALA_SECRET') || "").trim();
+  const props = PropertiesService.getScriptProperties();
+  const key = String(props.getProperty('LALAMOVE_API_KEY') || "").trim();
+  const secret = String(props.getProperty('LALAMOVE_SECRET') || "").trim();
+  const baseUrl = String(props.getProperty('LALAMOVE_BASE_URL') || LALA_BASE_URL).trim();
   if (!key || !secret) throw new Error("API Keys not set.");
 
   const time = new Date().getTime().toString();
@@ -425,7 +427,7 @@ function callLalamoveAPI(method, path, bodyObj) {
   
   if (method === 'PUT' || method === 'POST') options.payload = bodyStr;
 
-  const response = UrlFetchApp.fetch(LALA_BASE_URL + path, options);
+  const response = UrlFetchApp.fetch(baseUrl + path, options);
   return { code: response.getResponseCode(), body: response.getContentText() };
 }
 
