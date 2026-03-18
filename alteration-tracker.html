@@ -440,6 +440,13 @@
             // Persist so the user can return without re-typing
             try { localStorage.setItem(CACHE_ID_KEY, safeId); } catch(e) {}
 
+            // If the WA payment link included &paid=hub, lock in the paid flag
+            // for this device/browser so it survives tab changes and reloads
+            if (urlParams.get('paid') === 'hub') {
+                sessionStorage.setItem('paid_hub_' + safeId, 'true');
+                try { localStorage.setItem('paid_hub_' + safeId, 'true'); } catch(e) {}
+            }
+
             // Optimistic UI: render cached payload instantly, then revalidate in background
             let rendered = false;
             try {
@@ -771,7 +778,9 @@
                 isIncomingOrder = false;
                 if (!currentData.outboundChoice) {
                     
-                    let hasPaidHub = sessionStorage.getItem('paid_hub_' + sanitizeHTML(currentData.alterationId)) === 'true';
+                    const _paidKey = 'paid_hub_' + sanitizeHTML(currentData.alterationId);
+                    let hasPaidHub = sessionStorage.getItem(_paidKey) === 'true'
+                        || localStorage.getItem(_paidKey) === 'true';
                     
                     if (!hasPaidHub) {
                         extraText = `
@@ -978,11 +987,14 @@
     }
 
     function notifyHubPayment() {
-        sessionStorage.setItem('paid_hub_' + sanitizeHTML(currentData.alterationId), 'true');
+        const safeId = sanitizeHTML(currentData.alterationId);
+        sessionStorage.setItem('paid_hub_' + safeId, 'true');
+        try { localStorage.setItem('paid_hub_' + safeId, 'true'); } catch(e) {}
         const phone = currentData.hubPhone || "60192482084"; 
         let cleanPhone = phone.replace(/[^0-9]/g, ''); 
         if (cleanPhone.startsWith('0')) cleanPhone = '6' + cleanPhone;
-        const link = trackerBaseUrl + encodeURIComponent(currentData.alterationId);
+        // Append &paid=hub so the flag is restored on any device / browser that opens the link
+        const link = trackerBaseUrl + encodeURIComponent(currentData.alterationId) + '&paid=hub';
         const msg = (t[currentLang].wa_hub_pay || "").replace('{id}', currentData.alterationId).replace('{total}', currentData.servicesTotal).replace('{link}', link);
         window.open(`https://wa.me/${cleanPhone}?text=${encodeURIComponent(msg)}`, '_blank');
         closeHubPayModal();
