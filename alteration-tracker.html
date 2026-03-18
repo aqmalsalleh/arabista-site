@@ -352,7 +352,7 @@
             txt_step1: "Step 1", txt_step2: "Step 2: Please ensure the Lalamove fee has been paid", txt_pay_alt_warn: "Please ensure the alteration fee has been paid to the hub before arranging Lalamove or Self-Pickup.",
             alert_enter_id: "Please enter an Alteration ID.", alert_order_not_found: "Order not found.", alert_conn_error: "Connection Error.", alert_enter_unit: "Please enter Unit / House Number.", alert_locate_gps: "Please pin your location on the map first.", alert_fee_error: "Fee Error: ", alert_error: "Error", alert_driver_booked: "Driver Booked!", alert_failed: "Failed: ", alert_cancel_failed: "Cancel Failed: ", alert_error_canceling: "Error canceling.", alert_copied: "Copied to clipboard!",
             msg_calculating: "Calculating...", msg_locating: "Locating...", msg_searching: "Searching...", msg_translating: "Translating...", msg_booking: "Booking...", msg_retry: "Retry", msg_gps_acquiring: "📡 Acquiring exact satellite coordinates...", msg_gps_locked: "GPS Locked:", msg_pin_dropped: "✅ Pin Dropped:", msg_location_not_found: "❌ Location not found.", msg_search_failed: "❌ Search failed.", msg_wait: "Wait...", msg_geo_notsupported: "Geo not supported",
-            wa_hub_pay: "*[ALTERATION PAYMENT]*\n- *Order:* {id}\n- *Amount:* {total}\n- *Paid To:* Arabista Hub\n\nReceipt attached below.",
+            wa_hub_pay: "*[ALTERATION PAYMENT]*\n- *Order:* {id}\n- *Amount:* {total}\n- *Paid To:* Arabista Hub\n\nTrack your order here:\n{link}\n\nReceipt attached below.",
             wa_hq_pay: "*[DELIVERY PAYMENT]*\n- *Order:* {id}\n- *Amount:* {total}\n- *Paid To:* Arabista HQ\n- *Link:* {link}\n\nReceipt attached below.",
             
             status_assigned_to: "Assigned to: ", txt_rejected_title: "Order Rejected", txt_rejected_desc: "Unfortunately, the Hub is currently unable to accept your request (likely due to high volume or closing time).", btn_choose_another: "Choose Another Hub", txt_waiting_approval: "Your request is waiting for Hub's approval. If it takes too long, you can re-notify them.", btn_renotify: "Re-notify Hub via WhatsApp", txt_please_dropoff: "Please drop off your items at the hub.", txt_lala_live: "Lalamove Live Status", txt_tab_orig: "Original", 
@@ -385,7 +385,7 @@
             txt_step1: "Langkah 1", txt_step2: "Langkah 2: Sila pastikan caj Lalamove telah dibayar", txt_pay_alt_warn: "Sila pastikan caj alterasi telah dibayar kepada hub sebelum menempah Lalamove atau Ambil Sendiri.",
             alert_enter_id: "Sila masukkan ID Tempahan.", alert_order_not_found: "Tempahan tidak dijumpai.", alert_conn_error: "Ralat Sambungan.", alert_enter_unit: "Sila masukkan No. Unit / Rumah.", alert_locate_gps: "Sila letakkan pin lokasi di peta dahulu.", alert_fee_error: "Ralat Caj: ", alert_error: "Ralat", alert_driver_booked: "Rider Berjaya Ditempah!", alert_failed: "Gagal: ", alert_cancel_failed: "Gagal Batal: ", alert_error_canceling: "Ralat membatalkan.", alert_copied: "Disalin ke papan keratan!",
             msg_calculating: "Mengira...", msg_locating: "Mengescan...", msg_searching: "Mencari...", msg_translating: "Menterjemah...", msg_booking: "Menempah...", msg_retry: "Cuba Lagi", msg_gps_acquiring: "📡 Mendapatkan koordinat satelit yang tepat...", msg_gps_locked: "GPS Dikunci:", msg_pin_dropped: "✅ Pin Diletakkan:", msg_location_not_found: "❌ Lokasi tidak dijumpai.", msg_search_failed: "❌ Carian gagal.", msg_wait: "Tunggu...", msg_geo_notsupported: "Geo tidak disokong",
-            wa_hub_pay: "*[BAYARAN ALTERASI]*\n- *Pesanan:* {id}\n- *Jumlah:* {total}\n- *Dibayar Kepada:* Arabista Hub\n\nResit dilampirkan di bawah.",
+            wa_hub_pay: "*[BAYARAN ALTERASI]*\n- *Pesanan:* {id}\n- *Jumlah:* {total}\n- *Dibayar Kepada:* Arabista Hub\n\nJejak tempahan anda:\n{link}\n\nResit dilampirkan di bawah.",
             wa_hq_pay: "*[BAYARAN PENGHANTARAN]*\n- *Pesanan:* {id}\n- *Jumlah:* {total}\n- *Dibayar Kepada:* Arabista HQ\n- *Pautan:* {link}\n\nResit dilampirkan di bawah.",
             
             status_assigned_to: "Ditetapkan kepada: ", txt_rejected_title: "Pesanan Ditolak", txt_rejected_desc: "Dukacita dimaklumkan, Hub tidak dapat menerima pesanan anda buat masa ini (mungkin kerana terlalu sibuk atau sudah tutup).", btn_choose_another: "Pilih Hub Lain", txt_waiting_approval: "Pesanan anda sedang menunggu kelulusan Hub. Jika terlalu lama, anda boleh maklumkan mereka semula.", btn_renotify: "Maklumkan Hub melalui WhatsApp", txt_please_dropoff: "Sila hantar (drop-off) barang anda di Hub.", txt_lala_live: "Status Terkini Lalamove", txt_tab_orig: "Asal", 
@@ -454,6 +454,7 @@
                     }
                 }
             } catch(e) {}
+            if (rendered) showSyncBanner();
             fetchTrackingData(safeId, rendered);
 
         } else {
@@ -479,6 +480,7 @@
                         }
                     }
                 } catch(e) {}
+                if (rendered) showSyncBanner();
                 fetchTrackingData(savedId, rendered);
 
             } else {
@@ -578,6 +580,8 @@
                 }
                 document.getElementById('search-panel').classList.remove('hidden'); 
             }
+        } finally {
+            hideSyncBanner();
         }
     }
     
@@ -621,6 +625,22 @@
 
     function stopPolling() {
         if (pollingTimer !== null) { clearInterval(pollingTimer); pollingTimer = null; }
+    }
+
+    function showSyncBanner() {
+        if (document.getElementById('sync-banner')) return;
+        const panel = document.getElementById('tracker-panel');
+        if (!panel || panel.classList.contains('hidden')) return;
+        const banner = document.createElement('div');
+        banner.id = 'sync-banner';
+        banner.className = 'flex items-center gap-2 bg-white/5 border border-white/10 rounded-lg px-3 py-2 mb-4 text-xs text-white/40';
+        banner.innerHTML = `<svg class="animate-spin w-3 h-3 shrink-0 text-luxe" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg><span>Syncing latest status…</span>`;
+        panel.prepend(banner);
+    }
+
+    function hideSyncBanner() {
+        const b = document.getElementById('sync-banner');
+        if (b) b.remove();
     }
 
     function renderDashboard() {
@@ -848,9 +868,15 @@
                 displayStageLabel = t[currentLang].stage_dispatched;
             }
 
-            html += `<div class="relative pl-6 pb-8 ${idx === stages.length - 1 ? 'last-step' : ''}"><div class="timeline-line ${idx < currentIdx ? 'active' : ''}"></div><div class="absolute left-0 top-1 timeline-dot ${dotClass}"></div><h4 class="text-sm font-bold ${isCurrent ? 'text-green-400' : 'text-white/30'}">${displayStageLabel}</h4>${extraText}</div>`;
+            html += `<div ${isCurrent ? 'id="current-timeline-step"' : ''} class="relative pl-6 pb-8 ${idx === stages.length - 1 ? 'last-step' : ''}"><div class="timeline-line ${idx < currentIdx ? 'active' : ''}"></div><div class="absolute left-0 top-1 timeline-dot ${dotClass}"></div><h4 class="text-sm font-bold ${isCurrent ? 'text-green-400' : 'text-white/30'}">${displayStageLabel}</h4>${extraText}</div>`;
         });
         document.getElementById('timeline-container').innerHTML = html;
+
+        // Scroll the active step into view after DOM settles
+        setTimeout(() => {
+            const el = document.getElementById('current-timeline-step');
+            if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }, 250);
     }
 
     function renderLalamoveSteps(status) {
@@ -958,7 +984,8 @@
         const phone = currentData.hubPhone || "60192482084"; 
         let cleanPhone = phone.replace(/[^0-9]/g, ''); 
         if (cleanPhone.startsWith('0')) cleanPhone = '6' + cleanPhone;
-        const msg = (t[currentLang].wa_hub_pay || "").replace('{id}', currentData.alterationId).replace('{total}', currentData.servicesTotal);
+        const link = trackerBaseUrl + encodeURIComponent(currentData.alterationId);
+        const msg = (t[currentLang].wa_hub_pay || "").replace('{id}', currentData.alterationId).replace('{total}', currentData.servicesTotal).replace('{link}', link);
         window.open(`https://wa.me/${cleanPhone}?text=${encodeURIComponent(msg)}`, '_blank');
         closeHubPayModal();
         renderDashboard(); 
@@ -999,6 +1026,7 @@
         trackerMap = new google.maps.Map(document.getElementById("tracker-map"), { 
             zoom: 16, center: centerPos, 
             disableDefaultUI: true, clickableIcons: false, keyboardShortcuts: false,
+            gestureHandling: "greedy",
             styles: [
                 { elementType: "geometry", stylers: [{ color: "#1A1A1C" }] },
                 { elementType: "labels.text.stroke", stylers: [{ color: "#1A1A1C" }] },
@@ -1015,12 +1043,17 @@
             icon: { url: svgBluePin, scaledSize: new google.maps.Size(32, 48), anchor: new google.maps.Point(16, 48) } 
         });
 
-        // Trigger geocode when user stops dragging the pin
-        trackerMarker.addListener('dragend', () => {
-            const pos = trackerMarker.getPosition();
-            trackerMap.panTo(pos);
-            updateTrackerLocation(pos.lat(), pos.lng());
-        });
+        // Shared handler for drag-end and tap-to-place
+        const movePin = (latLng) => {
+            trackerMarker.setPosition(latLng);
+            trackerMap.panTo(latLng);
+            updateTrackerLocation(latLng.lat(), latLng.lng());
+        };
+
+        trackerMarker.addListener('dragend', () => { movePin(trackerMarker.getPosition()); });
+
+        // Tap anywhere on the map to instantly relocate the pin
+        trackerMap.addListener('click', (e) => { movePin(e.latLng); });
         
         // Initialize the text box with current location
         updateTrackerLocation(centerPos.lat, centerPos.lng, true);
