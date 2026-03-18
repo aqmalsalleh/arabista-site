@@ -242,6 +242,21 @@ function placeLalamoveOrder(data, ss) {
     return "+60" + clean; 
   };
 
+  // Idempotency guard: if a Lalamove booking already exists for this order
+  // (e.g. a previous request succeeded but the client lost the response due to
+  // a tab-switch / network abort), return the existing booking instead of
+  // creating a duplicate.
+  const sheet = ss.getSheetByName("Incoming_Orders");
+  const search = sheet.getRange("B:B").createTextFinder(data.trackId).matchEntireCell(true).findNext();
+  if (search) {
+    const existingRow = search.getRow();
+    const existingOrderId = String(sheet.getRange(existingRow, 21).getValue()).trim();
+    if (existingOrderId) {
+      const existingTrackingUrl = String(sheet.getRange(existingRow, 20).getValue()).trim();
+      return sendJSON({ status: "success", lalamove_order_id: existingOrderId, tracking_url: existingTrackingUrl });
+    }
+  }
+
   const senderPhone = formatPhone(data.senderPhone);
   const recipientPhone = formatPhone(data.recipientPhone);
 
@@ -269,8 +284,6 @@ function placeLalamoveOrder(data, ss) {
     const orderRef = resData.data.orderId; 
     const trackingUrl = `https://share.sandbox.lalamove.com/tracking?orderId=${orderRef}&lang=en_MY`;
 
-    const sheet = ss.getSheetByName("Incoming_Orders");
-    const search = sheet.getRange("B:B").createTextFinder(data.trackId).matchEntireCell(true).findNext();
     if (search) {
       const row = search.getRow();
       sheet.getRange(row, 17).setValue("Dispatched");

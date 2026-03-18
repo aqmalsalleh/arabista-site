@@ -1295,7 +1295,30 @@
                 showDriverBookedModal(isIncomingOrder, data.tracking_url); 
             }
             else { alert((t[currentLang].alert_failed || "Failed: ") + data.message); btn.innerHTML = t[currentLang].msg_retry || "Retry"; btn.disabled = false; }
-        } catch(e) { alert(t[currentLang].alert_error); btn.innerHTML = t[currentLang].msg_retry || "Retry"; btn.disabled = false;}
+        } catch(e) {
+            // Network abort (e.g. tab switch while request was in-flight).
+            // The GAS backend may have already placed the Lalamove order before
+            // the connection dropped, so verify before allowing a retry — 
+            // blindly re-enabling the button risks creating a duplicate booking.
+            await verifyAndRecoverBooking(btn);
+        }
+    }
+
+    async function verifyAndRecoverBooking(btn) {
+        btn.innerHTML = `${spinnerSvg} ${t[currentLang].msg_verifying || "Verifying..."}`;
+        try {
+            const check = await fetch(`${scriptURL}?track_id=${encodeURIComponent(currentData.alterationId)}`);
+            const checkData = await check.json();
+            if (checkData.trackData && checkData.trackData.lalamoveOrderId) {
+                // The first booking actually succeeded — show the success modal
+                currentData = checkData.trackData;
+                showDriverBookedModal(isIncomingOrder, checkData.trackData.trackingUrl || '');
+                return;
+            }
+        } catch(e2) { /* ignore — fall through to retry */ }
+        // Booking genuinely did not complete — safe to retry
+        btn.innerHTML = t[currentLang].msg_retry || "Retry";
+        btn.disabled = false;
     }
     
     function showDriverBookedModal(isInbound, trackingUrl) {
