@@ -844,7 +844,6 @@
         container.innerHTML = '';
         const pFull = pricingData.full; const pHem = pricingData.hem; const pSleeve = pricingData.sleeve; const pShoulder = pricingData.shoulder; const pPads = pricingData.pads;
 
-        openStep(2);
         state.selectedItems.forEach(item => {
             const block = document.createElement('div'); block.className = "bg-black/30 border border-white/5 rounded-xl overflow-hidden relative";
             const header = `<div class="bg-white/5 p-4 border-b border-white/5 font-display text-lg flex justify-between items-center"><span class="text-white font-bold">${item.name}</span><span class="text-xs font-sans text-luxe border border-luxe/30 px-2 py-1 bg-luxe/10 rounded font-bold">${t[currentLang].txt_size_label} ${item.size}</span></div>`;
@@ -1029,10 +1028,12 @@
         const body2 = document.getElementById('step2-body');
         const chev2 = document.getElementById('step2-chev');
         if (body2) { body2.style.maxHeight = '9999px'; chev2.style.transform = 'rotate(0deg)'; }
-        // Scroll Step 2 header into view inside the sheet after transition begins
+        // After the 350ms collapse transition finishes, reset the sheet scroll to top
+        // so Step 2 header sits neatly at the top of the visible area
         setTimeout(() => {
-            document.getElementById('step2-hdr')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }, 50);
+            const sheetScroll = document.querySelector('#booking-sheet .overflow-y-auto.hide-scrollbar');
+            if (sheetScroll) sheetScroll.scrollTo({ top: 0, behavior: 'smooth' });
+        }, 380);
     }
 
     // --- JOIN NETWORK MODAL ---
