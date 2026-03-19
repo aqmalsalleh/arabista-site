@@ -793,7 +793,15 @@
     }
 
     function openBookingSheet() { document.getElementById('booking-overlay').classList.remove('hidden'); setTimeout(() => document.getElementById('booking-overlay').classList.remove('opacity-0'), 10); document.getElementById('booking-sheet').classList.add('open'); }
-    function closeBookingSheet() { document.getElementById('booking-sheet').classList.remove('open'); document.getElementById('booking-overlay').classList.add('opacity-0'); setTimeout(() => document.getElementById('booking-overlay').classList.add('hidden'), 400); }
+    function closeBookingSheet() {
+        if (document.activeElement) document.activeElement.blur();
+        window.scrollTo(0, 0);
+        const sheetScroll = document.querySelector('#booking-sheet .overflow-y-auto.hide-scrollbar');
+        if (sheetScroll) sheetScroll.scrollTop = 0;
+        document.getElementById('booking-sheet').classList.remove('open');
+        document.getElementById('booking-overlay').classList.add('opacity-0');
+        setTimeout(() => document.getElementById('booking-overlay').classList.add('hidden'), 400);
+    }
 
     function addManualItem() {
         const list = document.getElementById('manual-items-list'); const idx = list.children.length;
