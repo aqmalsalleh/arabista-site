@@ -471,7 +471,16 @@
     let base64Photo = "";
     let appData = { lat: "", lng: "", address: "" };
 
-    const scriptURL = 'https://script.google.com/macros/s/AKfycbxTN-fedBZU81dGAVOgiYpnTup60V2bpCnh3YsFgBwd5t-jma9j8v9hwxSC87YvctNViw/exec'; 
+    let scriptURL = "";
+    const currentHost = window.location.hostname;
+    // Auto-detect environment to route to the correct Google Apps Script backend
+    if (currentHost === "127.0.0.1" || currentHost === "localhost") {
+        // DEV Backend (Local Sandbox)
+        scriptURL = "https://script.google.com/macros/s/AKfycbxTN-fedBZU81dGAVOgiYpnTup60V2bpCnh3YsFgBwd5t-jma9j8v9hwxSC87YvctNViw/exec";
+    } else {
+        // PROD Backend (Live GitHub Pages)
+        scriptURL = "https://script.google.com/macros/s/AKfycbyrJFfuCrhAbdwzAj8uP4sSvFuzRzzzEFV5CHOCBSOK6OGlIXPtsf7-XEfjLHGnFZiyvw/exec";
+    } 
 
     function setLang(lang) {
         currentLang = lang;
