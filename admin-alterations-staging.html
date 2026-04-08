@@ -314,10 +314,20 @@
 
     function showQR(hubName, url) {
       document.getElementById('qr-hub-name').textContent = hubName;
-      const img = document.getElementById('qr-image');
-      const err = document.getElementById('qr-error');
-      if(url && url.length > 5) {
-        img.src = url;
+      var img = document.getElementById('qr-image');
+      var err = document.getElementById('qr-error');
+
+      // Convert Google Drive view link to direct image link
+      var directUrl = url;
+      if (url && url.includes('drive.google.com/file/d/')) {
+         var match = url.match(/\/d\/([a-zA-Z0-9_-]+)/);
+         if (match && match[1]) {
+             directUrl = 'https://drive.google.com/uc?export=view&id=' + match[1];
+         }
+      }
+
+      if (directUrl && directUrl.length > 5) {
+        img.src = directUrl;
         img.classList.remove('hidden');
         err.classList.add('hidden');
       } else {
