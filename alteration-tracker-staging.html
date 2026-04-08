@@ -424,17 +424,9 @@
             .replace(/"/g, '\\"');
     }
 
-    let scriptURL = "";
-    let senangPayBaseUrl = "";
+    const scriptURL = "https://script.google.com/macros/s/AKfycbw41OeSWKC315Fw8eocXoQTRxQABVb9-L_gRwSCw1oiszquVypIN2cO8An2cxco8H7IiA/exec";
+    const senangPayBaseUrl = "https://sandbox.senangpay.my/payment/";
     const currentHost = window.location.hostname;
-    // Auto-detect environment to route to the correct Google Apps Script backend
-    if (currentHost === "127.0.0.1" || currentHost === "localhost") {
-        scriptURL        = "https://script.google.com/macros/s/AKfycbw41OeSWKC315Fw8eocXoQTRxQABVb9-L_gRwSCw1oiszquVypIN2cO8An2cxco8H7IiA/exec";
-        senangPayBaseUrl = "https://sandbox.senangpay.my/payment/";
-    } else {
-        scriptURL        = "https://script.google.com/macros/s/AKfycbw41OeSWKC315Fw8eocXoQTRxQABVb9-L_gRwSCw1oiszquVypIN2cO8An2cxco8H7IiA/exec";
-        senangPayBaseUrl = "https://app.senangpay.my/payment/";
-    }
     const baseUrl = (currentHost === "127.0.0.1" || currentHost === "localhost")
         ? (window.location.origin + "/alteration-tracker-staging.html")
         : "https://www.arabistaofficial.com/alteration-tracker-staging.html";
