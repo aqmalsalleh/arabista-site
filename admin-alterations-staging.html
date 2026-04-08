@@ -202,7 +202,7 @@
             <p class="text-red-200 text-sm mt-2 font-medium">${i.notes}</p>
           </div>
           <div class="flex flex-wrap gap-2 shrink-0">
-            <a href="https://wa.me/${cleanPhone(i.custPhone)}" target="_blank" class="bg-white/10 hover:bg-white/20 px-4 py-2 rounded text-xs transition uppercase tracking-wider">Msg Cust</a>
+            <button type="button" onclick='window.open("https://wa.me/" + cleanPhone(${JSON.stringify(String(i.custPhone || ''))}), "_blank")' class="bg-white/10 hover:bg-white/20 px-4 py-2 rounded text-xs transition uppercase tracking-wider">Msg Cust</button>
             <button onclick="executeAction('CLEAR_FLAG', {row: ${i.row}})" class="bg-red-500 hover:bg-red-400 text-white px-4 py-2 rounded text-xs font-bold transition uppercase tracking-wider">Resolve & Clear</button>
           </div>
         </div>
@@ -222,8 +222,8 @@
         let lalaHTML = '<span class="text-gray-600 italic">None</span>';
         if(o.inboundLala || o.outboundLala) {
            lalaHTML = '';
-           if(o.inboundLala) lalaHTML += `<a href="https://share.sandbox.lalamove.com/tracking/${o.inboundLala}" target="_blank" class="text-blue-400 hover:text-blue-300 underline block mb-1">IN: ${o.inboundLala}</a>`;
-           if(o.outboundLala) lalaHTML += `<a href="https://share.sandbox.lalamove.com/tracking/${o.outboundLala}" target="_blank" class="text-purple-400 hover:text-purple-300 underline block">OUT: ${o.outboundLala}</a>`;
+           if(o.inboundLala) lalaHTML += `<button type="button" onclick='window.open(${JSON.stringify('https://share.sandbox.lalamove.com/tracking/' + String(o.inboundLala))}, "_blank")' class="text-blue-400 hover:text-blue-300 underline block mb-1 bg-transparent border-0 p-0 cursor-pointer text-left font-inherit">IN: ${o.inboundLala}</button>`;
+           if(o.outboundLala) lalaHTML += `<button type="button" onclick='window.open(${JSON.stringify('https://share.sandbox.lalamove.com/tracking/' + String(o.outboundLala))}, "_blank")' class="text-purple-400 hover:text-purple-300 underline block bg-transparent border-0 p-0 cursor-pointer text-left font-inherit">OUT: ${o.outboundLala}</button>`;
         }
 
         const selOps = statusOptions.map(opt => `<option value="${opt}" ${o.status === opt ? 'selected' : ''}>${opt}</option>`).join('');
