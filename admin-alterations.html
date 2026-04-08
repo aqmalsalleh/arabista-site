@@ -1,0 +1,337 @@
+<!doctype html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Arabista HQ — Alterations Command Center</title>
+  <meta name="theme-color" content="#0F0F10" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+        theme: {
+            extend: {
+                fontFamily: { display: ['"Cormorant Garamond"', 'serif'], sans: ['Inter', 'ui-sans-serif', 'system-ui'], },
+                colors: { brand: '#0F0F10' }
+            }
+        }
+    }
+  </script>
+</head>
+<body class="bg-brand text-white font-sans antialiased min-h-screen flex flex-col">
+
+  <div id="login-screen" class="fixed inset-0 z-50 bg-brand flex flex-col items-center justify-center px-4">
+    <div class="w-full max-w-sm text-center">
+      <h1 class="font-display text-4xl text-amber-400 mb-2 tracking-widest uppercase">Arabista HQ</h1>
+      <p class="text-gray-400 mb-8 tracking-widest text-xs">ALTERATIONS COMMAND CENTER</p>
+      <input type="password" id="admin-pin" placeholder="ENTER SECURE PIN" class="w-full bg-white/5 border border-white/10 text-center text-white text-xl tracking-widest px-4 py-4 rounded focus:outline-none focus:border-amber-400 transition-colors mb-4">
+      <button onclick="login()" id="btn-login" class="w-full bg-amber-500 hover:bg-amber-400 text-black font-semibold tracking-wide py-4 rounded transition-colors uppercase text-sm">Access System</button>
+      <div id="login-error" class="text-red-400 text-sm mt-4 hidden">Invalid PIN. Access Denied.</div>
+    </div>
+  </div>
+
+  <div id="main-dashboard" class="hidden flex-1 flex flex-col h-screen overflow-hidden">
+
+    <header class="bg-white/5 border-b border-white/10 p-4 lg:px-8 flex justify-between items-center shrink-0">
+      <h1 class="font-display text-2xl text-amber-400 tracking-wider uppercase">Arabista HQ</h1>
+      <div class="flex space-x-6 overflow-x-auto no-scrollbar">
+        <button onclick="switchTab('tab-interventions')" id="nav-interventions" class="nav-btn whitespace-nowrap text-amber-400 font-medium pb-1 border-b-2 border-amber-400 transition-colors hover:text-amber-300">Interventions</button>
+        <button onclick="switchTab('tab-operations')" id="nav-operations" class="nav-btn whitespace-nowrap text-gray-400 font-medium pb-1 border-b-2 border-transparent hover:text-white transition-colors">Live Operations</button>
+        <button onclick="switchTab('tab-hubs')" id="nav-hubs" class="nav-btn whitespace-nowrap text-gray-400 font-medium pb-1 border-b-2 border-transparent hover:text-white transition-colors">Hub Fleet</button>
+        <button onclick="switchTab('tab-payouts')" id="nav-payouts" class="nav-btn whitespace-nowrap text-gray-400 font-medium pb-1 border-b-2 border-transparent hover:text-white transition-colors">Payout Center</button>
+      </div>
+    </header>
+
+    <main class="flex-1 overflow-y-auto p-4 lg:p-8">
+
+      <div id="tab-interventions" class="tab-pane active space-y-4 max-w-6xl mx-auto">
+        <div class="flex justify-between items-end mb-6">
+          <div>
+            <h2 class="font-display text-3xl mb-1">AI Interventions</h2>
+            <p class="text-gray-400 text-sm">Orders flagged by Gemini requiring human oversight.</p>
+          </div>
+          <button onclick="fetchData()" class="bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded text-sm transition-colors shrink-0">Refresh Data</button>
+        </div>
+        <div id="interventions-container" class="grid gap-4"></div>
+      </div>
+
+      <div id="tab-operations" class="tab-pane hidden space-y-4 max-w-6xl mx-auto">
+        <div class="flex justify-between items-end mb-6">
+          <div>
+            <h2 class="font-display text-3xl mb-1">God-Mode Database</h2>
+            <p class="text-gray-400 text-sm">All active orders. Manually override statuses if necessary.</p>
+          </div>
+        </div>
+        <div class="bg-white/5 border border-white/10 rounded overflow-x-auto">
+          <table class="w-full text-left text-sm whitespace-nowrap">
+            <thead class="bg-white/5 text-gray-400 border-b border-white/10 uppercase tracking-wider text-xs">
+              <tr>
+                <th class="p-4">Order ID</th>
+                <th class="p-4">Customer & Hub</th>
+                <th class="p-4">Lalamove Links</th>
+                <th class="p-4">Status Override</th>
+              </tr>
+            </thead>
+            <tbody id="operations-table" class="divide-y divide-white/5"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div id="tab-hubs" class="tab-pane hidden space-y-4 max-w-6xl mx-auto">
+        <div class="flex justify-between items-end mb-6">
+          <div>
+            <h2 class="font-display text-3xl mb-1">Fleet Management</h2>
+            <p class="text-gray-400 text-sm">Monitor tailor capacity and toggle availability.</p>
+          </div>
+        </div>
+        <div id="hubs-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+      </div>
+
+      <div id="tab-payouts" class="tab-pane hidden space-y-4 max-w-6xl mx-auto">
+        <div class="flex justify-between items-end mb-6">
+          <div>
+            <h2 class="font-display text-3xl mb-1">Clearinghouse</h2>
+            <p class="text-gray-400 text-sm">Execute payday transfers directly from this terminal.</p>
+          </div>
+        </div>
+        <div id="payouts-container" class="grid gap-4"></div>
+      </div>
+
+    </main>
+  </div>
+
+  <div id="qr-modal" class="fixed inset-0 z-50 bg-black/90 flex flex-col items-center justify-center p-4 hidden">
+    <div class="bg-[#1a1a1c] p-6 rounded-lg border border-white/10 w-full max-w-sm text-center">
+      <h3 class="font-display text-2xl text-amber-400 mb-4" id="qr-hub-name">Hub QR</h3>
+      <img id="qr-image" src="" alt="DuitNow QR" class="w-full rounded mb-6 hidden">
+      <p id="qr-error" class="text-gray-400 mb-6 hidden">No QR code uploaded by this Hub.</p>
+      <button onclick="document.getElementById('qr-modal').classList.add('hidden')" class="w-full bg-white/10 hover:bg-white/20 py-3 rounded transition-colors text-sm uppercase tracking-wider">Close</button>
+    </div>
+  </div>
+
+  <div id="loader" class="fixed inset-0 z-[60] bg-brand flex flex-col items-center justify-center hidden">
+    <div class="w-12 h-12 border-4 border-amber-500/30 border-t-amber-500 rounded-full animate-spin mb-4"></div>
+    <p class="text-amber-400 tracking-widest text-sm animate-pulse">SYNCING DATABANKS...</p>
+  </div>
+
+  <style>
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+  </style>
+
+  <script>
+    // --- APP STATE ---
+    let token = "";
+    let systemData = null;
+
+    // --- UTILS ---
+    function showLoader() { document.getElementById('loader').classList.remove('hidden'); }
+    function hideLoader() { document.getElementById('loader').classList.add('hidden'); }
+
+    // Allow Enter key to trigger login
+    document.getElementById('admin-pin').addEventListener('keypress', function (e) {
+        if (e.key === 'Enter') login();
+    });
+
+    // --- LOGIN ---
+    function login() {
+      const pin = document.getElementById('admin-pin').value;
+      if(!pin) return;
+      document.getElementById('btn-login').innerHTML = 'VERIFYING...';
+
+      google.script.run.withSuccessHandler(function(res) {
+        document.getElementById('btn-login').innerHTML = 'Access System';
+        if(res.success) {
+          token = res.token;
+          document.getElementById('login-screen').classList.add('hidden');
+          document.getElementById('main-dashboard').classList.remove('hidden');
+          fetchData();
+        } else {
+          document.getElementById('login-error').classList.remove('hidden');
+        }
+      }).adminLogin(pin);
+    }
+
+    // --- DATA FETCH ---
+    function fetchData() {
+      showLoader();
+      google.script.run.withSuccessHandler(function(res) {
+        hideLoader();
+        if(res.success) {
+          systemData = res.data;
+          renderInterventions();
+          renderOperations();
+          renderHubs();
+          renderPayouts();
+        } else {
+          alert("Data Sync Failed: " + res.message);
+        }
+      }).getAdminDashboardData(token);
+    }
+
+    // --- UI RENDERERS ---
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-pane').forEach(el => el.classList.add('hidden'));
+      document.getElementById(tabId).classList.remove('hidden');
+
+      document.querySelectorAll('.nav-btn').forEach(el => {
+        el.classList.remove('text-amber-400', 'border-amber-400');
+        el.classList.add('text-gray-400', 'border-transparent');
+      });
+      const activeNav = document.getElementById(tabId.replace('tab', 'nav'));
+      activeNav.classList.remove('text-gray-400', 'border-transparent');
+      activeNav.classList.add('text-amber-400', 'border-amber-400');
+    }
+
+    function renderInterventions() {
+      const container = document.getElementById('interventions-container');
+      if(!systemData.interventions.length) {
+        container.innerHTML = '<div class="text-gray-500 text-center py-10 border border-dashed border-white/10 rounded">All systems nominal. No AI interventions required.</div>';
+        return;
+      }
+      container.innerHTML = systemData.interventions.map(i => `
+        <div class="bg-red-500/10 border border-red-500/20 rounded p-5 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+          <div>
+            <div class="flex items-center gap-2 mb-1">
+              <span class="bg-red-500 text-white text-xs px-2 py-0.5 rounded font-bold uppercase">${i.id}</span>
+              <span class="text-sm text-gray-300">${i.custName} → ${i.hubName}</span>
+            </div>
+            <p class="text-red-200 text-sm mt-2 font-medium">${i.notes}</p>
+          </div>
+          <div class="flex flex-wrap gap-2 shrink-0">
+            <a href="https://wa.me/${cleanPhone(i.custPhone)}" target="_blank" class="bg-white/10 hover:bg-white/20 px-4 py-2 rounded text-xs transition uppercase tracking-wider">Msg Cust</a>
+            <button onclick="executeAction('CLEAR_FLAG', {row: ${i.row}})" class="bg-red-500 hover:bg-red-400 text-white px-4 py-2 rounded text-xs font-bold transition uppercase tracking-wider">Resolve & Clear</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function renderOperations() {
+      const tbody = document.getElementById('operations-table');
+      if(!systemData.orders.length) {
+        tbody.innerHTML = '<tr><td colspan="4" class="p-8 text-center text-gray-500 border-dashed border border-white/10">No active orders in the databanks.</td></tr>';
+        return;
+      }
+
+      const statusOptions = ['Pending Dropoff', 'Awaiting Dispatch', 'In Progress', 'Ready for Return', 'Dispatched', 'Completed', 'Canceled'];
+
+      tbody.innerHTML = systemData.orders.map(o => {
+        let lalaHTML = '<span class="text-gray-600 italic">None</span>';
+        if(o.inboundLala || o.outboundLala) {
+           lalaHTML = '';
+           if(o.inboundLala) lalaHTML += `<a href="https://share.sandbox.lalamove.com/tracking/${o.inboundLala}" target="_blank" class="text-blue-400 hover:text-blue-300 underline block mb-1">IN: ${o.inboundLala}</a>`;
+           if(o.outboundLala) lalaHTML += `<a href="https://share.sandbox.lalamove.com/tracking/${o.outboundLala}" target="_blank" class="text-purple-400 hover:text-purple-300 underline block">OUT: ${o.outboundLala}</a>`;
+        }
+
+        const selOps = statusOptions.map(opt => `<option value="${opt}" ${o.status === opt ? 'selected' : ''}>${opt}</option>`).join('');
+
+        return `
+        <tr class="hover:bg-white/5 transition border-white/5">
+          <td class="p-4 font-bold text-amber-400">${o.id}</td>
+          <td class="p-4"><div class="font-medium">${o.custName}</div><div class="text-xs text-gray-400 mt-1">${o.hubName}</div></td>
+          <td class="p-4 text-xs">${lalaHTML}</td>
+          <td class="p-4">
+             <select onchange="executeAction('UPDATE_STATUS', {row: ${o.row}, newStatus: this.value})" class="bg-[#1a1a1c] border border-white/20 text-white text-xs p-2 rounded outline-none focus:border-amber-400 w-full max-w-[160px]">
+                ${selOps}
+             </select>
+          </td>
+        </tr>
+      `}).join('');
+    }
+
+    function renderHubs() {
+      const container = document.getElementById('hubs-container');
+      container.innerHTML = systemData.hubs.map(h => {
+        const isBusy = h.status === 'Busy / Full';
+        return `
+        <div class="bg-white/5 border border-white/10 rounded p-5 relative overflow-hidden group hover:border-white/20 transition">
+          <div class="absolute top-0 right-0 p-4 flex items-center gap-2">
+             <span class="text-xs uppercase tracking-wider text-gray-500">${h.status}</span>
+             <span class="w-3 h-3 rounded-full inline-block ${isBusy ? 'bg-red-500 shadow-[0_0_10px_rgba(239,68,68,0.6)]' : 'bg-green-500 shadow-[0_0_10px_rgba(34,197,94,0.6)]'}"></span>
+          </div>
+          <h3 class="font-display text-2xl text-amber-400 mb-1 pr-24">${h.name}</h3>
+          <p class="text-sm text-gray-400 mb-5">${h.capacity} Max Daily Capacity</p>
+
+          <select onchange="executeAction('TOGGLE_HUB', {row: ${h.row}, newStatus: this.value})" class="w-full bg-[#1a1a1c] border ${isBusy ? 'border-red-500/50 text-red-200' : 'border-white/20 text-white'} text-sm p-2 rounded outline-none cursor-pointer hover:border-amber-400 transition-colors">
+             <option value="Active" ${!isBusy ? 'selected' : ''}>SET: ACCEPTING ORDERS</option>
+             <option value="Busy / Full" ${isBusy ? 'selected' : ''}>SET: BUSY / OFFLINE</option>
+          </select>
+        </div>
+      `}).join('');
+    }
+
+    function renderPayouts() {
+      const container = document.getElementById('payouts-container');
+      if(!systemData.payouts.length) {
+        container.innerHTML = '<div class="text-gray-500 text-center py-10 border border-dashed border-white/10 rounded">All Hubs are fully paid. Ledger is balanced.</div>';
+        return;
+      }
+      container.innerHTML = systemData.payouts.map(p => `
+        <div class="bg-gradient-to-r from-amber-500/10 to-transparent border border-amber-500/20 rounded p-5 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+          <div class="flex-1">
+            <h3 class="font-display text-2xl text-white mb-3">${p.hubName}</h3>
+            <div class="flex flex-wrap items-center gap-4 text-sm text-gray-400">
+              <div class="bg-black/30 px-3 py-2 rounded border border-white/5"><span class="block text-xs uppercase tracking-wider text-gray-500 mb-0.5">Bank</span><span class="text-white">${p.bankName}</span></div>
+              <div class="bg-black/30 px-3 py-2 rounded border border-white/5"><span class="block text-xs uppercase tracking-wider text-gray-500 mb-0.5">Account</span><span class="font-mono text-amber-200 tracking-wide">${p.bankAcc}</span></div>
+            </div>
+          </div>
+          <div class="text-left md:text-right shrink-0">
+            <div class="text-xs uppercase tracking-wider text-amber-500 mb-1 font-bold">Total Payout Due</div>
+            <div class="font-display text-5xl text-amber-400 drop-shadow-[0_0_10px_rgba(251,191,36,0.3)]">RM ${p.amount}</div>
+          </div>
+          <div class="flex flex-col gap-2 shrink-0 w-full md:w-auto">
+            <button onclick="showQR('${p.hubName.replace(/'/g, "\\'")}', '${String(p.qrUrl || "").replace(/'/g, "\\'")}')" class="bg-white/10 hover:bg-white/20 px-4 py-3 rounded text-xs font-bold uppercase tracking-wider transition border border-white/10">Show DuitNow QR</button>
+            <button onclick='executeAction("MARK_PAID", ${JSON.stringify(p)})' class="bg-amber-500 hover:bg-amber-400 text-black px-6 py-3 rounded text-xs font-bold uppercase tracking-wider transition shadow-[0_0_15px_rgba(245,158,11,0.3)]">Confirm Transfer</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // --- ACTIONS ---
+    function executeAction(action, payload) {
+      if(action === 'MARK_PAID' && !confirm(`Are you sure you transferred RM ${payload.amount} to ${payload.hubName}? This will permanently mark their ledger as paid.`)) return;
+      if(action === 'UPDATE_STATUS' && !confirm(`Are you sure you want to manually force the status to ${payload.newStatus}?`)) {
+          fetchData(); // Reset dropdown if cancelled
+          return;
+      }
+
+      showLoader();
+      payload.action = action;
+      payload.token = token;
+
+      google.script.run.withSuccessHandler(function(res) {
+        if(res.success) {
+          fetchData(); // Reload all data to reflect changes
+        } else {
+          hideLoader();
+          alert("Action Failed: " + res.message);
+        }
+      }).executeAdminAction(payload);
+    }
+
+    function showQR(hubName, url) {
+      document.getElementById('qr-hub-name').textContent = hubName;
+      const img = document.getElementById('qr-image');
+      const err = document.getElementById('qr-error');
+      if(url && url.length > 5) {
+        img.src = url;
+        img.classList.remove('hidden');
+        err.classList.add('hidden');
+      } else {
+        img.classList.add('hidden');
+        err.classList.remove('hidden');
+      }
+      document.getElementById('qr-modal').classList.remove('hidden');
+    }
+
+    function cleanPhone(num) {
+      let c = String(num).replace(/\D/g, '');
+      if(c.startsWith('0')) c = '6' + c;
+      return c;
+    }
+  </script>
+</body>
+</html>
