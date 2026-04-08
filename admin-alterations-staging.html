@@ -142,7 +142,7 @@
       if(!pin) return;
       document.getElementById('btn-login').innerHTML = 'VERIFYING...';
 
-      google.script.run.withSuccessHandler(function(res) {
+      google.script.run.withFailureHandler(err => { document.getElementById('btn-login').innerHTML = 'Access System'; alert("Server Error: " + err.message); }).withSuccessHandler(function(res) {
         document.getElementById('btn-login').innerHTML = 'Access System';
         if(res.success) {
           token = res.token;
@@ -158,7 +158,7 @@
     // --- DATA FETCH ---
     function fetchData() {
       showLoader();
-      google.script.run.withSuccessHandler(function(res) {
+      google.script.run.withFailureHandler(err => { hideLoader(); alert("Server Error: " + err.message); }).withSuccessHandler(function(res) {
         hideLoader();
         if(res.success) {
           systemData = res.data;
