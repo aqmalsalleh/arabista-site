@@ -5,7 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0" />
   <title>Arabista — Hub Coverage & Booking</title>
   <meta name="theme-color" content="#0F0F10" />
-  
+  <meta property="og:url" content="https://www.arabistaofficial.com/hub-coverage-staging.html" />
+
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
   <meta http-equiv="Pragma" content="no-cache" />
   <meta http-equiv="Expires" content="0" />
@@ -332,11 +333,9 @@
     const currentHost = window.location.hostname;
     // Auto-detect environment to route to the correct Google Apps Script backend
     if (currentHost === "127.0.0.1" || currentHost === "localhost") {
-        // DEV Backend (Local Sandbox)
-        SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxTN-fedBZU81dGAVOgiYpnTup60V2bpCnh3YsFgBwd5t-jma9j8v9hwxSC87YvctNViw/exec";
+        SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw41OeSWKC315Fw8eocXoQTRxQABVb9-L_gRwSCw1oiszquVypIN2cO8An2cxco8H7IiA/exec";
     } else {
-        // PROD Backend (Live GitHub Pages)
-        SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyrJFfuCrhAbdwzAj8uP4sSvFuzRzzzEFV5CHOCBSOK6OGlIXPtsf7-XEfjLHGnFZiyvw/exec";
+        SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw41OeSWKC315Fw8eocXoQTRxQABVb9-L_gRwSCw1oiszquVypIN2cO8An2cxco8H7IiA/exec";
     }
     const spinnerSvg = `<svg class="animate-spin h-4 w-4 inline mr-2 text-current" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>`;
 
@@ -1218,7 +1217,7 @@
             pendingHubWhatsAppNotify = null;
         }
         if (generatedAltId) {
-            window.location.href = "alteration-tracker.html?id=" + encodeURIComponent(generatedAltId) + "&new=true";
+            window.location.href = "alteration-tracker-staging.html?id=" + encodeURIComponent(generatedAltId) + "&new=true";
         }
     }
 
@@ -1436,7 +1435,7 @@
         </div>
         <h3 class="font-display text-3xl text-white mb-3" data-t="jn_success_title">Thank You!</h3>
         <p class="text-sm text-white/70 mb-10 leading-relaxed max-w-xs mx-auto" data-t="jn_success_desc">Your alteration request has been successfully submitted! Click below to activate your live tracking dashboard.</p>
-        <button type="button" onclick="const id = window.currentBookingId || 'ALT-XXXX'; window.open('https://wa.me/60174920942?text=' + encodeURIComponent('Hi Arabista, please activate live tracking for my order ' + id), '_blank'); window.location.href = 'alteration-tracker.html?id=' + id;" class="w-full max-w-xs bg-luxe text-brand font-bold py-4 rounded-xl hover:bg-white transition shadow-[0_0_20px_rgba(192,160,98,0.3)]" data-t="jn_success_btn">Track Your Order</button>
+        <button type="button" onclick="const id = window.currentBookingId || 'ALT-XXXX'; window.open('https://wa.me/60174920942?text=' + encodeURIComponent('Hi Arabista, please activate live tracking for my order ' + id), '_blank'); window.location.href = 'alteration-tracker-staging.html?id=' + id;" class="w-full max-w-xs bg-luxe text-brand font-bold py-4 rounded-xl hover:bg-white transition shadow-[0_0_20px_rgba(192,160,98,0.3)]" data-t="jn_success_btn">Track Your Order</button>
     </div>
   </div>
 </body>

@@ -10,7 +10,7 @@
   <meta http-equiv="Expires" content="0" />
 
   <meta property="og:type" content="website" />
-  <meta property="og:url" content="https://www.arabistaofficial.com/hub-portal.html" />
+  <meta property="og:url" content="https://www.arabistaofficial.com/hub-portal-staging.html" />
   <meta property="og:title" content="Arabista — Tailor Portal" />
   <meta property="og:description" content="Login to your Arabista Tailor Portal to manage your alteration orders, track deliveries, and update your hub status." />
   <meta property="og:image" content="https://www.arabistaofficial.com/images/social-preview.jpg" />
@@ -240,13 +240,11 @@
     const currentHost = window.location.hostname;
     // Auto-detect environment to route to the correct Google Apps Script backend
     if (currentHost === "127.0.0.1" || currentHost === "localhost") {
-        // DEV Backend (Local Sandbox)
-        scriptURL = "https://script.google.com/macros/s/AKfycbxTN-fedBZU81dGAVOgiYpnTup60V2bpCnh3YsFgBwd5t-jma9j8v9hwxSC87YvctNViw/exec";
+        scriptURL = "https://script.google.com/macros/s/AKfycbw41OeSWKC315Fw8eocXoQTRxQABVb9-L_gRwSCw1oiszquVypIN2cO8An2cxco8H7IiA/exec";
     } else {
-        // PROD Backend (Live GitHub Pages)
-        scriptURL = "https://script.google.com/macros/s/AKfycbyrJFfuCrhAbdwzAj8uP4sSvFuzRzzzEFV5CHOCBSOK6OGlIXPtsf7-XEfjLHGnFZiyvw/exec";
+        scriptURL = "https://script.google.com/macros/s/AKfycbw41OeSWKC315Fw8eocXoQTRxQABVb9-L_gRwSCw1oiszquVypIN2cO8An2cxco8H7IiA/exec";
     }
-    const trackerBaseUrl = 'https://www.arabistaofficial.com/alteration-tracker.html?id=';
+    const trackerBaseUrl = 'https://www.arabistaofficial.com/alteration-tracker-staging.html?id=';
     const spinnerSvg = `<svg class="animate-spin h-4 w-4 inline mr-2 text-current" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>`;
 
     const t = {
@@ -1023,7 +1021,7 @@
         const itemsList = rawItems.trim()
             ? rawItems.split(/\r?\n/).map(i => i.trim()).filter(Boolean).map(i => `- ${i}`).join('\n')
             : "- Tiada butiran";
-        const trackerLink = `https://arabistaofficial.com/alteration-tracker.html?id=${encodeURIComponent(id)}`;
+        const trackerLink = `https://www.arabistaofficial.com/alteration-tracker-staging.html?id=${encodeURIComponent(id)}`;
         const custInfo = `${order.custName || 'Pelanggan'} (${order.custPhone || ''})`;
 
         let tpAction = "";

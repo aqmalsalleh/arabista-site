@@ -10,7 +10,7 @@
   <meta http-equiv="Expires" content="0" />
 
   <meta property="og:type" content="website" />
-  <meta property="og:url" content="https://www.arabistaofficial.com/alteration-tracker.html" />
+  <meta property="og:url" content="https://www.arabistaofficial.com/alteration-tracker-staging.html" />
   <meta property="og:title" content="Arabista — Alteration Tracker" />
   <meta property="og:description" content="Track the live status of your Arabista alteration order, manage payments, and view Lalamove delivery updates in real-time." />
   <meta property="og:image" content="https://www.arabistaofficial.com/images/social-preview.jpg" />
@@ -429,14 +429,15 @@
     const currentHost = window.location.hostname;
     // Auto-detect environment to route to the correct Google Apps Script backend
     if (currentHost === "127.0.0.1" || currentHost === "localhost") {
-        // DEV Backend (Local Sandbox)
-        scriptURL        = "https://script.google.com/macros/s/AKfycbxTN-fedBZU81dGAVOgiYpnTup60V2bpCnh3YsFgBwd5t-jma9j8v9hwxSC87YvctNViw/exec";
+        scriptURL        = "https://script.google.com/macros/s/AKfycbw41OeSWKC315Fw8eocXoQTRxQABVb9-L_gRwSCw1oiszquVypIN2cO8An2cxco8H7IiA/exec";
         senangPayBaseUrl = "https://sandbox.senangpay.my/payment/";
     } else {
-        // PROD Backend (Live GitHub Pages)
-        scriptURL        = "https://script.google.com/macros/s/AKfycbyrJFfuCrhAbdwzAj8uP4sSvFuzRzzzEFV5CHOCBSOK6OGlIXPtsf7-XEfjLHGnFZiyvw/exec";
+        scriptURL        = "https://script.google.com/macros/s/AKfycbw41OeSWKC315Fw8eocXoQTRxQABVb9-L_gRwSCw1oiszquVypIN2cO8An2cxco8H7IiA/exec";
         senangPayBaseUrl = "https://app.senangpay.my/payment/";
     }
+    const baseUrl = (currentHost === "127.0.0.1" || currentHost === "localhost")
+        ? (window.location.origin + "/alteration-tracker-staging.html")
+        : "https://www.arabistaofficial.com/alteration-tracker-staging.html";
     const trackerBaseUrl = window.location.origin + window.location.pathname + '?id=';
     /** Central AI switchboard — do not route customer WhatsApp to tailor hub. */
     const ARABISTA_HQ_WHATSAPP = '60174920942';
@@ -817,7 +818,7 @@
         btn.innerHTML = `${spinnerSvg} ${t[currentLang].msg_searching || "Searching..."}`;
         btn.disabled = true;
         
-        window.location.href = `alteration-tracker.html?id=${encodeURIComponent(val)}`;
+        window.location.href = `${baseUrl}?id=${encodeURIComponent(val)}`;
     }
 
     function triggerInitialWhatsApp() {
