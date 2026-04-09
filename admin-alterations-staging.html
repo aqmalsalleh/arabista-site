@@ -112,6 +112,19 @@
     </div>
   </div>
 
+  <div id="context-modal" class="fixed inset-0 z-50 bg-black/90 flex flex-col items-center justify-center p-4 hidden">
+    <div class="bg-[#1a1a1c] p-6 rounded-lg border border-white/10 w-full max-w-md">
+      <h3 class="font-display text-2xl text-amber-400 mb-4" id="modal-order-id">Order Context</h3>
+      <div class="space-y-3 text-sm text-gray-300 mb-6">
+        <div><span class="text-xs uppercase text-gray-500 block">Status</span> <span id="modal-status" class="text-white font-medium"></span></div>
+        <div><span class="text-xs uppercase text-gray-500 block">Hub Assigned</span> <span id="modal-hub" class="text-white font-medium"></span></div>
+        <div><span class="text-xs uppercase text-gray-500 block">Item Details</span> <span id="modal-items" class="text-white font-medium whitespace-pre-wrap"></span></div>
+        <div id="modal-lalamove-box" class="hidden"><span class="text-xs uppercase text-gray-500 block">Logistics Links</span> <div id="modal-lalamove" class="mt-1"></div></div>
+      </div>
+      <button onclick="document.getElementById('context-modal').classList.add('hidden')" class="w-full bg-white/10 hover:bg-white/20 py-3 rounded transition-colors text-sm uppercase tracking-wider">Close Context</button>
+    </div>
+  </div>
+
   <div id="loader" class="fixed inset-0 z-[60] bg-brand flex flex-col items-center justify-center hidden">
     <div class="w-12 h-12 border-4 border-amber-500/30 border-t-amber-500 rounded-full animate-spin mb-4"></div>
     <p class="text-amber-400 tracking-widest text-sm animate-pulse">SYNCING DATABANKS...</p>
@@ -186,27 +199,112 @@
       activeNav.classList.add('text-amber-400', 'border-amber-400');
     }
 
+    function replyBoxSafeId(orderId) {
+      return String(orderId).replace(/[^a-zA-Z0-9_-]/g, '_');
+    }
+
     function renderInterventions() {
       const container = document.getElementById('interventions-container');
       if(!systemData.interventions.length) {
         container.innerHTML = '<div class="text-gray-500 text-center py-10 border border-dashed border-white/10 rounded">All systems nominal. No AI interventions required.</div>';
         return;
       }
-      container.innerHTML = systemData.interventions.map(i => `
-        <div class="bg-red-500/10 border border-red-500/20 rounded p-5 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-          <div>
-            <div class="flex items-center gap-2 mb-1">
-              <span class="bg-red-500 text-white text-xs px-2 py-0.5 rounded font-bold uppercase">${i.id}</span>
-              <span class="text-sm text-gray-300">${i.custName} → ${i.hubName}</span>
+      container.innerHTML = systemData.interventions.map(i => {
+        const sid = replyBoxSafeId(i.id);
+        // Find Hub Phone
+        const hubObj = systemData.hubs.find(h => h.name === i.hubName);
+        const hubPhone = hubObj ? hubObj.phone : "";
+
+        // Format threaded notes (escape HTML in sheet-sourced lines)
+        const esc = (s) => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+        const formattedNotes = String(i.notes || '').split(/\r?\n/).map(line => {
+           const e = esc(line);
+           if(line.includes('[Customer]')) return `<div class="text-blue-300">${e}</div>`;
+           if(line.includes('[Hub]')) return `<div class="text-amber-300">${e}</div>`;
+           if(line.includes('[Admin]')) return `<div class="text-green-300">${e}</div>`;
+           return `<div>${e}</div>`;
+        }).join('');
+
+        return `
+        <div class="bg-red-500/10 border border-red-500/20 rounded p-5 flex flex-col gap-4">
+          <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+            <div>
+              <div class="flex items-center gap-3 mb-2">
+                <button type="button" onclick="openContextModal(${JSON.stringify(i.id)})" class="bg-red-500 hover:bg-red-400 text-white text-xs px-3 py-1 rounded font-bold uppercase transition cursor-pointer flex items-center gap-1">🔍 ${i.id}</button>
+                <span class="text-sm text-gray-300 font-medium">${i.custName} <span class="text-gray-500 mx-1">→</span> ${i.hubName}</span>
+              </div>
+              <div class="text-sm mt-3 font-medium bg-black/40 p-3 rounded border border-white/5 space-y-1 font-mono text-xs">
+                ${formattedNotes}
+              </div>
             </div>
-            <p class="text-red-200 text-sm mt-2 font-medium">${i.notes}</p>
+            <div class="flex flex-col gap-2 shrink-0 w-full md:w-auto">
+              <div class="flex gap-2">
+                <button type="button" onclick="toggleReplyBox(${JSON.stringify(i.id)}, ${JSON.stringify(String(i.custPhone || ''))}, 'Customer')" class="flex-1 bg-blue-500/20 hover:bg-blue-500/40 text-blue-300 border border-blue-500/30 px-3 py-2 rounded text-xs transition uppercase tracking-wider">Msg Cust</button>
+                <button type="button" onclick="toggleReplyBox(${JSON.stringify(i.id)}, ${JSON.stringify(String(hubPhone || ''))}, 'Hub')" class="flex-1 bg-amber-500/20 hover:bg-amber-500/40 text-amber-300 border border-amber-500/30 px-3 py-2 rounded text-xs transition uppercase tracking-wider${!hubPhone ? ' opacity-50 cursor-not-allowed' : ''}" ${!hubPhone ? 'disabled' : ''}>Msg Hub</button>
+              </div>
+              <button type="button" onclick="executeAction('CLEAR_FLAG', {row: ${i.row}})" class="w-full bg-red-500 hover:bg-red-400 text-white px-4 py-2 rounded text-xs font-bold transition uppercase tracking-wider">Resolve & Clear</button>
+            </div>
           </div>
-          <div class="flex flex-wrap gap-2 shrink-0">
-            <button type="button" onclick='window.open("https://wa.me/" + cleanPhone(${JSON.stringify(String(i.custPhone || ''))}), "_blank")' class="bg-white/10 hover:bg-white/20 px-4 py-2 rounded text-xs transition uppercase tracking-wider">Msg Cust</button>
-            <button onclick="executeAction('CLEAR_FLAG', {row: ${i.row}})" class="bg-red-500 hover:bg-red-400 text-white px-4 py-2 rounded text-xs font-bold transition uppercase tracking-wider">Resolve & Clear</button>
+
+          <div id="reply-box-${sid}" class="hidden mt-2 border-t border-white/10 pt-4">
+            <div class="text-xs text-gray-400 mb-2 uppercase tracking-wider" id="reply-label-${sid}"></div>
+            <div class="flex gap-2">
+              <input type="text" id="reply-input-${sid}" class="flex-1 bg-black/50 border border-white/20 text-white text-sm px-3 py-2 rounded outline-none focus:border-amber-400" placeholder="Type your message...">
+              <button type="button" onclick="dispatchReply(${JSON.stringify(i.id)}, ${i.row})" class="bg-amber-500 hover:bg-amber-400 text-black px-6 py-2 rounded text-sm font-bold transition uppercase tracking-wider">Send via API</button>
+            </div>
           </div>
         </div>
-      `).join('');
+      `}).join('');
+    }
+
+    function openContextModal(orderId) {
+      const order = systemData.orders.find(o => o.id === orderId);
+      if(!order) return;
+
+      document.getElementById('modal-order-id').innerText = order.id;
+      document.getElementById('modal-status').innerText = order.status;
+      document.getElementById('modal-hub').innerText = order.hubName;
+      document.getElementById('modal-items').innerText = order.itemDetails || "No details provided.";
+
+      let lalaHTML = '';
+      if(order.inboundLala) lalaHTML += `<a href="https://share.sandbox.lalamove.com/tracking/${order.inboundLala}" target="_blank" class="text-blue-400 hover:underline block">IN: ${order.inboundLala}</a>`;
+      if(order.outboundLala) lalaHTML += `<a href="https://share.sandbox.lalamove.com/tracking/${order.outboundLala}" target="_blank" class="text-purple-400 hover:underline block">OUT: ${order.outboundLala}</a>`;
+
+      if(lalaHTML) {
+         document.getElementById('modal-lalamove').innerHTML = lalaHTML;
+         document.getElementById('modal-lalamove-box').classList.remove('hidden');
+      } else {
+         document.getElementById('modal-lalamove-box').classList.add('hidden');
+      }
+
+      document.getElementById('context-modal').classList.remove('hidden');
+    }
+
+    // Stores the target phone number for the active reply box
+    window.activeReplyTargets = {};
+
+    function toggleReplyBox(orderId, phone, role) {
+      const sid = replyBoxSafeId(orderId);
+      const box = document.getElementById(`reply-box-${sid}`);
+      if (!box) return;
+      box.classList.remove('hidden');
+      document.getElementById(`reply-label-${sid}`).innerText = `Replying to: ${role} (${phone})`;
+      window.activeReplyTargets[orderId] = phone;
+      document.getElementById(`reply-input-${sid}`).focus();
+    }
+
+    function dispatchReply(orderId, rowNum) {
+      const sid = replyBoxSafeId(orderId);
+      const input = document.getElementById(`reply-input-${sid}`);
+      if (!input) return;
+      const text = input.value.trim();
+      const phone = window.activeReplyTargets[orderId];
+
+      if(!text || !phone) return;
+
+      executeAction('SEND_MANUAL_MESSAGE', { row: rowNum, phone: phone, message: text });
+      input.value = '';
+      document.getElementById(`reply-box-${sid}`).classList.add('hidden');
     }
 
     function renderOperations() {
