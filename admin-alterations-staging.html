@@ -110,7 +110,7 @@
         <div><span class="text-xs uppercase text-gray-500 block">Status</span> <span id="modal-status" class="text-white font-medium"></span></div>
         <div><span class="text-xs uppercase text-gray-500 block">Hub Assigned</span> <span id="modal-hub" class="text-white font-medium"></span></div>
         <div><span class="text-xs uppercase text-gray-500 block">Item Details</span> <span id="modal-items" class="text-white font-medium whitespace-pre-wrap"></span></div>
-        <div id="modal-lalamove-wrapper" class="hidden"><span class="text-xs uppercase text-gray-500 block">Logistics Links</span> <div id="modal-lalamove" class="mt-1"></div></div>
+        <div id="modal-lalamove-wrapper" class="hidden"><span class="text-xs uppercase text-gray-500 block">Logistics Links</span> <div id="modal-lalamove" class="mt-1 flex flex-col items-start"></div></div>
       </div>
       <button type="button" onclick="document.getElementById('context-modal').classList.add('hidden')" class="w-full bg-white/10 hover:bg-white/20 py-3 rounded transition-colors text-sm uppercase tracking-wider">Close Context</button>
     </div>
@@ -206,9 +206,14 @@
         return;
       }
       container.innerHTML = systemData.interventions.map(i => {
+        const sid = String(i.id).replace(/[^a-zA-Z0-9]/g, '-');
+        const hubObj = systemData.hubs.find(h => h.name === i.hubName);
+        const hubPhone = hubObj ? hubObj.phone : "";
         let currentColor = 'text-gray-300';
-        const formattedNotes = String(i.notes || '').split(/\r?\n|\\n/).map(line => {
-           let e = String(line).split('&').join('&amp;').split('<').join('&lt;').split('>').join('&gt;');
+
+        let rawNotes = String(i.notes || '').replace(/\\n/g, '\n');
+        const formattedNotes = rawNotes.split('\n').map(line => {
+           let e = String(line).replace(/&/g, '&amp;').replace(/\x3C/g, '&lt;').replace(/\x3E/g, '&gt;');
            if(e.includes('[Customer]')) currentColor = 'text-blue-300';
            else if(e.includes('[Hub]')) currentColor = 'text-amber-300';
            else if(e.includes('[Admin]')) currentColor = 'text-green-300';
@@ -217,22 +222,62 @@
         }).join('');
 
         return `
-        <div class="bg-red-500/10 border border-red-500/20 rounded p-5 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-          <div class="w-full md:w-2/3">
-            <div class="flex items-center gap-2 mb-1">
-              <button type="button" onclick="openContextModal('${i.id}')" class="bg-red-500 hover:bg-red-400 text-white text-xs px-2 py-0.5 rounded font-bold uppercase cursor-pointer">🔍 ${i.id}</button>
-              <span class="text-sm text-gray-300">${i.custName} → ${i.hubName}</span>
+        <div class="bg-red-500/10 border border-red-500/20 rounded p-5 flex flex-col gap-4">
+          <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+            <div>
+              <div class="flex items-center gap-3 mb-2">
+                <button type="button" onclick="openContextModal(this.getAttribute('data-id'))" data-id="${i.id}" class="bg-red-500 hover:bg-red-400 text-white text-xs px-3 py-1 rounded font-bold uppercase transition cursor-pointer flex items-center gap-1">🔍 ${i.id}</button>
+                <span class="text-sm text-gray-300 font-medium">${i.custName} → ${i.hubName}</span>
+              </div>
+              <div class="text-sm mt-3 font-medium bg-black/40 p-3 rounded border border-white/5 space-y-1 font-mono text-xs">
+                ${formattedNotes}
+              </div>
             </div>
-            <div class="text-sm mt-3 font-medium bg-black/40 p-3 rounded border border-white/5 space-y-1 font-mono text-xs">
-              ${formattedNotes}
+            <div class="flex flex-col gap-2 shrink-0 w-full md:w-auto">
+              <div class="flex gap-2">
+                <button type="button" onclick="toggleReplyBox(this.getAttribute('data-id'), this.getAttribute('data-phone'), 'Customer')" data-id="${i.id}" data-phone="${i.custPhone || ''}" class="flex-1 bg-blue-500/20 hover:bg-blue-500/40 text-blue-300 border border-blue-500/30 px-3 py-2 rounded text-xs transition uppercase tracking-wider">Msg Cust</button>
+                <button type="button" onclick="toggleReplyBox(this.getAttribute('data-id'), this.getAttribute('data-phone'), 'Hub')" data-id="${i.id}" data-phone="${hubPhone || ''}" class="flex-1 bg-amber-500/20 hover:bg-amber-500/40 text-amber-300 border border-amber-500/30 px-3 py-2 rounded text-xs transition uppercase tracking-wider" ${!hubPhone ? 'disabled' : ''}>Msg Hub</button>
+              </div>
+              <button type="button" onclick="executeAction('CLEAR_FLAG', {row: parseInt(this.getAttribute('data-row'), 10)})" data-row="${i.row}" class="w-full bg-red-500 hover:bg-red-400 text-white px-4 py-2 rounded text-xs font-bold transition uppercase tracking-wider">Resolve & Clear</button>
             </div>
           </div>
-          <div class="flex flex-wrap gap-2 shrink-0">
-            <button type="button" onclick='window.open("https://wa.me/" + cleanPhone(${JSON.stringify(String(i.custPhone || ""))}), "_blank")' class="bg-white/10 hover:bg-white/20 px-4 py-2 rounded text-xs transition uppercase tracking-wider">Msg Cust</button>
-            <button type="button" onclick="executeAction('CLEAR_FLAG', {row: ${i.row}})" class="bg-red-500 hover:bg-red-400 text-white px-4 py-2 rounded text-xs font-bold transition uppercase tracking-wider">Resolve & Clear</button>
+
+          <div id="reply-box-${sid}" class="hidden mt-2 border-t border-white/10 pt-4">
+            <div class="text-xs text-gray-400 mb-2 uppercase tracking-wider" id="reply-label-${sid}"></div>
+            <div class="flex gap-2">
+              <input type="text" id="reply-input-${sid}" class="flex-1 bg-black/50 border border-white/20 text-white text-sm px-3 py-2 rounded outline-none focus:border-amber-400" placeholder="Type your message...">
+              <button type="button" onclick="dispatchReply(this.getAttribute('data-id'), parseInt(this.getAttribute('data-row'), 10))" data-id="${i.id}" data-row="${i.row}" class="bg-amber-500 hover:bg-amber-400 text-black px-6 py-2 rounded text-sm font-bold transition uppercase tracking-wider">Send via API</button>
+            </div>
           </div>
         </div>
       `}).join('');
+    }
+
+    window.activeReplyTargets = {};
+
+    function toggleReplyBox(orderId, phone, role) {
+      if(!phone) { alert("No phone number available for this " + role); return; }
+      const sid = String(orderId).replace(/[^a-zA-Z0-9]/g, '-');
+      const box = document.getElementById('reply-box-' + sid);
+      if (!box) return;
+      box.classList.remove('hidden');
+      document.getElementById('reply-label-' + sid).innerText = 'Replying to: ' + role + ' (' + phone + ')';
+      window.activeReplyTargets[orderId] = phone;
+      document.getElementById('reply-input-' + sid).focus();
+    }
+
+    function dispatchReply(orderId, rowNum) {
+      const sid = String(orderId).replace(/[^a-zA-Z0-9]/g, '-');
+      const input = document.getElementById('reply-input-' + sid);
+      if (!input) return;
+      const text = input.value.trim();
+      const phone = window.activeReplyTargets[orderId];
+
+      if(!text || !phone) return;
+
+      executeAction('SEND_MANUAL_MESSAGE', { row: rowNum, phone: phone, message: text });
+      input.value = '';
+      document.getElementById('reply-box-' + sid).classList.add('hidden');
     }
 
     function openContextModal(orderId) {
@@ -250,16 +295,18 @@
       let hasLinks = false;
       if(order.inboundLala) {
          hasLinks = true;
-         let btn = document.createElement('div');
-         btn.className = "text-blue-400 hover:text-blue-300 hover:underline mb-2 cursor-pointer";
+         let btn = document.createElement('button');
+         btn.type = "button";
+         btn.className = "text-blue-400 hover:text-blue-300 hover:underline mb-2 cursor-pointer text-left w-full bg-transparent border-0 p-0";
          btn.innerText = "IN: " + order.inboundLala;
          btn.onclick = function() { window.open("https://share.sandbox.lalamove.com/tracking/" + order.inboundLala, "_blank"); };
          lalaBox.appendChild(btn);
       }
       if(order.outboundLala) {
          hasLinks = true;
-         let btn = document.createElement('div');
-         btn.className = "text-purple-400 hover:text-purple-300 hover:underline cursor-pointer";
+         let btn = document.createElement('button');
+         btn.type = "button";
+         btn.className = "text-purple-400 hover:text-purple-300 hover:underline cursor-pointer text-left w-full bg-transparent border-0 p-0";
          btn.innerText = "OUT: " + order.outboundLala;
          btn.onclick = function() { window.open("https://share.sandbox.lalamove.com/tracking/" + order.outboundLala, "_blank"); };
          lalaBox.appendChild(btn);
