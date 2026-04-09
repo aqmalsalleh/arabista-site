@@ -217,12 +217,20 @@
 
         // Format threaded notes (escape HTML in sheet-sourced lines)
         const esc = (s) => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-        const formattedNotes = String(i.notes || '').split(/\r?\n/).map(line => {
+        let currentColor = 'text-gray-300';
+
+        // Split by literal '\n' OR actual newlines
+        const formattedNotes = String(i.notes || '').split(/\\n|\r?\n/).map(line => {
            const e = esc(line);
-           if(line.includes('[Customer]')) return `<div class="text-blue-300">${e}</div>`;
-           if(line.includes('[Hub]')) return `<div class="text-amber-300">${e}</div>`;
-           if(line.includes('[Admin]')) return `<div class="text-green-300">${e}</div>`;
-           return `<div>${e}</div>`;
+
+           // Update color if a new tag is detected
+           if(e.includes('[Customer]')) currentColor = 'text-blue-300';
+           else if(e.includes('[Hub]')) currentColor = 'text-amber-300';
+           else if(e.includes('[Admin]')) currentColor = 'text-green-300';
+           else if(e.includes('[RESOLVED]')) currentColor = 'text-gray-500';
+
+           // Use min-h-[1rem] so empty line breaks actually take up vertical space
+           return `<div class="${currentColor} min-h-[1rem] whitespace-pre-wrap">${e}</div>`;
         }).join('');
 
         return `
