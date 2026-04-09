@@ -275,8 +275,8 @@
       document.getElementById('modal-items').innerText = order.itemDetails || "No details provided.";
 
       let lalaHTML = '';
-      if(order.inboundLala) lalaHTML += `<a href="https://share.sandbox.lalamove.com/tracking/${order.inboundLala}" target="_blank" class="text-blue-400 hover:underline block">IN: ${order.inboundLala}</a>`;
-      if(order.outboundLala) lalaHTML += `<a href="https://share.sandbox.lalamove.com/tracking/${order.outboundLala}" target="_blank" class="text-purple-400 hover:underline block">OUT: ${order.outboundLala}</a>`;
+      if(order.inboundLala) lalaHTML += `<button type="button" onclick='window.open("https://share.sandbox.lalamove.com/tracking/${order.inboundLala}", "_blank")' class="text-blue-400 hover:text-blue-300 underline block mb-1 bg-transparent border-0 p-0 cursor-pointer text-left font-inherit">IN: ${order.inboundLala}</button>`;
+      if(order.outboundLala) lalaHTML += `<button type="button" onclick='window.open("https://share.sandbox.lalamove.com/tracking/${order.outboundLala}", "_blank")' class="text-purple-400 hover:text-purple-300 underline block bg-transparent border-0 p-0 cursor-pointer text-left font-inherit">OUT: ${order.outboundLala}</button>`;
 
       if(lalaHTML) {
          document.getElementById('modal-lalamove').innerHTML = lalaHTML;
