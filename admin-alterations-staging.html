@@ -238,7 +238,7 @@
           <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
             <div>
               <div class="flex items-center gap-3 mb-2">
-                <button type="button" onclick="openContextModal(${JSON.stringify(i.id)})" class="bg-red-500 hover:bg-red-400 text-white text-xs px-3 py-1 rounded font-bold uppercase transition cursor-pointer flex items-center gap-1">🔍 ${i.id}</button>
+                <button type="button" onclick='openContextModal(${JSON.stringify(i.id)})' class="bg-red-500 hover:bg-red-400 text-white text-xs px-3 py-1 rounded font-bold uppercase transition cursor-pointer flex items-center gap-1">🔍 ${i.id}</button>
                 <span class="text-sm text-gray-300 font-medium">${i.custName} <span class="text-gray-500 mx-1">→</span> ${i.hubName}</span>
               </div>
               <div class="text-sm mt-3 font-medium bg-black/40 p-3 rounded border border-white/5 space-y-1 font-mono text-xs">
@@ -247,10 +247,10 @@
             </div>
             <div class="flex flex-col gap-2 shrink-0 w-full md:w-auto">
               <div class="flex gap-2">
-                <button type="button" onclick="toggleReplyBox(${JSON.stringify(i.id)}, ${JSON.stringify(String(i.custPhone || ''))}, 'Customer')" class="flex-1 bg-blue-500/20 hover:bg-blue-500/40 text-blue-300 border border-blue-500/30 px-3 py-2 rounded text-xs transition uppercase tracking-wider">Msg Cust</button>
-                <button type="button" onclick="toggleReplyBox(${JSON.stringify(i.id)}, ${JSON.stringify(String(hubPhone || ''))}, 'Hub')" class="flex-1 bg-amber-500/20 hover:bg-amber-500/40 text-amber-300 border border-amber-500/30 px-3 py-2 rounded text-xs transition uppercase tracking-wider${!hubPhone ? ' opacity-50 cursor-not-allowed' : ''}" ${!hubPhone ? 'disabled' : ''}>Msg Hub</button>
+                <button type="button" onclick='toggleReplyBox(${JSON.stringify(i.id)}, ${JSON.stringify(String(i.custPhone || ""))}, "Customer")' class="flex-1 bg-blue-500/20 hover:bg-blue-500/40 text-blue-300 border border-blue-500/30 px-3 py-2 rounded text-xs transition uppercase tracking-wider">Msg Cust</button>
+                <button type="button" onclick='toggleReplyBox(${JSON.stringify(i.id)}, ${JSON.stringify(String(hubPhone || ""))}, "Hub")' class="flex-1 bg-amber-500/20 hover:bg-amber-500/40 text-amber-300 border border-amber-500/30 px-3 py-2 rounded text-xs transition uppercase tracking-wider${!hubPhone ? ' opacity-50 cursor-not-allowed' : ''}" ${!hubPhone ? 'disabled' : ''}>Msg Hub</button>
               </div>
-              <button type="button" onclick="executeAction('CLEAR_FLAG', {row: ${i.row}})" class="w-full bg-red-500 hover:bg-red-400 text-white px-4 py-2 rounded text-xs font-bold transition uppercase tracking-wider">Resolve & Clear</button>
+              <button type="button" onclick='executeAction("CLEAR_FLAG", {row: ${i.row}})' class="w-full bg-red-500 hover:bg-red-400 text-white px-4 py-2 rounded text-xs font-bold transition uppercase tracking-wider">Resolve & Clear</button>
             </div>
           </div>
 
@@ -258,7 +258,7 @@
             <div class="text-xs text-gray-400 mb-2 uppercase tracking-wider" id="reply-label-${sid}"></div>
             <div class="flex gap-2">
               <input type="text" id="reply-input-${sid}" class="flex-1 bg-black/50 border border-white/20 text-white text-sm px-3 py-2 rounded outline-none focus:border-amber-400" placeholder="Type your message...">
-              <button type="button" onclick="dispatchReply(${JSON.stringify(i.id)}, ${i.row})" class="bg-amber-500 hover:bg-amber-400 text-black px-6 py-2 rounded text-sm font-bold transition uppercase tracking-wider">Send via API</button>
+              <button type="button" onclick='dispatchReply(${JSON.stringify(i.id)}, ${i.row})' class="bg-amber-500 hover:bg-amber-400 text-black px-6 py-2 rounded text-sm font-bold transition uppercase tracking-wider">Send via API</button>
             </div>
           </div>
         </div>
@@ -340,7 +340,7 @@
           <td class="p-4"><div class="font-medium">${o.custName}</div><div class="text-xs text-gray-400 mt-1">${o.hubName}</div></td>
           <td class="p-4 text-xs">${lalaHTML}</td>
           <td class="p-4">
-             <select onchange="executeAction('UPDATE_STATUS', {row: ${o.row}, newStatus: this.value})" class="bg-[#1a1a1c] border border-white/20 text-white text-xs p-2 rounded outline-none focus:border-amber-400 w-full max-w-[160px]">
+             <select onchange='executeAction("UPDATE_STATUS", {row: ${o.row}, newStatus: this.value})' class="bg-[#1a1a1c] border border-white/20 text-white text-xs p-2 rounded outline-none focus:border-amber-400 w-full max-w-[160px]">
                 ${selOps}
              </select>
           </td>
@@ -361,7 +361,7 @@
           <h3 class="font-display text-2xl text-amber-400 mb-1 pr-24">${h.name}</h3>
           <p class="text-sm text-gray-400 mb-5">${h.capacity} Max Daily Capacity</p>
 
-          <select onchange="executeAction('TOGGLE_HUB', {row: ${h.row}, newStatus: this.value})" class="w-full bg-[#1a1a1c] border ${isBusy ? 'border-red-500/50 text-red-200' : 'border-white/20 text-white'} text-sm p-2 rounded outline-none cursor-pointer hover:border-amber-400 transition-colors">
+          <select onchange='executeAction("TOGGLE_HUB", {row: ${h.row}, newStatus: this.value})' class="w-full bg-[#1a1a1c] border ${isBusy ? 'border-red-500/50 text-red-200' : 'border-white/20 text-white'} text-sm p-2 rounded outline-none cursor-pointer hover:border-amber-400 transition-colors">
              <option value="Active" ${!isBusy ? 'selected' : ''}>SET: ACCEPTING ORDERS</option>
              <option value="Busy / Full" ${isBusy ? 'selected' : ''}>SET: BUSY / OFFLINE</option>
           </select>
