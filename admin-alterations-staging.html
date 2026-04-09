@@ -112,7 +112,7 @@
         <div><span class="text-xs uppercase text-gray-500 block">Item Details</span> <span id="modal-items" class="text-white font-medium whitespace-pre-wrap"></span></div>
         <div id="modal-lalamove-wrapper" class="hidden"><span class="text-xs uppercase text-gray-500 block">Logistics Links</span> <div id="modal-lalamove" class="mt-1"></div></div>
       </div>
-      <button onclick="document.getElementById('context-modal').classList.add('hidden')" class="w-full bg-white/10 hover:bg-white/20 py-3 rounded transition-colors text-sm uppercase tracking-wider">Close Context</button>
+      <button type="button" onclick="document.getElementById('context-modal').classList.add('hidden')" class="w-full bg-white/10 hover:bg-white/20 py-3 rounded transition-colors text-sm uppercase tracking-wider">Close Context</button>
     </div>
   </div>
 
@@ -208,7 +208,7 @@
       container.innerHTML = systemData.interventions.map(i => {
         let currentColor = 'text-gray-300';
         const formattedNotes = String(i.notes || '').split(/\r?\n|\\n/).map(line => {
-           let e = String(line).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+           let e = String(line).split('&').join('&amp;').split('<').join('&lt;').split('>').join('&gt;');
            if(e.includes('[Customer]')) currentColor = 'text-blue-300';
            else if(e.includes('[Hub]')) currentColor = 'text-amber-300';
            else if(e.includes('[Admin]')) currentColor = 'text-green-300';
@@ -220,7 +220,7 @@
         <div class="bg-red-500/10 border border-red-500/20 rounded p-5 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <div class="w-full md:w-2/3">
             <div class="flex items-center gap-2 mb-1">
-              <button type="button" onclick='openContextModal(${JSON.stringify(String(i.id))})' class="bg-red-500 hover:bg-red-400 text-white text-xs px-2 py-0.5 rounded font-bold uppercase cursor-pointer">🔍 ${i.id}</button>
+              <button type="button" onclick="openContextModal('${i.id}')" class="bg-red-500 hover:bg-red-400 text-white text-xs px-2 py-0.5 rounded font-bold uppercase cursor-pointer">🔍 ${i.id}</button>
               <span class="text-sm text-gray-300">${i.custName} → ${i.hubName}</span>
             </div>
             <div class="text-sm mt-3 font-medium bg-black/40 p-3 rounded border border-white/5 space-y-1 font-mono text-xs">
@@ -228,8 +228,8 @@
             </div>
           </div>
           <div class="flex flex-wrap gap-2 shrink-0">
-            <button onclick="window.open('https://wa.me/' + cleanPhone(${JSON.stringify(String(i.custPhone || ''))}), '_blank')" class="bg-white/10 hover:bg-white/20 px-4 py-2 rounded text-xs transition uppercase tracking-wider">Msg Cust</button>
-            <button onclick="executeAction('CLEAR_FLAG', {row: ${i.row}})" class="bg-red-500 hover:bg-red-400 text-white px-4 py-2 rounded text-xs font-bold transition uppercase tracking-wider">Resolve & Clear</button>
+            <button type="button" onclick='window.open("https://wa.me/" + cleanPhone(${JSON.stringify(String(i.custPhone || ""))}), "_blank")' class="bg-white/10 hover:bg-white/20 px-4 py-2 rounded text-xs transition uppercase tracking-wider">Msg Cust</button>
+            <button type="button" onclick="executeAction('CLEAR_FLAG', {row: ${i.row}})" class="bg-red-500 hover:bg-red-400 text-white px-4 py-2 rounded text-xs font-bold transition uppercase tracking-wider">Resolve & Clear</button>
           </div>
         </div>
       `}).join('');
@@ -261,8 +261,8 @@
          let btn = document.createElement('div');
          btn.className = "text-purple-400 hover:text-purple-300 hover:underline cursor-pointer";
          btn.innerText = "OUT: " + order.outboundLala;
-         lalaBox.appendChild(btn);
          btn.onclick = function() { window.open("https://share.sandbox.lalamove.com/tracking/" + order.outboundLala, "_blank"); };
+         lalaBox.appendChild(btn);
       }
 
       if(hasLinks) {
