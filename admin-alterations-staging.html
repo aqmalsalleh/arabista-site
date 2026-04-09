@@ -238,7 +238,7 @@
           <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
             <div>
               <div class="flex items-center gap-3 mb-2">
-                <button ${"onclick"}='openContextModal(${JSON.stringify(i.id)})' class="bg-red-500 hover:bg-red-400 text-white text-xs px-3 py-1 rounded font-bold uppercase transition cursor-pointer flex items-center gap-1">🔍 ${i.id}</button>
+                <button data-action="open-context" data-id=${JSON.stringify(i.id)} class="bg-red-500 hover:bg-red-400 text-white text-xs px-3 py-1 rounded font-bold uppercase transition cursor-pointer flex items-center gap-1">🔍 ${i.id}</button>
                 <span class="text-sm text-gray-300 font-medium">${i.custName} <span class="text-gray-500 mx-1">→</span> ${i.hubName}</span>
               </div>
               <div class="text-sm mt-3 font-medium bg-black/40 p-3 rounded border border-white/5 space-y-1 font-mono text-xs">
@@ -247,10 +247,10 @@
             </div>
             <div class="flex flex-col gap-2 shrink-0 w-full md:w-auto">
               <div class="flex gap-2">
-                <button ${"onclick"}='toggleReplyBox(${JSON.stringify(i.id)}, ${JSON.stringify(String(i.custPhone || ""))}, "Customer")' class="flex-1 bg-blue-500/20 hover:bg-blue-500/40 text-blue-300 border border-blue-500/30 px-3 py-2 rounded text-xs transition uppercase tracking-wider">Msg Cust</button>
-                <button ${"onclick"}='toggleReplyBox(${JSON.stringify(i.id)}, ${JSON.stringify(String(hubPhone || ""))}, "Hub")' class="flex-1 bg-amber-500/20 hover:bg-amber-500/40 text-amber-300 border border-amber-500/30 px-3 py-2 rounded text-xs transition uppercase tracking-wider${!hubPhone ? ' opacity-50 cursor-not-allowed' : ''}" ${!hubPhone ? 'disabled' : ''}>Msg Hub</button>
+                <button data-action="reply-cust" data-id=${JSON.stringify(i.id)} data-phone=${JSON.stringify(String(i.custPhone || ""))} class="flex-1 bg-blue-500/20 hover:bg-blue-500/40 text-blue-300 border border-blue-500/30 px-3 py-2 rounded text-xs transition uppercase tracking-wider">Msg Cust</button>
+                <button data-action="reply-hub" data-id=${JSON.stringify(i.id)} data-phone=${JSON.stringify(String(hubPhone || ""))} class="flex-1 bg-amber-500/20 hover:bg-amber-500/40 text-amber-300 border border-amber-500/30 px-3 py-2 rounded text-xs transition uppercase tracking-wider${!hubPhone ? ' opacity-50 cursor-not-allowed' : ''}" ${!hubPhone ? 'disabled' : ''}>Msg Hub</button>
               </div>
-              <button ${"onclick"}='executeAction("CLEAR_FLAG", {row: ${i.row}})' class="w-full bg-red-500 hover:bg-red-400 text-white px-4 py-2 rounded text-xs font-bold transition uppercase tracking-wider">Resolve & Clear</button>
+              <button data-action="clear-flag" data-row="${i.row}" class="w-full bg-red-500 hover:bg-red-400 text-white px-4 py-2 rounded text-xs font-bold transition uppercase tracking-wider">Resolve & Clear</button>
             </div>
           </div>
 
@@ -258,7 +258,7 @@
             <div class="text-xs text-gray-400 mb-2 uppercase tracking-wider" id="reply-label-${sid}"></div>
             <div class="flex gap-2">
               <input type="text" id="reply-input-${sid}" class="flex-1 bg-black/50 border border-white/20 text-white text-sm px-3 py-2 rounded outline-none focus:border-amber-400" placeholder="Type your message...">
-              <button ${"onclick"}='dispatchReply(${JSON.stringify(i.id)}, ${i.row})' class="bg-amber-500 hover:bg-amber-400 text-black px-6 py-2 rounded text-sm font-bold transition uppercase tracking-wider">Send via API</button>
+              <button data-action="dispatch-reply" data-id=${JSON.stringify(i.id)} data-row="${i.row}" class="bg-amber-500 hover:bg-amber-400 text-black px-6 py-2 rounded text-sm font-bold transition uppercase tracking-wider">Send via API</button>
             </div>
           </div>
         </div>
@@ -275,8 +275,8 @@
       document.getElementById('modal-items').innerText = order.itemDetails || "No details provided.";
 
       let lalaHTML = '';
-      if(order.inboundLala) lalaHTML += `<button ${"onclick"}='window.open("https://share.sandbox.lalamove.com/tracking/${order.inboundLala}", "_blank")' class="text-blue-400 hover:text-blue-300 underline block mb-1 bg-transparent border-0 p-0 cursor-pointer text-left font-inherit">IN: ${order.inboundLala}</button>`;
-      if(order.outboundLala) lalaHTML += `<button ${"onclick"}='window.open("https://share.sandbox.lalamove.com/tracking/${order.outboundLala}", "_blank")' class="text-purple-400 hover:text-purple-300 underline block bg-transparent border-0 p-0 cursor-pointer text-left font-inherit">OUT: ${order.outboundLala}</button>`;
+      if(order.inboundLala) lalaHTML += `<button data-action="open-link" data-url=${JSON.stringify('https://share.sandbox.lalamove.com/tracking/' + String(order.inboundLala))} class="text-blue-400 hover:text-blue-300 underline block mb-1 bg-transparent border-0 p-0 cursor-pointer text-left font-inherit">IN: ${order.inboundLala}</button>`;
+      if(order.outboundLala) lalaHTML += `<button data-action="open-link" data-url=${JSON.stringify('https://share.sandbox.lalamove.com/tracking/' + String(order.outboundLala))} class="text-purple-400 hover:text-purple-300 underline block bg-transparent border-0 p-0 cursor-pointer text-left font-inherit">OUT: ${order.outboundLala}</button>`;
 
       if(lalaHTML) {
          document.getElementById('modal-lalamove').innerHTML = lalaHTML;
@@ -328,8 +328,8 @@
         let lalaHTML = '<span class="text-gray-600 italic">None</span>';
         if(o.inboundLala || o.outboundLala) {
            lalaHTML = '';
-           if(o.inboundLala) lalaHTML += `<button ${"onclick"}='window.open(${JSON.stringify('https://share.sandbox.lalamove.com/tracking/' + String(o.inboundLala))}, "_blank")' class="text-blue-400 hover:text-blue-300 underline block mb-1 bg-transparent border-0 p-0 cursor-pointer text-left font-inherit">IN: ${o.inboundLala}</button>`;
-           if(o.outboundLala) lalaHTML += `<button ${"onclick"}='window.open(${JSON.stringify('https://share.sandbox.lalamove.com/tracking/' + String(o.outboundLala))}, "_blank")' class="text-purple-400 hover:text-purple-300 underline block bg-transparent border-0 p-0 cursor-pointer text-left font-inherit">OUT: ${o.outboundLala}</button>`;
+           if(o.inboundLala) lalaHTML += `<button data-action="open-link" data-url=${JSON.stringify('https://share.sandbox.lalamove.com/tracking/' + String(o.inboundLala))} class="text-blue-400 hover:text-blue-300 underline block mb-1 bg-transparent border-0 p-0 cursor-pointer text-left font-inherit">IN: ${o.inboundLala}</button>`;
+           if(o.outboundLala) lalaHTML += `<button data-action="open-link" data-url=${JSON.stringify('https://share.sandbox.lalamove.com/tracking/' + String(o.outboundLala))} class="text-purple-400 hover:text-purple-300 underline block bg-transparent border-0 p-0 cursor-pointer text-left font-inherit">OUT: ${o.outboundLala}</button>`;
         }
 
         const selOps = statusOptions.map(opt => `<option value="${opt}" ${o.status === opt ? 'selected' : ''}>${opt}</option>`).join('');
@@ -340,7 +340,7 @@
           <td class="p-4"><div class="font-medium">${o.custName}</div><div class="text-xs text-gray-400 mt-1">${o.hubName}</div></td>
           <td class="p-4 text-xs">${lalaHTML}</td>
           <td class="p-4">
-             <select ${"onchange"}='executeAction("UPDATE_STATUS", {row: ${o.row}, newStatus: this.value})' class="bg-[#1a1a1c] border border-white/20 text-white text-xs p-2 rounded outline-none focus:border-amber-400 w-full max-w-[160px]">
+             <select data-action="update-status" data-row="${o.row}" class="bg-[#1a1a1c] border border-white/20 text-white text-xs p-2 rounded outline-none focus:border-amber-400 w-full max-w-[160px]">
                 ${selOps}
              </select>
           </td>
@@ -361,7 +361,7 @@
           <h3 class="font-display text-2xl text-amber-400 mb-1 pr-24">${h.name}</h3>
           <p class="text-sm text-gray-400 mb-5">${h.capacity} Max Daily Capacity</p>
 
-          <select ${"onchange"}='executeAction("TOGGLE_HUB", {row: ${h.row}, newStatus: this.value})' class="w-full bg-[#1a1a1c] border ${isBusy ? 'border-red-500/50 text-red-200' : 'border-white/20 text-white'} text-sm p-2 rounded outline-none cursor-pointer hover:border-amber-400 transition-colors">
+          <select data-action="toggle-hub" data-row="${h.row}" class="w-full bg-[#1a1a1c] border ${isBusy ? 'border-red-500/50 text-red-200' : 'border-white/20 text-white'} text-sm p-2 rounded outline-none cursor-pointer hover:border-amber-400 transition-colors">
              <option value="Active" ${!isBusy ? 'selected' : ''}>SET: ACCEPTING ORDERS</option>
              <option value="Busy / Full" ${isBusy ? 'selected' : ''}>SET: BUSY / OFFLINE</option>
           </select>
@@ -389,8 +389,8 @@
             <div class="font-display text-5xl text-amber-400 drop-shadow-[0_0_10px_rgba(251,191,36,0.3)]">RM ${p.amount}</div>
           </div>
           <div class="flex flex-col gap-2 shrink-0 w-full md:w-auto">
-            <button ${"onclick"}="showPayoutQR(${i})" class="bg-white/10 hover:bg-white/20 px-4 py-3 rounded text-xs font-bold uppercase tracking-wider transition border border-white/10">Show DuitNow QR</button>
-            <button ${"onclick"}='executeAction("MARK_PAID", ${JSON.stringify(p)})' class="bg-amber-500 hover:bg-amber-400 text-black px-6 py-3 rounded text-xs font-bold uppercase tracking-wider transition shadow-[0_0_15px_rgba(245,158,11,0.3)]">Confirm Transfer</button>
+            <button data-action="show-qr" data-index="${i}" class="bg-white/10 hover:bg-white/20 px-4 py-3 rounded text-xs font-bold uppercase tracking-wider transition border border-white/10">Show DuitNow QR</button>
+            <button data-action="mark-paid" data-index="${i}" class="bg-amber-500 hover:bg-amber-400 text-black px-6 py-3 rounded text-xs font-bold uppercase tracking-wider transition shadow-[0_0_15px_rgba(245,158,11,0.3)]">Confirm Transfer</button>
           </div>
         </div>
       `).join('');
@@ -452,6 +452,35 @@
       if(c.startsWith('0')) c = '6' + c;
       return c;
     }
+
+    // --- GLOBAL EVENT DELEGATION (BYPASSES GAS SANITIZER BUG) ---
+    document.addEventListener('click', function(e) {
+      const btn = e.target.closest('[data-action]');
+      if (!btn) return;
+      const action = btn.getAttribute('data-action');
+
+      if (action === 'open-context') openContextModal(btn.getAttribute('data-id'));
+      else if (action === 'reply-cust') toggleReplyBox(btn.getAttribute('data-id'), btn.getAttribute('data-phone'), 'Customer');
+      else if (action === 'reply-hub') toggleReplyBox(btn.getAttribute('data-id'), btn.getAttribute('data-phone'), 'Hub');
+      else if (action === 'clear-flag') executeAction('CLEAR_FLAG', { row: parseInt(btn.getAttribute('data-row'), 10) });
+      else if (action === 'dispatch-reply') dispatchReply(btn.getAttribute('data-id'), parseInt(btn.getAttribute('data-row'), 10));
+      else if (action === 'open-link') window.open(btn.getAttribute('data-url'), '_blank');
+      else if (action === 'show-qr') showPayoutQR(parseInt(btn.getAttribute('data-index'), 10));
+      else if (action === 'mark-paid') {
+          const p = systemData.payouts[parseInt(btn.getAttribute('data-index'), 10)];
+          if (!p) return;
+          executeAction('MARK_PAID', Object.assign({}, p));
+      }
+    });
+
+    document.addEventListener('change', function(e) {
+      const sel = e.target.closest('[data-action]');
+      if (!sel) return;
+      const action = sel.getAttribute('data-action');
+
+      if (action === 'update-status') executeAction('UPDATE_STATUS', { row: parseInt(sel.getAttribute('data-row'), 10), newStatus: sel.value });
+      else if (action === 'toggle-hub') executeAction('TOGGLE_HUB', { row: parseInt(sel.getAttribute('data-row'), 10), newStatus: sel.value });
+    });
   </script>
 </body>
 </html>
