@@ -59,11 +59,12 @@
       </div>
 
       <div id="tab-operations" class="tab-pane hidden space-y-4 max-w-6xl mx-auto">
-        <div class="flex justify-between items-end mb-6">
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-6 gap-4">
           <div>
             <h2 class="font-display text-3xl mb-1">God-Mode Database</h2>
             <p class="text-gray-400 text-sm">All active orders. Manually override statuses if necessary.</p>
           </div>
+          <input type="text" id="ops-search" onkeyup="window.opsSearchQuery = this.value.toLowerCase(); renderOperations();" placeholder="Search Order, Hub, or Name..." class="bg-black/50 border border-white/20 text-white text-sm px-4 py-2 rounded outline-none focus:border-amber-400 w-full md:w-72">
         </div>
         <div class="bg-white/5 border border-white/10 rounded overflow-x-auto">
           <table class="w-full text-left text-sm whitespace-nowrap">
@@ -72,6 +73,7 @@
                 <th class="p-4">Order ID</th>
                 <th class="p-4">Customer & Hub</th>
                 <th class="p-4">Lalamove Links</th>
+                <th class="p-4">Item Details</th>
                 <th class="p-4">Status Override</th>
               </tr>
             </thead>
@@ -101,6 +103,18 @@
       </div>
 
     </main>
+  </div>
+
+  <div id="edit-item-modal" class="fixed inset-0 z-50 bg-black/90 flex flex-col items-center justify-center p-4 hidden">
+    <div class="bg-[#1a1a1c] p-6 rounded-lg border border-white/10 w-full max-w-md">
+      <h3 class="font-display text-2xl text-amber-400 mb-4" id="edit-modal-title">Edit Item Details</h3>
+      <textarea id="edit-item-textarea" class="w-full bg-black/50 border border-white/20 text-white text-sm p-3 rounded outline-none focus:border-amber-400 h-32 mb-4 resize-none"></textarea>
+      <input type="hidden" id="edit-item-row">
+      <div class="flex gap-3">
+        <button type="button" onclick="document.getElementById('edit-item-modal').classList.add('hidden')" class="flex-1 bg-white/10 hover:bg-white/20 py-3 rounded transition-colors text-sm uppercase tracking-wider">Cancel</button>
+        <button type="button" onclick="saveItemDetails()" class="flex-1 bg-amber-500 hover:bg-amber-400 text-black font-bold py-3 rounded transition-colors text-sm uppercase tracking-wider">Save & Notify</button>
+      </div>
+    </div>
   </div>
 
   <div id="context-modal" class="fixed inset-0 z-50 bg-black/90 flex flex-col items-center justify-center p-4 hidden">
@@ -241,36 +255,52 @@
     }
 
     function renderOperations() {
-      const tbody = document.getElementById('operations-table');
-      if(!systemData.orders.length) {
-        tbody.innerHTML = '<tr><td colspan="4" class="p-8 text-center text-gray-500 border-dashed border border-white/10">No active orders in the databanks.</td></tr>';
+      var tbody = document.getElementById('operations-table');
+      if(!systemData || !systemData.orders) {
+        tbody.innerHTML = "<tr><td colspan='5' class='p-8 text-center text-gray-500 border-dashed border border-white/10'>No active orders found.</td></tr>";
         return;
       }
 
-      const statusOptions = ['Pending Dropoff', 'Awaiting Dispatch', 'In Progress', 'Ready for Return', 'Dispatched', 'Completed', 'Canceled'];
+      var statusOptions = ['Pending Dropoff', 'Awaiting Dispatch', 'In Progress', 'Ready for Return', 'Dispatched', 'Completed', 'Canceled'];
 
-      tbody.innerHTML = systemData.orders.map(o => {
-        let lalaHTML = '<span class="text-gray-600 italic">None</span>';
-        if(o.inboundLala || o.outboundLala) {
-           lalaHTML = '';
-           if(o.inboundLala) lalaHTML += `<button type="button" onclick='window.open(${JSON.stringify('https://share.sandbox.lalamove.com/tracking/' + String(o.inboundLala))}, "_blank")' class="text-blue-400 hover:text-blue-300 underline block mb-1 bg-transparent border-0 p-0 cursor-pointer text-left font-inherit">IN: ${o.inboundLala}</button>`;
-           if(o.outboundLala) lalaHTML += `<button type="button" onclick='window.open(${JSON.stringify('https://share.sandbox.lalamove.com/tracking/' + String(o.outboundLala))}, "_blank")' class="text-purple-400 hover:text-purple-300 underline block bg-transparent border-0 p-0 cursor-pointer text-left font-inherit">OUT: ${o.outboundLala}</button>`;
+      var htmlStr = "";
+      var activeOrders = systemData.orders.filter(function(o) {
+        var s = String(o.status).toUpperCase();
+        if (s === "REJECTED" || s === "CANCELED" || s === "COMPLETED") return false;
+        if (window.opsSearchQuery) {
+          var searchStr = (o.id + " " + o.custName + " " + o.hubName).toLowerCase();
+          if (searchStr.indexOf(window.opsSearchQuery) === -1) return false;
         }
+        return true;
+      });
 
-        const selOps = statusOptions.map(opt => `<option value="${opt}" ${o.status === opt ? 'selected' : ''}>${opt}</option>`).join('');
+      if(activeOrders.length === 0) {
+        tbody.innerHTML = "<tr><td colspan='5' class='p-8 text-center text-gray-500 border-dashed border border-white/10'>No active orders found.</td></tr>";
+        return;
+      }
 
-        return `
-        <tr class="hover:bg-white/5 transition border-white/5">
-          <td class="p-4 font-bold text-amber-400">${o.id}</td>
-          <td class="p-4"><div class="font-medium">${o.custName}</div><div class="text-xs text-gray-400 mt-1">${o.hubName}</div></td>
-          <td class="p-4 text-xs">${lalaHTML}</td>
-          <td class="p-4">
-             <select onchange="executeAction('UPDATE_STATUS', {row: ${o.row}, newStatus: this.value})" class="bg-[#1a1a1c] border border-white/20 text-white text-xs p-2 rounded outline-none focus:border-amber-400 w-full max-w-[160px]">
-                ${selOps}
-             </select>
-          </td>
-        </tr>
-      `}).join('');
+      for(var k=0; k<activeOrders.length; k++) {
+        var o = activeOrders[k];
+        var lalaHTML = "<span class='text-gray-600 italic'>None</span>";
+        if(o.inboundLala || o.outboundLala) {
+           lalaHTML = "";
+           if(o.inboundLala) lalaHTML += "<button type='button' onclick=\"window.open('https:/" + "/share.sandbox.lalamove.com/tracking/" + o.inboundLala + "', '_blank')\" class='text-blue-400 hover:text-blue-300 underline block mb-1 bg-transparent border-0 p-0 cursor-pointer text-left font-inherit'>IN: " + o.inboundLala + "</button>";
+           if(o.outboundLala) lalaHTML += "<button type='button' onclick=\"window.open('https:/" + "/share.sandbox.lalamove.com/tracking/" + o.outboundLala + "', '_blank')\" class='text-purple-400 hover:text-purple-300 underline block bg-transparent border-0 p-0 cursor-pointer text-left font-inherit'>OUT: " + o.outboundLala + "</button>";
+        }
+        var selOps = statusOptions.map(function(opt) { return "<option value='" + opt + "' " + (o.status === opt ? "selected" : "") + ">" + opt + "</option>"; }).join("");
+        
+        var safeDetails = (o.itemDetails || "").replace(/'/g, "\\'").replace(/\n/g, "\\n");
+        var detailsHTML = "<div class='flex items-start justify-between gap-2'><div class='text-xs text-gray-300 w-48 whitespace-normal'>" + (o.itemDetails || "None") + "</div><button type='button' onclick=\"openEditItemModal(" + o.row + ", '" + safeDetails + "', '" + o.id + "')\" class='text-amber-400 hover:text-amber-300 shrink-0'>✏️</button></div>";
+
+        htmlStr += "<tr class='hover:bg-white/5 transition border-b border-white/5'>" +
+          "<td class='p-4 font-bold text-amber-400'>" + o.id + "</td>" +
+          "<td class='p-4'><div class='font-medium'>" + o.custName + "</div><div class='text-xs text-gray-400 mt-1'>" + o.hubName + "</div></td>" +
+          "<td class='p-4 text-xs'>" + lalaHTML + "</td>" +
+          "<td class='p-4'>" + detailsHTML + "</td>" +
+          "<td class='p-4'><select onchange=\"executeAction('UPDATE_STATUS', {row: " + o.row + ", newStatus: this.value})\" class='bg-[#1a1a1c] border border-white/20 text-white text-xs p-2 rounded outline-none focus:border-amber-400 w-full max-w-[160px]'>" + selOps + "</select></td>" +
+        "</tr>";
+      }
+      tbody.innerHTML = htmlStr;
     }
 
     function renderHubs() {
@@ -453,6 +483,23 @@
       
       input.value = '';
       document.getElementById('reply-box-' + rowNum).classList.add('hidden');
+    }
+
+    window.opsSearchQuery = "";
+
+    function openEditItemModal(row, details, orderId) {
+      document.getElementById('edit-modal-title').innerText = "Edit: " + orderId;
+      document.getElementById('edit-item-textarea').value = details;
+      document.getElementById('edit-item-row').value = row;
+      document.getElementById('edit-item-modal').classList.remove('hidden');
+    }
+
+    function saveItemDetails() {
+      var row = document.getElementById('edit-item-row').value;
+      var newDetails = document.getElementById('edit-item-textarea').value.trim();
+      if(!newDetails) return;
+      document.getElementById('edit-item-modal').classList.add('hidden');
+      executeAction('UPDATE_ITEM_DETAILS', { row: row, newDetails: newDetails });
     }
   </script>
 </body>
