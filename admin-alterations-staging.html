@@ -224,51 +224,62 @@
     }
 
     function renderInterventions() {
-      const container = document.getElementById('interventions-container');
+      var container = document.getElementById("interventions-container");
       if(!systemData.interventions.length) {
-        container.innerHTML = '<div class="text-gray-500 text-center py-10 border border-dashed border-white/10 rounded">All systems nominal. No AI interventions required.</div>';
+        container.innerHTML = "<div class=\"text-gray-500 text-center py-10 border border-dashed border-white/10 rounded\">All systems nominal. No AI interventions required.</div>";
         return;
       }
 
-      container.innerHTML = systemData.interventions.map(i => {
-
-        let cPhone = i.custPhone ? cleanPhone(i.custPhone) : '';
-        let hPhone = '';
-        let hubObj = systemData.hubs.find(h => h.name === i.hubName);
+      var htmlStr = "";
+      var j;
+      for(j = 0; j < systemData.interventions.length; j++) {
+        var i = systemData.interventions[j];
+        var cPhone = i.custPhone ? cleanPhone(i.custPhone) : "";
+        var hPhone = "";
+        var hubObj = null;
+        var hh;
+        for(hh = 0; hh < systemData.hubs.length; hh++) {
+          if(systemData.hubs[hh].name === i.hubName) {
+            hubObj = systemData.hubs[hh];
+            break;
+          }
+        }
         if(hubObj && hubObj.phone) hPhone = cleanPhone(hubObj.phone);
 
-        return `
-        <div class="bg-red-500/10 border border-red-500/20 rounded p-5 flex flex-col gap-4">
-          <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-            <div>
-              <div class="flex flex-wrap items-center gap-2 mb-1">
-                <button type="button" onclick="openContextModal('${i.id}')" class="bg-red-500 hover:bg-red-400 text-white text-xs px-2 py-0.5 rounded font-bold uppercase cursor-pointer">🔍 ${i.id}</button>
-                <span class="text-sm text-gray-300 ml-1">${i.custName} → ${i.hubName}</span>
-                <span class="text-amber-400 font-bold ml-auto text-sm flex items-center gap-1 bg-black/30 px-2 py-1 rounded border border-white/5">RM ${i.servicesTotal || '0.00'} <button type="button" onclick="openEditPriceModal(${i.row}, '${i.servicesTotal || '0.00'}', '${i.id}')" class="text-amber-400 hover:text-amber-300 ml-1">✏️</button></span>
-              </div>
-              <p class="text-red-200 text-sm mt-2 font-medium whitespace-pre-wrap">${i.notes}</p>
-            </div>
-            <div class="flex flex-col gap-2 shrink-0 w-full md:w-auto">
-              <div class="flex gap-2 w-full mb-2">
-                <button type="button" onclick="toggleReplyBox(${i.row}, '${cPhone}', 'Customer')" class="flex-1 bg-blue-500/20 text-blue-300 border border-blue-500/30 px-3 py-2 rounded text-xs uppercase transition hover:bg-blue-500/40">Msg Cust</button>
-                <button type="button" onclick="toggleReplyBox(${i.row}, '${hPhone}', 'Hub')" class="flex-1 bg-amber-500/20 text-amber-300 border border-amber-500/30 px-3 py-2 rounded text-xs uppercase transition hover:bg-amber-500/40">Msg Hub</button>
-              </div>
-              <button onclick="executeAction('CLEAR_FLAG', {row: ${i.row}})" class="w-full bg-red-500 hover:bg-red-400 text-white px-4 py-2 rounded text-xs font-bold transition uppercase tracking-wider">Resolve & Clear</button>
-            </div>
-          </div>
+        var st = i.servicesTotal || "0.00";
 
-` + (i.aiDraft ? '<div class="mt-3 bg-amber-500/10 border border-amber-500/30 p-3 rounded"><div class="text-xs text-amber-400 mb-2 font-bold uppercase tracking-wider flex justify-between"><span>🤖 AI Draft Reply</span><span class="text-gray-500 text-[10px]">(Click to copy)</span></div><textarea readonly class="w-full bg-black/40 text-sm text-gray-200 outline-none resize-none p-2 rounded cursor-pointer border border-white/5" rows="3" onclick="this.select(); document.execCommand(\'copy\');">' + i.aiDraft + '</textarea></div>' : '') + `
-
-          <div id="reply-box-${i.row}" class="hidden mt-2 border-t border-white/10 pt-3">
-            <div id="reply-label-${i.row}" class="text-xs text-gray-400 mb-2 uppercase tracking-wider"></div>
-            <div class="flex gap-2">
-              <input type="text" id="reply-input-${i.row}" class="flex-1 bg-black/50 border border-white/20 text-white text-sm px-3 py-2 rounded outline-none focus:border-amber-400" placeholder="Type your message...">
-              <button type="button" onclick="dispatchReply(${i.row})" class="bg-amber-500 hover:bg-amber-400 text-black px-6 py-2 rounded text-sm font-bold uppercase transition">Send</button>
-            </div>
-          </div>
-        </div>
-        `;
-      }).join('');
+        htmlStr += "<div class=\"bg-red-500/10 border border-red-500/20 rounded p-5 flex flex-col gap-4\">" +
+          "<div class=\"flex flex-col md:flex-row justify-between items-start md:items-center gap-4\">" +
+            "<div>" +
+              "<div class=\"flex flex-wrap items-center gap-2 mb-1\">" +
+                "<button type=\"button\" onclick=\"openContextModal('" + i.id + "')\" class=\"bg-red-500 hover:bg-red-400 text-white text-xs px-2 py-0.5 rounded font-bold uppercase cursor-pointer\">🔍 " + i.id + "</button>" +
+                "<span class=\"text-sm text-gray-300 ml-1\">" + i.custName + " → " + i.hubName + "</span>" +
+                "<span class=\"text-amber-400 font-bold ml-auto text-sm flex items-center gap-1 bg-black/30 px-2 py-1 rounded border border-white/5\">RM " + st + " <button type=\"button\" onclick=\"openEditPriceModal(" + i.row + ", '" + st + "', '" + i.id + "')\" class=\"text-amber-400 hover:text-amber-300 ml-1\">✏️</button></span>" +
+              "</div>" +
+              "<p class=\"text-red-200 text-sm mt-2 font-medium whitespace-pre-wrap\">" + i.notes + "</p>" +
+            "</div>" +
+            "<div class=\"flex flex-col gap-2 shrink-0 w-full md:w-auto\">" +
+              "<div class=\"flex gap-2 w-full mb-2\">" +
+                "<button type=\"button\" onclick=\"toggleReplyBox(" + i.row + ", '" + cPhone + "', 'Customer')\" class=\"flex-1 bg-blue-500/20 text-blue-300 border border-blue-500/30 px-3 py-2 rounded text-xs uppercase transition hover:bg-blue-500/40\">Msg Cust</button>" +
+                "<button type=\"button\" onclick=\"toggleReplyBox(" + i.row + ", '" + hPhone + "', 'Hub')\" class=\"flex-1 bg-amber-500/20 text-amber-300 border border-amber-500/30 px-3 py-2 rounded text-xs uppercase transition hover:bg-amber-500/40\">Msg Hub</button>" +
+              "</div>" +
+              "<button onclick=\"executeAction('CLEAR_FLAG', {row: " + i.row + "})\" class=\"w-full bg-red-500 hover:bg-red-400 text-white px-4 py-2 rounded text-xs font-bold transition uppercase tracking-wider\">Resolve & Clear</button>" +
+            "</div>" +
+          "</div>" +
+          "<div class='mt-2 bg-black/40 p-3 rounded border border-red-500/20'>" +
+            "<div class='text-red-400 text-xs font-bold mb-1 uppercase tracking-wider'>Actionable Context</div>" +
+            "<div class='text-sm text-gray-200 italic'>\"" + (i.adminNotes || "No context provided.") + "\"</div>" +
+          "</div>" +
+          "<div id=\"reply-box-" + i.row + "\" class=\"hidden mt-2 border-t border-white/10 pt-3\">" +
+            "<div id=\"reply-label-" + i.row + "\" class=\"text-xs text-gray-400 mb-2 uppercase tracking-wider\"></div>" +
+            "<div class=\"flex gap-2\">" +
+              "<input type=\"text\" id=\"reply-input-" + i.row + "\" class=\"flex-1 bg-black/50 border border-white/20 text-white text-sm px-3 py-2 rounded outline-none focus:border-amber-400\" placeholder=\"Type your message...\">" +
+              "<button type=\"button\" onclick=\"dispatchReply(" + i.row + ")\" class=\"bg-amber-500 hover:bg-amber-400 text-black px-6 py-2 rounded text-sm font-bold uppercase transition\">Send</button>" +
+            "</div>" +
+          "</div>" +
+        "</div>";
+      }
+      container.innerHTML = htmlStr;
     }
 
     function renderOperations() {
@@ -324,56 +335,66 @@
     }
 
     function renderHubs() {
-      const container = document.getElementById('hubs-container');
-      container.innerHTML = systemData.hubs.map(h => {
-        const isBusy = h.status === 'Busy / Full';
-        return `
-        <div class="bg-white/5 border border-white/10 rounded p-5 relative overflow-hidden group hover:border-white/20 transition">
-          <div class="absolute top-0 right-0 p-4 flex items-center gap-2">
-             <span class="text-xs uppercase tracking-wider text-gray-500">${h.status}</span>
-             <span class="w-3 h-3 rounded-full inline-block ${isBusy ? 'bg-red-500 shadow-[0_0_10px_rgba(239,68,68,0.6)]' : 'bg-green-500 shadow-[0_0_10px_rgba(34,197,94,0.6)]'}"></span>
-          </div>
-          <h3 class="font-display text-2xl text-amber-400 mb-1 pr-24">${h.name}</h3>
-          <p class="text-sm text-gray-400 mb-5">${h.capacity} Max Daily Capacity</p>
-
-          <select onchange="executeAction('TOGGLE_HUB', {row: ${h.row}, newStatus: this.value})" class="w-full bg-[#1a1a1c] border ${isBusy ? 'border-red-500/50 text-red-200' : 'border-white/20 text-white'} text-sm p-2 rounded outline-none cursor-pointer hover:border-amber-400 transition-colors">
-             <option value="Active" ${!isBusy ? 'selected' : ''}>SET: ACCEPTING ORDERS</option>
-             <option value="Busy / Full" ${isBusy ? 'selected' : ''}>SET: BUSY / OFFLINE</option>
-          </select>
-        </div>
-      `}).join('');
+      var container = document.getElementById("hubs-container");
+      var htmlStr = "";
+      var j;
+      for(j = 0; j < systemData.hubs.length; j++) {
+        var h = systemData.hubs[j];
+        var isBusy = h.status === "Busy / Full";
+        var dotClass = isBusy ? "bg-red-500 shadow-[0_0_10px_rgba(239,68,68,0.6)]" : "bg-green-500 shadow-[0_0_10px_rgba(34,197,94,0.6)]";
+        var selBorder = isBusy ? "border-red-500/50 text-red-200" : "border-white/20 text-white";
+        var optActiveSel = !isBusy ? "selected" : "";
+        var optBusySel = isBusy ? "selected" : "";
+        htmlStr += "<div class=\"bg-white/5 border border-white/10 rounded p-5 relative overflow-hidden group hover:border-white/20 transition\">" +
+          "<div class=\"absolute top-0 right-0 p-4 flex items-center gap-2\">" +
+             "<span class=\"text-xs uppercase tracking-wider text-gray-500\">" + h.status + "</span>" +
+             "<span class=\"w-3 h-3 rounded-full inline-block " + dotClass + "\"></span>" +
+          "</div>" +
+          "<h3 class=\"font-display text-2xl text-amber-400 mb-1 pr-24\">" + h.name + "</h3>" +
+          "<p class=\"text-sm text-gray-400 mb-5\">" + h.capacity + " Max Daily Capacity</p>" +
+          "<select onchange=\"executeAction('TOGGLE_HUB', {row: " + h.row + ", newStatus: this.value})\" class=\"w-full bg-[#1a1a1c] border " + selBorder + " text-sm p-2 rounded outline-none cursor-pointer hover:border-amber-400 transition-colors\">" +
+             "<option value=\"Active\" " + optActiveSel + ">SET: ACCEPTING ORDERS</option>" +
+             "<option value=\"Busy / Full\" " + optBusySel + ">SET: BUSY / OFFLINE</option>" +
+          "</select>" +
+        "</div>";
+      }
+      container.innerHTML = htmlStr;
     }
 
     function renderPayouts() {
-      const container = document.getElementById('payouts-container');
+      var container = document.getElementById("payouts-container");
       if(!systemData.payouts.length) {
-        container.innerHTML = '<div class="text-gray-500 text-center py-10 border border-dashed border-white/10 rounded">All Hubs are fully paid. Ledger is balanced.</div>';
+        container.innerHTML = "<div class=\"text-gray-500 text-center py-10 border border-dashed border-white/10 rounded\">All Hubs are fully paid. Ledger is balanced.</div>";
         return;
       }
-      container.innerHTML = systemData.payouts.map((p, i) => `
-        <div class="bg-gradient-to-r from-amber-500/10 to-transparent border border-amber-500/20 rounded p-5 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-          <div class="flex-1">
-            <h3 class="font-display text-2xl text-white mb-3">${p.hubName}</h3>
-            <div class="flex flex-wrap items-center gap-4 text-sm text-gray-400">
-              <div class="bg-black/30 px-3 py-2 rounded border border-white/5"><span class="block text-xs uppercase tracking-wider text-gray-500 mb-0.5">Bank</span><span class="text-white">${p.bankName}</span></div>
-              <div class="bg-black/30 px-3 py-2 rounded border border-white/5"><span class="block text-xs uppercase tracking-wider text-gray-500 mb-0.5">Account</span><span class="font-mono text-amber-200 tracking-wide">${p.bankAcc}</span></div>
-            </div>
-          </div>
-          <div class="text-left md:text-right shrink-0">
-            <div class="text-xs uppercase tracking-wider text-amber-500 mb-1 font-bold">Total Payout Due</div>
-            <div class="font-display text-5xl text-amber-400 drop-shadow-[0_0_10px_rgba(251,191,36,0.3)]">RM ${p.amount}</div>
-          </div>
-          <div class="flex flex-col gap-2 shrink-0 w-full md:w-auto">
-            <button onclick="showPayoutQR(${i})" class="bg-white/10 hover:bg-white/20 px-4 py-3 rounded text-xs font-bold uppercase tracking-wider transition border border-white/10">Show DuitNow QR</button>
-            <button onclick='executeAction("MARK_PAID", ${JSON.stringify(p)})' class="bg-amber-500 hover:bg-amber-400 text-black px-6 py-3 rounded text-xs font-bold uppercase tracking-wider transition shadow-[0_0_15px_rgba(245,158,11,0.3)]">Confirm Transfer</button>
-          </div>
-        </div>
-      `).join('');
+      var htmlStr = "";
+      var j;
+      for(j = 0; j < systemData.payouts.length; j++) {
+        var p = systemData.payouts[j];
+        htmlStr += "<div class=\"bg-gradient-to-r from-amber-500/10 to-transparent border border-amber-500/20 rounded p-5 flex flex-col md:flex-row justify-between items-start md:items-center gap-6\">" +
+          "<div class=\"flex-1\">" +
+            "<h3 class=\"font-display text-2xl text-white mb-3\">" + p.hubName + "</h3>" +
+            "<div class=\"flex flex-wrap items-center gap-4 text-sm text-gray-400\">" +
+              "<div class=\"bg-black/30 px-3 py-2 rounded border border-white/5\"><span class=\"block text-xs uppercase tracking-wider text-gray-500 mb-0.5\">Bank</span><span class=\"text-white\">" + p.bankName + "</span></div>" +
+              "<div class=\"bg-black/30 px-3 py-2 rounded border border-white/5\"><span class=\"block text-xs uppercase tracking-wider text-gray-500 mb-0.5\">Account</span><span class=\"font-mono text-amber-200 tracking-wide\">" + p.bankAcc + "</span></div>" +
+            "</div>" +
+          "</div>" +
+          "<div class=\"text-left md:text-right shrink-0\">" +
+            "<div class=\"text-xs uppercase tracking-wider text-amber-500 mb-1 font-bold\">Total Payout Due</div>" +
+            "<div class=\"font-display text-5xl text-amber-400 drop-shadow-[0_0_10px_rgba(251,191,36,0.3)]\">RM " + p.amount + "</div>" +
+          "</div>" +
+          "<div class=\"flex flex-col gap-2 shrink-0 w-full md:w-auto\">" +
+            "<button onclick=\"showPayoutQR(" + j + ")\" class=\"bg-white/10 hover:bg-white/20 px-4 py-3 rounded text-xs font-bold uppercase tracking-wider transition border border-white/10\">Show DuitNow QR</button>" +
+            "<button onclick='executeAction(\"MARK_PAID\", " + JSON.stringify(p) + ")' class=\"bg-amber-500 hover:bg-amber-400 text-black px-6 py-3 rounded text-xs font-bold uppercase tracking-wider transition shadow-[0_0_15px_rgba(245,158,11,0.3)]\">Confirm Transfer</button>" +
+          "</div>" +
+        "</div>";
+      }
+      container.innerHTML = htmlStr;
     }
 
     function executeAction(action, payload) {
-      if(action === 'MARK_PAID' && !confirm(`Are you sure you transferred RM ${payload.amount} to ${payload.hubName}? This will permanently mark their ledger as paid.`)) return;
-      if(action === 'UPDATE_STATUS' && !confirm(`Are you sure you want to manually force the status to ${payload.newStatus}?`)) {
+      if(action === "MARK_PAID" && !confirm("Are you sure you transferred RM " + payload.amount + " to " + payload.hubName + "? This will permanently mark their ledger as paid.")) return;
+      if(action === "UPDATE_STATUS" && !confirm("Are you sure you want to manually force the status to " + payload.newStatus + "?")) {
           fetchData();
           return;
       }
