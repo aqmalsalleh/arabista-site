@@ -1107,7 +1107,7 @@
     }
 
     async function renderDashboard() {
-        if (currentData.orderStatus === "Rejected") {
+        if (String(currentData.orderStatus).toUpperCase() === "REJECTED") {
             document.getElementById('tracker-panel').classList.remove('hidden');
             document.getElementById('tracker-panel').innerHTML = `
                 <div class="bg-red-500/10 border border-red-500/30 rounded-xl p-6 text-center fade-in mt-10 shadow-[0_0_20px_rgba(239,68,68,0.1)]">
