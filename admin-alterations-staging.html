@@ -456,9 +456,7 @@
       var phone = window.activeReplyPhones[rowNum];
       var role = window.activeReplyRoles[rowNum];
       
-      var finalMessage = "[Admin to " + role + "] " + input.value.trim();
-      
-      executeAction('SEND_MANUAL_MESSAGE', { row: rowNum, phone: phone, message: finalMessage });
+      executeAction('SEND_MANUAL_MESSAGE', { row: rowNum, phone: phone, message: input.value.trim(), role: role });
       
       input.value = '';
       document.getElementById('reply-box-' + rowNum).classList.add('hidden');
