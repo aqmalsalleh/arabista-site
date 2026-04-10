@@ -1416,14 +1416,22 @@
             const savedInbound  = localStorage.getItem('lala_is_inbound_' + currentData.alterationId);
             
             if (savedAmt) document.getElementById('quote-amount').innerText = savedAmt;
-            baseFareAmount = savedBaseFare ? parseFloat(savedBaseFare) : 0;
-            
-            // SMART FALLBACK: Check database status if local memory was cleared
+
             if (savedInbound !== null) {
                 isIncomingOrder = (savedInbound === 'true');
             } else if (currentData) {
                 const inboundStages = ['Pending Approval', 'Awaiting Dispatch', 'Inbound Dispatched', 'Pending Dropoff'];
                 isIncomingOrder = inboundStages.includes(currentData.orderStatus);
+            }
+
+            if (savedBaseFare) {
+                baseFareAmount = parseFloat(savedBaseFare);
+            } else if (currentData) {
+                baseFareAmount = isIncomingOrder 
+                    ? (parseFloat(String(currentData.inboundBaseFare || '0').replace(/[^0-9.]/g, '')) || 0)
+                    : (parseFloat(String(currentData.outboundBaseFare || '0').replace(/[^0-9.]/g, '')) || 0);
+            } else {
+                baseFareAmount = 0;
             }
 
             showModalStep(3);
@@ -3149,7 +3157,12 @@
     }
 
     function calculateGrandTotal() {
-        const deliveryFee   = baseFareAmount || 0;
+        if ((!baseFareAmount || baseFareAmount === 0) && currentData) {
+            baseFareAmount = isIncomingOrder
+                ? (parseFloat(String(currentData.inboundBaseFare || '0').replace(/[^0-9.]/g, '')) || 0)
+                : (parseFloat(String(currentData.outboundBaseFare || '0').replace(/[^0-9.]/g, '')) || 0);
+        }
+        const deliveryFee = baseFareAmount || 0;
         const servicesTotal = parseFloat(String(currentData && currentData.servicesTotal || '0').replace(/[^0-9.]/g, '')) || 0;
 
         let inboundUnpaid = 0;
@@ -3604,6 +3617,8 @@
                     });
                     const data = await res.json();
                     if (data.status === 'success') {
+                        localStorage.setItem('lala_baseFare_' + currentData.alterationId, baseFareAmount.toString());
+                        localStorage.setItem('lala_is_inbound_' + currentData.alterationId, 'true');
                         currentData.lalamoveStatus = 'ASSIGNING_DRIVER';
                         currentData.orderStatus = 'Inbound Dispatched';
                         currentData.inboundLalaStatus = 'ASSIGNING_DRIVER';
