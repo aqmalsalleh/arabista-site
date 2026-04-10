@@ -74,6 +74,7 @@
                 <th class="p-4">Customer & Hub</th>
                 <th class="p-4">Lalamove Links</th>
                 <th class="p-4">Item Details</th>
+                <th class="p-4">Price</th>
                 <th class="p-4">Status Override</th>
               </tr>
             </thead>
@@ -113,6 +114,21 @@
       <div class="flex gap-3">
         <button type="button" onclick="document.getElementById('edit-item-modal').classList.add('hidden')" class="flex-1 bg-white/10 hover:bg-white/20 py-3 rounded transition-colors text-sm uppercase tracking-wider">Cancel</button>
         <button type="button" onclick="saveItemDetails()" class="flex-1 bg-amber-500 hover:bg-amber-400 text-black font-bold py-3 rounded transition-colors text-sm uppercase tracking-wider">Save & Notify</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="edit-price-modal" class="fixed inset-0 z-50 bg-black/90 flex flex-col items-center justify-center p-4 hidden">
+    <div class="bg-[#1a1a1c] p-6 rounded-lg border border-white/10 w-full max-w-sm">
+      <h3 class="font-display text-2xl text-amber-400 mb-4" id="edit-price-title">Edit Services Total</h3>
+      <div class="flex items-center bg-black/50 border border-white/20 rounded mb-4 focus-within:border-amber-400">
+        <span class="text-gray-400 pl-4 pr-2">RM</span>
+        <input type="number" step="0.01" id="edit-price-input" class="w-full bg-transparent text-white text-lg p-3 outline-none">
+      </div>
+      <input type="hidden" id="edit-price-row">
+      <div class="flex gap-3">
+        <button type="button" onclick="document.getElementById('edit-price-modal').classList.add('hidden')" class="flex-1 bg-white/10 hover:bg-white/20 py-3 rounded transition-colors text-sm uppercase tracking-wider">Cancel</button>
+        <button type="button" onclick="savePriceDetails()" class="flex-1 bg-amber-500 hover:bg-amber-400 text-black font-bold py-3 rounded transition-colors text-sm uppercase tracking-wider">Save & Notify</button>
       </div>
     </div>
   </div>
@@ -225,9 +241,10 @@
         <div class="bg-red-500/10 border border-red-500/20 rounded p-5 flex flex-col gap-4">
           <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
             <div>
-              <div class="flex items-center gap-2 mb-1">
+              <div class="flex flex-wrap items-center gap-2 mb-1">
                 <button type="button" onclick="openContextModal('${i.id}')" class="bg-red-500 hover:bg-red-400 text-white text-xs px-2 py-0.5 rounded font-bold uppercase cursor-pointer">🔍 ${i.id}</button>
-                <span class="text-sm text-gray-300">${i.custName} → ${i.hubName}</span>
+                <span class="text-sm text-gray-300 ml-1">${i.custName} → ${i.hubName}</span>
+                <span class="text-amber-400 font-bold ml-auto text-sm flex items-center gap-1 bg-black/30 px-2 py-1 rounded border border-white/5">RM ${i.servicesTotal || '0.00'} <button type="button" onclick="openEditPriceModal(${i.row}, '${i.servicesTotal || '0.00'}', '${i.id}')" class="text-amber-400 hover:text-amber-300 ml-1">✏️</button></span>
               </div>
               <p class="text-red-200 text-sm mt-2 font-medium whitespace-pre-wrap">${i.notes}</p>
             </div>
@@ -257,7 +274,7 @@
     function renderOperations() {
       var tbody = document.getElementById('operations-table');
       if(!systemData || !systemData.orders) {
-        tbody.innerHTML = "<tr><td colspan='5' class='p-8 text-center text-gray-500 border-dashed border border-white/10'>No active orders found.</td></tr>";
+        tbody.innerHTML = "<tr><td colspan='6' class='p-8 text-center text-gray-500 border-dashed border border-white/10'>No active orders found.</td></tr>";
         return;
       }
 
@@ -275,7 +292,7 @@
       });
 
       if(activeOrders.length === 0) {
-        tbody.innerHTML = "<tr><td colspan='5' class='p-8 text-center text-gray-500 border-dashed border border-white/10'>No active orders found.</td></tr>";
+        tbody.innerHTML = "<tr><td colspan='6' class='p-8 text-center text-gray-500 border-dashed border border-white/10'>No active orders found.</td></tr>";
         return;
       }
 
@@ -292,11 +309,14 @@
         var safeDetails = (o.itemDetails || "").replace(/'/g, "\\'").replace(/\n/g, "\\n");
         var detailsHTML = "<div class='flex items-start justify-between gap-2'><div class='text-xs text-gray-300 w-48 whitespace-normal'>" + (o.itemDetails || "None") + "</div><button type='button' onclick=\"openEditItemModal(" + o.row + ", '" + safeDetails + "', '" + o.id + "')\" class='text-amber-400 hover:text-amber-300 shrink-0'>✏️</button></div>";
 
+        var priceHTML = "<div class='flex items-center gap-2'><span class='font-medium text-amber-400 whitespace-nowrap'>RM " + (o.servicesTotal || "0.00") + "</span><button type='button' onclick=\"openEditPriceModal(" + o.row + ", '" + (o.servicesTotal || "0.00") + "', '" + o.id + "')\" class='text-amber-400 hover:text-amber-300 shrink-0'>✏️</button></div>";
+
         htmlStr += "<tr class='hover:bg-white/5 transition border-b border-white/5'>" +
           "<td class='p-4 font-bold text-amber-400'>" + o.id + "</td>" +
           "<td class='p-4'><div class='font-medium'>" + o.custName + "</div><div class='text-xs text-gray-400 mt-1'>" + o.hubName + "</div></td>" +
           "<td class='p-4 text-xs'>" + lalaHTML + "</td>" +
           "<td class='p-4'>" + detailsHTML + "</td>" +
+          "<td class='p-4'>" + priceHTML + "</td>" +
           "<td class='p-4'><select onchange=\"executeAction('UPDATE_STATUS', {row: " + o.row + ", newStatus: this.value})\" class='bg-[#1a1a1c] border border-white/20 text-white text-xs p-2 rounded outline-none focus:border-amber-400 w-full max-w-[160px]'>" + selOps + "</select></td>" +
         "</tr>";
       }
@@ -500,6 +520,21 @@
       if(!newDetails) return;
       document.getElementById('edit-item-modal').classList.add('hidden');
       executeAction('UPDATE_ITEM_DETAILS', { row: row, newDetails: newDetails });
+    }
+
+    function openEditPriceModal(row, currentPrice, orderId) {
+      document.getElementById('edit-price-title').innerText = "Edit Price: " + orderId;
+      document.getElementById('edit-price-input').value = currentPrice;
+      document.getElementById('edit-price-row').value = row;
+      document.getElementById('edit-price-modal').classList.remove('hidden');
+    }
+
+    function savePriceDetails() {
+      var row = document.getElementById('edit-price-row').value;
+      var newTotal = document.getElementById('edit-price-input').value.trim();
+      if(!newTotal) return;
+      document.getElementById('edit-price-modal').classList.add('hidden');
+      executeAction('UPDATE_SERVICES_TOTAL', { row: row, newTotal: newTotal });
     }
   </script>
 </body>
