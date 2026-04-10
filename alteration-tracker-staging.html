@@ -1151,6 +1151,7 @@
 
     /** After SenangPay pre-dispatch payment, place the Lalamove order using cached quotation. */
     async function executeRecoveryAutoBook(savedQuote, savedStopsJson, savedInbound, savedBaseFare) {
+        const savedPriority = localStorage.getItem('lala_priority_' + currentData.alterationId) || '0';
         const stops = JSON.parse(savedStopsJson);
         if (!stops || stops.length < 2) throw new Error('Invalid saved stops.');
         const dirInbound = savedInbound === 'true';
@@ -1181,7 +1182,8 @@
                 recipientName:   rName,
                 recipientPhone:  normalisePhone(rPhone),
                 direction:       dirInbound ? 'Inbound' : 'Outbound',
-                baseFare:        baseFareAmount
+                baseFare:        baseFareAmount,
+                priorityFee:     parseFloat(savedPriority)
             })
         });
         const data = await res.json();
@@ -1201,7 +1203,7 @@
     }
     
     function clearLalaCheckoutLocalStorage(altId) {
-        ['lala_quote_', 'lala_stops_', 'lala_amt_', 'lala_baseFare_', 'lala_is_inbound_'].forEach(k =>
+        ['lala_quote_', 'lala_stops_', 'lala_amt_', 'lala_baseFare_', 'lala_is_inbound_', 'lala_priority_'].forEach(k =>
             localStorage.removeItem(k + altId)
         );
     }
@@ -3293,6 +3295,7 @@
         localStorage.setItem('lala_amt_'        + currentData.alterationId, grandTotal);
         localStorage.setItem('lala_baseFare_'   + currentData.alterationId, baseFareAmount.toString());
         localStorage.setItem('lala_is_inbound_' + currentData.alterationId, isIncomingOrder);
+        localStorage.setItem('lala_priority_' + currentData.alterationId, (isIncomingOrder ? parseInboundPriorityTip() : effectiveOutboundPriorityFee()).toString());
 
         btn.innerHTML = `${spinnerSvg} ${t[currentLang].msg_connecting_gateway || "Connecting to Secure Gateway..."}`;
         btn.disabled  = true;
@@ -3373,6 +3376,7 @@
             recipientName: currentData.customerName,
             recipientPhone: normalisePhone(currentData.customerPhone),
             baseFare: fare,
+            priorityFee: parseSavedOutboundPriorityFee(),
             isRetry: true
         };
 
@@ -3612,7 +3616,8 @@
                             recipientName:   rName,
                             recipientPhone:  normalisePhone(rPhone),
                             direction:       'Inbound',
-                            baseFare:        baseFareAmount
+                            baseFare:        baseFareAmount,
+                            priorityFee:     parseInboundPriorityTip()
                         })
                     });
                     const data = await res.json();
@@ -3680,7 +3685,8 @@
                             recipientName:   rName,
                             recipientPhone:  normalisePhone(rPhone),
                             direction:       'Outbound',
-                            baseFare:        baseFareAmount
+                            baseFare:        baseFareAmount,
+                            priorityFee:     effectiveOutboundPriorityFee()
                         })
                     });
                     const data = await res.json();
@@ -3903,7 +3909,8 @@
             recipientName:   currentData.customerName,
             recipientPhone:  normalisePhone(currentData.customerPhone),
             direction:       'Outbound',
-            baseFare:        baseFareAmount
+            baseFare:        baseFareAmount,
+            priorityFee:     effectiveOutboundPriorityFee()
         };
     }
 
