@@ -110,7 +110,7 @@
         <div><span class="text-xs uppercase text-gray-500 block">Status</span> <span id="modal-status" class="text-white font-medium"></span></div>
         <div><span class="text-xs uppercase text-gray-500 block">Hub Assigned</span> <span id="modal-hub" class="text-white font-medium"></span></div>
         <div><span class="text-xs uppercase text-gray-500 block">Item Details</span> <span id="modal-items" class="text-white font-medium whitespace-pre-wrap"></span></div>
-        <div id="modal-lalamove-wrapper" class="hidden"><span class="text-xs uppercase text-gray-500 block">Logistics Links</span> <div id="modal-lalamove" class="mt-1 flex flex-col items-start"></div></div>
+        <div id="modal-lalamove-wrapper" class="hidden"><span class="text-xs uppercase text-gray-500 block">Logistics Links</span> <div id="modal-lalamove" class="mt-1 flex flex-col items-start gap-1"></div></div>
       </div>
       <button type="button" onclick="document.getElementById('context-modal').classList.add('hidden')" class="w-full bg-white/10 hover:bg-white/20 py-3 rounded transition-colors text-sm uppercase tracking-wider">Close Context</button>
     </div>
@@ -205,120 +205,45 @@
         container.innerHTML = '<div class="text-gray-500 text-center py-10 border border-dashed border-white/10 rounded">All systems nominal. No AI interventions required.</div>';
         return;
       }
+
       container.innerHTML = systemData.interventions.map(i => {
-        const sid = String(i.id).replace(/[^a-zA-Z0-9]/g, '-');
-        const hubObj = systemData.hubs.find(h => h.name === i.hubName);
-        const hubPhone = hubObj ? hubObj.phone : "";
-        let currentColor = 'text-gray-300';
+        
+        // --- THE PHONE NUMBER VARIABLES ---
+        let cPhone = i.custPhone ? cleanPhone(i.custPhone) : '';
+        let hPhone = '';
+        let hubObj = systemData.hubs.find(h => h.name === i.hubName);
+        if(hubObj && hubObj.phone) hPhone = cleanPhone(hubObj.phone);
 
-        let rawNotes = String(i.notes || '').replace(/\\n/g, '\n');
-        const formattedNotes = rawNotes.split('\n').map(line => {
-           let e = String(line).replace(/&/g, '&amp;').replace(/\x3C/g, '&lt;').replace(/\x3E/g, '&gt;');
-           if(e.includes('[Customer]')) currentColor = 'text-blue-300';
-           else if(e.includes('[Hub]')) currentColor = 'text-amber-300';
-           else if(e.includes('[Admin]')) currentColor = 'text-green-300';
-           else if(e.includes('[RESOLVED]')) currentColor = 'text-gray-500';
-           return `<div class="${currentColor} min-h-[1rem] whitespace-pre-wrap">${e}</div>`;
-        }).join('');
-
+        // --- THE UI TEMPLATE ---
         return `
         <div class="bg-red-500/10 border border-red-500/20 rounded p-5 flex flex-col gap-4">
           <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
             <div>
-              <div class="flex items-center gap-3 mb-2">
-                <button type="button" onclick="openContextModal(this.getAttribute('data-id'))" data-id="${i.id}" class="bg-red-500 hover:bg-red-400 text-white text-xs px-3 py-1 rounded font-bold uppercase transition cursor-pointer flex items-center gap-1">🔍 ${i.id}</button>
-                <span class="text-sm text-gray-300 font-medium">${i.custName} → ${i.hubName}</span>
+              <div class="flex items-center gap-2 mb-1">
+                <button type="button" onclick="openContextModal('${i.id}')" class="bg-red-500 hover:bg-red-400 text-white text-xs px-2 py-0.5 rounded font-bold uppercase cursor-pointer">🔍 ${i.id}</button>
+                <span class="text-sm text-gray-300">${i.custName} → ${i.hubName}</span>
               </div>
-              <div class="text-sm mt-3 font-medium bg-black/40 p-3 rounded border border-white/5 space-y-1 font-mono text-xs">
-                ${formattedNotes}
-              </div>
+              <p class="text-red-200 text-sm mt-2 font-medium whitespace-pre-wrap">${i.notes}</p>
             </div>
             <div class="flex flex-col gap-2 shrink-0 w-full md:w-auto">
-              <div class="flex gap-2">
-                <button type="button" onclick="toggleReplyBox(this.getAttribute('data-id'), this.getAttribute('data-phone'), 'Customer')" data-id="${i.id}" data-phone="${i.custPhone || ''}" class="flex-1 bg-blue-500/20 hover:bg-blue-500/40 text-blue-300 border border-blue-500/30 px-3 py-2 rounded text-xs transition uppercase tracking-wider">Msg Cust</button>
-                <button type="button" onclick="toggleReplyBox(this.getAttribute('data-id'), this.getAttribute('data-phone'), 'Hub')" data-id="${i.id}" data-phone="${hubPhone || ''}" class="flex-1 bg-amber-500/20 hover:bg-amber-500/40 text-amber-300 border border-amber-500/30 px-3 py-2 rounded text-xs transition uppercase tracking-wider" ${!hubPhone ? 'disabled' : ''}>Msg Hub</button>
+              <div class="flex gap-2 w-full mb-2">
+                <button type="button" onclick="toggleReplyBox(${i.row}, '${cPhone}', 'Customer')" class="flex-1 bg-blue-500/20 text-blue-300 border border-blue-500/30 px-3 py-2 rounded text-xs uppercase transition hover:bg-blue-500/40">Msg Cust</button>
+                <button type="button" onclick="toggleReplyBox(${i.row}, '${hPhone}', 'Hub')" class="flex-1 bg-amber-500/20 text-amber-300 border border-amber-500/30 px-3 py-2 rounded text-xs uppercase transition hover:bg-amber-500/40">Msg Hub</button>
               </div>
-              <button type="button" onclick="executeAction('CLEAR_FLAG', {row: parseInt(this.getAttribute('data-row'), 10)})" data-row="${i.row}" class="w-full bg-red-500 hover:bg-red-400 text-white px-4 py-2 rounded text-xs font-bold transition uppercase tracking-wider">Resolve & Clear</button>
+              <button onclick="executeAction('CLEAR_FLAG', {row: ${i.row}})" class="w-full bg-red-500 hover:bg-red-400 text-white px-4 py-2 rounded text-xs font-bold transition uppercase tracking-wider">Resolve & Clear</button>
             </div>
           </div>
 
-          <div id="reply-box-${sid}" class="hidden mt-2 border-t border-white/10 pt-4">
-            <div class="text-xs text-gray-400 mb-2 uppercase tracking-wider" id="reply-label-${sid}"></div>
+          <div id="reply-box-${i.row}" class="hidden mt-2 border-t border-white/10 pt-3">
+            <div id="reply-label-${i.row}" class="text-xs text-gray-400 mb-2 uppercase tracking-wider"></div>
             <div class="flex gap-2">
-              <input type="text" id="reply-input-${sid}" class="flex-1 bg-black/50 border border-white/20 text-white text-sm px-3 py-2 rounded outline-none focus:border-amber-400" placeholder="Type your message...">
-              <button type="button" onclick="dispatchReply(this.getAttribute('data-id'), parseInt(this.getAttribute('data-row'), 10))" data-id="${i.id}" data-row="${i.row}" class="bg-amber-500 hover:bg-amber-400 text-black px-6 py-2 rounded text-sm font-bold transition uppercase tracking-wider">Send via API</button>
+              <input type="text" id="reply-input-${i.row}" class="flex-1 bg-black/50 border border-white/20 text-white text-sm px-3 py-2 rounded outline-none focus:border-amber-400" placeholder="Type your message...">
+              <button type="button" onclick="dispatchReply(${i.row})" class="bg-amber-500 hover:bg-amber-400 text-black px-6 py-2 rounded text-sm font-bold uppercase transition">Send</button>
             </div>
           </div>
         </div>
-      `}).join('');
-    }
-
-    window.activeReplyTargets = {};
-
-    function toggleReplyBox(orderId, phone, role) {
-      if(!phone) { alert("No phone number available for this " + role); return; }
-      const sid = String(orderId).replace(/[^a-zA-Z0-9]/g, '-');
-      const box = document.getElementById('reply-box-' + sid);
-      if (!box) return;
-      box.classList.remove('hidden');
-      document.getElementById('reply-label-' + sid).innerText = 'Replying to: ' + role + ' (' + phone + ')';
-      window.activeReplyTargets[orderId] = phone;
-      document.getElementById('reply-input-' + sid).focus();
-    }
-
-    function dispatchReply(orderId, rowNum) {
-      const sid = String(orderId).replace(/[^a-zA-Z0-9]/g, '-');
-      const input = document.getElementById('reply-input-' + sid);
-      if (!input) return;
-      const text = input.value.trim();
-      const phone = window.activeReplyTargets[orderId];
-
-      if(!text || !phone) return;
-
-      executeAction('SEND_MANUAL_MESSAGE', { row: rowNum, phone: phone, message: text });
-      input.value = '';
-      document.getElementById('reply-box-' + sid).classList.add('hidden');
-    }
-
-    function openContextModal(orderId) {
-      const order = systemData.orders.find(o => o.id === orderId);
-      if(!order) return;
-
-      document.getElementById('modal-order-id').innerText = order.id;
-      document.getElementById('modal-status').innerText = order.status;
-      document.getElementById('modal-hub').innerText = order.hubName;
-      document.getElementById('modal-items').innerText = order.itemDetails || "No details provided.";
-
-      const lalaBox = document.getElementById('modal-lalamove');
-      lalaBox.innerHTML = '';
-
-      let hasLinks = false;
-      if(order.inboundLala) {
-         hasLinks = true;
-         let btn = document.createElement('button');
-         btn.type = "button";
-         btn.className = "text-blue-400 hover:text-blue-300 hover:underline mb-2 cursor-pointer text-left w-full bg-transparent border-0 p-0";
-         btn.innerText = "IN: " + order.inboundLala;
-         btn.onclick = function() { window.open("https://share.sandbox.lalamove.com/tracking/" + order.inboundLala, "_blank"); };
-         lalaBox.appendChild(btn);
-      }
-      if(order.outboundLala) {
-         hasLinks = true;
-         let btn = document.createElement('button');
-         btn.type = "button";
-         btn.className = "text-purple-400 hover:text-purple-300 hover:underline cursor-pointer text-left w-full bg-transparent border-0 p-0";
-         btn.innerText = "OUT: " + order.outboundLala;
-         btn.onclick = function() { window.open("https://share.sandbox.lalamove.com/tracking/" + order.outboundLala, "_blank"); };
-         lalaBox.appendChild(btn);
-      }
-
-      if(hasLinks) {
-         document.getElementById('modal-lalamove-wrapper').classList.remove('hidden');
-      } else {
-         document.getElementById('modal-lalamove-wrapper').classList.add('hidden');
-      }
-
-      document.getElementById('context-modal').classList.remove('hidden');
+        `;
+      }).join('');
     }
 
     function renderOperations() {
@@ -457,6 +382,86 @@
       let c = String(num).replace(/\D/g, '');
       if(c.startsWith('0')) c = '6' + c;
       return c;
+    }
+
+    function openContextModal(orderId) {
+      var order = null;
+      for (var k = 0; k < systemData.orders.length; k++) {
+        if (systemData.orders[k].id === orderId) {
+          order = systemData.orders[k];
+          break;
+        }
+      }
+      if (!order) return;
+
+      document.getElementById('modal-order-id').innerText = order.id;
+      document.getElementById('modal-status').innerText = order.status;
+      document.getElementById('modal-hub').innerText = order.hubName;
+      document.getElementById('modal-items').innerText = order.itemDetails || "No details provided.";
+
+      var lalaBox = document.getElementById('modal-lalamove');
+      lalaBox.innerHTML = '';
+      var hasLinks = false;
+
+      if (order.inboundLala) {
+         hasLinks = true;
+         var btnIn = document.createElement('div');
+         btnIn.className = "text-blue-400 hover:text-blue-300 hover:underline cursor-pointer mb-2";
+         btnIn.innerText = "IN: " + order.inboundLala;
+         btnIn.onclick = function() { 
+           window.open("https:/" + "/share.sandbox.lalamove.com/tracking/" + order.inboundLala, "_blank"); 
+         };
+         lalaBox.appendChild(btnIn);
+      }
+      
+      if (order.outboundLala) {
+         hasLinks = true;
+         var btnOut = document.createElement('div');
+         btnOut.className = "text-purple-400 hover:text-purple-300 hover:underline cursor-pointer";
+         btnOut.innerText = "OUT: " + order.outboundLala;
+         btnOut.onclick = function() { 
+           window.open("https:/" + "/share.sandbox.lalamove.com/tracking/" + order.outboundLala, "_blank"); 
+         };
+         lalaBox.appendChild(btnOut);
+      }
+
+      var wrapper = document.getElementById('modal-lalamove-wrapper');
+      if (hasLinks) {
+         wrapper.classList.remove('hidden');
+      } else {
+         wrapper.classList.add('hidden');
+      }
+
+      document.getElementById('context-modal').classList.remove('hidden');
+    }
+
+    window.activeReplyPhones = {};
+    window.activeReplyRoles = {};
+
+    function toggleReplyBox(rowNum, phone, role) {
+      if(!phone) { alert("No phone available for this " + role); return; }
+      var box = document.getElementById('reply-box-' + rowNum);
+      if(box) {
+        box.classList.remove('hidden');
+        document.getElementById('reply-label-' + rowNum).innerText = 'Replying to: ' + role;
+        window.activeReplyPhones[rowNum] = phone;
+        window.activeReplyRoles[rowNum] = role;
+      }
+    }
+
+    function dispatchReply(rowNum) {
+      var input = document.getElementById('reply-input-' + rowNum);
+      if(!input || !input.value.trim()) return;
+      
+      var phone = window.activeReplyPhones[rowNum];
+      var role = window.activeReplyRoles[rowNum];
+      
+      var finalMessage = "[Admin to " + role + "] " + input.value.trim();
+      
+      executeAction('SEND_MANUAL_MESSAGE', { row: rowNum, phone: phone, message: finalMessage });
+      
+      input.value = '';
+      document.getElementById('reply-box-' + rowNum).classList.add('hidden');
     }
   </script>
 </body>
