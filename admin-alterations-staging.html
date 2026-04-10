@@ -136,20 +136,16 @@
   </style>
 
   <script>
-    // --- APP STATE ---
     let token = "";
     let systemData = null;
 
-    // --- UTILS ---
     function showLoader() { document.getElementById('loader').classList.remove('hidden'); }
     function hideLoader() { document.getElementById('loader').classList.add('hidden'); }
 
-    // Allow Enter key to trigger login
     document.getElementById('admin-pin').addEventListener('keypress', function (e) {
         if (e.key === 'Enter') login();
     });
 
-    // --- LOGIN ---
     function login() {
       const pin = document.getElementById('admin-pin').value;
       if(!pin) return;
@@ -168,7 +164,6 @@
       }).adminLogin(pin);
     }
 
-    // --- DATA FETCH ---
     function fetchData() {
       showLoader();
       google.script.run.withFailureHandler(err => { hideLoader(); alert("Server Error: " + err.message); }).withSuccessHandler(function(res) {
@@ -185,7 +180,6 @@
       }).getAdminDashboardData(token);
     }
 
-    // --- UI RENDERERS ---
     function switchTab(tabId) {
       document.querySelectorAll('.tab-pane').forEach(el => el.classList.add('hidden'));
       document.getElementById(tabId).classList.remove('hidden');
@@ -207,14 +201,12 @@
       }
 
       container.innerHTML = systemData.interventions.map(i => {
-        
-        // --- THE PHONE NUMBER VARIABLES ---
+
         let cPhone = i.custPhone ? cleanPhone(i.custPhone) : '';
         let hPhone = '';
         let hubObj = systemData.hubs.find(h => h.name === i.hubName);
         if(hubObj && hubObj.phone) hPhone = cleanPhone(hubObj.phone);
 
-        // --- THE UI TEMPLATE ---
         return `
         <div class="bg-red-500/10 border border-red-500/20 rounded p-5 flex flex-col gap-4">
           <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
@@ -233,6 +225,8 @@
               <button onclick="executeAction('CLEAR_FLAG', {row: ${i.row}})" class="w-full bg-red-500 hover:bg-red-400 text-white px-4 py-2 rounded text-xs font-bold transition uppercase tracking-wider">Resolve & Clear</button>
             </div>
           </div>
+
+` + (i.aiDraft ? '<div class="mt-3 bg-amber-500/10 border border-amber-500/30 p-3 rounded"><div class="text-xs text-amber-400 mb-2 font-bold uppercase tracking-wider flex justify-between"><span>🤖 AI Draft Reply</span><span class="text-gray-500 text-[10px]">(Click to copy)</span></div><textarea readonly class="w-full bg-black/40 text-sm text-gray-200 outline-none resize-none p-2 rounded cursor-pointer border border-white/5" rows="3" onclick="this.select(); document.execCommand(\'copy\');">' + i.aiDraft + '</textarea></div>' : '') + `
 
           <div id="reply-box-${i.row}" class="hidden mt-2 border-t border-white/10 pt-3">
             <div id="reply-label-${i.row}" class="text-xs text-gray-400 mb-2 uppercase tracking-wider"></div>
@@ -327,11 +321,10 @@
       `).join('');
     }
 
-    // --- ACTIONS ---
     function executeAction(action, payload) {
       if(action === 'MARK_PAID' && !confirm(`Are you sure you transferred RM ${payload.amount} to ${payload.hubName}? This will permanently mark their ledger as paid.`)) return;
       if(action === 'UPDATE_STATUS' && !confirm(`Are you sure you want to manually force the status to ${payload.newStatus}?`)) {
-          fetchData(); // Reset dropdown if cancelled
+          fetchData();
           return;
       }
 
@@ -341,7 +334,7 @@
 
       google.script.run.withSuccessHandler(function(res) {
         if(res.success) {
-          fetchData(); // Reload all data to reflect changes
+          fetchData();
         } else {
           hideLoader();
           alert("Action Failed: " + res.message);
