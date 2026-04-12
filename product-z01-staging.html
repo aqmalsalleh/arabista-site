@@ -299,33 +299,28 @@
 
           <div class="space-y-3">
               <label class="text-[10px] uppercase text-gray-500 tracking-wider block">Shipping Details</label>
-              <input type="text" id="cart-name" class="w-full bg-white/5 border border-white/10 rounded-lg text-white px-4 py-3 text-[16px] focus:border-luxe outline-none" placeholder="Full Name">
-              <input type="tel" id="cart-phone" class="w-full bg-white/5 border border-white/10 rounded-lg text-white px-4 py-3 text-[16px] focus:border-luxe outline-none" placeholder="Phone (e.g. 0123456789)">
-              <input type="email" id="cart-email" class="w-full bg-white/5 border border-white/10 rounded-lg text-white px-4 py-3 text-[16px] focus:border-luxe outline-none" placeholder="Email Address">
-              <textarea id="cart-address" rows="2" class="w-full bg-white/5 border border-white/10 rounded-lg text-white px-4 py-3 text-[16px] focus:border-luxe outline-none" placeholder="Full Street Address"></textarea>
-              <select id="cart-state" class="w-full bg-white/5 border border-white/10 rounded-lg text-white px-4 py-3 text-[16px] focus:border-luxe outline-none appearance-none">
-                  <option value="">Select State...</option>
-                  <option value="Johor">Johor</option><option value="Kedah">Kedah</option><option value="Kelantan">Kelantan</option><option value="Melaka">Melaka</option><option value="Negeri Sembilan">Negeri Sembilan</option><option value="Pahang">Pahang</option><option value="Perak">Perak</option><option value="Perlis">Perlis</option><option value="Pulau Pinang">Pulau Pinang</option><option value="Sabah">Sabah</option><option value="Sarawak">Sarawak</option><option value="Selangor">Selangor</option><option value="Terengganu">Terengganu</option><option value="W.P. Kuala Lumpur">W.P. Kuala Lumpur</option><option value="W.P. Labuan">W.P. Labuan</option><option value="W.P. Putrajaya">W.P. Putrajaya</option>
-              </select>
-          </div>
-
-          <div>
-              <label class="text-[10px] uppercase text-gray-500 tracking-wider mb-2 block">Calculate Shipping</label>
-              <div class="flex gap-2">
-                  <input type="text" id="cart-postcode" class="w-full bg-white/5 border border-white/10 rounded-lg text-white px-4 py-3 text-[16px] focus:border-luxe outline-none" placeholder="Postcode">
-                  <button type="button" id="btn-calc-ship" class="bg-white/10 px-5 rounded-lg text-white text-xs font-medium uppercase tracking-widest hover:bg-white/20 transition-colors tap-none">Calc</button>
+              <input type="text" id="cart-name" class="w-full bg-white/5 border border-white/10 rounded-lg text-white px-4 py-3 text-[16px] focus:border-luxe outline-none transition-colors" placeholder="Full Name">
+              <input type="tel" id="cart-phone" class="w-full bg-white/5 border border-white/10 rounded-lg text-white px-4 py-3 text-[16px] focus:border-luxe outline-none transition-colors" placeholder="Phone (e.g. 0123456789)">
+              <textarea id="cart-address" rows="2" class="w-full bg-white/5 border border-white/10 rounded-lg text-white px-4 py-3 text-[16px] focus:border-luxe outline-none transition-colors" placeholder="Address"></textarea>
+              <div class="grid grid-cols-2 gap-3">
+                  <input type="text" id="cart-postcode" class="w-full bg-white/5 border border-white/10 rounded-lg text-white px-4 py-3 text-[16px] focus:border-luxe outline-none transition-colors" placeholder="Postcode">
+                  <select id="cart-state" class="w-full bg-white/5 border border-white/10 rounded-lg text-white px-4 py-3 text-[16px] focus:border-luxe outline-none appearance-none transition-colors">
+                      <option value="">State...</option>
+                      <option value="Johor">Johor</option><option value="Kedah">Kedah</option><option value="Kelantan">Kelantan</option><option value="Melaka">Melaka</option><option value="Negeri Sembilan">Negeri Sembilan</option><option value="Pahang">Pahang</option><option value="Perak">Perak</option><option value="Perlis">Perlis</option><option value="Pulau Pinang">Pulau Pinang</option><option value="Sabah">Sabah</option><option value="Sarawak">Sarawak</option><option value="Selangor">Selangor</option><option value="Terengganu">Terengganu</option><option value="W.P. Kuala Lumpur">W.P. Kuala Lumpur</option><option value="W.P. Labuan">W.P. Labuan</option><option value="W.P. Putrajaya">W.P. Putrajaya</option>
+                  </select>
               </div>
+              <button type="button" id="btn-calc-ship" class="hidden"></button>
           </div>
       </div>
 
-      <div class="p-4 sm:p-6 pb-8 sm:pb-6 border-t border-white/5 bg-ink shrink-0 relative z-10">
+      <div class="p-4 sm:p-6 pb-8 sm:pb-6 border-t border-luxe/20 bg-gradient-to-t from-brand via-ink to-ink shadow-[0_-10px_40px_rgba(192,160,98,0.05)] shrink-0 relative z-10">
           <div class="space-y-2 mb-6 text-sm">
               <div class="flex justify-between text-gray-400"><span>Subtotal</span><span id="cart-subtotal">RM 0.00</span></div>
               <div class="flex justify-between text-luxe hidden" id="cart-discount-row"><span id="cart-discount-label">Discount</span><span id="cart-discount-amount">-RM 0.00</span></div>
               <div class="flex justify-between text-gray-400"><span>Shipping</span><span id="cart-shipping">Pending</span></div>
               <div class="flex justify-between text-white text-lg font-medium pt-3 border-t border-white/10 mt-3"><span>Grand Total</span><span id="cart-total">RM 0.00</span></div>
           </div>
-          <button type="button" id="btn-checkout" class="w-full bg-white text-ink font-medium uppercase tracking-widest py-4 rounded-xl hover:bg-gray-200 transition-colors disabled:opacity-50 tap-none">Proceed to Payment</button>
+          <button type="button" id="btn-checkout" class="w-full bg-luxe text-ink font-medium uppercase tracking-widest py-4 rounded-xl hover:opacity-90 transition shadow-soft disabled:opacity-50 disabled:cursor-not-allowed tap-none">Proceed to Payment</button>
       </div>
   </div>
 
@@ -727,20 +722,70 @@
         btn.textContent = "CALC";
     };
 
+    // Intelligent Address Engine & Auto-Calc
+    const addressInput = document.getElementById('cart-address');
+    const postcodeInput = document.getElementById('cart-postcode');
+    const stateSelect = document.getElementById('cart-state');
+    const calcBtn = document.getElementById('btn-calc-ship');
+
+    function getStateFromPostcode(pc) {
+        const code = parseInt(pc, 10);
+        if (code >= 1000 && code <= 2999) return "Perlis";
+        if (code >= 5000 && code <= 9999) return "Kedah";
+        if (code >= 10000 && code <= 14999) return "Pulau Pinang";
+        if (code >= 15000 && code <= 18999) return "Kelantan";
+        if (code >= 20000 && code <= 28999) return "Pahang";
+        if (code >= 30000 && code <= 36999) return "Perak";
+        if (code >= 39000 && code <= 39999) return "Pahang";
+        if (code >= 40000 && code <= 48999) return "Selangor";
+        if (code >= 50000 && code <= 59999) return "W.P. Kuala Lumpur";
+        if (code >= 60000 && code <= 68999) return "Selangor";
+        if (code >= 69000 && code <= 73999) return "Negeri Sembilan";
+        if (code >= 75000 && code <= 78999) return "Melaka";
+        if (code >= 79000 && code <= 86999) return "Johor";
+        if (code >= 87000 && code <= 87999) return "W.P. Labuan";
+        if (code >= 88000 && code <= 91999) return "Sabah";
+        if (code >= 93000 && code <= 98999) return "Sarawak";
+        return "";
+    }
+
+    addressInput.addEventListener('input', () => {
+        const match = addressInput.value.match(/\b\d{5}\b/);
+        if (match) {
+            const pc = match[0];
+            if (postcodeInput.value !== pc) {
+                postcodeInput.value = pc;
+                const state = getStateFromPostcode(pc);
+                if (state) stateSelect.value = state;
+                calcBtn.click();
+            }
+        }
+    });
+
+    postcodeInput.addEventListener('input', () => {
+        const pc = postcodeInput.value.trim();
+        if (pc.length === 5 && !isNaN(pc)) {
+            const state = getStateFromPostcode(pc);
+            if (state) stateSelect.value = state;
+            calcBtn.click();
+        }
+    });
+
     document.getElementById('btn-checkout').onclick = async () => {
         if (!cartState) return;
         const name = document.getElementById('cart-name').value.trim();
         const phone = document.getElementById('cart-phone').value.trim();
-        const email = document.getElementById('cart-email').value.trim();
         const address = document.getElementById('cart-address').value.trim();
         const state = document.getElementById('cart-state').value;
         const postcode = document.getElementById('cart-postcode').value.trim();
-        if (!name || !phone || !email || !address || !state || !postcode || cartState.postcode === "") {
-            alert("Please complete all shipping details and calculate shipping."); return;
+        if (!name || !phone || !address || !state || !postcode || cartState.postcode === "") {
+            alert("Please complete all shipping details."); return;
         }
         const btn = document.getElementById('btn-checkout');
         btn.textContent = "Securing Order..."; btn.disabled = true;
-        cartState.name = name; cartState.phone = phone; cartState.email = email; cartState.address = address; cartState.state = state; cartState.postcode = postcode; cartState.totalPaid = (cartState.basePrice + cartState.altCost) - cartState.discount + cartState.shippingFee;
+
+        const dummyEmail = "no-reply@arabista.com";
+        cartState.name = name; cartState.phone = phone; cartState.email = dummyEmail; cartState.address = address; cartState.state = state; cartState.postcode = postcode; cartState.totalPaid = (cartState.basePrice + cartState.altCost) - cartState.discount + cartState.shippingFee;
 
         try {
             const res = await fetch(`${RETAIL_API_URL}?action=reserve_stock`, {
@@ -751,7 +796,7 @@
             if (json.status === 'success') {
                 const merchantId = "YOUR_MERCHANT_ID";
                 const desc = encodeURIComponent(`Arabista Retail Order: ${json.orderId}`);
-                window.location.href = `https://app.senangpay.my/payment/${merchantId}?detail=${desc}&amount=${json.amount}&order_id=${json.orderId}&name=${encodeURIComponent(name)}&email=${encodeURIComponent(email)}&phone=${encodeURIComponent(phone)}`;
+                window.location.href = `https://app.senangpay.my/payment/${merchantId}?detail=${desc}&amount=${json.amount}&order_id=${json.orderId}&name=${encodeURIComponent(name)}&email=${encodeURIComponent(dummyEmail)}&phone=${encodeURIComponent(phone)}`;
             } else {
                 alert("Checkout Error: " + json.message);
                 btn.textContent = "Proceed to Payment"; btn.disabled = false;
