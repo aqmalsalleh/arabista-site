@@ -388,34 +388,69 @@
         const res = document.getElementById('calc-result');
 
         if (!h || !w) {
-            res.textContent = "Please enter both values.";
+            res.innerHTML = "Please enter both values.";
             res.className = "mt-3 text-sm text-red-400 font-medium reveal show";
             res.classList.remove('hidden');
             return;
         }
 
-        // Apply formula logic
+        // 1. Calculate True Width (BMI)
         const heightM = h / 100;
         const adjustedWeight = (h <= 155) ? (w - 3) : w;
         const bmi = adjustedWeight / (heightM * heightM);
 
-        let sug = "Size Not Available";
-        if (bmi < 19.53) sug = 'XS';
-        else if (bmi <= 22.27) sug = 'S';
-        else if (bmi <= 25) sug = 'M';
-        else if (bmi <= 27.73) sug = 'L';
-        else if (bmi <= 30.47) sug = 'XL';
-        else if (bmi <= 33.2) sug = 'XXL';
-        else if (bmi <= 37.11) sug = 'XXXL';
+        const order = ['XS', 'S', 'M', 'L', 'XL', 'XXL', 'XXXL'];
+        const baseLengths = { 'XS': 55, 'S': 55, 'M': 57, 'L': 60, 'XL': 60, 'XXL': 60, 'XXXL': 60 };
+        const trueShoulders = { 'XS': 14, 'S': 15, 'M': 16, 'L': 16.5, 'XL': 17.5, 'XXL': 18, 'XXXL': 19 };
 
-        if (sug === "Size Not Available") {
-            res.textContent = "Size Not Available for these measurements.";
+        let trueSize = "Size Not Available";
+        if (bmi < 19.53) trueSize = 'XS';
+        else if (bmi <= 22.27) trueSize = 'S';
+        else if (bmi <= 25) trueSize = 'M';
+        else if (bmi <= 27.73) trueSize = 'L';
+        else if (bmi <= 30.47) trueSize = 'XL';
+        else if (bmi <= 33.2) trueSize = 'XXL';
+        else if (bmi <= 37.11) trueSize = 'XXXL';
+
+        if (trueSize === "Size Not Available") {
+            res.innerHTML = "Size Not Available for these measurements.";
             res.className = "mt-3 text-sm text-red-400 font-medium reveal show";
-        } else {
-            res.textContent = `Recommended Base Size: ${sug}`;
-            res.className = "mt-3 text-sm text-luxe font-medium reveal show";
+            res.classList.remove('hidden');
+            return;
         }
 
+        // 2. Calculate Ideal Length (Height Brackets)
+        let idealLength = 60;
+        if (h < 151) idealLength = 50;
+        else if (h <= 156) idealLength = 52;
+        else if (h <= 163) idealLength = 55;
+        else if (h <= 169) idealLength = 57;
+        else if (h <= 186) idealLength = 60;
+
+        // 3. The "Size Up" Safety Check (Never add fabric)
+        let finalSize = trueSize;
+        let finalSizeIdx = order.indexOf(finalSize);
+
+        while (finalSizeIdx < order.length - 1 && baseLengths[finalSize] < idealLength) {
+            finalSizeIdx++;
+            finalSize = order[finalSizeIdx];
+        }
+
+        // 4. Generate Formatting
+        const needsLengthAlteration = baseLengths[finalSize] > idealLength;
+        const needsShoulderAlteration = finalSize !== trueSize;
+
+        let alterText = "";
+        if (needsLengthAlteration && needsShoulderAlteration) {
+            alterText = `<br><span class="text-gray-400 text-[0.875rem] font-normal">Alter Length: ${idealLength}", Shoulder: ${trueShoulders[trueSize]}"</span>`;
+        } else if (needsLengthAlteration) {
+            alterText = `<br><span class="text-gray-400 text-[0.875rem] font-normal">Alter Length: ${idealLength}"</span>`;
+        } else if (needsShoulderAlteration) {
+            alterText = `<br><span class="text-gray-400 text-[0.875rem] font-normal">Alter Shoulder: ${trueShoulders[trueSize]}"</span>`;
+        }
+
+        res.innerHTML = `<span class="text-luxe font-medium">Recommended Size: ${finalSize}</span>${alterText}`;
+        res.className = "mt-3 text-sm reveal show";
         res.classList.remove('hidden');
     }
 
