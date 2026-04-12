@@ -354,6 +354,17 @@
       <div class="p-6 flex-1 overflow-y-auto hide-scrollbar" id="cart-items-container">
       </div>
       <div class="p-6 border-t border-white/10 bg-black/30">
+          <div class="mb-4 space-y-3">
+              <label class="text-[10px] uppercase text-gray-500 tracking-wider block">Shipping Details</label>
+              <input type="text" id="cart-name" class="w-full bg-black border border-white/20 rounded text-white px-3 py-2 text-[16px] focus:border-luxe outline-none" placeholder="Full Name">
+              <input type="tel" id="cart-phone" class="w-full bg-black border border-white/20 rounded text-white px-3 py-2 text-[16px] focus:border-luxe outline-none" placeholder="Phone Number (e.g. 0123456789)">
+              <input type="email" id="cart-email" class="w-full bg-black border border-white/20 rounded text-white px-3 py-2 text-[16px] focus:border-luxe outline-none" placeholder="Email Address">
+              <textarea id="cart-address" rows="2" class="w-full bg-black border border-white/20 rounded text-white px-3 py-2 text-[16px] focus:border-luxe outline-none" placeholder="Full Street Address"></textarea>
+              <select id="cart-state" class="w-full bg-black border border-white/20 rounded text-white px-3 py-2 text-[16px] focus:border-luxe outline-none">
+                  <option value="">Select State...</option>
+                  <option value="Johor">Johor</option><option value="Kedah">Kedah</option><option value="Kelantan">Kelantan</option><option value="Melaka">Melaka</option><option value="Negeri Sembilan">Negeri Sembilan</option><option value="Pahang">Pahang</option><option value="Perak">Perak</option><option value="Perlis">Perlis</option><option value="Pulau Pinang">Pulau Pinang</option><option value="Sabah">Sabah</option><option value="Sarawak">Sarawak</option><option value="Selangor">Selangor</option><option value="Terengganu">Terengganu</option><option value="W.P. Kuala Lumpur">W.P. Kuala Lumpur</option><option value="W.P. Labuan">W.P. Labuan</option><option value="W.P. Putrajaya">W.P. Putrajaya</option>
+              </select>
+          </div>
           <div class="mb-4">
               <label class="text-[11px] uppercase text-white/50 tracking-wider mb-2 block">Calculate Shipping</label>
               <div class="flex gap-2">
@@ -722,8 +733,10 @@
         let altHtml = '';
         if (Object.keys(cartState.alterations).length > 0) {
             altHtml = `<ul class="text-xs text-gray-400 mt-2 space-y-1">`;
-            for (let [k, v] of Object.entries(cartState.alterations)) {
-                altHtml += `<li>↳ Custom ${k}: ${v}"</li>`;
+            for(let [k, v] of Object.entries(cartState.alterations)) {
+                const sId = k === 'length' ? 'Z01_ALT_LENGTH' : (k === 'sleeve' ? 'Z01_ALT_SLEEVE' : 'Z01_ALT_SHOULDER');
+                const cPrice = appConfig[sId] ? appConfig[sId].standardPrice : 0;
+                altHtml += `<li class="flex justify-between"><span>↳ Custom ${k}: ${v}"</span><span class="text-white">RM ${cPrice.toFixed(2)}</span></li>`;
             }
             altHtml += `</ul>`;
         }
@@ -768,7 +781,7 @@
     // Shipping Calc
     document.getElementById('btn-calc-ship').onclick = async () => {
         const pc = document.getElementById('cart-postcode').value;
-        if (!pc || pc.length < 5) return;
+        if(!pc || pc.length < 5 || isNaN(pc)) { document.getElementById('cart-postcode').classList.add('border-red-500'); return; } else { document.getElementById('cart-postcode').classList.remove('border-red-500'); }
 
         const btn = document.getElementById('btn-calc-ship');
         btn.textContent = "...";
@@ -819,6 +832,56 @@
         }, { threshold: 0.12 });
         io.observe(el);
     });
+
+    document.getElementById('btn-checkout').onclick = async () => {
+        if (!cartState) {
+            alert("Your cart is empty.");
+            return;
+        }
+        const name = document.getElementById('cart-name').value.trim();
+        const phone = document.getElementById('cart-phone').value.trim();
+        const email = document.getElementById('cart-email').value.trim();
+        const address = document.getElementById('cart-address').value.trim();
+        const state = document.getElementById('cart-state').value;
+        const postcode = document.getElementById('cart-postcode').value.trim();
+
+        if (!name || !phone || !email || !address || !state || !postcode || cartState.shippingFee === 0) {
+            alert("Please complete all shipping details and calculate shipping.");
+            return;
+        }
+
+        const btn = document.getElementById('btn-checkout');
+        btn.textContent = "Securing Order...";
+        btn.disabled = true;
+
+        const totalPaid = (cartState.basePrice + cartState.altCost) - cartState.discount + cartState.shippingFee;
+        cartState.name = name; cartState.phone = phone; cartState.email = email; cartState.address = address; cartState.state = state; cartState.postcode = postcode; cartState.totalPaid = totalPaid;
+
+        try {
+            const res = await fetch(`${RETAIL_API_URL}?action=reserve_stock`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: `payload=${encodeURIComponent(JSON.stringify(cartState))}`
+            });
+            const json = await res.json();
+            
+            if (json.status === 'success') {
+                // REPLACE 'YOUR_MERCHANT_ID' WITH YOUR ACTUAL SENANGPAY MERCHANT ID
+                const merchantId = "YOUR_MERCHANT_ID"; 
+                const desc = encodeURIComponent(`Arabista Retail Order: ${json.orderId}`);
+                const paymentUrl = `https://app.senangpay.my/payment/${merchantId}?detail=${desc}&amount=${json.amount}&order_id=${json.orderId}&name=${encodeURIComponent(name)}&email=${encodeURIComponent(email)}&phone=${encodeURIComponent(phone)}`;
+                window.location.href = paymentUrl;
+            } else {
+                alert("Checkout Error: " + json.message);
+                btn.textContent = "Proceed to Payment";
+                btn.disabled = false;
+            }
+        } catch (e) {
+            alert("System error. Please try again.");
+            btn.textContent = "Proceed to Payment";
+            btn.disabled = false;
+        }
+    };
   </script>
 </body>
 </html>
