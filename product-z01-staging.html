@@ -107,7 +107,7 @@
           <div class="mb-6">
               <div class="flex justify-between items-center mb-3">
                   <label class="text-sm text-white/80 font-medium">Select Base Size</label>
-                  <button type="button" class="text-sm underline decoration-white/30 underline-offset-4 hover:text-luxe transition-colors">Size Guide</button>
+                  <button type="button" class="text-sm underline decoration-white/30 underline-offset-4 hover:text-luxe transition-colors" onclick="document.getElementById('size-modal').classList.remove('hidden')">Size Guide</button>
               </div>
               <div class="grid grid-cols-3 sm:grid-cols-6 gap-2" id="size-grid">
               </div>
@@ -317,6 +317,30 @@
   })();
   </script>
 
+  </div>
+
+  <div id="size-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-[60] hidden flex items-center justify-center p-4 opacity-0 transition-opacity duration-300 [&.show]:opacity-100" style="display:none;">
+      <div class="bg-brand border border-white/10 rounded-2xl w-full max-w-2xl overflow-hidden shadow-2xl relative transform scale-95 transition-transform duration-300 [&.show]:scale-100">
+          <div class="p-6 border-b border-white/10 flex justify-between items-center bg-gray-900/50">
+              <h2 class="font-display text-2xl text-white">Abaya Size Guide</h2>
+              <button type="button" onclick="closeSizeModal()" class="text-gray-400 hover:text-white" aria-label="Close size guide"><svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
+          </div>
+          <div class="p-6 overflow-x-auto">
+              <table class="w-full text-sm text-left text-gray-300">
+                  <thead class="text-xs uppercase bg-white/5 text-gray-400">
+                      <tr><th class="px-4 py-3">Size</th><th class="px-4 py-3">Length (Inches)</th><th class="px-4 py-3">Sleeve (Inches)</th><th class="px-4 py-3">Shoulder (Inches)</th></tr>
+                  </thead>
+                  <tbody class="divide-y divide-white/5">
+                      <tr><td class="px-4 py-3 font-medium text-white">XS</td><td class="px-4 py-3">52</td><td class="px-4 py-3">22</td><td class="px-4 py-3">13.5</td></tr>
+                      <tr><td class="px-4 py-3 font-medium text-white">S</td><td class="px-4 py-3">54</td><td class="px-4 py-3">22.5</td><td class="px-4 py-3">14</td></tr>
+                      <tr><td class="px-4 py-3 font-medium text-white">M</td><td class="px-4 py-3">56</td><td class="px-4 py-3">23</td><td class="px-4 py-3">14.5</td></tr>
+                      <tr><td class="px-4 py-3 font-medium text-white">L</td><td class="px-4 py-3">58</td><td class="px-4 py-3">23.5</td><td class="px-4 py-3">15</td></tr>
+                      <tr><td class="px-4 py-3 font-medium text-white">XL</td><td class="px-4 py-3">60</td><td class="px-4 py-3">24</td><td class="px-4 py-3">16</td></tr>
+                      <tr><td class="px-4 py-3 font-medium text-white">XXL</td><td class="px-4 py-3">60</td><td class="px-4 py-3">24.5</td><td class="px-4 py-3">16.5</td></tr>
+                  </tbody>
+              </table>
+          </div>
+      </div>
   </div>
 
   </main>
@@ -581,13 +605,17 @@
                 priceHtml = `<span class="text-gray-400">RM ${conf.standardPrice.toFixed(2)}</span>`;
             }
 
+            const baseLimit = selectedSize ? baseSizes[selectedSize][s.key] : "--";
+            const limitHtml = selectedSize ? `<span class="text-luxe font-mono text-[10px] ml-2">(Max: ${baseLimit}")</span>` : ``;
+            const placeholderTxt = selectedSize ? `&lt;= ${baseLimit}` : 'Select size first';
+
             container.innerHTML += `
                 <div>
                     <div class="flex justify-between items-end mb-2">
-                        <label class="text-[10px] uppercase text-gray-400 tracking-wider">${s.label}</label>
+                        <label class="text-[10px] uppercase text-gray-400 tracking-wider flex items-center">${s.label} ${limitHtml}</label>
                         <div class="text-[10px] uppercase tracking-widest">${priceHtml}</div>
                     </div>
-                    <input type="number" step="0.5" id="alt-input-${s.key}" data-key="${s.key}" class="alt-input w-full bg-black/50 border border-white/20 rounded p-3 text-white focus:border-gold outline-none transition-colors" placeholder="e.g. 54">
+                    <input type="number" step="0.5" id="alt-input-${s.key}" data-key="${s.key}" ${!selectedSize ? 'disabled' : ''} class="alt-input w-full bg-black/50 border border-white/20 rounded p-3 text-[16px] text-white focus:border-luxe outline-none transition-colors" placeholder="${placeholderTxt}">
                     <p id="alt-err-${s.key}" class="text-xs text-red-400 mt-2 hidden"></p>
                 </div>
             `;
@@ -774,6 +802,11 @@
     document.getElementById('nav-cart-btn').onclick = () => toggleCart(true);
     document.getElementById('close-cart-btn').onclick = () => toggleCart(false);
     document.getElementById('cart-overlay').onclick = () => toggleCart(false);
+
+    // Size Modal Logic
+    const sizeModal = document.getElementById('size-modal');
+    document.querySelector('[onclick*="size-modal"]').onclick = () => { sizeModal.style.display = 'flex'; setTimeout(() => { sizeModal.classList.add('show'); sizeModal.querySelector('div').classList.add('show'); }, 10); };
+    function closeSizeModal() { sizeModal.classList.remove('show'); sizeModal.querySelector('div').classList.remove('show'); setTimeout(() => sizeModal.style.display = 'none', 300); }
 
     // INIT
     document.getElementById('add-to-cart-btn').disabled = true;
