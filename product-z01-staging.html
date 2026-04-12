@@ -815,12 +815,14 @@
         const overlay = document.getElementById('cart-overlay');
         const drawer = document.getElementById('cart-drawer');
         if (show) {
-            document.body.style.overflow = 'hidden';
-            overlay.classList.remove('hidden'); setTimeout(() => overlay.classList.remove('opacity-0'), 10);
+            document.body.style.overflow = 'hidden'; // Lock background scroll
+            overlay.classList.remove('hidden');
+            setTimeout(() => overlay.classList.remove('opacity-0'), 10);
             drawer.classList.remove('translate-x-full');
         } else {
-            document.body.style.overflow = '';
-            overlay.classList.add('opacity-0'); setTimeout(() => overlay.classList.add('hidden'), 300);
+            document.body.style.overflow = ''; // Unlock background scroll
+            overlay.classList.add('opacity-0');
+            setTimeout(() => overlay.classList.add('hidden'), 300);
             drawer.classList.add('translate-x-full');
         }
     }
