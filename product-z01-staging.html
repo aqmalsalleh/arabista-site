@@ -782,18 +782,27 @@
     document.getElementById('btn-calc-ship').onclick = async () => {
         const pc = document.getElementById('cart-postcode').value;
         if(!pc || pc.length < 5 || isNaN(pc)) { document.getElementById('cart-postcode').classList.add('border-red-500'); return; } else { document.getElementById('cart-postcode').classList.remove('border-red-500'); }
+        if (!cartState) return;
 
         const btn = document.getElementById('btn-calc-ship');
         btn.textContent = "...";
 
         try {
-            const w = (cartState && cartState.weightKg != null) ? cartState.weightKg : activeWeightKg;
-            const res = await fetch(`${RETAIL_API_URL}?action=calc_shipping&postcode=${encodeURIComponent(pc)}&weight=${encodeURIComponent(String(w))}`);
+            const res = await fetch(`${RETAIL_API_URL}?action=calc_shipping&postcode=${encodeURIComponent(pc)}&weight=${cartState.weightKg || 1.0}`);
             const json = await res.json();
             if (json.status === 'success' && cartState) {
-                cartState.shippingFee = json.rate;
                 cartState.postcode = pc;
-                document.getElementById('cart-shipping').textContent = `RM ${json.rate.toFixed(2)} (Pos Laju)`;
+                
+                // Check App_Config for Free Shipping Promo
+                const freeShipPromo = appConfig['PROMO_FREE_SHIPPING'];
+                if (freeShipPromo && freeShipPromo.isActive) {
+                    cartState.shippingFee = 0;
+                    document.getElementById('cart-shipping').innerHTML = `<span class="line-through text-gray-500 mr-2">RM ${json.rate.toFixed(2)}</span><span class="text-gold font-bold">FREE</span>`;
+                } else {
+                    cartState.shippingFee = json.rate;
+                    document.getElementById('cart-shipping').textContent = `RM ${json.rate.toFixed(2)} (Pos Laju)`;
+                }
+                
                 updateGrandTotal();
             }
         } catch (e) { alert("Shipping calculation failed."); }
@@ -845,7 +854,7 @@
         const state = document.getElementById('cart-state').value;
         const postcode = document.getElementById('cart-postcode').value.trim();
 
-        if (!name || !phone || !email || !address || !state || !postcode || cartState.shippingFee === 0) {
+        if (!name || !phone || !email || !address || !state || !postcode || cartState.postcode === "") {
             alert("Please complete all shipping details and calculate shipping.");
             return;
         }
