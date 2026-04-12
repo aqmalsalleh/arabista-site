@@ -383,21 +383,39 @@
     }
 
     function calculateSize() {
-        const h = parseInt(document.getElementById('calc-height').value, 10);
-        const w = parseInt(document.getElementById('calc-weight').value, 10);
+        const h = parseFloat(document.getElementById('calc-height').value);
+        const w = parseFloat(document.getElementById('calc-weight').value);
         const res = document.getElementById('calc-result');
+
         if (!h || !w) {
             res.textContent = "Please enter both values.";
             res.className = "mt-3 text-sm text-red-400 font-medium reveal show";
             res.classList.remove('hidden');
             return;
         }
-        let sug = 'M';
-        if (h < 155 && w < 55) sug = 'XS';
-        else if (h < 160 && w < 60) sug = 'S';
-        else if (h > 165 && w > 70) sug = 'XL';
-        res.textContent = `Recommended Base Size: ${sug}`;
-        res.className = "mt-3 text-sm text-green-400 font-medium reveal show";
+
+        // Apply formula logic
+        const heightM = h / 100;
+        const adjustedWeight = (h <= 155) ? (w - 3) : w;
+        const bmi = adjustedWeight / (heightM * heightM);
+
+        let sug = "Size Not Available";
+        if (bmi < 19.53) sug = 'XS';
+        else if (bmi <= 22.27) sug = 'S';
+        else if (bmi <= 25) sug = 'M';
+        else if (bmi <= 27.73) sug = 'L';
+        else if (bmi <= 30.47) sug = 'XL';
+        else if (bmi <= 33.2) sug = 'XXL';
+        else if (bmi <= 37.11) sug = 'XXXL';
+
+        if (sug === "Size Not Available") {
+            res.textContent = "Size Not Available for these measurements.";
+            res.className = "mt-3 text-sm text-red-400 font-medium reveal show";
+        } else {
+            res.textContent = `Recommended Base Size: ${sug}`;
+            res.className = "mt-3 text-sm text-luxe font-medium reveal show";
+        }
+
         res.classList.remove('hidden');
     }
 
