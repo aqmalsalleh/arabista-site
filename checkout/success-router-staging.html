@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Arabista — Securing Order...</title>
+  <meta name="theme-color" content="#0F0F10" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body { background-color: #0F0F10; color: #ffffff; }
+    .loader { border-top-color: #ffffff; animation: spinner 1.5s linear infinite; }
+    @keyframes spinner { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-center">
+
+  <div class="text-center">
+      <div class="w-12 h-12 border-4 border-gray-800 border-t-white rounded-full loader mx-auto mb-6"></div>
+      <p class="text-gray-400 tracking-widest text-sm uppercase">Routing your order...</p>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const queryString = window.location.search;
+      const urlParams = new URLSearchParams(queryString);
+      const orderId = urlParams.get('order_id');
+
+      if (!orderId) {
+        // Fallback if accessed directly without SenangPay data
+        window.location.replace('/');
+        return;
+      }
+
+      // Route based on prefix, forwarding all SenangPay query parameters
+      if (orderId.startsWith('ALT-')) {
+        // Send to existing Alteration tracking page
+        window.location.replace('/alteration-tracker-staging.html' + queryString);
+      } else if (orderId.startsWith('ORD-')) {
+        // Send to the new universal Retail success page
+        window.location.replace('/checkout/retail-success-staging.html' + queryString);
+      } else {
+        // Failsafe for unknown prefixes
+        window.location.replace('/');
+      }
+    });
+  </script>
+</body>
+</html>
