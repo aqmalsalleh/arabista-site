@@ -33,7 +33,7 @@
     .review-text.clamp { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; overflow: hidden; }
   </style>
 </head>
-<body class="bg-brand text-white antialiased tap-none selection:bg-gray-700 selection:text-white pb-32">
+<body class="bg-brand text-white antialiased tap-none selection:bg-gray-700 selection:text-white pb-32 overflow-x-hidden">
 
   <header class="fixed top-0 inset-x-0 z-50 backdrop-blur bg-brand/80 border-b border-white/10">
     <div class="max-w-screen-xl mx-auto px-4 sm:px-6">
@@ -93,11 +93,11 @@
               <div class="grid grid-cols-2 gap-4 mb-4">
                   <div>
                       <label class="text-[11px] uppercase text-white/50 tracking-wider mb-1.5 block">Height (cm)</label>
-                      <input type="number" id="calc-height" class="w-full bg-black/40 border border-white/15 rounded-lg px-3 py-2.5 text-white text-sm focus:outline-none focus:border-luxe/80 focus:ring-1 focus:ring-luxe/30 transition-colors" placeholder="e.g. 160">
+                      <input type="number" id="calc-height" class="w-full bg-black/40 border border-white/15 rounded-lg px-3 py-2.5 text-white text-[16px] focus:outline-none focus:border-luxe/80 focus:ring-1 focus:ring-luxe/30 transition-colors" placeholder="e.g. 160">
                   </div>
                   <div>
                       <label class="text-[11px] uppercase text-white/50 tracking-wider mb-1.5 block">Weight (kg)</label>
-                      <input type="number" id="calc-weight" class="w-full bg-black/40 border border-white/15 rounded-lg px-3 py-2.5 text-white text-sm focus:outline-none focus:border-luxe/80 focus:ring-1 focus:ring-luxe/30 transition-colors" placeholder="e.g. 55">
+                      <input type="number" id="calc-weight" class="w-full bg-black/40 border border-white/15 rounded-lg px-3 py-2.5 text-white text-[16px] focus:outline-none focus:border-luxe/80 focus:ring-1 focus:ring-luxe/30 transition-colors" placeholder="e.g. 55">
                   </div>
               </div>
               <button type="button" onclick="calculateSize()" class="text-xs uppercase tracking-widest text-luxe hover:text-white transition-colors">Suggest Size &rarr;</button>
@@ -135,7 +135,7 @@
               Add To Cart
           </button>
 
-          <p class="text-xs text-white/55 mb-6">⭐ 4.9 rating · reviews below · Pos Laju staging rates</p>
+          <p class="text-sm text-gray-400 mb-6">⭐ 4.9 rating · <a href="#pdp-review-section" class="underline hover:text-luxe transition-colors">Check reviews</a></p>
 
           <div class="rounded-2xl border border-white/10 divide-y divide-white/10 overflow-hidden">
               <div class="py-5">
@@ -174,7 +174,7 @@
       </div>
     </section>
 
-  <div id="pdp-review-section" class="max-w-screen-xl mx-auto px-4 sm:px-6 pb-12 border-t border-white/10 pt-10 mt-2">
+  <div id="pdp-review-section" class="max-w-screen-xl mx-auto px-4 sm:px-6 pb-12 border-t border-white/10 pt-10 mt-2 scroll-mt-24">
     <!-- REVIEWS: What Our Customers Say -->
     <section id="reviews" class="reveal mt-2">
       <h2 class="font-display text-2xl sm:text-3xl mb-3">What Our Customers Say</h2>
@@ -322,7 +322,7 @@
   </main>
 
   <div id="cart-overlay" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden opacity-0 transition-opacity duration-300"></div>
-  <div id="cart-drawer" class="fixed top-0 right-0 h-full w-full max-w-md bg-brand border-l border-white/10 z-[60] transform translate-x-full transition-transform duration-300 flex flex-col shadow-2xl ring-1 ring-white/10">
+  <div id="cart-drawer" class="fixed top-0 right-0 h-[100dvh] w-full sm:max-w-md bg-brand border-l border-white/10 z-[60] transform translate-x-full transition-transform duration-300 flex flex-col shadow-2xl ring-1 ring-white/10">
       <div class="p-6 border-b border-white/10 flex justify-between items-center bg-black/20">
           <h2 class="font-display text-2xl sm:text-3xl text-white tracking-wide">Your Cart</h2>
           <button type="button" id="close-cart-btn" class="text-white/50 hover:text-white p-1 rounded-lg hover:bg-white/5 transition-colors" aria-label="Close cart"><svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
@@ -333,7 +333,7 @@
           <div class="mb-4">
               <label class="text-[11px] uppercase text-white/50 tracking-wider mb-2 block">Calculate Shipping</label>
               <div class="flex gap-2">
-                  <input type="text" id="cart-postcode" class="w-full bg-black/50 border border-white/15 rounded-xl text-white px-3 py-2.5 text-sm focus:border-luxe focus:ring-1 focus:ring-luxe/30 outline-none transition-colors" placeholder="Postcode">
+                  <input type="text" id="cart-postcode" class="w-full bg-black/50 border border-white/15 rounded-xl text-white px-3 py-2.5 text-[16px] focus:border-luxe focus:ring-1 focus:ring-luxe/30 outline-none transition-colors" placeholder="Postcode">
                   <button type="button" id="btn-calc-ship" class="shrink-0 px-4 rounded-xl ring-1 ring-white/15 text-white text-xs uppercase tracking-widest hover:bg-white/10 transition-colors">Calc</button>
               </div>
           </div>
@@ -500,7 +500,7 @@
         Object.keys(baseSizes).forEach(size => {
             const btn = document.createElement('button');
             btn.type = 'button';
-            btn.className = 'size-btn px-3 py-2.5 rounded-xl border border-white/15 bg-transparent text-white font-medium hover:border-white/35 hover:bg-white/5 transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-luxe/40';
+            btn.className = 'size-btn py-3 border border-white/15 bg-transparent text-white rounded-lg font-medium hover:border-white/40 transition-colors focus:outline-none';
             btn.textContent = size;
             btn.onclick = () => selectSize(size, btn);
             grid.appendChild(btn);
@@ -509,14 +509,16 @@
 
     function selectSize(size, btnElement) {
         selectedSize = size;
-        document.querySelectorAll('.size-btn').forEach(b => {
-            b.classList.remove('bg-luxe', 'bg-white', 'text-ink', 'text-black', 'text-white', 'border-white', 'border-luxe', 'ring-2', 'ring-white/25');
-            b.classList.add('text-white', 'border-white/15', 'bg-transparent');
+        // Reset all to outline
+        document.querySelectorAll('.size-btn').forEach(b => { 
+            b.className = "size-btn py-3 border border-white/15 bg-transparent text-white rounded-lg font-medium hover:border-white/40 transition-colors focus:outline-none"; 
         });
-        btnElement.classList.remove('text-white', 'border-white/15', 'bg-transparent');
-        btnElement.classList.add('bg-luxe', 'text-ink', 'border-luxe', 'ring-2', 'ring-white/25');
+        // Set active to Luxe Gold
+        btnElement.className = "size-btn py-3 border border-luxe bg-luxe text-ink rounded-lg font-medium shadow-[0_0_15px_rgba(192,160,98,0.3)] transition-colors focus:outline-none";
+        
         updateMatrixPricingFromSize(size);
         validateAlterations();
+        renderAlterationFields();
     }
 
     // Size Calculator Logic
