@@ -1,10 +1,10 @@
 <!doctype html>
-<html lang="en" class="scroll-smooth max-w-[100vw] overflow-x-hidden">
+<html lang="en" class="scroll-smooth">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0" />
   <title>Z01 Zahra Series Abaya — Arabista</title>
-  <meta name="theme-color" content="#0F0F10" />
+  <meta name="theme-color" content="#111213" />
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -22,125 +22,100 @@
     }
   </script>
   <style>
-    body { background-color: #0F0F10; color: #ffffff; }
-    .tap-none { -webkit-tap-highlight-color: transparent; }
+    /* D01 Premium Aesthetics & Animations */
+    body { background-color: #111213; color: #ffffff; }
     .hide-scrollbar::-webkit-scrollbar { display: none; }
     .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     input[type="number"]::-webkit-inner-spin-button, input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
-    .thumb-active { border-color: #ffffff !important; opacity: 1 !important; }
-    .reveal { opacity: 0; transform: translateY(12px); transition: .6s; }
-    .reveal.show { opacity: 1; transform: none; }
-    .review-text.clamp { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; overflow: hidden; }
+    .thumb-active { border-color: #C0A062 !important; opacity: 1 !important; }
+
+    .reveal { opacity: 0; transform: translateY(20px); transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1); }
+    .reveal.show { opacity: 1; transform: translateY(0); }
+    .tap-none { -webkit-tap-highlight-color: transparent; }
   </style>
 </head>
-<body class="bg-brand text-white antialiased tap-none selection:bg-gray-700 selection:text-white pb-32 w-full max-w-[100vw] overflow-x-hidden relative">
+<body class="font-sans antialiased pb-32 selection:bg-luxe selection:text-ink max-w-[100vw] overflow-x-hidden relative">
 
-  <header class="fixed top-0 inset-x-0 z-50 backdrop-blur bg-brand/80 border-b border-white/10">
-    <div class="max-w-screen-xl mx-auto px-4 sm:px-6">
-      <div class="h-14 grid grid-cols-3 items-center">
-        <a href="index.html#home" class="font-display tracking-[0.18em] text-[14px] text-white hover:text-luxe transition-colors">ARABISTA</a>
-        <a href="index.html#home" class="justify-self-center"><img src="images/logo.png" alt="Arabista logo" class="h-11 w-auto"></a>
-        <div class="justify-self-end flex items-center gap-4">
-          <nav class="hidden sm:flex gap-4 text-sm text-white/80">
-            <a href="index.html#shop" class="hover:text-luxe transition-colors">Shop</a>
-            <a href="index.html#about" class="hover:text-luxe transition-colors">About</a>
-            <a href="index.html#contact" class="hover:text-luxe transition-colors">Contact</a>
-          </nav>
-          <button type="button" id="nav-cart-btn" class="relative text-white p-1 rounded-lg hover:bg-white/5 transition-colors" aria-label="Open cart">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
-          </button>
-        </div>
-      </div>
+  <header class="fixed top-0 inset-x-0 z-40 bg-ink/80 backdrop-blur-md border-b border-white/5 transition-all duration-300">
+    <div class="max-w-screen-xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+      <a href="/" class="font-display text-2xl tracking-[0.15em] text-white uppercase tap-none">Arabista</a>
+      <button id="nav-cart-btn" class="relative p-2 -mr-2 text-white hover:text-luxe transition-colors tap-none" aria-label="Open cart">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
+      </button>
     </div>
   </header>
 
-  <main class="pt-20">
-    <nav class="max-w-screen-xl mx-auto px-4 sm:px-6 text-xs text-white/60">
-      <ol class="flex items-center gap-2 py-3">
-        <li><a href="index.html" class="hover:text-luxe transition-colors">Home</a></li><li>›</li>
-        <li><a href="index.html#shop" class="hover:text-luxe transition-colors">Shop</a></li><li>›</li>
-        <li class="text-white">Z01 Staging</li>
-      </ol>
-    </nav>
+  <main class="max-w-screen-xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 px-4 sm:px-6 pt-24 pb-12 reveal min-w-0 w-full overflow-hidden">
 
-    <section class="max-w-screen-xl mx-auto px-4 sm:px-6 grid lg:grid-cols-2 gap-8 lg:gap-12 items-start pb-12" id="pdp-grid">
-
-      <div>
-        <div class="relative aspect-[4/5] bg-black/30 rounded-2xl overflow-hidden ring-1 ring-white/10 shadow-soft group">
+      <div class="lg:col-span-7 flex flex-col gap-4 min-w-0 w-full">
+          <div class="relative aspect-[4/5] bg-white/5 rounded-2xl overflow-hidden shadow-soft ring-1 ring-white/10 group">
               <video id="main-video" class="w-full h-full object-cover hidden" loop muted playsinline></video>
-              <img id="main-image" src="images/z01-1-hero.webp" class="w-full h-full object-cover transition-opacity duration-300" alt="Z01 Abaya" width="1080" height="1350">
-        </div>
-        <div class="mt-3 flex gap-2 overflow-x-auto hide-scrollbar pb-1 sm:grid sm:grid-cols-4 sm:overflow-visible" id="gallery-thumbs">
-        </div>
+              <img id="main-image" src="images/z01-1-hero.webp" class="w-full h-full object-cover transition-opacity duration-300" alt="Z01 Abaya">
+          </div>
+          <div class="flex gap-3 overflow-x-auto hide-scrollbar pb-2" id="gallery-thumbs"></div>
       </div>
 
-      <div>
-          <p class="text-xs text-luxe uppercase tracking-[0.2em] mb-2 font-medium">Zahra Series · Staging</p>
-          <h1 class="font-display text-3xl sm:text-5xl leading-tight text-white mb-2">Abaya Arab Kod Z01</h1>
-          <p class="text-white/70 text-sm leading-relaxed mb-4">Premium Nidha Dubai — nursing zip, pockets, inner sleeve lining, free shawl &amp; gift box.</p>
+      <div class="lg:col-span-5 flex flex-col min-w-0 w-full lg:pl-4">
+          <nav class="flex items-center gap-2 text-xs text-gray-500 uppercase tracking-widest mb-6">
+            <a href="/" class="hover:text-white transition-colors">Home</a><span>/</span><span class="text-luxe">Zahra Series</span>
+          </nav>
+          <h1 class="font-display text-4xl sm:text-5xl text-white mb-3 font-medium tracking-wide">Abaya Arab Kod Z01</h1>
+          <p class="text-gray-400 text-sm mb-6 leading-relaxed">Premium Nidha Dubai</p>
 
-          <div id="pdp-price-row" class="mt-2 flex flex-wrap items-baseline gap-3 mb-2">
-            <span class="text-2xl sm:text-3xl font-semibold text-white">RM 150.00</span>
-            <span class="text-sm text-white/50">Code: Z01</span>
-          </div>
-          <p class="text-xs text-white/50 mb-6">Select a size for live price from inventory matrix.</p>
+          <div class="text-2xl text-white font-medium mb-8" id="pdp-price-row">RM 150.00</div>
 
-          <div class="rounded-2xl border border-white/10 bg-white/[0.03] p-5 sm:p-6 mb-6 shadow-soft">
-              <h3 class="text-sm font-semibold text-white uppercase tracking-widest mb-4 flex items-center gap-2">
-                  <svg class="w-4 h-4 text-luxe shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+          <div class="bg-white/5 border border-white/10 rounded-2xl p-5 mb-8 shadow-soft">
+              <h3 class="text-sm font-medium text-white uppercase tracking-widest mb-4 flex items-center gap-2">
+                  <svg class="w-4 h-4 text-luxe" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
                   Find Your Base Size
               </h3>
               <div class="grid grid-cols-2 gap-4 mb-4">
                   <div>
-                      <label class="text-[11px] uppercase text-white/50 tracking-wider mb-1.5 block">Height (cm)</label>
-                      <input type="number" id="calc-height" class="w-full bg-black/40 border border-white/15 rounded-lg px-3 py-2.5 text-white text-[16px] focus:outline-none focus:border-luxe/80 focus:ring-1 focus:ring-luxe/30 transition-colors" placeholder="e.g. 160">
+                      <label class="text-[10px] uppercase text-gray-500 tracking-wider mb-2 block">Height (cm)</label>
+                      <input type="number" id="calc-height" class="w-full bg-transparent border-b border-white/20 text-white pb-2 text-[16px] focus:outline-none focus:border-luxe transition-colors" placeholder="e.g. 160">
                   </div>
                   <div>
-                      <label class="text-[11px] uppercase text-white/50 tracking-wider mb-1.5 block">Weight (kg)</label>
-                      <input type="number" id="calc-weight" class="w-full bg-black/40 border border-white/15 rounded-lg px-3 py-2.5 text-white text-[16px] focus:outline-none focus:border-luxe/80 focus:ring-1 focus:ring-luxe/30 transition-colors" placeholder="e.g. 55">
+                      <label class="text-[10px] uppercase text-gray-500 tracking-wider mb-2 block">Weight (kg)</label>
+                      <input type="number" id="calc-weight" class="w-full bg-transparent border-b border-white/20 text-white pb-2 text-[16px] focus:outline-none focus:border-luxe transition-colors" placeholder="e.g. 55">
                   </div>
               </div>
-              <button type="button" onclick="calculateSize()" class="text-xs uppercase tracking-widest text-luxe hover:text-white transition-colors">Suggest Size &rarr;</button>
-              <p id="calc-result" class="mt-3 text-sm text-green-400/90 hidden font-medium"></p>
+              <button type="button" onclick="calculateSize()" class="text-xs uppercase tracking-widest text-luxe hover:text-white transition-colors tap-none">Suggest Size &rarr;</button>
+              <p id="calc-result" class="mt-3 text-sm text-green-400 hidden font-medium"></p>
           </div>
 
-          <div class="mb-6">
-              <div class="flex justify-between items-center mb-3">
-                  <label class="text-sm text-white/80 font-medium">Select Base Size</label>
-                  <button type="button" class="text-sm underline decoration-white/30 underline-offset-4 hover:text-luxe transition-colors" onclick="document.getElementById('size-modal').classList.remove('hidden')">Size Guide</button>
+          <div class="mb-8">
+              <div class="flex justify-between items-center mb-4">
+                  <label class="text-sm font-medium text-white uppercase tracking-widest">Select Base Size</label>
+                  <button type="button" onclick="document.getElementById('size-modal').style.display='flex'; setTimeout(()=>document.getElementById('size-modal').classList.add('show'),10);" class="text-xs text-gray-500 underline decoration-gray-700 underline-offset-4 hover:text-white tap-none">Size Guide</button>
               </div>
-              <div class="grid grid-cols-3 sm:grid-cols-6 gap-2" id="size-grid">
+              <div class="grid grid-cols-4 lg:grid-cols-6 gap-3" id="size-grid"></div>
+          </div>
+
+          <div class="border border-luxe/30 rounded-2xl overflow-hidden mb-10 shadow-[0_0_15px_rgba(192,160,98,0.05)] transition-all duration-300 bg-white/[0.02]">
+              <button type="button" class="w-full p-5 flex justify-between items-center text-left tap-none group" id="toggle-alt-btn">
+                  <div>
+                      <h3 class="text-luxe font-medium text-sm uppercase tracking-widest mb-1 group-hover:text-white transition-colors">Guaranteed Perfect Fit</h3>
+                      <p class="text-xs text-gray-400">Add complimentary custom alterations</p>
+                  </div>
+                  <div class="w-10 h-6 bg-white/10 rounded-full relative transition-colors duration-300" id="alt-switch">
+                      <div class="w-4 h-4 bg-white rounded-full absolute top-1 left-1 transition-transform duration-300" id="alt-knob"></div>
+                  </div>
+              </button>
+
+              <div id="alt-drawer" class="hidden p-5 bg-ink/50 border-t border-luxe/20 flex-col gap-6">
+                  <div id="alt-loading" class="text-xs text-gray-500 animate-pulse uppercase tracking-widest">Loading studio configs...</div>
+                  <div id="alt-fields-container" class="hidden flex-col gap-5"></div>
               </div>
           </div>
 
-          <div class="border border-luxe/25 rounded-2xl overflow-hidden mb-8 transition-all duration-300 shadow-soft">
-              <div class="bg-luxe/10 p-5 sm:p-6 flex justify-between items-center cursor-pointer hover:bg-luxe/[0.12] transition-colors" id="toggle-alt-btn">
-                  <div class="min-w-0 pr-3">
-                      <h3 class="text-luxe font-semibold text-sm uppercase tracking-widest mb-1">Guaranteed Perfect Fit</h3>
-                      <p class="text-xs text-white/60">Add complimentary custom alterations</p>
-                  </div>
-                  <div class="w-10 h-6 bg-gray-800 rounded-full relative shrink-0 transition-colors duration-300" id="alt-switch">
-                      <div class="w-4 h-4 bg-white rounded-full absolute top-1 left-1 transition-transform duration-300 shadow" id="alt-knob"></div>
-                  </div>
-              </div>
-
-              <div id="alt-drawer" class="hidden p-5 sm:p-6 bg-black/40 border-t border-luxe/20 flex-col gap-6">
-                  <div id="alt-loading" class="text-xs text-white/50 animate-pulse uppercase tracking-widest">Loading studio configs...</div>
-                  <div id="alt-fields-container" class="hidden flex-col gap-5">
-                  </div>
-              </div>
-          </div>
-
-          <button type="button" id="add-to-cart-btn" class="w-full inline-flex items-center justify-center gap-2 bg-luxe text-ink font-semibold uppercase tracking-widest py-4 rounded-xl hover:opacity-90 transition shadow-soft mb-8 disabled:opacity-45 disabled:cursor-not-allowed">
+          <button type="button" id="add-to-cart-btn" class="w-full bg-white text-ink font-medium uppercase tracking-widest py-4 rounded-xl hover:bg-gray-200 transition-colors mb-10 disabled:opacity-50 disabled:cursor-not-allowed tap-none">
               Add To Cart
           </button>
 
-          <p class="text-sm text-gray-400 mb-6">⭐ 4.9 rating · <a href="#pdp-review-section" class="underline hover:text-luxe transition-colors">Check reviews</a></p>
-
-          <div class="rounded-2xl border border-white/10 divide-y divide-white/10 overflow-hidden">
+          <div class="border-t border-white/10 divide-y divide-white/10">
               <div class="py-5">
-                  <button type="button" class="flex justify-between items-center w-full text-left group accordion-btn">
-                      <span class="text-sm font-semibold uppercase tracking-widest text-white">Description</span>
+                  <button type="button" class="flex justify-between items-center w-full text-left group accordion-btn tap-none">
+                      <span class="text-sm font-medium uppercase tracking-widest text-white">Description</span>
                       <svg class="w-5 h-5 text-gray-500 group-hover:text-white transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
                   </button>
                   <div class="accordion-content hidden mt-4 text-sm text-gray-400 leading-relaxed">
@@ -148,22 +123,22 @@
                   </div>
               </div>
               <div class="py-5">
-                  <button type="button" class="flex justify-between items-center w-full text-left group accordion-btn">
-                      <span class="text-sm font-semibold uppercase tracking-widest text-white">Features</span>
+                  <button type="button" class="flex justify-between items-center w-full text-left group accordion-btn tap-none">
+                      <span class="text-sm font-medium uppercase tracking-widest text-white">Features</span>
                       <svg class="w-5 h-5 text-gray-500 group-hover:text-white transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
                   </button>
                   <div class="accordion-content hidden mt-4 text-sm text-gray-400 leading-relaxed">
-                      <ul class="space-y-2">
-                          <li class="flex gap-3 items-center"><svg class="w-4 h-4 text-gold shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg> Cutting Ala Cardigan</li>
-                          <li class="flex gap-3 items-center"><svg class="w-4 h-4 text-gold shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg> Zip Menyusu Hadapan</li>
-                          <li class="flex gap-3 items-center"><svg class="w-4 h-4 text-gold shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg> Poket Kiri & Kanan</li>
-                          <li class="flex gap-3 items-center"><svg class="w-4 h-4 text-gold shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg> Inner Seluruh Lengan (Mesra Wudhu')</li>
+                      <ul class="space-y-3">
+                          <li class="flex gap-3 items-center"><svg class="w-4 h-4 text-luxe shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg> Cutting Ala Cardigan</li>
+                          <li class="flex gap-3 items-center"><svg class="w-4 h-4 text-luxe shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg> Zip Menyusu Hadapan</li>
+                          <li class="flex gap-3 items-center"><svg class="w-4 h-4 text-luxe shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg> Poket Kiri & Kanan</li>
+                          <li class="flex gap-3 items-center"><svg class="w-4 h-4 text-luxe shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg> Inner Seluruh Lengan (Mesra Wudhu')</li>
                       </ul>
                   </div>
               </div>
               <div class="py-5">
-                  <button type="button" class="flex justify-between items-center w-full text-left group accordion-btn">
-                      <span class="text-sm font-semibold uppercase tracking-widest text-white">Included in Box</span>
+                  <button type="button" class="flex justify-between items-center w-full text-left group accordion-btn tap-none">
+                      <span class="text-sm font-medium uppercase tracking-widest text-white">Included in Box</span>
                       <svg class="w-5 h-5 text-gray-500 group-hover:text-white transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
                   </button>
                   <div class="accordion-content hidden mt-4 text-sm text-gray-400 leading-relaxed">
@@ -172,161 +147,38 @@
               </div>
           </div>
       </div>
-    </section>
+  </main>
 
-  <div id="pdp-review-section" class="max-w-screen-xl mx-auto px-4 sm:px-6 pb-12 border-t border-white/10 pt-10 mt-2 scroll-mt-24">
-    <!-- REVIEWS: What Our Customers Say -->
-    <section id="reviews" class="reveal mt-2">
-      <h2 class="font-display text-2xl sm:text-3xl mb-3">What Our Customers Say</h2>
+  <section id="pdp-review-section" class="max-w-screen-xl mx-auto px-4 sm:px-6 py-20 border-t border-white/5 scroll-mt-24 reveal">
+      <h2 class="font-display text-3xl sm:text-4xl text-white mb-10 tracking-wide">What Our Customers Say</h2>
 
-      <!-- Container where review cards render -->
-      <div id="reviewList" class="divide-y divide-white/10 border border-white/10 rounded-2xl overflow-hidden"></div>
-
-      <!-- Pagination controls -->
-      <div class="mt-4 flex items-center justify-between">
-        <button id="prevBtn" class="px-4 py-2 rounded-xl ring-1 ring-white/15 hover:bg-white/5 text-sm disabled:opacity-40 disabled:cursor-not-allowed">Previous</button>
-        <div class="text-xs text-white/60">Page <span id="pageNum">1</span> of <span id="pageTotal">—</span></div>
-        <button id="nextBtn" class="px-4 py-2 rounded-xl ring-1 ring-white/15 hover:bg-white/5 text-sm disabled:opacity-40 disabled:cursor-not-allowed">Next</button>
-      </div>
-
-      <!-- Last-page TikTok preview (hidden until last page) -->
-      <div id="tiktokPreview" class="hidden mt-4">
-        <a href="https://vt.tiktok.com/ZSHnDRphXWjk2-DE4dI/" target="_blank" class="block rounded-2xl border border-white/10 hover:border-white/20 transition">
-          <div class="p-4 sm:p-5 flex items-start gap-3">
-            <div class="shrink-0 rounded-xl bg-white p-2">
-              <svg width="28" height="28" viewBox="0 0 48 48" aria-hidden="true">
-                <path d="M33.3 13.4c2.4 1.8 5.4 2.9 8.7 2.9v7.2c-3.7 0-7.1-1.1-10-3.1v12.1c0 7.4-6 13.4-13.4 13.4S5.2 39.9 5.2 32.5 11.2 19.1 18.6 19.1c1 0 2 .1 2.9.4v7.5c-.9-.3-1.9-.5-2.9-.5-4 0-7.2 3.2-7.2 7.2s3.2 7.2 7.2 7.2 7.2-3.2 7.2-7.2V5.9h7.3c.2 2.9 1.7 5.5 4.2 7.5z" fill="#000"/>
-              </svg>
-            </div>
-            <div class="min-w-0">
-              <div class="text-sm font-medium">View on TikTok</div>
-              <div class="text-xs text-white/60 truncate">https://vt.tiktok.com/ZSHnDRphXWjk2-DE4dI/</div>
-              <p class="mt-2 text-sm text-white/70">See all reviews and purchase directly on TikTok Shop.</p>
-            </div>
-          </div>
-        </a>
-      </div>
-
-      <!-- Schema.org (Aggregate + a few example reviews) -->
-      <script type="application/ld+json" id="reviews-ld">
-      {
-        "@context":"https://schema.org",
-        "@type":"Product",
-        "name":"Z01 Abaya Arab",
-        "sku":"Z01",
-        "aggregateRating":{
-          "@type":"AggregateRating",
-          "ratingValue":"4.9",
-          "reviewCount":"71"
-        },
-        "review":[
-          {"@type":"Review","reviewRating":{"@type":"Rating","ratingValue":"5"},
-           "author":{"@type":"Person","name":"L**a"},
-           "reviewBody":"Beautiful heavy fabric that drapes well, gives a taller and slimmer effect."},
-          {"@type":"Review","reviewRating":{"@type":"Rating","ratingValue":"5"},
-           "author":{"@type":"Person","name":"c**e k**"},
-           "reviewBody":"Abaya received well-packed in a box. The cut is nice too."},
-          {"@type":"Review","reviewRating":{"@type":"Rating","ratingValue":"5"},
-           "author":{"@type":"Person","name":"T**p S**"},
-           "reviewBody":"Arabista abaya design and material are very high quality; will buy again."}
-        ]
-      }
-      </script>
-    </section>
-
-  <!-- ----- D01 Reviews Renderer (5-per-page with Next/Previous; TikTok preview on last page) ----- -->
-  <script>
-  (function(){
-    // === Full reviews (username, size, rating, original, english) ===
-    const FULL = [{"username":"L**a","size":"M","rating":5,"original":"Cantik kain berat and jatuh, so ada effect tinggi and kurus","english":"Beautiful heavy fabric that drapes well, gives a taller and slimmer effect."},{"username":"S**v","size":"L","rating":5,"original":"Alhamdulillah sgt berpuas hati.. material kain best, kemas jahitan, berbaloi beli..","english":"Thank God, very satisfied—the fabric is great, stitching neat, worth the purchase."},{"username":"n**f","size":"XXL","rating":5,"original":"Kain jenis berat .. dada 42 je tpi ambil 1 bigger size mmg ngam.. XXL cun..","english":"Heavy fabric. Bust 42\" but took one size up; XXL fits perfectly."},{"username":"c**e k**","size":"S","rating":5,"original":"Jubah dah diterima dibungkus dgn baik, siap ada kotak. Cutting pun lawa.","english":"Abaya received well-packed in a box. The cut is nice too."},{"username":"F*R","size":"M","rating":5,"original":"Alhamdulillah dh sampai, sempat grab masa offer. Kain cantik dan kemas.","english":"Thank God it arrived; managed to grab it during the offer. The fabric is pretty and neat."},{"username":"N**a","size":"XS","rating":5,"original":"alhmdulillah selamat sampai. Pertama kali pakai abaya. Sangat cantik. ❤️","english":"Thank God it arrived safely. First time wearing an abaya—very beautiful. ❤️"},{"username":"P**n A**n","size":"S","rating":5,"original":"Kain sejuk dan lembut. Size ngam utk saya yg berat 54kg.","english":"Fabric is cool and soft. Size fits me (54 kg)."},{"username":"F**E","size":"S","rating":5,"original":"Cantik sgt abaya nya, packaging exclusive. Seller pun baik.","english":"The abaya is very beautiful, exclusive packaging. Seller is nice too."},{"username":"M**a N**i","size":"XXL","rating":5,"original":"Baju n material sungguh cantik nnt nk beli lg ❤️","english":"The dress and material are truly beautiful—will buy again. ❤️"},{"username":"A**n","size":"S","rating":5,"original":"alhamdullilah.. kain selesa, saiz ngam (S)","english":"Thank God... fabric is comfortable, size fits (S)."},{"username":"A**a","size":"XXL","rating":5,"original":"Baju cantik sungguh. Abg courier pun ckp cantik 😅 tq seller 😍","english":"The dress is really beautiful. Even the courier said it’s pretty 😅 thanks seller 😍"},{"username":"S** M**","size":"S","rating":5,"original":"Saya suka sgt dengan tgn dia sebab yg paling saya suka adalah jenis yg inner penuh. Kain sejuk.","english":"I really love the sleeves—especially the full inner lining. The fabric is cool."},{"username":"y**g L**","size":"XS","rating":5,"original":"Alhamdulillah sampai dengan baik. Saiz semua cantik & kain kualiti terbaik sejuk. Akan repeat order.","english":"Thank God it arrived well. Sizes are great and the fabric is cool, top quality. Will reorder."},{"username":"H**a","size":"S","rating":5,"original":"Selesa, cutting cantik, kain sejuk.","english":"Comfortable, beautiful cutting, cool fabric."},{"username":"H**a","size":"M","rating":5,"original":"Kain mmg cantik. Lembut.","english":"The fabric is indeed beautiful. Soft."},{"username":"T**p S**","size":"XXXL","rating":5,"original":"Design dan material abaya dari Arabista sangat berkualiti, akan repeat.","english":"Arabista abaya design and material are very high quality; will buy again."},{"username":"N**l","size":"S","rating":5,"original":"Saiz ngam. Puas hati. Kain cantik.","english":"Size fits. Satisfied. Beautiful fabric."},{"username":"W**i","size":"S","rating":5,"original":"Jubah cantik, kain sejuk. TQ","english":"Beautiful abaya, cool fabric. Thanks."},{"username":"S**a","size":"M","rating":5,"original":"Material selesa dan nice cutting. Suka sgt!","english":"Comfortable material and nice cutting. Love it!"},{"username":"N**a","size":"M","rating":5,"original":"Puas hati kain tebal. Jahitan kemas.","english":"Satisfied—the fabric is thick. Stitching is neat."},{"username":"H**a","size":"L","rating":5,"original":"Jahit kemas, kain cantik. Worth it!","english":"Neat stitching, beautiful fabric. Worth it!"},{"username":"N**e","size":"XXL","rating":5,"original":"Alhamdulillah, sampai cepat. Kain sejuk.","english":"Thank God, arrived quickly. Cool fabric."},{"username":"A**a","size":"S","rating":5,"original":"Cantik, cutting lawa. Sesuai utk hadiah.","english":"Beautiful, lovely cut. Suitable for gifts."},{"username":"A**m","size":"L","rating":5,"original":"Potongan cantik, kain jatuh elok.","english":"Nice cut, fabric drapes well."},{"username":"N**m","size":"XS","rating":5,"original":"Kain lembut nk pegang. Saiz XS ngam.","english":"Fabric is soft to the touch. Size XS fits."},{"username":"I**a","size":"M","rating":5,"original":"Kain tak panas, selesa pakai lama.","english":"Fabric isn’t hot; comfortable for long wear."},{"username":"S**h","size":"XL","rating":5,"original":"Box cantik, puas hati.","english":"The box is beautiful; satisfied."},{"username":"F**i","size":"M","rating":5,"original":"Suka sgt kain Nidha ni. Elegant.","english":"Really love this Nidha fabric. Elegant."},{"username":"N**d","size":"S","rating":5,"original":"Fast delivery. Seller helpful.","english":"Fast delivery. Helpful seller."},{"username":"A**a","size":"XXL","rating":5,"original":"Repeat order sbb kain best.","english":"Repeat order because the fabric is great."},{"username":"N**z","size":"L","rating":5,"original":"Size L ngam, kain tak jarang.","english":"Size L fits, fabric isn’t sheer."},{"username":"Z**a","size":"M","rating":5,"original":"Cantik utk raya juga. Akan order lagi.","english":"Beautiful for Raya too. Will order again."},{"username":"R**a","size":"XXL","rating":5,"original":"Kain jatuh and selesa bergerak.","english":"Fabric drapes and is comfortable to move in."},{"username":"H**n","size":"S","rating":5,"original":"Kain lembut, sy suka inner lengan.","english":"Soft fabric; I like the inner sleeve lining."},{"username":"F**a","size":"M","rating":5,"original":"Datang cepat, packing kemas.","english":"Came quickly, neat packing."},{"username":"N**s","size":"XL","rating":5,"original":"Mmg puas hati. Worth every ringgit.","english":"Very satisfied. Worth every ringgit."},{"username":"S**i","size":"S","rating":5,"original":"Nursing zip senang sgt.","english":"The nursing zip is very convenient."},{"username":"A**y","size":"XXXL","rating":5,"original":"XXXL pun cantik jatuh dia.","english":"Even XXXL drapes beautifully."},{"username":"K**m","size":"M","rating":5,"original":"Kain sejuk, tkn panas. Selesa.","english":"Cool fabric, not hot. Comfortable."},{"username":"I**n","size":"S","rating":5,"original":"Seller baik, size tukar cepat.","english":"Nice seller, size exchange was fast."},{"username":"D**a","size":"S","rating":5,"original":"Warna hitam elok, tak pudar.","english":"Black color is good, not faded."},{"username":"C**y","size":"M","rating":5,"original":"Terbaik. Akan beli lagi.","english":"Excellent. Will buy again."},{"username":"N**a","size":"M","rating":5,"original":"Suka packaging ada kotak.","english":"Love the packaging with a box."},{"username":"M**n","size":"L","rating":5,"original":"Sgt puas hati dgn kualiti.","english":"Very satisfied with the quality."},{"username":"S**y","size":"S","rating":5,"original":"Senang iron, tak mudah berkedut.","english":"Easy to iron, doesn’t crease easily."},{"username":"H**m","size":"XL","rating":5,"original":"Sesuai utk hadiah kahwin.","english":"Suitable as a wedding gift."},{"username":"R**n","size":"M","rating":5,"original":"Cutting A-line cantik.","english":"Beautiful A-line cutting."},{"username":"F**z","size":"S","rating":5,"original":"Selesa pakai lama di office.","english":"Comfortable for long wear at the office."},{"username":"L**n","size":"XS","rating":5,"original":"Sgt kemas jahitan.","english":"Very neat stitching."},{"username":"N**y","size":"S","rating":5,"original":"Inner lengan buat wudhu’ senang.","english":"Inner sleeve makes wudhu’ easy."},{"username":"W**a","size":"M","rating":5,"original":"Sgt puas hati. Lembut dan jatuh.","english":"Very satisfied. Soft and drapey."},{"username":"Q**a","size":"L","rating":5,"original":"Tak jarang, selamat pakai.","english":"Not sheer; safe to wear."},{"username":"S**n","size":"XXL","rating":5,"original":"Kualiti terbaik dgn harga.","english":"Best quality for the price."},{"username":"H**r","size":"S","rating":5,"original":"Saiz S ngam 150cm tinggi.","english":"Size S suits 150 cm height."},{"username":"R**f","size":"M","rating":5,"original":"Seller responsif, bantu pilih size.","english":"Responsive seller, helped choose size."},{"username":"A**q","size":"L","rating":5,"original":"Suka kain berat, nampak jatuh.","english":"Like the heavy fabric; nice drape."},{"username":"M**y","size":"XL","rating":5,"original":"Datang cepat, kotak elok.","english":"Arrived fast; box in good condition."},{"username":"I**e","size":"M","rating":5,"original":"Kain breathable, x panas.","english":"Breathable fabric, not hot."},{"username":"S**a","size":"S","rating":5,"original":"Zip depan memudahkan.","english":"Front zip makes it easy."},{"username":"N**r","size":"XXL","rating":5,"original":"XXL sesuai utk saya 80kg.","english":"XXL suits me (80 kg)."},{"username":"T**a","size":"M","rating":5,"original":"Classic look, minimal.","english":"Classic look, minimal."},{"username":"Z**h","size":"S","rating":5,"original":"Potongan kemas, cantik.","english":"Neat, beautiful cutting."},{"username":"J**a","size":"M","rating":5,"original":"Shawl percuma best kualiti.","english":"Free shawl is good quality."},{"username":"N**a","size":"L","rating":5,"original":"Length ngam utk saya 165cm.","english":"Length suits me at 165 cm."},{"username":"R**a","size":"M","rating":5,"original":"Abaya cantik utk kerja.","english":"Nice abaya for work."},{"username":"S**y","size":"S","rating":5,"original":"Selesa sgt utk travel.","english":"Very comfortable for travel."},{"username":"P**a","size":"S","rating":5,"original":"Suka kotak hadiah.","english":"Like the gift box."},{"username":"A**i","size":"XXXL","rating":5,"original":"XXXL cutting lawa.","english":"Nice cutting for XXXL."},{"username":"M**e","size":"M","rating":5,"original":"Harga berbaloi.","english":"Good value."},{"username":"N**h","size":"S","rating":5,"original":"Senang matching shawl.","english":"Easy to match the shawl."},{"username":"S**a","size":"S","rating":5,"original":"Kain tak melekat, airy.","english":"Doesn’t cling; airy."}];
-
-    const PER_PAGE = 5;
-    const list = document.getElementById('reviewList');
-    const prevBtn = document.getElementById('prevBtn');
-    const nextBtn = document.getElementById('nextBtn');
-    const pageNum = document.getElementById('pageNum');
-    const pageTotal = document.getElementById('pageTotal');
-    const tiktokPreview = document.getElementById('tiktokPreview');
-    const reviewsSection = document.getElementById('reviews');
-
-    const mkStar = (n)=>'★'.repeat(n||5);
-    const esc = (s)=>String(s||'').replace(/[&<>]/g, c=>({ '&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
-    const dot = '<span class="mx-2 text-white/30">•</span>';
-
-    function reviewCard(r){
-      const longOrig = (r.original||'').length > 160;
-      const longEng  = (r.english||'').length > 160;
-      const id = Math.random().toString(36).slice(2,8);
-      return `
-      <article class="p-4 sm:p-5">
-        <div class="text-xs text-white/60 mb-1">
-          <strong class="text-white/80">${esc(r.username)}</strong>${dot}
-          Size: ${esc(r.size||'—')}${dot}
-          <span aria-label="rating">${mkStar(r.rating)}</span>
+      <div class="flex flex-col mb-10 overflow-hidden">
+        <div class="flex items-center gap-4 mb-6">
+            <div class="text-4xl font-semibold text-white">4.9</div>
+            <div class="text-luxe flex items-center">★★★★★</div>
+            <div class="w-px h-8 bg-white/20 mx-2"></div>
+            <div class="text-gray-400 text-sm">380 global reviews</div>
         </div>
-        <div class="space-y-2">
-          <div class="text-sm leading-relaxed">
-            <span class="text-white/60 block text-[12px] uppercase tracking-wide">Original</span>
-            <p class="review-text ${longOrig?'clamp':''}" id="o-${id}">${esc(r.original||'')}</p>
-            ${longOrig?`<button class="readmore text-xs underline decoration-white/30 hover:text-luxe" data-target="o-${id}">Read more</button>`:''}
-          </div>
-          <div class="text-sm leading-relaxed">
-            <span class="text-white/60 block text-[12px] uppercase tracking-wide">Translated</span>
-            <p class="review-text ${longEng?'clamp':''}" id="e-${id}">${esc(r.english||'')}</p>
-            ${longEng?`<button class="readmore text-xs underline decoration-white/30 hover:text-luxe" data-target="e-${id}">Read more</button>`:''}
-          </div>
+        <div class="mb-10">
+            <p class="text-sm font-medium text-gray-300 mb-4">Photos from reviews</p>
+            <div class="flex gap-4 overflow-x-auto hide-scrollbar pb-4 w-full">
+                <img class="w-28 h-28 sm:w-32 sm:h-32 object-cover rounded-xl shrink-0 border border-white/10" src="images/z01-1-hero.webp" alt="Review 1">
+                <img class="w-28 h-28 sm:w-32 sm:h-32 object-cover rounded-xl shrink-0 border border-white/10" src="images/z01-2-angle.webp" alt="Review 2">
+                <img class="w-28 h-28 sm:w-32 sm:h-32 object-cover rounded-xl shrink-0 border border-white/10" src="images/z01-4-zoom-fabric.webp" alt="Review 3">
+                <img class="w-28 h-28 sm:w-32 sm:h-32 object-cover rounded-xl shrink-0 border border-white/10" src="images/z01-6-feature-sleeve.webp" alt="Review 4">
+            </div>
         </div>
-      </article>`;
-    }
+      </div>
+  </section>
 
-    function renderPage(p){
-      const totalPages = Math.max(1, Math.ceil(FULL.length / PER_PAGE));
-      const clamped = Math.min(Math.max(1, p), totalPages);
-      const start = (clamped - 1) * PER_PAGE;
-      const slice = FULL.slice(start, start + PER_PAGE);
-
-      list.innerHTML = slice.map(reviewCard).join('');
-      pageNum.textContent = clamped;
-      pageTotal.textContent = totalPages;
-
-      prevBtn.disabled = clamped === 1;
-      nextBtn.disabled = clamped === totalPages;
-
-      tiktokPreview.classList.toggle('hidden', clamped !== totalPages);
-    }
-
-    // Read more toggles (event delegation)
-    list.addEventListener('click', (e)=>{
-      const b = e.target.closest('.readmore');
-      if(!b) return;
-      const id = b.getAttribute('data-target');
-      const p = document.getElementById(id);
-      if(!p) return;
-      p.classList.toggle('clamp');
-      b.textContent = p.classList.contains('clamp') ? 'Read more' : 'Show less';
-    });
-
-    // Pagination events (scroll to top of reviews section)
-    let current = 1;
-    function scrollReviewsTop(){ reviewsSection.scrollIntoView({behavior:'smooth', block:'start'}); }
-    prevBtn.addEventListener('click', ()=>{ if(current>1){ current--; renderPage(current); scrollReviewsTop(); } });
-    nextBtn.addEventListener('click', ()=>{ const tp=Math.ceil(FULL.length/PER_PAGE); if(current<tp){ current++; renderPage(current); scrollReviewsTop(); } });
-
-    // Initial render
-    renderPage(current);
-  })();
-  </script>
-
-  </div>
-
-  <div id="size-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-[60] hidden flex items-center justify-center p-4 opacity-0 transition-opacity duration-300 [&.show]:opacity-100" style="display:none;">
-      <div class="bg-brand border border-white/10 rounded-2xl w-full max-w-2xl overflow-hidden shadow-2xl relative transform scale-95 transition-transform duration-300 [&.show]:scale-100">
-          <div class="p-6 border-b border-white/10 flex justify-between items-center bg-gray-900/50">
+  <div id="size-modal" class="fixed inset-0 bg-ink/90 backdrop-blur-md z-[60] hidden flex-col items-center justify-center p-4 opacity-0 transition-opacity duration-300 [&.show]:opacity-100" style="display:none;">
+      <div class="bg-ink border border-white/10 rounded-2xl w-full max-w-2xl overflow-hidden shadow-2xl relative transform scale-95 transition-transform duration-300 [&.show]:scale-100">
+          <div class="p-6 border-b border-white/10 flex justify-between items-center bg-white/[0.02]">
               <h2 class="font-display text-2xl text-white">Abaya Size Guide</h2>
-              <button type="button" onclick="closeSizeModal()" class="text-gray-400 hover:text-white" aria-label="Close size guide"><svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
+              <button type="button" onclick="closeSizeModal()" class="text-gray-400 hover:text-white tap-none"><svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
           </div>
           <div class="p-6 overflow-x-auto">
-              <table class="w-full text-sm text-left text-gray-300">
+              <table class="w-full text-sm text-left text-gray-300 whitespace-nowrap">
                   <thead class="text-xs uppercase bg-white/5 text-gray-400">
                       <tr><th class="px-4 py-3">Size</th><th class="px-4 py-3">Length (Inches)</th><th class="px-4 py-3">Sleeve (Inches)</th><th class="px-4 py-3">Shoulder (Inches)</th></tr>
                   </thead>
@@ -343,51 +195,52 @@
       </div>
   </div>
 
-  </main>
-
   <div id="cart-overlay" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden opacity-0 transition-opacity duration-300"></div>
-  <div id="cart-drawer" class="fixed top-0 right-0 h-[100dvh] w-full sm:max-w-md bg-brand border-l border-white/10 z-[60] transform translate-x-full transition-transform duration-300 flex flex-col shadow-2xl ring-1 ring-white/10">
-      <div class="p-6 border-b border-white/10 flex justify-between items-center shrink-0 bg-black/20">
-          <h2 class="font-display text-2xl sm:text-3xl text-white tracking-wide">Your Cart</h2>
-          <button type="button" id="close-cart-btn" class="text-white/50 hover:text-white p-1 rounded-lg hover:bg-white/5 transition-colors" aria-label="Close cart"><svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
+  <div id="cart-drawer" class="fixed inset-y-0 right-0 w-full sm:max-w-md bg-ink border-l border-white/5 z-50 transform translate-x-full transition-transform duration-300 flex flex-col shadow-2xl">
+
+      <div class="p-4 sm:p-6 border-b border-white/5 flex justify-between items-center shrink-0 relative z-10 bg-ink">
+          <h2 class="font-display text-2xl text-white">Your Cart</h2>
+          <button type="button" id="close-cart-btn" class="text-gray-400 hover:text-white tap-none"><svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
       </div>
-      <div class="p-6 flex-1 min-h-[150px] overflow-y-auto hide-scrollbar flex flex-col gap-6 min-w-0" id="cart-scroll-area">
+
+      <div class="flex-1 overflow-y-auto overscroll-contain p-4 sm:p-6 flex flex-col gap-8 hide-scrollbar" id="cart-scroll-area">
           <div id="cart-items-container"></div>
-          <div class="mb-4 space-y-3">
+
+          <div class="space-y-3">
               <label class="text-[10px] uppercase text-gray-500 tracking-wider block">Shipping Details</label>
-              <input type="text" id="cart-name" class="w-full bg-black border border-white/20 rounded text-white px-3 py-2 text-[16px] focus:border-luxe outline-none" placeholder="Full Name">
-              <input type="tel" id="cart-phone" class="w-full bg-black border border-white/20 rounded text-white px-3 py-2 text-[16px] focus:border-luxe outline-none" placeholder="Phone Number (e.g. 0123456789)">
-              <input type="email" id="cart-email" class="w-full bg-black border border-white/20 rounded text-white px-3 py-2 text-[16px] focus:border-luxe outline-none" placeholder="Email Address">
-              <textarea id="cart-address" rows="2" class="w-full bg-black border border-white/20 rounded text-white px-3 py-2 text-[16px] focus:border-luxe outline-none" placeholder="Full Street Address"></textarea>
-              <select id="cart-state" class="w-full bg-black border border-white/20 rounded text-white px-3 py-2 text-[16px] focus:border-luxe outline-none">
+              <input type="text" id="cart-name" class="w-full bg-white/5 border border-white/10 rounded-lg text-white px-4 py-3 text-[16px] focus:border-luxe outline-none" placeholder="Full Name">
+              <input type="tel" id="cart-phone" class="w-full bg-white/5 border border-white/10 rounded-lg text-white px-4 py-3 text-[16px] focus:border-luxe outline-none" placeholder="Phone (e.g. 0123456789)">
+              <input type="email" id="cart-email" class="w-full bg-white/5 border border-white/10 rounded-lg text-white px-4 py-3 text-[16px] focus:border-luxe outline-none" placeholder="Email Address">
+              <textarea id="cart-address" rows="2" class="w-full bg-white/5 border border-white/10 rounded-lg text-white px-4 py-3 text-[16px] focus:border-luxe outline-none" placeholder="Full Street Address"></textarea>
+              <select id="cart-state" class="w-full bg-white/5 border border-white/10 rounded-lg text-white px-4 py-3 text-[16px] focus:border-luxe outline-none appearance-none">
                   <option value="">Select State...</option>
                   <option value="Johor">Johor</option><option value="Kedah">Kedah</option><option value="Kelantan">Kelantan</option><option value="Melaka">Melaka</option><option value="Negeri Sembilan">Negeri Sembilan</option><option value="Pahang">Pahang</option><option value="Perak">Perak</option><option value="Perlis">Perlis</option><option value="Pulau Pinang">Pulau Pinang</option><option value="Sabah">Sabah</option><option value="Sarawak">Sarawak</option><option value="Selangor">Selangor</option><option value="Terengganu">Terengganu</option><option value="W.P. Kuala Lumpur">W.P. Kuala Lumpur</option><option value="W.P. Labuan">W.P. Labuan</option><option value="W.P. Putrajaya">W.P. Putrajaya</option>
               </select>
           </div>
-          <div class="mb-4">
-              <label class="text-[11px] uppercase text-white/50 tracking-wider mb-2 block">Calculate Shipping</label>
+
+          <div>
+              <label class="text-[10px] uppercase text-gray-500 tracking-wider mb-2 block">Calculate Shipping</label>
               <div class="flex gap-2">
-                  <input type="text" id="cart-postcode" class="w-full bg-black/50 border border-white/15 rounded-xl text-white px-3 py-2.5 text-[16px] focus:border-luxe focus:ring-1 focus:ring-luxe/30 outline-none transition-colors" placeholder="Postcode">
-                  <button type="button" id="btn-calc-ship" class="shrink-0 px-4 rounded-xl ring-1 ring-white/15 text-white text-xs uppercase tracking-widest hover:bg-white/10 transition-colors">Calc</button>
+                  <input type="text" id="cart-postcode" class="w-full bg-white/5 border border-white/10 rounded-lg text-white px-4 py-3 text-[16px] focus:border-luxe outline-none" placeholder="Postcode">
+                  <button type="button" id="btn-calc-ship" class="bg-white/10 px-5 rounded-lg text-white text-xs font-medium uppercase tracking-widest hover:bg-white/20 transition-colors tap-none">Calc</button>
               </div>
           </div>
       </div>
-      <div class="p-6 border-t border-white/10 shrink-0 bg-gray-900/50">
+
+      <div class="p-4 sm:p-6 pb-8 sm:pb-6 border-t border-white/5 bg-ink shrink-0 relative z-10">
           <div class="space-y-2 mb-6 text-sm">
-              <div class="flex justify-between text-white/60"><span>Subtotal</span><span id="cart-subtotal">RM 0.00</span></div>
-              <div class="flex justify-between text-gold hidden" id="cart-discount-row"><span id="cart-discount-label">Discount</span><span id="cart-discount-amount">-RM 0.00</span></div>
-              <div class="flex justify-between text-white/60"><span>Shipping</span><span id="cart-shipping">Pending</span></div>
-              <div class="flex justify-between text-white text-lg font-medium pt-2 border-t border-white/10 mt-2"><span>Grand Total</span><span id="cart-total">RM 0.00</span></div>
+              <div class="flex justify-between text-gray-400"><span>Subtotal</span><span id="cart-subtotal">RM 0.00</span></div>
+              <div class="flex justify-between text-luxe hidden" id="cart-discount-row"><span id="cart-discount-label">Discount</span><span id="cart-discount-amount">-RM 0.00</span></div>
+              <div class="flex justify-between text-gray-400"><span>Shipping</span><span id="cart-shipping">Pending</span></div>
+              <div class="flex justify-between text-white text-lg font-medium pt-3 border-t border-white/10 mt-3"><span>Grand Total</span><span id="cart-total">RM 0.00</span></div>
           </div>
-          <button type="button" id="btn-checkout" class="w-full inline-flex items-center justify-center gap-2 bg-luxe text-ink font-semibold uppercase tracking-widest py-4 rounded-xl hover:opacity-90 transition shadow-soft disabled:opacity-45">Proceed to Payment</button>
+          <button type="button" id="btn-checkout" class="w-full bg-white text-ink font-medium uppercase tracking-widest py-4 rounded-xl hover:bg-gray-200 transition-colors disabled:opacity-50 tap-none">Proceed to Payment</button>
       </div>
   </div>
 
   <script>
-    // --- CONFIGURATION ---
-    const RETAIL_API_URL = "https://script.google.com/macros/s/AKfycbw4qGOeC2Sebod06uFnW2u-ZAkj7l8zRdzyWrFEyL1_7eDCn-ks9lVKrd1I226qHxRmQg/exec"; // PASTE URL HERE
+    const RETAIL_API_URL = "https://script.google.com/macros/s/AKfycbw4qGOeC2Sebod06uFnW2u-ZAkj7l8zRdzyWrFEyL1_7eDCn-ks9lVKrd1I226qHxRmQg/exec";
 
-    // Base Size Dictionary (In Inches)
     const baseSizes = {
         'XS': { length: 52, sleeve: 22, shoulder: 13.5 },
         'S': { length: 54, sleeve: 22.5, shoulder: 14 },
@@ -397,28 +250,21 @@
         'XXL': { length: 60, sleeve: 24.5, shoulder: 16.5 }
     };
 
-    const ITEM_CODE = 'Z01';
-    const FALLBACK_RETAIL = 150;
     let selectedSize = null;
     let appConfig = {};
     let inventoryMatrix = {};
-    /** Matrix-driven globals (updated on size select) */
-    let activeRetailPrice = FALLBACK_RETAIL;
-    let activePromoPrice = null;
-    let activeWeightKg = 1;
     let altEnabled = false;
     let cartState = null;
+    let activeRetailPrice = 150.00;
+    let activePromoPrice = null;
+    let activeWeightKg = 1.0;
 
-    // --- MEDIA GALLERY LOGIC ---
+    // Gallery Logic
     const mediaFiles = [
-        { type: 'img', src: 'images/z01-1-hero.webp' },
-        { type: 'img', src: 'images/z01-2-angle.webp' },
-        { type: 'img', src: 'images/z01-3-back.webp' },
-        { type: 'img', src: 'images/z01-4-zoom-fabric.webp' },
-        { type: 'img', src: 'images/z01-5-feature-zip.webp' },
-        { type: 'img', src: 'images/z01-6-feature-sleeve.webp' },
-        { type: 'img', src: 'images/z01-7-packaging.webp' },
-        { type: 'img', src: 'images/z01-8-shawl.webp' },
+        { type: 'img', src: 'images/z01-1-hero.webp' }, { type: 'img', src: 'images/z01-2-angle.webp' },
+        { type: 'img', src: 'images/z01-3-back.webp' }, { type: 'img', src: 'images/z01-4-zoom-fabric.webp' },
+        { type: 'img', src: 'images/z01-5-feature-zip.webp' }, { type: 'img', src: 'images/z01-6-feature-sleeve.webp' },
+        { type: 'img', src: 'images/z01-7-packaging.webp' }, { type: 'img', src: 'images/z01-8-shawl.webp' },
         { type: 'vid', src: 'images/z01-9-video-flow.mp4' }
     ];
 
@@ -429,15 +275,13 @@
     mediaFiles.forEach((m, i) => {
         const btn = document.createElement('button');
         btn.type = 'button';
-        btn.className = `w-16 h-20 shrink-0 rounded-lg overflow-hidden border-2 transition-all ${i === 0 ? 'border-white opacity-100' : 'border-transparent opacity-50 hover:opacity-100'}`;
-        if (m.type === 'img') {
-            btn.innerHTML = `<img src="${m.src}" class="w-full h-full object-cover" alt="">`;
-        } else {
-            btn.innerHTML = `<div class="w-full h-full bg-gray-800 flex items-center justify-center"><svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20"><path d="M4 4l12 6-12 6V4z"/></svg></div>`;
-        }
+        btn.className = `w-16 h-20 shrink-0 rounded-lg overflow-hidden border-2 transition-all ${i === 0 ? 'border-luxe opacity-100' : 'border-transparent opacity-50 hover:opacity-100'}`;
+        if (m.type === 'img') btn.innerHTML = `<img src="${m.src}" class="w-full h-full object-cover" alt="">`;
+        else btn.innerHTML = `<div class="w-full h-full bg-gray-800 flex items-center justify-center"><svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20"><path d="M4 4l12 6-12 6V4z"/></svg></div>`;
+
         btn.onclick = () => {
-            document.querySelectorAll('#gallery-thumbs button').forEach(b => { b.classList.remove('border-white', 'opacity-100'); b.classList.add('border-transparent', 'opacity-50'); });
-            btn.classList.remove('border-transparent', 'opacity-50'); btn.classList.add('border-white', 'opacity-100');
+            document.querySelectorAll('#gallery-thumbs button').forEach(b => { b.classList.remove('border-luxe', 'opacity-100'); b.classList.add('border-transparent', 'opacity-50'); });
+            btn.classList.remove('border-transparent', 'opacity-50'); btn.classList.add('border-luxe', 'opacity-100');
             if (m.type === 'img') {
                 mainVideo.classList.add('hidden'); mainVideo.pause();
                 mainImage.src = m.src; mainImage.classList.remove('hidden');
@@ -449,94 +293,27 @@
         thumbContainer.appendChild(btn);
     });
 
-    // --- INITIALIZATION & BACKEND SYNC ---
-    function findZ01MatrixRow(size) {
-        const sz = String(size || '').trim();
-        if (!inventoryMatrix || typeof inventoryMatrix !== 'object') return null;
-        for (const [sku, row] of Object.entries(inventoryMatrix)) {
-            if (!row || typeof row !== 'object') continue;
-            const base = String(row.baseItem != null ? row.baseItem : '').trim().toUpperCase();
-            const rowSize = String(row.size != null ? row.size : '').trim();
-            const keyU = String(sku).trim().toUpperCase();
-            const baseIsZ01 = base === ITEM_CODE || base.startsWith(ITEM_CODE + ' ') || base.startsWith(ITEM_CODE + '-');
-            if ((baseIsZ01 && rowSize === sz) || keyU === `${ITEM_CODE}-${sz}` || keyU === `${ITEM_CODE}_${sz}`) {
-                return row;
-            }
-        }
-        return null;
-    }
-
-    function updateMatrixPricingFromSize(size) {
-        const row = findZ01MatrixRow(size);
-        const el = document.getElementById('pdp-price-row');
-        if (!el) return;
-
-        if (!row) {
-            activeRetailPrice = FALLBACK_RETAIL;
-            activePromoPrice = null;
-            activeWeightKg = 1;
-            el.innerHTML = '<span class="text-2xl sm:text-3xl font-semibold text-white">RM ' + activeRetailPrice.toFixed(2) + '</span><span class="text-sm text-white/50 ml-2">Code: ' + ITEM_CODE + '</span>';
-            return;
-        }
-
-        activeRetailPrice = Number(row.retailPrice);
-        if (!Number.isFinite(activeRetailPrice) || activeRetailPrice <= 0) activeRetailPrice = FALLBACK_RETAIL;
-
-        const rawPromo = row.promoPrice;
-        if (rawPromo === '' || rawPromo === null || rawPromo === undefined) {
-            activePromoPrice = null;
-        } else {
-            const p = Number(rawPromo);
-            activePromoPrice = Number.isFinite(p) ? p : null;
-        }
-
-        const w = Number(row.weight);
-        activeWeightKg = Number.isFinite(w) && w > 0 ? w : 1;
-
-        const hasPromo = activePromoPrice != null && activePromoPrice < activeRetailPrice;
-        if (hasPromo) {
-            el.innerHTML = '<del class="text-lg sm:text-xl text-white/45 font-medium">RM ' + activeRetailPrice.toFixed(2) + '</del> <span class="text-2xl sm:text-3xl font-semibold text-gold">RM ' + activePromoPrice.toFixed(2) + '</span><span class="text-sm text-white/50 ml-2">Code: ' + ITEM_CODE + '</span>';
-        } else {
-            el.innerHTML = '<span class="text-2xl sm:text-3xl font-semibold text-white">RM ' + activeRetailPrice.toFixed(2) + '</span><span class="text-sm text-white/50 ml-2">Code: ' + ITEM_CODE + '</span>';
-        }
-    }
-
-    function effectiveGarmentPrice() {
-        if (activePromoPrice != null && activePromoPrice < activeRetailPrice) return activePromoPrice;
-        return activeRetailPrice;
-    }
-
+    // Fetch Backend
     async function fetchConfig() {
-        const loadingEl = document.getElementById('alt-loading');
-        if (RETAIL_API_URL.includes('YOUR_RETAIL')) {
-            if (loadingEl) loadingEl.textContent = 'Set RETAIL_API_URL to load App_Config + matrix.';
-            inventoryMatrix = {};
-            appConfig = {};
-            renderAlterationFields();
-            return;
-        }
+        if (RETAIL_API_URL.includes("YOUR_RETAIL")) return;
         try {
             const res = await fetch(`${RETAIL_API_URL}?action=get_config`);
             const json = await res.json();
-            if (json.status === 'success' && json.data) {
+            if (json.status === 'success') {
                 appConfig = json.data.config || {};
                 inventoryMatrix = json.data.matrix || {};
                 renderAlterationFields();
-                if (selectedSize) updateMatrixPricingFromSize(selectedSize);
             }
-        } catch (e) {
-            console.error('Config fetch failed:', e);
-            const le = document.getElementById('alt-loading');
-            if (le) { le.textContent = 'Could not load config. Check network / deployment URL.'; }
-        }
+        } catch (e) { console.error("Config fetch failed:", e); }
     }
 
+    // Size & Matrix Logic
     function renderSizeGrid() {
         const grid = document.getElementById('size-grid');
         Object.keys(baseSizes).forEach(size => {
             const btn = document.createElement('button');
             btn.type = 'button';
-            btn.className = 'size-btn py-3 border border-white/15 bg-transparent text-white rounded-lg font-medium hover:border-white/40 transition-colors focus:outline-none';
+            btn.className = "size-btn py-3 border border-white/15 bg-transparent text-white rounded-lg font-medium hover:border-white/40 transition-colors focus:outline-none tap-none";
             btn.textContent = size;
             btn.onclick = () => selectSize(size, btn);
             grid.appendChild(btn);
@@ -545,58 +322,71 @@
 
     function selectSize(size, btnElement) {
         selectedSize = size;
-        // Reset all to outline
-        document.querySelectorAll('.size-btn').forEach(b => { 
-            b.className = "size-btn py-3 border border-white/15 bg-transparent text-white rounded-lg font-medium hover:border-white/40 transition-colors focus:outline-none"; 
-        });
-        // Set active to Luxe Gold
-        btnElement.className = "size-btn py-3 border border-luxe bg-luxe text-ink rounded-lg font-medium shadow-[0_0_15px_rgba(192,160,98,0.3)] transition-colors focus:outline-none";
-        
+        document.querySelectorAll('.size-btn').forEach(b => b.className = "size-btn py-3 border border-white/15 bg-transparent text-white rounded-lg font-medium hover:border-white/40 transition-colors focus:outline-none tap-none");
+        btnElement.className = "size-btn py-3 border border-luxe bg-luxe text-ink rounded-lg font-medium shadow-[0_0_15px_rgba(192,160,98,0.3)] transition-colors focus:outline-none tap-none";
+
         updateMatrixPricingFromSize(size);
         validateAlterations();
         renderAlterationFields();
     }
 
-    // Size Calculator Logic
+    function updateMatrixPricingFromSize(size) {
+        const sku = `Z01-${size}`;
+        const matrixRow = inventoryMatrix[sku];
+        if (matrixRow) {
+            activeRetailPrice = matrixRow.retailPrice;
+            activePromoPrice = matrixRow.promoPrice;
+            activeWeightKg = matrixRow.weight;
+        }
+        const priceRow = document.getElementById('pdp-price-row');
+        if (activePromoPrice !== null && activePromoPrice < activeRetailPrice) {
+            priceRow.innerHTML = `<del class="text-gray-500 text-lg mr-2">RM ${activeRetailPrice.toFixed(2)}</del><span class="text-luxe">RM ${activePromoPrice.toFixed(2)}</span>`;
+        } else {
+            priceRow.textContent = `RM ${activeRetailPrice.toFixed(2)}`;
+        }
+    }
+
     function calculateSize() {
         const h = parseInt(document.getElementById('calc-height').value, 10);
         const w = parseInt(document.getElementById('calc-weight').value, 10);
         const res = document.getElementById('calc-result');
-        if (!h || !w) { res.textContent = "Please enter both values."; res.className = "mt-3 text-sm text-red-400"; res.classList.remove('hidden'); return; }
-
+        if (!h || !w) {
+            res.textContent = "Please enter both values.";
+            res.className = "mt-3 text-sm text-red-400 font-medium reveal show";
+            res.classList.remove('hidden');
+            return;
+        }
         let sug = 'M';
         if (h < 155 && w < 55) sug = 'XS';
         else if (h < 160 && w < 60) sug = 'S';
         else if (h > 165 && w > 70) sug = 'XL';
-
         res.textContent = `Recommended Base Size: ${sug}`;
-        res.className = "mt-3 text-sm text-green-400 font-medium";
+        res.className = "mt-3 text-sm text-green-400 font-medium reveal show";
         res.classList.remove('hidden');
     }
 
-    // --- ALTERATION ENGINE ---
+    // Alteration Engine
     document.getElementById('toggle-alt-btn').onclick = () => {
         altEnabled = !altEnabled;
         const knob = document.getElementById('alt-knob');
         const sw = document.getElementById('alt-switch');
         const drawer = document.getElementById('alt-drawer');
-
         if (altEnabled) {
             knob.classList.add('translate-x-4');
-            sw.classList.add('bg-luxe'); sw.classList.remove('bg-gray-800');
+            sw.classList.add('bg-luxe'); sw.classList.remove('bg-white/10');
             drawer.classList.remove('hidden'); drawer.classList.add('flex');
         } else {
             knob.classList.remove('translate-x-4');
-            sw.classList.remove('bg-luxe'); sw.classList.add('bg-gray-800');
+            sw.classList.remove('bg-luxe'); sw.classList.add('bg-white/10');
             drawer.classList.add('hidden'); drawer.classList.remove('flex');
         }
     };
 
     function renderAlterationFields() {
-        document.getElementById('alt-loading').classList.add('hidden');
         const container = document.getElementById('alt-fields-container');
+        if (Object.keys(appConfig).length === 0) return;
+        document.getElementById('alt-loading').classList.add('hidden');
         container.classList.remove('hidden');
-        container.classList.add('flex');
         container.innerHTML = '';
 
         const services = [
@@ -608,7 +398,6 @@
         services.forEach(s => {
             const conf = appConfig[s.id];
             if (!conf || !conf.isActive) return;
-
             let priceHtml = ``;
             if (conf.promoPrice !== null && conf.promoPrice < conf.standardPrice) {
                 const badgeText = conf.promoPrice === 0 ? "FREE" : `PROMO RM ${conf.promoPrice.toFixed(2)}`;
@@ -619,7 +408,7 @@
 
             const baseLimit = selectedSize ? baseSizes[selectedSize][s.key] : "--";
             const limitHtml = selectedSize ? `<span class="text-luxe font-mono text-[10px] ml-2">(Max: ${baseLimit}")</span>` : ``;
-            const placeholderTxt = selectedSize ? `&lt;= ${baseLimit}` : 'Select size first';
+            const placeholderTxt = selectedSize ? ('\u2264 ' + baseLimit) : 'Select size first';
 
             container.innerHTML += `
                 <div>
@@ -627,74 +416,73 @@
                         <label class="text-[10px] uppercase text-gray-400 tracking-wider flex items-center">${s.label} ${limitHtml}</label>
                         <div class="text-[10px] uppercase tracking-widest">${priceHtml}</div>
                     </div>
-                    <input type="number" step="0.5" id="alt-input-${s.key}" data-key="${s.key}" ${!selectedSize ? 'disabled' : ''} class="alt-input w-full bg-black/50 border border-white/20 rounded p-3 text-[16px] text-white focus:border-luxe outline-none transition-colors" placeholder="${placeholderTxt}">
+                    <input type="number" step="0.5" id="alt-input-${s.key}" data-key="${s.key}" ${!selectedSize ? 'disabled' : ''} class="alt-input w-full bg-black/50 border border-white/20 rounded-lg p-3 text-[16px] text-white focus:border-luxe outline-none transition-colors" placeholder="${placeholderTxt}">
                     <p id="alt-err-${s.key}" class="text-xs text-red-400 mt-2 hidden"></p>
                 </div>
             `;
         });
-
-        document.querySelectorAll('.alt-input').forEach(inp => {
-            inp.addEventListener('input', validateAlterations);
-        });
-
-        if (!container.querySelector('.alt-input')) {
-            container.innerHTML = '<p class="text-xs text-white/50">No optional alterations are active in App_Config for this drop.</p>';
-        }
+        document.querySelectorAll('.alt-input').forEach(inp => inp.addEventListener('input', validateAlterations));
     }
 
     function validateAlterations() {
-        if (!selectedSize) {
-            document.getElementById('add-to-cart-btn').disabled = true;
-            return;
-        }
+        if (!selectedSize) { document.getElementById('add-to-cart-btn').disabled = true; return; }
         let isValid = true;
         const base = baseSizes[selectedSize];
-
         document.querySelectorAll('.alt-input').forEach(inp => {
             const key = inp.getAttribute('data-key');
             const val = parseFloat(inp.value);
             const errEl = document.getElementById(`alt-err-${key}`);
-            if (!errEl) return;
-
             if (val && val > base[key]) {
-                errEl.textContent = `Cannot exceed base size (${base[key]}"). Please select a larger Base Size.`;
-                errEl.classList.remove('hidden');
+                if (errEl) { errEl.textContent = `Cannot exceed base size (${base[key]}").`; errEl.classList.remove('hidden'); }
                 inp.classList.add('border-red-400');
                 isValid = false;
             } else {
-                errEl.classList.add('hidden');
+                if (errEl) errEl.classList.add('hidden');
                 inp.classList.remove('border-red-400');
             }
         });
-
         document.getElementById('add-to-cart-btn').disabled = !isValid;
     }
 
-    // Accordion Logic
+    // Accordions & Modals
     document.querySelectorAll('.accordion-btn').forEach(btn => {
-        btn.onclick = () => {
-            const content = btn.nextElementSibling;
-            content.classList.toggle('hidden');
-        };
+        btn.onclick = () => btn.nextElementSibling.classList.toggle('hidden');
     });
+    function closeSizeModal() {
+        const sm = document.getElementById('size-modal');
+        sm.classList.remove('show');
+        setTimeout(() => { sm.style.display = 'none'; }, 300);
+    }
 
-    // --- CART LOGIC ---
+    // Cart Flow
+    function toggleCart(show) {
+        const overlay = document.getElementById('cart-overlay');
+        const drawer = document.getElementById('cart-drawer');
+        if (show) {
+            document.body.style.overflow = 'hidden';
+            overlay.classList.remove('hidden');
+            setTimeout(() => overlay.classList.remove('opacity-0'), 10);
+            drawer.classList.remove('translate-x-full');
+        } else {
+            document.body.style.overflow = '';
+            overlay.classList.add('opacity-0');
+            setTimeout(() => overlay.classList.add('hidden'), 300);
+            drawer.classList.add('translate-x-full');
+        }
+    }
+    document.getElementById('nav-cart-btn').onclick = () => toggleCart(true);
+    document.getElementById('close-cart-btn').onclick = () => toggleCart(false);
+    document.getElementById('cart-overlay').onclick = () => toggleCart(false);
+
     document.getElementById('add-to-cart-btn').onclick = () => {
-        if (!selectedSize) { alert("Please select a Base Size."); return; }
-
-        let alterations = {};
-        let altCost = 0;
-        let altDiscount = 0;
-        let activePromoLabel = "";
-
+        if (!selectedSize) return;
+        let alterations = {}; let altCost = 0; let altDiscount = 0; let activePromoLabel = "";
         if (altEnabled) {
             document.querySelectorAll('.alt-input').forEach(inp => {
                 const val = parseFloat(inp.value);
                 if (val) {
                     const key = inp.getAttribute('data-key');
                     alterations[key] = val;
-
-                    // Find matching config to calc math
                     const sId = key === 'length' ? 'Z01_ALT_LENGTH' : (key === 'sleeve' ? 'Z01_ALT_SLEEVE' : 'Z01_ALT_SHOULDER');
                     const conf = appConfig[sId];
                     if (conf) {
@@ -707,69 +495,45 @@
                 }
             });
         }
-
         cartState = {
-            itemCode: ITEM_CODE,
-            size: selectedSize,
-            basePrice: effectiveGarmentPrice(),
-            matrixRetail: activeRetailPrice,
-            matrixPromo: activePromoPrice,
-            weightKg: activeWeightKg,
-            alterations: alterations,
-            altCost: altCost,
-            discount: altDiscount,
-            promoLabel: activePromoLabel,
-            shippingFee: 0,
-            postcode: ""
+            itemCode: "Z01", size: selectedSize, basePrice: (activePromoPrice !== null ? activePromoPrice : activeRetailPrice),
+            alterations: alterations, altCost: altCost, discount: altDiscount, promoLabel: activePromoLabel,
+            shippingFee: 0, postcode: "", weightKg: activeWeightKg
         };
-
         renderCart();
         toggleCart(true);
     };
 
     function renderCart() {
-        const container = document.getElementById('cart-items-container');
         if (!cartState) return;
-
         let altHtml = '';
         if (Object.keys(cartState.alterations).length > 0) {
-            altHtml = `<ul class="text-xs text-gray-400 mt-2 space-y-1">`;
-            for(let [k, v] of Object.entries(cartState.alterations)) {
+            altHtml = `<ul class="text-xs text-gray-400 mt-3 space-y-2">`;
+            for (let [k, v] of Object.entries(cartState.alterations)) {
                 const sId = k === 'length' ? 'Z01_ALT_LENGTH' : (k === 'sleeve' ? 'Z01_ALT_SLEEVE' : 'Z01_ALT_SHOULDER');
                 const cPrice = appConfig[sId] ? appConfig[sId].standardPrice : 0;
-                altHtml += `<li class="flex justify-between"><span>↳ Custom ${k}: ${v}"</span><span class="text-white">RM ${cPrice.toFixed(2)}</span></li>`;
+                altHtml += `<li class="flex justify-between border-t border-white/5 pt-2"><span>↳ Custom ${k}: ${v}"</span><span class="text-white">RM ${cPrice.toFixed(2)}</span></li>`;
             }
             altHtml += `</ul>`;
         }
-
-        let priceRowHtml = '<span class="text-white">RM ' + cartState.basePrice.toFixed(2) + '</span>';
-        if (cartState.matrixPromo != null && cartState.matrixPromo < cartState.matrixRetail) {
-            priceRowHtml = '<span class="line-through text-white/35 mr-1">RM ' + cartState.matrixRetail.toFixed(2) + '</span><span class="text-gold font-medium">RM ' + cartState.basePrice.toFixed(2) + '</span>';
-        }
-
-        container.innerHTML = `
-            <div class="flex gap-4">
-                <img src="images/z01-1-hero.webp" class="w-20 h-24 object-cover rounded-xl bg-black/40 ring-1 ring-white/10" alt="">
-                <div>
-                    <div class="text-white font-medium">${ITEM_CODE} Abaya (Size ${cartState.size})</div>
-                    <div class="text-white/60 text-sm">${priceRowHtml}</div>
+        document.getElementById('cart-items-container').innerHTML = `
+            <div class="flex gap-4 bg-white/5 p-4 rounded-xl border border-white/5">
+                <img src="images/z01-1-hero.webp" class="w-20 h-24 object-cover rounded-lg bg-gray-800 shrink-0" alt="">
+                <div class="flex-1 min-w-0">
+                    <div class="text-white font-medium text-lg truncate">Z01 Abaya (Size ${cartState.size})</div>
+                    <div class="text-luxe font-medium">RM ${cartState.basePrice.toFixed(2)}</div>
                     ${altHtml}
                 </div>
             </div>
         `;
-
         const subtotal = cartState.basePrice + cartState.altCost;
         document.getElementById('cart-subtotal').textContent = `RM ${subtotal.toFixed(2)}`;
-
         const discRow = document.getElementById('cart-discount-row');
         if (cartState.discount > 0) {
             document.getElementById('cart-discount-label').textContent = cartState.promoLabel ? `Discount (${cartState.promoLabel})` : `Discount`;
             document.getElementById('cart-discount-amount').textContent = `-RM ${cartState.discount.toFixed(2)}`;
             discRow.classList.remove('hidden');
-        } else {
-            discRow.classList.add('hidden');
-        }
-
+        } else discRow.classList.add('hidden');
         updateGrandTotal();
     }
 
@@ -779,123 +543,80 @@
         document.getElementById('cart-total').textContent = `RM ${total.toFixed(2)}`;
     }
 
-    // Shipping Calc
     document.getElementById('btn-calc-ship').onclick = async () => {
-        const pc = document.getElementById('cart-postcode').value;
-        if(!pc || pc.length < 5 || isNaN(pc)) { document.getElementById('cart-postcode').classList.add('border-red-500'); return; } else { document.getElementById('cart-postcode').classList.remove('border-red-500'); }
         if (!cartState) return;
+        const pc = document.getElementById('cart-postcode').value.trim();
+        if (!pc || pc.length < 5 || isNaN(pc)) { document.getElementById('cart-postcode').classList.add('border-red-500'); return; }
+        else document.getElementById('cart-postcode').classList.remove('border-red-500');
 
         const btn = document.getElementById('btn-calc-ship');
         btn.textContent = "...";
-
         try {
-            const res = await fetch(`${RETAIL_API_URL}?action=calc_shipping&postcode=${encodeURIComponent(pc)}&weight=${cartState.weightKg || 1.0}`);
+            const res = await fetch(`${RETAIL_API_URL}?action=calc_shipping&postcode=${encodeURIComponent(pc)}&weight=${cartState.weightKg}`);
             const json = await res.json();
-            if (json.status === 'success' && cartState) {
+            if (json.status === 'success') {
                 cartState.postcode = pc;
-                
-                // Check App_Config for Free Shipping Promo
                 const freeShipPromo = appConfig['PROMO_FREE_SHIPPING'];
                 if (freeShipPromo && freeShipPromo.isActive) {
                     cartState.shippingFee = 0;
-                    document.getElementById('cart-shipping').innerHTML = `<span class="line-through text-gray-500 mr-2">RM ${json.rate.toFixed(2)}</span><span class="text-gold font-bold">FREE</span>`;
+                    document.getElementById('cart-shipping').innerHTML = `<span class="line-through text-gray-500 mr-2">RM ${json.rate.toFixed(2)}</span><span class="text-luxe font-bold">FREE</span>`;
                 } else {
                     cartState.shippingFee = json.rate;
                     document.getElementById('cart-shipping').textContent = `RM ${json.rate.toFixed(2)} (Pos Laju)`;
                 }
-                
                 updateGrandTotal();
             }
         } catch (e) { alert("Shipping calculation failed."); }
         btn.textContent = "CALC";
     };
 
-    // UI Overlays
-    function toggleCart(show) {
-        const overlay = document.getElementById('cart-overlay');
-        const drawer = document.getElementById('cart-drawer');
-        if (show) {
-            document.body.style.overflow = 'hidden'; // Lock background scroll
-            overlay.classList.remove('hidden');
-            setTimeout(() => overlay.classList.remove('opacity-0'), 10);
-            drawer.classList.remove('translate-x-full');
-        } else {
-            document.body.style.overflow = ''; // Unlock background scroll
-            overlay.classList.add('opacity-0');
-            setTimeout(() => overlay.classList.add('hidden'), 300);
-            drawer.classList.add('translate-x-full');
-        }
-    }
-    document.getElementById('nav-cart-btn').onclick = () => toggleCart(true);
-    document.getElementById('close-cart-btn').onclick = () => toggleCart(false);
-    document.getElementById('cart-overlay').onclick = () => toggleCart(false);
-
-    // Size Modal Logic
-    const sizeModal = document.getElementById('size-modal');
-    document.querySelector('[onclick*="size-modal"]').onclick = () => { sizeModal.style.display = 'flex'; setTimeout(() => { sizeModal.classList.add('show'); sizeModal.querySelector('div').classList.add('show'); }, 10); };
-    function closeSizeModal() { sizeModal.classList.remove('show'); sizeModal.querySelector('div').classList.remove('show'); setTimeout(() => sizeModal.style.display = 'none', 300); }
-
-    // INIT
-    document.getElementById('add-to-cart-btn').disabled = true;
-    renderSizeGrid();
-    fetchConfig();
-
-    document.querySelectorAll('.reveal').forEach(el => {
-        const io = new IntersectionObserver((entries, obs) => {
-            entries.forEach(en => { if (en.isIntersecting) { en.target.classList.add('show'); obs.unobserve(en.target); } });
-        }, { threshold: 0.12 });
-        io.observe(el);
-    });
-
     document.getElementById('btn-checkout').onclick = async () => {
-        if (!cartState) {
-            alert("Your cart is empty.");
-            return;
-        }
+        if (!cartState) return;
         const name = document.getElementById('cart-name').value.trim();
         const phone = document.getElementById('cart-phone').value.trim();
         const email = document.getElementById('cart-email').value.trim();
         const address = document.getElementById('cart-address').value.trim();
         const state = document.getElementById('cart-state').value;
         const postcode = document.getElementById('cart-postcode').value.trim();
-
         if (!name || !phone || !email || !address || !state || !postcode || cartState.postcode === "") {
-            alert("Please complete all shipping details and calculate shipping.");
-            return;
+            alert("Please complete all shipping details and calculate shipping."); return;
         }
-
         const btn = document.getElementById('btn-checkout');
-        btn.textContent = "Securing Order...";
-        btn.disabled = true;
-
-        const totalPaid = (cartState.basePrice + cartState.altCost) - cartState.discount + cartState.shippingFee;
-        cartState.name = name; cartState.phone = phone; cartState.email = email; cartState.address = address; cartState.state = state; cartState.postcode = postcode; cartState.totalPaid = totalPaid;
+        btn.textContent = "Securing Order..."; btn.disabled = true;
+        cartState.name = name; cartState.phone = phone; cartState.email = email; cartState.address = address; cartState.state = state; cartState.postcode = postcode; cartState.totalPaid = (cartState.basePrice + cartState.altCost) - cartState.discount + cartState.shippingFee;
 
         try {
             const res = await fetch(`${RETAIL_API_URL}?action=reserve_stock`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                 body: `payload=${encodeURIComponent(JSON.stringify(cartState))}`
             });
             const json = await res.json();
-            
             if (json.status === 'success') {
-                // REPLACE 'YOUR_MERCHANT_ID' WITH YOUR ACTUAL SENANGPAY MERCHANT ID
-                const merchantId = "YOUR_MERCHANT_ID"; 
+                const merchantId = "YOUR_MERCHANT_ID";
                 const desc = encodeURIComponent(`Arabista Retail Order: ${json.orderId}`);
-                const paymentUrl = `https://app.senangpay.my/payment/${merchantId}?detail=${desc}&amount=${json.amount}&order_id=${json.orderId}&name=${encodeURIComponent(name)}&email=${encodeURIComponent(email)}&phone=${encodeURIComponent(phone)}`;
-                window.location.href = paymentUrl;
+                window.location.href = `https://app.senangpay.my/payment/${merchantId}?detail=${desc}&amount=${json.amount}&order_id=${json.orderId}&name=${encodeURIComponent(name)}&email=${encodeURIComponent(email)}&phone=${encodeURIComponent(phone)}`;
             } else {
                 alert("Checkout Error: " + json.message);
-                btn.textContent = "Proceed to Payment";
-                btn.disabled = false;
+                btn.textContent = "Proceed to Payment"; btn.disabled = false;
             }
         } catch (e) {
-            alert("System error. Please try again.");
-            btn.textContent = "Proceed to Payment";
-            btn.disabled = false;
+            alert("System error: " + e.message);
+            btn.textContent = "Proceed to Payment"; btn.disabled = false;
         }
     };
+
+    // Init
+    document.getElementById('add-to-cart-btn').disabled = true;
+    renderSizeGrid();
+    fetchConfig();
+
+    // D01 Intersection Observer for .reveal animations
+    document.querySelectorAll('.reveal').forEach(el => {
+        const io = new IntersectionObserver((entries, obs) => {
+            entries.forEach(en => { if (en.isIntersecting) { en.target.classList.add('show'); obs.unobserve(en.target); } });
+        }, { threshold: 0.1, rootMargin: "0px 0px -50px 0px" });
+        io.observe(el);
+    });
   </script>
 </body>
 </html>
