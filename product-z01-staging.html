@@ -1,0 +1,509 @@
+<!doctype html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Z01 Zahra Series Abaya — Arabista</title>
+  <meta name="theme-color" content="#0F0F10" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+        theme: {
+            extend: {
+                fontFamily: { display: ['"Cormorant Garamond"', 'serif'], sans: ['Inter', 'ui-sans-serif', 'system-ui'] },
+                colors: { brand: '#0F0F10', gold: '#D4AF37' }
+            }
+        }
+    }
+  </script>
+  <style>
+    body { background-color: #0F0F10; color: #ffffff; }
+    .hide-scrollbar::-webkit-scrollbar { display: none; }
+    .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    input[type="number"]::-webkit-inner-spin-button, input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+    .thumb-active { border-color: #ffffff !important; opacity: 1 !important; }
+  </style>
+</head>
+<body class="font-sans antialiased pb-32 selection:bg-gray-700 selection:text-white">
+
+  <header class="w-full border-b border-white/10 bg-brand/90 backdrop-blur sticky top-0 z-40 px-6 py-4 flex justify-between items-center">
+      <a href="/" class="font-display text-2xl tracking-widest text-white uppercase">Arabista</a>
+      <button id="nav-cart-btn" class="relative text-white">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
+      </button>
+  </header>
+
+  <main class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-20 pt-6 px-4 lg:px-8">
+
+      <div class="flex flex-col gap-4">
+          <div class="relative aspect-[4/5] bg-gray-900 rounded-xl overflow-hidden group">
+              <video id="main-video" class="w-full h-full object-cover hidden" loop muted playsinline></video>
+              <img id="main-image" src="images/z01-1-hero.webp" class="w-full h-full object-cover transition-opacity duration-300" alt="Z01 Abaya">
+          </div>
+          <div class="flex gap-3 overflow-x-auto hide-scrollbar pb-2" id="gallery-thumbs">
+          </div>
+      </div>
+
+      <div class="flex flex-col">
+          <p class="text-xs text-gold uppercase tracking-[0.2em] mb-2 font-medium">Zahra Series</p>
+          <h1 class="font-display text-4xl lg:text-5xl text-white mb-2">Abaya Arab Kod Z01</h1>
+          <p class="text-gray-400 text-sm mb-6">Premium Nidha Dubai</p>
+
+          <div class="text-2xl text-white font-medium mb-8">RM 150.00</div>
+
+          <div class="bg-white/5 border border-white/10 rounded-xl p-5 mb-8">
+              <h3 class="text-sm font-semibold text-white uppercase tracking-widest mb-4 flex items-center gap-2">
+                  <svg class="w-4 h-4 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+                  Find Your Base Size
+              </h3>
+              <div class="grid grid-cols-2 gap-4 mb-4">
+                  <div>
+                      <label class="text-[10px] uppercase text-gray-500 tracking-wider mb-1 block">Height (cm)</label>
+                      <input type="number" id="calc-height" class="w-full bg-transparent border-b border-white/20 text-white pb-2 focus:outline-none focus:border-gold transition-colors" placeholder="e.g. 160">
+                  </div>
+                  <div>
+                      <label class="text-[10px] uppercase text-gray-500 tracking-wider mb-1 block">Weight (kg)</label>
+                      <input type="number" id="calc-weight" class="w-full bg-transparent border-b border-white/20 text-white pb-2 focus:outline-none focus:border-gold transition-colors" placeholder="e.g. 55">
+                  </div>
+              </div>
+              <button type="button" onclick="calculateSize()" class="text-xs uppercase tracking-widest text-gold hover:text-white transition-colors">Suggest Size &rarr;</button>
+              <p id="calc-result" class="mt-3 text-sm text-green-400 hidden font-medium"></p>
+          </div>
+
+          <div class="mb-8">
+              <div class="flex justify-between items-center mb-4">
+                  <label class="text-sm font-semibold text-white uppercase tracking-widest">Select Base Size</label>
+                  <button type="button" class="text-xs text-gray-500 underline decoration-gray-700 underline-offset-4 hover:text-white">Size Guide</button>
+              </div>
+              <div class="grid grid-cols-4 lg:grid-cols-6 gap-3" id="size-grid">
+              </div>
+          </div>
+
+          <div class="border border-gold/30 rounded-xl overflow-hidden mb-10 transition-all duration-300">
+              <div class="bg-gold/10 p-5 flex justify-between items-center cursor-pointer" id="toggle-alt-btn">
+                  <div>
+                      <h3 class="text-gold font-semibold text-sm uppercase tracking-widest mb-1">Guaranteed Perfect Fit</h3>
+                      <p class="text-xs text-gray-400">Add complimentary custom alterations</p>
+                  </div>
+                  <div class="w-10 h-6 bg-gray-800 rounded-full relative transition-colors duration-300" id="alt-switch">
+                      <div class="w-4 h-4 bg-white rounded-full absolute top-1 left-1 transition-transform duration-300" id="alt-knob"></div>
+                  </div>
+              </div>
+
+              <div id="alt-drawer" class="hidden p-5 bg-black/40 border-t border-gold/20 flex-col gap-6">
+                  <div id="alt-loading" class="text-xs text-gray-500 animate-pulse uppercase tracking-widest">Loading studio configs...</div>
+                  <div id="alt-fields-container" class="hidden flex-col gap-5">
+                  </div>
+              </div>
+          </div>
+
+          <button type="button" id="add-to-cart-btn" class="w-full bg-white text-black font-semibold uppercase tracking-widest py-4 rounded-lg hover:bg-gray-200 transition-colors mb-10 disabled:opacity-50 disabled:cursor-not-allowed">
+              Add To Cart
+          </button>
+
+          <div class="border-t border-white/10 divide-y divide-white/10">
+              <div class="py-5">
+                  <button type="button" class="flex justify-between items-center w-full text-left group accordion-btn">
+                      <span class="text-sm font-semibold uppercase tracking-widest text-white">Description</span>
+                      <svg class="w-5 h-5 text-gray-500 group-hover:text-white transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                  </button>
+                  <div class="accordion-content hidden mt-4 text-sm text-gray-400 leading-relaxed">
+                      Material Premium Nidha Dubai - Lembut, sejuk, beralun dan jatuh terletak atas badan. Didatangi dengan Zip Menyusu, Poket Kiri & Kanan dan Inner Seluruh Lengan (Mesra wudhu' & lengan tidak akan terdedah).
+                  </div>
+              </div>
+              <div class="py-5">
+                  <button type="button" class="flex justify-between items-center w-full text-left group accordion-btn">
+                      <span class="text-sm font-semibold uppercase tracking-widest text-white">Features</span>
+                      <svg class="w-5 h-5 text-gray-500 group-hover:text-white transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                  </button>
+                  <div class="accordion-content hidden mt-4 text-sm text-gray-400 leading-relaxed">
+                      <ul class="space-y-2">
+                          <li class="flex gap-3 items-center"><svg class="w-4 h-4 text-gold shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg> Cutting Ala Cardigan</li>
+                          <li class="flex gap-3 items-center"><svg class="w-4 h-4 text-gold shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg> Zip Menyusu Hadapan</li>
+                          <li class="flex gap-3 items-center"><svg class="w-4 h-4 text-gold shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg> Poket Kiri & Kanan</li>
+                          <li class="flex gap-3 items-center"><svg class="w-4 h-4 text-gold shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg> Inner Seluruh Lengan (Mesra Wudhu')</li>
+                      </ul>
+                  </div>
+              </div>
+              <div class="py-5">
+                  <button type="button" class="flex justify-between items-center w-full text-left group accordion-btn">
+                      <span class="text-sm font-semibold uppercase tracking-widest text-white">Included in Box</span>
+                      <svg class="w-5 h-5 text-gray-500 group-hover:text-white transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                  </button>
+                  <div class="accordion-content hidden mt-4 text-sm text-gray-400 leading-relaxed">
+                      FREE SHAWL SEDONDON - chiffon silk (1.9m x 0.7m). Packaging kotak eksklusif, sesuai untuk dijadikan hadiah.
+                  </div>
+              </div>
+          </div>
+      </div>
+  </main>
+
+  <section class="max-w-7xl mx-auto px-6 py-20 border-t border-white/10 mt-10">
+      <h2 class="font-display text-3xl text-white mb-8">Customer Reviews</h2>
+      <p class="text-gray-500 text-sm">4.9/5 stars based on 380 global reviews.</p>
+  </section>
+
+  <div id="cart-overlay" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden opacity-0 transition-opacity duration-300"></div>
+  <div id="cart-drawer" class="fixed top-0 right-0 h-full w-full max-w-md bg-brand border-l border-white/10 z-50 transform translate-x-full transition-transform duration-300 flex flex-col shadow-2xl">
+      <div class="p-6 border-b border-white/10 flex justify-between items-center">
+          <h2 class="font-display text-2xl text-white">Your Cart</h2>
+          <button type="button" id="close-cart-btn" class="text-gray-400 hover:text-white"><svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
+      </div>
+      <div class="p-6 flex-1 overflow-y-auto hide-scrollbar" id="cart-items-container">
+      </div>
+      <div class="p-6 border-t border-white/10 bg-gray-900/50">
+          <div class="mb-4">
+              <label class="text-[10px] uppercase text-gray-500 tracking-wider mb-2 block">Calculate Shipping</label>
+              <div class="flex gap-2">
+                  <input type="text" id="cart-postcode" class="w-full bg-black border border-white/20 rounded text-white px-3 py-2 text-sm focus:border-gold outline-none" placeholder="Postcode">
+                  <button type="button" id="btn-calc-ship" class="bg-white/10 px-4 rounded text-white text-xs uppercase tracking-widest hover:bg-white/20 transition-colors">Calc</button>
+              </div>
+          </div>
+          <div class="space-y-2 mb-6 text-sm">
+              <div class="flex justify-between text-gray-400"><span>Subtotal</span><span id="cart-subtotal">RM 0.00</span></div>
+              <div class="flex justify-between text-gold hidden" id="cart-discount-row"><span id="cart-discount-label">Discount</span><span id="cart-discount-amount">-RM 0.00</span></div>
+              <div class="flex justify-between text-gray-400"><span>Shipping</span><span id="cart-shipping">Pending</span></div>
+              <div class="flex justify-between text-white text-lg font-medium pt-2 border-t border-white/10 mt-2"><span>Grand Total</span><span id="cart-total">RM 0.00</span></div>
+          </div>
+          <button type="button" id="btn-checkout" class="w-full bg-white text-black font-semibold uppercase tracking-widest py-4 rounded-lg hover:bg-gray-200 transition-colors disabled:opacity-50">Proceed to Payment</button>
+      </div>
+  </div>
+
+  <script>
+    // --- CONFIGURATION ---
+    const RETAIL_API_URL = "YOUR_RETAIL_STAGING_WEBAPP_URL"; // PASTE URL HERE
+
+    // Base Size Dictionary (In Inches)
+    const baseSizes = {
+        'XS': { length: 52, sleeve: 22, shoulder: 13.5 },
+        'S': { length: 54, sleeve: 22.5, shoulder: 14 },
+        'M': { length: 56, sleeve: 23, shoulder: 14.5 },
+        'L': { length: 58, sleeve: 23.5, shoulder: 15 },
+        'XL': { length: 60, sleeve: 24, shoulder: 16 },
+        'XXL': { length: 60, sleeve: 24.5, shoulder: 16.5 }
+    };
+
+    let selectedSize = null;
+    let appConfig = {};
+    let altEnabled = false;
+    let cartState = null;
+
+    // --- MEDIA GALLERY LOGIC ---
+    const mediaFiles = [
+        { type: 'img', src: 'images/z01-1-hero.webp' },
+        { type: 'img', src: 'images/z01-2-angle.webp' },
+        { type: 'img', src: 'images/z01-3-back.webp' },
+        { type: 'img', src: 'images/z01-4-zoom-fabric.webp' },
+        { type: 'img', src: 'images/z01-5-feature-zip.webp' },
+        { type: 'img', src: 'images/z01-6-feature-sleeve.webp' },
+        { type: 'img', src: 'images/z01-7-packaging.webp' },
+        { type: 'img', src: 'images/z01-8-shawl.webp' },
+        { type: 'vid', src: 'images/z01-9-video-flow.mp4' }
+    ];
+
+    const thumbContainer = document.getElementById('gallery-thumbs');
+    const mainImage = document.getElementById('main-image');
+    const mainVideo = document.getElementById('main-video');
+
+    mediaFiles.forEach((m, i) => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = `w-16 h-20 shrink-0 rounded-lg overflow-hidden border-2 transition-all ${i === 0 ? 'border-white opacity-100' : 'border-transparent opacity-50 hover:opacity-100'}`;
+        if (m.type === 'img') {
+            btn.innerHTML = `<img src="${m.src}" class="w-full h-full object-cover" alt="">`;
+        } else {
+            btn.innerHTML = `<div class="w-full h-full bg-gray-800 flex items-center justify-center"><svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20"><path d="M4 4l12 6-12 6V4z"/></svg></div>`;
+        }
+        btn.onclick = () => {
+            document.querySelectorAll('#gallery-thumbs button').forEach(b => { b.classList.remove('border-white', 'opacity-100'); b.classList.add('border-transparent', 'opacity-50'); });
+            btn.classList.remove('border-transparent', 'opacity-50'); btn.classList.add('border-white', 'opacity-100');
+            if (m.type === 'img') {
+                mainVideo.classList.add('hidden'); mainVideo.pause();
+                mainImage.src = m.src; mainImage.classList.remove('hidden');
+            } else {
+                mainImage.classList.add('hidden');
+                mainVideo.src = m.src; mainVideo.classList.remove('hidden'); mainVideo.play();
+            }
+        };
+        thumbContainer.appendChild(btn);
+    });
+
+    // --- INITIALIZATION & BACKEND SYNC ---
+    async function fetchConfig() {
+        if (RETAIL_API_URL.includes("YOUR_RETAIL")) return; // Guard
+        try {
+            const res = await fetch(`${RETAIL_API_URL}?action=get_config`);
+            const json = await res.json();
+            if (json.status === 'success') {
+                appConfig = json.data;
+                renderAlterationFields();
+            }
+        } catch (e) { console.error("Config fetch failed:", e); }
+    }
+
+    function renderSizeGrid() {
+        const grid = document.getElementById('size-grid');
+        Object.keys(baseSizes).forEach(size => {
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = "size-btn py-3 border border-white/20 rounded-lg text-white font-medium hover:border-white transition-colors focus:outline-none";
+            btn.textContent = size;
+            btn.onclick = () => selectSize(size, btn);
+            grid.appendChild(btn);
+        });
+    }
+
+    function selectSize(size, btnElement) {
+        selectedSize = size;
+        document.querySelectorAll('.size-btn').forEach(b => { b.classList.remove('bg-white', 'text-black', 'border-white'); });
+        btnElement.classList.add('bg-white', 'text-black', 'border-white');
+        validateAlterations(); // Re-validate if size changes
+    }
+
+    // Size Calculator Logic
+    function calculateSize() {
+        const h = parseInt(document.getElementById('calc-height').value, 10);
+        const w = parseInt(document.getElementById('calc-weight').value, 10);
+        const res = document.getElementById('calc-result');
+        if (!h || !w) { res.textContent = "Please enter both values."; res.className = "mt-3 text-sm text-red-400"; res.classList.remove('hidden'); return; }
+
+        let sug = 'M';
+        if (h < 155 && w < 55) sug = 'XS';
+        else if (h < 160 && w < 60) sug = 'S';
+        else if (h > 165 && w > 70) sug = 'XL';
+
+        res.textContent = `Recommended Base Size: ${sug}`;
+        res.className = "mt-3 text-sm text-green-400 font-medium";
+        res.classList.remove('hidden');
+    }
+
+    // --- ALTERATION ENGINE ---
+    document.getElementById('toggle-alt-btn').onclick = () => {
+        altEnabled = !altEnabled;
+        const knob = document.getElementById('alt-knob');
+        const sw = document.getElementById('alt-switch');
+        const drawer = document.getElementById('alt-drawer');
+
+        if (altEnabled) {
+            knob.classList.add('translate-x-4');
+            sw.classList.add('bg-gold'); sw.classList.remove('bg-gray-800');
+            drawer.classList.remove('hidden'); drawer.classList.add('flex');
+        } else {
+            knob.classList.remove('translate-x-4');
+            sw.classList.remove('bg-gold'); sw.classList.add('bg-gray-800');
+            drawer.classList.add('hidden'); drawer.classList.remove('flex');
+        }
+    };
+
+    function renderAlterationFields() {
+        document.getElementById('alt-loading').classList.add('hidden');
+        const container = document.getElementById('alt-fields-container');
+        container.classList.remove('hidden');
+        container.classList.add('flex');
+        container.innerHTML = '';
+
+        const services = [
+            { id: 'Z01_ALT_LENGTH', label: 'Dress Length (Inches)', key: 'length' },
+            { id: 'Z01_ALT_SLEEVE', label: 'Sleeve Length (Inches)', key: 'sleeve' },
+            { id: 'Z01_ALT_SHOULDER', label: 'Shoulder Width (Inches)', key: 'shoulder' }
+        ];
+
+        services.forEach(s => {
+            const conf = appConfig[s.id];
+            if (!conf || !conf.isActive) return;
+
+            let priceHtml = ``;
+            if (conf.promoPrice !== null && conf.promoPrice < conf.standardPrice) {
+                const badgeText = conf.promoPrice === 0 ? "FREE" : `PROMO RM ${conf.promoPrice.toFixed(2)}`;
+                priceHtml = `<span class="line-through text-gray-500 mr-2">RM ${conf.standardPrice.toFixed(2)}</span><span class="text-green-400 font-bold">${badgeText}</span>`;
+            } else {
+                priceHtml = `<span class="text-gray-400">RM ${conf.standardPrice.toFixed(2)}</span>`;
+            }
+
+            container.innerHTML += `
+                <div>
+                    <div class="flex justify-between items-end mb-2">
+                        <label class="text-[10px] uppercase text-gray-400 tracking-wider">${s.label}</label>
+                        <div class="text-[10px] uppercase tracking-widest">${priceHtml}</div>
+                    </div>
+                    <input type="number" step="0.5" id="alt-input-${s.key}" data-key="${s.key}" class="alt-input w-full bg-black/50 border border-white/20 rounded p-3 text-white focus:border-gold outline-none transition-colors" placeholder="e.g. 54">
+                    <p id="alt-err-${s.key}" class="text-xs text-red-400 mt-2 hidden"></p>
+                </div>
+            `;
+        });
+
+        document.querySelectorAll('.alt-input').forEach(inp => {
+            inp.addEventListener('input', validateAlterations);
+        });
+    }
+
+    function validateAlterations() {
+        if (!selectedSize) return;
+        let isValid = true;
+        const base = baseSizes[selectedSize];
+
+        document.querySelectorAll('.alt-input').forEach(inp => {
+            const key = inp.getAttribute('data-key');
+            const val = parseFloat(inp.value);
+            const errEl = document.getElementById(`alt-err-${key}`);
+
+            if (val && val > base[key]) {
+                errEl.textContent = `Cannot exceed base size (${base[key]}"). Please select a larger Base Size.`;
+                errEl.classList.remove('hidden');
+                inp.classList.add('border-red-400');
+                isValid = false;
+            } else {
+                errEl.classList.add('hidden');
+                inp.classList.remove('border-red-400');
+            }
+        });
+
+        document.getElementById('add-to-cart-btn').disabled = !isValid;
+    }
+
+    // Accordion Logic
+    document.querySelectorAll('.accordion-btn').forEach(btn => {
+        btn.onclick = () => {
+            const content = btn.nextElementSibling;
+            content.classList.toggle('hidden');
+        };
+    });
+
+    // --- CART LOGIC ---
+    document.getElementById('add-to-cart-btn').onclick = () => {
+        if (!selectedSize) { alert("Please select a Base Size."); return; }
+
+        let alterations = {};
+        let altCost = 0;
+        let altDiscount = 0;
+        let activePromoLabel = "";
+
+        if (altEnabled) {
+            document.querySelectorAll('.alt-input').forEach(inp => {
+                const val = parseFloat(inp.value);
+                if (val) {
+                    const key = inp.getAttribute('data-key');
+                    alterations[key] = val;
+
+                    // Find matching config to calc math
+                    const sId = key === 'length' ? 'Z01_ALT_LENGTH' : (key === 'sleeve' ? 'Z01_ALT_SLEEVE' : 'Z01_ALT_SHOULDER');
+                    const conf = appConfig[sId];
+                    if (conf) {
+                        altCost += conf.standardPrice;
+                        if (conf.promoPrice !== null && conf.promoPrice < conf.standardPrice) {
+                            altDiscount += (conf.standardPrice - conf.promoPrice);
+                            if (conf.promoLabel) activePromoLabel = conf.promoLabel;
+                        }
+                    }
+                }
+            });
+        }
+
+        cartState = {
+            itemCode: "Z01",
+            size: selectedSize,
+            basePrice: 150.00,
+            alterations: alterations,
+            altCost: altCost,
+            discount: altDiscount,
+            promoLabel: activePromoLabel,
+            shippingFee: 0,
+            postcode: ""
+        };
+
+        renderCart();
+        toggleCart(true);
+    };
+
+    function renderCart() {
+        const container = document.getElementById('cart-items-container');
+        if (!cartState) return;
+
+        let altHtml = '';
+        if (Object.keys(cartState.alterations).length > 0) {
+            altHtml = `<ul class="text-xs text-gray-400 mt-2 space-y-1">`;
+            for (let [k, v] of Object.entries(cartState.alterations)) {
+                altHtml += `<li>↳ Custom ${k}: ${v}"</li>`;
+            }
+            altHtml += `</ul>`;
+        }
+
+        container.innerHTML = `
+            <div class="flex gap-4">
+                <img src="images/z01-1-hero.webp" class="w-20 h-24 object-cover rounded bg-gray-800" alt="">
+                <div>
+                    <div class="text-white font-medium">Z01 Abaya (Size ${cartState.size})</div>
+                    <div class="text-gray-400 text-sm">RM ${cartState.basePrice.toFixed(2)}</div>
+                    ${altHtml}
+                </div>
+            </div>
+        `;
+
+        const subtotal = cartState.basePrice + cartState.altCost;
+        document.getElementById('cart-subtotal').textContent = `RM ${subtotal.toFixed(2)}`;
+
+        const discRow = document.getElementById('cart-discount-row');
+        if (cartState.discount > 0) {
+            document.getElementById('cart-discount-label').textContent = cartState.promoLabel ? `Discount (${cartState.promoLabel})` : `Discount`;
+            document.getElementById('cart-discount-amount').textContent = `-RM ${cartState.discount.toFixed(2)}`;
+            discRow.classList.remove('hidden');
+        } else {
+            discRow.classList.add('hidden');
+        }
+
+        updateGrandTotal();
+    }
+
+    function updateGrandTotal() {
+        if (!cartState) return;
+        const total = (cartState.basePrice + cartState.altCost) - cartState.discount + cartState.shippingFee;
+        document.getElementById('cart-total').textContent = `RM ${total.toFixed(2)}`;
+    }
+
+    // Shipping Calc
+    document.getElementById('btn-calc-ship').onclick = async () => {
+        const pc = document.getElementById('cart-postcode').value;
+        if (!pc || pc.length < 5) return;
+
+        const btn = document.getElementById('btn-calc-ship');
+        btn.textContent = "...";
+
+        try {
+            const res = await fetch(`${RETAIL_API_URL}?action=calc_shipping&postcode=${encodeURIComponent(pc)}&weight=1.0`);
+            const json = await res.json();
+            if (json.status === 'success' && cartState) {
+                cartState.shippingFee = json.rate;
+                cartState.postcode = pc;
+                document.getElementById('cart-shipping').textContent = `RM ${json.rate.toFixed(2)} (Pos Laju)`;
+                updateGrandTotal();
+            }
+        } catch (e) { alert("Shipping calculation failed."); }
+        btn.textContent = "CALC";
+    };
+
+    // UI Overlays
+    function toggleCart(show) {
+        const overlay = document.getElementById('cart-overlay');
+        const drawer = document.getElementById('cart-drawer');
+        if (show) {
+            overlay.classList.remove('hidden'); setTimeout(() => overlay.classList.remove('opacity-0'), 10);
+            drawer.classList.remove('translate-x-full');
+        } else {
+            overlay.classList.add('opacity-0'); setTimeout(() => overlay.classList.add('hidden'), 300);
+            drawer.classList.add('translate-x-full');
+        }
+    }
+    document.getElementById('nav-cart-btn').onclick = () => toggleCart(true);
+    document.getElementById('close-cart-btn').onclick = () => toggleCart(false);
+    document.getElementById('cart-overlay').onclick = () => toggleCart(false);
+
+    // INIT
+    renderSizeGrid();
+    fetchConfig();
+  </script>
+</body>
+</html>
