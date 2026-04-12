@@ -32,6 +32,7 @@
     .reveal { opacity: 0; transform: translateY(20px); transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1); }
     .reveal.show { opacity: 1; transform: translateY(0); }
     .tap-none { -webkit-tap-highlight-color: transparent; }
+    .review-text.clamp { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; overflow: hidden; }
     @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
   </style>
 </head>
@@ -77,7 +78,8 @@
 
       <div class="lg:col-span-5 flex flex-col min-w-0 w-full lg:pl-4">
           <h1 class="font-display text-4xl sm:text-5xl text-white mb-3 font-medium tracking-wide mt-2">ARABISTA | Abaya Arab</h1>
-          <p class="text-gray-400 text-sm mb-6 leading-relaxed">Zahra Series (Code Z01) Nidha Premium Dubai</p>
+          <p class="text-gray-400 text-sm mb-2 leading-relaxed">Zahra Series (Code Z01) Nidha Premium Dubai</p>
+          <p class="text-xs text-white/60 mb-6"><a href="#pdp-review-section" class="hover:text-luxe transition-colors tap-none">⭐ 4.9 rating · 273 reviews · 1.4K sold on TikTok</a></p>
 
           <div class="text-2xl text-white font-medium mb-3" id="pdp-price-row">
               <del class="text-gray-500 text-lg mr-2">RM 265.00</del><span class="text-luxe">RM 139.00</span>
@@ -217,16 +219,31 @@
             <div class="text-4xl font-semibold text-white">4.9</div>
             <div class="text-luxe flex items-center">★★★★★</div>
             <div class="w-px h-8 bg-white/20 mx-2"></div>
-            <div class="text-gray-400 text-sm">380 global reviews</div>
+            <div class="text-gray-400 text-sm">273 reviews</div>
         </div>
-        <div class="mb-10">
-            <p class="text-sm font-medium text-gray-300 mb-4">Photos from reviews</p>
-            <div class="flex gap-4 overflow-x-auto hide-scrollbar pb-4 w-full">
-                <img class="w-28 h-28 sm:w-32 sm:h-32 object-cover rounded-xl shrink-0 border border-white/10" src="images/z01-1-hero.webp" alt="Review 1">
-                <img class="w-28 h-28 sm:w-32 sm:h-32 object-cover rounded-xl shrink-0 border border-white/10" src="images/z01-2-angle.webp" alt="Review 2">
-                <img class="w-28 h-28 sm:w-32 sm:h-32 object-cover rounded-xl shrink-0 border border-white/10" src="images/z01-4-zoom-fabric.webp" alt="Review 3">
-                <img class="w-28 h-28 sm:w-32 sm:h-32 object-cover rounded-xl shrink-0 border border-white/10" src="images/z01-6-feature-sleeve.webp" alt="Review 4">
+        <div id="reviewList" class="divide-y divide-white/10 border border-white/10 rounded-2xl overflow-hidden"></div>
+
+        <div class="mt-4 flex items-center justify-between">
+          <button id="prevBtn" type="button" class="px-4 py-2 rounded-xl ring-1 ring-white/15 hover:bg-white/5 text-sm disabled:opacity-40 disabled:cursor-not-allowed tap-none">Previous</button>
+          <div class="text-xs text-white/60">Page <span id="pageNum">1</span> of <span id="pageTotal">—</span></div>
+          <button id="nextBtn" type="button" class="px-4 py-2 rounded-xl ring-1 ring-white/15 hover:bg-white/5 text-sm disabled:opacity-40 disabled:cursor-not-allowed tap-none">Next</button>
+        </div>
+
+        <div id="tiktokPreview" class="hidden mt-4">
+          <a href="https://vt.tiktok.com/ZSHnDRphXWjk2-DE4dI/" target="_blank" class="block rounded-2xl border border-white/10 hover:border-white/20 transition tap-none">
+            <div class="p-4 sm:p-5 flex items-start gap-3">
+              <div class="shrink-0 rounded-xl bg-white p-2">
+                <svg width="28" height="28" viewBox="0 0 48 48" aria-hidden="true">
+                  <path d="M33.3 13.4c2.4 1.8 5.4 2.9 8.7 2.9v7.2c-3.7 0-7.1-1.1-10-3.1v12.1c0 7.4-6 13.4-13.4 13.4S5.2 39.9 5.2 32.5 11.2 19.1 18.6 19.1c1 0 2 .1 2.9.4v7.5c-.9-.3-1.9-.5-2.9-.5-4 0-7.2 3.2-7.2 7.2s3.2 7.2 7.2 7.2 7.2-3.2 7.2-7.2V5.9h7.3c.2 2.9 1.7 5.5 4.2 7.5z" fill="#000"/>
+                </svg>
+              </div>
+              <div class="min-w-0">
+                <div class="text-sm font-medium text-white">View on TikTok</div>
+                <div class="text-xs text-white/60 truncate">https://vt.tiktok.com/ZSHnDRphXWjk2-DE4dI/</div>
+                <p class="mt-2 text-sm text-white/70">See all reviews and purchase directly on TikTok Shop.</p>
+              </div>
             </div>
+          </a>
         </div>
       </div>
   </section>
@@ -742,6 +759,74 @@
     document.getElementById('add-to-cart-btn').disabled = true;
     renderSizeGrid();
     fetchConfig();
+
+    // --- D01 Reviews Renderer ---
+    (function(){
+        const FULL = [{"username":"L**a","size":"M","rating":5,"original":"Cantik kain berat and jatuh, so ada effect tinggi and kurus"},{"username":"S**v","size":"L","rating":5,"original":"Alhamdulillah sgt berpuas hati.. material kain best, kemas jahitan, berbaloi beli.."},{"username":"n**f","size":"XXL","rating":5,"original":"Kain jenis berat .. dada 42 je tpi ambil 1 bigger size mmg ngam.. XXL cun.."},{"username":"c**e k**","size":"S","rating":5,"original":"Jubah dah diterima dibungkus dgn baik, siap ada kotak. Cutting pun lawa."},{"username":"F*R","size":"M","rating":5,"original":"Alhamdulillah dh sampai, sempat grab masa offer. Kain cantik dan kemas."},{"username":"N**a","size":"XS","rating":5,"original":"alhmdulillah selamat sampai. Pertama kali pakai abaya. Sangat cantik. ❤️"},{"username":"P**n A**n","size":"S","rating":5,"original":"Kain sejuk dan lembut. Size ngam utk saya yg berat 54kg."},{"username":"F**E","size":"S","rating":5,"original":"Cantik sgt abaya nya, packaging exclusive. Seller pun baik."},{"username":"M**a N**i","size":"XXL","rating":5,"original":"Baju n material sungguh cantik nnt nk beli lg ❤️"},{"username":"A**n","size":"S","rating":5,"original":"alhamdullilah.. kain selesa, saiz ngam (S)"},{"username":"A**a","size":"XXL","rating":5,"original":"Baju cantik sungguh. Abg courier pun ckp cantik 😅 tq seller 😍"},{"username":"S** M**","size":"S","rating":5,"original":"Saya suka sgt dengan tgn dia sebab yg paling saya suka adalah jenis yg inner penuh. Kain sejuk."},{"username":"y**g L**","size":"XS","rating":5,"original":"Alhamdulillah sampai dengan baik. Saiz semua cantik & kain kualiti terbaik sejuk. Akan repeat order."},{"username":"H**a","size":"S","rating":5,"original":"Selesa, cutting cantik, kain sejuk."},{"username":"H**a","size":"M","rating":5,"original":"Kain mmg cantik. Lembut."},{"username":"T**p S**","size":"XXXL","rating":5,"original":"Design dan material abaya dari Arabista sangat berkualiti, akan repeat."},{"username":"N**l","size":"S","rating":5,"original":"Saiz ngam. Puas hati. Kain cantik."},{"username":"W**i","size":"S","rating":5,"original":"Jubah cantik, kain sejuk. TQ"},{"username":"S**a","size":"M","rating":5,"original":"Material selesa dan nice cutting. Suka sgt!"},{"username":"N**a","size":"M","rating":5,"original":"Puas hati kain tebal. Jahitan kemas."},{"username":"H**a","size":"L","rating":5,"original":"Jahit kemas, kain cantik. Worth it!"},{"username":"N**e","size":"XXL","rating":5,"original":"Alhamdulillah, sampai cepat. Kain sejuk."},{"username":"A**a","size":"S","rating":5,"original":"Cantik, cutting lawa. Sesuai utk hadiah."},{"username":"A**m","size":"L","rating":5,"original":"Potongan cantik, kain jatuh elok."},{"username":"N**m","size":"XS","rating":5,"original":"Kain lembut nk pegang. Saiz XS ngam."},{"username":"I**a","size":"M","rating":5,"original":"Kain tak panas, selesa pakai lama."},{"username":"S**h","size":"XL","rating":5,"original":"Box cantik, puas hati."},{"username":"F**i","size":"M","rating":5,"original":"Suka sgt kain Nidha ni. Elegant."},{"username":"N**d","size":"S","rating":5,"original":"Fast delivery. Seller helpful."},{"username":"A**a","size":"XXL","rating":5,"original":"Repeat order sbb kain best."},{"username":"N**z","size":"L","rating":5,"original":"Size L ngam, kain tak jarang."},{"username":"Z**a","size":"M","rating":5,"original":"Cantik utk raya juga. Akan order lagi."},{"username":"R**a","size":"XXL","rating":5,"original":"Kain jatuh and selesa bergerak."},{"username":"H**n","size":"S","rating":5,"original":"Kain lembut, sy suka inner lengan."},{"username":"F**a","size":"M","rating":5,"original":"Datang cepat, packing kemas."},{"username":"N**s","size":"XL","rating":5,"original":"Mmg puas hati. Worth every ringgit."},{"username":"S**i","size":"S","rating":5,"original":"Nursing zip senang sgt."},{"username":"A**y","size":"XXXL","rating":5,"original":"XXXL pun cantik jatuh dia."},{"username":"K**m","size":"M","rating":5,"original":"Kain sejuk, tkn panas. Selesa."},{"username":"I**n","size":"S","rating":5,"original":"Seller baik, size tukar cepat."},{"username":"D**a","size":"S","rating":5,"original":"Warna hitam elok, tak pudar."},{"username":"C**y","size":"M","rating":5,"original":"Terbaik. Akan beli lagi."},{"username":"N**a","size":"M","rating":5,"original":"Suka packaging ada kotak."},{"username":"M**n","size":"L","rating":5,"original":"Sgt puas hati dgn kualiti."},{"username":"S**y","size":"S","rating":5,"original":"Senang iron, tak mudah berkedut."},{"username":"H**m","size":"XL","rating":5,"original":"Sesuai utk hadiah kahwin."},{"username":"R**n","size":"M","rating":5,"original":"Cutting A-line cantik."},{"username":"F**z","size":"S","rating":5,"original":"Selesa pakai lama di office."},{"username":"L**n","size":"XS","rating":5,"original":"Sgt kemas jahitan."},{"username":"N**y","size":"S","rating":5,"original":"Inner lengan buat wudhu’ senang."},{"username":"W**a","size":"M","rating":5,"original":"Sgt puas hati. Lembut dan jatuh."},{"username":"Q**a","size":"L","rating":5,"original":"Tak jarang, selamat pakai."},{"username":"S**n","size":"XXL","rating":5,"original":"Kualiti terbaik dgn harga."},{"username":"H**r","size":"S","rating":5,"original":"Saiz S ngam 150cm tinggi."},{"username":"R**f","size":"M","rating":5,"original":"Seller responsif, bantu pilih size."},{"username":"A**q","size":"L","rating":5,"original":"Suka kain berat, nampak jatuh."},{"username":"M**y","size":"XL","rating":5,"original":"Datang cepat, kotak elok."},{"username":"I**e","size":"M","rating":5,"original":"Kain breathable, x panas."},{"username":"S**a","size":"S","rating":5,"original":"Zip depan memudahkan."},{"username":"N**r","size":"XXL","rating":5,"original":"XXL sesuai utk saya 80kg."},{"username":"T**a","size":"M","rating":5,"original":"Classic look, minimal."},{"username":"Z**h","size":"S","rating":5,"original":"Potongan kemas, cantik."},{"username":"J**a","size":"M","rating":5,"original":"Shawl percuma best kualiti."},{"username":"N**a","size":"L","rating":5,"original":"Length ngam utk saya 165cm."},{"username":"R**a","size":"M","rating":5,"original":"Abaya cantik utk kerja."},{"username":"S**y","size":"S","rating":5,"original":"Selesa sgt utk travel."},{"username":"P**a","size":"S","rating":5,"original":"Suka kotak hadiah."},{"username":"A**i","size":"XXXL","rating":5,"original":"XXXL cutting lawa."},{"username":"M**e","size":"M","rating":5,"original":"Harga berbaloi."},{"username":"N**h","size":"S","rating":5,"original":"Senang matching shawl."},{"username":"S**a","size":"S","rating":5,"original":"Kain tak melekat, airy."}];
+
+        const PER_PAGE = 5;
+        const list = document.getElementById('reviewList');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const pageNum = document.getElementById('pageNum');
+        const pageTotal = document.getElementById('pageTotal');
+        const tiktokPreview = document.getElementById('tiktokPreview');
+        const reviewsSection = document.getElementById('pdp-review-section');
+
+        const mkStar = (n)=>'★'.repeat(n||5);
+        const esc = (s)=>String(s||'').replace(/[&<>]/g, c=>({ '&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+        const dot = '<span class="mx-2 text-white/30">•</span>';
+
+        function reviewCard(r){
+          const longOrig = (r.original||'').length > 160;
+          const id = Math.random().toString(36).slice(2,8);
+          return `
+          <article class="p-4 sm:p-5">
+            <div class="text-xs text-white/60 mb-2">
+              <strong class="text-white/80">${esc(r.username)}</strong>${dot}
+              Size: ${esc(r.size||'—')}${dot}
+              <span aria-label="rating" class="text-luxe">${mkStar(r.rating)}</span>
+            </div>
+            <div class="text-sm leading-relaxed">
+              <p class="review-text ${longOrig?'clamp':''}" id="o-${id}">${esc(r.original||'')}</p>
+              ${longOrig?'<button type="button" class="readmore text-xs underline decoration-white/30 hover:text-luxe mt-1 tap-none" data-target="o-'+id+'">Read more</button>':''}
+            </div>
+          </article>`;
+        }
+
+        function renderPage(p){
+          const totalPages = Math.max(1, Math.ceil(FULL.length / PER_PAGE));
+          const clamped = Math.min(Math.max(1, p), totalPages);
+          const start = (clamped - 1) * PER_PAGE;
+          const slice = FULL.slice(start, start + PER_PAGE);
+
+          list.innerHTML = slice.map(reviewCard).join('');
+          pageNum.textContent = clamped;
+          pageTotal.textContent = totalPages;
+
+          prevBtn.disabled = clamped === 1;
+          nextBtn.disabled = clamped === totalPages;
+
+          tiktokPreview.classList.toggle('hidden', clamped !== totalPages);
+        }
+
+        list.addEventListener('click', (e)=>{
+          const b = e.target.closest('.readmore');
+          if(!b) return;
+          const id = b.getAttribute('data-target');
+          const p = document.getElementById(id);
+          if(!p) return;
+          p.classList.toggle('clamp');
+          b.textContent = p.classList.contains('clamp') ? 'Read more' : 'Show less';
+        });
+
+        let current = 1;
+        function scrollReviewsTop(){ reviewsSection.scrollIntoView({behavior:'smooth', block:'start'}); }
+        prevBtn.addEventListener('click', ()=>{ if(current>1){ current--; renderPage(current); scrollReviewsTop(); } });
+        nextBtn.addEventListener('click', ()=>{ const tp=Math.ceil(FULL.length/PER_PAGE); if(current<tp){ current++; renderPage(current); scrollReviewsTop(); } });
+
+        renderPage(current);
+    })();
 
     // D01 Intersection Observer for .reveal animations
     document.querySelectorAll('.reveal').forEach(el => {
