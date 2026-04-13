@@ -800,9 +800,14 @@
             });
             const json = await res.json();
             if (json.status === 'success') {
-                const merchantId = "357177400032661";
-                const desc = encodeURIComponent(`Arabista Retail Order: ${json.orderId}`);
-                window.location.href = `https://sandbox.senangpay.my/payment/${merchantId}?detail=${desc}&amount=${json.amount}&order_id=${json.orderId}&name=${encodeURIComponent(name)}&email=${encodeURIComponent(dummyEmail)}&phone=${encodeURIComponent(phone)}`;
+                if (json.paymentUrl) {
+                    window.location.href = json.paymentUrl;
+                } else {
+                    const merchantId = "357177400032661";
+                    const desc = encodeURIComponent(`Arabista Retail Order: ${json.orderId}`);
+                    const amt = Number(cartState.totalPaid).toFixed(2);
+                    window.location.href = `https://sandbox.senangpay.my/payment/${merchantId}?detail=${desc}&amount=${amt}&order_id=${json.orderId}&name=${encodeURIComponent(name)}&phone=${encodeURIComponent(phone)}`;
+                }
             } else {
                 alert("Checkout Error: " + json.message);
                 btn.textContent = "Proceed to Payment"; btn.disabled = false;
