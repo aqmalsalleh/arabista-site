@@ -436,8 +436,6 @@
             .replace(/"/g, "&quot;")
             .replace(/'/g, "&#039;"); 
     }
-    function sanitizePhone(phone) { let p = phone.replace(/\D/g, ''); if (p.startsWith('0')) p = '6' + p; else if (!p.startsWith('60') && p.length >= 9) p = '60' + p; return p; }
-
     function setLang(lang) {
         currentLang = lang;
         document.querySelectorAll('[data-t]').forEach(el => { if(t[lang][el.getAttribute('data-t')]) el.innerHTML = t[lang][el.getAttribute('data-t')]; });
@@ -1130,10 +1128,19 @@
 
     async function submitOrder() {
         const custName = state.path === 'A' ? document.getElementById('auto-cust-name').value : document.getElementById('manual-cust-name').value.trim();
-        const rawPhone = state.path === 'A' ? document.getElementById('auto-cust-phone').value : document.getElementById('manual-cust-phone').value.trim();
-        
+
+        // --- FRONTEND PHONE SANITIZATION ---
+        let rawPhone = state.path === 'A' ? document.getElementById('auto-cust-phone').value : document.getElementById('manual-cust-phone').value;
+        let cleanPhone = String(rawPhone).trim().replace(/\D/g, ''); // Strip spaces, dashes, and '+'
+        if (cleanPhone.startsWith('1')) {
+             cleanPhone = '60' + cleanPhone; // Catch dropped leading zero
+        } else if (cleanPhone.startsWith('0')) {
+             cleanPhone = '6' + cleanPhone; // Convert '019' to '6019'
+        }
+        const phone = cleanPhone;
+
         if(!custName) return alert(t[currentLang].alert_name);
-        if(!rawPhone) return alert(t[currentLang].alert_phone);
+        if(!phone) return alert(t[currentLang].alert_phone);
         
         if(state.mode === 'lalamove') {
             state.unitNo = document.getElementById('cov-unit').value.trim();
@@ -1179,7 +1186,7 @@
         const payload = {
             Order_Type: state.path === 'A' ? "Website" : "Public",
             Order_Ref: state.path === 'A' ? document.getElementById('order-id-display').innerText.replace('#', '') : "Manual",
-            Customer_Name: custName, Phone_No: sanitizePhone(rawPhone),
+            Customer_Name: custName, Phone_No: phone,
             Unit_No: state.unitNo || "",
             Address_Details: state.address || "",
             Customer_Lat: parseFloat(state.lat).toFixed(6), Customer_Lng: parseFloat(state.lng).toFixed(6),
@@ -1202,7 +1209,7 @@
                     altId: generatedAltId,
                     hub: hubData,
                     custName: custName,
-                    custPhone: sanitizePhone(rawPhone)
+                    custPhone: phone
                 };
             } else { throw new Error(responseData.message); }
         } catch (error) {
