@@ -780,7 +780,17 @@
     document.getElementById('btn-checkout').onclick = async () => {
         if (!cartState) return;
         const name = document.getElementById('cart-name').value.trim();
-        const phone = document.getElementById('cart-phone').value.trim();
+
+        // --- FRONTEND PHONE SANITIZATION ---
+        let rawPhone = document.getElementById('cart-phone').value;
+        let cleanPhone = String(rawPhone).trim().replace(/\D/g, ''); // Strip spaces, dashes, and '+'
+        if (cleanPhone.startsWith('1')) {
+             cleanPhone = '60' + cleanPhone; // Catch dropped leading zero
+        } else if (cleanPhone.startsWith('0')) {
+             cleanPhone = '6' + cleanPhone; // Convert '019' to '6019'
+        }
+        const phone = cleanPhone;
+
         const address = document.getElementById('cart-address').value.trim();
         const state = document.getElementById('cart-state').value;
         const postcode = document.getElementById('cart-postcode').value.trim();
