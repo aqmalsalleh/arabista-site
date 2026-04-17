@@ -838,11 +838,38 @@
                 }
             });
         }
+        // --- SMART CART MEMORY: Preserve existing details ---
+        const prevName = cartState ? cartState.name : '';
+        const prevPhone = cartState ? cartState.phone : '';
+        const prevAddress = cartState ? cartState.address : '';
+        const prevPostcode = cartState ? cartState.postcode : '';
+        const prevStateVal = cartState ? cartState.state : '';
+        const prevShippingFee = cartState ? cartState.shippingFee : 0;
+        const prevEmail = cartState ? cartState.email : '';
+
         cartState = {
             itemCode: "Z01", size: selectedSize, basePrice: (activePromoPrice !== null ? activePromoPrice : activeRetailPrice),
             alterations: alterations, altCost: altCost, discount: altDiscount, promoLabel: activePromoLabel,
-            shippingFee: 0, postcode: "", weightKg: activeWeightKg
+            shippingFee: prevShippingFee, // Inherit previously calculated fee
+            postcode: prevPostcode, // Inherit previously entered postcode
+            weightKg: activeWeightKg,
+            name: prevName,
+            phone: prevPhone,
+            email: prevEmail,
+            address: prevAddress,
+            state: prevStateVal,
+            totalPaid: 0
         };
+        const elName = document.getElementById('cart-name');
+        const elPhone = document.getElementById('cart-phone');
+        const elAddr = document.getElementById('cart-address');
+        const elPc = document.getElementById('cart-postcode');
+        const elState = document.getElementById('cart-state');
+        if (elName) elName.value = cartState.name || '';
+        if (elPhone) elPhone.value = cartState.phone || '';
+        if (elAddr) elAddr.value = cartState.address || '';
+        if (elPc) elPc.value = cartState.postcode || '';
+        if (elState) elState.value = cartState.state || '';
         renderCart();
         toggleCart(true);
     };
@@ -878,6 +905,10 @@
             discRow.classList.remove('hidden');
         } else discRow.classList.add('hidden');
         updateGrandTotal();
+        const shipEl = document.getElementById('cart-shipping');
+        if (shipEl && cartState.shippingFee > 0 && shipEl.textContent.trim() === 'Pending') {
+            shipEl.textContent = `RM ${cartState.shippingFee.toFixed(2)} (Pos Laju)`;
+        }
     }
 
     function updateGrandTotal() {
@@ -979,14 +1010,31 @@
         const address = document.getElementById('cart-address').value.trim();
         const state = document.getElementById('cart-state').value;
         const postcode = document.getElementById('cart-postcode').value.trim();
-        if (!name || !phone || !address || !state || !postcode || cartState.postcode === "") {
-            alert("Please complete all shipping details."); return;
+        // Update state with the DOM inputs just in case they typed without blurring
+        cartState.name = name;
+        cartState.phone = phone;
+        cartState.address = address;
+        cartState.state = state;
+        cartState.postcode = postcode;
+
+        if (!name || !phone || !address || !state || !postcode) {
+            alert("Please fill in all shipping details."); 
+            return;
+        }
+
+        // If they filled the postcode but haven't calculated shipping yet, prompt them gently instead of a generic error
+        const shipRow = document.getElementById('cart-shipping');
+        const shipLabel = shipRow ? shipRow.textContent.replace(/\s+/g, ' ').trim() : '';
+        if (shipLabel === 'Pending' || shipLabel === '') {
+            alert("Please click 'Calculate Shipping' to update your delivery fee before checking out.");
+            return;
         }
         const btn = document.getElementById('btn-checkout');
         btn.textContent = "Securing Order..."; btn.disabled = true;
 
         // Email is omitted; SenangPay will collect it on the checkout page.
-        cartState.name = name; cartState.phone = phone; cartState.email = ""; cartState.address = address; cartState.state = state; cartState.postcode = postcode; cartState.totalPaid = (cartState.basePrice + cartState.altCost) - cartState.discount + cartState.shippingFee;
+        cartState.email = "";
+        cartState.totalPaid = (cartState.basePrice + cartState.altCost) - cartState.discount + cartState.shippingFee;
 
         try {
             const res = await fetch(`${RETAIL_API_URL}?action=reserve_stock`, {
