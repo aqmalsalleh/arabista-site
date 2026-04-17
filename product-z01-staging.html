@@ -413,7 +413,7 @@
         { type: 'img', src: 'images/z01-3-portrait-1.webp' }, { type: 'img', src: 'images/z01-4-portrait-2.webp' },
         { type: 'img', src: 'images/z01-5-closeup.webp' }, { type: 'img', src: 'images/z01-6-feature-zip.webp' },
         { type: 'img', src: 'images/z01-7-feature-sleeve.webp' }, { type: 'img', src: 'images/z01-8-feature-pockets.webp' },
-        { type: 'vid', src: 'images/z01-9-video-flow.mp4' }
+        { type: 'vid', src: 'images/z01-9-video-flow.mp4', thumb: 'images/z01-8-feature-pockets.webp' } // Using pockets as fallback thumb if specific video thumb doesn't exist yet
     ];
 
     const thumbContainer = document.getElementById('gallery-thumbs');
@@ -443,7 +443,7 @@
         if (m.type === 'img') {
             btn.innerHTML = `<img src="${m.src}" class="w-full h-full object-cover" alt="">`;
         } else {
-            btn.innerHTML = `<div class="w-full h-full bg-gray-800 flex items-center justify-center"><svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20"><path d="M4 4l12 6-12 6V4z"/></svg></div>`;
+            btn.innerHTML = `<div class="relative w-full h-full"><img src="${m.thumb}" class="w-full h-full object-cover" alt=""><div class="absolute inset-0 bg-black/40 flex items-center justify-center"><svg class="w-6 h-6 text-white pl-1" fill="currentColor" viewBox="0 0 20 20"><path d="M4 4l12 6-12 6V4z"/></svg></div></div>`;
         }
         thumbContainer.appendChild(btn);
     });
@@ -1088,108 +1088,95 @@
         syncThumbnails(0);
         renderLoop();
 
-    // --- PILLAR 6: The Fabric Inspector Lightbox ---
+    // --- PILLAR 6: Framed Canvas Pre-Render Engine ---
     const lightbox = document.getElementById('arabista-lightbox');
-    const lightboxContent = document.getElementById('lightbox-content');
-    const lightboxClose = document.getElementById('lightbox-close');
-    let activeLightboxMedia = null;
-    let isDraggingImage = false; // To prevent ghost clicks
+    const lbTrack = document.getElementById('lightbox-track');
+    const lbClose = document.getElementById('lightbox-close');
+    const lbNext = document.getElementById('lightbox-next');
+    const lbPrev = document.getElementById('lightbox-prev');
+    let lbItems = [];
+    let isDraggingImage = false; 
 
-    // Track Drag vs Click
+    // Pre-build the lightbox DOM on load (Zero lag)
+    mediaFiles.forEach((m) => {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'lb-item shrink-0 w-full h-full snap-center flex items-center justify-center relative';
+        let media;
+        if(m.type === 'vid') {
+            media = document.createElement('video');
+            media.src = m.src; media.loop = true; media.playsInline = true; media.muted = true;
+        } else {
+            media = document.createElement('img');
+            media.src = m.src;
+        }
+        media.className = 'lb-media max-w-full max-h-full object-contain';
+        wrapper.appendChild(media);
+        lbTrack.appendChild(wrapper);
+        lbItems.push(media);
+    });
+
+    // Track Drag vs Click to prevent ghost opening
     mainContainer.addEventListener('mousedown', () => { isDraggingImage = false; });
     mainContainer.addEventListener('mousemove', () => { if (isDown) isDraggingImage = true; });
     
     mainContainer.addEventListener('click', (e) => {
-        if (isDraggingImage) return; // Prevent ghost clicks
+        if (isDraggingImage) return; 
         openLightbox();
     });
 
     const openLightbox = () => {
-        const sourceMedia = mainImages[activeIndex];
-        if (!sourceMedia) return;
-
-        // Clean previous
-        lightboxContent.innerHTML = '';
+        // Instantly align lightbox track to current active index
+        lbTrack.scrollTo({ left: activeIndex * lbTrack.clientWidth, behavior: 'instant' });
         
-        // Clone Media
-        activeLightboxMedia = sourceMedia.cloneNode(true);
-        activeLightboxMedia.className = 'lightbox-media';
-        
-        // Handle Video Sync
-        if (sourceMedia.tagName.toLowerCase() === 'video') {
-            activeLightboxMedia.currentTime = sourceMedia.currentTime;
-            activeLightboxMedia.play();
-            activeLightboxMedia.style.pointerEvents = 'auto'; // Re-enable for lightbox
-        }
-
-        lightboxContent.appendChild(activeLightboxMedia);
         lightbox.classList.add('is-open');
         document.body.style.overflow = 'hidden';
-
-        // Fabric Inspector (Deep Zoom) Math
-        activeLightboxMedia.addEventListener('click', (e) => {
-            if (!activeLightboxMedia.classList.contains('is-zoomed')) {
-                // Calculate exact click coordinates for precise zoom origin
-                const rect = activeLightboxMedia.getBoundingClientRect();
-                const x = ((e.clientX - rect.left) / rect.width) * 100;
-                const y = ((e.clientY - rect.top) / rect.height) * 100;
-                activeLightboxMedia.style.transformOrigin = `${x}% ${y}%`;
-                activeLightboxMedia.classList.add('is-zoomed');
-            } else {
-                activeLightboxMedia.classList.remove('is-zoomed');
-                setTimeout(() => { activeLightboxMedia.style.transformOrigin = 'center center'; }, 500);
-            }
-        });
+        
+        // Auto-play video if active
+        if(lbItems[activeIndex].tagName.toLowerCase() === 'video') {
+            lbItems[activeIndex].play().catch(e=>console.log(e));
+        }
     };
 
     const closeLightbox = () => {
         lightbox.classList.remove('is-open');
         document.body.style.overflow = '';
-        if (activeLightboxMedia && activeLightboxMedia.tagName.toLowerCase() === 'video') {
-            activeLightboxMedia.pause();
+        
+        // Two-Way Sync: Find where the user swiped to in the lightbox
+        const lbIndex = Math.round(lbTrack.scrollLeft / lbTrack.clientWidth);
+        
+        // Pause all lightbox videos safely
+        lbItems.forEach(el => { if(el.tagName.toLowerCase() === 'video') el.pause(); });
+        
+        // If they changed images, fast-forward the main gallery
+        if(lbIndex !== activeIndex && mainImages[lbIndex]) {
+            const targetImg = mainImages[lbIndex];
+            const targetScroll = targetImg.offsetLeft - (mainContainer.clientWidth / 2) + (targetImg.clientWidth / 2);
+            mainContainer.scrollTo({ left: targetScroll, behavior: 'instant' });
         }
-        setTimeout(() => { lightboxContent.innerHTML = ''; }, 500); // Clear after animation
     };
 
-    lightboxClose.addEventListener('click', closeLightbox);
-    
-    // Close on Escape or Background Click
+    // Desktop Navigation
+    lbNext.addEventListener('click', () => lbTrack.scrollBy({ left: lbTrack.clientWidth, behavior: 'smooth' }));
+    lbPrev.addEventListener('click', () => lbTrack.scrollBy({ left: -lbTrack.clientWidth, behavior: 'smooth' }));
+
+    // Close Triggers
+    lbClose.addEventListener('click', closeLightbox);
     document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeLightbox(); });
     lightbox.addEventListener('click', (e) => {
-        if (e.target === lightbox || e.target === lightboxContent) closeLightbox();
+        if (e.target === lightbox || e.target.classList.contains('lb-item')) closeLightbox();
     });
 
-    // Mobile Pull-to-Dismiss Physics
-    let touchStartY = 0;
-    let touchCurrentY = 0;
-    
-    lightboxContent.addEventListener('touchstart', (e) => {
-        if (activeLightboxMedia && activeLightboxMedia.classList.contains('is-zoomed')) return;
-        touchStartY = e.touches[0].clientY;
-        lightboxContent.style.transition = 'none';
-    });
-
-    lightboxContent.addEventListener('touchmove', (e) => {
-        if (activeLightboxMedia && activeLightboxMedia.classList.contains('is-zoomed')) return;
-        touchCurrentY = e.touches[0].clientY - touchStartY;
-        if (touchCurrentY > 0) { // Only allow pull down
-            e.preventDefault();
-            lightboxContent.style.transform = `translateY(${touchCurrentY}px)`;
-            lightbox.style.backgroundColor = `rgba(15, 15, 16, ${1 - (touchCurrentY / 500)})`;
-        }
-    });
-
-    lightboxContent.addEventListener('touchend', () => {
-        lightboxContent.style.transition = 'transform 0.3s cubic-bezier(0.16, 1, 0.3, 1)';
-        if (touchCurrentY > 120) {
-            closeLightbox();
-        } else {
-            // Snap back
-            lightboxContent.style.transform = '';
-            lightbox.style.backgroundColor = '';
-        }
-        touchCurrentY = 0;
-    });
+    // Video Auto-Play Sync inside Lightbox while scrolling
+    lbTrack.addEventListener('scroll', () => {
+        if(!lightbox.classList.contains('is-open')) return;
+        const currentLbIndex = Math.round(lbTrack.scrollLeft / lbTrack.clientWidth);
+        lbItems.forEach((el, idx) => {
+            if(el.tagName.toLowerCase() === 'video') {
+                if(idx === currentLbIndex) el.play().catch(e=>e);
+                else el.pause();
+            }
+        });
+    }, { passive: true });
 
         }
     });
