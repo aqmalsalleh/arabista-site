@@ -34,6 +34,68 @@
     .tap-none { -webkit-tap-highlight-color: transparent; }
     .review-text.clamp { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; overflow: hidden; }
     @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+    /* Product gallery — Phase 1 (premium luxury, CSS only) */
+    @media (max-width: 1023px) {
+      #gallery-thumbs {
+        scroll-snap-type: x mandatory;
+        -webkit-overflow-scrolling: touch;
+      }
+      #gallery-thumbs > button {
+        scroll-snap-align: center;
+      }
+    }
+    @media (min-width: 1024px) {
+      .product-gallery > div:first-of-type {
+        cursor: zoom-in;
+      }
+      #gallery-thumbs {
+        cursor: grab;
+      }
+      #gallery-thumbs:active {
+        cursor: grabbing;
+      }
+    }
+    @keyframes galleryImgFadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    #main-image,
+    #main-video,
+    #gallery-thumbs img {
+      transition: opacity 0.45s ease;
+    }
+    #main-image {
+      animation: galleryImgFadeIn 0.55s ease-out forwards;
+    }
+    #gallery-thumbs img {
+      opacity: 0;
+      animation: galleryImgFadeIn 0.5s ease-out forwards;
+    }
+    .product-gallery video::-webkit-media-controls,
+    .product-gallery video::-webkit-media-controls-enclosure {
+      display: none !important;
+    }
+    .lightbox-active {
+      position: fixed !important;
+      inset: 0 !important;
+      z-index: 10000;
+      box-sizing: border-box;
+      width: 100vw !important;
+      height: 100vh !important;
+      max-width: none !important;
+      max-height: none !important;
+      margin: 0 !important;
+      border-radius: 0 !important;
+      background: #0F0F10 !important;
+      border: 2px solid #D4AF37;
+      object-fit: contain;
+    }
+    img.lightbox-active {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
   </style>
 </head>
 <body class="font-sans antialiased pb-8 selection:bg-luxe selection:text-ink max-w-[100vw] overflow-x-hidden relative bg-brand text-white">
@@ -68,7 +130,7 @@
 
     <section class="max-w-screen-xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 px-4 sm:px-6 pt-4 pb-4 min-w-0 w-full overflow-hidden">
 
-      <div class="lg:col-span-7 flex flex-col gap-4 min-w-0 w-full reveal">
+      <div class="product-gallery lg:col-span-7 flex flex-col gap-4 min-w-0 w-full reveal">
           <div class="relative aspect-[4/5] bg-white/5 rounded-2xl overflow-hidden shadow-soft ring-1 ring-white/10 group">
               <video id="main-video" class="w-full h-full object-cover hidden" loop muted playsinline></video>
               <img id="main-image" src="images/z01-1-hero.webp" class="w-full h-full object-cover transition-opacity duration-300" alt="Z01 Abaya">
