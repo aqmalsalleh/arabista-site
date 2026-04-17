@@ -84,27 +84,12 @@
     .arabista-gallery-img::-webkit-media-controls { display: none !important; }
     video.arabista-gallery-img { object-fit: cover; pointer-events: none; }
 
-    /* --- ARABISTA LIGHTBOX CSS --- */
-    #arabista-lightbox.is-open {
-        opacity: 1;
-        pointer-events: auto;
-    }
-    .lightbox-media {
-        max-width: 100%;
-        max-height: 100%;
-        width: auto;
-        height: auto;
-        object-fit: contain;
-        transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-        will-change: transform;
-    }
-    .lightbox-media:not(.is-zoomed) {
-        cursor: zoom-in;
-    }
-    .lightbox-media.is-zoomed {
-        cursor: zoom-out;
-        transform: scale(2.5);
-    }
+    /* --- ARABISTA LIGHTBOX CSS (FRAMED CANVAS) --- */
+    #arabista-lightbox.is-open { opacity: 1; pointer-events: auto; }
+    #arabista-lightbox.is-open #lightbox-frame { transform: scale(1); }
+    .lb-item { scroll-snap-align: center; flex: 0 0 100%; min-width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; }
+    .lb-media { max-width: 100%; max-height: 100%; object-fit: contain; }
+    .lb-media::-webkit-media-controls { display: none !important; }
   </style>
 </head>
 <body class="font-sans antialiased pb-8 selection:bg-luxe selection:text-ink max-w-[100vw] overflow-x-hidden relative bg-brand text-white">
@@ -1210,11 +1195,23 @@
     });
   </script>
 
-  <div id="arabista-lightbox" class="fixed inset-0 z-[100] flex items-center justify-center opacity-0 pointer-events-none transition-all duration-500 bg-[#0F0F10]/95 backdrop-blur-md">
-      <button id="lightbox-close" class="absolute top-6 right-6 sm:top-8 sm:right-8 text-white/50 hover:text-white z-[110] p-2 transition-colors tap-none">
-          <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M6 18L18 6M6 6l12 12"/></svg>
-      </button>
-      <div id="lightbox-content" class="w-full h-full flex items-center justify-center relative overflow-hidden transition-transform duration-300"></div>
-  </div>
+  <div id="arabista-lightbox" class="fixed inset-0 z-[100] flex items-center justify-center opacity-0 pointer-events-none transition-opacity duration-500 bg-[#0F0F10]/95 backdrop-blur-md">
+    <div class="relative w-[95vw] h-[95vh] sm:w-[90vw] sm:h-[90vh] border border-luxe/50 shadow-[0_0_30px_rgba(192,160,98,0.15)] bg-ink rounded-xl overflow-hidden flex flex-col transform scale-95 transition-transform duration-500" id="lightbox-frame">
+
+        <button id="lightbox-close" class="absolute top-4 right-4 z-[110] p-2 rounded-full ring-1 ring-white/20 hover:ring-luxe bg-black/40 backdrop-blur-md text-white/70 hover:text-white transition-all tap-none">
+            <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+
+        <button id="lightbox-prev" class="absolute left-4 top-1/2 -translate-y-1/2 z-[110] p-3 rounded-full ring-1 ring-white/20 hover:ring-luxe bg-black/40 backdrop-blur-md text-white/70 hover:text-white transition-all tap-none hidden sm:flex">
+            <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 19l-7-7 7-7"/></svg>
+        </button>
+        <button id="lightbox-next" class="absolute right-4 top-1/2 -translate-y-1/2 z-[110] p-3 rounded-full ring-1 ring-white/20 hover:ring-luxe bg-black/40 backdrop-blur-md text-white/70 hover:text-white transition-all tap-none hidden sm:flex">
+            <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5l7 7-7 7"/></svg>
+        </button>
+
+        <div id="lightbox-track" class="flex-1 w-full h-full flex overflow-x-auto snap-x snap-mandatory hide-scrollbar scroll-smooth">
+            </div>
+    </div>
+</div>
 </body>
 </html>
