@@ -494,10 +494,28 @@
             activeWeightKg = matrixRow.weight;
         }
         const priceRow = document.getElementById('pdp-price-row');
+        const stickyPriceDisplay = document.getElementById('sticky-price-display');
+        const stickyBtn = document.getElementById('sticky-btn');
+        
+        let priceHtml = '';
         if (activePromoPrice !== null && activePromoPrice < activeRetailPrice) {
+            // Promo Active: Strike-through retail, show promo
+            priceHtml = `<del class="text-gray-500 mr-2 text-[13px]">RM ${activeRetailPrice.toFixed(2)}</del><span class="text-luxe">RM ${activePromoPrice.toFixed(2)}</span>`;
             priceRow.innerHTML = `<del class="text-gray-500 text-lg mr-2">RM ${activeRetailPrice.toFixed(2)}</del><span class="text-luxe">RM ${activePromoPrice.toFixed(2)}</span>`;
         } else {
+            // No Promo: Show standard retail
+            priceHtml = `<span class="text-white">RM ${activeRetailPrice.toFixed(2)}</span>`;
             priceRow.textContent = `RM ${activeRetailPrice.toFixed(2)}`;
+        }
+
+        // --- STICKY BAR CONTEXT SYNC ---
+        if (stickyPriceDisplay) {
+            stickyPriceDisplay.innerHTML = `<span class="text-white/50 mr-2 text-[12px]">Size ${size} &middot;</span> ${priceHtml}`;
+        }
+        
+        if (stickyBtn) {
+            stickyBtn.textContent = "ADD TO CART";
+            stickyBtn.className = "px-6 py-2.5 rounded-lg text-[10px] font-medium uppercase tracking-widest transition-all duration-300 tap-none bg-luxe text-ink shadow-[0_0_15px_rgba(192,160,98,0.2)]";
         }
     }
 
@@ -889,6 +907,43 @@
     renderSizeGrid();
     fetchConfig();
 
+    // --- CONTEXT-AWARE STICKY BAR ENGINE ---
+    document.addEventListener('DOMContentLoaded', () => {
+        const mainCartBtn = document.getElementById('add-to-cart-btn');
+        const stickyBar = document.getElementById('sticky-buy-bar');
+        const stickyBtn = document.getElementById('sticky-btn');
+        const sizeGrid = document.getElementById('size-grid');
+
+        if (mainCartBtn && stickyBar && stickyBtn) {
+            // 1. Hide-and-Seek Scroll Observer
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    // Slide up only if user scrolled PAST the main button (top < 0)
+                    if (!entry.isIntersecting && entry.boundingClientRect.top < 0) {
+                        stickyBar.classList.remove('translate-y-full');
+                    } else {
+                        stickyBar.classList.add('translate-y-full');
+                    }
+                });
+            }, { threshold: 0 });
+            observer.observe(mainCartBtn);
+
+            // 2. Intelligent Button Logic
+            stickyBtn.addEventListener('click', () => {
+                if (!selectedSize) {
+                    // State A: Auto-scroll to Size Grid
+                    if (sizeGrid) {
+                        const y = sizeGrid.getBoundingClientRect().top + window.scrollY - 120; 
+                        window.scrollTo({ top: y, behavior: 'smooth' });
+                    }
+                } else {
+                    // State B: Add to Cart
+                    mainCartBtn.click();
+                }
+            });
+        }
+    });
+
     // --- D01 Reviews Renderer ---
     (function(){
         const FULL = [{"username":"L**a","size":"M","rating":5,"original":"Cantik kain berat and jatuh, so ada effect tinggi and kurus"},{"username":"S**v","size":"L","rating":5,"original":"Alhamdulillah sgt berpuas hati.. material kain best, kemas jahitan, berbaloi beli.."},{"username":"n**f","size":"XXL","rating":5,"original":"Kain jenis berat .. dada 42 je tpi ambil 1 bigger size mmg ngam.. XXL cun.."},{"username":"c**e k**","size":"S","rating":5,"original":"Jubah dah diterima dibungkus dgn baik, siap ada kotak. Cutting pun lawa."},{"username":"F*R","size":"M","rating":5,"original":"Alhamdulillah dh sampai, sempat grab masa offer. Kain cantik dan kemas."},{"username":"N**a","size":"XS","rating":5,"original":"alhmdulillah selamat sampai. Pertama kali pakai abaya. Sangat cantik. ❤️"},{"username":"P**n A**n","size":"S","rating":5,"original":"Kain sejuk dan lembut. Size ngam utk saya yg berat 54kg."},{"username":"F**E","size":"S","rating":5,"original":"Cantik sgt abaya nya, packaging exclusive. Seller pun baik."},{"username":"M**a N**i","size":"XXL","rating":5,"original":"Baju n material sungguh cantik nnt nk beli lg ❤️"},{"username":"A**n","size":"S","rating":5,"original":"alhamdullilah.. kain selesa, saiz ngam (S)"},{"username":"A**a","size":"XXL","rating":5,"original":"Baju cantik sungguh. Abg courier pun ckp cantik 😅 tq seller 😍"},{"username":"S** M**","size":"S","rating":5,"original":"Saya suka sgt dengan tgn dia sebab yg paling saya suka adalah jenis yg inner penuh. Kain sejuk."},{"username":"y**g L**","size":"XS","rating":5,"original":"Alhamdulillah sampai dengan baik. Saiz semua cantik & kain kualiti terbaik sejuk. Akan repeat order."},{"username":"H**a","size":"S","rating":5,"original":"Selesa, cutting cantik, kain sejuk."},{"username":"H**a","size":"M","rating":5,"original":"Kain mmg cantik. Lembut."},{"username":"T**p S**","size":"XXXL","rating":5,"original":"Design dan material abaya dari Arabista sangat berkualiti, akan repeat."},{"username":"N**l","size":"S","rating":5,"original":"Saiz ngam. Puas hati. Kain cantik."},{"username":"W**i","size":"S","rating":5,"original":"Jubah cantik, kain sejuk. TQ"},{"username":"S**a","size":"M","rating":5,"original":"Material selesa dan nice cutting. Suka sgt!"},{"username":"N**a","size":"M","rating":5,"original":"Puas hati kain tebal. Jahitan kemas."},{"username":"H**a","size":"L","rating":5,"original":"Jahit kemas, kain cantik. Worth it!"},{"username":"N**e","size":"XXL","rating":5,"original":"Alhamdulillah, sampai cepat. Kain sejuk."},{"username":"A**a","size":"S","rating":5,"original":"Cantik, cutting lawa. Sesuai utk hadiah."},{"username":"A**m","size":"L","rating":5,"original":"Potongan cantik, kain jatuh elok."},{"username":"N**m","size":"XS","rating":5,"original":"Kain lembut nk pegang. Saiz XS ngam."},{"username":"I**a","size":"M","rating":5,"original":"Kain tak panas, selesa pakai lama."},{"username":"S**h","size":"XL","rating":5,"original":"Box cantik, puas hati."},{"username":"F**i","size":"M","rating":5,"original":"Suka sgt kain Nidha ni. Elegant."},{"username":"N**d","size":"S","rating":5,"original":"Fast delivery. Seller helpful."},{"username":"A**a","size":"XXL","rating":5,"original":"Repeat order sbb kain best."},{"username":"N**z","size":"L","rating":5,"original":"Size L ngam, kain tak jarang."},{"username":"Z**a","size":"M","rating":5,"original":"Cantik utk raya juga. Akan order lagi."},{"username":"R**a","size":"XXL","rating":5,"original":"Kain jatuh and selesa bergerak."},{"username":"H**n","size":"S","rating":5,"original":"Kain lembut, sy suka inner lengan."},{"username":"F**a","size":"M","rating":5,"original":"Datang cepat, packing kemas."},{"username":"N**s","size":"XL","rating":5,"original":"Mmg puas hati. Worth every ringgit."},{"username":"S**i","size":"S","rating":5,"original":"Nursing zip senang sgt."},{"username":"A**y","size":"XXXL","rating":5,"original":"XXXL pun cantik jatuh dia."},{"username":"K**m","size":"M","rating":5,"original":"Kain sejuk, tkn panas. Selesa."},{"username":"I**n","size":"S","rating":5,"original":"Seller baik, size tukar cepat."},{"username":"D**a","size":"S","rating":5,"original":"Warna hitam elok, tak pudar."},{"username":"C**y","size":"M","rating":5,"original":"Terbaik. Akan beli lagi."},{"username":"N**a","size":"M","rating":5,"original":"Suka packaging ada kotak."},{"username":"M**n","size":"L","rating":5,"original":"Sgt puas hati dgn kualiti."},{"username":"S**y","size":"S","rating":5,"original":"Senang iron, tak mudah berkedut."},{"username":"H**m","size":"XL","rating":5,"original":"Sesuai utk hadiah kahwin."},{"username":"R**n","size":"M","rating":5,"original":"Cutting A-line cantik."},{"username":"F**z","size":"S","rating":5,"original":"Selesa pakai lama di office."},{"username":"L**n","size":"XS","rating":5,"original":"Sgt kemas jahitan."},{"username":"N**y","size":"S","rating":5,"original":"Inner lengan buat wudhu’ senang."},{"username":"W**a","size":"M","rating":5,"original":"Sgt puas hati. Lembut dan jatuh."},{"username":"Q**a","size":"L","rating":5,"original":"Tak jarang, selamat pakai."},{"username":"S**n","size":"XXL","rating":5,"original":"Kualiti terbaik dgn harga."},{"username":"H**r","size":"S","rating":5,"original":"Saiz S ngam 150cm tinggi."},{"username":"R**f","size":"M","rating":5,"original":"Seller responsif, bantu pilih size."},{"username":"A**q","size":"L","rating":5,"original":"Suka kain berat, nampak jatuh."},{"username":"M**y","size":"XL","rating":5,"original":"Datang cepat, kotak elok."},{"username":"I**e","size":"M","rating":5,"original":"Kain breathable, x panas."},{"username":"S**a","size":"S","rating":5,"original":"Zip depan memudahkan."},{"username":"N**r","size":"XXL","rating":5,"original":"XXL sesuai utk saya 80kg."},{"username":"T**a","size":"M","rating":5,"original":"Classic look, minimal."},{"username":"Z**h","size":"S","rating":5,"original":"Potongan kemas, cantik."},{"username":"J**a","size":"M","rating":5,"original":"Shawl percuma best kualiti."},{"username":"N**a","size":"L","rating":5,"original":"Length ngam utk saya 165cm."},{"username":"R**a","size":"M","rating":5,"original":"Abaya cantik utk kerja."},{"username":"S**y","size":"S","rating":5,"original":"Selesa sgt utk travel."},{"username":"P**a","size":"S","rating":5,"original":"Suka kotak hadiah."},{"username":"A**i","size":"XXXL","rating":5,"original":"XXXL cutting lawa."},{"username":"M**e","size":"M","rating":5,"original":"Harga berbaloi."},{"username":"N**h","size":"S","rating":5,"original":"Senang matching shawl."},{"username":"S**a","size":"S","rating":5,"original":"Kain tak melekat, airy."}];
@@ -1181,6 +1236,18 @@
         }
     });
   </script>
+
+  <div id="sticky-buy-bar" class="fixed bottom-0 inset-x-0 z-[45] transform translate-y-full transition-transform duration-500 bg-[#111213]/85 backdrop-blur-xl border-t border-white/5 shadow-[0_-15px_40px_rgba(0,0,0,0.6)] sm:hidden flex items-center justify-between px-5 py-4 pb-[calc(1rem+env(safe-area-inset-bottom,0px))]">
+      <div class="flex flex-col">
+          <span class="text-white font-medium text-[13px] tracking-wide">Z01 Zahra Series</span>
+          <div id="sticky-price-display" class="text-sm mt-0.5 flex items-center">
+              <span class="text-luxe">RM 139.00</span>
+          </div>
+      </div>
+      <button type="button" id="sticky-btn" class="px-6 py-2.5 rounded-lg text-[10px] font-medium uppercase tracking-widest transition-all duration-300 tap-none bg-white/10 text-white hover:bg-white/20">
+          Select Size
+      </button>
+  </div>
 
   <div id="arabista-lightbox" class="fixed inset-0 z-[100] flex items-center justify-center opacity-0 pointer-events-none transition-opacity duration-500 bg-[#0F0F10]/95 backdrop-blur-md">
     <div class="relative w-[95vw] h-[95vh] sm:w-[90vw] sm:h-[90vh] border border-luxe/50 shadow-[0_0_30px_rgba(192,160,98,0.15)] bg-ink rounded-xl overflow-hidden flex flex-col transform scale-95 transition-transform duration-500" id="lightbox-frame">
