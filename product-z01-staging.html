@@ -506,17 +506,37 @@
 
     // Fetch Backend
     async function fetchConfig() {
-        if (RETAIL_API_URL.includes("YOUR_RETAIL")) return;
+        if (RETAIL_API_URL.includes("YOUR_RETAIL")) {
+            // Failsafe for unconfigured API
+            document.querySelectorAll('.size-btn').forEach(btn => btn.classList.remove('animate-pulse', 'pointer-events-none', 'opacity-40'));
+            return;
+        }
+        
         try {
-            const res = await fetch(`${RETAIL_API_URL}?action=get_config`);
+            // Set a 5-second timeout controller so it doesn't hang forever on bad connections
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 5000);
+            
+            const res = await fetch(`${RETAIL_API_URL}?action=get_config`, { signal: controller.signal });
+            clearTimeout(timeoutId);
+            
             const json = await res.json();
+            
             if (json.status === 'success') {
                 appConfig = json.data.config || {};
                 inventoryMatrix = json.data.matrix || {};
                 renderAlterationFields();
                 applyOOSStyling();
+            } else {
+                throw new Error("API returned non-success status");
             }
-        } catch (e) { console.error("Config fetch failed:", e); }
+        } catch (e) {
+            console.warn("Inventory fetch failed, engaging failsafe fallback.", e);
+            // FAILSAFE: Strip skeleton and leave buttons clickable so revenue isn't blocked
+            document.querySelectorAll('.size-btn').forEach(btn => {
+                btn.classList.remove('animate-pulse', 'pointer-events-none', 'opacity-40');
+            });
+        }
     }
 
     // --- OOS AESTHETIC ENGINE ---
