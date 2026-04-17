@@ -87,8 +87,17 @@
     /* --- ARABISTA LIGHTBOX CSS (FRAMED CANVAS) --- */
     #arabista-lightbox.is-open { opacity: 1; pointer-events: auto; }
     #arabista-lightbox.is-open #lightbox-frame { transform: scale(1); }
-    .lb-item { scroll-snap-align: center; flex: 0 0 100%; min-width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; }
-    .lb-media { max-width: 100%; max-height: 100%; object-fit: contain; }
+    .lb-item { scroll-snap-align: center; flex: 0 0 100%; min-width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; padding: 2rem; }
+    @media (max-width: 640px) { .lb-item { padding: 0.5rem; } }
+    .lb-media { 
+        max-width: 100%; 
+        max-height: 100%; 
+        object-fit: contain; 
+        border: 1px solid rgba(192, 160, 98, 0.5); 
+        box-shadow: 0 0 30px rgba(192, 160, 98, 0.15); 
+        background-color: #111213;
+        border-radius: 0.5rem;
+    }
     .lb-media::-webkit-media-controls { display: none !important; }
   </style>
 </head>
@@ -413,7 +422,7 @@
         { type: 'img', src: 'images/z01-3-portrait-1.webp' }, { type: 'img', src: 'images/z01-4-portrait-2.webp' },
         { type: 'img', src: 'images/z01-5-closeup.webp' }, { type: 'img', src: 'images/z01-6-feature-zip.webp' },
         { type: 'img', src: 'images/z01-7-feature-sleeve.webp' }, { type: 'img', src: 'images/z01-8-feature-pockets.webp' },
-        { type: 'vid', src: 'images/z01-9-video-flow.mp4', thumb: 'images/z01-8-feature-pockets.webp' } // Using pockets as fallback thumb if specific video thumb doesn't exist yet
+        { type: 'vid', src: 'images/z01-9-video-flow.mp4', thumb: 'images/z01-9-video-poster.webp' } 
     ];
 
     const thumbContainer = document.getElementById('gallery-thumbs');
@@ -1152,7 +1161,7 @@
     let lbItems = [];
     let isDraggingImage = false; 
 
-    // Pre-build the lightbox DOM on load (Zero lag)
+    // Pre-build the lightbox DOM on load
     mediaFiles.forEach((m) => {
         const wrapper = document.createElement('div');
         wrapper.className = 'lb-item shrink-0 w-full h-full snap-center flex items-center justify-center relative';
@@ -1164,13 +1173,12 @@
             media = document.createElement('img');
             media.src = m.src;
         }
-        media.className = 'lb-media max-w-full max-h-full object-contain';
+        media.className = 'lb-media'; // CSS handles the hugging border and sizing
         wrapper.appendChild(media);
         lbTrack.appendChild(wrapper);
         lbItems.push(media);
     });
 
-    // Track Drag vs Click to prevent ghost opening
     mainContainer.addEventListener('mousedown', () => { isDraggingImage = false; });
     mainContainer.addEventListener('mousemove', () => { if (isDown) isDraggingImage = true; });
     
@@ -1180,13 +1188,10 @@
     });
 
     const openLightbox = () => {
-        // Instantly align lightbox track to current active index
         lbTrack.scrollTo({ left: activeIndex * lbTrack.clientWidth, behavior: 'instant' });
-        
         lightbox.classList.add('is-open');
         document.body.style.overflow = 'hidden';
         
-        // Auto-play video if active
         if(lbItems[activeIndex].tagName.toLowerCase() === 'video') {
             lbItems[activeIndex].play().catch(e=>console.log(e));
         }
@@ -1196,13 +1201,9 @@
         lightbox.classList.remove('is-open');
         document.body.style.overflow = '';
         
-        // Two-Way Sync: Find where the user swiped to in the lightbox
         const lbIndex = Math.round(lbTrack.scrollLeft / lbTrack.clientWidth);
-        
-        // Pause all lightbox videos safely
         lbItems.forEach(el => { if(el.tagName.toLowerCase() === 'video') el.pause(); });
         
-        // If they changed images, fast-forward the main gallery
         if(lbIndex !== activeIndex && mainImages[lbIndex]) {
             const targetImg = mainImages[lbIndex];
             const targetScroll = targetImg.offsetLeft - (mainContainer.clientWidth / 2) + (targetImg.clientWidth / 2);
@@ -1210,18 +1211,15 @@
         }
     };
 
-    // Desktop Navigation
     lbNext.addEventListener('click', () => lbTrack.scrollBy({ left: lbTrack.clientWidth, behavior: 'smooth' }));
     lbPrev.addEventListener('click', () => lbTrack.scrollBy({ left: -lbTrack.clientWidth, behavior: 'smooth' }));
 
-    // Close Triggers
     lbClose.addEventListener('click', closeLightbox);
     document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeLightbox(); });
     lightbox.addEventListener('click', (e) => {
         if (e.target === lightbox || e.target.classList.contains('lb-item')) closeLightbox();
     });
 
-    // Video Auto-Play Sync inside Lightbox while scrolling
     lbTrack.addEventListener('scroll', () => {
         if(!lightbox.classList.contains('is-open')) return;
         const currentLbIndex = Math.round(lbTrack.scrollLeft / lbTrack.clientWidth);
@@ -1250,22 +1248,22 @@
   </div>
 
   <div id="arabista-lightbox" class="fixed inset-0 z-[100] flex items-center justify-center opacity-0 pointer-events-none transition-opacity duration-500 bg-[#0F0F10]/95 backdrop-blur-md">
-    <div class="relative w-[95vw] h-[95vh] sm:w-[90vw] sm:h-[90vh] border border-luxe/50 shadow-[0_0_30px_rgba(192,160,98,0.15)] bg-ink rounded-xl overflow-hidden flex flex-col transform scale-95 transition-transform duration-500" id="lightbox-frame">
+      <div class="relative w-full h-full flex flex-col transform scale-95 transition-transform duration-500" id="lightbox-frame">
+          
+          <button id="lightbox-close" class="absolute top-4 right-4 sm:top-6 sm:right-6 z-[110] p-2.5 rounded-full ring-1 ring-white/20 hover:ring-luxe bg-black/40 backdrop-blur-md text-white/70 hover:text-white transition-all tap-none">
+              <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M6 18L18 6M6 6l12 12"/></svg>
+          </button>
 
-        <button id="lightbox-close" class="absolute top-4 right-4 z-[110] p-2 rounded-full ring-1 ring-white/20 hover:ring-luxe bg-black/40 backdrop-blur-md text-white/70 hover:text-white transition-all tap-none">
-            <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M6 18L18 6M6 6l12 12"/></svg>
-        </button>
+          <button id="lightbox-prev" class="absolute left-2 sm:left-6 top-1/2 -translate-y-1/2 z-[110] p-2 sm:p-3 rounded-full ring-1 ring-white/20 hover:ring-luxe bg-black/40 backdrop-blur-md text-white/70 hover:text-white transition-all tap-none flex">
+              <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 19l-7-7 7-7"/></svg>
+          </button>
+          <button id="lightbox-next" class="absolute right-2 sm:right-6 top-1/2 -translate-y-1/2 z-[110] p-2 sm:p-3 rounded-full ring-1 ring-white/20 hover:ring-luxe bg-black/40 backdrop-blur-md text-white/70 hover:text-white transition-all tap-none flex">
+              <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5l7 7-7 7"/></svg>
+          </button>
 
-        <button id="lightbox-prev" class="absolute left-4 top-1/2 -translate-y-1/2 z-[110] p-3 rounded-full ring-1 ring-white/20 hover:ring-luxe bg-black/40 backdrop-blur-md text-white/70 hover:text-white transition-all tap-none hidden sm:flex">
-            <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 19l-7-7 7-7"/></svg>
-        </button>
-        <button id="lightbox-next" class="absolute right-4 top-1/2 -translate-y-1/2 z-[110] p-3 rounded-full ring-1 ring-white/20 hover:ring-luxe bg-black/40 backdrop-blur-md text-white/70 hover:text-white transition-all tap-none hidden sm:flex">
-            <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5l7 7-7 7"/></svg>
-        </button>
-
-        <div id="lightbox-track" class="flex-1 w-full h-full flex overflow-x-auto snap-x snap-mandatory hide-scrollbar scroll-smooth">
-            </div>
-    </div>
-</div>
+          <div id="lightbox-track" class="flex-1 w-full h-full flex overflow-x-auto snap-x snap-mandatory hide-scrollbar scroll-smooth">
+              </div>
+      </div>
+  </div>
 </body>
 </html>
