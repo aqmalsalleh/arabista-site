@@ -523,6 +523,9 @@
     function applyOOSStyling() {
         const btns = document.querySelectorAll('.size-btn');
         btns.forEach(btn => {
+            // Strip the loading skeleton state now that data has arrived
+            btn.classList.remove('animate-pulse', 'pointer-events-none', 'opacity-40');
+
             const size = btn.dataset.size;
             const sku = `Z01-${size}`;
             const item = inventoryMatrix[sku];
@@ -552,7 +555,8 @@
         Object.keys(baseSizes).forEach(size => {
             const btn = document.createElement('button');
             btn.type = 'button';
-            btn.className = "size-btn py-3 border border-white/15 bg-transparent text-white rounded-lg font-medium hover:border-white/40 transition-colors focus:outline-none tap-none";
+            // Start buttons in a locked, pulsing skeleton state
+            btn.className = "size-btn py-3 border border-white/15 bg-transparent text-white rounded-lg font-medium hover:border-white/40 transition-colors focus:outline-none tap-none animate-pulse pointer-events-none opacity-40";
             btn.textContent = size;
             btn.dataset.size = size;
             btn.onclick = () => selectSize(size, btn);
