@@ -99,6 +99,27 @@
         border-radius: 0.5rem;
     }
     .lb-media::-webkit-media-controls { display: none !important; }
+
+    /* --- ARABISTA OOS AESTHETIC --- */
+    .size-btn:disabled {
+        color: rgba(255, 255, 255, 0.25) !important;
+        border-color: rgba(255, 255, 255, 0.08) !important;
+        cursor: not-allowed !important;
+        position: relative;
+        overflow: hidden;
+        background: transparent !important;
+    }
+    .size-btn:disabled::after {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: -15%;
+        width: 130%;
+        height: 1px;
+        background-color: rgba(255, 255, 255, 0.15);
+        transform: rotate(-25deg);
+        pointer-events: none;
+    }
   </style>
 </head>
 <body class="font-sans antialiased pb-8 selection:bg-luxe selection:text-ink max-w-[100vw] overflow-x-hidden relative bg-brand text-white">
@@ -209,9 +230,12 @@
           </div>
 
           <div class="mb-8">
-              <div class="flex justify-between items-center mb-4">
-                  <label class="text-sm font-medium text-white uppercase tracking-widest">Select Size</label>
-                  <button type="button" onclick="document.getElementById('size-modal').style.display='flex'; setTimeout(()=>document.getElementById('size-modal').classList.add('show'),10);" class="text-xs text-gray-500 underline decoration-gray-700 underline-offset-4 hover:text-white tap-none">Size Guide</button>
+              <div class="flex justify-between items-center mb-4 gap-3">
+                  <div class="flex flex-col sm:flex-row sm:items-baseline sm:gap-3 min-w-0">
+                      <label class="text-sm font-medium text-white uppercase tracking-widest">Select Size</label>
+                      <span id="sizeChosen" class="text-[11px] text-white/45 font-medium tracking-wide truncate"></span>
+                  </div>
+                  <button type="button" onclick="document.getElementById('size-modal').style.display='flex'; setTimeout(()=>document.getElementById('size-modal').classList.add('show'),10);" class="text-xs text-gray-500 underline decoration-gray-700 underline-offset-4 hover:text-white tap-none shrink-0">Size Guide</button>
               </div>
               <div class="grid grid-cols-4 lg:grid-cols-6 gap-3" id="size-grid"></div>
           </div>
@@ -490,8 +514,36 @@
                 appConfig = json.data.config || {};
                 inventoryMatrix = json.data.matrix || {};
                 renderAlterationFields();
+                applyOOSStyling();
             }
         } catch (e) { console.error("Config fetch failed:", e); }
+    }
+
+    // --- OOS AESTHETIC ENGINE ---
+    function applyOOSStyling() {
+        const btns = document.querySelectorAll('.size-btn');
+        btns.forEach(btn => {
+            const size = btn.dataset.size;
+            const sku = `Z01-${size}`;
+            const item = inventoryMatrix[sku];
+            
+            // Handle different variations of stock property naming from backend
+            const stockLevel = item ? (item.Available_To_Sell || item.stock || item.qty || 0) : 0;
+            
+            if (!item || stockLevel <= 0 || stockLevel === "") {
+                btn.disabled = true;
+                // Auto-deselect if the user somehow had an OOS size selected
+                if (selectedSize === size) {
+                    btn.classList.remove('ring-2', 'ring-white/60');
+                    selectedSize = '';
+                    document.getElementById('sizeChosen').textContent = 'Size: —';
+                    if (typeof updateMatrixPricingFromSize === 'function') updateMatrixPricingFromSize(null);
+                }
+            } else {
+                btn.disabled = false;
+            }
+        });
+        validateAlterations();
     }
 
     // Size & Matrix Logic
@@ -502,6 +554,7 @@
             btn.type = 'button';
             btn.className = "size-btn py-3 border border-white/15 bg-transparent text-white rounded-lg font-medium hover:border-white/40 transition-colors focus:outline-none tap-none";
             btn.textContent = size;
+            btn.dataset.size = size;
             btn.onclick = () => selectSize(size, btn);
             grid.appendChild(btn);
         });
@@ -509,6 +562,8 @@
 
     function selectSize(size, btnElement) {
         selectedSize = size;
+        const sizeChosenEl = document.getElementById('sizeChosen');
+        if (sizeChosenEl) sizeChosenEl.textContent = 'Size: ' + size;
         document.querySelectorAll('.size-btn').forEach(b => b.className = "size-btn py-3 border border-white/15 bg-transparent text-white rounded-lg font-medium hover:border-white/40 transition-colors focus:outline-none tap-none");
         btnElement.className = "size-btn py-3 border border-luxe bg-luxe text-ink rounded-lg font-medium shadow-[0_0_15px_rgba(192,160,98,0.3)] transition-colors focus:outline-none tap-none";
 
@@ -518,6 +573,27 @@
     }
 
     function updateMatrixPricingFromSize(size) {
+        const priceRow = document.getElementById('pdp-price-row');
+        const stickyPriceDisplay = document.getElementById('sticky-price-display');
+        const stickyBtn = document.getElementById('sticky-btn');
+
+        if (size == null || size === '') {
+            activeRetailPrice = 150.00;
+            activePromoPrice = null;
+            activeWeightKg = 1.0;
+            if (priceRow) {
+                priceRow.innerHTML = `<del class="text-gray-500 text-lg mr-2">RM 265.00</del><span class="text-luxe">RM 139.00</span>`;
+            }
+            if (stickyPriceDisplay) {
+                stickyPriceDisplay.innerHTML = `<span class="text-luxe">RM 139.00</span>`;
+            }
+            if (stickyBtn) {
+                stickyBtn.textContent = 'Select Size';
+                stickyBtn.className = 'px-6 py-2.5 rounded-lg text-[10px] font-medium uppercase tracking-widest transition-all duration-300 tap-none bg-white/10 text-white hover:bg-white/20';
+            }
+            return;
+        }
+
         const sku = `Z01-${size}`;
         const matrixRow = inventoryMatrix[sku];
         if (matrixRow) {
@@ -525,9 +601,6 @@
             activePromoPrice = matrixRow.promoPrice;
             activeWeightKg = matrixRow.weight;
         }
-        const priceRow = document.getElementById('pdp-price-row');
-        const stickyPriceDisplay = document.getElementById('sticky-price-display');
-        const stickyBtn = document.getElementById('sticky-btn');
         
         let priceHtml = '';
         if (activePromoPrice !== null && activePromoPrice < activeRetailPrice) {
@@ -944,7 +1017,6 @@
         const mainCartBtn = document.getElementById('add-to-cart-btn');
         const stickyBar = document.getElementById('sticky-buy-bar');
         const stickyBtn = document.getElementById('sticky-btn');
-        const sizeGrid = document.getElementById('size-grid');
 
         if (mainCartBtn && stickyBar && stickyBtn) {
             // 1. Hide-and-Seek Scroll Observer
