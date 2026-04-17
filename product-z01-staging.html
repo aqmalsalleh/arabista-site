@@ -382,6 +382,10 @@
                 mainImage.classList.add('hidden');
                 mainVideo.src = m.src; mainVideo.classList.remove('hidden'); mainVideo.play();
             }
+            const clickedThumbnail = btn;
+            const thumbnailContainer = thumbContainer;
+            const scrollPos = clickedThumbnail.offsetLeft - (thumbnailContainer.clientWidth / 2) + (clickedThumbnail.clientWidth / 2);
+            thumbnailContainer.scrollTo({ left: scrollPos, behavior: 'smooth' });
         };
         thumbContainer.appendChild(btn);
     });
