@@ -34,40 +34,6 @@
     .tap-none { -webkit-tap-highlight-color: transparent; }
     .review-text.clamp { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; overflow: hidden; }
     @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-
-    /* Main gallery — cinematic horizontal track (scroll + snap + breathe) */
-    .gallery-main-scroll {
-      display: flex;
-      flex-direction: row;
-      flex-wrap: nowrap;
-      align-items: stretch;
-      overflow-x: auto;
-      overflow-y: hidden;
-      scroll-snap-type: x mandatory;
-      -webkit-overflow-scrolling: touch;
-      cursor: grab;
-      -ms-overflow-style: none;
-      scrollbar-width: none;
-    }
-    .gallery-main-scroll::-webkit-scrollbar { display: none; }
-    .gallery-main-slide {
-      position: relative;
-      flex: 0 0 100%;
-      width: 100%;
-      min-width: 100%;
-      height: 100%;
-      min-height: 0;
-      scroll-snap-align: center;
-    }
-    .gallery-main-slide img,
-    .gallery-main-slide video {
-      display: block;
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      scroll-snap-align: center;
-      transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.4s ease;
-    }
   </style>
 </head>
 <body class="font-sans antialiased pb-8 selection:bg-luxe selection:text-ink max-w-[100vw] overflow-x-hidden relative bg-brand text-white">
@@ -398,166 +364,6 @@
     const thumbContainer = document.getElementById('gallery-thumbs');
     const mainImage = document.getElementById('main-image');
     const mainVideo = document.getElementById('main-video');
-    const mainGalleryStage = mainImage.parentElement;
-
-    function initGalleryMainStage() {
-        if (!mainGalleryStage) return;
-        mainGalleryStage.classList.remove('overflow-hidden');
-        mainGalleryStage.classList.add('gallery-main-scroll', 'min-h-0');
-        while (mainGalleryStage.firstChild) mainGalleryStage.removeChild(mainGalleryStage.firstChild);
-        mediaFiles.forEach((m, i) => {
-            const slide = document.createElement('div');
-            slide.className = 'gallery-main-slide';
-            if (m.type === 'img') {
-                if (i === 0) {
-                    mainImage.draggable = false;
-                    slide.appendChild(mainImage);
-                } else {
-                    const im = document.createElement('img');
-                    im.src = m.src;
-                    im.className = 'w-full h-full object-cover transition-opacity duration-300';
-                    im.alt = 'Z01 Abaya';
-                    im.draggable = false;
-                    slide.appendChild(im);
-                }
-            } else {
-                mainVideo.draggable = false;
-                mainVideo.src = m.src;
-                slide.appendChild(mainVideo);
-            }
-            mainGalleryStage.appendChild(slide);
-        });
-    }
-
-    initGalleryMainStage();
-
-    function updateGalleryBreathe() {
-        if (!mainGalleryStage) return;
-        const rect = mainGalleryStage.getBoundingClientRect();
-        const cx = rect.left + rect.width * 0.5;
-        mainGalleryStage.querySelectorAll('.gallery-main-slide').forEach((slide) => {
-            const sr = slide.getBoundingClientRect();
-            const sx = sr.left + sr.width * 0.5;
-            const dist = Math.abs(sx - cx);
-            const norm = Math.min(1, dist / (rect.width * 0.5 + 1e-6));
-            const scale = 1 - 0.05 * norm;
-            const opacity = 1 - 0.5 * norm;
-            slide.querySelectorAll('img, video').forEach((el) => {
-                el.style.transform = `scale(${scale})`;
-                el.style.opacity = String(opacity);
-            });
-        });
-    }
-
-    function syncThumbHighlightFromMainScroll() {
-        if (!mainGalleryStage || !thumbContainer) return;
-        const w = mainGalleryStage.clientWidth;
-        if (w < 1) return;
-        let idx = Math.round(mainGalleryStage.scrollLeft / w);
-        idx = Math.max(0, Math.min(mediaFiles.length - 1, idx));
-        const m = mediaFiles[idx];
-        thumbContainer.querySelectorAll('button').forEach((b, j) => {
-            if (j === idx) {
-                b.classList.remove('border-transparent', 'opacity-50');
-                b.classList.add('border-luxe', 'opacity-100');
-            } else {
-                b.classList.remove('border-luxe', 'opacity-100');
-                b.classList.add('border-transparent', 'opacity-50');
-            }
-        });
-        if (m.type === 'img') {
-            mainVideo.pause();
-            mainVideo.classList.add('hidden');
-            if (idx === 0) {
-                mainImage.src = m.src;
-                mainImage.classList.remove('hidden');
-            } else {
-                mainImage.classList.add('hidden');
-            }
-        } else {
-            mainImage.classList.add('hidden');
-            mainVideo.src = m.src;
-            mainVideo.classList.remove('hidden');
-            mainVideo.play().catch(() => {});
-        }
-    }
-
-    let galleryBreatheRaf = null;
-    mainGalleryStage.addEventListener('scroll', () => {
-        if (galleryBreatheRaf) return;
-        galleryBreatheRaf = requestAnimationFrame(() => {
-            galleryBreatheRaf = null;
-            updateGalleryBreathe();
-            syncThumbHighlightFromMainScroll();
-        });
-    }, { passive: true });
-
-    let galleryDragActive = false;
-    let galleryDragStartX = 0;
-    let galleryDragStartScrollLeft = 0;
-
-    mainGalleryStage.addEventListener('mousedown', (e) => {
-        if (e.button !== 0) return;
-        galleryDragActive = true;
-        galleryDragStartX = e.pageX;
-        galleryDragStartScrollLeft = mainGalleryStage.scrollLeft;
-        mainGalleryStage.style.scrollSnapType = 'none';
-        mainGalleryStage.style.cursor = 'grabbing';
-        e.preventDefault();
-    });
-
-    function galleryDragEnd() {
-        if (!galleryDragActive) return;
-        galleryDragActive = false;
-        mainGalleryStage.style.scrollSnapType = '';
-        mainGalleryStage.style.cursor = '';
-        syncThumbHighlightFromMainScroll();
-        updateGalleryBreathe();
-    }
-
-    mainGalleryStage.addEventListener('mouseleave', galleryDragEnd);
-    document.addEventListener('mouseup', galleryDragEnd);
-    document.addEventListener('mousemove', (e) => {
-        if (!galleryDragActive) return;
-        e.preventDefault();
-        const dx = e.pageX - galleryDragStartX;
-        mainGalleryStage.scrollLeft = galleryDragStartScrollLeft - dx;
-    }, { passive: false });
-
-    function selectGalleryIndex(i) {
-        const m = mediaFiles[i];
-        const btn = thumbContainer ? thumbContainer.children[i] : null;
-        if (!btn || !m || !mainGalleryStage) return;
-        document.querySelectorAll('#gallery-thumbs button').forEach(b => { b.classList.remove('border-luxe', 'opacity-100'); b.classList.add('border-transparent', 'opacity-50'); });
-        btn.classList.remove('border-transparent', 'opacity-50'); btn.classList.add('border-luxe', 'opacity-100');
-        const w = mainGalleryStage.clientWidth;
-        if (w > 0) mainGalleryStage.scrollTo({ left: i * w, behavior: 'smooth' });
-        if (m.type === 'img') {
-            mainVideo.classList.add('hidden'); mainVideo.pause();
-            if (i === 0) {
-                mainImage.src = m.src;
-                mainImage.classList.remove('hidden');
-            } else {
-                mainImage.classList.add('hidden');
-            }
-        } else {
-            mainImage.classList.add('hidden');
-            mainVideo.src = m.src;
-            mainVideo.classList.remove('hidden');
-            mainVideo.play();
-        }
-        const clickedThumbnail = btn;
-        const thumbnailContainer = thumbContainer;
-        const scrollPos = clickedThumbnail.offsetLeft - (thumbnailContainer.clientWidth / 2) + (clickedThumbnail.clientWidth / 2);
-        thumbnailContainer.scrollTo({ left: scrollPos, behavior: 'smooth' });
-    }
-
-    requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-            updateGalleryBreathe();
-            syncThumbHighlightFromMainScroll();
-        });
-    });
 
     mediaFiles.forEach((m, i) => {
         const btn = document.createElement('button');
@@ -566,7 +372,17 @@
         if (m.type === 'img') btn.innerHTML = `<img src="${m.src}" class="w-full h-full object-cover" alt="">`;
         else btn.innerHTML = `<div class="w-full h-full bg-gray-800 flex items-center justify-center"><svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20"><path d="M4 4l12 6-12 6V4z"/></svg></div>`;
 
-        btn.onclick = () => { selectGalleryIndex(i); };
+        btn.onclick = () => {
+            document.querySelectorAll('#gallery-thumbs button').forEach(b => { b.classList.remove('border-luxe', 'opacity-100'); b.classList.add('border-transparent', 'opacity-50'); });
+            btn.classList.remove('border-transparent', 'opacity-50'); btn.classList.add('border-luxe', 'opacity-100');
+            if (m.type === 'img') {
+                mainVideo.classList.add('hidden'); mainVideo.pause();
+                mainImage.src = m.src; mainImage.classList.remove('hidden');
+            } else {
+                mainImage.classList.add('hidden');
+                mainVideo.src = m.src; mainVideo.classList.remove('hidden'); mainVideo.play();
+            }
+        };
         thumbContainer.appendChild(btn);
     });
 
