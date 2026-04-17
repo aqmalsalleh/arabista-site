@@ -83,6 +83,28 @@
     }
     .arabista-gallery-img::-webkit-media-controls { display: none !important; }
     video.arabista-gallery-img { object-fit: cover; pointer-events: none; }
+
+    /* --- ARABISTA LIGHTBOX CSS --- */
+    #arabista-lightbox.is-open {
+        opacity: 1;
+        pointer-events: auto;
+    }
+    .lightbox-media {
+        max-width: 100%;
+        max-height: 100%;
+        width: auto;
+        height: auto;
+        object-fit: contain;
+        transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+        will-change: transform;
+    }
+    .lightbox-media:not(.is-zoomed) {
+        cursor: zoom-in;
+    }
+    .lightbox-media.is-zoomed {
+        cursor: zoom-out;
+        transform: scale(2.5);
+    }
   </style>
 </head>
 <body class="font-sans antialiased pb-8 selection:bg-luxe selection:text-ink max-w-[100vw] overflow-x-hidden relative bg-brand text-white">
@@ -962,11 +984,10 @@
     document.addEventListener('DOMContentLoaded', () => {
         const mainContainer = document.querySelector('.arabista-gallery-main');
         const thumbContainer = document.querySelector('.arabista-gallery-thumbs');
-        if (!mainContainer || !thumbContainer) return;
+        const mainImages = mainContainer ? Array.from(mainContainer.querySelectorAll('.arabista-gallery-img')) : [];
+        const thumbnails = thumbContainer ? Array.from(thumbContainer.querySelectorAll('.arabista-thumb-btn')) : [];
 
-        const mainImages = Array.from(mainContainer.querySelectorAll('.arabista-gallery-img'));
-        const thumbnails = Array.from(thumbContainer.querySelectorAll('.arabista-thumb-btn'));
-        if (mainImages.length === 0 || thumbnails.length === 0) return;
+        if (mainContainer && thumbContainer && mainImages.length > 0 && thumbnails.length > 0) {
 
         let isDown = false;
         let startX;
@@ -1081,7 +1102,119 @@
         // Initialize
         syncThumbnails(0);
         renderLoop();
+
+    // --- PILLAR 6: The Fabric Inspector Lightbox ---
+    const lightbox = document.getElementById('arabista-lightbox');
+    const lightboxContent = document.getElementById('lightbox-content');
+    const lightboxClose = document.getElementById('lightbox-close');
+    let activeLightboxMedia = null;
+    let isDraggingImage = false; // To prevent ghost clicks
+
+    // Track Drag vs Click
+    mainContainer.addEventListener('mousedown', () => { isDraggingImage = false; });
+    mainContainer.addEventListener('mousemove', () => { if (isDown) isDraggingImage = true; });
+    
+    mainContainer.addEventListener('click', (e) => {
+        if (isDraggingImage) return; // Prevent ghost clicks
+        openLightbox();
+    });
+
+    const openLightbox = () => {
+        const sourceMedia = mainImages[activeIndex];
+        if (!sourceMedia) return;
+
+        // Clean previous
+        lightboxContent.innerHTML = '';
+        
+        // Clone Media
+        activeLightboxMedia = sourceMedia.cloneNode(true);
+        activeLightboxMedia.className = 'lightbox-media';
+        
+        // Handle Video Sync
+        if (sourceMedia.tagName.toLowerCase() === 'video') {
+            activeLightboxMedia.currentTime = sourceMedia.currentTime;
+            activeLightboxMedia.play();
+            activeLightboxMedia.style.pointerEvents = 'auto'; // Re-enable for lightbox
+        }
+
+        lightboxContent.appendChild(activeLightboxMedia);
+        lightbox.classList.add('is-open');
+        document.body.style.overflow = 'hidden';
+
+        // Fabric Inspector (Deep Zoom) Math
+        activeLightboxMedia.addEventListener('click', (e) => {
+            if (!activeLightboxMedia.classList.contains('is-zoomed')) {
+                // Calculate exact click coordinates for precise zoom origin
+                const rect = activeLightboxMedia.getBoundingClientRect();
+                const x = ((e.clientX - rect.left) / rect.width) * 100;
+                const y = ((e.clientY - rect.top) / rect.height) * 100;
+                activeLightboxMedia.style.transformOrigin = `${x}% ${y}%`;
+                activeLightboxMedia.classList.add('is-zoomed');
+            } else {
+                activeLightboxMedia.classList.remove('is-zoomed');
+                setTimeout(() => { activeLightboxMedia.style.transformOrigin = 'center center'; }, 500);
+            }
+        });
+    };
+
+    const closeLightbox = () => {
+        lightbox.classList.remove('is-open');
+        document.body.style.overflow = '';
+        if (activeLightboxMedia && activeLightboxMedia.tagName.toLowerCase() === 'video') {
+            activeLightboxMedia.pause();
+        }
+        setTimeout(() => { lightboxContent.innerHTML = ''; }, 500); // Clear after animation
+    };
+
+    lightboxClose.addEventListener('click', closeLightbox);
+    
+    // Close on Escape or Background Click
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeLightbox(); });
+    lightbox.addEventListener('click', (e) => {
+        if (e.target === lightbox || e.target === lightboxContent) closeLightbox();
+    });
+
+    // Mobile Pull-to-Dismiss Physics
+    let touchStartY = 0;
+    let touchCurrentY = 0;
+    
+    lightboxContent.addEventListener('touchstart', (e) => {
+        if (activeLightboxMedia && activeLightboxMedia.classList.contains('is-zoomed')) return;
+        touchStartY = e.touches[0].clientY;
+        lightboxContent.style.transition = 'none';
+    });
+
+    lightboxContent.addEventListener('touchmove', (e) => {
+        if (activeLightboxMedia && activeLightboxMedia.classList.contains('is-zoomed')) return;
+        touchCurrentY = e.touches[0].clientY - touchStartY;
+        if (touchCurrentY > 0) { // Only allow pull down
+            e.preventDefault();
+            lightboxContent.style.transform = `translateY(${touchCurrentY}px)`;
+            lightbox.style.backgroundColor = `rgba(15, 15, 16, ${1 - (touchCurrentY / 500)})`;
+        }
+    });
+
+    lightboxContent.addEventListener('touchend', () => {
+        lightboxContent.style.transition = 'transform 0.3s cubic-bezier(0.16, 1, 0.3, 1)';
+        if (touchCurrentY > 120) {
+            closeLightbox();
+        } else {
+            // Snap back
+            lightboxContent.style.transform = '';
+            lightbox.style.backgroundColor = '';
+        }
+        touchCurrentY = 0;
+    });
+
+        }
     });
   </script>
+
+  <div id="arabista-lightbox" class="fixed inset-0 z-[100] flex items-center justify-center opacity-0 pointer-events-none transition-all duration-500 bg-[#0F0F10]/95 backdrop-blur-md">
+      <button id="lightbox-close" class="absolute top-6 right-6 sm:top-8 sm:right-8 text-white/50 hover:text-white z-[110] p-2 transition-colors tap-none">
+          <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M6 18L18 6M6 6l12 12"/></svg>
+      </button>
+      <div id="lightbox-content" class="w-full h-full flex items-center justify-center relative overflow-hidden transition-transform duration-300"></div>
+  </div>
 </body>
 </html>
