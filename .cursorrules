@@ -1,9 +1,15 @@
 # ARABISTA PROJECT - AI BEHAVIOR RULES
 
 ## Context
-This workspace contains two distinct decoupled systems for Arabista:
-1. The Retail Engine (Direct E-Commerce / Pos Laju / SenangPay)
-2. The Alteration Service (Gig-Tailor Network / Lalamove / Hub Portal)
+This workspace contains a unified omnichannel architecture divided into distinct decoupled systems, managed by a central Master Router:
+1. Master Webhook Router (Central point of entry, routing triage, & Command Center)
+2. Retail Engine (Direct E-Commerce / Pos Laju / SenangPay)
+3. Alteration Service (Gig-Tailor Network / Lalamove / Hub Portal)
+4. Support CRM (Telegram 1-on-1 Auto-Topic Triage)
+
+## ⚠️ MANDATORY DEVOPS & ARCHITECTURE RULES
+- **Single-File Architecture (Google Apps Script):** To bypass Google Apps Script's aggressive caching and ghost-file merging bugs, frontend HTML/UI must be embedded directly as string-returning functions (e.g., `getDashboardUI()`) inside the main `.gs` file. Do NOT create separate `.html` files or use global `const` variables for HTML templates to avoid redeclaration errors.
+- **Telegram CRM Standard:** All outbound bot messages to customers from a Telegram CRM environment MUST require the `/c` command prefix to enforce muscle-memory consistency across the team.
 
 ## ⚠️ MANDATORY DOCUMENTATION RULE
 We maintain two single-source-of-truth architecture documents in the root folder:
