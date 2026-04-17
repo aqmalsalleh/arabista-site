@@ -34,6 +34,53 @@
     .tap-none { -webkit-tap-highlight-color: transparent; }
     .review-text.clamp { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; overflow: hidden; }
     @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+    /* --- ARABISTA PREMIUM GALLERY CSS --- */
+    .arabista-gallery-main {
+        scroll-snap-type: x mandatory;
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+        cursor: grab;
+    }
+    .arabista-gallery-main::-webkit-scrollbar { display: none; }
+
+    .arabista-gallery-main.is-dragging {
+        scroll-snap-type: none !important;
+        cursor: grabbing !important;
+    }
+
+    .arabista-gallery-img {
+        scroll-snap-align: center;
+        user-select: none;
+        -webkit-user-drag: none;
+        will-change: transform, opacity;
+        transform: translateZ(0); /* Force GPU Acceleration */
+    }
+
+    .arabista-gallery-thumbs {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+    }
+    .arabista-gallery-thumbs::-webkit-scrollbar { display: none; }
+
+    /* Layout rails for architect scroll math (not part of engine physics block) */
+    .arabista-gallery-main {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: nowrap;
+        height: 100%;
+        width: 100%;
+        min-height: 0;
+        overflow-x: auto;
+        overflow-y: hidden;
+    }
+    .arabista-gallery-img {
+        flex: 0 0 100%;
+        min-width: 100%;
+        height: 100%;
+        object-fit: cover;
+        box-sizing: border-box;
+    }
   </style>
 </head>
 <body class="font-sans antialiased pb-8 selection:bg-luxe selection:text-ink max-w-[100vw] overflow-x-hidden relative bg-brand text-white">
@@ -71,9 +118,9 @@
       <div class="lg:col-span-7 flex flex-col gap-4 min-w-0 w-full reveal">
           <div class="relative aspect-[4/5] bg-white/5 rounded-2xl overflow-hidden shadow-soft ring-1 ring-white/10 group">
               <video id="main-video" class="w-full h-full object-cover hidden" loop muted playsinline></video>
-              <img id="main-image" src="images/z01-1-hero.webp" class="w-full h-full object-cover transition-opacity duration-300" alt="Z01 Abaya">
+              <div class="arabista-gallery-main relative z-0 h-full w-full min-h-0"></div>
           </div>
-          <div class="flex gap-3 overflow-x-auto hide-scrollbar pb-2" id="gallery-thumbs"></div>
+          <div class="arabista-gallery-thumbs flex gap-3 overflow-x-auto hide-scrollbar pb-2" id="gallery-thumbs"></div>
       </div>
 
       <div class="lg:col-span-5 flex flex-col min-w-0 w-full lg:pl-4">
@@ -362,27 +409,22 @@
     ];
 
     const thumbContainer = document.getElementById('gallery-thumbs');
-    const mainImage = document.getElementById('main-image');
-    const mainVideo = document.getElementById('main-video');
+    const mainGalleryMain = document.querySelector('.arabista-gallery-main');
 
     mediaFiles.forEach((m, i) => {
+        if (mainGalleryMain) {
+            const stripImg = document.createElement('img');
+            stripImg.className = 'arabista-gallery-img';
+            stripImg.alt = 'Z01 Abaya';
+            stripImg.src = m.type === 'img' ? m.src : 'images/z01-8-feature-pockets.webp';
+            if (i === 0) stripImg.id = 'main-image';
+            mainGalleryMain.appendChild(stripImg);
+        }
         const btn = document.createElement('button');
         btn.type = 'button';
-        btn.className = `w-16 h-20 shrink-0 rounded-lg overflow-hidden border-2 transition-all ${i === 0 ? 'border-luxe opacity-100' : 'border-transparent opacity-50 hover:opacity-100'}`;
+        btn.className = `arabista-thumb-btn w-16 h-20 shrink-0 rounded-lg overflow-hidden border-2 border-transparent opacity-50 hover:opacity-100`;
         if (m.type === 'img') btn.innerHTML = `<img src="${m.src}" class="w-full h-full object-cover" alt="">`;
         else btn.innerHTML = `<div class="w-full h-full bg-gray-800 flex items-center justify-center"><svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20"><path d="M4 4l12 6-12 6V4z"/></svg></div>`;
-
-        btn.onclick = () => {
-            document.querySelectorAll('#gallery-thumbs button').forEach(b => { b.classList.remove('border-luxe', 'opacity-100'); b.classList.add('border-transparent', 'opacity-50'); });
-            btn.classList.remove('border-transparent', 'opacity-50'); btn.classList.add('border-luxe', 'opacity-100');
-            if (m.type === 'img') {
-                mainVideo.classList.add('hidden'); mainVideo.pause();
-                mainImage.src = m.src; mainImage.classList.remove('hidden');
-            } else {
-                mainImage.classList.add('hidden');
-                mainVideo.src = m.src; mainVideo.classList.remove('hidden'); mainVideo.play();
-            }
-        };
         thumbContainer.appendChild(btn);
     });
 
@@ -901,6 +943,120 @@
             entries.forEach(en => { if (en.isIntersecting) { en.target.classList.add('show'); obs.unobserve(en.target); } });
         }, { threshold: 0.1, rootMargin: "0px 0px -50px 0px" });
         io.observe(el);
+    });
+
+    /* --- ARABISTA PREMIUM GALLERY ENGINE --- */
+    document.addEventListener('DOMContentLoaded', () => {
+        const mainContainer = document.querySelector('.arabista-gallery-main');
+        const thumbContainer = document.querySelector('.arabista-gallery-thumbs');
+        if (!mainContainer || !thumbContainer) return;
+
+        const mainImages = Array.from(mainContainer.querySelectorAll('.arabista-gallery-img'));
+        const thumbnails = Array.from(thumbContainer.querySelectorAll('.arabista-thumb-btn'));
+        if (mainImages.length === 0 || thumbnails.length === 0) return;
+
+        let isDown = false;
+        let startX;
+        let scrollLeft;
+        let activeIndex = 0;
+
+        // --- PILLAR 3: Desktop Drag Physics ---
+        mainContainer.addEventListener('mousedown', (e) => {
+            isDown = true;
+            mainContainer.classList.add('is-dragging');
+            startX = e.pageX - mainContainer.offsetLeft;
+            scrollLeft = mainContainer.scrollLeft;
+        });
+
+        const stopDragging = () => {
+            if (!isDown) return;
+            isDown = false;
+            mainContainer.classList.remove('is-dragging');
+        };
+
+        mainContainer.addEventListener('mouseleave', stopDragging);
+        mainContainer.addEventListener('mouseup', stopDragging);
+
+        mainContainer.addEventListener('mousemove', (e) => {
+            if (!isDown) return;
+            e.preventDefault();
+            const x = e.pageX - mainContainer.offsetLeft;
+            const walk = (x - startX) * 1.5; // Drag momentum multiplier
+            mainContainer.scrollLeft = scrollLeft - walk;
+        });
+
+        // --- PILLARS 4 & 5: Two-Way Thumbnail Sync ---
+        const syncThumbnails = (index) => {
+            thumbnails.forEach((thumb, i) => {
+                if (i === index) {
+                    thumb.style.opacity = '1';
+                    thumb.style.border = '1px solid #D4AF37'; // Subtle gold active state
+                } else {
+                    thumb.style.opacity = '0.4';
+                    thumb.style.border = 'none';
+                }
+            });
+
+            // Click-to-Center math
+            const activeThumb = thumbnails[index];
+            if (activeThumb) {
+                const targetScroll = activeThumb.offsetLeft - (thumbContainer.clientWidth / 2) + (activeThumb.clientWidth / 2);
+                thumbContainer.scrollTo({ left: targetScroll, behavior: 'smooth' });
+            }
+        };
+
+        // Thumbnail Click triggers Main Gallery Scroll
+        thumbnails.forEach((thumb, index) => {
+            thumb.style.cursor = 'pointer';
+            thumb.style.transition = 'opacity 0.3s ease';
+            thumb.addEventListener('click', () => {
+                const targetImg = mainImages[index];
+                if (targetImg) {
+                    const targetScroll = targetImg.offsetLeft - (mainContainer.clientWidth / 2) + (targetImg.clientWidth / 2);
+                    mainContainer.scrollTo({ left: targetScroll, behavior: 'smooth' });
+                }
+            });
+        });
+
+        // --- PILLARS 1 & 2: GPU 60fps Cinematic Depth-of-Field ---
+        const renderLoop = () => {
+            const containerCenter = mainContainer.scrollLeft + (mainContainer.clientWidth / 2);
+            let closestIndex = 0;
+            let minDistance = Infinity;
+
+            mainImages.forEach((img, index) => {
+                const imgCenter = img.offsetLeft + (img.clientWidth / 2);
+                const distance = Math.abs(containerCenter - imgCenter);
+
+                // Track Active Index for Two-Way Sync
+                if (distance < minDistance) {
+                    minDistance = distance;
+                    closestIndex = index;
+                }
+
+                // Cinematic Scale & Fade Math
+                const effectRange = img.clientWidth * 0.8; 
+                let progress = distance / effectRange;
+                if (progress > 1) progress = 1;
+
+                const scale = 1 - (0.08 * progress); // Floor is 0.92
+                const opacity = 1 - (0.6 * progress); // Floor is 0.4
+
+                img.style.transform = `translate3d(0,0,0) scale(${scale})`;
+                img.style.opacity = opacity;
+            });
+
+            if (closestIndex !== activeIndex) {
+                activeIndex = closestIndex;
+                syncThumbnails(activeIndex);
+            }
+
+            requestAnimationFrame(renderLoop);
+        };
+
+        // Initialize
+        syncThumbnails(0);
+        renderLoop();
     });
   </script>
 </body>
