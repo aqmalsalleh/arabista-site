@@ -1,7 +1,9 @@
 # 📘 ARABISTA Z01 RETAIL & PRE-SALE ALTERATION — MASTER BLUEPRINT
 
-**Version:** 2.0 | **Aligned to codebase:** April 18, 2026  
+**Version:** 2.1 | **Aligned to codebase:** April 18, 2026  
 **Canonical detail:** Operational depth, API names, and DevOps live in `Arabista_Retail_Master_Doc.md`. This blueprint is the **product-level story** from project inception: how Z01 retail stays isolated, how inventory and checkout behave, and how money, logistics, and CRM connect.
+
+**v2.1 (same day):** Retail order success (`retail-success-staging.html`) now uses the luxury UI stack (Cormorant Garamond display type, gold **luxe** accents, pulsing halo + check treatment). Customer-facing copy and CTAs are **courier-agnostic** (no carrier name in the success narrative). In **`Retail_STAGING.gs`**, the automated WhatsApp **order-confirmed** message sent when the customer activates updates (`tp1Msg` in `handleInboundWhatsApp`) now embeds multiline **Item_Details** from **`Orders` column K** and uses generic “tracking information” wording. Logistics (AWB generation, zone rates, dispatch tooling) may still reference Pos Laju where the integration requires it; mirror these UX and copy changes in `Arabista_Retail_Master_Doc.md` if that file lives outside this repo.
 
 ---
 
@@ -19,8 +21,8 @@
 |--------|------------------|------|
 | Product PDP | `product-z01-staging.html` | `get_config` → cart → `calc_shipping` → `reserve_stock`; optional pre-sale alteration fields; premium gallery / lightbox / sticky bar (see §6). |
 | SenangPay return | `checkout/success-router-staging.html` | Reads `order_id`; sends `ORD-…` to retail success, `ALT-…` to alteration tracker. |
-| Success / CRM kickoff | `checkout/retail-success-staging.html` | Order summary + “Activate Order Updates” (WhatsApp prefill). |
-| Retail API | `Retail_STAGING.gs` | Inventory lock, SenangPay hash, Pos Laju AWB, Telegram ↔ WhatsApp CRM, sweeper. |
+| Success / CRM kickoff | `checkout/retail-success-staging.html` | Post-payment screen: order reference, luxury-branded layout, courier-agnostic copy, **Activate Order Updates** CTA (script fills a hidden `#wa-link` and programmatic click opens WhatsApp with the activation message). |
+| Retail API | `Retail_STAGING.gs` | Inventory lock, SenangPay hash, Pos Laju AWB, Telegram ↔ WhatsApp CRM, sweeper; activation auto-reply includes **column K** line-item receipt and carrier-neutral customer wording where applicable. |
 | Ingress | `Webhook_Router_STAGING.gs` | Webhook verification, routing, Command Center (`?view=dashboard`). |
 
 Production mirrors the same pattern with non-staging filenames when promoted; staging is the **authoritative development surface** until cutover.
@@ -73,7 +75,7 @@ Static assets live under **`images/z01-*`** (WebP stills, MP4 flow, poster); aft
 ## 7. After SenangPay — router and success
 
 * User returns to **`checkout/success-router-staging.html`** with `order_id`.
-* **`ORD-…`** → **`checkout/retail-success-staging.html`** (retail summary + WhatsApp activation).
+* **`ORD-…`** → **`checkout/retail-success-staging.html`**: shows **Order Successful** (display serif + gold accent system), **Order Reference** from the URL (or a verified fallback label), courier-agnostic body copy about tailoring queue and tracking, and the WhatsApp CTA described in the isolation map.
 * SenangPay **server-to-server** hits the **Router**, not Retail directly; Router forwards to **`Retail_STAGING.gs`**, which idempotently marks **`PAID`**, moves **Reserved → Sold**, calls **Pos Laju v2.1** for AWB, and persists tracking + PDF link to the sheet.
 
 ---
@@ -81,9 +83,10 @@ Static assets live under **`images/z01-*`** (WebP stills, MP4 flow, poster); aft
 ## 8. WhatsApp ↔ Telegram fulfillment (quota-conscious)
 
 * Customer activates CRM from the success page; Meta delivers to Router → Retail.
+* On successful activation, Retail sends **`tp1Msg`** to the customer: header **ORDER CONFIRMED**, order id, ***Item Details:*** block filled from **`Orders` column K** (`Item_Details`, multiline / line-broken in the sheet), then payment-received / packing copy and a promise of a follow-up with **tracking information** (no named carrier in that template).
 * Retail opens a **forum topic** per order, binds **`Telegram_Topic_ID`**, and bridges messages.
 * Operators reply with **`/c`** (customer-bound); media can flow **Telegram ↔ WhatsApp** via the vault pipeline described in the master doc.
-* **Inline callback** (e.g. ship action) marks dispatch, edits the Telegram card, and sends a **tracking** touchpoint on WhatsApp.
+* **Inline callback** (e.g. ship action) marks dispatch, edits the Telegram card, and sends a **tracking** touchpoint on WhatsApp (separate templates may still name the live courier or tracking URLs used in ops).
 
 ---
 
