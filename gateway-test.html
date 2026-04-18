@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arabista - Immersive Gateway Prototype</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&display=swap" rel="stylesheet">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        display: ['"Cormorant Garamond"', 'serif'],
+                    },
+                    colors: {
+                        brand: '#0F0F10',
+                        luxe: '#C0A062',
+                        ink: '#111213'
+                    },
+                    animation: {
+                        // Custom slow spin for a more luxurious feel
+                        'spin-slow': 'spin 1.5s cubic-bezier(0.4, 0, 0.2, 1) infinite',
+                        // Custom deep pulse for the text
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-white min-h-screen flex items-center justify-center antialiased">
+
+    <div class="text-center p-10 max-w-lg">
+        <h1 class="text-4xl font-bold text-gray-900 mb-4">Cart Drawer Simulation</h1>
+        <p class="text-gray-500 mb-8">Click the button below to simulate the user clicking "Proceed to Payment". Notice how the background gets blurred and isolated.</p>
+        <button onclick="document.getElementById('gateway-overlay').classList.remove('opacity-0', 'pointer-events-none')" class="w-full bg-black text-white font-medium uppercase tracking-widest py-4 rounded-xl hover:opacity-90 transition shadow-lg">
+            Proceed to Payment
+        </button>
+    </div>
+
+    <div id="gateway-overlay" class="fixed inset-0 z-[120] bg-ink/90 backdrop-blur-md flex flex-col items-center justify-center opacity-0 pointer-events-none transition-opacity duration-500">
+
+        <div class="relative flex items-center justify-center mb-10">
+            
+            <div class="w-16 h-16 rounded-full bg-brand border border-white/5 flex items-center justify-center text-white font-display text-3xl tracking-widest opacity-80 z-10 shadow-2xl">
+                A
+            </div>
+
+            <div class="absolute w-28 h-28 rounded-full border-[2px] border-white/5 z-0"></div>
+
+            <div class="absolute w-28 h-28 rounded-full border-[2px] border-transparent border-t-luxe border-r-luxe/30 animate-spin-slow z-20 drop-shadow-[0_0_12px_rgba(192,160,98,0.4)]"></div>
+            
+        </div>
+
+        <div class="font-display text-luxe text-2xl tracking-[0.08em] animate-pulse-slow">
+            Securing your selection...
+        </div>
+
+        <button onclick="document.getElementById('gateway-overlay').classList.add('opacity-0', 'pointer-events-none')" class="absolute top-8 right-8 text-white/30 hover:text-white text-xs tracking-widest uppercase transition-colors">
+            ✕ Close Demo
+        </button>
+
+    </div>
+
+</body>
+</html>
