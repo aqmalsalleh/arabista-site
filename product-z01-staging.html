@@ -16,7 +16,11 @@
         extend: {
           fontFamily: { display: ['"Cormorant Garamond"', 'serif'], sans: ['Inter', 'ui-sans-serif', 'system-ui'] },
           colors: { brand: '#0F0F10', gold: '#D4AF37', luxe: '#C0A062', ink: '#111213' },
-          boxShadow: { soft: '0 10px 30px rgba(0,0,0,.08)' }
+          boxShadow: { soft: '0 10px 30px rgba(0,0,0,.08)' },
+          animation: {
+            'spin-slow': 'spin 1.5s cubic-bezier(0.4, 0, 0.2, 1) infinite',
+            'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+          }
         }
       }
     }
@@ -410,6 +414,10 @@
       <div class="p-4 sm:p-6 border-b border-white/5 flex justify-between items-center shrink-0 relative z-10 bg-ink">
           <h2 class="font-display text-2xl text-white">Your Cart</h2>
           <button type="button" id="close-cart-btn" class="text-gray-400 hover:text-white tap-none"><svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
+      </div>
+
+      <div id="cart-notification" class="hidden bg-red-500/10 border-b border-red-500/20 p-3 text-center text-red-400 text-[11px] tracking-wide shadow-inner transition-all duration-300">
+          Another customer just secured the last piece of a selected item. Please review your cart.
       </div>
 
       <div class="flex-1 overflow-y-auto overscroll-contain p-4 sm:p-6 flex flex-col gap-8 hide-scrollbar" id="cart-scroll-area">
@@ -1021,13 +1029,7 @@
             if (Object.keys(item.alterations).length > 0) {
                 altHtml = '<div class="text-white/40 text-[11px] mt-1.5 leading-relaxed space-y-0.5">';
                 for (let [k, v] of Object.entries(item.alterations)) {
-                    let priceDisplay = '';
-                    if (v.isPromo) {
-                        const promoText = v.price === 0 ? "FREE" : `RM ${v.price.toFixed(2)}`;
-                        priceDisplay = `<del class="text-white/30">RM ${v.standardPrice.toFixed(2)}</del> <span class="text-luxe font-bold ml-1">${promoText}</span>`;
-                    } else {
-                        priceDisplay = `+RM ${v.price.toFixed(2)}`;
-                    }
+                    let priceDisplay = v.isPromo ? `<del class="text-white/30">RM ${v.standardPrice.toFixed(2)}</del> <span class="text-luxe font-bold ml-1">${v.price === 0 ? "FREE" : `RM ${v.price.toFixed(2)}`}</span>` : `+RM ${v.price.toFixed(2)}`;
                     altHtml += `<div>${v.name}: ${v.val} <span class="text-white/20 mx-1">|</span> ${priceDisplay}</div>`;
                 }
                 altHtml += '</div>';
@@ -1035,38 +1037,59 @@
 
             const itemPaid = (item.unitEffectivePrice + item.unitAltCost) * item.qty;
             const itemSaved = (item.unitDiscount || 0) * item.qty;
-            visualSubtotal += (itemPaid + itemSaved);
-            totalDiscount += itemSaved;
-
             const sigJson = JSON.stringify(item.signature);
 
+            // Only add to totals if the item is NOT sold out
+            if (!item.isSoldOut) {
+                visualSubtotal += (itemPaid + itemSaved);
+                totalDiscount += itemSaved;
+            }
+
+            // Aesthetic States based on Soft Reject
+            const isOOS = item.isSoldOut;
+            const cardBorder = isOOS ? 'border-red-500/30' : 'border-white/10';
+            const imgStyle = isOOS ? 'border-red-500/30 grayscale opacity-40' : 'border-white/10';
+            const titleStyle = isOOS ? 'text-white/40' : 'text-white';
+
+            let priceOrOOS = '';
+            let qtyOrEmpty = '';
+
+            if (isOOS) {
+                priceOrOOS = `<div class="mt-2 text-red-500/90 text-[10px] font-bold uppercase tracking-widest bg-red-500/10 inline-block px-2 py-1.5 rounded border border-red-500/20 shadow-[0_0_10px_rgba(239,68,68,0.15)]">[ Sold Out ]</div>`;
+            } else {
+                priceOrOOS = `
+                    <div class="mt-0.5">
+                        ${item.unitEffectivePrice < item.unitRetailPrice
+                            ? `<del class="text-white/30 mr-1.5 text-xs">RM ${(item.unitRetailPrice * item.qty).toFixed(2)}</del><span class="text-luxe font-bold text-sm">RM ${(item.unitEffectivePrice * item.qty).toFixed(2)}</span>`
+                            : `<span class="text-luxe font-medium text-sm">RM ${(item.unitEffectivePrice * item.qty).toFixed(2)}</span>`
+                        }
+                    </div>
+                    ${altHtml}
+                `;
+                qtyOrEmpty = `
+                    <div class="flex items-center mt-3">
+                        <div class="flex items-center rounded-md border border-white/15 bg-white/[0.02]">
+                            <button type="button" onclick='updateCartItemQty(${sigJson}, -1)' class="px-3 py-1 text-white/50 hover:text-white tap-none">&minus;</button>
+                            <span class="w-6 text-center text-xs font-medium">${item.qty}</span>
+                            <button type="button" onclick='updateCartItemQty(${sigJson}, 1)' class="px-3 py-1 text-white/50 hover:text-white tap-none">&plus;</button>
+                        </div>
+                    </div>`;
+            }
+
             html += `
-                <div class="flex gap-4 pb-5 border-b border-white/10 relative group last:border-0 last:pb-0">
-                    <img src="images/z01-1-hero.webp" class="w-20 h-24 object-cover rounded-lg border border-white/10" alt="Z01">
+                <div class="flex gap-4 pb-5 border-b ${cardBorder} relative group last:border-0 last:pb-0 transition-all duration-300">
+                    <img src="images/z01-1-hero.webp" class="w-20 h-24 object-cover rounded-lg border ${imgStyle} transition-all duration-300" alt="Z01">
                     <div class="flex-1 flex flex-col justify-between">
                         <div>
                             <div class="flex justify-between items-start">
-                                <div class="text-white font-medium text-[14px]">Z01 Abaya <span class="text-white/50 text-xs ml-1 font-normal">(Size ${item.size})</span></div>
+                                <div class="${titleStyle} font-medium text-[14px] transition-colors">Z01 Abaya <span class="text-white/50 text-xs ml-1 font-normal">(Size ${item.size})</span></div>
                                 <button type="button" onclick='removeCartItem(${sigJson})' class="text-white/30 hover:text-white transition-colors p-1 -mr-2 -mt-1 tap-none" title="Remove item">
                                     <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
                                 </button>
                             </div>
-                            <div class="mt-0.5">
-                                ${item.unitEffectivePrice < item.unitRetailPrice
-                                    ? `<del class="text-white/30 mr-1.5 text-xs">RM ${(item.unitRetailPrice * item.qty).toFixed(2)}</del><span class="text-luxe font-bold text-sm">RM ${(item.unitEffectivePrice * item.qty).toFixed(2)}</span>`
-                                    : `<span class="text-luxe font-medium text-sm">RM ${(item.unitEffectivePrice * item.qty).toFixed(2)}</span>`
-                                }
-                            </div>
-                            ${altHtml}
+                            ${priceOrOOS}
                         </div>
-
-                        <div class="flex items-center mt-3">
-                            <div class="flex items-center rounded-md border border-white/15 bg-white/[0.02]">
-                                <button type="button" onclick='updateCartItemQty(${sigJson}, -1)' class="px-3 py-1 text-white/50 hover:text-white tap-none">&minus;</button>
-                                <span class="w-6 text-center text-xs font-medium">${item.qty}</span>
-                                <button type="button" onclick='updateCartItemQty(${sigJson}, 1)' class="px-3 py-1 text-white/50 hover:text-white tap-none">&plus;</button>
-                            </div>
-                        </div>
+                        ${qtyOrEmpty}
                     </div>
                 </div>
             `;
@@ -1229,7 +1252,10 @@
         const btn = document.getElementById('btn-checkout');
         btn.textContent = "Securing Order..."; btn.disabled = true;
 
-        // Email is omitted; SenangPay will collect it on the checkout page.
+        // 1. Trigger Immersive Gateway
+        const gateway = document.getElementById('gateway-overlay');
+        gateway.classList.remove('opacity-0', 'pointer-events-none');
+
         cartState.email = "";
         cartState.totalPaid = (cartState.basePrice + cartState.altCost) - cartState.discount + cartState.shippingFee;
 
@@ -1239,17 +1265,36 @@
                 body: `payload=${encodeURIComponent(JSON.stringify(cartState))}`
             });
             const json = await res.json();
+
             if (json.status === 'success') {
-                // Securely redirect using the tamper-proof Sandbox URL generated by the backend
                 window.location.href = json.paymentUrl;
             } else {
-                alert("Checkout Error: " + json.message);
-                btn.textContent = "Proceed to Payment"; btn.disabled = false;
+                // Remove Gateway Overlay
+                gateway.classList.add('opacity-0', 'pointer-events-none');
+
+                if (json.reason === 'out_of_stock' && json.failedSignature) {
+                    // Soft Reject Flow
+                    const failedItem = cartState.items.find(i => i.signature === json.failedSignature);
+                    if (failedItem) {
+                        failedItem.isSoldOut = true;
+                    }
+                    renderCart();
+
+                    const notif = document.getElementById('cart-notification');
+                    notif.classList.remove('hidden');
+                    // Ensure drawer scrolls to top to see notification
+                    document.getElementById('cart-scroll-area').scrollTop = 0;
+
+                    setTimeout(() => { notif.classList.add('hidden'); }, 8000);
+                } else {
+                    alert("Checkout Error: " + json.message);
+                }
             }
         } catch (e) {
+            gateway.classList.add('opacity-0', 'pointer-events-none');
             alert("System error: " + e.message);
-            btn.textContent = "Proceed to Payment"; btn.disabled = false;
         }
+        btn.textContent = "Proceed to Payment"; btn.disabled = false;
     };
 
     // Init
@@ -1603,6 +1648,19 @@
 
           <div id="lightbox-track" class="flex-1 w-full h-full flex overflow-x-auto snap-x snap-mandatory hide-scrollbar scroll-smooth">
               </div>
+      </div>
+  </div>
+
+  <div id="gateway-overlay" class="fixed inset-0 z-[120] bg-ink/90 backdrop-blur-md flex flex-col items-center justify-center opacity-0 pointer-events-none transition-opacity duration-500">
+      <div class="relative flex items-center justify-center mb-10">
+          <div class="w-24 h-24 rounded-full border border-white/10 flex items-center justify-center z-10 shadow-2xl overflow-hidden p-2.5 bg-transparent">
+              <img src="images/logo.webp" alt="Arabista Logo" class="w-full h-full object-contain opacity-90">
+          </div>
+          <div class="absolute w-28 h-28 rounded-full border-[2px] border-white/5 z-0"></div>
+          <div class="absolute w-28 h-28 rounded-full border-[2px] border-transparent border-t-luxe border-r-luxe/30 animate-spin-slow z-20 drop-shadow-[0_0_12px_rgba(192,160,98,0.4)]"></div>
+      </div>
+      <div class="font-display text-luxe text-2xl tracking-[0.08em] animate-pulse-slow">
+          Securing your selection...
       </div>
   </div>
 </body>
