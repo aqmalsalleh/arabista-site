@@ -262,6 +262,7 @@
           <button type="button" id="add-to-cart-btn" class="w-full bg-luxe text-ink font-medium uppercase tracking-widest py-4 rounded-xl hover:opacity-90 transition shadow-soft mb-10 disabled:opacity-50 disabled:cursor-not-allowed tap-none">
               Add To Cart
           </button>
+          <input type="hidden" id="qty" value="1" />
           </div>
 
           <div class="flex flex-col gap-3 reveal">
@@ -841,85 +842,184 @@
     document.getElementById('close-cart-btn').onclick = () => toggleCart(false);
     document.getElementById('cart-overlay').onclick = () => toggleCart(false);
 
-    document.getElementById('add-to-cart-btn').onclick = () => {
-        if (!selectedSize) return;
-        let alterations = {}; let altCost = 0; let altDiscount = 0; let activePromoLabel = "";
+    function closeCart() {
+        if (cartState && (!cartState.items || cartState.items.length === 0)) {
+            const c = document.getElementById('cart-items-container');
+            if (c) c.innerHTML = '';
+            const subEl = document.getElementById('cart-subtotal');
+            if (subEl) subEl.textContent = 'RM 0.00';
+            const discRow = document.getElementById('cart-discount-row');
+            if (discRow) discRow.classList.add('hidden');
+            updateGrandTotal();
+        }
+        toggleCart(false);
+    }
+
+    // --- MULTI-LINE-ITEM CART ENGINE ---
+    document.getElementById('add-to-cart-btn').addEventListener('click', () => {
+        if (!selectedSize) {
+            alert("Please select a size first.");
+            document.getElementById('size-calculator-section')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            return;
+        }
+
+        const currentAlterations = {};
         if (altEnabled) {
             document.querySelectorAll('.alt-input').forEach(inp => {
                 const val = parseFloat(inp.value);
                 if (val) {
                     const key = inp.getAttribute('data-key');
-                    alterations[key] = val;
                     const sId = key === 'length' ? 'Z01_ALT_LENGTH' : (key === 'sleeve' ? 'Z01_ALT_SLEEVE' : 'Z01_ALT_SHOULDER');
                     const conf = appConfig[sId];
                     if (conf) {
-                        altCost += conf.standardPrice;
-                        if (conf.promoPrice !== null && conf.promoPrice < conf.standardPrice) {
-                            altDiscount += (conf.standardPrice - conf.promoPrice);
-                            if (conf.promoLabel) activePromoLabel = conf.promoLabel;
-                        }
+                        const charged = (conf.promoPrice !== null && conf.promoPrice < conf.standardPrice) ? conf.promoPrice : conf.standardPrice;
+                        currentAlterations[key] = {
+                            name: key.charAt(0).toUpperCase() + key.slice(1),
+                            val: val + '"',
+                            price: charged
+                        };
                     }
                 }
             });
         }
-        // --- SMART CART MEMORY: Preserve existing details ---
-        const prevName = cartState ? cartState.name : '';
-        const prevPhone = cartState ? cartState.phone : '';
-        const prevAddress = cartState ? cartState.address : '';
-        const prevPostcode = cartState ? cartState.postcode : '';
-        const prevStateVal = cartState ? cartState.state : '';
-        const prevShippingFee = cartState ? cartState.shippingFee : 0;
-        const prevEmail = cartState ? cartState.email : '';
 
-        cartState = {
-            itemCode: "Z01", size: selectedSize, basePrice: (activePromoPrice !== null ? activePromoPrice : activeRetailPrice),
-            alterations: alterations, altCost: altCost, discount: altDiscount, promoLabel: activePromoLabel,
-            shippingFee: prevShippingFee, // Inherit previously calculated fee
-            postcode: prevPostcode, // Inherit previously entered postcode
-            weightKg: activeWeightKg,
-            name: prevName,
-            phone: prevPhone,
-            email: prevEmail,
-            address: prevAddress,
-            state: prevStateVal,
-            totalPaid: 0
-        };
-        const elName = document.getElementById('cart-name');
-        const elPhone = document.getElementById('cart-phone');
-        const elAddr = document.getElementById('cart-address');
-        const elPc = document.getElementById('cart-postcode');
-        const elState = document.getElementById('cart-state');
-        if (elName) elName.value = cartState.name || '';
-        if (elPhone) elPhone.value = cartState.phone || '';
-        if (elAddr) elAddr.value = cartState.address || '';
-        if (elPc) elPc.value = cartState.postcode || '';
-        if (elState) elState.value = cartState.state || '';
+        const effectivePrice = activePromoPrice !== null ? activePromoPrice : activeRetailPrice;
+        const inputQty = parseInt(document.getElementById('qty').value) || 1;
+        const unitAltCost = Object.values(currentAlterations).reduce((sum, a) => sum + a.price, 0);
+
+        // The Configuration Hash: Unique signature for this exact size + alt combo
+        const signature = `Z01-${selectedSize}|${JSON.stringify(currentAlterations)}`;
+
+        // Initialize Cart State if empty (preserving smart memory format)
+        if (!cartState) {
+            cartState = {
+                items: [],
+                basePrice: 0, altCost: 0, weightKg: 0, totalQty: 0,
+                shippingFee: 0, discount: 0, promoLabel: '',
+                name: '', phone: '', email: '', address: '', state: '', postcode: ''
+            };
+        }
+
+        // Check if this exact configuration already exists in the cart
+        const existingItem = cartState.items.find(i => i.signature === signature);
+        if (existingItem) {
+            existingItem.qty += inputQty;
+        } else {
+            cartState.items.push({
+                signature: signature,
+                sku: `Z01-${selectedSize}`,
+                size: selectedSize,
+                qty: inputQty,
+                unitEffectivePrice: effectivePrice,
+                unitAltCost: unitAltCost,
+                unitWeight: activeWeightKg,
+                alterations: { ...currentAlterations }
+            });
+        }
+
+        updateCartTotals();
         renderCart();
+
+        // Reset UI for next item
+        document.getElementById('qty').value = 1;
         toggleCart(true);
+    });
+
+    // Helper: Recalculates root totals for checkout/shipping compatibility
+    function updateCartTotals() {
+        if (!cartState) return;
+        cartState.basePrice = 0; cartState.altCost = 0; cartState.weightKg = 0; cartState.totalQty = 0;
+
+        cartState.items.forEach(item => {
+            cartState.basePrice += item.unitEffectivePrice * item.qty;
+            cartState.altCost += item.unitAltCost * item.qty;
+            cartState.weightKg += item.unitWeight * item.qty;
+            cartState.totalQty += item.qty;
+        });
+
+        // Reset shipping if cart is emptied to force recalc
+        if (cartState.items.length === 0) cartState.shippingFee = 0;
+    }
+
+    // Helper: Internal Cart QTY Adjuster
+    window.updateCartItemQty = function(signature, delta) {
+        if (!cartState) return;
+        const item = cartState.items.find(i => i.signature === signature);
+        if (item) {
+            item.qty += delta;
+            if (item.qty <= 0) {
+                cartState.items = cartState.items.filter(i => i.signature !== signature);
+            }
+            updateCartTotals();
+            cartState.items.length === 0 ? closeCart() : renderCart();
+        }
+    };
+
+    // Helper: Remove Item
+    window.removeCartItem = function(signature) {
+        if (!cartState) return;
+        cartState.items = cartState.items.filter(i => i.signature !== signature);
+        updateCartTotals();
+        cartState.items.length === 0 ? closeCart() : renderCart();
     };
 
     function renderCart() {
         if (!cartState) return;
-        let altHtml = '';
-        if (Object.keys(cartState.alterations).length > 0) {
-            altHtml = `<ul class="text-xs text-gray-400 mt-3 space-y-2">`;
-            for (let [k, v] of Object.entries(cartState.alterations)) {
-                const sId = k === 'length' ? 'Z01_ALT_LENGTH' : (k === 'sleeve' ? 'Z01_ALT_SLEEVE' : 'Z01_ALT_SHOULDER');
-                const cPrice = appConfig[sId] ? appConfig[sId].standardPrice : 0;
-                altHtml += `<li class="flex justify-between border-t border-white/5 pt-2"><span>↳ Custom ${k}: ${v}"</span><span class="text-white">RM ${cPrice.toFixed(2)}</span></li>`;
+        const container = document.getElementById('cart-items-container');
+        if (!cartState.items || cartState.items.length === 0) return;
+
+        let html = '';
+        cartState.items.forEach(item => {
+            let altHtml = '';
+            if (Object.keys(item.alterations).length > 0) {
+                altHtml = '<div class="text-white/40 text-[11px] mt-1.5 leading-relaxed space-y-0.5">';
+                for (let [k, v] of Object.entries(item.alterations)) {
+                    altHtml += `<div>${v.name}: ${v.val} <span class="text-white/20 mx-1">|</span> +RM ${v.price.toFixed(2)}</div>`;
+                }
+                altHtml += '</div>';
             }
-            altHtml += `</ul>`;
-        }
-        document.getElementById('cart-items-container').innerHTML = `
-            <div class="flex gap-4 bg-white/5 p-4 rounded-xl border border-white/5">
-                <img src="images/z01-1-hero.webp" class="w-20 h-24 object-cover rounded-lg bg-gray-800 shrink-0" alt="">
-                <div class="flex-1 min-w-0">
-                    <div class="text-white font-medium text-lg truncate">Z01 Abaya (Size ${cartState.size})</div>
-                    <div class="text-luxe font-medium">RM ${cartState.basePrice.toFixed(2)}</div>
-                    ${altHtml}
+
+            const itemTotal = (item.unitEffectivePrice + item.unitAltCost) * item.qty;
+            const sigJson = JSON.stringify(item.signature);
+
+            html += `
+                <div class="flex gap-4 pb-5 border-b border-white/10 relative group last:border-0 last:pb-0">
+                    <img src="images/z01-1-hero.webp" class="w-20 h-24 object-cover rounded-lg border border-white/10" alt="Z01">
+                    <div class="flex-1 flex flex-col justify-between">
+                        <div>
+                            <div class="flex justify-between items-start">
+                                <div class="text-white font-medium text-[14px]">Z01 Abaya <span class="text-white/50 text-xs ml-1 font-normal">(Size ${item.size})</span></div>
+                                <button type="button" onclick='removeCartItem(${sigJson})' class="text-white/30 hover:text-white transition-colors p-1 -mr-2 -mt-1 tap-none" title="Remove item">
+                                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                                </button>
+                            </div>
+                            <div class="text-luxe font-medium text-sm mt-0.5">RM ${itemTotal.toFixed(2)}</div>
+                            ${altHtml}
+                        </div>
+
+                        <div class="flex items-center mt-3">
+                            <div class="flex items-center rounded-md border border-white/15 bg-white/[0.02]">
+                                <button type="button" onclick='updateCartItemQty(${sigJson}, -1)' class="px-3 py-1 text-white/50 hover:text-white tap-none">&minus;</button>
+                                <span class="w-6 text-center text-xs font-medium">${item.qty}</span>
+                                <button type="button" onclick='updateCartItemQty(${sigJson}, 1)' class="px-3 py-1 text-white/50 hover:text-white tap-none">&plus;</button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
+            `;
+        });
+
+        // Add Another Piece Button
+        html += `
+            <div class="mt-4 pt-4 border-t border-white/10">
+                <button onclick="closeCart()" class="w-full py-2.5 border border-dashed border-white/20 rounded-xl text-white/60 text-[10px] uppercase tracking-widest hover:border-luxe hover:text-luxe transition-colors tap-none flex items-center justify-center gap-2">
+                    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                    Add Another Piece
+                </button>
             </div>
         `;
+
+        container.innerHTML = html;
         const subtotal = cartState.basePrice + cartState.altCost;
         document.getElementById('cart-subtotal').textContent = `RM ${subtotal.toFixed(2)}`;
         const discRow = document.getElementById('cart-discount-row');
