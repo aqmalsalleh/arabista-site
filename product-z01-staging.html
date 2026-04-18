@@ -1283,8 +1283,11 @@
 
                     const notif = document.getElementById('cart-notification');
                     notif.classList.remove('hidden');
-                    // Ensure drawer scrolls to top to see notification
                     document.getElementById('cart-scroll-area').scrollTop = 0;
+
+                    // --- LIVE MATRIX REFRESH ---
+                    // Silently updates the main page sizing buttons to reflect the sold-out status
+                    await fetchConfig();
 
                     setTimeout(() => { notif.classList.add('hidden'); }, 8000);
                 } else {
