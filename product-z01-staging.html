@@ -864,6 +864,9 @@
         }
 
         const currentAlterations = {};
+        let altStandardSum = 0;
+        let altPaidSum = 0;
+
         if (altEnabled) {
             document.querySelectorAll('.alt-input').forEach(inp => {
                 const val = parseFloat(inp.value);
@@ -872,12 +875,19 @@
                     const sId = key === 'length' ? 'Z01_ALT_LENGTH' : (key === 'sleeve' ? 'Z01_ALT_SLEEVE' : 'Z01_ALT_SHOULDER');
                     const conf = appConfig[sId];
                     if (conf) {
-                        const charged = (conf.promoPrice !== null && conf.promoPrice < conf.standardPrice) ? conf.promoPrice : conf.standardPrice;
+                        const stdPrice = conf.standardPrice || 0;
+                        const isPromo = conf.promoPrice !== null && conf.promoPrice < stdPrice;
+                        const charged = isPromo ? conf.promoPrice : stdPrice;
+
                         currentAlterations[key] = {
                             name: key.charAt(0).toUpperCase() + key.slice(1),
                             val: val + '"',
-                            price: charged
+                            price: charged,
+                            standardPrice: stdPrice,
+                            isPromo: isPromo
                         };
+                        altStandardSum += stdPrice;
+                        altPaidSum += charged;
                     }
                 }
             });
@@ -885,12 +895,14 @@
 
         const effectivePrice = activePromoPrice !== null ? activePromoPrice : activeRetailPrice;
         const inputQty = parseInt(document.getElementById('qty').value) || 1;
-        const unitAltCost = Object.values(currentAlterations).reduce((sum, a) => sum + a.price, 0);
+        const baseDiscount = activeRetailPrice - effectivePrice;
+        const altDiscount = altStandardSum - altPaidSum;
+        const totalUnitDiscount = baseDiscount + altDiscount;
 
         // The Configuration Hash: Unique signature for this exact size + alt combo
         const signature = `Z01-${selectedSize}|${JSON.stringify(currentAlterations)}`;
 
-        // Initialize Cart State if empty (preserving smart memory format)
+        // Initialize Cart State if empty
         if (!cartState) {
             cartState = {
                 items: [],
@@ -911,7 +923,8 @@
                 size: selectedSize,
                 qty: inputQty,
                 unitEffectivePrice: effectivePrice,
-                unitAltCost: unitAltCost,
+                unitAltCost: altPaidSum,
+                unitDiscount: totalUnitDiscount,
                 unitWeight: activeWeightKg,
                 alterations: { ...currentAlterations }
             });
@@ -969,17 +982,31 @@
         if (!cartState.items || cartState.items.length === 0) return;
 
         let html = '';
+        let visualSubtotal = 0;
+        let totalDiscount = 0;
+
         cartState.items.forEach(item => {
             let altHtml = '';
             if (Object.keys(item.alterations).length > 0) {
                 altHtml = '<div class="text-white/40 text-[11px] mt-1.5 leading-relaxed space-y-0.5">';
                 for (let [k, v] of Object.entries(item.alterations)) {
-                    altHtml += `<div>${v.name}: ${v.val} <span class="text-white/20 mx-1">|</span> +RM ${v.price.toFixed(2)}</div>`;
+                    let priceDisplay = '';
+                    if (v.isPromo) {
+                        const promoText = v.price === 0 ? "FREE" : `RM ${v.price.toFixed(2)}`;
+                        priceDisplay = `<del class="text-white/30">RM ${v.standardPrice.toFixed(2)}</del> <span class="text-luxe font-bold ml-1">${promoText}</span>`;
+                    } else {
+                        priceDisplay = `+RM ${v.price.toFixed(2)}`;
+                    }
+                    altHtml += `<div>${v.name}: ${v.val} <span class="text-white/20 mx-1">|</span> ${priceDisplay}</div>`;
                 }
                 altHtml += '</div>';
             }
 
-            const itemTotal = (item.unitEffectivePrice + item.unitAltCost) * item.qty;
+            const itemPaid = (item.unitEffectivePrice + item.unitAltCost) * item.qty;
+            const itemSaved = (item.unitDiscount || 0) * item.qty;
+            visualSubtotal += (itemPaid + itemSaved);
+            totalDiscount += itemSaved;
+
             const sigJson = JSON.stringify(item.signature);
 
             html += `
@@ -993,7 +1020,7 @@
                                     <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
                                 </button>
                             </div>
-                            <div class="text-luxe font-medium text-sm mt-0.5">RM ${itemTotal.toFixed(2)}</div>
+                            <div class="text-luxe font-medium text-sm mt-0.5">RM ${itemPaid.toFixed(2)}</div>
                             ${altHtml}
                         </div>
 
@@ -1020,15 +1047,25 @@
         `;
 
         container.innerHTML = html;
-        const subtotal = cartState.basePrice + cartState.altCost;
-        document.getElementById('cart-subtotal').textContent = `RM ${subtotal.toFixed(2)}`;
+
+        // Visual Cart Totals Math
+        totalDiscount += cartState.discount || 0; // Catch generic cart-level promos if any
+        document.getElementById('cart-subtotal').textContent = `RM ${visualSubtotal.toFixed(2)}`;
+
         const discRow = document.getElementById('cart-discount-row');
-        if (cartState.discount > 0) {
-            document.getElementById('cart-discount-label').textContent = cartState.promoLabel ? `Discount (${cartState.promoLabel})` : `Discount`;
-            document.getElementById('cart-discount-amount').textContent = `-RM ${cartState.discount.toFixed(2)}`;
+        if (totalDiscount > 0) {
+            document.getElementById('cart-discount-label').textContent = "Total Discount";
+            document.getElementById('cart-discount-amount').textContent = `-RM ${totalDiscount.toFixed(2)}`;
+            document.getElementById('cart-discount-amount').className = "text-luxe font-medium";
             discRow.classList.remove('hidden');
-        } else discRow.classList.add('hidden');
+            discRow.classList.add('flex');
+        } else {
+            discRow.classList.add('hidden');
+            discRow.classList.remove('flex');
+        }
+
         updateGrandTotal();
+
         const shipEl = document.getElementById('cart-shipping');
         if (shipEl && cartState.shippingFee > 0 && shipEl.textContent.trim() === 'Pending') {
             shipEl.textContent = `RM ${cartState.shippingFee.toFixed(2)} (Pos Laju)`;
