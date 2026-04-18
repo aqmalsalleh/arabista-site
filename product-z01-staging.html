@@ -460,8 +460,8 @@
     let inventoryMatrix = {};
     let altEnabled = false;
     let cartState = null;
-    let activeRetailPrice = 150.00;
-    let activePromoPrice = null;
+    let activeRetailPrice = 0; // Dynamically set on load
+    let activePromoPrice = null; // Dynamically set on load
     let activeWeightKg = 1.0;
 
     // Gallery Logic
@@ -527,6 +527,7 @@
                 appConfig = json.data.config || {};
                 inventoryMatrix = json.data.matrix || {};
                 renderAlterationFields();
+                initializeDefaultPricing(); // <-- INJECT HERE
                 applyOOSStyling();
             } else {
                 throw new Error("API returned non-success status");
@@ -538,6 +539,43 @@
                 btn.classList.remove('animate-pulse', 'pointer-events-none', 'opacity-40');
             });
         }
+    }
+
+    // --- DYNAMIC PRICING ENGINE ---
+    function initializeDefaultPricing() {
+        let defaultRetail = 0;
+        let defaultPromo = null;
+
+        // Scan the matrix to find baseline prices
+        for (let key in inventoryMatrix) {
+            const row = inventoryMatrix[key];
+            if (row.retailPrice > defaultRetail) defaultRetail = row.retailPrice;
+            if (row.promoPrice !== null) {
+                if (defaultPromo === null || row.promoPrice < defaultPromo) {
+                    defaultPromo = row.promoPrice;
+                }
+            }
+        }
+
+        // Fallback safety if DB is completely empty
+        if (defaultRetail === 0) defaultRetail = 265.00;
+
+        activeRetailPrice = defaultRetail;
+        activePromoPrice = defaultPromo;
+
+        const priceRow = document.getElementById('pdp-price-row');
+        const stickyPriceDisplay = document.getElementById('sticky-price-display');
+
+        let priceHtml = '';
+        if (activePromoPrice !== null && activePromoPrice < activeRetailPrice) {
+            priceHtml = `<del class="text-gray-500 text-lg mr-2">RM ${activeRetailPrice.toFixed(2)}</del><span class="text-luxe">RM ${activePromoPrice.toFixed(2)}</span>`;
+            if (stickyPriceDisplay) stickyPriceDisplay.innerHTML = `<span class="text-white/50 mr-2 text-[12px]">Base &middot;</span> <del class="text-gray-500 mr-2 text-[13px]">RM ${activeRetailPrice.toFixed(2)}</del><span class="text-luxe">RM ${activePromoPrice.toFixed(2)}</span>`;
+        } else {
+            priceHtml = `<span class="text-luxe">RM ${activeRetailPrice.toFixed(2)}</span>`;
+            if (stickyPriceDisplay) stickyPriceDisplay.innerHTML = `<span class="text-white/50 mr-2 text-[12px]">Base &middot;</span> <span class="text-white">RM ${activeRetailPrice.toFixed(2)}</span>`;
+        }
+
+        if (priceRow) priceRow.innerHTML = priceHtml;
     }
 
     // --- OOS AESTHETIC ENGINE ---
@@ -603,15 +641,7 @@
         const stickyBtn = document.getElementById('sticky-btn');
 
         if (size == null || size === '') {
-            activeRetailPrice = 150.00;
-            activePromoPrice = null;
-            activeWeightKg = 1.0;
-            if (priceRow) {
-                priceRow.innerHTML = `<del class="text-gray-500 text-lg mr-2">RM 265.00</del><span class="text-luxe">RM 139.00</span>`;
-            }
-            if (stickyPriceDisplay) {
-                stickyPriceDisplay.innerHTML = `<span class="text-luxe">RM 139.00</span>`;
-            }
+            initializeDefaultPricing();
             if (stickyBtn) {
                 stickyBtn.textContent = 'Select Size';
                 stickyBtn.className = 'px-6 py-2.5 rounded-lg text-[10px] font-medium uppercase tracking-widest transition-all duration-300 tap-none bg-white/10 text-white hover:bg-white/20';
@@ -922,6 +952,7 @@
                 sku: `Z01-${selectedSize}`,
                 size: selectedSize,
                 qty: inputQty,
+                unitRetailPrice: activeRetailPrice,
                 unitEffectivePrice: effectivePrice,
                 unitAltCost: altPaidSum,
                 unitDiscount: totalUnitDiscount,
@@ -1020,7 +1051,12 @@
                                     <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
                                 </button>
                             </div>
-                            <div class="text-luxe font-medium text-sm mt-0.5">RM ${itemPaid.toFixed(2)}</div>
+                            <div class="mt-0.5">
+                                ${item.unitEffectivePrice < item.unitRetailPrice
+                                    ? `<del class="text-white/30 mr-1.5 text-xs">RM ${(item.unitRetailPrice * item.qty).toFixed(2)}</del><span class="text-luxe font-bold text-sm">RM ${(item.unitEffectivePrice * item.qty).toFixed(2)}</span>`
+                                    : `<span class="text-luxe font-medium text-sm">RM ${(item.unitEffectivePrice * item.qty).toFixed(2)}</span>`
+                                }
+                            </div>
                             ${altHtml}
                         </div>
 
