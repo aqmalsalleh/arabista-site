@@ -59,11 +59,12 @@
       </div>
 
       <div id="tab-operations" class="tab-pane hidden space-y-4 max-w-6xl mx-auto">
-        <div class="flex justify-between items-end mb-6">
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-6 gap-4">
           <div>
             <h2 class="font-display text-3xl mb-1">God-Mode Database</h2>
             <p class="text-gray-400 text-sm">All active orders. Manually override statuses if necessary.</p>
           </div>
+          <input type="text" id="ops-search" onkeyup="window.opsSearchQuery = this.value.toLowerCase(); renderOperations();" placeholder="Search Order, Hub, or Name..." class="bg-black/50 border border-white/20 text-white text-sm px-4 py-2 rounded outline-none focus:border-amber-400 w-full md:w-72">
         </div>
         <div class="bg-white/5 border border-white/10 rounded overflow-x-auto">
           <table class="w-full text-left text-sm whitespace-nowrap">
@@ -72,6 +73,8 @@
                 <th class="p-4">Order ID</th>
                 <th class="p-4">Customer & Hub</th>
                 <th class="p-4">Lalamove Links</th>
+                <th class="p-4">Item Details</th>
+                <th class="p-4">Price</th>
                 <th class="p-4">Status Override</th>
               </tr>
             </thead>
@@ -103,6 +106,46 @@
     </main>
   </div>
 
+  <div id="edit-item-modal" class="fixed inset-0 z-50 bg-black/90 flex flex-col items-center justify-center p-4 hidden">
+    <div class="bg-[#1a1a1c] p-6 rounded-lg border border-white/10 w-full max-w-md">
+      <h3 class="font-display text-2xl text-amber-400 mb-4" id="edit-modal-title">Edit Item Details</h3>
+      <textarea id="edit-item-textarea" class="w-full bg-black/50 border border-white/20 text-white text-sm p-3 rounded outline-none focus:border-amber-400 h-32 mb-4 resize-none"></textarea>
+      <input type="hidden" id="edit-item-row">
+      <div class="flex gap-3">
+        <button type="button" onclick="document.getElementById('edit-item-modal').classList.add('hidden')" class="flex-1 bg-white/10 hover:bg-white/20 py-3 rounded transition-colors text-sm uppercase tracking-wider">Cancel</button>
+        <button type="button" onclick="saveItemDetails()" class="flex-1 bg-amber-500 hover:bg-amber-400 text-black font-bold py-3 rounded transition-colors text-sm uppercase tracking-wider">Save & Notify</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="edit-price-modal" class="fixed inset-0 z-50 bg-black/90 flex flex-col items-center justify-center p-4 hidden">
+    <div class="bg-[#1a1a1c] p-6 rounded-lg border border-white/10 w-full max-w-sm">
+      <h3 class="font-display text-2xl text-amber-400 mb-4" id="edit-price-title">Edit Services Total</h3>
+      <div class="flex items-center bg-black/50 border border-white/20 rounded mb-4 focus-within:border-amber-400">
+        <span class="text-gray-400 pl-4 pr-2">RM</span>
+        <input type="number" step="0.01" id="edit-price-input" class="w-full bg-transparent text-white text-lg p-3 outline-none">
+      </div>
+      <input type="hidden" id="edit-price-row">
+      <div class="flex gap-3">
+        <button type="button" onclick="document.getElementById('edit-price-modal').classList.add('hidden')" class="flex-1 bg-white/10 hover:bg-white/20 py-3 rounded transition-colors text-sm uppercase tracking-wider">Cancel</button>
+        <button type="button" onclick="savePriceDetails()" class="flex-1 bg-amber-500 hover:bg-amber-400 text-black font-bold py-3 rounded transition-colors text-sm uppercase tracking-wider">Save & Notify</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="context-modal" class="fixed inset-0 z-50 bg-black/90 flex flex-col items-center justify-center p-4 hidden">
+    <div class="bg-[#1a1a1c] p-6 rounded-lg border border-white/10 w-full max-w-md">
+      <h3 class="font-display text-2xl text-amber-400 mb-4" id="modal-order-id">Order Context</h3>
+      <div class="space-y-3 text-sm text-gray-300 mb-6">
+        <div><span class="text-xs uppercase text-gray-500 block">Status</span> <span id="modal-status" class="text-white font-medium"></span></div>
+        <div><span class="text-xs uppercase text-gray-500 block">Hub Assigned</span> <span id="modal-hub" class="text-white font-medium"></span></div>
+        <div><span class="text-xs uppercase text-gray-500 block">Item Details</span> <span id="modal-items" class="text-white font-medium whitespace-pre-wrap"></span></div>
+        <div id="modal-lalamove-wrapper" class="hidden"><span class="text-xs uppercase text-gray-500 block">Logistics Links</span> <div id="modal-lalamove" class="mt-1 flex flex-col items-start gap-1"></div></div>
+      </div>
+      <button type="button" onclick="document.getElementById('context-modal').classList.add('hidden')" class="w-full bg-white/10 hover:bg-white/20 py-3 rounded transition-colors text-sm uppercase tracking-wider">Close Context</button>
+    </div>
+  </div>
+
   <div id="qr-modal" class="fixed inset-0 z-50 bg-black/90 flex flex-col items-center justify-center p-4 hidden">
     <div class="bg-[#1a1a1c] p-6 rounded-lg border border-white/10 w-full max-w-sm text-center">
       <h3 class="font-display text-2xl text-amber-400 mb-4" id="qr-hub-name">Hub QR</h3>
@@ -123,26 +166,22 @@
   </style>
 
   <script>
-    // --- APP STATE ---
     let token = "";
     let systemData = null;
 
-    // --- UTILS ---
     function showLoader() { document.getElementById('loader').classList.remove('hidden'); }
     function hideLoader() { document.getElementById('loader').classList.add('hidden'); }
 
-    // Allow Enter key to trigger login
     document.getElementById('admin-pin').addEventListener('keypress', function (e) {
         if (e.key === 'Enter') login();
     });
 
-    // --- LOGIN ---
     function login() {
       const pin = document.getElementById('admin-pin').value;
       if(!pin) return;
       document.getElementById('btn-login').innerHTML = 'VERIFYING...';
 
-      google.script.run.withSuccessHandler(function(res) {
+      google.script.run.withFailureHandler(err => { document.getElementById('btn-login').innerHTML = 'Access System'; alert("Server Error: " + err.message); }).withSuccessHandler(function(res) {
         document.getElementById('btn-login').innerHTML = 'Access System';
         if(res.success) {
           token = res.token;
@@ -155,10 +194,9 @@
       }).adminLogin(pin);
     }
 
-    // --- DATA FETCH ---
     function fetchData() {
       showLoader();
-      google.script.run.withSuccessHandler(function(res) {
+      google.script.run.withFailureHandler(err => { hideLoader(); alert("Server Error: " + err.message); }).withSuccessHandler(function(res) {
         hideLoader();
         if(res.success) {
           systemData = res.data;
@@ -172,7 +210,6 @@
       }).getAdminDashboardData(token);
     }
 
-    // --- UI RENDERERS ---
     function switchTab(tabId) {
       document.querySelectorAll('.tab-pane').forEach(el => el.classList.add('hidden'));
       document.getElementById(tabId).classList.remove('hidden');
@@ -187,114 +224,174 @@
     }
 
     function renderInterventions() {
-      const container = document.getElementById('interventions-container');
+      var container = document.getElementById("interventions-container");
       if(!systemData.interventions.length) {
-        container.innerHTML = '<div class="text-gray-500 text-center py-10 border border-dashed border-white/10 rounded">All systems nominal. No AI interventions required.</div>';
+        container.innerHTML = "<div class=\"text-gray-500 text-center py-10 border border-dashed border-white/10 rounded\">All systems nominal. No AI interventions required.</div>";
         return;
       }
-      container.innerHTML = systemData.interventions.map(i => `
-        <div class="bg-red-500/10 border border-red-500/20 rounded p-5 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-          <div>
-            <div class="flex items-center gap-2 mb-1">
-              <span class="bg-red-500 text-white text-xs px-2 py-0.5 rounded font-bold uppercase">${i.id}</span>
-              <span class="text-sm text-gray-300">${i.custName} → ${i.hubName}</span>
-            </div>
-            <p class="text-red-200 text-sm mt-2 font-medium">${i.notes}</p>
-          </div>
-          <div class="flex flex-wrap gap-2 shrink-0">
-            <a href="https://wa.me/${cleanPhone(i.custPhone)}" target="_blank" class="bg-white/10 hover:bg-white/20 px-4 py-2 rounded text-xs transition uppercase tracking-wider">Msg Cust</a>
-            <button onclick="executeAction('CLEAR_FLAG', {row: ${i.row}})" class="bg-red-500 hover:bg-red-400 text-white px-4 py-2 rounded text-xs font-bold transition uppercase tracking-wider">Resolve & Clear</button>
-          </div>
-        </div>
-      `).join('');
+
+      var htmlStr = "";
+      var j;
+      for(j = 0; j < systemData.interventions.length; j++) {
+        var i = systemData.interventions[j];
+        var cPhone = i.custPhone ? cleanPhone(i.custPhone) : "";
+        var hPhone = "";
+        var hubObj = null;
+        var hh;
+        for(hh = 0; hh < systemData.hubs.length; hh++) {
+          if(systemData.hubs[hh].name === i.hubName) {
+            hubObj = systemData.hubs[hh];
+            break;
+          }
+        }
+        if(hubObj && hubObj.phone) hPhone = cleanPhone(hubObj.phone);
+
+        var st = i.servicesTotal || "0.00";
+
+        htmlStr += "<div class=\"bg-red-500/10 border border-red-500/20 rounded p-5 flex flex-col gap-4\">" +
+          "<div class=\"flex flex-col md:flex-row justify-between items-start md:items-center gap-4\">" +
+            "<div>" +
+              "<div class=\"flex flex-wrap items-center gap-2 mb-1\">" +
+                "<button type=\"button\" onclick=\"openContextModal('" + i.id + "')\" class=\"bg-red-500 hover:bg-red-400 text-white text-xs px-2 py-0.5 rounded font-bold uppercase cursor-pointer\">🔍 " + i.id + "</button>" +
+                "<span class=\"text-sm text-gray-300 ml-1\">" + i.custName + " → " + i.hubName + "</span>" +
+                "<span class=\"text-amber-400 font-bold ml-auto text-sm flex items-center gap-1 bg-black/30 px-2 py-1 rounded border border-white/5\">RM " + st + " <button type=\"button\" onclick=\"openEditPriceModal(" + i.row + ", '" + st + "', '" + i.id + "')\" class=\"text-amber-400 hover:text-amber-300 ml-1\">✏️</button></span>" +
+              "</div>" +
+              "<p class=\"text-red-200 text-sm mt-2 font-medium whitespace-pre-wrap\">" + i.notes + "</p>" +
+            "</div>" +
+            "<div class=\"flex flex-col gap-2 shrink-0 w-full md:w-auto\">" +
+              "<div class=\"flex gap-2 w-full mb-2\">" +
+                "<button type=\"button\" onclick=\"toggleReplyBox(" + i.row + ", '" + cPhone + "', 'Customer')\" class=\"flex-1 bg-blue-500/20 text-blue-300 border border-blue-500/30 px-3 py-2 rounded text-xs uppercase transition hover:bg-blue-500/40\">Msg Cust</button>" +
+                "<button type=\"button\" onclick=\"toggleReplyBox(" + i.row + ", '" + hPhone + "', 'Hub')\" class=\"flex-1 bg-amber-500/20 text-amber-300 border border-amber-500/30 px-3 py-2 rounded text-xs uppercase transition hover:bg-amber-500/40\">Msg Hub</button>" +
+              "</div>" +
+              "<button onclick=\"executeAction('CLEAR_FLAG', {row: " + i.row + "})\" class=\"w-full bg-red-500 hover:bg-red-400 text-white px-4 py-2 rounded text-xs font-bold transition uppercase tracking-wider\">Resolve & Clear</button>" +
+            "</div>" +
+          "</div>" +
+          "<div id=\"reply-box-" + i.row + "\" class=\"hidden mt-2 border-t border-white/10 pt-3\">" +
+            "<div id=\"reply-label-" + i.row + "\" class=\"text-xs text-gray-400 mb-2 uppercase tracking-wider\"></div>" +
+            "<div class=\"flex gap-2\">" +
+              "<input type=\"text\" id=\"reply-input-" + i.row + "\" class=\"flex-1 bg-black/50 border border-white/20 text-white text-sm px-3 py-2 rounded outline-none focus:border-amber-400\" placeholder=\"Type your message...\">" +
+              "<button type=\"button\" onclick=\"dispatchReply(" + i.row + ")\" class=\"bg-amber-500 hover:bg-amber-400 text-black px-6 py-2 rounded text-sm font-bold uppercase transition\">Send</button>" +
+            "</div>" +
+          "</div>" +
+        "</div>";
+      }
+      container.innerHTML = htmlStr;
     }
 
     function renderOperations() {
-      const tbody = document.getElementById('operations-table');
-      if(!systemData.orders.length) {
-        tbody.innerHTML = '<tr><td colspan="4" class="p-8 text-center text-gray-500 border-dashed border border-white/10">No active orders in the databanks.</td></tr>';
+      var tbody = document.getElementById('operations-table');
+      if(!systemData || !systemData.orders) {
+        tbody.innerHTML = "<tr><td colspan='6' class='p-8 text-center text-gray-500 border-dashed border border-white/10'>No active orders found.</td></tr>";
         return;
       }
 
-      const statusOptions = ['Pending Dropoff', 'Awaiting Dispatch', 'In Progress', 'Ready for Return', 'Dispatched', 'Completed', 'Canceled'];
+      var statusOptions = ['Pending Dropoff', 'Awaiting Dispatch', 'In Progress', 'Ready for Return', 'Dispatched', 'Completed', 'Canceled'];
 
-      tbody.innerHTML = systemData.orders.map(o => {
-        let lalaHTML = '<span class="text-gray-600 italic">None</span>';
-        if(o.inboundLala || o.outboundLala) {
-           lalaHTML = '';
-           if(o.inboundLala) lalaHTML += `<a href="https://share.sandbox.lalamove.com/tracking/${o.inboundLala}" target="_blank" class="text-blue-400 hover:text-blue-300 underline block mb-1">IN: ${o.inboundLala}</a>`;
-           if(o.outboundLala) lalaHTML += `<a href="https://share.sandbox.lalamove.com/tracking/${o.outboundLala}" target="_blank" class="text-purple-400 hover:text-purple-300 underline block">OUT: ${o.outboundLala}</a>`;
+      var htmlStr = "";
+      var activeOrders = systemData.orders.filter(function(o) {
+        var s = String(o.status).toUpperCase();
+        if (s === "REJECTED" || s === "CANCELED" || s === "COMPLETED") return false;
+        if (window.opsSearchQuery) {
+          var searchStr = (o.id + " " + o.custName + " " + o.hubName).toLowerCase();
+          if (searchStr.indexOf(window.opsSearchQuery) === -1) return false;
         }
+        return true;
+      });
 
-        const selOps = statusOptions.map(opt => `<option value="${opt}" ${o.status === opt ? 'selected' : ''}>${opt}</option>`).join('');
+      if(activeOrders.length === 0) {
+        tbody.innerHTML = "<tr><td colspan='6' class='p-8 text-center text-gray-500 border-dashed border border-white/10'>No active orders found.</td></tr>";
+        return;
+      }
 
-        return `
-        <tr class="hover:bg-white/5 transition border-white/5">
-          <td class="p-4 font-bold text-amber-400">${o.id}</td>
-          <td class="p-4"><div class="font-medium">${o.custName}</div><div class="text-xs text-gray-400 mt-1">${o.hubName}</div></td>
-          <td class="p-4 text-xs">${lalaHTML}</td>
-          <td class="p-4">
-             <select onchange="executeAction('UPDATE_STATUS', {row: ${o.row}, newStatus: this.value})" class="bg-[#1a1a1c] border border-white/20 text-white text-xs p-2 rounded outline-none focus:border-amber-400 w-full max-w-[160px]">
-                ${selOps}
-             </select>
-          </td>
-        </tr>
-      `}).join('');
+      for(var k=0; k<activeOrders.length; k++) {
+        var o = activeOrders[k];
+        var lalaHTML = "<span class='text-gray-600 italic'>None</span>";
+        if(o.inboundLala || o.outboundLala) {
+           lalaHTML = "";
+           if(o.inboundLala) lalaHTML += "<button type='button' onclick=\"window.open('https:/" + "/share.sandbox.lalamove.com/tracking/" + o.inboundLala + "', '_blank')\" class='text-blue-400 hover:text-blue-300 underline block mb-1 bg-transparent border-0 p-0 cursor-pointer text-left font-inherit'>IN: " + o.inboundLala + "</button>";
+           if(o.outboundLala) lalaHTML += "<button type='button' onclick=\"window.open('https:/" + "/share.sandbox.lalamove.com/tracking/" + o.outboundLala + "', '_blank')\" class='text-purple-400 hover:text-purple-300 underline block bg-transparent border-0 p-0 cursor-pointer text-left font-inherit'>OUT: " + o.outboundLala + "</button>";
+        }
+        var selOps = statusOptions.map(function(opt) { return "<option value='" + opt + "' " + (o.status === opt ? "selected" : "") + ">" + opt + "</option>"; }).join("");
+        
+        var safeDetails = (o.itemDetails || "").replace(/'/g, "\\'").replace(/\n/g, "\\n");
+        var detailsHTML = "<div class='flex items-start justify-between gap-2'><div class='text-xs text-gray-300 w-48 whitespace-normal'>" + (o.itemDetails || "None") + "</div><button type='button' onclick=\"openEditItemModal(" + o.row + ", '" + safeDetails + "', '" + o.id + "')\" class='text-amber-400 hover:text-amber-300 shrink-0'>✏️</button></div>";
+
+        var priceHTML = "<div class='flex items-center gap-2'><span class='font-medium text-amber-400 whitespace-nowrap'>RM " + (o.servicesTotal || "0.00") + "</span><button type='button' onclick=\"openEditPriceModal(" + o.row + ", '" + (o.servicesTotal || "0.00") + "', '" + o.id + "')\" class='text-amber-400 hover:text-amber-300 shrink-0'>✏️</button></div>";
+
+        htmlStr += "<tr class='hover:bg-white/5 transition border-b border-white/5'>" +
+          "<td class='p-4 font-bold text-amber-400'>" + o.id + "</td>" +
+          "<td class='p-4'><div class='font-medium'>" + o.custName + "</div><div class='text-xs text-gray-400 mt-1'>" + o.hubName + "</div></td>" +
+          "<td class='p-4 text-xs'>" + lalaHTML + "</td>" +
+          "<td class='p-4'>" + detailsHTML + "</td>" +
+          "<td class='p-4'>" + priceHTML + "</td>" +
+          "<td class='p-4'><select onchange=\"executeAction('UPDATE_STATUS', {row: " + o.row + ", newStatus: this.value})\" class='bg-[#1a1a1c] border border-white/20 text-white text-xs p-2 rounded outline-none focus:border-amber-400 w-full max-w-[160px]'>" + selOps + "</select></td>" +
+        "</tr>";
+      }
+      tbody.innerHTML = htmlStr;
     }
 
     function renderHubs() {
-      const container = document.getElementById('hubs-container');
-      container.innerHTML = systemData.hubs.map(h => {
-        const isBusy = h.status === 'Busy / Full';
-        return `
-        <div class="bg-white/5 border border-white/10 rounded p-5 relative overflow-hidden group hover:border-white/20 transition">
-          <div class="absolute top-0 right-0 p-4 flex items-center gap-2">
-             <span class="text-xs uppercase tracking-wider text-gray-500">${h.status}</span>
-             <span class="w-3 h-3 rounded-full inline-block ${isBusy ? 'bg-red-500 shadow-[0_0_10px_rgba(239,68,68,0.6)]' : 'bg-green-500 shadow-[0_0_10px_rgba(34,197,94,0.6)]'}"></span>
-          </div>
-          <h3 class="font-display text-2xl text-amber-400 mb-1 pr-24">${h.name}</h3>
-          <p class="text-sm text-gray-400 mb-5">${h.capacity} Max Daily Capacity</p>
-
-          <select onchange="executeAction('TOGGLE_HUB', {row: ${h.row}, newStatus: this.value})" class="w-full bg-[#1a1a1c] border ${isBusy ? 'border-red-500/50 text-red-200' : 'border-white/20 text-white'} text-sm p-2 rounded outline-none cursor-pointer hover:border-amber-400 transition-colors">
-             <option value="Active" ${!isBusy ? 'selected' : ''}>SET: ACCEPTING ORDERS</option>
-             <option value="Busy / Full" ${isBusy ? 'selected' : ''}>SET: BUSY / OFFLINE</option>
-          </select>
-        </div>
-      `}).join('');
+      var container = document.getElementById("hubs-container");
+      var htmlStr = "";
+      var j;
+      for(j = 0; j < systemData.hubs.length; j++) {
+        var h = systemData.hubs[j];
+        var isBusy = h.status === "Busy / Full";
+        var dotClass = isBusy ? "bg-red-500 shadow-[0_0_10px_rgba(239,68,68,0.6)]" : "bg-green-500 shadow-[0_0_10px_rgba(34,197,94,0.6)]";
+        var selBorder = isBusy ? "border-red-500/50 text-red-200" : "border-white/20 text-white";
+        var optActiveSel = !isBusy ? "selected" : "";
+        var optBusySel = isBusy ? "selected" : "";
+        htmlStr += "<div class=\"bg-white/5 border border-white/10 rounded p-5 relative overflow-hidden group hover:border-white/20 transition\">" +
+          "<div class=\"absolute top-0 right-0 p-4 flex items-center gap-2\">" +
+             "<span class=\"text-xs uppercase tracking-wider text-gray-500\">" + h.status + "</span>" +
+             "<span class=\"w-3 h-3 rounded-full inline-block " + dotClass + "\"></span>" +
+          "</div>" +
+          "<h3 class=\"font-display text-2xl text-amber-400 mb-1 pr-24\">" + h.name + "</h3>" +
+          "<p class=\"text-sm text-gray-400 mb-5\">" + h.capacity + " Max Daily Capacity</p>" +
+          "<select onchange=\"executeAction('TOGGLE_HUB', {row: " + h.row + ", newStatus: this.value})\" class=\"w-full bg-[#1a1a1c] border " + selBorder + " text-sm p-2 rounded outline-none cursor-pointer hover:border-amber-400 transition-colors\">" +
+             "<option value=\"Active\" " + optActiveSel + ">SET: ACCEPTING ORDERS</option>" +
+             "<option value=\"Busy / Full\" " + optBusySel + ">SET: BUSY / OFFLINE</option>" +
+          "</select>" +
+        "</div>";
+      }
+      container.innerHTML = htmlStr;
     }
 
     function renderPayouts() {
-      const container = document.getElementById('payouts-container');
+      var container = document.getElementById("payouts-container");
       if(!systemData.payouts.length) {
-        container.innerHTML = '<div class="text-gray-500 text-center py-10 border border-dashed border-white/10 rounded">All Hubs are fully paid. Ledger is balanced.</div>';
+        container.innerHTML = "<div class=\"text-gray-500 text-center py-10 border border-dashed border-white/10 rounded\">All Hubs are fully paid. Ledger is balanced.</div>";
         return;
       }
-      container.innerHTML = systemData.payouts.map(p => `
-        <div class="bg-gradient-to-r from-amber-500/10 to-transparent border border-amber-500/20 rounded p-5 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-          <div class="flex-1">
-            <h3 class="font-display text-2xl text-white mb-3">${p.hubName}</h3>
-            <div class="flex flex-wrap items-center gap-4 text-sm text-gray-400">
-              <div class="bg-black/30 px-3 py-2 rounded border border-white/5"><span class="block text-xs uppercase tracking-wider text-gray-500 mb-0.5">Bank</span><span class="text-white">${p.bankName}</span></div>
-              <div class="bg-black/30 px-3 py-2 rounded border border-white/5"><span class="block text-xs uppercase tracking-wider text-gray-500 mb-0.5">Account</span><span class="font-mono text-amber-200 tracking-wide">${p.bankAcc}</span></div>
-            </div>
-          </div>
-          <div class="text-left md:text-right shrink-0">
-            <div class="text-xs uppercase tracking-wider text-amber-500 mb-1 font-bold">Total Payout Due</div>
-            <div class="font-display text-5xl text-amber-400 drop-shadow-[0_0_10px_rgba(251,191,36,0.3)]">RM ${p.amount}</div>
-          </div>
-          <div class="flex flex-col gap-2 shrink-0 w-full md:w-auto">
-            <button onclick="showQR('${p.hubName.replace(/'/g, "\\'")}', '${String(p.qrUrl || "").replace(/'/g, "\\'")}')" class="bg-white/10 hover:bg-white/20 px-4 py-3 rounded text-xs font-bold uppercase tracking-wider transition border border-white/10">Show DuitNow QR</button>
-            <button onclick='executeAction("MARK_PAID", ${JSON.stringify(p)})' class="bg-amber-500 hover:bg-amber-400 text-black px-6 py-3 rounded text-xs font-bold uppercase tracking-wider transition shadow-[0_0_15px_rgba(245,158,11,0.3)]">Confirm Transfer</button>
-          </div>
-        </div>
-      `).join('');
+      var htmlStr = "";
+      var j;
+      for(j = 0; j < systemData.payouts.length; j++) {
+        var p = systemData.payouts[j];
+        htmlStr += "<div class=\"bg-gradient-to-r from-amber-500/10 to-transparent border border-amber-500/20 rounded p-5 flex flex-col md:flex-row justify-between items-start md:items-center gap-6\">" +
+          "<div class=\"flex-1\">" +
+            "<h3 class=\"font-display text-2xl text-white mb-3\">" + p.hubName + "</h3>" +
+            "<div class=\"flex flex-wrap items-center gap-4 text-sm text-gray-400\">" +
+              "<div class=\"bg-black/30 px-3 py-2 rounded border border-white/5\"><span class=\"block text-xs uppercase tracking-wider text-gray-500 mb-0.5\">Bank</span><span class=\"text-white\">" + p.bankName + "</span></div>" +
+              "<div class=\"bg-black/30 px-3 py-2 rounded border border-white/5\"><span class=\"block text-xs uppercase tracking-wider text-gray-500 mb-0.5\">Account</span><span class=\"font-mono text-amber-200 tracking-wide\">" + p.bankAcc + "</span></div>" +
+            "</div>" +
+          "</div>" +
+          "<div class=\"text-left md:text-right shrink-0\">" +
+            "<div class=\"text-xs uppercase tracking-wider text-amber-500 mb-1 font-bold\">Total Payout Due</div>" +
+            "<div class=\"font-display text-5xl text-amber-400 drop-shadow-[0_0_10px_rgba(251,191,36,0.3)]\">RM " + p.amount + "</div>" +
+          "</div>" +
+          "<div class=\"flex flex-col gap-2 shrink-0 w-full md:w-auto\">" +
+            "<button onclick=\"showPayoutQR(" + j + ")\" class=\"bg-white/10 hover:bg-white/20 px-4 py-3 rounded text-xs font-bold uppercase tracking-wider transition border border-white/10\">Show DuitNow QR</button>" +
+            "<button onclick='executeAction(\"MARK_PAID\", " + JSON.stringify(p) + ")' class=\"bg-amber-500 hover:bg-amber-400 text-black px-6 py-3 rounded text-xs font-bold uppercase tracking-wider transition shadow-[0_0_15px_rgba(245,158,11,0.3)]\">Confirm Transfer</button>" +
+          "</div>" +
+        "</div>";
+      }
+      container.innerHTML = htmlStr;
     }
 
-    // --- ACTIONS ---
     function executeAction(action, payload) {
-      if(action === 'MARK_PAID' && !confirm(`Are you sure you transferred RM ${payload.amount} to ${payload.hubName}? This will permanently mark their ledger as paid.`)) return;
-      if(action === 'UPDATE_STATUS' && !confirm(`Are you sure you want to manually force the status to ${payload.newStatus}?`)) {
-          fetchData(); // Reset dropdown if cancelled
+      if(action === "MARK_PAID" && !confirm("Are you sure you transferred RM " + payload.amount + " to " + payload.hubName + "? This will permanently mark their ledger as paid.")) return;
+      if(action === "UPDATE_STATUS" && !confirm("Are you sure you want to manually force the status to " + payload.newStatus + "?")) {
+          fetchData();
           return;
       }
 
@@ -304,7 +401,7 @@
 
       google.script.run.withSuccessHandler(function(res) {
         if(res.success) {
-          fetchData(); // Reload all data to reflect changes
+          fetchData();
         } else {
           hideLoader();
           alert("Action Failed: " + res.message);
@@ -312,12 +409,26 @@
       }).executeAdminAction(payload);
     }
 
+    function showPayoutQR(index) {
+      var p = systemData.payouts[index];
+      showQR(p.hubName, p.qrUrl);
+    }
+
     function showQR(hubName, url) {
       document.getElementById('qr-hub-name').textContent = hubName;
-      const img = document.getElementById('qr-image');
-      const err = document.getElementById('qr-error');
-      if(url && url.length > 5) {
-        img.src = url;
+      var img = document.getElementById('qr-image');
+      var err = document.getElementById('qr-error');
+
+      var directUrl = url;
+      if (url && url.indexOf('/d/') !== -1) {
+        var fileId = url.split('/d/')[1].split('/')[0];
+        if (fileId) {
+          directUrl = 'https://drive.google.com/thumbnail?id=' + fileId + '&sz=w800';
+        }
+      }
+
+      if (directUrl && directUrl.length > 5) {
+        img.src = directUrl;
         img.classList.remove('hidden');
         err.classList.add('hidden');
       } else {
@@ -331,6 +442,116 @@
       let c = String(num).replace(/\D/g, '');
       if(c.startsWith('0')) c = '6' + c;
       return c;
+    }
+
+    function openContextModal(orderId) {
+      var order = null;
+      for (var k = 0; k < systemData.orders.length; k++) {
+        if (systemData.orders[k].id === orderId) {
+          order = systemData.orders[k];
+          break;
+        }
+      }
+      if (!order) return;
+
+      document.getElementById('modal-order-id').innerText = order.id;
+      document.getElementById('modal-status').innerText = order.status;
+      document.getElementById('modal-hub').innerText = order.hubName;
+      document.getElementById('modal-items').innerText = order.itemDetails || "No details provided.";
+
+      var lalaBox = document.getElementById('modal-lalamove');
+      lalaBox.innerHTML = '';
+      var hasLinks = false;
+
+      if (order.inboundLala) {
+         hasLinks = true;
+         var btnIn = document.createElement('div');
+         btnIn.className = "text-blue-400 hover:text-blue-300 hover:underline cursor-pointer mb-2";
+         btnIn.innerText = "IN: " + order.inboundLala;
+         btnIn.onclick = function() { 
+           window.open("https:/" + "/share.sandbox.lalamove.com/tracking/" + order.inboundLala, "_blank"); 
+         };
+         lalaBox.appendChild(btnIn);
+      }
+      
+      if (order.outboundLala) {
+         hasLinks = true;
+         var btnOut = document.createElement('div');
+         btnOut.className = "text-purple-400 hover:text-purple-300 hover:underline cursor-pointer";
+         btnOut.innerText = "OUT: " + order.outboundLala;
+         btnOut.onclick = function() { 
+           window.open("https:/" + "/share.sandbox.lalamove.com/tracking/" + order.outboundLala, "_blank"); 
+         };
+         lalaBox.appendChild(btnOut);
+      }
+
+      var wrapper = document.getElementById('modal-lalamove-wrapper');
+      if (hasLinks) {
+         wrapper.classList.remove('hidden');
+      } else {
+         wrapper.classList.add('hidden');
+      }
+
+      document.getElementById('context-modal').classList.remove('hidden');
+    }
+
+    window.activeReplyPhones = {};
+    window.activeReplyRoles = {};
+
+    function toggleReplyBox(rowNum, phone, role) {
+      if(!phone) { alert("No phone available for this " + role); return; }
+      var box = document.getElementById('reply-box-' + rowNum);
+      if(box) {
+        box.classList.remove('hidden');
+        document.getElementById('reply-label-' + rowNum).innerText = 'Replying to: ' + role;
+        window.activeReplyPhones[rowNum] = phone;
+        window.activeReplyRoles[rowNum] = role;
+      }
+    }
+
+    function dispatchReply(rowNum) {
+      var input = document.getElementById('reply-input-' + rowNum);
+      if(!input || !input.value.trim()) return;
+      
+      var phone = window.activeReplyPhones[rowNum];
+      var role = window.activeReplyRoles[rowNum];
+      
+      executeAction('SEND_MANUAL_MESSAGE', { row: rowNum, phone: phone, message: input.value.trim(), role: role });
+      
+      input.value = '';
+      document.getElementById('reply-box-' + rowNum).classList.add('hidden');
+    }
+
+    window.opsSearchQuery = "";
+
+    function openEditItemModal(row, details, orderId) {
+      document.getElementById('edit-modal-title').innerText = "Edit: " + orderId;
+      document.getElementById('edit-item-textarea').value = details;
+      document.getElementById('edit-item-row').value = row;
+      document.getElementById('edit-item-modal').classList.remove('hidden');
+    }
+
+    function saveItemDetails() {
+      var row = document.getElementById('edit-item-row').value;
+      var newDetails = document.getElementById('edit-item-textarea').value.trim();
+      if(!newDetails) return;
+      document.getElementById('edit-item-modal').classList.add('hidden');
+      executeAction('UPDATE_ITEM_DETAILS', { row: row, newDetails: newDetails });
+    }
+
+    function openEditPriceModal(row, currentPrice, orderId) {
+      document.getElementById('edit-price-title').innerText = "Edit Price: " + orderId;
+      document.getElementById('edit-price-input').value = currentPrice;
+      document.getElementById('edit-price-row').value = row;
+      document.getElementById('edit-price-modal').classList.remove('hidden');
+    }
+
+    function savePriceDetails() {
+      var row = document.getElementById('edit-price-row').value;
+      var newTotal = document.getElementById('edit-price-input').value.trim();
+      if(!newTotal) return;
+      document.getElementById('edit-price-modal').classList.add('hidden');
+      executeAction('UPDATE_SERVICES_TOTAL', { row: row, newTotal: newTotal });
     }
   </script>
 </body>

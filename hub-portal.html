@@ -10,7 +10,7 @@
   <meta http-equiv="Expires" content="0" />
 
   <meta property="og:type" content="website" />
-  <meta property="og:url" content="https://www.arabistaofficial.com/hub-portal.html" />
+  <meta property="og:url" content="https://www.arabistaofficial.com/hub-portal-staging.html" />
   <meta property="og:title" content="Arabista — Tailor Portal" />
   <meta property="og:description" content="Login to your Arabista Tailor Portal to manage your alteration orders, track deliveries, and update your hub status." />
   <meta property="og:image" content="https://www.arabistaofficial.com/images/social-preview.jpg" />
@@ -110,6 +110,22 @@
       <div class="flex-1 overflow-y-auto px-4 py-6 scroll-smooth relative" id="scroll-area">
           
           <div id="tab-dashboard" class="tab-content active fade-in">
+            <div class="bg-gradient-to-br from-[#1a1a1c] to-[#2d2d30] border border-luxe/30 rounded-2xl p-6 shadow-lg relative overflow-hidden mb-2">
+                <div class="absolute top-0 right-0 p-4 opacity-10 pointer-events-none">
+                    <svg class="w-24 h-24 text-luxe" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                </div>
+                <div class="relative z-10">
+                    <p class="text-white/60 text-sm font-medium mb-1 uppercase tracking-wider" data-t="lbl_unpaid_earnings">Unpaid Earnings</p>
+                    <div class="flex items-baseline gap-2">
+                        <span class="text-2xl text-luxe font-bold">RM</span>
+                        <span id="wallet-balance" class="text-5xl text-white font-display font-bold tracking-tight">0.00</span>
+                    </div>
+                    <p class="text-xs text-white/40 mt-2 flex items-center gap-1">
+                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        <span data-t="lbl_wallet_disclaimer">Payouts are processed automatically to your registered bank account.</span>
+                    </p>
+                </div>
+            </div>
               <div class="flex justify-between items-center mb-4">
                   <h3 class="text-lg font-bold" data-t="title_timeline">Orders Timeline</h3>
                   <button onclick="loadDashboard(false, true)" class="p-2 text-luxe hover:bg-white/5 rounded-full transition border border-luxe/30 shadow-sm flex items-center justify-center gap-1.5 px-3" title="Refresh">
@@ -224,13 +240,11 @@
     const currentHost = window.location.hostname;
     // Auto-detect environment to route to the correct Google Apps Script backend
     if (currentHost === "127.0.0.1" || currentHost === "localhost") {
-        // DEV Backend (Local Sandbox)
-        scriptURL = "https://script.google.com/macros/s/AKfycbxTN-fedBZU81dGAVOgiYpnTup60V2bpCnh3YsFgBwd5t-jma9j8v9hwxSC87YvctNViw/exec";
+        scriptURL = "https://script.google.com/macros/s/AKfycbw41OeSWKC315Fw8eocXoQTRxQABVb9-L_gRwSCw1oiszquVypIN2cO8An2cxco8H7IiA/exec";
     } else {
-        // PROD Backend (Live GitHub Pages)
-        scriptURL = "https://script.google.com/macros/s/AKfycbyrJFfuCrhAbdwzAj8uP4sSvFuzRzzzEFV5CHOCBSOK6OGlIXPtsf7-XEfjLHGnFZiyvw/exec";
+        scriptURL = "https://script.google.com/macros/s/AKfycbw41OeSWKC315Fw8eocXoQTRxQABVb9-L_gRwSCw1oiszquVypIN2cO8An2cxco8H7IiA/exec";
     }
-    const trackerBaseUrl = 'https://www.arabistaofficial.com/alteration-tracker.html?id=';
+    const trackerBaseUrl = 'https://www.arabistaofficial.com/alteration-tracker-staging.html?id=';
     const spinnerSvg = `<svg class="animate-spin h-4 w-4 inline mr-2 text-current" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>`;
 
     const t = {
@@ -238,6 +252,7 @@
             login_title: "Tailor Portal", login_desc: "Enter your registered Hub Phone Number and PIN.", lbl_phone: "Phone Number", lbl_pin: "6-Digit PIN", btn_login: "Login securely",
             lbl_active_hub: "Active Hub", btn_logout: "Logout",
             title_timeline: "Orders Timeline", txt_syncing: "Syncing database...", btn_refresh: "Refresh",
+            lbl_unpaid_earnings: "Unpaid Earnings", lbl_wallet_disclaimer: "Payouts are processed automatically to your registered bank account.",
             header_requests: "New Requests (Approval)", header_pending: "Expected Arrivals (Pending)", header_active: "Currently Altering (In Progress)", header_completed: "Today's Deliveries",
             txt_history_limit: "Showing deliveries completed in the last 24 hours. Use the Search tab to find older orders.",
             txt_no_requests: "No new requests.", txt_no_pending: "No pending arrivals.", txt_no_active: "No active alterations.", txt_no_completed: "No completed orders.",
@@ -272,6 +287,7 @@
             login_title: "Portal Tukang Jahit", login_desc: "Masukkan No. Telefon dan PIN Hub anda.", lbl_phone: "No. Telefon", lbl_pin: "PIN 6-Digit", btn_login: "Log Masuk Selamat",
             lbl_active_hub: "Hub Aktif", btn_logout: "Log Keluar",
             title_timeline: "Garis Masa Pesanan", txt_syncing: "Menyegerakkan data...", btn_refresh: "Segar Semula",
+            lbl_unpaid_earnings: "Upah Belum Dibayar", lbl_wallet_disclaimer: "Bayaran akan diproses secara automatik ke akaun bank berdaftar anda.",
             header_requests: "Permintaan Baru (Kelulusan)", header_pending: "Jangkaan Tiba (Pending)", header_active: "Sedang Dijahit (In Progress)", header_completed: "Penghantaran Hari Ini",
             txt_history_limit: "Memaparkan penghantaran selesai dalam masa 24 jam lepas. Guna tab Cari untuk pesanan lama.",
             txt_no_requests: "Tiada permintaan baru.", txt_no_pending: "Tiada ketibaan baru.", txt_no_active: "Tiada alterasi aktif.", txt_no_completed: "Tiada pesanan selesai tempoh ini.",
@@ -308,7 +324,10 @@
     let hubToken = localStorage.getItem('arabista_hub_token') || ""; 
     let hubLat = ""; let hubLng = ""; let hubDays = "";
     let completedOrdersData = [];
-    let previousPendingCount = -1;
+    let lastPendingApprovalCount = 0;
+    let lastDispatchedCount = 0;
+    let isInitialLoad = true;
+    let globalOrders = [];
     let previousActionMap = new Map();
     let currentLang = 'en';
     
@@ -487,6 +506,11 @@
         } 
     }
 
+    const notifSound = new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3');
+    notifSound.volume = 1.0;
+    const successSound = new Audio('https://assets.mixkit.co/active_storage/sfx/2870/2870-preview.mp3');
+    successSound.volume = 0.9;
+
     function playAlert(type) {
         try {
             let soundUrl = 'https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3'; 
@@ -537,6 +561,7 @@
                 document.getElementById('header-hub-name').innerText = sanitizeHTML(hubName); 
                 
                 requestNotificationPermission();
+                isInitialLoad = true;
                 loadDashboard(false, true);
                 startAutoRefresh();
             } else { 
@@ -593,16 +618,52 @@
 
             if(data.status === "success") { 
                 if (data.timestamp) lastSyncTime = data.timestamp; 
+
+                const walletEl = document.getElementById('wallet-balance');
+                if (walletEl) {
+                    walletEl.innerText = parseFloat(data.walletBalance || 0).toFixed(2);
+                }
+
+                if (!data.orders) return;
                 
-                const newPendingCount = data.orders.pending.length;
-                if (previousPendingCount !== -1 && newPendingCount > previousPendingCount) { playAlert(1); }
-                previousPendingCount = newPendingCount;
-                
+                // --- SMART AUDIO ROUTING ---
+                let currentPendingApproval = 0;
+                let currentDispatched = 0;
+
+                // Count new actionable orders
+                (data.orders.pending || []).forEach(o => {
+                    if (o.status === "Pending Approval") currentPendingApproval++;
+                    if (o.status === "Inbound Dispatched") currentDispatched++;
+                });
+                // Count outbound logistics updates
+                (data.orders.inProgress || []).forEach(o => {
+                    if (o.status === "Outbound Dispatched") currentDispatched++;
+                });
+
+                // Trigger sounds based on what increased (External events only)
+                if (!isInitialLoad) {
+                    if (currentPendingApproval > lastPendingApprovalCount) {
+                        // High Urgency: New order needs Accept/Reject
+                        notifSound.play().catch(e => console.log("Audio blocked:", e));
+                    } else if (currentDispatched > lastDispatchedCount) {
+                        // Acknowledgement: Lalamove rider is on the way (Inbound or Outbound)
+                        successSound.play().catch(e => console.log("Audio blocked:", e));
+                    }
+                }
+
+                // Update state variables for the next polling cycle
+                lastPendingApprovalCount = currentPendingApproval;
+                lastDispatchedCount = currentDispatched;
+                isInitialLoad = false;
+
+                // Store orders globally to build WhatsApp templates later
+                globalOrders = [...(data.orders.pending || []), ...(data.orders.inProgress || []), ...(data.orders.completed || [])];
+
                 const currentReadyOrders = (data.orders.inProgress || []).filter(o => o.status === "Ready for Return");
                 currentReadyOrders.forEach(o => {
                     const prevOutbound = previousActionMap.get(o.id);
-                    if (previousActionMap.has(o.id) && !prevOutbound && o.outbound && o.outbound !== "") { playAlert(2); }
-                    previousActionMap.set(o.id, o.outbound);
+                    if (previousActionMap.has(o.id) && !prevOutbound && o.outboundChoice && o.outboundChoice !== "") { playAlert(2); }
+                    previousActionMap.set(o.id, o.outboundChoice);
                 });
                 
                 renderPending(data.orders.pending);
@@ -623,7 +684,7 @@
 
     function renderPending(orders) {
         const requests = orders.filter(o => o.status === "Pending Approval");
-        const arrivals = orders.filter(o => o.status === "Pending Dropoff" || o.status === "Awaiting Dispatch" || (o.status === "Dispatched" && o.direction === "Inbound"));
+        const arrivals = orders.filter(o => o.status === "Pending Dropoff" || o.status === "Awaiting Dispatch" || o.status === "Inbound Dispatched");
         
         const reqList = document.getElementById('list-requests'); 
         const reqIcon = document.getElementById('icon-requests'); 
@@ -645,7 +706,7 @@
                 const jsPhone = escapeJS(safePhone);
                 
                 const link = `${trackerBaseUrl}${safeId}`;
-                const rebookLink = `https://www.arabistaofficial.com/alterations.html?rebook=${safeId}`;
+                const rebookLink = `https://www.arabistaofficial.com/hub-coverage.html?rebook=${safeId}`;
 
                 let modeBadge = (o.logisticsMode === "Walk-in") 
                     ? `<span class="text-[9px] bg-orange-500/20 text-orange-400 px-2 py-0.5 rounded border border-orange-500/30">${t[currentLang].badge_walkin}</span>` 
@@ -686,11 +747,10 @@
         const icon = document.getElementById('icon-pending'); 
         const pendingHeader = document.getElementById('header-pending-text');
         
-        const arrivedCount = arrivals.filter(o => o.lalamoveStatus === "COMPLETED").length;
+        const arrivedCount = arrivals.filter(o => o.inboundLalaStatus === "COMPLETED").length;
         
         if (arrivedCount > 0) {
              pendingHeader.innerHTML = `${t[currentLang].header_pending} <span class="text-white font-bold ml-1 bg-red-500 px-2 rounded-full text-[10px] animate-pulse">${arrivals.length}</span>`;
-             if(previousPendingCount !== -1 && arrivedCount > 0) playAlert(3); 
         } else {
              pendingHeader.innerHTML = `${t[currentLang].header_pending} <span class="text-luxe font-bold ml-1">[ ${arrivals.length} ]</span>`;
         }
@@ -725,7 +785,7 @@
             let arrivedClass = "";
             let trackerHtml = "";
             
-            let modeBadge = (o.direction === "Inbound" || o.lalamoveId || o.logisticsMode === "Lalamove") 
+            let modeBadge = (o.inboundLalaId || o.logisticsMode === "Lalamove") 
                 ? `<span class="text-[9px] bg-blue-500/20 text-blue-400 px-2 py-0.5 rounded border border-blue-500/30 mt-1 inline-block">${t[currentLang].badge_in_lala}</span>` 
                 : `<span class="text-[9px] bg-orange-500/20 text-orange-400 px-2 py-0.5 rounded border border-orange-500/30 mt-1 inline-block">${t[currentLang].badge_in_walk}</span>`;
             
@@ -733,8 +793,8 @@
                 statusBadge = `<span class="text-[9px] bg-yellow-500/10 text-yellow-400 px-2 py-0.5 rounded border border-yellow-500/20">${t[currentLang].stat_await_action}</span>`;
             } else if (o.status === "Pending Dropoff") {
                 statusBadge = `<span class="text-[9px] bg-yellow-500/10 text-yellow-400 px-2 py-0.5 rounded border border-yellow-500/20">${t[currentLang].stat_await_drop}</span>`;
-            } else if (o.status === "Dispatched") {
-                 const displayStatus = o.lalamoveStatus || sessionStorage.getItem('lala_status_' + safeId) || 'ASSIGNING_DRIVER';
+            } else if (o.status === "Inbound Dispatched") {
+                 const displayStatus = o.inboundLalaStatus || sessionStorage.getItem('lala_status_' + safeId) || 'ASSIGNING_DRIVER';
                  trackerHtml = `
                     <div class="mt-3 mb-3 pt-3 border-t border-white/5">
                         <div class="lala-track-container w-full">
@@ -743,7 +803,7 @@
                         </div>
                     </div>`;
 
-                 if (o.lalamoveStatus === "COMPLETED") {
+                 if (o.inboundLalaStatus === "COMPLETED") {
                      statusBadge = `<span class="text-[9px] bg-green-500 text-brand font-bold px-2 py-0.5 rounded shadow-[0_0_10px_rgba(34,197,94,0.5)] animate-pulse">📢 ${t[currentLang].arrived}</span>`;
                      arrivedClass = "border-green-500/50 shadow-[0_0_15px_rgba(34,197,94,0.1)]";
                  } else {
@@ -809,46 +869,58 @@
             const ageBadge = daysOld >= 3 ? `<span class="text-[9px] bg-red-500/20 text-red-400 px-2 py-0.5 rounded shadow-sm border border-red-500/30">⏳ ${t[currentLang].waiting_days} ${daysOld} ${t[currentLang].days}</span>` : '';
             
             let modeBadge = "";
-            if (o.outbound === "Lalamove" || o.direction === "Outbound") modeBadge = `<span class="text-[9px] bg-purple-500/20 text-purple-400 px-2 py-0.5 rounded border border-purple-500/30 mt-1 inline-block">${t[currentLang].badge_out_lala}</span>`;
-            else if (o.outbound === "Self-Pickup") modeBadge = `<span class="text-[9px] bg-orange-500/20 text-orange-400 px-2 py-0.5 rounded border border-orange-500/30 mt-1 inline-block">${t[currentLang].badge_out_self}</span>`;
+            if (o.outboundChoice === "Lalamove" || o.outboundLalaId) modeBadge = `<span class="text-[9px] bg-purple-500/20 text-purple-400 px-2 py-0.5 rounded border border-purple-500/30 mt-1 inline-block">${t[currentLang].badge_out_lala}</span>`;
+            else if (o.outboundChoice === "Self-Pickup") modeBadge = `<span class="text-[9px] bg-orange-500/20 text-orange-400 px-2 py-0.5 rounded border border-orange-500/30 mt-1 inline-block">${t[currentLang].badge_out_self}</span>`;
             else modeBadge = `<span class="text-[9px] bg-gray-500/20 text-gray-400 px-2 py-0.5 rounded border border-gray-500/30 mt-1 inline-block">${t[currentLang].badge_out_wait}</span>`;
 
             if (o.status === "In Progress") { 
                  actionHtml = `
-                    <button onclick="updateStatus('${jsId}', 'Ready for Return', '${jsName}', '${jsPhone}', '${link}', 1.5, this)" class="flex-1 bg-luxe text-brand font-bold py-2.5 rounded-lg text-xs hover:bg-white transition shadow-soft flex justify-center items-center">
+                    <button onclick="updateStatus('${jsId}', 'Ready for Return', '${jsName}', '${jsPhone}', '${link}', 1.5, this)" class="w-full bg-luxe text-brand font-bold py-2.5 rounded-lg text-xs hover:bg-white transition shadow-soft flex justify-center items-center">
                         ${t[currentLang].btn_mark_completed}
                     </button>`; 
             } 
             else if (o.status === "Ready for Return") { 
-                 if (!o.outbound || o.outbound === "") {
+                 if (!o.outboundChoice || o.outboundChoice === "") {
                      actionHtml = `
-                        <button disabled class="flex-1 bg-white/5 text-white/30 font-bold py-2.5 rounded-lg text-xs border border-white/5 cursor-not-allowed">
+                        <button disabled class="w-full bg-white/5 text-white/30 font-bold py-2.5 rounded-lg text-xs border border-white/5 cursor-not-allowed">
                             ${t[currentLang].btn_wait_choice}
                         </button>`; 
-                 } else if (o.outbound === "Self-Pickup") {
+                 } else if (o.outboundChoice === "Self-Pickup") {
                      actionHtml = `
-                        <button onclick="updateStatus('${jsId}', 'Completed', '${jsName}', '${jsPhone}', '${link}', 0, this)" class="flex-1 bg-blue-500/10 text-blue-400 border border-blue-500/20 font-bold py-2.5 rounded-lg text-xs hover:bg-blue-500/20 transition flex justify-center items-center">
+                        <button onclick="updateStatus('${jsId}', 'Completed', '${jsName}', '${jsPhone}', '${link}', 0, this)" class="w-full bg-blue-500/10 text-blue-400 border border-blue-500/20 font-bold py-2.5 rounded-lg text-xs hover:bg-blue-500/20 transition flex justify-center items-center">
                             ${t[currentLang].btn_cust_pickup}
                         </button>`; 
-                 } else if (o.outbound === "Lalamove") {
+                 } else if (o.outboundChoice === "Lalamove") {
                      actionHtml = `
-                        <button disabled class="flex-1 bg-orange-500/20 text-orange-300 border border-orange-500/30 font-bold py-2.5 rounded-lg text-xs cursor-not-allowed flex justify-center items-center gap-1">
+                        <button disabled class="w-full bg-orange-500/20 text-orange-300 border border-orange-500/30 font-bold py-2.5 rounded-lg text-xs cursor-not-allowed flex justify-center items-center gap-1">
                             <svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> 
                             ${t[currentLang].btn_wait_booking}
                         </button>`; 
                  }
             } 
-            else if (o.status === "Dispatched") { 
+            else if (o.status === "Outbound Dispatched") { 
                  actionHtml = `
-                    <button onclick="updateStatus('${jsId}', 'Completed', '${jsName}', '${jsPhone}', '${link}', 0, this)" class="flex-1 bg-green-500/10 text-green-400 border border-green-500/20 font-bold py-2.5 rounded-lg text-xs hover:bg-green-500/20 transition flex justify-center items-center">
+                    <button onclick="updateStatus('${jsId}', 'Completed', '${jsName}', '${jsPhone}', '${link}', 0, this)" class="w-full bg-green-500/10 text-green-400 border border-green-500/20 font-bold py-2.5 rounded-lg text-xs hover:bg-green-500/20 transition flex justify-center items-center">
                         <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> 
                         ${t[currentLang].btn_override}
                     </button>`; 
             }
             
+            // Derive active payment + Lalamove status from split inbound/outbound fields
+            const isOutbound = ["Ready for Return", "Outbound Dispatched", "Completed"].includes(o.status);
+            const currentPayment = isOutbound ? o.outboundPaymentStatus : o.inboundPaymentStatus;
+            const currentLala    = isOutbound ? o.outboundLalaStatus    : o.inboundLalaStatus;
+
+            let payBadge = "";
+            if (currentPayment === "PAID") {
+                payBadge = `<span class="text-[9px] bg-green-500/10 text-green-400 px-2 py-0.5 rounded border border-green-500/20">✓ Paid</span>`;
+            } else if (currentPayment !== undefined && currentPayment !== "" && currentLala && currentLala !== "CANCELED") {
+                payBadge = `<span class="text-[9px] bg-red-500/10 text-red-400 px-2 py-0.5 rounded border border-red-500/20 animate-pulse">⚠ Pending Payment</span>`;
+            }
+
             let trackerHtml = "";
-            if (o.status === "Dispatched") {
-                 const displayStatus = o.lalamoveStatus || sessionStorage.getItem('lala_status_' + safeId) || 'ASSIGNING_DRIVER';
+            if (o.status === "Outbound Dispatched") {
+                 const displayStatus = currentLala || sessionStorage.getItem('lala_status_' + safeId) || 'ASSIGNING_DRIVER';
                  trackerHtml = `
                     <div class="mt-3 mb-3 pt-3 border-t border-white/5">
                         <div class="lala-track-container w-full">
@@ -868,8 +940,8 @@
                         </div>
                         <span class="text-[10px] font-bold px-2 py-0.5 rounded ${o.status === 'Ready for Return' ? 'bg-luxe text-brand' : 'bg-white/10 text-white/70'}">${sanitizeHTML(o.status)}</span>
                     </div>
-                    <div class="mb-2">${modeBadge}</div>
-                    <div class="flex justify-between items-center mb-3">
+                    <div class="mb-2 flex flex-wrap gap-1">${modeBadge} ${payBadge}</div>
+                    <div class="flex justify-between items-center mb-1">
                         <p class="font-bold text-base text-white">${safeName}</p>
                         <a href="tel:${safePhone}" class="p-2 bg-white/5 hover:bg-white/10 rounded-full text-white/70 transition" title="Call Customer">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg>
@@ -877,7 +949,7 @@
                     </div>
                     <p class="text-xs text-white/50 mb-4 whitespace-pre-line">${safeItems}</p>
                     ${trackerHtml}
-                    <div class="flex gap-2 w-full">${actionHtml}</div>
+                    <div class="flex flex-col gap-3 w-full pt-2">${actionHtml}</div>
                 </div>`;
         });
         list.innerHTML = actHtml; 
@@ -927,8 +999,86 @@
         list.innerHTML = html; 
     }
 
+    function resolveOrderForHubWa(id, custName, phone) {
+        const found = globalOrders.find(o => String(o.id).trim() === String(id).trim());
+        if (found) return Object.assign({}, found);
+        return {
+            id: String(id),
+            custName: custName || 'Pelanggan',
+            custPhone: phone || '',
+            items: '',
+            logisticsMode: '',
+            inboundLalaUrl: '',
+            outboundChoice: '',
+            outboundLalaId: '',
+            outboundLalaUrl: ''
+        };
+    }
+
+    function buildHubWaTouchpointText(id, newStatus, milestone, order, hubDisplayName) {
+        const isAccepting = (milestone === 2);
+        const rawItems = order.items != null ? String(order.items) : '';
+        const itemsList = rawItems.trim()
+            ? rawItems.split(/\r?\n/).map(i => i.trim()).filter(Boolean).map(i => `- ${i}`).join('\n')
+            : "- Tiada butiran";
+        const trackerLink = `https://www.arabistaofficial.com/alteration-tracker-staging.html?id=${encodeURIComponent(id)}`;
+        const custInfo = `${order.custName || 'Pelanggan'} (${order.custPhone || ''})`;
+
+        let tpAction = "";
+        let tpStatus = "";
+        let tpInstruction = "";
+        let extraFields = "";
+
+        if (isAccepting) {
+            tpAction = "[ TERIMA ]";
+            if (newStatus === "Pending Dropoff") {
+                tpStatus = "Menunggu Baju (Drop-off Pelanggan)";
+                tpInstruction = "Arahan: Pelanggan akan hantar baju ke kedai anda. Apabila baju diterima, 'Copy' mesej ini, isi ruangan TINDAKAN dengan [DITERIMA], dan hantar.";
+            } else {
+                tpStatus = "Menunggu Penempahan Lalamove (Pelanggan)";
+                tpInstruction = "Arahan: Pelanggan akan menempah rider Lalamove untuk menghantar baju kepada anda. Apabila rider di hantar, pantau pautan penjejakan jika ada.";
+            }
+        } else if (newStatus === "Rejected") {
+            tpAction = "[ TOLAK ]";
+            tpStatus = "Pesanan Baru (Mohon Kelulusan)";
+            tpInstruction = "Arahan: 'Copy' mesej ini, isi ruangan TINDAKAN dengan [TERIMA] atau [TOLAK], dan hantar.";
+        } else if (newStatus === "In Progress") {
+            tpAction = "[ DITERIMA ]";
+            tpStatus = "Sedang Dijahit (In Progress)";
+            tpInstruction = "Arahan: Apabila baju telah siap dialter, 'Copy' mesej ini, isi ruangan TINDAKAN dengan [SIAP], dan hantar.";
+        } else if (newStatus === "Ready for Return") {
+            tpAction = "[ SIAP ]";
+            tpStatus = "Sedang Dijahit (In Progress)";
+            tpInstruction = "Arahan: Apabila baju telah siap dialter, 'Copy' mesej ini, isi ruangan TINDAKAN dengan [SIAP], dan hantar.";
+        } else if (newStatus === "Completed") {
+            const outLala = order.outboundChoice === "Lalamove" || (order.outboundLalaId && String(order.outboundLalaId).trim());
+            if (outLala) {
+                tpAction = "[ MAKLUMAN ]";
+                tpStatus = "Lalamove Ditempah (Pemulangan)";
+                tpInstruction = "Arahan: Ini makluman sahaja. Rider sedang dalam perjalanan untuk 'pickup'. Sila bersedia untuk menyerahkan baju kepada rider.";
+                if (order.outboundLalaUrl) extraFields = `\n*LALAMOVE:* ${order.outboundLalaUrl}`;
+            } else {
+                tpAction = "[ DIAMBIL ]";
+                tpStatus = "Menunggu Pelanggan Ambil (Self-Pickup)";
+                tpInstruction = "Arahan: Apabila baju telah diserahkan kepada pelanggan, 'Copy' mesej ini, isi ruangan TINDAKAN dengan [DIAMBIL], dan hantar.";
+            }
+        }
+
+        if (!tpAction) return "";
+        return `*TINDAKAN:* ${tpAction}\n*STATUS:* ${tpStatus}\n\n*ID ${id}*\n_${hubDisplayName}_\n\n*ALTER:*\n${itemsList}\n*PELANGGAN:* ${custInfo}${extraFields}\n*LINK:* ${trackerLink}\n\n*_${tpInstruction}_*`;
+    }
+
     async function updateStatus(id, newStatus, custName, phone, link, milestone, btn) {
         if(!confirm(t[currentLang].confirm_update.replace('{status}', newStatus))) return;
+
+        const hubNameEl = document.getElementById('header-hub-name');
+        const hubDisplayName = (hubNameEl && hubNameEl.innerText.trim()) ? hubNameEl.innerText.trim() : (hubName || "Arabista Hub");
+        let order = resolveOrderForHubWa(id, custName, phone);
+        if (milestone === 2 && !String(order.logisticsMode || '').trim()) {
+            order.logisticsMode = (newStatus === "Pending Dropoff") ? "Walk-in" : "Lalamove";
+        }
+        const waText = buildHubWaTouchpointText(id, newStatus, milestone, order, hubDisplayName);
+        if (waText) sendWA("60174920942", waText);
 
         // Capture card and its DOM position before touching anything
         const card = btn.closest('div.rounded-xl');
@@ -942,23 +1092,6 @@
             card.style.opacity = '0';
             card.style.transform = 'scale(0.97)';
             removeTimer = setTimeout(() => { if (card.parentElement) card.remove(); }, 220);
-        }
-
-        // Fire WhatsApp IMMEDIATELY — before the GAS round-trip so the hub never waits
-        if (newStatus === "Rejected") {
-            sendWA(phone, t[currentLang].wa_rejected.replace('{id}', id).replace('{link}', link));
-        } else if (milestone === 1) {
-            sendWA(phone, t[currentLang].wa_received.replace('{id}', id).replace('{link}', link));
-        } else if (milestone === 1.5) {
-            sendWA(phone, t[currentLang].wa_completed.replace('{id}', id).replace('{link}', link));
-        } else if (milestone === 2) {
-            if (newStatus === "Pending Dropoff") {
-                sendWA(phone, t[currentLang].wa_approved_walkin.replace('{id}', id).replace('{link}', link));
-            } else {
-                sendWA(phone, t[currentLang].wa_approved_lala.replace('{id}', id).replace('{link}', link));
-            }
-        } else if (newStatus === "Completed" && phone) {
-            sendWA(phone, t[currentLang].wa_order_done.replace('{id}', id).replace('{link}', link));
         }
 
         try {
