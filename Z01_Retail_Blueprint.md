@@ -1,9 +1,11 @@
 # 📘 ARABISTA Z01 RETAIL & PRE-SALE ALTERATION — MASTER BLUEPRINT
 
-**Version:** 2.1 | **Aligned to codebase:** April 18, 2026  
-**Canonical detail:** Operational depth, API names, and DevOps live in `Arabista_Retail_Master_Doc.md`. This blueprint is the **product-level story** from project inception: how Z01 retail stays isolated, how inventory and checkout behave, and how money, logistics, and CRM connect.
+**Version:** 2.2 | **Aligned to codebase:** April 19, 2026  
+**Canonical detail:** Operational depth, API names, column maps, and DevOps live in `Arabista_Retail_Master_Doc.md` (when maintained alongside this repo). This blueprint is the **product-level story** from project inception: how Z01 retail stays isolated, how inventory and checkout behave, and how money, logistics, and CRM connect.
 
-**v2.1 (same day):** Retail order success (`retail-success-staging.html`) now uses the luxury UI stack (Cormorant Garamond display type, gold **luxe** accents, pulsing halo + check treatment). Customer-facing copy and CTAs are **courier-agnostic** (no carrier name in the success narrative). In **`Retail_STAGING.gs`**, the automated WhatsApp **order-confirmed** message sent when the customer activates updates (`tp1Msg` in `handleInboundWhatsApp`) now embeds multiline **Item_Details** from **`Orders` column K** and uses generic “tracking information” wording. Logistics (AWB generation, zone rates, dispatch tooling) may still reference Pos Laju where the integration requires it; mirror these UX and copy changes in `Arabista_Retail_Master_Doc.md` if that file lives outside this repo.
+**v2.2 (19 Apr):** On **`product-z01-staging.html`**, **Proceed to Payment** raises a full-screen **gateway overlay** (ink blur, luxe spinner ring, Cormorant *Securing your selection…*) until `reserve_stock` returns. A standalone demo is **`gateway-test.html`**. If the API responds with **`out_of_stock`** and **`failedSignature`**, the cart **soft-rejects** that line, shows the top **cart notification** rail, re-renders, then runs **`fetchConfig()`** so **size buttons** on the PDP match fresh matrix stock without a reload. Cart line items for pre-sale alterations display short **BM** labels (**Labuh**, **Lengan**, **Bahu**) for readability.
+
+**v2.1 (18 Apr):** Retail order success (`retail-success-staging.html`) uses the luxury UI stack (Cormorant Garamond display type, gold **luxe** accents, pulsing halo + check). Customer-facing copy and CTAs are **courier-agnostic** (no carrier name in the success narrative). In **`Retail_STAGING.gs`**, **`tp1Msg`** (after activation) embeds multiline **Item_Details** from **`Orders` column K** and uses generic “tracking information” wording. Logistics (AWB, zone rates, cart shipping line) may still name **Pos Laju** where the integration requires it.
 
 ---
 
@@ -19,7 +21,7 @@
 
 | Layer | Staging artifact | Role |
 |--------|------------------|------|
-| Product PDP | `product-z01-staging.html` | `get_config` → cart → `calc_shipping` → `reserve_stock`; optional pre-sale alteration fields; premium gallery / lightbox / sticky bar (see §6). |
+| Product PDP | `product-z01-staging.html` | `get_config` → cart → `calc_shipping` → `reserve_stock`; optional pre-sale alteration fields; premium gallery / lightbox / sticky bar; checkout **gateway overlay**; OOS soft-reject + **live matrix refresh** (see §6). |
 | SenangPay return | `checkout/success-router-staging.html` | Reads `order_id`; sends `ORD-…` to retail success, `ALT-…` to alteration tracker. |
 | Success / CRM kickoff | `checkout/retail-success-staging.html` | Post-payment screen: order reference, luxury-branded layout, courier-agnostic copy, **Activate Order Updates** CTA (script fills a hidden `#wa-link` and programmatic click opens WhatsApp with the activation message). |
 | Retail API | `Retail_STAGING.gs` | Inventory lock, SenangPay hash, Pos Laju AWB, Telegram ↔ WhatsApp CRM, sweeper; activation auto-reply includes **column K** line-item receipt and carrier-neutral customer wording where applicable. |
@@ -67,6 +69,8 @@ From project start through April 2026 staging, the PDP is not “static HTML”:
 * **Merchandising:** Horizontal **gallery** (snap + drag), **thumbnails**, **lightbox** (images + video), hero **video** + **WebP poster**, **reviews** block with readable excerpts.
 * **Commerce chrome:** **Context-aware sticky bar** (prompt vs price vs add-to-cart), **size calculator** section, cart **state** so drawer fields survive open/close within the session.
 * **Checkout hygiene:** **Phone sanitization** in the browser (strip non-digits; normalize Malaysian `0…` / `1…` → `60…`) before **`reserve_stock`**, matching backend expectations and reducing Pos Laju / Meta validation issues.
+* **Payment moment UX:** **Proceed to Payment** shows **`#gateway-overlay`** until the reserve call completes (success → redirect to SenangPay; failure → overlay dismissed). On **`out_of_stock`** + **`failedSignature`**, the matching cart line becomes **sold out** in the UI, the **notification** strip appears, and **`fetchConfig()`** updates PDP size availability from the server.
+* **Cart copy for alterations:** Pre-sale dims show as **Labuh / Lengan / Bahu** with inch values and promo strikethroughs where applicable (internal keys remain `length` / `sleeve` / `shoulder`).
 
 Static assets live under **`images/z01-*`** (WebP stills, MP4 flow, poster); after image renames or swaps, invalidate CDN/browser caches if you front the site with a cache layer.
 
@@ -101,7 +105,8 @@ Static assets live under **`images/z01-*`** (WebP stills, MP4 flow, poster); aft
 
 ## 10. Where to go deeper
 
-* **Full lifecycle, column maps, API versions, Command Center, Support CRM:** `Arabista_Retail_Master_Doc.md` (v1.2+).
-* **Alteration-only booking** (maps, Lalamove, `ALT-` flows): `Arabista_Alteration_Master_Doc.md`.
+* **Full lifecycle, column maps, API actions, CRM templates, DevOps:** `Arabista_Retail_Master_Doc.md` (keep in sync when altering `Retail_STAGING.gs` or sheets).
+* **Alteration-only booking** (maps, Lalamove, `ALT-` flows) vs **Z01 pre-sale** add-ons: `Arabista_Alteration_Master_Doc.md`.
+* **Gateway overlay click-through demo:** `gateway-test.html`.
 
 This blueprint is intentionally **stable narrative + file map**; when behavior changes, update **this file’s sections** and the **version line**, then fold precise mechanics into the retail master doc.
