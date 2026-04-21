@@ -1261,10 +1261,15 @@
         cartState.email = "";
         cartState.totalPaid = (cartState.basePrice + cartState.altCost) - cartState.discount + cartState.shippingFee;
 
+        const payload = {
+            ...cartState,
+            totalWeight: cartState.weightKg
+        };
+
         try {
             const res = await fetch(`${RETAIL_API_URL}?action=reserve_stock`, {
                 method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                body: `payload=${encodeURIComponent(JSON.stringify(cartState))}`
+                body: `payload=${encodeURIComponent(JSON.stringify(payload))}`
             });
             const json = await res.json();
 
