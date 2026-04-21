@@ -34,7 +34,7 @@
       // Route based on prefix, forwarding all SenangPay query parameters
       if (orderId.startsWith('ALT-')) {
         window.location.replace('/checkout/alteration-tracker-staging.html' + queryString);
-      } else if (orderId.startsWith('ORD-')) {
+      } else if (orderId.startsWith('ORD-') || orderId.startsWith('STGORD-')) {
         window.location.replace('/checkout/retail-success-staging.html' + queryString);
       } else {
         // Failsafe for unknown prefixes
