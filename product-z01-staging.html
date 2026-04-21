@@ -526,7 +526,7 @@
             const controller = new AbortController();
             const timeoutId = setTimeout(() => controller.abort(), 5000);
             
-            const res = await fetch(`${RETAIL_API_URL}?action=get_config`, { signal: controller.signal });
+            const res = await fetch(`${RETAIL_API_URL}?action=get_config&model=Z01`, { signal: controller.signal });
             clearTimeout(timeoutId);
             
             const json = await res.json();
@@ -534,8 +534,9 @@
             if (json.status === 'success') {
                 appConfig = json.data.config || {};
                 inventoryMatrix = json.data.matrix || {};
+                activeWeightKg = json.data.modelWeight || 1.0; // DICTIONARY LOAD
                 renderAlterationFields();
-                initializeDefaultPricing(); // <-- INJECT HERE
+                initializeDefaultPricing();
                 applyOOSStyling();
             } else {
                 throw new Error("API returned non-success status");
@@ -662,7 +663,7 @@
         if (matrixRow) {
             activeRetailPrice = matrixRow.retailPrice;
             activePromoPrice = matrixRow.promoPrice;
-            activeWeightKg = matrixRow.weight;
+            // activeWeightKg is now globally set on load via dictionary, no longer per-sku
         }
         
         let priceHtml = '';
