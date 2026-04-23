@@ -517,43 +517,72 @@
         thumbContainer.appendChild(btn);
     });
 
-    // Fetch Backend
-    async function fetchConfig() {
+    // Fetch Backend with Silent Retries
+    async function fetchConfig(retries = 2) {
         if (RETAIL_API_URL.includes("YOUR_RETAIL")) {
-            // Failsafe for unconfigured API
+            // Failsafe for unconfigured templates
+            appConfig = {}; inventoryMatrix = {};
             document.querySelectorAll('.size-btn').forEach(btn => btn.classList.remove('animate-pulse', 'pointer-events-none', 'opacity-40'));
+            const altLoading = document.getElementById('alt-loading');
+            const altFields = document.getElementById('alt-fields-container');
+            if (altLoading) altLoading.classList.add('hidden');
+            if (altFields) altFields.classList.remove('hidden');
             return;
         }
-        
-        try {
-            // Set a 5-second timeout controller so it doesn't hang forever on bad connections
+
+        for (let i = 0; i <= retries; i++) {
+            // Increased to 8 seconds to safely absorb Google Apps Script cold starts
             const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 5000);
-            
-            const res = await fetch(`${RETAIL_API_URL}?action=get_config&model=Z01`, { signal: controller.signal });
-            clearTimeout(timeoutId);
-            
-            const json = await res.json();
-            
-            if (json.status === 'success') {
+            const timeoutId = setTimeout(() => controller.abort(), 8000); 
+
+            try {
+                if (i > 0) {
+                    // Update splash text on silent retry
+                    const textEl = document.getElementById('app-blocker-text');
+                    if (textEl) textEl.innerText = `Establishing secure connection... (Retry ${i}/${retries})`;
+                }
+
+                const res = await fetch(`${RETAIL_API_URL}?action=get_config&model=Z01`, { signal: controller.signal });
+                clearTimeout(timeoutId);
+                
+                if (!res.ok) throw new Error(`HTTP Error: ${res.status}`);
+                
+                const json = await res.json();
+                if (json.status !== 'success') throw new Error("API returned non-success status");
+
                 appConfig = json.data.config || {};
                 inventoryMatrix = json.data.matrix || {};
-                // Remove the hard block only after data is secured
-                const blocker = document.getElementById('app-blocker');
-                blocker.classList.add('opacity-0');
-                setTimeout(() => blocker.remove(), 500);
-                activeWeightKg = json.data.modelWeight || 1.0; // DICTIONARY LOAD
+                activeWeightKg = json.data.modelWeight || 1.0;
+
+                // Sync UI (matches Retail.gs get_config payload)
+                renderSizeGrid();
                 renderAlterationFields();
                 initializeDefaultPricing();
                 applyOOSStyling();
-            } else {
-                throw new Error("API returned non-success status");
+
+                // Remove the hard block only after data is secured
+                const blocker = document.getElementById('app-blocker');
+                if (blocker) {
+                    blocker.classList.add('opacity-0');
+                    setTimeout(() => blocker.remove(), 500);
+                }
+                
+                // Success! Exit the loop and function
+                return; 
+
+            } catch (error) {
+                clearTimeout(timeoutId);
+                console.warn(`Config fetch attempt ${i + 1} failed:`, error);
+                
+                // If we have exhausted all retries, show the error trap
+                if (i === retries) {
+                    console.error("All config fetch retries exhausted.");
+                    const spinner = document.getElementById('app-blocker-spinner');
+                    const text = document.getElementById('app-blocker-text');
+                    if(spinner) spinner.style.display = 'none';
+                    if(text) text.innerHTML = 'Connection failed.<br><button onclick="window.location.reload()" class="mt-4 px-4 py-2 border border-gold text-gold rounded text-xs uppercase tracking-widest">Tap to Retry</button>';
+                }
             }
-        } catch (error) {
-            console.error("Config fetch failed:", error);
-            // Trap the user in the error state
-            document.getElementById('app-blocker-spinner').style.display = 'none';
-            document.getElementById('app-blocker-text').innerHTML = 'Connection failed.<br><button onclick="window.location.reload()" class="mt-4 px-4 py-2 border border-gold text-gold rounded text-xs uppercase tracking-widest">Tap to Retry</button>';
         }
     }
 
