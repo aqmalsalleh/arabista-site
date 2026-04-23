@@ -526,7 +526,11 @@
             const controller = new AbortController();
             const timeoutId = setTimeout(() => controller.abort(), 5000);
             
-            const res = await fetch(`${RETAIL_API_URL}?action=get_config&model=Z01`, { signal: controller.signal });
+            // Grab device details to send to the backend
+            const ua = navigator.userAgent ? navigator.userAgent.substring(0, 60) : "Unknown";
+            const sw = window.innerWidth;
+
+            const res = await fetch(`${RETAIL_API_URL}?action=get_config&model=Z01&device=${encodeURIComponent(ua)}&width=${sw}`, { signal: controller.signal });
             clearTimeout(timeoutId);
             
             const json = await res.json();
