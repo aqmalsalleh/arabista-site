@@ -127,10 +127,6 @@
   </style>
 </head>
 <body class="font-sans antialiased pb-8 selection:bg-luxe selection:text-ink max-w-[100vw] overflow-x-hidden relative bg-brand text-white">
-  <div id="app-blocker" class="fixed inset-0 z-[999] bg-ink flex flex-col items-center justify-center text-white/80 transition-opacity duration-500">
-      <div id="app-blocker-spinner" class="w-8 h-8 border-2 border-gold border-t-transparent rounded-full animate-spin mb-4"></div>
-      <p id="app-blocker-text" class="text-xs tracking-widest uppercase text-center px-6">Establishing secure connection...</p>
-  </div>
 
   <header class="fixed top-0 inset-x-0 z-50 backdrop-blur bg-brand/80">
     <div class="max-w-screen-xl mx-auto px-4 sm:px-6">
@@ -517,72 +513,40 @@
         thumbContainer.appendChild(btn);
     });
 
-    // Fetch Backend with Silent Retries
-    async function fetchConfig(retries = 2) {
+    // Fetch Backend
+    async function fetchConfig() {
         if (RETAIL_API_URL.includes("YOUR_RETAIL")) {
-            // Failsafe for unconfigured templates
-            appConfig = {}; inventoryMatrix = {};
+            // Failsafe for unconfigured API
             document.querySelectorAll('.size-btn').forEach(btn => btn.classList.remove('animate-pulse', 'pointer-events-none', 'opacity-40'));
-            const altLoading = document.getElementById('alt-loading');
-            const altFields = document.getElementById('alt-fields-container');
-            if (altLoading) altLoading.classList.add('hidden');
-            if (altFields) altFields.classList.remove('hidden');
             return;
         }
-
-        for (let i = 0; i <= retries; i++) {
-            // Increased to 8 seconds to safely absorb Google Apps Script cold starts
+        
+        try {
+            // Set a 5-second timeout controller so it doesn't hang forever on bad connections
             const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 8000); 
-
-            try {
-                if (i > 0) {
-                    // Update splash text on silent retry
-                    const textEl = document.getElementById('app-blocker-text');
-                    if (textEl) textEl.innerText = `Establishing secure connection... (Retry ${i}/${retries})`;
-                }
-
-                const res = await fetch(`${RETAIL_API_URL}?action=get_config&model=Z01`, { signal: controller.signal });
-                clearTimeout(timeoutId);
-                
-                if (!res.ok) throw new Error(`HTTP Error: ${res.status}`);
-                
-                const json = await res.json();
-                if (json.status !== 'success') throw new Error("API returned non-success status");
-
+            const timeoutId = setTimeout(() => controller.abort(), 5000);
+            
+            const res = await fetch(`${RETAIL_API_URL}?action=get_config&model=Z01`, { signal: controller.signal });
+            clearTimeout(timeoutId);
+            
+            const json = await res.json();
+            
+            if (json.status === 'success') {
                 appConfig = json.data.config || {};
                 inventoryMatrix = json.data.matrix || {};
-                activeWeightKg = json.data.modelWeight || 1.0;
-
-                // Sync UI (matches Retail.gs get_config payload)
-                renderSizeGrid();
+                activeWeightKg = json.data.modelWeight || 1.0; // DICTIONARY LOAD
                 renderAlterationFields();
                 initializeDefaultPricing();
                 applyOOSStyling();
-
-                // Remove the hard block only after data is secured
-                const blocker = document.getElementById('app-blocker');
-                if (blocker) {
-                    blocker.classList.add('opacity-0');
-                    setTimeout(() => blocker.remove(), 500);
-                }
-                
-                // Success! Exit the loop and function
-                return; 
-
-            } catch (error) {
-                clearTimeout(timeoutId);
-                console.warn(`Config fetch attempt ${i + 1} failed:`, error);
-                
-                // If we have exhausted all retries, show the error trap
-                if (i === retries) {
-                    console.error("All config fetch retries exhausted.");
-                    const spinner = document.getElementById('app-blocker-spinner');
-                    const text = document.getElementById('app-blocker-text');
-                    if(spinner) spinner.style.display = 'none';
-                    if(text) text.innerHTML = 'Connection failed.<br><button onclick="window.location.reload()" class="mt-4 px-4 py-2 border border-gold text-gold rounded text-xs uppercase tracking-widest">Tap to Retry</button>';
-                }
+            } else {
+                throw new Error("API returned non-success status");
             }
+        } catch (e) {
+            console.warn("Inventory fetch failed, engaging failsafe fallback.", e);
+            // FAILSAFE: Strip skeleton and leave buttons clickable so revenue isn't blocked
+            document.querySelectorAll('.size-btn').forEach(btn => {
+                btn.classList.remove('animate-pulse', 'pointer-events-none', 'opacity-40');
+            });
         }
     }
 
