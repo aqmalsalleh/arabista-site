@@ -263,8 +263,8 @@
               </div>
           </div>
 
-          <button type="button" id="add-to-cart-btn" class="w-full bg-luxe text-ink font-medium uppercase tracking-widest py-4 rounded-xl hover:opacity-90 transition shadow-soft mb-10 disabled:opacity-50 disabled:cursor-not-allowed tap-none">
-              Add To Cart
+          <button type="button" id="add-to-cart-btn" disabled class="w-full py-4 bg-ink text-white/50 tracking-[0.2em] text-xs uppercase font-medium hover:bg-brand transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+              CONNECTING TO SERVER...
           </button>
           <input type="hidden" id="qty" value="1" />
           </div>
@@ -513,40 +513,63 @@
         thumbContainer.appendChild(btn);
     });
 
-    // Fetch Backend
-    async function fetchConfig() {
+    // Fetch Backend with Fortified Soft Lock & Retries
+    async function fetchConfig(retries = 2) {
+        const btn = document.getElementById('add-to-cart-btn');
+        
         if (RETAIL_API_URL.includes("YOUR_RETAIL")) {
-            // Failsafe for unconfigured API
-            document.querySelectorAll('.size-btn').forEach(btn => btn.classList.remove('animate-pulse', 'pointer-events-none', 'opacity-40'));
+            appConfig = {}; inventoryMatrix = {};
+            const altLoading = document.getElementById('alt-loading');
+            const altOpts = document.getElementById('alt-fields-container');
+            if (altLoading) altLoading.classList.add('hidden');
+            if (altOpts) altOpts.classList.remove('hidden');
+            document.querySelectorAll('.size-btn').forEach(b => b.classList.remove('animate-pulse', 'pointer-events-none', 'opacity-40'));
+            if (btn) btn.innerText = 'API NOT CONFIGURED';
             return;
         }
-        
-        try {
-            // Set a 5-second timeout controller so it doesn't hang forever on bad connections
+
+        for (let i = 0; i <= retries; i++) {
+            // 8-second window to safely absorb Google Apps Script cold starts
             const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 5000);
-            
-            const res = await fetch(`${RETAIL_API_URL}?action=get_config&model=Z01`, { signal: controller.signal });
-            clearTimeout(timeoutId);
-            
-            const json = await res.json();
-            
-            if (json.status === 'success') {
+            const timeoutId = setTimeout(() => controller.abort(), 8000); 
+
+            try {
+                if (i > 0 && btn) btn.innerText = `CONNECTING... (RETRY ${i}/${retries})`;
+
+                const res = await fetch(`${RETAIL_API_URL}?action=get_config&model=Z01`, { signal: controller.signal });
+                clearTimeout(timeoutId);
+                
+                if (!res.ok) throw new Error(`HTTP Error: ${res.status}`);
+                
+                const json = await res.json();
+                if (json.status !== 'success') throw new Error("API returned non-success status");
+
                 appConfig = json.data.config || {};
                 inventoryMatrix = json.data.matrix || {};
-                activeWeightKg = json.data.modelWeight || 1.0; // DICTIONARY LOAD
+                activeWeightKg = json.data.modelWeight || 1.0;
+
                 renderAlterationFields();
                 initializeDefaultPricing();
                 applyOOSStyling();
-            } else {
-                throw new Error("API returned non-success status");
+
+                if (btn) btn.innerText = 'SELECT A SIZE';
+                
+                return;
+
+            } catch (error) {
+                clearTimeout(timeoutId);
+                console.warn(`Config fetch attempt ${i + 1} failed:`, error);
+                
+                if (i === retries) {
+                    console.error("All config fetch retries exhausted. Failing closed.");
+                    if (btn) {
+                        btn.innerText = 'CONNECTION ERROR - PLEASE REFRESH';
+                        btn.classList.add('bg-red-900', 'text-white');
+                        btn.classList.remove('hover:bg-brand');
+                        btn.disabled = true;
+                    }
+                }
             }
-        } catch (e) {
-            console.warn("Inventory fetch failed, engaging failsafe fallback.", e);
-            // FAILSAFE: Strip skeleton and leave buttons clickable so revenue isn't blocked
-            document.querySelectorAll('.size-btn').forEach(btn => {
-                btn.classList.remove('animate-pulse', 'pointer-events-none', 'opacity-40');
-            });
         }
     }
 
@@ -852,6 +875,11 @@
     }
 
     function validateAlterations() {
+        const atc = document.getElementById('add-to-cart-btn');
+        if (atc && atc.innerText.includes('CONNECTION ERROR')) {
+            atc.disabled = true;
+            return;
+        }
         if (!selectedSize) { document.getElementById('add-to-cart-btn').disabled = true; return; }
         let isValid = true;
         const base = baseSizes[selectedSize];
@@ -1241,6 +1269,13 @@
     });
 
     document.getElementById('btn-checkout').onclick = async () => {
+        // TERMINAL GUARD: Physically block checkout if prices failed to load
+        const currentPrice = activePromoPrice || activeRetailPrice;
+        if (!currentPrice || currentPrice <= 0) {
+            alert("⚠️ System Busy: Pricing data failed to load securely. Please refresh the page to continue.");
+            window.location.reload();
+            return;
+        }
         if (!cartState) return;
         const name = document.getElementById('cart-name').value.trim();
 
