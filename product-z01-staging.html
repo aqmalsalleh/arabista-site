@@ -639,6 +639,31 @@
         document.querySelectorAll('.size-btn').forEach(b => b.className = "size-btn py-3 border border-white/15 bg-transparent text-white rounded-lg font-medium hover:border-white/40 transition-colors focus:outline-none tap-none");
         btnElement.className = "size-btn py-3 border border-luxe bg-luxe text-ink rounded-lg font-medium shadow-[0_0_15px_rgba(192,160,98,0.3)] transition-colors focus:outline-none tap-none";
 
+        // Check Matrix for Alteration Permissions
+        const sku = `Z01-${size}`;
+        const reqAlt = inventoryMatrix[sku] && inventoryMatrix[sku].requiresAlteration !== undefined 
+            ? inventoryMatrix[sku].requiresAlteration 
+            : true; // Default to true if not found
+            
+        const altBtn = document.getElementById('toggle-alt-btn');
+        
+        if (reqAlt === false) {
+            // Visually disable the button
+            altBtn.classList.add('opacity-40', 'pointer-events-none');
+            // Force drawer closed if it is currently open
+            if (typeof altEnabled !== 'undefined' && altEnabled === true) {
+                altEnabled = false;
+                document.getElementById('alt-knob').classList.remove('translate-x-4');
+                document.getElementById('alt-switch').classList.remove('bg-luxe'); 
+                document.getElementById('alt-switch').classList.add('bg-white/10');
+                document.getElementById('alt-drawer').classList.add('hidden'); 
+                document.getElementById('alt-drawer').classList.remove('flex');
+            }
+        } else {
+            // Enable the button
+            altBtn.classList.remove('opacity-40', 'pointer-events-none');
+        }
+
         updateMatrixPricingFromSize(size);
         validateAlterations();
         renderAlterationFields();
