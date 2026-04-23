@@ -527,7 +527,8 @@
             if (btn) btn.innerText = 'API NOT CONFIGURED';
             return;
         }
-
+        
+        const sessionTrace = Math.random().toString(36).substring(2, 8).toUpperCase();
         for (let i = 0; i <= retries; i++) {
             // 8-second window to safely absorb Google Apps Script cold starts
             const controller = new AbortController();
@@ -536,7 +537,7 @@
             try {
                 if (i > 0 && btn) btn.innerText = `CONNECTING... (RETRY ${i}/${retries})`;
 
-                const res = await fetch(`${RETAIL_API_URL}?action=get_config&model=Z01`, { signal: controller.signal });
+                const res = await fetch(`${RETAIL_API_URL}?action=get_config&model=Z01&session=${sessionTrace}&attempt=${i}`, { signal: controller.signal });
                 clearTimeout(timeoutId);
                 
                 if (!res.ok) throw new Error(`HTTP Error: ${res.status}`);
