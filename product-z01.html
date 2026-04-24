@@ -263,7 +263,7 @@
               </div>
           </div>
 
-          <button type="button" id="add-to-cart-btn" disabled class="w-full py-4 bg-ink text-white/50 tracking-[0.2em] text-xs uppercase font-medium hover:bg-brand transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+          <button type="button" id="add-to-cart-btn" disabled class="w-full bg-luxe text-ink font-medium uppercase tracking-widest py-4 rounded-xl hover:opacity-90 transition shadow-soft mb-10 disabled:opacity-50 disabled:cursor-not-allowed tap-none">
               CONNECTING TO SERVER...
           </button>
           <input type="hidden" id="qty" value="1" />
@@ -528,7 +528,6 @@
             return;
         }
         
-        const sessionTrace = Math.random().toString(36).substring(2, 8).toUpperCase();
         for (let i = 0; i <= retries; i++) {
             // 8-second window to safely absorb Google Apps Script cold starts
             const controller = new AbortController();
@@ -537,7 +536,7 @@
             try {
                 if (i > 0 && btn) btn.innerText = `CONNECTING... (RETRY ${i}/${retries})`;
 
-                const res = await fetch(`${RETAIL_API_URL}?action=get_config&model=Z01&session=${sessionTrace}&attempt=${i}`, { signal: controller.signal });
+                const res = await fetch(`${RETAIL_API_URL}?action=get_config&model=Z01`, { signal: controller.signal });
                 clearTimeout(timeoutId);
                 
                 if (!res.ok) throw new Error(`HTTP Error: ${res.status}`);
