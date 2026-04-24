@@ -1269,6 +1269,13 @@
     });
 
     document.getElementById('btn-checkout').onclick = async () => {
+        // TERMINAL GUARD: Physically block checkout if prices failed to load
+        const currentPrice = activePromoPrice || activeRetailPrice;
+        if (!currentPrice || currentPrice <= 0) {
+            alert("⚠️ System Busy: Pricing data failed to load securely. Please refresh the page to continue.");
+            window.location.reload();
+            return;
+        }
         if (!cartState) return;
         const name = document.getElementById('cart-name').value.trim();
 
