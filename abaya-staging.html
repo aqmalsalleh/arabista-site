@@ -70,7 +70,7 @@
     
     <div class="relative z-10 text-center px-4 mt-10 reveal">
       <h1 class="font-display text-4xl sm:text-6xl md:text-7xl font-medium tracking-wide mb-4">The Abaya Collection</h1>
-      <p class="text-white/60 text-sm sm:text-base max-w-lg mx-auto font-light">Timeless silhouettes tailored from Premium Nidha Dubai. Designed for the elegant, modern woman.</p>
+      <p class="text-white/60 text-sm sm:text-base max-w-lg mx-auto font-light">Timeless design and effortless grace. Crafted for the modern modest wardrobe.</p>
     </div>
   </section>
 
@@ -236,6 +236,48 @@
     Advanced Filtering Coming Soon
   </div>
 
+  <div id="filter-overlay" class="fixed inset-0 bg-brand/80 backdrop-blur-sm z-50 opacity-0 pointer-events-none transition-opacity duration-300"></div>
+
+  <div id="filter-drawer" class="fixed top-0 right-0 h-full w-full sm:w-[400px] bg-ink border-l border-white/10 z-50 translate-x-full transition-transform duration-500 ease-in-out flex flex-col">
+    <div class="h-14 flex items-center justify-between px-6 border-b border-white/10 shrink-0">
+      <h3 class="text-sm font-medium uppercase tracking-widest text-white">Filter & Sort</h3>
+      <button id="close-filter-btn" class="p-2 -mr-2 text-white/50 hover:text-white transition-colors tap-none">
+        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M6 18L18 6M6 6l12 12"></path></svg>
+      </button>
+    </div>
+    <div class="flex-1 overflow-y-auto p-6 space-y-8">
+      <div>
+        <h4 class="text-[10px] uppercase tracking-widest text-white/40 mb-3">Sort By</h4>
+        <div class="space-y-3">
+          <label class="flex items-center gap-3 cursor-pointer group">
+            <div class="w-4 h-4 rounded-full border border-luxe flex items-center justify-center"><div class="w-2 h-2 bg-luxe rounded-full"></div></div>
+            <span class="text-sm text-white group-hover:text-luxe transition-colors">Recommended</span>
+          </label>
+          <label class="flex items-center gap-3 cursor-pointer group">
+            <div class="w-4 h-4 rounded-full border border-white/20 flex items-center justify-center"></div>
+            <span class="text-sm text-white/70 group-hover:text-white transition-colors">Price: Low to High</span>
+          </label>
+          <label class="flex items-center gap-3 cursor-pointer group">
+            <div class="w-4 h-4 rounded-full border border-white/20 flex items-center justify-center"></div>
+            <span class="text-sm text-white/70 group-hover:text-white transition-colors">Price: High to Low</span>
+          </label>
+        </div>
+      </div>
+      <div>
+        <h4 class="text-[10px] uppercase tracking-widest text-white/40 mb-3">Size</h4>
+        <div class="grid grid-cols-4 gap-2">
+          <button class="py-2 border border-luxe text-luxe text-xs font-medium rounded-lg tap-none">S</button>
+          <button class="py-2 border border-white/10 text-white/50 hover:text-white hover:border-white/30 text-xs font-medium rounded-lg transition-colors tap-none">M</button>
+          <button class="py-2 border border-white/10 text-white/50 hover:text-white hover:border-white/30 text-xs font-medium rounded-lg transition-colors tap-none">L</button>
+          <button class="py-2 border border-white/10 text-white/50 hover:text-white hover:border-white/30 text-xs font-medium rounded-lg transition-colors tap-none">XL</button>
+        </div>
+      </div>
+    </div>
+    <div class="p-6 border-t border-white/10 shrink-0">
+      <button id="apply-filter-btn" class="w-full bg-luxe text-ink font-medium uppercase tracking-widest py-3.5 rounded-xl hover:opacity-90 transition shadow-soft tap-none">Apply</button>
+    </div>
+  </div>
+
   <script>
     // --- 1. Reveal Animations ---
     const io = new IntersectionObserver((entries) => {
@@ -278,21 +320,32 @@
       });
     });
 
-    // --- 4. Custom Filter Button Toast ---
+    // --- 4. Filter Drawer Logic ---
     const filterBtn = document.getElementById('filter-btn');
-    const toast = document.getElementById('toast-notification');
-    let toastTimeout;
+    const closeFilterBtn = document.getElementById('close-filter-btn');
+    const applyFilterBtn = document.getElementById('apply-filter-btn');
+    const filterDrawer = document.getElementById('filter-drawer');
+    const filterOverlay = document.getElementById('filter-overlay');
 
-    filterBtn.addEventListener('click', () => {
-      clearTimeout(toastTimeout);
-      toast.classList.remove('opacity-0', 'translate-y-4');
-      toast.classList.add('opacity-100', 'translate-y-0');
-      
-      toastTimeout = setTimeout(() => {
-        toast.classList.remove('opacity-100', 'translate-y-0');
-        toast.classList.add('opacity-0', 'translate-y-4');
-      }, 3000);
-    });
+    function toggleFilter() {
+      const isOpen = !filterDrawer.classList.contains('translate-x-full');
+      if (isOpen) {
+        filterDrawer.classList.add('translate-x-full');
+        filterOverlay.classList.remove('opacity-100');
+        filterOverlay.classList.add('opacity-0', 'pointer-events-none');
+        document.body.style.overflow = '';
+      } else {
+        filterDrawer.classList.remove('translate-x-full');
+        filterOverlay.classList.remove('opacity-0', 'pointer-events-none');
+        filterOverlay.classList.add('opacity-100');
+        document.body.style.overflow = 'hidden';
+      }
+    }
+
+    filterBtn.addEventListener('click', toggleFilter);
+    closeFilterBtn.addEventListener('click', toggleFilter);
+    filterOverlay.addEventListener('click', toggleFilter);
+    applyFilterBtn.addEventListener('click', toggleFilter);
 
     // --- 5. Dynamic Catalog Price Fetching ---
     const RETAIL_API_URL = "https://script.google.com/macros/s/AKfycbw4qGOeC2Sebod06uFnW2u-ZAkj7l8zRdzyWrFEyL1_7eDCn-ks9lVKrd1I226qHxRmQg/exec";
@@ -309,44 +362,49 @@
         const json = await res.json();
         if (json.status !== 'success') throw new Error("API error");
 
+        const matrix = json.data.matrix || {};
         const config = json.data.config || {};
-        const targetModels = ['D01', 'D02', 'D04', 'D06', 'Z01', 'M01', 'M02'];
         const modelPrices = {};
 
-        // Parse Promo Logic from App Config
-        targetModels.forEach(model => {
-          if (config[model]) {
-            modelPrices[model] = {
-              retail: config[model].standardPrice,
-              promo: config[model].promoPrice,
-              hasPromo: config[model].promoPrice && config[model].promoPrice < config[model].standardPrice,
-              label: config[model].promoLabel
-            };
-          }
-        });
+        // 1. Scan the inventoryMatrix for the lowest price per model
+        for (let sku in matrix) {
+            const row = matrix[sku];
+            const base = row.baseItem;
+            if (!base) continue;
 
-        // Smoothly inject prices into the DOM (Mimicking pdp-price-row)
+            if (!modelPrices[base]) {
+                modelPrices[base] = { retail: row.retailPrice, promo: row.promoPrice };
+            } else {
+                if (row.retailPrice > 0 && (modelPrices[base].retail === 0 || row.retailPrice < modelPrices[base].retail)) {
+                    modelPrices[base].retail = row.retailPrice;
+                }
+                if (row.promoPrice !== null && (modelPrices[base].promo === null || row.promoPrice < modelPrices[base].promo)) {
+                    modelPrices[base].promo = row.promoPrice;
+                }
+            }
+        }
+
+        // 2. Smoothly inject prices into the DOM mimicking PDP style
         document.querySelectorAll('.price-container').forEach(el => {
           const model = el.getAttribute('data-model');
           el.style.opacity = '0';
           
           setTimeout(() => {
             const data = modelPrices[model];
-            if (data) {
-              if (data.hasPromo) {
-                // Slashed Price + Promo Layout
-                let labelHtml = data.label ? `<span class="text-[9px] uppercase tracking-widest text-luxe border border-luxe/30 px-1.5 py-0.5 rounded-sm mr-2">${data.label}</span>` : '';
+            if (data && data.retail > 0) {
+              const hasPromo = data.promo !== null && data.promo < data.retail;
+              const label = config[model] && config[model].promoLabel ? config[model].promoLabel : "";
+              
+              if (hasPromo) {
+                let labelHtml = label ? `<span class="text-[9px] uppercase tracking-widest text-luxe border border-luxe/30 px-1.5 py-0.5 rounded-sm mr-2">${label}</span>` : '';
                 el.innerHTML = `
-                  <div class="flex flex-col items-end">
-                    <div class="flex items-center">
-                      ${labelHtml}
-                      <span class="text-white/40 line-through text-[10px] mr-1.5">RM ${data.retail.toFixed(0)}</span>
-                      <span class="text-luxe font-medium text-sm">RM ${data.promo.toFixed(0)}</span>
-                    </div>
+                  <div class="flex items-center justify-end">
+                    ${labelHtml}
+                    <del class="text-white/40 text-xs mr-1.5">RM ${data.retail.toFixed(0)}</del>
+                    <span class="text-luxe font-medium text-sm">RM ${data.promo.toFixed(0)}</span>
                   </div>
                 `;
               } else {
-                // Standard Layout
                 el.innerHTML = `<span class="text-white font-medium text-sm">RM ${data.retail.toFixed(0)}</span>`;
               }
             } else {
