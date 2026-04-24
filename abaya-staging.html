@@ -248,9 +248,11 @@
     <div class="flex-1 overflow-y-auto p-6 space-y-8">
       <div>
         <h4 class="text-[10px] uppercase tracking-widest text-white/40 mb-3">Search Design</h4>
-        <div class="relative">
-          <input type="text" placeholder="e.g. Z01, Maraya..." class="w-full bg-transparent border-b border-white/20 text-white pb-2 text-sm focus:outline-none focus:border-luxe transition-colors placeholder:text-white/30 tap-none">
-          <svg class="w-4 h-4 text-white/30 absolute right-0 top-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+        <div class="relative flex items-center">
+          <input type="text" id="search-input" placeholder="e.g. Z01, Maraya..." class="w-full bg-transparent border-b border-white/20 text-white pb-2 text-sm focus:outline-none focus:border-luxe transition-colors placeholder:text-white/30 tap-none">
+          <button id="search-trigger-btn" class="absolute right-0 bottom-2 text-white/30 hover:text-luxe transition-colors tap-none" aria-label="Search">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+          </button>
         </div>
       </div>
 
@@ -296,10 +298,41 @@
     // --- 2. Dynamic Year ---
     document.getElementById('y').textContent = new Date().getFullYear();
 
-    // --- 3. Category Filtering Logic ---
+    // --- 3 & 4. Unified Filtering & Drawer Logic ---
     const navBtns = document.querySelectorAll('.nav-btn');
     const products = document.querySelectorAll('.product-card');
+    const searchInput = document.getElementById('search-input');
+    const searchTriggerBtn = document.getElementById('search-trigger-btn');
+    const filterBtn = document.getElementById('filter-btn');
+    const closeFilterBtn = document.getElementById('close-filter-btn');
+    const applyFilterBtn = document.getElementById('apply-filter-btn');
+    const filterDrawer = document.getElementById('filter-drawer');
+    const filterOverlay = document.getElementById('filter-overlay');
 
+    let activeCategory = 'all';
+
+    // Core Filtering Engine
+    function runFilters() {
+      const searchTerm = searchInput.value.toLowerCase().trim();
+
+      products.forEach(p => {
+        p.classList.remove('reveal', 'show'); // Reset animation
+        
+        const matchCategory = (activeCategory === 'all' || p.getAttribute('data-category') === activeCategory);
+        // Scans the entire text content of the product card (Title, Subtitle, Price)
+        const matchSearch = (searchTerm === '' || p.innerText.toLowerCase().includes(searchTerm));
+
+        if (matchCategory && matchSearch) {
+          p.style.display = 'block';
+          // Slight delay to allow display:block to render before applying opacity transition
+          setTimeout(() => p.classList.add('reveal', 'show'), 20); 
+        } else {
+          p.style.display = 'none';
+        }
+      });
+    }
+
+    // Category Navigation Click
     navBtns.forEach(btn => {
       btn.addEventListener('click', (e) => {
         // Reset styles
@@ -307,34 +340,16 @@
           b.classList.remove('text-luxe', 'border-b-2', 'border-luxe');
           b.classList.add('text-white/50');
         });
-        
         // Set active style
         e.currentTarget.classList.remove('text-white/50');
         e.currentTarget.classList.add('text-luxe', 'border-b-2', 'border-luxe');
-
-        const target = e.currentTarget.getAttribute('data-target');
-
-        // Filter Grid
-        products.forEach(p => {
-          p.classList.remove('reveal', 'show'); // Reset animation
-          
-          if (target === 'all' || p.getAttribute('data-category') === target) {
-            p.style.display = 'block';
-            setTimeout(() => p.classList.add('reveal', 'show'), 20); // Re-trigger animation
-          } else {
-            p.style.display = 'none';
-          }
-        });
+        
+        activeCategory = e.currentTarget.getAttribute('data-target');
+        runFilters();
       });
     });
 
-    // --- 4. Filter Drawer Logic ---
-    const filterBtn = document.getElementById('filter-btn');
-    const closeFilterBtn = document.getElementById('close-filter-btn');
-    const applyFilterBtn = document.getElementById('apply-filter-btn');
-    const filterDrawer = document.getElementById('filter-drawer');
-    const filterOverlay = document.getElementById('filter-overlay');
-
+    // Drawer Toggle Function
     function toggleFilter() {
       const isOpen = !filterDrawer.classList.contains('translate-x-full');
       if (isOpen) {
@@ -353,7 +368,24 @@
     filterBtn.addEventListener('click', toggleFilter);
     closeFilterBtn.addEventListener('click', toggleFilter);
     filterOverlay.addEventListener('click', toggleFilter);
-    applyFilterBtn.addEventListener('click', toggleFilter);
+
+    // Apply Filters & Close Drawer
+    function applyAndCloseFilters() {
+      runFilters();
+      toggleFilter();
+    }
+
+    // Bind Search Triggers
+    applyFilterBtn.addEventListener('click', applyAndCloseFilters);
+    searchTriggerBtn.addEventListener('click', applyAndCloseFilters);
+    
+    // Listen for 'Enter' key in the search input
+    searchInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        applyAndCloseFilters();
+      }
+    });
 
     // --- 5. Dynamic Catalog Price Fetching ---
     const RETAIL_API_URL = "https://script.google.com/macros/s/AKfycbw4qGOeC2Sebod06uFnW2u-ZAkj7l8zRdzyWrFEyL1_7eDCn-ks9lVKrd1I226qHxRmQg/exec";
