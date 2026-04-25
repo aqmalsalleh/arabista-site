@@ -39,3 +39,29 @@ The ONLY permitted differences between a staging file and its production counter
 2. **Internal Routing:** Staging uses relative paths (e.g., `href="index-staging.html"`). Production uses live root paths (e.g., `href="/"`).
 3. **API URL:** Staging connects to the Staging Google Apps Script URL. Production connects to the Live Apps Script URL.  
 Never introduce a layout or logic change to Production without also mirroring it in Staging (and vice versa).
+
+## ⚠️ REVIEW INGESTION PROTOCOL
+Whenever you are instructed to inject customer reviews from a CSV file into a product staging page, you MUST strictly follow this exact 5-step process to prevent syntax errors and maintain data integrity:
+
+**1. Column Mapping:**  
+Read the provided CSV and map the data to an array of JSON objects using EXACTLY these 4 keys: `username`, `size`, `rating`, `original`.
+* `username` <- Mapped from the `Reviewer` column.
+* `rating` <- Mapped from the `Rating` column (parsed as an integer).
+* `original` <- Mapped from the `Text` column.
+* `size` <- Mapped from the `Variant` column.
+
+**2. Strict Data Sanitization (Syntax Error Prevention):**
+* **The Newline Rule:** You MUST replace ANY literal newlines (`\n` or `\r`) inside the `Text` column with a single space. The entire review string must sit on a single line to prevent JavaScript `Uncaught SyntaxError` crashes.
+* **The Size Extraction Rule:** You MUST extract ONLY the size string from the `Variant` column. Strip out any extra product details. (e.g., `"No Shawl, S"` becomes `"S"`; `"Shawl, XXL"` becomes `"XXL"`; `"XS"` remains `"XS"`).
+
+**3. JSON Injection Formatting:**  
+Locate `const FULL = [...];` inside the `// --- Review Grid Logic ---` section of the HTML file. Replace it entirely with the newly mapped array.
+* **Format:** The injected JSON MUST be formatted as a minified, single-line string or tightly packed array to guarantee zero line-break syntax errors.
+
+**4. Sync HTML Review Counts:**  
+Calculate the exact total number of reviews injected (the length of the `FULL` array) and update the hardcoded numbers in the HTML to match:
+* Update the Header count: `<span class="text-white/50 text-[10px] uppercase tracking-widest">{TOTAL} Reviews</span>`
+* Update the Grid count: `<div class="text-gray-400 text-sm">{TOTAL} reviews</div>`
+
+**5. Verification:**  
+Do NOT alter the `reviewCard(r)` function or any surrounding layout/logic during this process.
