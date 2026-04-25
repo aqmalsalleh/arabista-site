@@ -412,7 +412,20 @@
     }
 
     if (applyFiltersBtn && productGrid) {
-      applyFiltersBtn.addEventListener('click', () => {
+      applyFiltersBtn.addEventListener('click', async () => {
+        const originalText = applyFiltersBtn.innerText;
+        applyFiltersBtn.innerText = "UPDATING...";
+        applyFiltersBtn.disabled = true;
+        applyFiltersBtn.classList.add('opacity-50', 'cursor-not-allowed');
+
+        try {
+          await fetchCatalogPrices();
+        } finally {
+          applyFiltersBtn.innerText = originalText;
+          applyFiltersBtn.disabled = false;
+          applyFiltersBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+        }
+
         appliedSizes = Array.from(document.querySelectorAll('input[name="size"]:checked')).map(cb => cb.value);
         const sortOption = document.querySelector('input[name="sort"]:checked')?.value;
 
@@ -445,25 +458,30 @@
 
     // --- 5. Dynamic Catalog Price Fetching ---
     const RETAIL_API_URL = "https://script.google.com/macros/s/AKfycbw4qGOeC2Sebod06uFnW2u-ZAkj7l8zRdzyWrFEyL1_7eDCn-ks9lVKrd1I226qHxRmQg/exec";
+    let isFetchingPrices = false;
 
-    async function fetchCatalogPrices() {
-      try {
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 8000);
-        
-        const res = await fetch(`${RETAIL_API_URL}?action=get_config&cb=${Date.now().toString(36)}`, { signal: controller.signal });
-        clearTimeout(timeoutId);
-        
-        if (!res.ok) throw new Error("Network error");
-        const json = await res.json();
-        if (json.status !== 'success') throw new Error("API error");
+    function fetchCatalogPrices() {
+      if (isFetchingPrices) return Promise.resolve();
+      isFetchingPrices = true;
 
-        const matrix = json.data.matrix || {};
-        const config = json.data.config || {};
-        const modelPrices = {};
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 10000);
 
-        // 1. Scan the inventoryMatrix for the lowest price per model and per-size stock (for data-sizes)
-        for (let sku in matrix) {
+      return fetch(`${RETAIL_API_URL}?action=get_config&cb=${Date.now().toString(36)}`, { signal: controller.signal })
+        .then((res) => {
+          clearTimeout(timeoutId);
+          if (!res.ok) throw new Error("Network error");
+          return res.json();
+        })
+        .then((json) => {
+          if (json.status !== 'success') throw new Error("API error");
+
+          const matrix = json.data.matrix || {};
+          const config = json.data.config || {};
+          const modelPrices = {};
+
+          // 1. Scan the inventoryMatrix for the lowest price per model and per-size stock (for data-sizes)
+          for (let sku in matrix) {
             const row = matrix[sku];
             const base = row.baseItem;
             if (!base) continue;
@@ -489,70 +507,74 @@
                 const prev = modelPrices[base].matrix[sizeFromSku] || 0;
                 modelPrices[base].matrix[sizeFromSku] = Math.max(prev, stock);
             }
-        }
-
-        // 2. Smoothly inject prices into the DOM mimicking PDP style
-        document.querySelectorAll('.price-container').forEach(el => {
-          const model = el.getAttribute('data-model');
-          const d = modelPrices[model];
-          const article = el.closest('article');
-          if (article) {
-            if (d && d.retail > 0) {
-              article.dataset.price = d.promo !== null && d.promo < d.retail ? d.promo : d.retail;
-            } else {
-              delete article.dataset.price;
-            }
-            if (d && d.matrix) {
-              const availableSizes = Object.entries(d.matrix)
-                .filter(([size, stock]) => parseInt(stock) > 0)
-                .map(([size]) => size);
-              if (availableSizes.length) {
-                article.dataset.sizes = availableSizes.join(',');
-              } else {
-                delete article.dataset.sizes;
-              }
-            }
           }
-          el.style.opacity = '0';
 
-          setTimeout(() => {
+          // 2. Smoothly inject prices into the DOM mimicking PDP style
+          document.querySelectorAll('.price-container').forEach(el => {
+            const model = el.getAttribute('data-model');
             const d = modelPrices[model];
-            if (d && d.retail > 0) {
-              const hasPromo = d.promo !== null && d.promo < d.retail;
-              const label = config[model] && config[model].promoLabel ? config[model].promoLabel : "";
-              
-              if (hasPromo) {
-                let labelHtml = label ? `<span class="text-[9px] uppercase tracking-widest text-luxe border border-luxe/30 px-1.5 py-0.5 rounded-sm mr-2">${label}</span>` : '';
-                el.innerHTML = `
-                  <div class="flex items-center justify-end">
-                    ${labelHtml}
-                    <del class="text-white/40 text-xs mr-1.5">RM ${d.retail.toFixed(0)}</del>
-                    <span class="text-luxe font-medium text-sm">RM ${d.promo.toFixed(0)}</span>
-                  </div>
-                `;
+            const article = el.closest('article');
+            if (article) {
+              if (d && d.retail > 0) {
+                article.dataset.price = d.promo !== null && d.promo < d.retail ? d.promo : d.retail;
               } else {
-                el.innerHTML = `<span class="text-white font-medium text-sm">RM ${d.retail.toFixed(0)}</span>`;
+                delete article.dataset.price;
               }
-            } else {
-              el.innerHTML = `<span class="text-white/30 text-xs">RM --</span>`;
+              if (d && d.matrix) {
+                const availableSizes = Object.entries(d.matrix)
+                  .filter(([size, stock]) => parseInt(stock) > 0)
+                  .map(([size]) => size);
+                if (availableSizes.length) {
+                  article.dataset.sizes = availableSizes.join(',');
+                } else {
+                  delete article.dataset.sizes;
+                }
+              }
             }
+            el.style.opacity = '0';
+
+            setTimeout(() => {
+              const d2 = modelPrices[model];
+              if (d2 && d2.retail > 0) {
+                const hasPromo = d2.promo !== null && d2.promo < d2.retail;
+                const label = config[model] && config[model].promoLabel ? config[model].promoLabel : "";
+                
+                if (hasPromo) {
+                  let labelHtml = label ? `<span class="text-[9px] uppercase tracking-widest text-luxe border border-luxe/30 px-1.5 py-0.5 rounded-sm mr-2">${label}</span>` : '';
+                  el.innerHTML = `
+                    <div class="flex items-center justify-end">
+                      ${labelHtml}
+                      <del class="text-white/40 text-xs mr-1.5">RM ${d2.retail.toFixed(0)}</del>
+                      <span class="text-luxe font-medium text-sm">RM ${d2.promo.toFixed(0)}</span>
+                    </div>
+                  `;
+                } else {
+                  el.innerHTML = `<span class="text-white font-medium text-sm">RM ${d2.retail.toFixed(0)}</span>`;
+                }
+              } else {
+                el.innerHTML = `<span class="text-white/30 text-xs">RM --</span>`;
+              }
+              el.style.opacity = '1';
+            }, 300);
+          });
+
+          if (filterBtn) {
+            filterBtn.disabled = false;
+            filterBtn.classList.remove('text-white/30', 'cursor-not-allowed');
+            filterBtn.classList.add('text-white/70', 'hover:text-luxe', 'hover:border-luxe');
+          }
+        })
+        .catch((e) => {
+          console.warn("Failed to fetch catalog prices:", e);
+          document.querySelectorAll('.price-container').forEach(el => {
+            el.innerHTML = `<span class="text-white/30 text-xs">RM --</span>`;
             el.style.opacity = '1';
-          }, 300);
+          });
+        })
+        .finally(() => {
+          clearTimeout(timeoutId);
+          isFetchingPrices = false;
         });
-
-        if (filterBtn) {
-          filterBtn.disabled = false;
-          filterBtn.classList.remove('text-white/30', 'cursor-not-allowed');
-          filterBtn.classList.add('text-white/70', 'hover:text-luxe', 'hover:border-luxe');
-        }
-
-      } catch (e) {
-        console.warn("Failed to fetch catalog prices:", e);
-        document.querySelectorAll('.price-container').forEach(el => {
-          el.innerHTML = `<span class="text-white/30 text-xs">RM --</span>`;
-          el.style.opacity = '1';
-        });
-      }
     }
 
     // Initialize Fetch on Page Load
