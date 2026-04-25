@@ -419,7 +419,7 @@
         applyFiltersBtn.classList.add('opacity-50', 'cursor-not-allowed');
 
         try {
-          await fetchCatalogPrices();
+          await fetchCatalogPrices(true);
         } finally {
           applyFiltersBtn.innerText = originalText;
           applyFiltersBtn.disabled = false;
@@ -460,14 +460,15 @@
     const RETAIL_API_URL = "https://script.google.com/macros/s/AKfycbw4qGOeC2Sebod06uFnW2u-ZAkj7l8zRdzyWrFEyL1_7eDCn-ks9lVKrd1I226qHxRmQg/exec";
     let isFetchingPrices = false;
 
-    function fetchCatalogPrices() {
+    function fetchCatalogPrices(forceLive = false) {
       if (isFetchingPrices) return Promise.resolve();
       isFetchingPrices = true;
 
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 10000);
 
-      return fetch(`${RETAIL_API_URL}?action=get_config&cb=${Date.now().toString(36)}`, { signal: controller.signal })
+      const url = `${RETAIL_API_URL}?action=get_config${forceLive ? '&nocache=true' : ''}&cb=${Date.now().toString(36)}`;
+      return fetch(url, { signal: controller.signal })
         .then((res) => {
           clearTimeout(timeoutId);
           if (!res.ok) throw new Error("Network error");
