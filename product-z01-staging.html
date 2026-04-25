@@ -1103,7 +1103,10 @@
             const totalUnitPaid = item.price + altCost;
             const lineTotal = totalUnitPaid * item.qty;
 
-            visualSubtotal += lineTotal;
+            // BUGFIX: Subtotal must reflect the raw retail value before discounts
+            const retailLineTotal = (itemRetail + altCost) * item.qty;
+
+            visualSubtotal += retailLineTotal;
             totalDiscount += (itemDiscount * item.qty);
 
             // Strikethrough Logic for the UI
