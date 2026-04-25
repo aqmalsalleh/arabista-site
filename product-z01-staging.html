@@ -451,6 +451,7 @@
   </div>
 
   <script>
+    const currentModel = 'Z01';
     const RETAIL_API_URL = "https://script.google.com/macros/s/AKfycbw4qGOeC2Sebod06uFnW2u-ZAkj7l8zRdzyWrFEyL1_7eDCn-ks9lVKrd1I226qHxRmQg/exec";
 
     const baseSizes = {
@@ -536,7 +537,7 @@
             try {
                 if (i > 0 && btn) btn.innerText = `CONNECTING... (RETRY ${i}/${retries})`;
 
-                const res = await fetch(`${RETAIL_API_URL}?action=get_config&model=Z01`, { signal: controller.signal });
+                const res = await fetch(`${RETAIL_API_URL}?action=get_config&model=${currentModel}`, { signal: controller.signal });
                 clearTimeout(timeoutId);
                 
                 if (!res.ok) throw new Error(`HTTP Error: ${res.status}`);
@@ -618,7 +619,7 @@
             btn.classList.remove('animate-pulse', 'pointer-events-none', 'opacity-40');
 
             const size = btn.dataset.size;
-            const sku = `Z01-${size}`;
+            const sku = `${currentModel}-${size}`;
             const item = inventoryMatrix[sku];
             
             // Handle different variations of stock property naming from backend
@@ -663,7 +664,7 @@
         btnElement.className = "size-btn py-3 border border-luxe bg-luxe text-ink rounded-lg font-medium shadow-[0_0_15px_rgba(192,160,98,0.3)] transition-colors focus:outline-none tap-none";
 
         // Check Matrix for Alteration Permissions
-        const sku = `Z01-${size}`;
+        const sku = `${currentModel}-${size}`;
         const reqAlt = inventoryMatrix[sku] && inventoryMatrix[sku].requiresAlteration !== undefined 
             ? inventoryMatrix[sku].requiresAlteration 
             : true; // Default to true if not found
@@ -706,7 +707,7 @@
             return;
         }
 
-        const sku = `Z01-${size}`;
+        const sku = `${currentModel}-${size}`;
         const matrixRow = inventoryMatrix[sku];
         if (matrixRow) {
             activeRetailPrice = matrixRow.retailPrice;
@@ -993,7 +994,7 @@
         const totalUnitDiscount = baseDiscount + altDiscount;
 
         // The Configuration Hash: Unique signature for this exact size + alt combo
-        const signature = `Z01-${selectedSize}|${JSON.stringify(currentAlterations)}`;
+        const signature = `${currentModel}-${selectedSize}|${JSON.stringify(currentAlterations)}`;
 
         // Initialize Cart State if empty
         if (!cartState) {
@@ -1012,7 +1013,7 @@
         } else {
             cartState.items.push({
                 signature: signature,
-                sku: `Z01-${selectedSize}`,
+                sku: `${currentModel}-${selectedSize}`,
                 size: selectedSize,
                 qty: inputQty,
                 unitRetailPrice: activeRetailPrice,
