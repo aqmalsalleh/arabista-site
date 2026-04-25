@@ -17,4 +17,25 @@ We maintain two single-source-of-truth architecture documents in the root folder
 - `Arabista_Alteration_Master_Doc.md`
 
 Whenever you (the AI) are asked to write new code, modify logic, alter an API payload, change a URL, or adjust the database schema, you MUST adhere to the following rule:
-You must proactively update the corresponding Master Document (.md file) to reflect the new changes so the documentation never drifts from the live codebase. Maintain the existing Markdown hierarchy, structure, and tone when making your updates. Do not ask for permission to update the doc; just include the document updates in your proposed code changes.
+You must proactively update the corresponding Master Document (.md file) to reflect the new changes so the documentation never drifts from the live codebase. Maintain the existing Markdown hierarchy, structure, and tone when making your updates. Do not ask for permission to update the doc; just include the document updates in your proposed code changes. (Current retail reference: `Arabista_Retail_Master_Doc.md` **v1.10**+.)
+
+## ⚠️ FRONTEND MASTER TEMPLATE PROTOCOL
+To prevent code drift and maintain a unified architecture, we strictly enforce a Master Template system for all product pages.
+
+**1. The Master Template**  
+`product-z01-staging.html` is the absolute **Master Reference Template**. Whenever you are asked to create or update a product page (e.g., `product-m01-staging.html`, `product-d02-staging.html`), you MUST strictly clone the HTML layout, CSS classes, and JavaScript logic of the Master Template.
+
+**2. Allowed Modifications for New Products**  
+When cloning the Master Template for a new product, you are ONLY permitted to change the following data points:
+* Model codes (e.g., `Z01` to `M01`) and Series Names (e.g., `Zahra` to `Maraya`).
+* Image file paths and the CSV Review data payload.
+* Alteration ID keys (e.g., `Z01_ALT_LENGTH` to `M01_ALT_LENGTH`).
+* **THE DAHLIA EXCEPTION:** If the product belongs to the "Dahlia" series (e.g., D01, D02), you MUST change the feature bullet wording from `"Cutting Ala Cardigan"` to `"Cutting 1-Lapis"`. For all other series (Zahra, Maraya, etc.), it must remain `"Cutting Ala Cardigan"`. Do not alter any other structural HTML.
+
+**3. Staging vs. Production Synchronization**  
+Staging files (e.g., `product-z01-staging.html`) and Production files (e.g., `product-z01.html`) MUST remain structurally, logically, and aesthetically 100% identical at all times.  
+The ONLY permitted differences between a staging file and its production counterpart are environment variables:
+1. **Title Tag:** Staging includes `(STAGING)`.
+2. **Internal Routing:** Staging uses relative paths (e.g., `href="index-staging.html"`). Production uses live root paths (e.g., `href="/"`).
+3. **API URL:** Staging connects to the Staging Google Apps Script URL. Production connects to the Live Apps Script URL.  
+Never introduce a layout or logic change to Production without also mirroring it in Staging (and vice versa).
