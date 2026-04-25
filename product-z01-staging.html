@@ -515,6 +515,9 @@
         }
     };
 
+    let sessionShippingFee = 0;
+    let sessionPostcode = '';
+
     // Initialize count on page load
     document.addEventListener('DOMContentLoaded', () => CartManager.updateCartCount());
 
@@ -1042,7 +1045,7 @@
             if (subEl) subEl.textContent = 'RM 0.00';
             const discRow = document.getElementById('cart-discount-row');
             if (discRow) discRow.classList.add('hidden');
-            if (typeof updateGrandTotal === 'function' && cartState) updateGrandTotal();
+            if (typeof updateGrandTotal === 'function') updateGrandTotal();
         }
         toggleCart(false);
     }
@@ -1074,6 +1077,7 @@
                 discRow.classList.add('hidden');
                 discRow.classList.remove('flex');
             }
+            updateGrandTotal();
             return;
         }
 
@@ -1167,38 +1171,70 @@
                 discRow.classList.remove('flex');
             }
         }
+        updateGrandTotal();
     }
 
     function updateGrandTotal() {
-        if (!cartState) return;
-        const total = (cartState.basePrice + cartState.altCost) - cartState.discount + cartState.shippingFee;
-        document.getElementById('cart-total').textContent = `RM ${total.toFixed(2)}`;
+        const items = CartManager.getItems();
+        if (items.length === 0) {
+            document.getElementById('cart-total').textContent = `RM 0.00`;
+            return;
+        }
+
+        let baseTotal = 0;
+        items.forEach(item => {
+            let altCost = 0;
+            if (item.alterations) {
+                Object.values(item.alterations).forEach(alt => altCost += (alt.price || 0));
+            }
+            baseTotal += (item.price + altCost) * item.qty;
+        });
+
+        const grandTotal = baseTotal + sessionShippingFee;
+        document.getElementById('cart-total').textContent = `RM ${grandTotal.toFixed(2)}`;
     }
 
     document.getElementById('btn-calc-ship').onclick = async () => {
-        if (!cartState) return;
+        const items = CartManager.getItems();
+        if (items.length === 0) return;
+
         const pc = document.getElementById('cart-postcode').value.trim();
-        if (!pc || pc.length < 5 || isNaN(pc)) { document.getElementById('cart-postcode').classList.add('border-red-500'); return; }
-        else document.getElementById('cart-postcode').classList.remove('border-red-500');
+        if (!pc || pc.length < 5 || isNaN(pc)) {
+            document.getElementById('cart-postcode').classList.add('border-red-500');
+            return;
+        } else {
+            document.getElementById('cart-postcode').classList.remove('border-red-500');
+        }
+
+        // Calculate aggregated weight across all cart items
+        let totalCartWeight = 0;
+        items.forEach(item => {
+            totalCartWeight += (item.unitWeight || 1.0) * item.qty;
+        });
 
         const btn = document.getElementById('btn-calc-ship');
         btn.textContent = "...";
+
         try {
-            const res = await fetch(`${RETAIL_API_URL}?action=calc_shipping&postcode=${encodeURIComponent(pc)}&weight=${cartState.weightKg}`);
+            const res = await fetch(`${RETAIL_API_URL}?action=calc_shipping&postcode=${encodeURIComponent(pc)}&weight=${totalCartWeight}`);
             const json = await res.json();
+
             if (json.status === 'success') {
-                cartState.postcode = pc;
+                sessionPostcode = pc;
                 const freeShipPromo = appConfig['PROMO_FREE_SHIPPING'];
+
                 if (freeShipPromo && freeShipPromo.isActive) {
-                    cartState.shippingFee = 0;
+                    sessionShippingFee = 0;
                     document.getElementById('cart-shipping').innerHTML = `<span class="line-through text-gray-500 mr-2">RM ${json.rate.toFixed(2)}</span><span class="text-luxe font-bold">FREE</span>`;
                 } else {
-                    cartState.shippingFee = json.rate;
+                    sessionShippingFee = json.rate;
                     document.getElementById('cart-shipping').textContent = `RM ${json.rate.toFixed(2)} (J&T Express)`;
                 }
                 updateGrandTotal();
             }
-        } catch (e) { alert("Shipping calculation failed."); }
+        } catch (e) {
+            alert("Shipping calculation failed. Please try again.");
+        }
         btn.textContent = "CALC";
     };
 
@@ -1252,93 +1288,117 @@
     });
 
     document.getElementById('btn-checkout').onclick = async () => {
-        // TERMINAL GUARD: Physically block checkout if prices failed to load
+        const items = CartManager.getItems();
+        if (items.length === 0) return;
+
+        // Terminal Guard for dynamic pricing loads
         const currentPrice = activePromoPrice || activeRetailPrice;
         if (!currentPrice || currentPrice <= 0) {
             alert("⚠️ System Busy: Pricing data failed to load securely. Please refresh the page to continue.");
             window.location.reload();
             return;
         }
-        if (!cartState) return;
-        const name = document.getElementById('cart-name').value.trim();
 
-        // --- FRONTEND PHONE SANITIZATION ---
+        const name = document.getElementById('cart-name').value.trim();
         let rawPhone = document.getElementById('cart-phone').value;
-        let cleanPhone = String(rawPhone).trim().replace(/\D/g, ''); // Strip spaces, dashes, and '+'
-        if (cleanPhone.startsWith('1')) {
-             cleanPhone = '60' + cleanPhone; // Catch dropped leading zero
-        } else if (cleanPhone.startsWith('0')) {
-             cleanPhone = '6' + cleanPhone; // Convert '019' to '6019'
-        }
+        let cleanPhone = String(rawPhone).trim().replace(/\D/g, '');
+        if (cleanPhone.startsWith('1')) cleanPhone = '60' + cleanPhone;
+        else if (cleanPhone.startsWith('0')) cleanPhone = '6' + cleanPhone;
         const phone = cleanPhone;
 
         const address = document.getElementById('cart-address').value.trim();
         const state = document.getElementById('cart-state').value;
         const postcode = document.getElementById('cart-postcode').value.trim();
-        // Update state with the DOM inputs just in case they typed without blurring
-        cartState.name = name;
-        cartState.phone = phone;
-        cartState.address = address;
-        cartState.state = state;
-        cartState.postcode = postcode;
 
         if (!name || !phone || !address || !state || !postcode) {
-            alert("Please fill in all shipping details."); 
+            alert("Please fill in all shipping details.");
             return;
         }
 
-        // If they filled the postcode but haven't calculated shipping yet, prompt them gently instead of a generic error
         const shipRow = document.getElementById('cart-shipping');
         const shipLabel = shipRow ? shipRow.textContent.replace(/\s+/g, ' ').trim() : '';
-        if (shipLabel === 'Pending' || shipLabel === '') {
+        if (shipLabel === 'Pending' || shipLabel === '' || postcode !== sessionPostcode) {
             alert("Please click 'Calculate Shipping' to update your delivery fee before checking out.");
             return;
         }
+
         const btn = document.getElementById('btn-checkout');
         btn.textContent = "Securing Order..."; btn.disabled = true;
 
-        // 1. Trigger Immersive Gateway
         const gateway = document.getElementById('gateway-overlay');
         gateway.classList.remove('opacity-0', 'pointer-events-none');
 
-        cartState.email = "";
-        cartState.totalPaid = (cartState.basePrice + cartState.altCost) - cartState.discount + cartState.shippingFee;
+        // TRANSLATOR: Rebuild the precise payload expected by Google Apps Script
+        let payloadBasePrice = 0;
+        let payloadAltCost = 0;
+        let payloadTotalWeight = 0;
+        let payloadTotalQty = 0;
+
+        const formattedItems = items.map(item => {
+            let unitAltCost = 0;
+            if (item.alterations) {
+                Object.values(item.alterations).forEach(alt => unitAltCost += (alt.price || 0));
+            }
+
+            payloadBasePrice += item.price * item.qty;
+            payloadAltCost += unitAltCost * item.qty;
+            payloadTotalWeight += (item.unitWeight || 1.0) * item.qty;
+            payloadTotalQty += item.qty;
+
+            const signature = `${item.model}-${item.size}|${JSON.stringify(item.alterations || {})}`;
+
+            return {
+                signature: signature,
+                sku: `${item.model}-${item.size}`,
+                size: item.size,
+                qty: item.qty,
+                unitRetailPrice: item.retailPrice || item.price,
+                unitEffectivePrice: item.price,
+                unitAltCost: unitAltCost,
+                unitDiscount: Math.max(0, (item.retailPrice || item.price) - item.price),
+                unitWeight: item.unitWeight || 1.0,
+                alterations: item.alterations || {},
+                isSoldOut: false
+            };
+        });
+
+        const grandTotal = payloadBasePrice + payloadAltCost + sessionShippingFee;
 
         const payload = {
-            ...cartState,
-            totalWeight: cartState.weightKg
+            items: formattedItems,
+            basePrice: payloadBasePrice,
+            altCost: payloadAltCost,
+            weightKg: payloadTotalWeight,
+            totalWeight: payloadTotalWeight,
+            totalQty: payloadTotalQty,
+            shippingFee: sessionShippingFee,
+            discount: 0,
+            totalPaid: grandTotal,
+            name: name,
+            phone: phone,
+            email: "",
+            address: address,
+            state: state,
+            postcode: postcode
         };
 
         try {
             const res = await fetch(`${RETAIL_API_URL}?action=reserve_stock`, {
-                method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                 body: `payload=${encodeURIComponent(JSON.stringify(payload))}`
             });
             const json = await res.json();
 
             if (json.status === 'success') {
+                localStorage.removeItem('arabista_cart');
                 window.location.href = json.paymentUrl;
             } else {
-                // Remove Gateway Overlay
                 gateway.classList.add('opacity-0', 'pointer-events-none');
 
                 if (json.reason === 'out_of_stock' && json.failedSignature) {
-                    // Soft Reject Flow
-                    const failedItem = cartState.items.find(i => i.signature === json.failedSignature);
-                    if (failedItem) {
-                        failedItem.isSoldOut = true;
-                    }
-                    renderCart();
-
-                    const notif = document.getElementById('cart-notification');
-                    notif.classList.remove('hidden');
-                    document.getElementById('cart-scroll-area').scrollTop = 0;
-
-                    // --- LIVE MATRIX REFRESH ---
-                    // Silently updates the main page sizing buttons to reflect the sold-out status
-                    await fetchConfig();
-
-                    setTimeout(() => { notif.classList.add('hidden'); }, 8000);
+                    alert(`A selected item sold out during checkout. Please review your cart.`);
+                    window.location.reload();
                 } else {
                     alert("Checkout Error: " + json.message);
                 }
