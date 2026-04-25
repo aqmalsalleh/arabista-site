@@ -473,6 +473,31 @@
     let activePromoPrice = null; // Dynamically set on load
     let activeWeightKg = 1.0;
 
+    // --- GLOBAL CART MANAGER ---
+    const CartManager = {
+        key: 'arabista_cart',
+        getItems: function() {
+            return JSON.parse(localStorage.getItem(this.key)) || [];
+        },
+        addItem: function(productObj) {
+            const items = this.getItems();
+            items.push(productObj);
+            localStorage.setItem(this.key, JSON.stringify(items));
+            this.updateCartCount();
+        },
+        updateCartCount: function() {
+            const count = this.getItems().length;
+            const cartBtn = document.getElementById('nav-cart-btn');
+            if (cartBtn) {
+                let badge = cartBtn.querySelector('span.absolute');
+                if (badge) badge.innerText = count;
+            }
+        }
+    };
+
+    // Initialize count on page load
+    document.addEventListener('DOMContentLoaded', () => CartManager.updateCartCount());
+
     // Gallery Logic
     const mediaFiles = [
         { type: 'img', src: 'images/z01-1-hero.webp' }, { type: 'img', src: 'images/z01-2-angle.webp' },
@@ -935,6 +960,56 @@
     document.getElementById('close-cart-btn').onclick = () => toggleCart(false);
     document.getElementById('cart-overlay').onclick = () => toggleCart(false);
 
+    function getSelectedAlterationsForCart() {
+        const selectedAlterations = {};
+        if (!altEnabled) return selectedAlterations;
+        document.querySelectorAll('.alt-input').forEach(inp => {
+            const val = parseFloat(inp.value);
+            if (val) {
+                const key = inp.getAttribute('data-key');
+                const sId = key === 'length' ? 'Z01_ALT_LENGTH' : (key === 'sleeve' ? 'Z01_ALT_SLEEVE' : 'Z01_ALT_SHOULDER');
+                const conf = appConfig[sId];
+                if (conf) {
+                    const stdPrice = conf.standardPrice || 0;
+                    const isPromo = conf.promoPrice !== null && conf.promoPrice < stdPrice;
+                    const charged = isPromo ? conf.promoPrice : stdPrice;
+                    const bmNames = { length: 'Labuh', sleeve: 'Lengan', shoulder: 'Bahu' };
+                    selectedAlterations[key] = {
+                        name: bmNames[key] || (key.charAt(0).toUpperCase() + key.slice(1)),
+                        val: val + '"',
+                        price: charged,
+                        standardPrice: stdPrice,
+                        isPromo: isPromo
+                    };
+                }
+            }
+        });
+        return selectedAlterations;
+    }
+
+    function addZ01ToLocalCartAndOpenDrawer() {
+        if (!selectedSize) {
+            alert("Please select a size before adding to cart.");
+            return;
+        }
+
+        const currentPrice = activePromoPrice !== null ? activePromoPrice : activeRetailPrice;
+        const selectedAlterations = getSelectedAlterationsForCart();
+        const cartItem = {
+            id: `Z01-${Date.now()}`,
+            model: currentModel,
+            series: 'Zahra Series',
+            size: selectedSize,
+            price: currentPrice,
+            alterations: { ...selectedAlterations },
+            image: 'images/z01-1-hero.webp',
+            qty: 1
+        };
+
+        CartManager.addItem(cartItem);
+        toggleCart(true);
+    }
+
     function closeCart() {
         if (cartState && (!cartState.items || cartState.items.length === 0)) {
             const c = document.getElementById('cart-items-container');
@@ -948,90 +1023,8 @@
         toggleCart(false);
     }
 
-    // --- MULTI-LINE-ITEM CART ENGINE ---
-    document.getElementById('add-to-cart-btn').addEventListener('click', () => {
-        if (!selectedSize) {
-            alert("Please select a size first.");
-            document.getElementById('size-calculator-section')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            return;
-        }
-
-        const currentAlterations = {};
-        let altStandardSum = 0;
-        let altPaidSum = 0;
-
-        if (altEnabled) {
-            document.querySelectorAll('.alt-input').forEach(inp => {
-                const val = parseFloat(inp.value);
-                if (val) {
-                    const key = inp.getAttribute('data-key');
-                    const sId = key === 'length' ? 'Z01_ALT_LENGTH' : (key === 'sleeve' ? 'Z01_ALT_SLEEVE' : 'Z01_ALT_SHOULDER');
-                    const conf = appConfig[sId];
-                    if (conf) {
-                        const stdPrice = conf.standardPrice || 0;
-                        const isPromo = conf.promoPrice !== null && conf.promoPrice < stdPrice;
-                        const charged = isPromo ? conf.promoPrice : stdPrice;
-
-                        const bmNames = { length: 'Labuh', sleeve: 'Lengan', shoulder: 'Bahu' };
-                        currentAlterations[key] = {
-                            name: bmNames[key] || (key.charAt(0).toUpperCase() + key.slice(1)),
-                            val: val + '"',
-                            price: charged,
-                            standardPrice: stdPrice,
-                            isPromo: isPromo
-                        };
-                        altStandardSum += stdPrice;
-                        altPaidSum += charged;
-                    }
-                }
-            });
-        }
-
-        const effectivePrice = activePromoPrice !== null ? activePromoPrice : activeRetailPrice;
-        const inputQty = parseInt(document.getElementById('qty').value) || 1;
-        const baseDiscount = activeRetailPrice - effectivePrice;
-        const altDiscount = altStandardSum - altPaidSum;
-        const totalUnitDiscount = baseDiscount + altDiscount;
-
-        // The Configuration Hash: Unique signature for this exact size + alt combo
-        const signature = `${currentModel}-${selectedSize}|${JSON.stringify(currentAlterations)}`;
-
-        // Initialize Cart State if empty
-        if (!cartState) {
-            cartState = {
-                items: [],
-                basePrice: 0, altCost: 0, weightKg: 0, totalQty: 0,
-                shippingFee: 0, discount: 0, promoLabel: '',
-                name: '', phone: '', email: '', address: '', state: '', postcode: ''
-            };
-        }
-
-        // Check if this exact configuration already exists in the cart
-        const existingItem = cartState.items.find(i => i.signature === signature);
-        if (existingItem) {
-            existingItem.qty += inputQty;
-        } else {
-            cartState.items.push({
-                signature: signature,
-                sku: `${currentModel}-${selectedSize}`,
-                size: selectedSize,
-                qty: inputQty,
-                unitRetailPrice: activeRetailPrice,
-                unitEffectivePrice: effectivePrice,
-                unitAltCost: altPaidSum,
-                unitDiscount: totalUnitDiscount,
-                unitWeight: activeWeightKg,
-                alterations: { ...currentAlterations }
-            });
-        }
-
-        updateCartTotals();
-        renderCart();
-
-        // Reset UI for next item
-        document.getElementById('qty').value = 1;
-        toggleCart(true);
-    });
+    // --- ADD TO CART (localStorage via CartManager) ---
+    document.getElementById('add-to-cart-btn').addEventListener('click', addZ01ToLocalCartAndOpenDrawer);
 
     // Helper: Recalculates root totals for checkout/shipping compatibility
     function updateCartTotals() {
@@ -1393,19 +1386,8 @@
             }, { threshold: 0 });
             observer.observe(mainCartBtn);
 
-            // 2. Intelligent Button Logic
-            const sizeCalc = document.getElementById('size-calculator-section');
-            stickyBtn.addEventListener('click', () => {
-                if (!selectedSize) {
-                    // State A: Auto-scroll to Size Calculator
-                    if (sizeCalc) {
-                        sizeCalc.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                    }
-                } else {
-                    // State B: Add to Cart
-                    mainCartBtn.click();
-                }
-            });
+            // 2. Intelligent Button Logic (add to localStorage cart, same as main ATC)
+            stickyBtn.addEventListener('click', addZ01ToLocalCartAndOpenDrawer);
         }
     });
 
