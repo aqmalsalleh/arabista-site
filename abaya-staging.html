@@ -462,14 +462,20 @@
         const config = json.data.config || {};
         const modelPrices = {};
 
-        // 1. Scan the inventoryMatrix for the lowest price per model
+        // 1. Scan the inventoryMatrix for the lowest price per model and per-size stock (for data-sizes)
         for (let sku in matrix) {
             const row = matrix[sku];
             const base = row.baseItem;
             if (!base) continue;
 
+            const sizeFromSku = sku.startsWith(base + '-')
+                ? sku.slice((base + '-').length)
+                : (row.size != null && String(row.size) ? String(row.size) : '');
+            const stockVal = row.Available_To_Sell ?? row.stock ?? row.qty ?? 0;
+            const stock = parseInt(String(stockVal), 10) || 0;
+
             if (!modelPrices[base]) {
-                modelPrices[base] = { retail: row.retailPrice, promo: row.promoPrice };
+                modelPrices[base] = { retail: row.retailPrice, promo: row.promoPrice, matrix: {} };
             } else {
                 if (row.retailPrice > 0 && (modelPrices[base].retail === 0 || row.retailPrice < modelPrices[base].retail)) {
                     modelPrices[base].retail = row.retailPrice;
@@ -478,18 +484,33 @@
                     modelPrices[base].promo = row.promoPrice;
                 }
             }
+            if (!modelPrices[base].matrix) modelPrices[base].matrix = {};
+            if (sizeFromSku) {
+                const prev = modelPrices[base].matrix[sizeFromSku] || 0;
+                modelPrices[base].matrix[sizeFromSku] = Math.max(prev, stock);
+            }
         }
 
         // 2. Smoothly inject prices into the DOM mimicking PDP style
         document.querySelectorAll('.price-container').forEach(el => {
           const model = el.getAttribute('data-model');
-          const data = modelPrices[model];
+          const d = modelPrices[model];
           const article = el.closest('article');
           if (article) {
-            if (data && data.retail > 0) {
-              article.dataset.price = (data.promo !== null && data.promo < data.retail) ? data.promo : data.retail;
+            if (d && d.retail > 0) {
+              article.dataset.price = d.promo !== null && d.promo < d.retail ? d.promo : d.retail;
             } else {
               delete article.dataset.price;
+            }
+            if (d && d.matrix) {
+              const availableSizes = Object.entries(d.matrix)
+                .filter(([size, stock]) => parseInt(stock) > 0)
+                .map(([size]) => size);
+              if (availableSizes.length) {
+                article.dataset.sizes = availableSizes.join(',');
+              } else {
+                delete article.dataset.sizes;
+              }
             }
           }
           el.style.opacity = '0';
