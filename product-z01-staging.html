@@ -485,8 +485,28 @@
             localStorage.setItem(this.key, JSON.stringify(items));
             this.updateCartCount();
         },
+        removeItem: function(id) {
+            const items = this.getItems().filter(item => item.id !== id);
+            localStorage.setItem(this.key, JSON.stringify(items));
+            this.updateCartCount();
+            if (typeof renderCart === 'function') renderCart();
+        },
+        updateQty: function(id, delta) {
+            const items = this.getItems();
+            const item = items.find(i => i.id === id);
+            if (item) {
+                item.qty += delta;
+                if (item.qty <= 0) {
+                    this.removeItem(id);
+                    return;
+                }
+                localStorage.setItem(this.key, JSON.stringify(items));
+                this.updateCartCount();
+                if (typeof renderCart === 'function') renderCart();
+            }
+        },
         updateCartCount: function() {
-            const count = this.getItems().length;
+            const count = this.getItems().reduce((total, item) => total + item.qty, 0);
             const cartBtn = document.getElementById('nav-cart-btn');
             if (cartBtn) {
                 let badge = cartBtn.querySelector('span.absolute');
@@ -945,6 +965,7 @@
         const overlay = document.getElementById('cart-overlay');
         const drawer = document.getElementById('cart-drawer');
         if (show) {
+            if (typeof renderCart === 'function') renderCart();
             document.body.style.overflow = 'hidden';
             overlay.classList.remove('hidden');
             setTimeout(() => overlay.classList.remove('opacity-0'), 10);
@@ -1011,71 +1032,44 @@
     }
 
     function closeCart() {
-        if (cartState && (!cartState.items || cartState.items.length === 0)) {
+        if (CartManager.getItems().length === 0) {
             const c = document.getElementById('cart-items-container');
             if (c) c.innerHTML = '';
             const subEl = document.getElementById('cart-subtotal');
             if (subEl) subEl.textContent = 'RM 0.00';
             const discRow = document.getElementById('cart-discount-row');
             if (discRow) discRow.classList.add('hidden');
-            updateGrandTotal();
+            if (typeof updateGrandTotal === 'function' && cartState) updateGrandTotal();
         }
+        toggleCart(false);
+    }
+
+    function closeCartDrawer() {
         toggleCart(false);
     }
 
     // --- ADD TO CART (localStorage via CartManager) ---
     document.getElementById('add-to-cart-btn').addEventListener('click', addZ01ToLocalCartAndOpenDrawer);
 
-    // Helper: Recalculates root totals for checkout/shipping compatibility
-    function updateCartTotals() {
-        if (!cartState) return;
-        cartState.basePrice = 0; cartState.altCost = 0; cartState.weightKg = 0; cartState.totalQty = 0;
-
-        cartState.items.forEach(item => {
-            cartState.basePrice += item.unitEffectivePrice * item.qty;
-            cartState.altCost += item.unitAltCost * item.qty;
-            cartState.weightKg += item.unitWeight * item.qty;
-            cartState.totalQty += item.qty;
-        });
-
-        // Reset shipping if cart is emptied to force recalc
-        if (cartState.items.length === 0) cartState.shippingFee = 0;
-    }
-
-    // Helper: Internal Cart QTY Adjuster
-    window.updateCartItemQty = function(signature, delta) {
-        if (!cartState) return;
-        const item = cartState.items.find(i => i.signature === signature);
-        if (item) {
-            item.qty += delta;
-            if (item.qty <= 0) {
-                cartState.items = cartState.items.filter(i => i.signature !== signature);
-            }
-            updateCartTotals();
-            cartState.items.length === 0 ? closeCart() : renderCart();
-        }
-    };
-
-    // Helper: Remove Item
-    window.removeCartItem = function(signature) {
-        if (!cartState) return;
-        cartState.items = cartState.items.filter(i => i.signature !== signature);
-        updateCartTotals();
-        cartState.items.length === 0 ? closeCart() : renderCart();
-    };
-
     function renderCart() {
-        if (!cartState) return;
         const container = document.getElementById('cart-items-container');
-        if (!cartState.items || cartState.items.length === 0) return;
+        const subtotalEl = document.getElementById('cart-subtotal');
+
+        if (!container || !subtotalEl) return;
+
+        const items = CartManager.getItems();
+        let visualSubtotal = 0;
+
+        if (items.length === 0) {
+            container.innerHTML = `<div class="text-center text-white/40 py-10 text-sm">Your cart is currently empty.</div>`;
+            subtotalEl.innerText = `RM 0.00`;
+            return;
+        }
 
         let html = '';
-        let visualSubtotal = 0;
-        let totalDiscount = 0;
-
-        cartState.items.forEach(item => {
+        items.forEach(item => {
             let altHtml = '';
-            if (Object.keys(item.alterations).length > 0) {
+            if (item.alterations && Object.keys(item.alterations).length > 0) {
                 altHtml = '<div class="text-white/40 text-[11px] mt-1.5 leading-relaxed space-y-0.5">';
                 for (let [k, v] of Object.entries(item.alterations)) {
                     let priceDisplay = v.isPromo ? `<del class="text-white/30">RM ${v.standardPrice.toFixed(2)}</del> <span class="text-luxe font-bold ml-1">${v.price === 0 ? "FREE" : `RM ${v.price.toFixed(2)}`}</span>` : `+RM ${v.price.toFixed(2)}`;
@@ -1084,100 +1078,48 @@
                 altHtml += '</div>';
             }
 
-            const itemPaid = (item.unitEffectivePrice + item.unitAltCost) * item.qty;
-            const itemSaved = (item.unitDiscount || 0) * item.qty;
-            const sigJson = JSON.stringify(item.signature);
-
-            // Only add to totals if the item is NOT sold out
-            if (!item.isSoldOut) {
-                visualSubtotal += (itemPaid + itemSaved);
-                totalDiscount += itemSaved;
-            }
-
-            // Aesthetic States based on Soft Reject
-            const isOOS = item.isSoldOut;
-            const cardBorder = isOOS ? 'border-red-500/30' : 'border-white/10';
-            const imgStyle = isOOS ? 'border-red-500/30 grayscale opacity-40' : 'border-white/10';
-            const titleStyle = isOOS ? 'text-white/40' : 'text-white';
-
-            let priceOrOOS = '';
-            let qtyOrEmpty = '';
-
-            if (isOOS) {
-                priceOrOOS = `<div class="mt-2 text-red-500/90 text-[10px] font-bold uppercase tracking-widest bg-red-500/10 inline-block px-2 py-1.5 rounded border border-red-500/20 shadow-[0_0_10px_rgba(239,68,68,0.15)]">[ Sold Out ]</div>`;
-            } else {
-                priceOrOOS = `
-                    <div class="mt-0.5">
-                        ${item.unitEffectivePrice < item.unitRetailPrice
-                            ? `<del class="text-white/30 mr-1.5 text-xs">RM ${(item.unitRetailPrice * item.qty).toFixed(2)}</del><span class="text-luxe font-bold text-sm">RM ${(item.unitEffectivePrice * item.qty).toFixed(2)}</span>`
-                            : `<span class="text-luxe font-medium text-sm">RM ${(item.unitEffectivePrice * item.qty).toFixed(2)}</span>`
-                        }
-                    </div>
-                    ${altHtml}
-                `;
-                qtyOrEmpty = `
-                    <div class="flex items-center mt-3">
-                        <div class="flex items-center rounded-md border border-white/15 bg-white/[0.02]">
-                            <button type="button" onclick='updateCartItemQty(${sigJson}, -1)' class="px-3 py-1 text-white/50 hover:text-white tap-none">&minus;</button>
-                            <span class="w-6 text-center text-xs font-medium">${item.qty}</span>
-                            <button type="button" onclick='updateCartItemQty(${sigJson}, 1)' class="px-3 py-1 text-white/50 hover:text-white tap-none">&plus;</button>
-                        </div>
-                    </div>`;
-            }
+            const itemTotal = item.price * item.qty;
+            visualSubtotal += itemTotal;
 
             html += `
-                <div class="flex gap-4 pb-5 border-b ${cardBorder} relative group last:border-0 last:pb-0 transition-all duration-300">
-                    <img src="images/z01-1-hero.webp" class="w-20 h-24 object-cover rounded-lg border ${imgStyle} transition-all duration-300" alt="Z01">
-                    <div class="flex-1 flex flex-col justify-between">
-                        <div>
-                            <div class="flex justify-between items-start">
-                                <div class="${titleStyle} font-medium text-[14px] transition-colors">Z01 Abaya <span class="text-white/50 text-xs ml-1 font-normal">(Size ${item.size})</span></div>
-                                <button type="button" onclick='removeCartItem(${sigJson})' class="text-white/30 hover:text-white transition-colors p-1 -mr-2 -mt-1 tap-none" title="Remove item">
-                                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-                                </button>
-                            </div>
-                            ${priceOrOOS}
+            <div class="flex gap-4 pb-5 border-b border-white/10 relative group last:border-0 last:pb-0 transition-all duration-300">
+                <img src="${item.image}" class="w-20 h-24 object-cover rounded-lg border border-white/10 transition-all duration-300" alt="${item.model}">
+                <div class="flex-1 flex flex-col justify-between">
+                    <div>
+                        <div class="flex justify-between items-start">
+                            <div class="text-white font-medium text-[14px] transition-colors">${item.model} ${item.series} <span class="text-white/50 text-xs ml-1 font-normal">(Size ${item.size})</span></div>
+                            <button type="button" onclick="CartManager.removeItem('${item.id}')" class="text-white/30 hover:text-white transition-colors p-1 -mr-2 -mt-1 tap-none" title="Remove item">
+                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                            </button>
                         </div>
-                        ${qtyOrEmpty}
+                        <div class="mt-0.5">
+                            <span class="text-luxe font-medium text-sm">RM ${itemTotal.toFixed(2)}</span>
+                        </div>
+                        ${altHtml}
+                    </div>
+                    <div class="flex items-center mt-3">
+                        <div class="flex items-center rounded-md border border-white/15 bg-white/[0.02]">
+                            <button type="button" onclick="CartManager.updateQty('${item.id}', -1)" class="px-3 py-1 text-white/50 hover:text-white tap-none">&minus;</button>
+                            <span class="w-6 text-center text-xs font-medium">${item.qty}</span>
+                            <button type="button" onclick="CartManager.updateQty('${item.id}', 1)" class="px-3 py-1 text-white/50 hover:text-white tap-none">&plus;</button>
+                        </div>
                     </div>
                 </div>
-            `;
-        });
-
-        // Add Another Piece Button
-        html += `
-            <div class="mt-4 pt-4 border-t border-white/10">
-                <button onclick="closeCart()" class="w-full py-2.5 border border-dashed border-white/20 rounded-xl text-white/60 text-[10px] uppercase tracking-widest hover:border-luxe hover:text-luxe transition-colors tap-none flex items-center justify-center gap-2">
-                    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-                    Add Another Piece
-                </button>
             </div>
         `;
+        });
+
+        html += `
+        <div class="mt-4 pt-4 border-t border-white/10">
+            <button onclick="closeCartDrawer()" class="w-full py-2.5 border border-dashed border-white/20 rounded-xl text-white/60 text-[10px] uppercase tracking-widest hover:border-luxe hover:text-luxe transition-colors tap-none flex items-center justify-center gap-2">
+                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                Add Another Piece
+            </button>
+        </div>
+    `;
 
         container.innerHTML = html;
-
-        // Visual Cart Totals Math
-        totalDiscount += cartState.discount || 0; // Catch generic cart-level promos if any
-        document.getElementById('cart-subtotal').textContent = `RM ${visualSubtotal.toFixed(2)}`;
-
-        const discRow = document.getElementById('cart-discount-row');
-        if (totalDiscount > 0) {
-            document.getElementById('cart-discount-label').textContent = "Total Discount";
-            document.getElementById('cart-discount-amount').textContent = `-RM ${totalDiscount.toFixed(2)}`;
-            document.getElementById('cart-discount-amount').className = "text-luxe font-medium";
-            discRow.classList.remove('hidden');
-            discRow.classList.add('flex');
-        } else {
-            discRow.classList.add('hidden');
-            discRow.classList.remove('flex');
-        }
-
-        updateGrandTotal();
-
-        const shipEl = document.getElementById('cart-shipping');
-        if (shipEl && cartState.shippingFee > 0 && shipEl.textContent.trim() === 'Pending') {
-            shipEl.textContent = `RM ${cartState.shippingFee.toFixed(2)} (J&T Express)`;
-        }
+        subtotalEl.textContent = `RM ${visualSubtotal.toFixed(2)}`;
     }
 
     function updateGrandTotal() {
