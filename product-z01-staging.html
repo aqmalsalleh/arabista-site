@@ -1015,12 +1015,14 @@
         }
 
         const currentPrice = activePromoPrice !== null ? activePromoPrice : activeRetailPrice;
+        const currentRetailPrice = activeRetailPrice;
         const selectedAlterations = getSelectedAlterationsForCart();
         const cartItem = {
             id: `Z01-${Date.now()}`,
             model: currentModel,
             series: 'Zahra Series',
             size: selectedSize,
+            retailPrice: currentRetailPrice,
             price: currentPrice,
             alterations: { ...selectedAlterations },
             image: 'images/z01-1-hero.webp',
@@ -1051,7 +1053,9 @@
     // --- ADD TO CART (localStorage via CartManager) ---
     document.getElementById('add-to-cart-btn').addEventListener('click', addZ01ToLocalCartAndOpenDrawer);
 
+    // --- CART UI RENDERER ---
     function renderCart() {
+        const currentRetailPrice = activeRetailPrice;
         const container = document.getElementById('cart-items-container');
         const subtotalEl = document.getElementById('cart-subtotal');
 
@@ -1059,27 +1063,57 @@
 
         const items = CartManager.getItems();
         let visualSubtotal = 0;
+        let totalDiscount = 0;
 
         if (items.length === 0) {
             container.innerHTML = `<div class="text-center text-white/40 py-10 text-sm">Your cart is currently empty.</div>`;
-            subtotalEl.innerText = `RM 0.00`;
+            subtotalEl.textContent = `RM 0.00`;
+            const discRow = document.getElementById('cart-discount-row');
+            if (discRow) {
+                discRow.classList.add('hidden');
+                discRow.classList.remove('flex');
+            }
             return;
         }
 
         let html = '';
         items.forEach(item => {
             let altHtml = '';
+            let altCost = 0;
+
             if (item.alterations && Object.keys(item.alterations).length > 0) {
                 altHtml = '<div class="text-white/40 text-[11px] mt-1.5 leading-relaxed space-y-0.5">';
                 for (let [k, v] of Object.entries(item.alterations)) {
                     let priceDisplay = v.isPromo ? `<del class="text-white/30">RM ${v.standardPrice.toFixed(2)}</del> <span class="text-luxe font-bold ml-1">${v.price === 0 ? "FREE" : `RM ${v.price.toFixed(2)}`}</span>` : `+RM ${v.price.toFixed(2)}`;
                     altHtml += `<div>${v.name}: ${v.val} <span class="text-white/20 mx-1">|</span> ${priceDisplay}</div>`;
+                    altCost += (v.price || 0);
                 }
                 altHtml += '</div>';
             }
 
-            const itemTotal = item.price * item.qty;
-            visualSubtotal += itemTotal;
+            // Handle dynamic discount math
+            const itemRetail = item.retailPrice || currentRetailPrice || item.price;
+            const itemDiscount = Math.max(0, itemRetail - item.price);
+
+            const totalUnitPaid = item.price + altCost;
+            const lineTotal = totalUnitPaid * item.qty;
+
+            visualSubtotal += lineTotal;
+            totalDiscount += (itemDiscount * item.qty);
+
+            // Strikethrough Logic for the UI
+            const priceOrOOS = `
+            <div class="mt-0.5">
+                ${itemDiscount > 0
+                    ? `<del class="text-white/30 mr-1.5 text-xs">RM ${((itemRetail + altCost) * item.qty).toFixed(2)}</del><span class="text-luxe font-bold text-sm">RM ${lineTotal.toFixed(2)}</span>`
+                    : `<span class="text-luxe font-medium text-sm">RM ${lineTotal.toFixed(2)}</span>`
+                }
+            </div>
+            ${altHtml}
+        `;
+
+            // Proper Trash Can SVG
+            const trashSvg = `<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>`;
 
             html += `
             <div class="flex gap-4 pb-5 border-b border-white/10 relative group last:border-0 last:pb-0 transition-all duration-300">
@@ -1088,14 +1122,11 @@
                     <div>
                         <div class="flex justify-between items-start">
                             <div class="text-white font-medium text-[14px] transition-colors">${item.model} ${item.series} <span class="text-white/50 text-xs ml-1 font-normal">(Size ${item.size})</span></div>
-                            <button type="button" onclick="CartManager.removeItem('${item.id}')" class="text-white/30 hover:text-white transition-colors p-1 -mr-2 -mt-1 tap-none" title="Remove item">
-                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                            <button type="button" onclick="CartManager.removeItem('${item.id}')" class="text-white/30 hover:text-red-400 transition-colors p-1 -mr-2 -mt-1 tap-none" title="Remove item">
+                                ${trashSvg}
                             </button>
                         </div>
-                        <div class="mt-0.5">
-                            <span class="text-luxe font-medium text-sm">RM ${itemTotal.toFixed(2)}</span>
-                        </div>
-                        ${altHtml}
+                        ${priceOrOOS}
                     </div>
                     <div class="flex items-center mt-3">
                         <div class="flex items-center rounded-md border border-white/15 bg-white/[0.02]">
@@ -1120,6 +1151,21 @@
 
         container.innerHTML = html;
         subtotalEl.textContent = `RM ${visualSubtotal.toFixed(2)}`;
+
+        // Toggle Overall Discount Row
+        const discRow = document.getElementById('cart-discount-row');
+        if (discRow) {
+            if (totalDiscount > 0) {
+                document.getElementById('cart-discount-label').textContent = "Total Discount";
+                document.getElementById('cart-discount-amount').textContent = `-RM ${totalDiscount.toFixed(2)}`;
+                document.getElementById('cart-discount-amount').className = "text-luxe font-medium";
+                discRow.classList.remove('hidden');
+                discRow.classList.add('flex');
+            } else {
+                discRow.classList.add('hidden');
+                discRow.classList.remove('flex');
+            }
+        }
     }
 
     function updateGrandTotal() {
