@@ -1,0 +1,1738 @@
+<!doctype html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0" />
+  <title>D02 Dahlia Series Abaya — Arabista (STAGING)</title>
+  <meta name="theme-color" content="#111213" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { display: ['"Cormorant Garamond"', 'serif'], sans: ['Inter', 'ui-sans-serif', 'system-ui'] },
+          colors: { brand: '#0F0F10', gold: '#D4AF37', luxe: '#C0A062', ink: '#111213' },
+          boxShadow: { soft: '0 10px 30px rgba(0,0,0,.08)' },
+          animation: {
+            'spin-slow': 'spin 1.5s cubic-bezier(0.4, 0, 0.2, 1) infinite',
+            'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    /* D01 Premium Aesthetics & Animations */
+    body { background-color: #111213; color: #ffffff; }
+    .hide-scrollbar::-webkit-scrollbar { display: none; }
+    .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    input[type="number"]::-webkit-inner-spin-button, input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+    .thumb-active { border-color: #C0A062 !important; opacity: 1 !important; }
+
+    .reveal { opacity: 0; transform: translateY(30px); transition: all 1.8s cubic-bezier(0.16, 1, 0.3, 1); }
+    .reveal.show { opacity: 1; transform: translateY(0); }
+    .tap-none { -webkit-tap-highlight-color: transparent; }
+    .review-text.clamp { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; overflow: hidden; }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+    /* --- ARABISTA PREMIUM GALLERY CSS --- */
+    .arabista-gallery-main {
+        scroll-snap-type: x mandatory;
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+        cursor: grab;
+    }
+    .arabista-gallery-main::-webkit-scrollbar { display: none; }
+
+    .arabista-gallery-main.is-dragging {
+        scroll-snap-type: none !important;
+        cursor: grabbing !important;
+    }
+
+    .arabista-gallery-img {
+        scroll-snap-align: center;
+        user-select: none;
+        -webkit-user-drag: none;
+        will-change: transform, opacity;
+        transform: translateZ(0); /* Force GPU Acceleration */
+    }
+
+    .arabista-gallery-thumbs {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+    }
+    .arabista-gallery-thumbs::-webkit-scrollbar { display: none; }
+
+    /* Layout rails for architect scroll math (not part of engine physics block) */
+    .arabista-gallery-main {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: nowrap;
+        height: 100%;
+        width: 100%;
+        min-height: 0;
+        overflow-x: auto;
+        overflow-y: hidden;
+    }
+    .arabista-gallery-img {
+        flex: 0 0 100%;
+        min-width: 100%;
+        height: 100%;
+        object-fit: cover;
+        box-sizing: border-box;
+    }
+    .arabista-gallery-img::-webkit-media-controls { display: none !important; }
+    video.arabista-gallery-img { object-fit: cover; pointer-events: none; }
+
+    /* --- ARABISTA LIGHTBOX CSS (FRAMED CANVAS) --- */
+    #arabista-lightbox.is-open { opacity: 1; pointer-events: auto; }
+    #arabista-lightbox.is-open #lightbox-frame { transform: scale(1); }
+    .lb-item { scroll-snap-align: center; flex: 0 0 100%; min-width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; padding: 2rem; }
+    @media (max-width: 640px) { .lb-item { padding: 0.5rem; } }
+    .lb-media { 
+        max-width: 100%; 
+        max-height: 100%; 
+        object-fit: contain; 
+        border: 1px solid rgba(192, 160, 98, 0.5); 
+        box-shadow: 0 0 30px rgba(192, 160, 98, 0.15); 
+        background-color: #111213;
+        border-radius: 0.5rem;
+    }
+    .lb-media::-webkit-media-controls { display: none !important; }
+
+    /* --- ARABISTA OOS AESTHETIC --- */
+    .size-btn:disabled {
+        color: rgba(255, 255, 255, 0.25) !important;
+        border-color: rgba(255, 255, 255, 0.08) !important;
+        cursor: not-allowed !important;
+        position: relative;
+        overflow: hidden;
+        background: transparent !important;
+    }
+    .size-btn:disabled::after {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: -15%;
+        width: 130%;
+        height: 1px;
+        background-color: rgba(255, 255, 255, 0.15);
+        transform: rotate(-25deg);
+        pointer-events: none;
+    }
+  </style>
+</head>
+<body class="font-sans antialiased pb-8 selection:bg-luxe selection:text-ink max-w-[100vw] overflow-x-hidden relative bg-brand text-white">
+
+  <header class="fixed top-0 inset-x-0 z-50 backdrop-blur bg-brand/80">
+    <div class="max-w-screen-xl mx-auto px-4 sm:px-6">
+      <div class="h-14 grid grid-cols-3 items-center">
+        <a href="index-staging.html" class="font-display tracking-[0.18em] text-[14px] text-white tap-none">ARABISTA</a>
+
+        <a href="index-staging.html" class="justify-self-center tap-none">
+          <img src="images/logo.png" alt="Arabista logo" class="h-11 w-auto">
+        </a>
+
+        <div class="justify-self-end flex items-center">
+          <button type="button" id="nav-cart-btn" class="relative p-2 -mr-2 text-white hover:text-luxe transition-colors tap-none" aria-label="Open cart">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="pt-20">
+    <nav class="max-w-screen-xl mx-auto px-4 sm:px-6 text-xs text-white/60">
+      <ol class="flex items-center gap-2 py-3">
+        <li><a href="index-staging.html" class="hover:text-luxe transition-colors">Home</a></li><li>›</li>
+        <li><a href="products-staging.html" class="hover:text-luxe transition-colors">Products</a></li><li>›</li>
+        <li><a href="abaya-staging.html" class="hover:text-luxe transition-colors">Abaya</a></li><li>›</li>
+        <li class="text-white">D02</li>
+      </ol>
+    </nav>
+
+    <section class="max-w-screen-xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 px-4 sm:px-6 pt-4 pb-4 min-w-0 w-full overflow-hidden">
+
+      <div class="lg:col-span-7 flex flex-col gap-4 min-w-0 w-full reveal">
+          <div class="relative aspect-[4/5] bg-white/5 rounded-2xl overflow-hidden shadow-soft ring-1 ring-white/10 group">
+              <div class="arabista-gallery-main relative z-0 h-full w-full min-h-0"></div>
+          </div>
+          <div class="arabista-gallery-thumbs flex gap-3 overflow-x-auto hide-scrollbar pb-2" id="gallery-thumbs"></div>
+      </div>
+
+      <div class="lg:col-span-5 flex flex-col min-w-0 w-full lg:pl-4">
+          <div class="reveal">
+              <h1 class="font-display text-3xl sm:text-4xl text-white mb-3 font-medium tracking-wide mt-2">ARABISTA | Abaya Arab</h1>
+              <p class="text-white/60 font-light text-sm mb-2 leading-relaxed">Dahlia Series (Code D02) Nidha Premium Dubai</p>
+              <div class="mb-6">
+                  <a href="#pdp-review-section" class="group inline-flex items-center gap-3 px-4 py-2.5 rounded-full bg-white/[0.03] border border-white/10 hover:border-luxe/50 hover:bg-white/[0.05] transition-all duration-300 tap-none backdrop-blur-sm shadow-[0_0_15px_rgba(0,0,0,0.1)]">
+
+                      <div class="flex items-center gap-1.5">
+                          <svg class="w-3.5 h-3.5 text-luxe drop-shadow-[0_0_8px_rgba(192,160,98,0.5)]" viewBox="0 0 20 20" fill="currentColor">
+                              <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                          </svg>
+                          <span class="text-white font-semibold text-[11px] tracking-wider">4.9</span>
+                      </div>
+
+                      <div class="w-px h-3.5 bg-white/20"></div>
+
+                      <span class="text-white/50 text-[10px] uppercase tracking-widest">251 Reviews</span>
+
+                      <div class="w-px h-3.5 bg-white/20 hidden sm:block"></div>
+
+                      <div class="hidden sm:flex items-center gap-1.5">
+                          <span class="relative flex h-2 w-2">
+                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                            <span class="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
+                          </span>
+                          <span class="text-white/80 text-[10px] uppercase tracking-widest font-medium">1.4K Sold on TikTok</span>
+                      </div>
+
+                      <svg class="w-3.5 h-3.5 text-white/40 group-hover:text-luxe group-hover:translate-x-1 transition-all duration-300 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                      </svg>
+                  </a>
+              </div>
+
+              <div class="text-xl text-white font-medium mb-3 min-h-[28px] flex items-center" id="pdp-price-row">
+                  <div class="h-6 w-32 bg-white/10 rounded animate-pulse"></div>
+              </div>
+              <div class="mt-4 mb-8 flex flex-wrap gap-2 text-[10px] tracking-widest uppercase font-medium">
+                  <span class="px-2.5 py-1 rounded-full bg-white/10 border border-white/10">Premium Nidha</span>
+                  <span class="px-2.5 py-1 rounded-full bg-white/10 border border-white/10">10″ front zip</span>
+                  <span class="px-2.5 py-1 rounded-full bg-white/10 border border-white/10">Pockets (L/R)</span>
+                  <span class="px-2.5 py-1 rounded-full bg-white/10 border border-white/10">Inner sleeve lining</span>
+                  <span class="px-2.5 py-1 rounded-full bg-white/10 border border-white/10">Free shawl 1.9×0.7 m</span>
+                  <span class="px-2.5 py-1 rounded-full bg-white/10 border border-white/10">Premium gift box</span>
+                  <span class="px-2.5 py-1 rounded-full bg-white/10 border border-white/10">Fast delivery</span>
+              </div>
+          </div>
+
+          <div class="reveal" style="transition-delay: 150ms;">
+              <div id="size-calculator-section" class="scroll-mt-24 bg-white/5 border border-white/10 rounded-2xl p-5 mb-8 shadow-soft">
+              <h3 class="text-sm font-medium text-white uppercase tracking-widest mb-4 flex items-center gap-2">
+                  <svg class="w-4 h-4 text-luxe" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+                  Size Calculator
+              </h3>
+              <div class="grid grid-cols-2 gap-4 mb-4">
+                  <div>
+                      <label class="text-[10px] uppercase text-gray-500 tracking-wider mb-2 block">Height (cm)</label>
+                      <input type="number" id="calc-height" class="w-full bg-transparent border-b border-white/20 text-white pb-2 text-[16px] focus:outline-none focus:border-luxe transition-colors" placeholder="e.g. 160">
+                  </div>
+                  <div>
+                      <label class="text-[10px] uppercase text-gray-500 tracking-wider mb-2 block">Weight (kg)</label>
+                      <input type="number" id="calc-weight" class="w-full bg-transparent border-b border-white/20 text-white pb-2 text-[16px] focus:outline-none focus:border-luxe transition-colors" placeholder="e.g. 55">
+                  </div>
+              </div>
+              <button type="button" onclick="calculateSize()" class="text-xs uppercase tracking-widest text-luxe hover:text-white transition-colors tap-none">Suggest Size &rarr;</button>
+              <p id="calc-result" class="mt-3 text-sm text-green-400 hidden font-medium"></p>
+          </div>
+
+          <div class="mb-8">
+              <div class="flex justify-between items-center mb-4 gap-3">
+                  <div class="flex flex-col sm:flex-row sm:items-baseline sm:gap-3 min-w-0">
+                      <label class="text-sm font-medium text-white uppercase tracking-widest">Select Size</label>
+                      <span id="sizeChosen" class="text-[11px] text-white/45 font-medium tracking-wide truncate"></span>
+                  </div>
+                  <button type="button" onclick="document.getElementById('size-modal').style.display='flex'; setTimeout(()=>document.getElementById('size-modal').classList.add('show'),10);" class="text-xs text-gray-500 underline decoration-gray-700 underline-offset-4 hover:text-white tap-none shrink-0">Size Guide</button>
+              </div>
+              <div class="grid grid-cols-4 lg:grid-cols-6 gap-3" id="size-grid"></div>
+          </div>
+          </div>
+
+          <div class="reveal" style="transition-delay: 300ms;">
+              <div class="border border-luxe/30 rounded-2xl overflow-hidden mb-10 shadow-[0_0_15px_rgba(192,160,98,0.05)] transition-all duration-300 bg-white/[0.02]">
+              <button type="button" class="w-full p-5 flex justify-between items-center text-left tap-none group" id="toggle-alt-btn">
+                  <div>
+                      <h3 class="text-luxe font-medium text-sm uppercase tracking-widest mb-1 group-hover:text-white transition-colors">Alteration Service</h3>
+                      <p class="text-xs text-gray-400">Guaranteed Perfect Fit</p>
+                  </div>
+                  <div class="w-10 h-6 bg-white/10 rounded-full relative transition-colors duration-300" id="alt-switch">
+                      <div class="w-4 h-4 bg-white rounded-full absolute top-1 left-1 transition-transform duration-300" id="alt-knob"></div>
+                  </div>
+              </button>
+
+              <div id="alt-drawer" class="hidden p-5 bg-ink/50 border-t border-luxe/20 flex-col gap-6">
+                  <div id="alt-loading" class="text-xs text-gray-500 animate-pulse uppercase tracking-widest">Loading studio configs...</div>
+                  <div id="alt-fields-container" class="hidden flex-col gap-5"></div>
+              </div>
+          </div>
+
+          <button type="button" id="add-to-cart-btn" disabled class="w-full bg-luxe text-ink font-medium uppercase tracking-widest py-4 rounded-xl hover:opacity-90 transition shadow-soft mb-10 disabled:opacity-50 disabled:cursor-not-allowed tap-none">
+              CONNECTING TO SERVER...
+          </button>
+          <input type="hidden" id="qty" value="1" />
+          </div>
+
+          <div class="flex flex-col gap-3 reveal">
+              <div class="rounded-2xl border border-white/10 p-5 bg-white/[0.02]">
+                  <button type="button" class="flex justify-between items-center w-full text-left group accordion-btn tap-none">
+                      <span class="cursor-pointer text-lg font-display text-white capitalize">Description</span>
+                      <svg class="w-5 h-5 text-gray-500 group-hover:text-white transition-transform duration-300 icon-arrow" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                  </button>
+                  <div class="accordion-content hidden mt-4 text-sm text-gray-400 leading-relaxed animate-[fadeIn_0.3s_ease-in-out]">
+                      Material Premium Nidha Dubai - Lembut, sejuk, beralun dan jatuh terletak atas badan. Didatangi dengan Zip Menyusu, Poket Kiri & Kanan dan Inner Seluruh Lengan (Mesra wudhu' & lengan tidak akan terdedah).
+                  </div>
+              </div>
+
+              <div class="rounded-2xl border border-white/10 p-5 bg-white/[0.02]">
+                  <button type="button" class="flex justify-between items-center w-full text-left group accordion-btn tap-none">
+                      <span class="cursor-pointer text-lg font-display text-white capitalize">Features</span>
+                      <svg class="w-5 h-5 text-gray-500 group-hover:text-white transition-transform duration-300 icon-arrow" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                  </button>
+                  <div class="accordion-content hidden mt-4 text-sm text-gray-400 leading-relaxed animate-[fadeIn_0.3s_ease-in-out]">
+                      <ul class="space-y-3">
+                          <li class="flex gap-3 items-center"><svg class="w-4 h-4 text-luxe shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg> Cutting 1-Lapis</li>
+                          <li class="flex gap-3 items-center"><svg class="w-4 h-4 text-luxe shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg> Zip Menyusu Hadapan</li>
+                          <li class="flex gap-3 items-center"><svg class="w-4 h-4 text-luxe shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg> Poket Kiri & Kanan</li>
+                          <li class="flex gap-3 items-center"><svg class="w-4 h-4 text-luxe shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg> Inner Seluruh Lengan (Mesra Wudhu')</li>
+                      </ul>
+                  </div>
+              </div>
+
+              <div class="rounded-2xl border border-white/10 p-5 bg-white/[0.02]">
+                  <button type="button" class="flex justify-between items-center w-full text-left group accordion-btn tap-none">
+                      <span class="cursor-pointer text-lg font-display text-white capitalize">Included in Box</span>
+                      <svg class="w-5 h-5 text-gray-500 group-hover:text-white transition-transform duration-300 icon-arrow" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                  </button>
+                  <div class="accordion-content hidden mt-4 text-sm text-gray-400 leading-relaxed animate-[fadeIn_0.3s_ease-in-out]">
+                      <ul class="space-y-3">
+                          <li class="flex gap-3 items-center"><svg class="w-4 h-4 text-luxe shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg> Free Shawl Lebar (Chiffon) berukuran 190cm x 70cm</li>
+                          <li class="flex gap-3 items-center"><svg class="w-4 h-4 text-luxe shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg> Packaging kotak eksklusif, sesuai dijadikan hadiah.</li>
+                      </ul>
+                  </div>
+              </div>
+          </div>
+      </div>
+    </section>
+
+    <section id="size-chart-section" class="max-w-screen-xl mx-auto px-4 sm:px-6 mt-2">
+      <div class="rounded-2xl border border-luxe/30 p-5 sm:p-6 bg-white/[0.02] shadow-[0_0_15px_rgba(192,160,98,0.05)] reveal transition-all duration-300">
+        <h2 class="font-display text-2xl sm:text-3xl text-white mb-6">Size Chart</h2>
+        <div class="overflow-x-auto hide-scrollbar">
+          <table class="w-full text-center text-sm">
+            <thead class="text-luxe uppercase tracking-widest text-[10px]">
+              <tr class="border-b border-white/10">
+                <th class="py-3 px-2 font-medium">Size</th>
+                <th class="py-3 px-2 font-medium">Shoulder (in)</th>
+                <th class="py-3 px-2 font-medium">Bust (in)</th>
+                <th class="py-3 px-2 font-medium">Sleeve (in)</th>
+                <th class="py-3 px-2 font-medium">Length (in)</th>
+              </tr>
+            </thead>
+            <tbody class="text-white/80">
+              <tr class="border-b border-white/5 hover:bg-white/5 transition-colors cursor-default"><td class="py-3 px-2 font-medium text-white">XS</td><td class="py-3 px-2">14</td><td class="py-3 px-2">36</td><td class="py-3 px-2">22</td><td class="py-3 px-2">55</td></tr>
+              <tr class="border-b border-white/5 hover:bg-white/5 transition-colors cursor-default"><td class="py-3 px-2 font-medium text-white">S</td><td class="py-3 px-2">15</td><td class="py-3 px-2">39</td><td class="py-3 px-2">22</td><td class="py-3 px-2">55</td></tr>
+              <tr class="border-b border-white/5 hover:bg-white/5 transition-colors cursor-default"><td class="py-3 px-2 font-medium text-white">M</td><td class="py-3 px-2">16</td><td class="py-3 px-2">40</td><td class="py-3 px-2">23</td><td class="py-3 px-2">57</td></tr>
+              <tr class="border-b border-white/5 hover:bg-white/5 transition-colors cursor-default"><td class="py-3 px-2 font-medium text-white">L</td><td class="py-3 px-2">16.5</td><td class="py-3 px-2">43</td><td class="py-3 px-2">23.5</td><td class="py-3 px-2">60</td></tr>
+              <tr class="border-b border-white/5 hover:bg-white/5 transition-colors cursor-default"><td class="py-3 px-2 font-medium text-white">XL</td><td class="py-3 px-2">17.5</td><td class="py-3 px-2">44</td><td class="py-3 px-2">23.5</td><td class="py-3 px-2">60</td></tr>
+              <tr class="border-b border-white/5 hover:bg-white/5 transition-colors cursor-default"><td class="py-3 px-2 font-medium text-white">XXL</td><td class="py-3 px-2">18</td><td class="py-3 px-2">46</td><td class="py-3 px-2">23.5</td><td class="py-3 px-2">60</td></tr>
+              <tr class="hover:bg-white/5 transition-colors cursor-default"><td class="py-3 px-2 font-medium text-white">XXXL</td><td class="py-3 px-2">19</td><td class="py-3 px-2">50</td><td class="py-3 px-2">23.5</td><td class="py-3 px-2">60</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <section id="pdp-review-section" class="max-w-screen-xl mx-auto px-4 sm:px-6 pt-10 pb-8 border-t border-white/5 scroll-mt-14">
+      <h2 class="font-display text-3xl sm:text-4xl text-white mb-10 tracking-wide reveal">What Our Customers Say</h2>
+      
+      <div class="flex flex-col mb-10 overflow-hidden reveal" style="transition-delay: 150ms;">
+        <div class="flex items-center gap-4 mb-6">
+            <div class="text-4xl font-semibold text-white">4.9</div>
+            <div class="text-luxe flex items-center">★★★★★</div>
+            <div class="w-px h-8 bg-white/20 mx-2"></div>
+            <div class="text-gray-400 text-sm">251 reviews</div>
+        </div>
+        <div id="reviewList" class="divide-y divide-white/10 border border-white/10 rounded-2xl overflow-hidden"></div>
+
+        <div class="mt-4 flex items-center justify-between">
+          <button id="prevBtn" type="button" class="px-4 py-2 rounded-xl ring-1 ring-white/15 hover:bg-white/5 text-sm disabled:opacity-40 disabled:cursor-not-allowed tap-none">Previous</button>
+          <div class="text-xs text-white/60">Page <span id="pageNum">1</span> of <span id="pageTotal">—</span></div>
+          <button id="nextBtn" type="button" class="px-4 py-2 rounded-xl ring-1 ring-white/15 hover:bg-white/5 text-sm disabled:opacity-40 disabled:cursor-not-allowed tap-none">Next</button>
+        </div>
+
+        <div id="tiktokPreview" class="hidden mt-4">
+          <a href="https://vt.tiktok.com/ZSHnDRphXWjk2-DE4dI/" target="_blank" class="block rounded-2xl border border-white/10 hover:border-white/20 transition tap-none">
+            <div class="p-4 sm:p-5 flex items-start gap-3">
+              <div class="shrink-0 rounded-xl bg-white p-2">
+                <svg width="28" height="28" viewBox="0 0 48 48" aria-hidden="true">
+                  <path d="M33.3 13.4c2.4 1.8 5.4 2.9 8.7 2.9v7.2c-3.7 0-7.1-1.1-10-3.1v12.1c0 7.4-6 13.4-13.4 13.4S5.2 39.9 5.2 32.5 11.2 19.1 18.6 19.1c1 0 2 .1 2.9.4v7.5c-.9-.3-1.9-.5-2.9-.5-4 0-7.2 3.2-7.2 7.2s3.2 7.2 7.2 7.2 7.2-3.2 7.2-7.2V5.9h7.3c.2 2.9 1.7 5.5 4.2 7.5z" fill="#000"/>
+                </svg>
+              </div>
+              <div class="min-w-0">
+                <div class="text-sm font-medium text-white">View on TikTok</div>
+                <div class="text-xs text-white/60 truncate">https://vt.tiktok.com/ZSHnDRphXWjk2-DE4dI/</div>
+                <p class="mt-2 text-sm text-white/70">See all reviews and purchase directly on TikTok Shop.</p>
+              </div>
+            </div>
+          </a>
+        </div>
+      </div>
+  </section>
+
+  <div id="size-modal" class="fixed inset-0 bg-ink/90 backdrop-blur-md z-[60] hidden flex-col items-center justify-center p-4 opacity-0 transition-opacity duration-300 [&.show]:opacity-100" style="display:none;">
+      <div class="bg-ink border border-white/10 rounded-2xl w-full max-w-2xl overflow-hidden shadow-2xl relative transform scale-95 transition-transform duration-300 [&.show]:scale-100">
+          <div class="p-6 border-b border-white/10 flex justify-between items-center bg-white/[0.02]">
+              <h2 class="font-display text-2xl text-white">Abaya Size Guide</h2>
+              <button type="button" onclick="closeSizeModal()" class="text-gray-400 hover:text-white tap-none"><svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
+          </div>
+          <div class="p-6 overflow-x-auto hide-scrollbar">
+              <table class="w-full text-center text-sm">
+                <thead class="text-luxe uppercase tracking-widest text-[10px]">
+                  <tr class="border-b border-white/10">
+                    <th class="py-3 px-2 font-medium">Size</th>
+                    <th class="py-3 px-2 font-medium">Shoulder (in)</th>
+                    <th class="py-3 px-2 font-medium">Bust (in)</th>
+                    <th class="py-3 px-2 font-medium">Sleeve (in)</th>
+                    <th class="py-3 px-2 font-medium">Length (in)</th>
+                  </tr>
+                </thead>
+                <tbody class="text-white/80">
+                  <tr class="border-b border-white/5 hover:bg-white/5 transition-colors cursor-default"><td class="py-3 px-2 font-medium text-white">XS</td><td class="py-3 px-2">14</td><td class="py-3 px-2">36</td><td class="py-3 px-2">22</td><td class="py-3 px-2">55</td></tr>
+                  <tr class="border-b border-white/5 hover:bg-white/5 transition-colors cursor-default"><td class="py-3 px-2 font-medium text-white">S</td><td class="py-3 px-2">15</td><td class="py-3 px-2">39</td><td class="py-3 px-2">22</td><td class="py-3 px-2">55</td></tr>
+                  <tr class="border-b border-white/5 hover:bg-white/5 transition-colors cursor-default"><td class="py-3 px-2 font-medium text-white">M</td><td class="py-3 px-2">16</td><td class="py-3 px-2">40</td><td class="py-3 px-2">23</td><td class="py-3 px-2">57</td></tr>
+                  <tr class="border-b border-white/5 hover:bg-white/5 transition-colors cursor-default"><td class="py-3 px-2 font-medium text-white">L</td><td class="py-3 px-2">16.5</td><td class="py-3 px-2">43</td><td class="py-3 px-2">23.5</td><td class="py-3 px-2">60</td></tr>
+                  <tr class="border-b border-white/5 hover:bg-white/5 transition-colors cursor-default"><td class="py-3 px-2 font-medium text-white">XL</td><td class="py-3 px-2">17.5</td><td class="py-3 px-2">44</td><td class="py-3 px-2">23.5</td><td class="py-3 px-2">60</td></tr>
+                  <tr class="border-b border-white/5 hover:bg-white/5 transition-colors cursor-default"><td class="py-3 px-2 font-medium text-white">XXL</td><td class="py-3 px-2">18</td><td class="py-3 px-2">46</td><td class="py-3 px-2">23.5</td><td class="py-3 px-2">60</td></tr>
+                  <tr class="hover:bg-white/5 transition-colors cursor-default"><td class="py-3 px-2 font-medium text-white">XXXL</td><td class="py-3 px-2">19</td><td class="py-3 px-2">50</td><td class="py-3 px-2">23.5</td><td class="py-3 px-2">60</td></tr>
+                </tbody>
+              </table>
+          </div>
+      </div>
+  </div>
+
+  <div id="cart-overlay" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden opacity-0 transition-opacity duration-300"></div>
+  <div id="cart-drawer" class="fixed inset-y-0 right-0 w-full sm:max-w-md bg-ink border-l border-white/5 z-50 transform translate-x-full transition-transform duration-300 flex flex-col shadow-2xl">
+
+      <div class="p-4 sm:p-6 border-b border-white/5 flex justify-between items-center shrink-0 relative z-10 bg-ink">
+          <h2 class="font-display text-2xl text-white">Your Cart</h2>
+          <button type="button" id="close-cart-btn" class="text-gray-400 hover:text-white tap-none"><svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
+      </div>
+
+      <div id="cart-notification" class="hidden bg-red-500/10 border-b border-red-500/20 p-3 text-center text-red-400 text-[11px] tracking-wide shadow-inner transition-all duration-300">
+          Another customer just secured the last piece of a selected item. Please review your cart.
+      </div>
+
+      <div class="flex-1 overflow-y-auto overscroll-contain p-4 sm:p-6 flex flex-col gap-8 hide-scrollbar" id="cart-scroll-area">
+          <div id="cart-items-container"></div>
+
+          <div class="space-y-3">
+              <label class="text-[10px] uppercase text-gray-500 tracking-wider block">Shipping Details</label>
+              <input type="text" id="cart-name" class="w-full bg-white/5 border border-white/10 rounded-lg text-white px-4 py-3 text-[16px] focus:border-luxe outline-none transition-colors" placeholder="Full Name">
+              <input type="tel" id="cart-phone" class="w-full bg-white/5 border border-white/10 rounded-lg text-white px-4 py-3 text-[16px] focus:border-luxe outline-none transition-colors" placeholder="Phone (e.g. 0123456789)">
+              <textarea id="cart-address" rows="2" class="w-full bg-white/5 border border-white/10 rounded-lg text-white px-4 py-3 text-[16px] focus:border-luxe outline-none transition-colors" placeholder="Address"></textarea>
+              <div class="grid grid-cols-2 gap-3">
+                  <input type="text" id="cart-postcode" class="w-full bg-white/5 border border-white/10 rounded-lg text-white px-4 py-3 text-[16px] focus:border-luxe outline-none transition-colors" placeholder="Postcode">
+                  <select id="cart-state" class="w-full bg-white/5 border border-white/10 rounded-lg text-white px-4 py-3 text-[16px] focus:border-luxe outline-none appearance-none transition-colors">
+                      <option value="">State...</option>
+                      <option value="Johor">Johor</option><option value="Kedah">Kedah</option><option value="Kelantan">Kelantan</option><option value="Melaka">Melaka</option><option value="Negeri Sembilan">Negeri Sembilan</option><option value="Pahang">Pahang</option><option value="Perak">Perak</option><option value="Perlis">Perlis</option><option value="Pulau Pinang">Pulau Pinang</option><option value="Sabah">Sabah</option><option value="Sarawak">Sarawak</option><option value="Selangor">Selangor</option><option value="Terengganu">Terengganu</option><option value="W.P. Kuala Lumpur">W.P. Kuala Lumpur</option><option value="W.P. Labuan">W.P. Labuan</option><option value="W.P. Putrajaya">W.P. Putrajaya</option>
+                  </select>
+              </div>
+              <button type="button" id="btn-calc-ship" class="hidden"></button>
+          </div>
+      </div>
+
+      <div class="p-4 sm:p-6 pb-8 sm:pb-6 border-t border-white/5 bg-ink shrink-0 relative z-10">
+          <div class="space-y-2 mb-6 text-sm p-5 rounded-2xl border border-luxe/20 bg-gradient-to-t from-brand via-ink to-ink shadow-[0_0_15px_rgba(192,160,98,0.05)]">
+              <div class="flex justify-between text-gray-400"><span>Subtotal</span><span id="cart-subtotal">RM 0.00</span></div>
+              <div class="flex justify-between text-luxe hidden" id="cart-discount-row"><span id="cart-discount-label">Discount</span><span id="cart-discount-amount">-RM 0.00</span></div>
+              <div class="flex justify-between text-gray-400"><span>Shipping</span><span id="cart-shipping">Pending</span></div>
+              <div class="flex justify-between text-white text-lg font-medium pt-3 border-t border-white/10 mt-3"><span>Grand Total</span><span id="cart-total">RM 0.00</span></div>
+          </div>
+          <button type="button" id="btn-checkout" class="w-full bg-luxe text-ink font-medium uppercase tracking-widest py-4 rounded-xl hover:opacity-90 transition shadow-soft disabled:opacity-50 disabled:cursor-not-allowed tap-none">Proceed to Payment</button>
+      </div>
+  </div>
+
+  <script>
+    const currentModel = 'D02';
+    const RETAIL_API_URL = "https://script.google.com/macros/s/AKfycbw4qGOeC2Sebod06uFnW2u-ZAkj7l8zRdzyWrFEyL1_7eDCn-ks9lVKrd1I226qHxRmQg/exec";
+
+    const baseSizes = {
+        'XS': { length: 55, sleeve: 22, shoulder: 14, bust: 36 },
+        'S': { length: 55, sleeve: 22, shoulder: 15, bust: 39 },
+        'M': { length: 57, sleeve: 23, shoulder: 16, bust: 40 },
+        'L': { length: 60, sleeve: 23.5, shoulder: 16.5, bust: 43 },
+        'XL': { length: 60, sleeve: 23.5, shoulder: 17.5, bust: 44 },
+        'XXL': { length: 60, sleeve: 23.5, shoulder: 18, bust: 46 },
+        'XXXL': { length: 60, sleeve: 23.5, shoulder: 19, bust: 50 }
+    };
+
+    let selectedSize = null;
+    let appConfig = {};
+    let inventoryMatrix = {};
+    let altEnabled = false;
+    let cartState = null;
+    let activeRetailPrice = 0; // Dynamically set on load
+    let activePromoPrice = null; // Dynamically set on load
+    let activeWeightKg = 1.0;
+
+    // Gallery Logic
+    const mediaFiles = [
+        { type: 'img', src: 'images/d02-1-hero.webp' }, { type: 'img', src: 'images/d02-2-angle.webp' },
+        { type: 'img', src: 'images/d02-3-portrait-1.webp' }, { type: 'img', src: 'images/d02-4-portrait-2.webp' },
+        { type: 'img', src: 'images/d02-5-closeup.webp' }, { type: 'img', src: 'images/d02-6-feature-zip.webp' },
+        { type: 'img', src: 'images/d02-7-feature-sleeve.webp' }, { type: 'img', src: 'images/d02-8-feature-pockets.webp' },
+        { type: 'vid', src: 'images/d02-9-video-flow.mp4', thumb: 'images/d02-9-video-poster.webp' } 
+    ];
+
+    const thumbContainer = document.getElementById('gallery-thumbs');
+    const mainGalleryMain = document.querySelector('.arabista-gallery-main');
+
+    mediaFiles.forEach((m, i) => {
+        if (mainGalleryMain) {
+            let mediaEl;
+            if (m.type === 'vid') {
+                mediaEl = document.createElement('video');
+                mediaEl.loop = true;
+                mediaEl.muted = true;
+                mediaEl.playsInline = true;
+            } else {
+                mediaEl = document.createElement('img');
+                mediaEl.alt = 'D02 Abaya';
+            }
+            mediaEl.className = 'arabista-gallery-img';
+            mediaEl.src = m.src;
+            if (i === 0) mediaEl.id = 'main-image';
+            mainGalleryMain.appendChild(mediaEl);
+        }
+        
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = `arabista-thumb-btn w-16 h-20 shrink-0 rounded-lg overflow-hidden border-2 border-transparent opacity-50 hover:opacity-100`;
+        if (m.type === 'img') {
+            btn.innerHTML = `<img src="${m.src}" class="w-full h-full object-cover" alt="">`;
+        } else {
+            btn.innerHTML = `<div class="relative w-full h-full"><img src="${m.thumb}" class="w-full h-full object-cover" alt=""><div class="absolute inset-0 bg-black/40 flex items-center justify-center"><svg class="w-6 h-6 text-white pl-1" fill="currentColor" viewBox="0 0 20 20"><path d="M4 4l12 6-12 6V4z"/></svg></div></div>`;
+        }
+        thumbContainer.appendChild(btn);
+    });
+
+    // Fetch Backend with Fortified Soft Lock & Retries
+    async function fetchConfig(retries = 2) {
+        const btn = document.getElementById('add-to-cart-btn');
+        
+        if (RETAIL_API_URL.includes("YOUR_RETAIL")) {
+            appConfig = {}; inventoryMatrix = {};
+            const altLoading = document.getElementById('alt-loading');
+            const altOpts = document.getElementById('alt-fields-container');
+            if (altLoading) altLoading.classList.add('hidden');
+            if (altOpts) altOpts.classList.remove('hidden');
+            document.querySelectorAll('.size-btn').forEach(b => b.classList.remove('animate-pulse', 'pointer-events-none', 'opacity-40'));
+            if (btn) btn.innerText = 'API NOT CONFIGURED';
+            return;
+        }
+        
+        for (let i = 0; i <= retries; i++) {
+            // 8-second window to safely absorb Google Apps Script cold starts
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 8000); 
+
+            try {
+                if (i > 0 && btn) btn.innerText = `CONNECTING... (RETRY ${i}/${retries})`;
+
+                const res = await fetch(`${RETAIL_API_URL}?action=get_config&model=${currentModel}`, { signal: controller.signal });
+                clearTimeout(timeoutId);
+                
+                if (!res.ok) throw new Error(`HTTP Error: ${res.status}`);
+                
+                const json = await res.json();
+                if (json.status !== 'success') throw new Error("API returned non-success status");
+
+                appConfig = json.data.config || {};
+                inventoryMatrix = json.data.matrix || {};
+                activeWeightKg = json.data.modelWeight || 1.0;
+
+                renderAlterationFields();
+                initializeDefaultPricing();
+                applyOOSStyling();
+
+                if (btn) btn.innerText = 'ADD TO CART';
+                
+                return;
+
+            } catch (error) {
+                clearTimeout(timeoutId);
+                console.warn(`Config fetch attempt ${i + 1} failed:`, error);
+                
+                if (i === retries) {
+                    console.error("All config fetch retries exhausted. Failing closed.");
+                    if (btn) {
+                        btn.innerText = 'CONNECTION ERROR - PLEASE REFRESH';
+                        btn.classList.add('bg-red-900', 'text-white');
+                        btn.classList.remove('hover:bg-brand');
+                        btn.disabled = true;
+                    }
+                }
+            }
+        }
+    }
+
+    // --- DYNAMIC PRICING ENGINE ---
+    function initializeDefaultPricing() {
+        let defaultRetail = 0;
+        let defaultPromo = null;
+
+        // Scan the matrix to find baseline prices
+        for (let key in inventoryMatrix) {
+            const row = inventoryMatrix[key];
+            if (row.retailPrice > defaultRetail) defaultRetail = row.retailPrice;
+            if (row.promoPrice !== null) {
+                if (defaultPromo === null || row.promoPrice < defaultPromo) {
+                    defaultPromo = row.promoPrice;
+                }
+            }
+        }
+
+        // Fallback safety if DB is completely empty
+        if (defaultRetail === 0) defaultRetail = 265.00;
+
+        activeRetailPrice = defaultRetail;
+        activePromoPrice = defaultPromo;
+
+        const priceRow = document.getElementById('pdp-price-row');
+        const stickyPriceDisplay = document.getElementById('sticky-price-display');
+
+        let priceHtml = '';
+        if (activePromoPrice !== null && activePromoPrice < activeRetailPrice) {
+            priceHtml = `<del class="text-gray-500 text-lg mr-2">RM ${activeRetailPrice.toFixed(2)}</del><span class="text-luxe">RM ${activePromoPrice.toFixed(2)}</span>`;
+            if (stickyPriceDisplay) stickyPriceDisplay.innerHTML = `<span class="text-white/50 mr-2 text-[12px]">Base &middot;</span> <del class="text-gray-500 mr-2 text-[13px]">RM ${activeRetailPrice.toFixed(2)}</del><span class="text-luxe">RM ${activePromoPrice.toFixed(2)}</span>`;
+        } else {
+            priceHtml = `<span class="text-luxe">RM ${activeRetailPrice.toFixed(2)}</span>`;
+            if (stickyPriceDisplay) stickyPriceDisplay.innerHTML = `<span class="text-white/50 mr-2 text-[12px]">Base &middot;</span> <span class="text-white">RM ${activeRetailPrice.toFixed(2)}</span>`;
+        }
+
+        if (priceRow) priceRow.innerHTML = priceHtml;
+    }
+
+    // --- OOS AESTHETIC ENGINE ---
+    function applyOOSStyling() {
+        const btns = document.querySelectorAll('.size-btn');
+        btns.forEach(btn => {
+            // Strip the loading skeleton state now that data has arrived
+            btn.classList.remove('animate-pulse', 'pointer-events-none', 'opacity-40');
+
+            const size = btn.dataset.size;
+            const sku = `${currentModel}-${size}`;
+            const item = inventoryMatrix[sku];
+            
+            // Handle different variations of stock property naming from backend
+            const stockLevel = item ? (item.Available_To_Sell || item.stock || item.qty || 0) : 0;
+            
+            if (!item || stockLevel <= 0 || stockLevel === "") {
+                btn.disabled = true;
+                // Auto-deselect if the user somehow had an OOS size selected
+                if (selectedSize === size) {
+                    btn.classList.remove('ring-2', 'ring-white/60');
+                    selectedSize = '';
+                    document.getElementById('sizeChosen').textContent = 'Size: —';
+                    if (typeof updateMatrixPricingFromSize === 'function') updateMatrixPricingFromSize(null);
+                }
+            } else {
+                btn.disabled = false;
+            }
+        });
+        validateAlterations();
+    }
+
+    // Size & Matrix Logic
+    function renderSizeGrid() {
+        const grid = document.getElementById('size-grid');
+        Object.keys(baseSizes).forEach(size => {
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            // Start buttons in a locked, pulsing skeleton state
+            btn.className = "size-btn py-3 border border-white/15 bg-transparent text-white rounded-lg font-medium hover:border-white/40 transition-colors focus:outline-none tap-none animate-pulse pointer-events-none opacity-40";
+            btn.textContent = size;
+            btn.dataset.size = size;
+            btn.onclick = () => selectSize(size, btn);
+            grid.appendChild(btn);
+        });
+    }
+
+    function selectSize(size, btnElement) {
+        selectedSize = size;
+        const sizeChosenEl = document.getElementById('sizeChosen');
+        if (sizeChosenEl) sizeChosenEl.textContent = 'Size: ' + size;
+        document.querySelectorAll('.size-btn').forEach(b => b.className = "size-btn py-3 border border-white/15 bg-transparent text-white rounded-lg font-medium hover:border-white/40 transition-colors focus:outline-none tap-none");
+        btnElement.className = "size-btn py-3 border border-luxe bg-luxe text-ink rounded-lg font-medium shadow-[0_0_15px_rgba(192,160,98,0.3)] transition-colors focus:outline-none tap-none";
+
+        // Check Matrix for Alteration Permissions
+        const sku = `${currentModel}-${size}`;
+        const reqAlt = inventoryMatrix[sku] && inventoryMatrix[sku].requiresAlteration !== undefined 
+            ? inventoryMatrix[sku].requiresAlteration 
+            : true; // Default to true if not found
+            
+        const altBtn = document.getElementById('toggle-alt-btn');
+        
+        if (reqAlt === false) {
+            // Visually disable the button
+            altBtn.classList.add('opacity-40', 'pointer-events-none');
+            // Force drawer closed if it is currently open
+            if (typeof altEnabled !== 'undefined' && altEnabled === true) {
+                altEnabled = false;
+                document.getElementById('alt-knob').classList.remove('translate-x-4');
+                document.getElementById('alt-switch').classList.remove('bg-luxe'); 
+                document.getElementById('alt-switch').classList.add('bg-white/10');
+                document.getElementById('alt-drawer').classList.add('hidden'); 
+                document.getElementById('alt-drawer').classList.remove('flex');
+            }
+        } else {
+            // Enable the button
+            altBtn.classList.remove('opacity-40', 'pointer-events-none');
+        }
+
+        updateMatrixPricingFromSize(size);
+        validateAlterations();
+        renderAlterationFields();
+    }
+
+    function updateMatrixPricingFromSize(size) {
+        const priceRow = document.getElementById('pdp-price-row');
+        const stickyPriceDisplay = document.getElementById('sticky-price-display');
+        const stickyBtn = document.getElementById('sticky-btn');
+
+        if (size == null || size === '') {
+            initializeDefaultPricing();
+            if (stickyBtn) {
+                stickyBtn.textContent = 'Select Size';
+                stickyBtn.className = 'px-6 py-2.5 rounded-lg text-[10px] font-medium uppercase tracking-widest transition-all duration-300 tap-none bg-white/10 text-white hover:bg-white/20';
+            }
+            return;
+        }
+
+        const sku = `${currentModel}-${size}`;
+        const matrixRow = inventoryMatrix[sku];
+        if (matrixRow) {
+            activeRetailPrice = matrixRow.retailPrice;
+            activePromoPrice = matrixRow.promoPrice;
+            // activeWeightKg is now globally set on load via dictionary, no longer per-sku
+        }
+        
+        let priceHtml = '';
+        if (activePromoPrice !== null && activePromoPrice < activeRetailPrice) {
+            // Promo Active: Strike-through retail, show promo
+            priceHtml = `<del class="text-gray-500 mr-2 text-[13px]">RM ${activeRetailPrice.toFixed(2)}</del><span class="text-luxe">RM ${activePromoPrice.toFixed(2)}</span>`;
+            priceRow.innerHTML = `<del class="text-gray-500 text-lg mr-2">RM ${activeRetailPrice.toFixed(2)}</del><span class="text-luxe">RM ${activePromoPrice.toFixed(2)}</span>`;
+        } else {
+            // No Promo: Show standard retail
+            priceHtml = `<span class="text-white">RM ${activeRetailPrice.toFixed(2)}</span>`;
+            priceRow.textContent = `RM ${activeRetailPrice.toFixed(2)}`;
+        }
+
+        // --- STICKY BAR CONTEXT SYNC ---
+        if (stickyPriceDisplay) {
+            stickyPriceDisplay.innerHTML = `<span class="text-white/50 mr-2 text-[12px]">Size ${size} &middot;</span> ${priceHtml}`;
+        }
+        
+        if (stickyBtn) {
+            stickyBtn.textContent = "ADD TO CART";
+            stickyBtn.className = "px-6 py-2.5 rounded-lg text-[10px] font-medium uppercase tracking-widest transition-all duration-300 tap-none bg-luxe text-ink shadow-[0_0_15px_rgba(192,160,98,0.2)]";
+        }
+    }
+
+    function calculateSize() {
+        const h = parseFloat(document.getElementById('calc-height').value);
+        const w = parseFloat(document.getElementById('calc-weight').value);
+        const res = document.getElementById('calc-result');
+
+        if (!h || !w) {
+            res.innerHTML = "Please enter both values.";
+            res.className = "mt-3 text-sm text-red-400 font-medium reveal show";
+            res.classList.remove('hidden');
+            return;
+        }
+
+        // 1. Calculate True Width (BMI)
+        const heightM = h / 100;
+        const adjustedWeight = (h <= 155) ? (w - 3) : w;
+        const bmi = adjustedWeight / (heightM * heightM);
+
+        const order = ['XS', 'S', 'M', 'L', 'XL', 'XXL', 'XXXL'];
+        const baseLengths = { 'XS': 55, 'S': 55, 'M': 57, 'L': 60, 'XL': 60, 'XXL': 60, 'XXXL': 60 };
+        const trueShoulders = { 'XS': 14, 'S': 15, 'M': 16, 'L': 16.5, 'XL': 17.5, 'XXL': 18, 'XXXL': 19 };
+
+        let trueSize = "Size Not Available";
+        if (bmi < 19.53) trueSize = 'XS';
+        else if (bmi <= 22.27) trueSize = 'S';
+        else if (bmi <= 25) trueSize = 'M';
+        else if (bmi <= 27.73) trueSize = 'L';
+        else if (bmi <= 30.47) trueSize = 'XL';
+        else if (bmi <= 33.2) trueSize = 'XXL';
+        else if (bmi <= 37.11) trueSize = 'XXXL';
+
+        if (trueSize === "Size Not Available") {
+            res.innerHTML = "Size Not Available for these measurements.";
+            res.className = "mt-3 text-sm text-red-400 font-medium reveal show";
+            res.classList.remove('hidden');
+            return;
+        }
+
+        // 2. Calculate Ideal Length (Height Brackets)
+        let idealLength = 60;
+        if (h < 151) idealLength = 50;
+        else if (h <= 156) idealLength = 52;
+        else if (h <= 163) idealLength = 55;
+        else if (h <= 169) idealLength = 57;
+        else if (h <= 186) idealLength = 60;
+
+        // 3. The "Size Up" Safety Check (Never add fabric)
+        let finalSize = trueSize;
+        let finalSizeIdx = order.indexOf(finalSize);
+
+        while (finalSizeIdx < order.length - 1 && baseLengths[finalSize] < idealLength) {
+            finalSizeIdx++;
+            finalSize = order[finalSizeIdx];
+        }
+
+        // 4. Generate Formatting
+        const needsLengthAlteration = baseLengths[finalSize] > idealLength;
+        const needsShoulderAlteration = finalSize !== trueSize;
+
+        let alterText = "";
+        if (needsLengthAlteration && needsShoulderAlteration) {
+            alterText = `<br><span class="text-gray-400 text-[0.875rem] font-normal">Alter Length: ${idealLength}", Shoulder: ${trueShoulders[trueSize]}"</span>`;
+        } else if (needsLengthAlteration) {
+            alterText = `<br><span class="text-gray-400 text-[0.875rem] font-normal">Alter Length: ${idealLength}"</span>`;
+        } else if (needsShoulderAlteration) {
+            alterText = `<br><span class="text-gray-400 text-[0.875rem] font-normal">Alter Shoulder: ${trueShoulders[trueSize]}"</span>`;
+        }
+
+        res.innerHTML = `<span class="text-luxe font-medium">Recommended Size: ${finalSize}</span>${alterText}`;
+        res.className = "mt-3 text-sm reveal show";
+        res.classList.remove('hidden');
+
+        // Auto-select the size in the grid
+        document.querySelectorAll('.size-btn').forEach(btn => {
+            if (btn.textContent === finalSize) {
+                btn.click();
+            }
+        });
+    }
+
+    // Alteration Engine
+    document.getElementById('toggle-alt-btn').onclick = () => {
+        altEnabled = !altEnabled;
+        const knob = document.getElementById('alt-knob');
+        const sw = document.getElementById('alt-switch');
+        const drawer = document.getElementById('alt-drawer');
+        if (altEnabled) {
+            knob.classList.add('translate-x-4');
+            sw.classList.add('bg-luxe'); sw.classList.remove('bg-white/10');
+            drawer.classList.remove('hidden'); drawer.classList.add('flex');
+        } else {
+            knob.classList.remove('translate-x-4');
+            sw.classList.remove('bg-luxe'); sw.classList.add('bg-white/10');
+            drawer.classList.add('hidden'); drawer.classList.remove('flex');
+        }
+    };
+
+    function renderAlterationFields() {
+        const container = document.getElementById('alt-fields-container');
+        if (Object.keys(appConfig).length === 0) return;
+        document.getElementById('alt-loading').classList.add('hidden');
+        container.classList.remove('hidden');
+        container.innerHTML = '';
+
+        const services = [
+            { id: 'D02_ALT_LENGTH', label: 'Alter Labuh (Inches)', key: 'length' },
+            { id: 'D02_ALT_SLEEVE', label: 'Alter Lengan (Inches)', key: 'sleeve' },
+            { id: 'D02_ALT_SHOULDER', label: 'Alter Bahu (Inches)', key: 'shoulder' }
+        ];
+
+        services.forEach(s => {
+            const conf = appConfig[s.id];
+            if (!conf || !conf.isActive) return;
+            let priceHtml = ``;
+            if (conf.promoPrice !== null && conf.promoPrice < conf.standardPrice) {
+                const badgeText = conf.promoPrice === 0 ? "FREE" : `PROMO RM ${conf.promoPrice.toFixed(2)}`;
+                priceHtml = `<span class="line-through text-gray-500 mr-2">RM ${conf.standardPrice.toFixed(2)}</span><span class="text-green-400 font-bold">${badgeText}</span>`;
+            } else {
+                priceHtml = `<span class="text-gray-400">RM ${conf.standardPrice.toFixed(2)}</span>`;
+            }
+
+            const baseLimit = selectedSize ? baseSizes[selectedSize][s.key] : "--";
+            const limitHtml = selectedSize ? `<span class="text-luxe font-mono text-[10px] ml-2">(Max: ${baseLimit}")</span>` : ``;
+            const placeholderTxt = selectedSize ? ('\u2264 ' + baseLimit) : 'Select size first';
+
+            container.innerHTML += `
+                <div>
+                    <div class="flex justify-between items-end mb-2">
+                        <label class="text-[10px] uppercase text-gray-400 tracking-wider flex items-center">${s.label} ${limitHtml}</label>
+                        <div class="text-[10px] uppercase tracking-widest">${priceHtml}</div>
+                    </div>
+                    <input type="number" step="0.5" id="alt-input-${s.key}" data-key="${s.key}" ${!selectedSize ? 'disabled' : ''} class="alt-input w-full bg-black/50 border border-white/20 rounded-lg p-3 text-[16px] text-white focus:border-luxe outline-none transition-colors" placeholder="${placeholderTxt}">
+                    <p id="alt-err-${s.key}" class="text-xs text-red-400 mt-2 hidden"></p>
+                </div>
+            `;
+        });
+        document.querySelectorAll('.alt-input').forEach(inp => inp.addEventListener('input', validateAlterations));
+    }
+
+    function validateAlterations() {
+        const atc = document.getElementById('add-to-cart-btn');
+        if (atc && atc.innerText.includes('CONNECTION ERROR')) {
+            atc.disabled = true;
+            return;
+        }
+        if (!selectedSize) { document.getElementById('add-to-cart-btn').disabled = true; return; }
+        let isValid = true;
+        const base = baseSizes[selectedSize];
+        document.querySelectorAll('.alt-input').forEach(inp => {
+            const key = inp.getAttribute('data-key');
+            const val = parseFloat(inp.value);
+            const errEl = document.getElementById(`alt-err-${key}`);
+            if (val && val > base[key]) {
+                if (errEl) { errEl.textContent = `Cannot exceed base size (${base[key]}").`; errEl.classList.remove('hidden'); }
+                inp.classList.add('border-red-400');
+                isValid = false;
+            } else {
+                if (errEl) errEl.classList.add('hidden');
+                inp.classList.remove('border-red-400');
+            }
+        });
+        document.getElementById('add-to-cart-btn').disabled = !isValid;
+    }
+
+    // Accordions & Modals
+    document.querySelectorAll('.accordion-btn').forEach(btn => {
+        btn.onclick = () => {
+            const content = btn.nextElementSibling;
+            const icon = btn.querySelector('.icon-arrow');
+            content.classList.toggle('hidden');
+            icon.classList.toggle('rotate-180');
+        };
+    });
+    function closeSizeModal() {
+        const sm = document.getElementById('size-modal');
+        sm.classList.remove('show');
+        setTimeout(() => { sm.style.display = 'none'; }, 300);
+    }
+
+    // Cart Flow
+    function toggleCart(show) {
+        const overlay = document.getElementById('cart-overlay');
+        const drawer = document.getElementById('cart-drawer');
+        if (show) {
+            document.body.style.overflow = 'hidden';
+            overlay.classList.remove('hidden');
+            setTimeout(() => overlay.classList.remove('opacity-0'), 10);
+            drawer.classList.remove('translate-x-full');
+        } else {
+            document.body.style.overflow = '';
+            overlay.classList.add('opacity-0');
+            setTimeout(() => overlay.classList.add('hidden'), 300);
+            drawer.classList.add('translate-x-full');
+        }
+    }
+    document.getElementById('nav-cart-btn').onclick = () => toggleCart(true);
+    document.getElementById('close-cart-btn').onclick = () => toggleCart(false);
+    document.getElementById('cart-overlay').onclick = () => toggleCart(false);
+
+    function closeCart() {
+        if (cartState && (!cartState.items || cartState.items.length === 0)) {
+            const c = document.getElementById('cart-items-container');
+            if (c) c.innerHTML = '';
+            const subEl = document.getElementById('cart-subtotal');
+            if (subEl) subEl.textContent = 'RM 0.00';
+            const discRow = document.getElementById('cart-discount-row');
+            if (discRow) discRow.classList.add('hidden');
+            updateGrandTotal();
+        }
+        toggleCart(false);
+    }
+
+    // --- MULTI-LINE-ITEM CART ENGINE ---
+    document.getElementById('add-to-cart-btn').addEventListener('click', () => {
+        if (!selectedSize) {
+            alert("Please select a size first.");
+            document.getElementById('size-calculator-section')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            return;
+        }
+
+        const currentAlterations = {};
+        let altStandardSum = 0;
+        let altPaidSum = 0;
+
+        if (altEnabled) {
+            document.querySelectorAll('.alt-input').forEach(inp => {
+                const val = parseFloat(inp.value);
+                if (val) {
+                    const key = inp.getAttribute('data-key');
+                    const sId = key === 'length' ? 'D02_ALT_LENGTH' : (key === 'sleeve' ? 'D02_ALT_SLEEVE' : 'D02_ALT_SHOULDER');
+                    const conf = appConfig[sId];
+                    if (conf) {
+                        const stdPrice = conf.standardPrice || 0;
+                        const isPromo = conf.promoPrice !== null && conf.promoPrice < stdPrice;
+                        const charged = isPromo ? conf.promoPrice : stdPrice;
+
+                        const bmNames = { length: 'Labuh', sleeve: 'Lengan', shoulder: 'Bahu' };
+                        currentAlterations[key] = {
+                            name: bmNames[key] || (key.charAt(0).toUpperCase() + key.slice(1)),
+                            val: val + '"',
+                            price: charged,
+                            standardPrice: stdPrice,
+                            isPromo: isPromo
+                        };
+                        altStandardSum += stdPrice;
+                        altPaidSum += charged;
+                    }
+                }
+            });
+        }
+
+        const effectivePrice = activePromoPrice !== null ? activePromoPrice : activeRetailPrice;
+        const inputQty = parseInt(document.getElementById('qty').value) || 1;
+        const baseDiscount = activeRetailPrice - effectivePrice;
+        const altDiscount = altStandardSum - altPaidSum;
+        const totalUnitDiscount = baseDiscount + altDiscount;
+
+        // The Configuration Hash: Unique signature for this exact size + alt combo
+        const signature = `${currentModel}-${selectedSize}|${JSON.stringify(currentAlterations)}`;
+
+        // Initialize Cart State if empty
+        if (!cartState) {
+            cartState = {
+                items: [],
+                basePrice: 0, altCost: 0, weightKg: 0, totalQty: 0,
+                shippingFee: 0, discount: 0, promoLabel: '',
+                name: '', phone: '', email: '', address: '', state: '', postcode: ''
+            };
+        }
+
+        // Check if this exact configuration already exists in the cart
+        const existingItem = cartState.items.find(i => i.signature === signature);
+        if (existingItem) {
+            existingItem.qty += inputQty;
+        } else {
+            cartState.items.push({
+                signature: signature,
+                sku: `${currentModel}-${selectedSize}`,
+                size: selectedSize,
+                qty: inputQty,
+                unitRetailPrice: activeRetailPrice,
+                unitEffectivePrice: effectivePrice,
+                unitAltCost: altPaidSum,
+                unitDiscount: totalUnitDiscount,
+                unitWeight: activeWeightKg,
+                alterations: { ...currentAlterations }
+            });
+        }
+
+        updateCartTotals();
+        renderCart();
+
+        // Reset UI for next item
+        document.getElementById('qty').value = 1;
+        toggleCart(true);
+    });
+
+    // Helper: Recalculates root totals for checkout/shipping compatibility
+    function updateCartTotals() {
+        if (!cartState) return;
+        cartState.basePrice = 0; cartState.altCost = 0; cartState.weightKg = 0; cartState.totalQty = 0;
+
+        cartState.items.forEach(item => {
+            cartState.basePrice += item.unitEffectivePrice * item.qty;
+            cartState.altCost += item.unitAltCost * item.qty;
+            cartState.weightKg += item.unitWeight * item.qty;
+            cartState.totalQty += item.qty;
+        });
+
+        // Reset shipping if cart is emptied to force recalc
+        if (cartState.items.length === 0) cartState.shippingFee = 0;
+    }
+
+    // Helper: Internal Cart QTY Adjuster
+    window.updateCartItemQty = function(signature, delta) {
+        if (!cartState) return;
+        const item = cartState.items.find(i => i.signature === signature);
+        if (item) {
+            item.qty += delta;
+            if (item.qty <= 0) {
+                cartState.items = cartState.items.filter(i => i.signature !== signature);
+            }
+            updateCartTotals();
+            cartState.items.length === 0 ? closeCart() : renderCart();
+        }
+    };
+
+    // Helper: Remove Item
+    window.removeCartItem = function(signature) {
+        if (!cartState) return;
+        cartState.items = cartState.items.filter(i => i.signature !== signature);
+        updateCartTotals();
+        cartState.items.length === 0 ? closeCart() : renderCart();
+    };
+
+    function renderCart() {
+        if (!cartState) return;
+        const container = document.getElementById('cart-items-container');
+        if (!cartState.items || cartState.items.length === 0) return;
+
+        let html = '';
+        let visualSubtotal = 0;
+        let totalDiscount = 0;
+
+        cartState.items.forEach(item => {
+            let altHtml = '';
+            if (Object.keys(item.alterations).length > 0) {
+                altHtml = '<div class="text-white/40 text-[11px] mt-1.5 leading-relaxed space-y-0.5">';
+                for (let [k, v] of Object.entries(item.alterations)) {
+                    let priceDisplay = v.isPromo ? `<del class="text-white/30">RM ${v.standardPrice.toFixed(2)}</del> <span class="text-luxe font-bold ml-1">${v.price === 0 ? "FREE" : `RM ${v.price.toFixed(2)}`}</span>` : `+RM ${v.price.toFixed(2)}`;
+                    altHtml += `<div>${v.name}: ${v.val} <span class="text-white/20 mx-1">|</span> ${priceDisplay}</div>`;
+                }
+                altHtml += '</div>';
+            }
+
+            const itemPaid = (item.unitEffectivePrice + item.unitAltCost) * item.qty;
+            const itemSaved = (item.unitDiscount || 0) * item.qty;
+            const sigJson = JSON.stringify(item.signature);
+
+            // Only add to totals if the item is NOT sold out
+            if (!item.isSoldOut) {
+                visualSubtotal += (itemPaid + itemSaved);
+                totalDiscount += itemSaved;
+            }
+
+            // Aesthetic States based on Soft Reject
+            const isOOS = item.isSoldOut;
+            const cardBorder = isOOS ? 'border-red-500/30' : 'border-white/10';
+            const imgStyle = isOOS ? 'border-red-500/30 grayscale opacity-40' : 'border-white/10';
+            const titleStyle = isOOS ? 'text-white/40' : 'text-white';
+
+            let priceOrOOS = '';
+            let qtyOrEmpty = '';
+
+            if (isOOS) {
+                priceOrOOS = `<div class="mt-2 text-red-500/90 text-[10px] font-bold uppercase tracking-widest bg-red-500/10 inline-block px-2 py-1.5 rounded border border-red-500/20 shadow-[0_0_10px_rgba(239,68,68,0.15)]">[ Sold Out ]</div>`;
+            } else {
+                priceOrOOS = `
+                    <div class="mt-0.5">
+                        ${item.unitEffectivePrice < item.unitRetailPrice
+                            ? `<del class="text-white/30 mr-1.5 text-xs">RM ${(item.unitRetailPrice * item.qty).toFixed(2)}</del><span class="text-luxe font-bold text-sm">RM ${(item.unitEffectivePrice * item.qty).toFixed(2)}</span>`
+                            : `<span class="text-luxe font-medium text-sm">RM ${(item.unitEffectivePrice * item.qty).toFixed(2)}</span>`
+                        }
+                    </div>
+                    ${altHtml}
+                `;
+                qtyOrEmpty = `
+                    <div class="flex items-center mt-3">
+                        <div class="flex items-center rounded-md border border-white/15 bg-white/[0.02]">
+                            <button type="button" onclick='updateCartItemQty(${sigJson}, -1)' class="px-3 py-1 text-white/50 hover:text-white tap-none">&minus;</button>
+                            <span class="w-6 text-center text-xs font-medium">${item.qty}</span>
+                            <button type="button" onclick='updateCartItemQty(${sigJson}, 1)' class="px-3 py-1 text-white/50 hover:text-white tap-none">&plus;</button>
+                        </div>
+                    </div>`;
+            }
+
+            html += `
+                <div class="flex gap-4 pb-5 border-b ${cardBorder} relative group last:border-0 last:pb-0 transition-all duration-300">
+                    <img src="images/d02-1-hero.webp" class="w-20 h-24 object-cover rounded-lg border ${imgStyle} transition-all duration-300" alt="D02">
+                    <div class="flex-1 flex flex-col justify-between">
+                        <div>
+                            <div class="flex justify-between items-start">
+                                <div class="${titleStyle} font-medium text-[14px] transition-colors">D02 Abaya <span class="text-white/50 text-xs ml-1 font-normal">(Size ${item.size})</span></div>
+                                <button type="button" onclick='removeCartItem(${sigJson})' class="text-white/30 hover:text-white transition-colors p-1 -mr-2 -mt-1 tap-none" title="Remove item">
+                                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                                </button>
+                            </div>
+                            ${priceOrOOS}
+                        </div>
+                        ${qtyOrEmpty}
+                    </div>
+                </div>
+            `;
+        });
+
+        // Add Another Piece Button
+        html += `
+            <div class="mt-4 pt-4 border-t border-white/10">
+                <button onclick="closeCart()" class="w-full py-2.5 border border-dashed border-white/20 rounded-xl text-white/60 text-[10px] uppercase tracking-widest hover:border-luxe hover:text-luxe transition-colors tap-none flex items-center justify-center gap-2">
+                    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                    Add Another Piece
+                </button>
+            </div>
+        `;
+
+        container.innerHTML = html;
+
+        // Visual Cart Totals Math
+        totalDiscount += cartState.discount || 0; // Catch generic cart-level promos if any
+        document.getElementById('cart-subtotal').textContent = `RM ${visualSubtotal.toFixed(2)}`;
+
+        const discRow = document.getElementById('cart-discount-row');
+        if (totalDiscount > 0) {
+            document.getElementById('cart-discount-label').textContent = "Total Discount";
+            document.getElementById('cart-discount-amount').textContent = `-RM ${totalDiscount.toFixed(2)}`;
+            document.getElementById('cart-discount-amount').className = "text-luxe font-medium";
+            discRow.classList.remove('hidden');
+            discRow.classList.add('flex');
+        } else {
+            discRow.classList.add('hidden');
+            discRow.classList.remove('flex');
+        }
+
+        updateGrandTotal();
+
+        const shipEl = document.getElementById('cart-shipping');
+        if (shipEl && cartState.shippingFee > 0 && shipEl.textContent.trim() === 'Pending') {
+            shipEl.textContent = `RM ${cartState.shippingFee.toFixed(2)} (J&T Express)`;
+        }
+    }
+
+    function updateGrandTotal() {
+        if (!cartState) return;
+        const total = (cartState.basePrice + cartState.altCost) - cartState.discount + cartState.shippingFee;
+        document.getElementById('cart-total').textContent = `RM ${total.toFixed(2)}`;
+    }
+
+    document.getElementById('btn-calc-ship').onclick = async () => {
+        if (!cartState) return;
+        const pc = document.getElementById('cart-postcode').value.trim();
+        if (!pc || pc.length < 5 || isNaN(pc)) { document.getElementById('cart-postcode').classList.add('border-red-500'); return; }
+        else document.getElementById('cart-postcode').classList.remove('border-red-500');
+
+        const btn = document.getElementById('btn-calc-ship');
+        btn.textContent = "...";
+        try {
+            const res = await fetch(`${RETAIL_API_URL}?action=calc_shipping&postcode=${encodeURIComponent(pc)}&weight=${cartState.weightKg}`);
+            const json = await res.json();
+            if (json.status === 'success') {
+                cartState.postcode = pc;
+                const freeShipPromo = appConfig['PROMO_FREE_SHIPPING'];
+                if (freeShipPromo && freeShipPromo.isActive) {
+                    cartState.shippingFee = 0;
+                    document.getElementById('cart-shipping').innerHTML = `<span class="line-through text-gray-500 mr-2">RM ${json.rate.toFixed(2)}</span><span class="text-luxe font-bold">FREE</span>`;
+                } else {
+                    cartState.shippingFee = json.rate;
+                    document.getElementById('cart-shipping').textContent = `RM ${json.rate.toFixed(2)} (J&T Express)`;
+                }
+                updateGrandTotal();
+            }
+        } catch (e) { alert("Shipping calculation failed."); }
+        btn.textContent = "CALC";
+    };
+
+    // Intelligent Address Engine & Auto-Calc
+    const addressInput = document.getElementById('cart-address');
+    const postcodeInput = document.getElementById('cart-postcode');
+    const stateSelect = document.getElementById('cart-state');
+    const calcBtn = document.getElementById('btn-calc-ship');
+
+    function getStateFromPostcode(pc) {
+        const code = parseInt(pc, 10);
+        if (code >= 1000 && code <= 2999) return "Perlis";
+        if (code >= 5000 && code <= 9999) return "Kedah";
+        if (code >= 10000 && code <= 14999) return "Pulau Pinang";
+        if (code >= 15000 && code <= 18999) return "Kelantan";
+        if (code >= 20000 && code <= 28999) return "Pahang";
+        if (code >= 30000 && code <= 36999) return "Perak";
+        if (code >= 39000 && code <= 39999) return "Pahang";
+        if (code >= 40000 && code <= 48999) return "Selangor";
+        if (code >= 50000 && code <= 59999) return "W.P. Kuala Lumpur";
+        if (code >= 60000 && code <= 68999) return "Selangor";
+        if (code >= 69000 && code <= 73999) return "Negeri Sembilan";
+        if (code >= 75000 && code <= 78999) return "Melaka";
+        if (code >= 79000 && code <= 86999) return "Johor";
+        if (code >= 87000 && code <= 87999) return "W.P. Labuan";
+        if (code >= 88000 && code <= 91999) return "Sabah";
+        if (code >= 93000 && code <= 98999) return "Sarawak";
+        return "";
+    }
+
+    addressInput.addEventListener('input', () => {
+        const match = addressInput.value.match(/\b\d{5}\b/);
+        if (match) {
+            const pc = match[0];
+            if (postcodeInput.value !== pc) {
+                postcodeInput.value = pc;
+                const state = getStateFromPostcode(pc);
+                if (state) stateSelect.value = state;
+                calcBtn.click();
+            }
+        }
+    });
+
+    postcodeInput.addEventListener('input', () => {
+        const pc = postcodeInput.value.trim();
+        if (pc.length === 5 && !isNaN(pc)) {
+            const state = getStateFromPostcode(pc);
+            if (state) stateSelect.value = state;
+            calcBtn.click();
+        }
+    });
+
+    document.getElementById('btn-checkout').onclick = async () => {
+        // TERMINAL GUARD: Physically block checkout if prices failed to load
+        const currentPrice = activePromoPrice || activeRetailPrice;
+        if (!currentPrice || currentPrice <= 0) {
+            alert("⚠️ System Busy: Pricing data failed to load securely. Please refresh the page to continue.");
+            window.location.reload();
+            return;
+        }
+        if (!cartState) return;
+        const name = document.getElementById('cart-name').value.trim();
+
+        // --- FRONTEND PHONE SANITIZATION ---
+        let rawPhone = document.getElementById('cart-phone').value;
+        let cleanPhone = String(rawPhone).trim().replace(/\D/g, ''); // Strip spaces, dashes, and '+'
+        if (cleanPhone.startsWith('1')) {
+             cleanPhone = '60' + cleanPhone; // Catch dropped leading zero
+        } else if (cleanPhone.startsWith('0')) {
+             cleanPhone = '6' + cleanPhone; // Convert '019' to '6019'
+        }
+        const phone = cleanPhone;
+
+        const address = document.getElementById('cart-address').value.trim();
+        const state = document.getElementById('cart-state').value;
+        const postcode = document.getElementById('cart-postcode').value.trim();
+        // Update state with the DOM inputs just in case they typed without blurring
+        cartState.name = name;
+        cartState.phone = phone;
+        cartState.address = address;
+        cartState.state = state;
+        cartState.postcode = postcode;
+
+        if (!name || !phone || !address || !state || !postcode) {
+            alert("Please fill in all shipping details."); 
+            return;
+        }
+
+        // If they filled the postcode but haven't calculated shipping yet, prompt them gently instead of a generic error
+        const shipRow = document.getElementById('cart-shipping');
+        const shipLabel = shipRow ? shipRow.textContent.replace(/\s+/g, ' ').trim() : '';
+        if (shipLabel === 'Pending' || shipLabel === '') {
+            alert("Please click 'Calculate Shipping' to update your delivery fee before checking out.");
+            return;
+        }
+        const btn = document.getElementById('btn-checkout');
+        btn.textContent = "Securing Order..."; btn.disabled = true;
+
+        // 1. Trigger Immersive Gateway
+        const gateway = document.getElementById('gateway-overlay');
+        gateway.classList.remove('opacity-0', 'pointer-events-none');
+
+        cartState.email = "";
+        cartState.totalPaid = (cartState.basePrice + cartState.altCost) - cartState.discount + cartState.shippingFee;
+
+        const payload = {
+            ...cartState,
+            totalWeight: cartState.weightKg
+        };
+
+        try {
+            const res = await fetch(`${RETAIL_API_URL}?action=reserve_stock`, {
+                method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: `payload=${encodeURIComponent(JSON.stringify(payload))}`
+            });
+            const json = await res.json();
+
+            if (json.status === 'success') {
+                window.location.href = json.paymentUrl;
+            } else {
+                // Remove Gateway Overlay
+                gateway.classList.add('opacity-0', 'pointer-events-none');
+
+                if (json.reason === 'out_of_stock' && json.failedSignature) {
+                    // Soft Reject Flow
+                    const failedItem = cartState.items.find(i => i.signature === json.failedSignature);
+                    if (failedItem) {
+                        failedItem.isSoldOut = true;
+                    }
+                    renderCart();
+
+                    const notif = document.getElementById('cart-notification');
+                    notif.classList.remove('hidden');
+                    document.getElementById('cart-scroll-area').scrollTop = 0;
+
+                    // --- LIVE MATRIX REFRESH ---
+                    // Silently updates the main page sizing buttons to reflect the sold-out status
+                    await fetchConfig();
+
+                    setTimeout(() => { notif.classList.add('hidden'); }, 8000);
+                } else {
+                    alert("Checkout Error: " + json.message);
+                }
+            }
+        } catch (e) {
+            gateway.classList.add('opacity-0', 'pointer-events-none');
+            alert("System error: " + e.message);
+        }
+        btn.textContent = "Proceed to Payment"; btn.disabled = false;
+    };
+
+    // Init
+    document.getElementById('add-to-cart-btn').disabled = true;
+    renderSizeGrid();
+    fetchConfig();
+
+    // --- CONTEXT-AWARE STICKY BAR ENGINE ---
+    document.addEventListener('DOMContentLoaded', () => {
+        const mainCartBtn = document.getElementById('add-to-cart-btn');
+        const stickyBar = document.getElementById('sticky-buy-bar');
+        const stickyBtn = document.getElementById('sticky-btn');
+
+        if (mainCartBtn && stickyBar && stickyBtn) {
+            // 1. Hide-and-Seek Scroll Observer
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    // Slide up only if user scrolled PAST the main button (top < 0)
+                    if (!entry.isIntersecting && entry.boundingClientRect.top < 0) {
+                        stickyBar.classList.remove('translate-y-full');
+                    } else {
+                        stickyBar.classList.add('translate-y-full');
+                    }
+                });
+            }, { threshold: 0 });
+            observer.observe(mainCartBtn);
+
+            // 2. Intelligent Button Logic
+            const sizeCalc = document.getElementById('size-calculator-section');
+            stickyBtn.addEventListener('click', () => {
+                if (!selectedSize) {
+                    // State A: Auto-scroll to Size Calculator
+                    if (sizeCalc) {
+                        sizeCalc.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
+                } else {
+                    // State B: Add to Cart
+                    mainCartBtn.click();
+                }
+            });
+        }
+    });
+
+    // --- D01 Reviews Renderer ---
+    (function(){
+        const FULL = [{"username":"5** F**Y M**T","size":"S","rating":5,"original":"Alhamdulillah dah selamat sampai. Material sejuk, lembut dan selesa nampak exclusive gitu.. Packaging pun cantik dan terbaik. InshaAllah akan pakai utk ke umrah Nov'24 ini. Recommended 👍"},{"username":"M**i","size":"XS","rating":5,"original":"Kain sedap, tak tebal. Basic punya pun cantik sangat. Beli dengan harga rm80 aje. Bahu saiz 14, measurement chart i sesuai saiz xs. Tapi bila sampai xs tu bahu 13. Inform seller, mintak tukar semua boleh. Customer service sangat sangat sangat bagusssss! 145cm tu labuh sangat, so nanti alter aje."},{"username":"y**e","size":"XS","rating":4,"original":"kain nipis kena pakai inner.cutting cantik.pembungkusan sangat cantik dalam kotak.ada free shawl."},{"username":"i**l","size":"L","rating":5,"original":"MasyaAllah Material sejuk kain jatuh Love sgt..nti nk repeat lg... Oversized tau abaya ni..next saya nk beli M utk berat 62 tinggi 159 tuhari beli L ok jer cuma longgar + pjg 😁 Overall 9/10🫶 Tgn siap ada inner..mesra muslimah, ada zip Dan kocek👍"},{"username":"h**6","size":"XS","rating":5,"original":"Alhamdulillah Abaya terbaik..Dr packaging & product quality 👌"},{"username":"d**a","size":"XS","rating":5,"original":"Size ngam, kain sedap pakai. Berat terletak Packaging sangat eksklusif Love…"},{"username":"W**h","size":"XXL","rating":5,"original":"Jahitan sangat kemas elok, fabric berkualiti, tak panas, selesa pakai.. labuh dan saiz sesuai, lagi best lengan ada inner cerut. Terjaga aurat. Packing pun kemas berkualiti berserta kotak zip lock bag. Delivery pun cepat. Harap seller kekalkan service dan kualiti ini. Semoga murah rezeki seller"},{"username":"S**Z","size":"L","rating":5,"original":"Baju ada cutting ikut bentuk badan. Saya ambil size L just sedang2 untuk berat 64kg ketinggian 155cm kena potong sedikit. Kain sejuk & agak berat. Selesa untuk terus bawa solat"},{"username":"E**️","size":"S","rating":5,"original":"Siap kotak tebal..nmpak exclusive..Alhamdulillah... mmg ngam dgn sy... masih longgar... size s sesuai utk berat 57kg/158cm... kain pn best flowy cuma sedikit jarang xtebal xnipis sesuai dgn cuaca malaysia.. mmg love .. lepas ni nk beli design lain"},{"username":"🦋**🦋","size":"M","rating":4,"original":"Parcel sampai cepat,bungkusan pun kemas dlm kotak..Material best tp lepas ni kne amik saiz besar sikit sbb bahagian dada ngam..tp masih boleh lg pki😍"},{"username":"F**a","size":"L","rating":5,"original":"Sy memang abaya material nidha lovers. Alhamdulillah jubah ni ada lapisan inner tangan di dlm lagi mudah utk guna solat. Harga pun berbaloi. Harap dpt terus jual abaya berkualiti & mampu dimiliki oleh semua ladies"},{"username":"R**e","size":"XXL","rating":5,"original":"Penghantaran cepat, pembungkusan rapi & eksklusif.. berbaloi beli.. memang cantik .."},{"username":"m**y y**a","size":"XS","rating":5,"original":"Material nida mmg terbaik👍👍 sy mmg penggemar Abaya Dubai & mekah krn menggunakan material nida. Sgt selesa. Ni baru jumpa seller Malaysia yg jual Abaya material nida dgn harga berpatutan,jahitan kemas, dapat free Shawl & bahagian lengan siap ada “handsock”😍 i love sgt2. Hari ni kita beli lagi😁"},{"username":"Y**a A**f","size":"XXL","rating":5,"original":"kain sejuk berkualiti,packaging tip top"},{"username":"𝙒**𝙨","size":"XXL","rating":5,"original":"Material kain cantik, terletak jatuh — flowyy ♥️. Alhamdulillah akhirnya jumpa abaya sesuai dengan ketinggian saya 175cm/68kg.. Sapa² yg ketinggian kurang 180cm, inshaa Allah tak senteng.. Tq seller"},{"username":"D**t b** A**h A**r","size":"L","rating":5,"original":"As per expected la kalau kain nida mmg cun.. I berat 74kg tinggi 163, amek size L, dekat bust ketat sikit tp labuh nye nyahhh.. Seb baik ada tailor sudi nak potong dekat2 raya ni..."},{"username":"h**a","size":"XS","rating":5,"original":"Saya puas hati sangat, design simple & cantik. Siap dgn inner tangan bergetah..loveeee sangat."},{"username":"y**a","size":"XXXL","rating":5,"original":"cantiknya abaya nih love sangattt🥰🥰🥰🥰🥰🥰🥰🥰🥰🥰🥰packaging pun terbaikkkkkkkk"},{"username":"m**n","size":"XL","rating":5,"original":"Product quality: Kain sejuk. Berat. Jahitsnbkemas. Pembungkusan kemas."},{"username":"H**n","size":"L","rating":5,"original":"Alhamdullilah baju cantik, kain sejuk selesa.. Cuma pada saya labuh sikit tinggi 158cm berat 76kg.."},{"username":"R**🌹","size":"L","rating":5,"original":"Jubah sudah sampai. servis sangat cepat. saya puas hati. terima kasih. saya beli. Sempat bagi hadiah kepada kawan."},{"username":"Y**F H**r","size":"L","rating":5,"original":"Sy 71kg 156cm. Amik saiz L. Saiz ngam tapi mmg ada shape yer n agak labuh. Jd kena potong sikit. Nasib x amik M sbb akan lg sexy. Kain best, sejuk.bbaloi dgn harga Thanks seller."},{"username":"s**o","size":"S","rating":5,"original":"Memang terbaikkk, packaging sgt nmpk exclusive dan material & design mmg chantikkk"},{"username":"b**o","size":"XXXL","rating":5,"original":"Kena iron baru cantik beralun dipakai. Simple bergaya. Suka pd kelebihan tergabung inner tangan dan lengan."},{"username":"** N**","size":"XXXL","rating":5,"original":"Pembungkusan sgt cantik n jubahvjg cantik, tq seller"},{"username":"t**E","size":"S","rating":5,"original":"ngam2 dgn bdn. simple. nice. bli 2 trus.mula2 bli utk gift mil☺️xsmpi sehati repeat plk😁"},{"username":"M**N","size":"M","rating":5,"original":"Baju sampai dgn cepat,simple dan cantik..seller pun baik je..tq"},{"username":"a**","size":"L","rating":5,"original":"Hrga sangat berbaloi dgn quality kain. Sgt puas hati. Delivery pun cpt.. ada rezki blh repeat oder yg lain pula. T.ksh"},{"username":"M**️","size":"M","rating":5,"original":"Material dan cutting yg cantik. Packaging kemas."},{"username":"H**s","size":"M","rating":4,"original":"Received in good condition. But I feel this nidha isn’t premium high quality nidha. Still it’s nice to wear."},{"username":"a**😎","size":"XXXL","rating":5,"original":"sgt bagus kain n design.saya sgt suka"},{"username":"o**2","size":"XS","rating":3,"original":"Kecewa.. ikut pd size chart xs dada baju 36\".. tp bila ukur pada baju 34\".. ketat bahagian dada.."},{"username":"A**A","size":"S","rating":5,"original":"Dah sampai abaya tapi ada sempit kt ketiak. Saya ambik saiz S. Boleh return ke"},{"username":"s**2","size":"L","rating":5,"original":"Mmg terbaik sgt2.... Sy suka.. Pasni sy nk repeat beli lg... Tolong la beli ngan sis ni mmg tk nyesal langsung. Siap dpt tudung sekali👍👍👍👍"},{"username":"d**m","size":"S","rating":5,"original":"Fabric yg sgt berkualiti, design yg simple but exclusice 👍🏻👍🏻👍🏻"},{"username":"N**a","size":"L","rating":5,"original":"Item good as expected fast delivery good material and beautiful design recommended for others to buy"},{"username":"a**h","size":"M","rating":5,"original":"sangat cantik, such a calue for money. Suka dah ada inner kat tangan and pockets."},{"username":"ℹ**a","size":"L","rating":5,"original":"Cantik sgt. Kain pon best. Ukuran mmg ngam cuma labuh, x pe bole potong nanti. Overall, smuanya cantik, selesa & memuaskan 👍"},{"username":"b**","size":"L","rating":5,"original":"Cantik sgt..❤️❤️ labuh sikit. Tp xpe cuma potong sikit je."},{"username":"E**🦁","size":"M","rating":5,"original":"Cantik dan kain dia agak nipis.kena pakai inner utk selamat. Kain lembut dan sedap pakai."},{"username":"M**4","size":"S","rating":5,"original":"Pembelian kali kedua. Abaya mmg cantik, kain nidha yg premium lembut dan flowy.. harga murah tapi berkualiti..nice packaging too..tqvm seller"},{"username":"c**h","size":"S","rating":5,"original":"Review jujur, cutting memang utk badan asian, kain quality, jahitan kemas, design cantik. Pade sy utk quality tempatan jahitan tempatan harga mcm ni saya blh category kan sbg premium. Arabista, gudluck kekalkan quality💪🏽"},{"username":"F**F","size":"XL","rating":5,"original":"Sesuai jangkaan. Kain sejuk,design simple Tp terlebih labuh plak walau kito nyo 164cm. Saiz XL"},{"username":"N**5","size":"XXL","rating":5,"original":"Kainyg sangat berkualiti. suka designnya Dah pernah beli sebelum ni. Penghantaran pun sangat cepat."},{"username":"a**y","size":"L","rating":5,"original":"Kualiti mmg terbaik, jahitan kemas & yg paling best super fast delivery 🚚 . Hari ini order esok sampai 😱💃♥️. Dah ada 3 helai dengan 4 delivery, 1 kit bagi hadiah. Sesuai klu nk bagi hasiah sbb packaging yg sgt cantik."},{"username":"L**0","size":"L","rating":5,"original":"Cantik bila pakai.. kain pon sejuk .. saya suka🥰cuma labuh jerla kena potong"},{"username":"S**i","size":"XXL","rating":5,"original":"Sampai dalam keadaan baik. Jubah sangat selesa dipakai"},{"username":"a**💐","size":"XS","rating":5,"original":"Seller sangat baik. Very well after sale service. Kain cantek. Jubah kain elok terletak. Btw baju ni ada cutting sket, jadi advise korang amek saiz besar sket. Jadi loose bila pakai."},{"username":"m** y**3","size":"XXL","rating":5,"original":"Penghantaran cepat..kain cantik.. yg paling best dh siap jahit inner lengan.. sy agak chubby jd next order kn ambil saiz 3XL"},{"username":"R** A**a","size":"XXL","rating":5,"original":"Material best cuma lbh skit utk sy yg x berapa nk tggi"},{"username":"M**🌸","size":"L","rating":5,"original":"Kain sedap pakai Penghantaran ada kotak Alhamdulillah Terima kasih😍"},{"username":"Z**A","size":"M","rating":5,"original":"Alhamdulillah suka dengan kualiti kain dan design yang simple...paling saya suka design tangan baju yang ada lapis dalam tu....memang lain dari yang lain...insya Allah boleh repeat lagi nnti"},{"username":"B**i","size":"S","rating":5,"original":"First time beli abaya dr kedai ni,masa mula2 sampai wowww...Premium betul packaging & bila test rasa sizeS mcm xselesa &minta tukar kpd saiz M.Admin layan pantas...Sy blom pos lg abaya tuk tukar tup...tup yg sy minta tukar Size M tu dh sampai...Terbaik ARABISTA For referens tggi sy 153 berat 54"},{"username":"B**8","size":"XXL","rating":5,"original":"Lawa tapi ya ampun labuh kalau g alter ni takut tak cantik plak jahitan bawah tu..memang letop jubahnya"},{"username":"R**e","size":"L","rating":5,"original":"I pernah beli the same material and style abaya which cost me RM309 but this abaya is only RM99.. I recommend this shop because when I open the parcel, I really love the experience, with premium black box and tidy packaging."},{"username":"I**e","size":"L","rating":5,"original":"Dah jadi favourite abaya dah...best sangat pakai kain ni ..sejuk, lembut dan beralun .."},{"username":"M**🌸","size":"S","rating":5,"original":"Sy beli design ni saiz s..dgn berat 62 kg blh ambik saiz s. Sy pakai ngam..labuh mmg kena alter lh dgn sy..sy hnya 148 shj,🤭 kain lembut dan jatuh beralun..cantik sgt..gaji bln depan..nk beli design lain plk..rasa terjatuh cinta plak..hihi.."},{"username":"A** w**h m** c**l m**👍","size":"L","rating":5,"original":"Ht 165 cm, wt 75kg, muat cantik. Kain btul2 best selesa x panas.labuh sket jek. Suke ada kocek & ada inner lengan dlm."},{"username":"D** c**n","size":"XXXL","rating":5,"original":"Quality kain sgt selesa & sejuk..packaging sgt kebabom tak padan dgn hrga..Syabas seller👍"},{"username":"q**5","size":"XS","rating":5,"original":"Sgt memudahkan customer, memudahkan saya utk tukar saiz... Tqvm seller... 👍👍👍"},{"username":"m**","size":"S","rating":5,"original":"Cantik..berbaloi...material best ..flowy... Sy berat 52kg, tinggi 162cm.. Pakai size S."},{"username":"m**n G**","size":"L","rating":5,"original":"Abaya simple tapi cantik..beli masa live..dpt harga murah.."},{"username":"f**0","size":"XXL","rating":5,"original":"Suka sangat jubah... sedap di pakai sejuk kain nya"},{"username":"A**","size":"M","rating":5,"original":"Sgt cantik dan selesa. If saya boleh beri feedback..kelim.lengan sebelah dalam jadikan di luar.. jadi nampak spt ropol. Syukur alhamdulillah"},{"username":"N**o","size":"S","rating":5,"original":"comeyyy dooh .. sesuai utk nokk g kerja .. rugii xgrab sep mung !!!"},{"username":"a**6","size":"XXXL","rating":5,"original":"Jubah paling sesuai untuk yang tinggi 170cm"},{"username":"m**5","size":"XL","rating":5,"original":"kain cantik … baju sngat memuasakan 🫶🏻"},{"username":"h**♡","size":"S","rating":5,"original":"Packaging menarik Kualiti produk: Berkualiti"},{"username":"O**r","size":"S","rating":5,"original":"First time beli. Cantik kainnya. Ngam saiz."},{"username":"c**7","size":"M","rating":4,"original":"Fabrik ringan, design minimalis cuma terlalu labuh"},{"username":"w**i","size":"M","rating":4,"original":"Material berkualiti..tapi zip mcm tak brp ok Susah nak tarik tersekat sekat."},{"username":"b**u j**e","size":"XXL","rating":4,"original":"Sy puas hati. Walaupon berat 80kg tp masih muat saiz XXL. Kualiti material Nida baik tp nipis xsama material nida yg dbeli dr dubai/mekah/madinah. Perlu pakai kain dalam. Sy suka inner tgn dan poket baju. Nnt nak beli lg."},{"username":"n**h","size":"XXL","rating":4,"original":"Kain sejuk dn potongan cantek Ambil 2 xl mmg padan sgt²"},{"username":"U**a","size":"XL","rating":4,"original":"Saya ambik saiz XL utk bahu 17.5. Bahagian dada sampai pinggan agak ketat sedikit (cutting). Sedang jubah patut agak longgar. Saiz sebenar saiz bahu 16 sahaja. Dada 42. Pinggang ke bawah A cut. Longgar. Kena hantar repairlah.. nnt boleh tambah baik bahagian tersebut. Product quality: Ok"},{"username":"I**a","size":"M","rating":5,"original":"saiz m labuh..tp cutting cantik"},{"username":"n**a","size":"XXL","rating":5,"original":"Best products n good quality 🥰"},{"username":"s**r","size":"XXXL","rating":5,"original":"Product quality: Material cantik."},{"username":"L**a H**l","size":"M","rating":5,"original":"Alhamdulillah brg smpi, cantek sangat"},{"username":"B**A A**A","size":"S","rating":5,"original":"Kain best pakai👍👍👍👍👍"},{"username":"t**a","size":"L","rating":5,"original":"cantik tp kena potong la labuhnye"},{"username":"A**a","size":"S","rating":5,"original":"So cantik, kain jatuh terletak…love"},{"username":"l**a","size":"M","rating":5,"original":"Kain ny sejuk jahitan kemas n cntik"},{"username":"Z**n","size":"L","rating":5,"original":"Product quality: Jahitan kemas"},{"username":"Z**n","size":"M","rating":5,"original":"Product quality: Jahitan kemas"},{"username":"i**l","size":"L","rating":5,"original":"Barang selamat sampai. Baju cantik"},{"username":"R**h M**","size":"L","rating":5,"original":"Alhamdulillah... sangat recomanded..."},{"username":"c**4","size":"XS","rating":5,"original":"kain best cuma labuh boleh potong"},{"username":"a**a","size":"L","rating":5,"original":"Cantik dan cepat oenghantarannye"},{"username":"H**s","size":"XXL","rating":5,"original":"Koleksi yg ke 3🤩mmg sngt2 selesa👍"},{"username":"r**y","size":"S","rating":5,"original":"Alhamdulillah abaya cantik sgt"},{"username":"S**r K**i","size":"XXXL","rating":5,"original":"Barang sampai dalam keadaan baik"},{"username":"R**e","size":"L","rating":4,"original":""},{"username":"R**e","size":"M","rating":4,"original":""},{"username":"f**a","size":"XS","rating":5,"original":"Product quality: Cantik"},{"username":"_**a","size":"M","rating":5,"original":"Product quality: good"},{"username":"S**a","size":"XS","rating":5,"original":"🌟🌟🌟🌟🌟"},{"username":"j**l","size":"M","rating":5,"original":"Kain best sangat.. terbaik"},{"username":"D**h","size":"M","rating":5,"original":"Material sejuk dan flowy."},{"username":"𝐵** ꫂ**","size":"XXXL","rating":5,"original":"👍👍👍"},{"username":"R**i R**n","size":"L","rating":5,"original":"Sgt2 puas hati"},{"username":"s**a","size":"M","rating":5,"original":"canti puas hati"},{"username":"s**m","size":"M","rating":5,"original":"cantik dan selesa"},{"username":"j**1","size":"M","rating":5,"original":"Material best"},{"username":"🌷**🌷","size":"M","rating":5,"original":"terbaik😍"},{"username":"N**l R**o","size":"XXXL","rating":5,"original":"Ngam to ware"},{"username":"s**1","size":"XL","rating":5,"original":"Cantikk sangat"},{"username":"E**n","size":"L","rating":5,"original":"Tq cantik"},{"username":"A**h","size":"XL","rating":5,"original":"Cantik"},{"username":"J**","size":"XL","rating":5,"original":"suka"},{"username":"f**a","size":"L","rating":5,"original":"Berbaloi"},{"username":"N**M","size":"L","rating":5,"original":"Mak suka"},{"username":"R**i","size":"L","rating":5,"original":"Love sgt"},{"username":"y**a s**n","size":"XXL","rating":5,"original":"Excellent"},{"username":"4**l","size":"XL","rating":5,"original":"Nice"},{"username":"t**s","size":"L","rating":5,"original":"🥰"},{"username":"y**i a**d","size":"L","rating":5,"original":"👍"},{"username":"**","size":"L","rating":5,"original":"Lawa"},{"username":"α**🪷","size":"S","rating":5,"original":"Come dooh"},{"username":"W**h","size":"XXXL","rating":5,"original":"Good"},{"username":"f**a","size":"XL","rating":5,"original":"Cantik"},{"username":"F**h D**d","size":"L","rating":5,"original":"ok"},{"username":"m**n","size":"L","rating":5,"original":"good"},{"username":"Q**o","size":"XL","rating":5,"original":"Cantik"},{"username":"N**🌻","size":"L","rating":5,"original":"Lawa"},{"username":"G**a A**d","size":"XL","rating":4,"original":"Dah terima"},{"username":"M**n","size":"S","rating":5,"original":""},{"username":"s**a","size":"XXXL","rating":5,"original":""},{"username":"A**e y**f","size":"XXXL","rating":5,"original":""},{"username":"M**t","size":"XXXL","rating":5,"original":""},{"username":"m**6","size":"XS","rating":5,"original":""},{"username":"N**a","size":"XXXL","rating":5,"original":""},{"username":"A**y","size":"S","rating":5,"original":""},{"username":"j**n","size":"L","rating":5,"original":""},{"username":"m**i","size":"XS","rating":5,"original":""},{"username":"E**3","size":"XXL","rating":5,"original":""},{"username":"𝒔**","size":"XXL","rating":5,"original":""},{"username":"B**a F**n H**e","size":"XXXL","rating":5,"original":""},{"username":"B**a F**n H**e","size":"XL","rating":5,"original":""},{"username":"N** R**h M**d S**","size":"XXL","rating":5,"original":""},{"username":"N**r","size":"M","rating":5,"original":""},{"username":"H**a","size":"S","rating":5,"original":""},{"username":"n**i","size":"L","rating":5,"original":""},{"username":"Z**a B**a","size":"M","rating":5,"original":""},{"username":"f**e","size":"L","rating":5,"original":""},{"username":"m**a","size":"L","rating":5,"original":""},{"username":"c**n","size":"L","rating":5,"original":""},{"username":"N**a","size":"M","rating":5,"original":""},{"username":"e**r","size":"XL","rating":5,"original":""},{"username":"S**","size":"XXXL","rating":5,"original":""},{"username":"𒆜** ོ**𝓓 **","size":"L","rating":5,"original":""},{"username":"N**n","size":"M","rating":5,"original":""},{"username":"i**🩷","size":"S","rating":5,"original":""},{"username":"M**T","size":"XXL","rating":5,"original":""},{"username":"Z**i N**w","size":"XXL","rating":5,"original":""},{"username":"S**T","size":"M","rating":5,"original":""},{"username":"Z**1","size":"M","rating":5,"original":""},{"username":"c**g","size":"XXXL","rating":5,"original":""},{"username":"i**a","size":"L","rating":5,"original":""},{"username":"f**5","size":"M","rating":5,"original":""},{"username":"K** i**a","size":"XS","rating":5,"original":""},{"username":"I**2","size":"M","rating":5,"original":""},{"username":"A**️","size":"L","rating":5,"original":""},{"username":"^**","size":"M","rating":5,"original":""},{"username":"M**a N**i","size":"L","rating":5,"original":""},{"username":"L**i","size":"XL","rating":5,"original":""},{"username":"A**s H**l","size":"M","rating":5,"original":""},{"username":"S**3","size":"M","rating":5,"original":""},{"username":"h**y","size":"XXL","rating":5,"original":""},{"username":"ع** و**ف","size":"M","rating":5,"original":""},{"username":"J**S H**M","size":"L","rating":5,"original":""},{"username":"n**n","size":"XL","rating":5,"original":""},{"username":"a**r","size":"M","rating":5,"original":""},{"username":"R**8","size":"XXXL","rating":5,"original":""},{"username":"R**8","size":"L","rating":5,"original":""},{"username":"u**f","size":"M","rating":5,"original":""},{"username":"M**a","size":"S","rating":5,"original":""},{"username":"n**s","size":"L","rating":5,"original":""},{"username":"h**n","size":"M","rating":5,"original":""},{"username":"s**n","size":"XL","rating":5,"original":""},{"username":"m**a","size":"XXXL","rating":5,"original":""},{"username":"h**a","size":"XXL","rating":5,"original":""},{"username":"Z**💞","size":"XXXL","rating":5,"original":""},{"username":"S** K**l","size":"XXXL","rating":5,"original":""},{"username":"h**y","size":"XXL","rating":5,"original":""},{"username":"M**i S**i","size":"XL","rating":5,"original":""},{"username":"r**️","size":"XXXL","rating":5,"original":""},{"username":"J**S H**M","size":"XS","rating":5,"original":""},{"username":"S**l I**","size":"XXL","rating":5,"original":""},{"username":"S**l I**","size":"XL","rating":5,"original":""},{"username":"s**1","size":"XXL","rating":5,"original":""},{"username":"z**i","size":"L","rating":5,"original":""},{"username":"E**4","size":"S","rating":5,"original":""},{"username":"a**a","size":"S","rating":5,"original":""},{"username":"W**a","size":"XXL","rating":5,"original":""},{"username":"A**n S**a A**m","size":"XL","rating":5,"original":""},{"username":"F**🌼","size":"M","rating":5,"original":""},{"username":"y**z","size":"XS","rating":5,"original":""},{"username":"e**z","size":"L","rating":5,"original":""},{"username":"F**t","size":"XXXL","rating":5,"original":""},{"username":"C**n","size":"XXL","rating":5,"original":""},{"username":"a**h","size":"XL","rating":5,"original":""},{"username":"Y**6","size":"XL","rating":5,"original":""},{"username":"E**N S**A #**H","size":"L","rating":5,"original":""},{"username":"L**e","size":"XXL","rating":5,"original":""},{"username":"m**2","size":"M","rating":5,"original":""},{"username":"d**6","size":"XL","rating":5,"original":""},{"username":"W**l","size":"S","rating":5,"original":""},{"username":"L**a I**0","size":"S","rating":5,"original":""},{"username":"J**","size":"L","rating":5,"original":""},{"username":"s**a **","size":"XXXL","rating":5,"original":""},{"username":"W**5","size":"XL","rating":5,"original":""},{"username":"b**9","size":"L","rating":5,"original":""},{"username":"M**a","size":"XL","rating":5,"original":""},{"username":"h**🌹","size":"L","rating":5,"original":""},{"username":"n**m","size":"M","rating":5,"original":""},{"username":"ن**ر","size":"M","rating":5,"original":""},{"username":"d**z","size":"XXXL","rating":5,"original":""},{"username":"m**r","size":"M","rating":5,"original":""},{"username":"c**s","size":"XL","rating":5,"original":""},{"username":"P**𝚗 W**𝓱 **","size":"M","rating":5,"original":""},{"username":"m**n","size":"XXXL","rating":5,"original":""},{"username":"s**5","size":"XXXL","rating":5,"original":""},{"username":"n**0","size":"XXXL","rating":5,"original":""},{"username":"n**h","size":"XXXL","rating":5,"original":""},{"username":"a**a","size":"L","rating":5,"original":""},{"username":"I**️","size":"XXXL","rating":5,"original":""},{"username":"M**k","size":"M","rating":5,"original":""},{"username":"S**K","size":"S","rating":5,"original":""},{"username":"f**a","size":"XXXL","rating":5,"original":""},{"username":"** ** ** **","size":"XXL","rating":5,"original":""},{"username":"N**i A**n","size":"XS","rating":5,"original":""},{"username":"a**n","size":"S","rating":5,"original":""},{"username":"k** w**y","size":"XXL","rating":4,"original":"Ok"},{"username":"i**t","size":"L","rating":4,"original":"👍"},{"username":"s**a","size":"XL","rating":4,"original":"Cantik"},{"username":"D**k","size":"M","rating":4,"original":"kaij best"},{"username":"** H**a A**h **","size":"S","rating":4,"original":"Ok"},{"username":"N**m I**m","size":"S","rating":4,"original":""},{"username":"A**a","size":"S","rating":4,"original":""},{"username":"c**s","size":"L","rating":4,"original":""},{"username":"A**n","size":"XXL","rating":4,"original":""},{"username":"Z**a A**","size":"XXL","rating":4,"original":""},{"username":"u**6","size":"S","rating":4,"original":""},{"username":"a** l**","size":"XXXL","rating":4,"original":""},{"username":"A**i Y**n","size":"L","rating":4,"original":""},{"username":"i**9","size":"XS","rating":4,"original":""},{"username":"n**u","size":"M","rating":4,"original":"Pembungkusannya sgt cantik & kemas..kotak tak kemek dan kualiti baju mmg best👍👍👍 terima kasih seller."},{"username":"A**h","size":"XXL","rating":4,"original":""},{"username":"K**0","size":"S","rating":3,"original":""},{"username":"B**g ⭐**","size":"XXXL","rating":3,"original":""},{"username":"z**h","size":"XXL","rating":1,"original":"Kain jarang"}];
+
+        const PER_PAGE = 5;
+        const list = document.getElementById('reviewList');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const pageNum = document.getElementById('pageNum');
+        const pageTotal = document.getElementById('pageTotal');
+        const tiktokPreview = document.getElementById('tiktokPreview');
+        const reviewsSection = document.getElementById('pdp-review-section');
+
+        const mkStar = (n)=>'★'.repeat(n||5);
+        const esc = (s)=>String(s||'').replace(/[&<>]/g, c=>({ '&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+        const dot = '<span class="mx-2 text-white/30">•</span>';
+
+        function reviewCard(r){
+          const longOrig = (r.original||'').length > 160;
+          const id = Math.random().toString(36).slice(2,8);
+          return `
+          <article class="p-4 sm:p-5">
+            <div class="text-xs text-white/60 mb-2">
+              <strong class="text-white/80">${esc(r.username)}</strong>${dot}
+              Size: ${esc(r.size||'—')}${dot}
+              <span aria-label="rating" class="text-luxe">${mkStar(r.rating)}</span>
+            </div>
+            <div class="text-sm leading-relaxed">
+              <p class="review-text ${longOrig?'clamp':''}" id="o-${id}">${esc(r.original||'')}</p>
+              ${longOrig?'<button type="button" class="readmore text-xs underline decoration-white/30 hover:text-luxe mt-1 tap-none" data-target="o-'+id+'">Read more</button>':''}
+            </div>
+          </article>`;
+        }
+
+        function renderPage(p){
+          const totalPages = Math.max(1, Math.ceil(FULL.length / PER_PAGE));
+          const clamped = Math.min(Math.max(1, p), totalPages);
+          const start = (clamped - 1) * PER_PAGE;
+          const slice = FULL.slice(start, start + PER_PAGE);
+
+          list.innerHTML = slice.map(reviewCard).join('');
+          pageNum.textContent = clamped;
+          pageTotal.textContent = totalPages;
+
+          prevBtn.disabled = clamped === 1;
+          nextBtn.disabled = clamped === totalPages;
+
+          tiktokPreview.classList.toggle('hidden', clamped !== totalPages);
+        }
+
+        list.addEventListener('click', (e)=>{
+          const b = e.target.closest('.readmore');
+          if(!b) return;
+          const id = b.getAttribute('data-target');
+          const p = document.getElementById(id);
+          if(!p) return;
+          p.classList.toggle('clamp');
+          b.textContent = p.classList.contains('clamp') ? 'Read more' : 'Show less';
+        });
+
+        let current = 1;
+        function scrollReviewsTop(){ reviewsSection.scrollIntoView({behavior:'smooth', block:'start'}); }
+        prevBtn.addEventListener('click', ()=>{ if(current>1){ current--; renderPage(current); scrollReviewsTop(); } });
+        nextBtn.addEventListener('click', ()=>{ const tp=Math.ceil(FULL.length/PER_PAGE); if(current<tp){ current++; renderPage(current); scrollReviewsTop(); } });
+
+        renderPage(current);
+    })();
+
+    // D01 Intersection Observer for .reveal animations
+    document.querySelectorAll('.reveal').forEach(el => {
+        const io = new IntersectionObserver((entries, obs) => {
+            entries.forEach(en => { if (en.isIntersecting) { en.target.classList.add('show'); obs.unobserve(en.target); } });
+        }, { threshold: 0.1, rootMargin: "0px 0px -50px 0px" });
+        io.observe(el);
+    });
+
+    /* --- ARABISTA PREMIUM GALLERY ENGINE --- */
+    document.addEventListener('DOMContentLoaded', () => {
+        const mainContainer = document.querySelector('.arabista-gallery-main');
+        const thumbContainer = document.querySelector('.arabista-gallery-thumbs');
+        const mainImages = mainContainer ? Array.from(mainContainer.querySelectorAll('.arabista-gallery-img')) : [];
+        const thumbnails = thumbContainer ? Array.from(thumbContainer.querySelectorAll('.arabista-thumb-btn')) : [];
+
+        if (mainContainer && thumbContainer && mainImages.length > 0 && thumbnails.length > 0) {
+
+        let isDown = false;
+        let startX;
+        let scrollLeft;
+        let activeIndex = 0;
+
+        // --- PILLAR 3: Desktop Drag Physics ---
+        mainContainer.addEventListener('mousedown', (e) => {
+            isDown = true;
+            mainContainer.classList.add('is-dragging');
+            startX = e.pageX - mainContainer.offsetLeft;
+            scrollLeft = mainContainer.scrollLeft;
+        });
+
+        const stopDragging = () => {
+            if (!isDown) return;
+            isDown = false;
+            mainContainer.classList.remove('is-dragging');
+        };
+
+        mainContainer.addEventListener('mouseleave', stopDragging);
+        mainContainer.addEventListener('mouseup', stopDragging);
+
+        mainContainer.addEventListener('mousemove', (e) => {
+            if (!isDown) return;
+            e.preventDefault();
+            const x = e.pageX - mainContainer.offsetLeft;
+            const walk = (x - startX) * 1.5; // Drag momentum multiplier
+            mainContainer.scrollLeft = scrollLeft - walk;
+        });
+
+        // --- PILLARS 4 & 5: Two-Way Thumbnail Sync ---
+        const syncThumbnails = (index) => {
+            thumbnails.forEach((thumb, i) => {
+                if (i === index) {
+                    thumb.style.opacity = '1';
+                    thumb.style.border = '1px solid #D4AF37'; // Subtle gold active state
+                } else {
+                    thumb.style.opacity = '0.4';
+                    thumb.style.border = 'none';
+                }
+            });
+
+            // Click-to-Center math
+            const activeThumb = thumbnails[index];
+            if (activeThumb) {
+                const targetScroll = activeThumb.offsetLeft - (thumbContainer.clientWidth / 2) + (activeThumb.clientWidth / 2);
+                thumbContainer.scrollTo({ left: targetScroll, behavior: 'smooth' });
+            }
+        };
+
+        // Thumbnail Click triggers Main Gallery Scroll
+        thumbnails.forEach((thumb, index) => {
+            thumb.style.cursor = 'pointer';
+            thumb.style.transition = 'opacity 0.3s ease';
+            thumb.addEventListener('click', () => {
+                const targetImg = mainImages[index];
+                if (targetImg) {
+                    const targetScroll = targetImg.offsetLeft - (mainContainer.clientWidth / 2) + (targetImg.clientWidth / 2);
+                    mainContainer.scrollTo({ left: targetScroll, behavior: 'smooth' });
+                }
+            });
+        });
+
+        // --- PILLARS 1 & 2: GPU 60fps Cinematic Depth-of-Field ---
+        const renderLoop = () => {
+            const containerCenter = mainContainer.scrollLeft + (mainContainer.clientWidth / 2);
+            let closestIndex = 0;
+            let minDistance = Infinity;
+
+            mainImages.forEach((img, index) => {
+                const imgCenter = img.offsetLeft + (img.clientWidth / 2);
+                const distance = Math.abs(containerCenter - imgCenter);
+
+                // Track Active Index for Two-Way Sync
+                if (distance < minDistance) {
+                    minDistance = distance;
+                    closestIndex = index;
+                }
+
+                // Cinematic Scale & Fade Math
+                const effectRange = img.clientWidth * 0.8; 
+                let progress = distance / effectRange;
+                if (progress > 1) progress = 1;
+
+                const scale = 1 - (0.08 * progress); // Floor is 0.92
+                const opacity = 1 - (0.6 * progress); // Floor is 0.4
+
+                img.style.transform = `translate3d(0,0,0) scale(${scale})`;
+                img.style.opacity = opacity;
+            });
+
+            if (closestIndex !== activeIndex) {
+                activeIndex = closestIndex;
+                syncThumbnails(activeIndex);
+                
+                // Cinematic Play/Pause Video Logic
+                mainImages.forEach((media, i) => {
+                    if (media.tagName.toLowerCase() === 'video') {
+                        if (i === activeIndex) {
+                            media.play().catch(e => console.log('Autoplay blocked by browser', e));
+                        } else {
+                            media.pause();
+                        }
+                    }
+                });
+            }
+
+            requestAnimationFrame(renderLoop);
+        };
+
+        // Initialize
+        syncThumbnails(0);
+        renderLoop();
+
+    // --- PILLAR 6: Framed Canvas Pre-Render Engine ---
+    const lightbox = document.getElementById('arabista-lightbox');
+    const lbTrack = document.getElementById('lightbox-track');
+    const lbClose = document.getElementById('lightbox-close');
+    const lbNext = document.getElementById('lightbox-next');
+    const lbPrev = document.getElementById('lightbox-prev');
+    let lbItems = [];
+    let isDraggingImage = false; 
+
+    // Pre-build the lightbox DOM on load
+    mediaFiles.forEach((m) => {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'lb-item shrink-0 w-full h-full snap-center flex items-center justify-center relative';
+        let media;
+        if(m.type === 'vid') {
+            media = document.createElement('video');
+            media.src = m.src; media.loop = true; media.playsInline = true; media.muted = true;
+        } else {
+            media = document.createElement('img');
+            media.src = m.src;
+        }
+        media.className = 'lb-media'; // CSS handles the hugging border and sizing
+        wrapper.appendChild(media);
+        lbTrack.appendChild(wrapper);
+        lbItems.push(media);
+    });
+
+    mainContainer.addEventListener('mousedown', () => { isDraggingImage = false; });
+    mainContainer.addEventListener('mousemove', () => { if (isDown) isDraggingImage = true; });
+    
+    mainContainer.addEventListener('click', (e) => {
+        if (isDraggingImage) return; 
+        openLightbox();
+    });
+
+    const openLightbox = () => {
+        lbTrack.scrollTo({ left: activeIndex * lbTrack.clientWidth, behavior: 'instant' });
+        lightbox.classList.add('is-open');
+        document.body.style.overflow = 'hidden';
+        
+        if(lbItems[activeIndex].tagName.toLowerCase() === 'video') {
+            lbItems[activeIndex].play().catch(e=>console.log(e));
+        }
+    };
+
+    const closeLightbox = () => {
+        lightbox.classList.remove('is-open');
+        document.body.style.overflow = '';
+        
+        const lbIndex = Math.round(lbTrack.scrollLeft / lbTrack.clientWidth);
+        lbItems.forEach(el => { if(el.tagName.toLowerCase() === 'video') el.pause(); });
+        
+        if(lbIndex !== activeIndex && mainImages[lbIndex]) {
+            const targetImg = mainImages[lbIndex];
+            const targetScroll = targetImg.offsetLeft - (mainContainer.clientWidth / 2) + (targetImg.clientWidth / 2);
+            mainContainer.scrollTo({ left: targetScroll, behavior: 'instant' });
+        }
+    };
+
+    lbNext.addEventListener('click', () => lbTrack.scrollBy({ left: lbTrack.clientWidth, behavior: 'smooth' }));
+    lbPrev.addEventListener('click', () => lbTrack.scrollBy({ left: -lbTrack.clientWidth, behavior: 'smooth' }));
+
+    lbClose.addEventListener('click', closeLightbox);
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeLightbox(); });
+    lightbox.addEventListener('click', (e) => {
+        if (e.target === lightbox || e.target.classList.contains('lb-item')) closeLightbox();
+    });
+
+    lbTrack.addEventListener('scroll', () => {
+        if(!lightbox.classList.contains('is-open')) return;
+        const currentLbIndex = Math.round(lbTrack.scrollLeft / lbTrack.clientWidth);
+        lbItems.forEach((el, idx) => {
+            if(el.tagName.toLowerCase() === 'video') {
+                if(idx === currentLbIndex) el.play().catch(e=>e);
+                else el.pause();
+            }
+        });
+    }, { passive: true });
+
+        }
+    });
+  </script>
+
+  <div id="sticky-buy-bar" class="fixed bottom-0 inset-x-0 z-[45] transform translate-y-full transition-transform duration-500 bg-[#111213]/85 backdrop-blur-xl border-t border-white/5 shadow-[0_-15px_40px_rgba(0,0,0,0.6)] sm:hidden flex items-center justify-between px-5 py-4 pb-[calc(1rem+env(safe-area-inset-bottom,0px))]">
+      <div class="flex flex-col">
+          <span class="text-white font-medium text-[13px] tracking-wide">D02 Dahlia Series</span>
+          <div id="sticky-price-display" class="text-sm mt-0.5 flex items-center min-h-[20px]">
+              <div class="h-4 w-24 bg-white/10 rounded animate-pulse"></div>
+          </div>
+      </div>
+      <button type="button" id="sticky-btn" class="px-6 py-2.5 rounded-lg text-[10px] font-medium uppercase tracking-widest transition-all duration-300 tap-none bg-white/10 text-white hover:bg-white/20">
+          Select Size
+      </button>
+  </div>
+
+  <div id="arabista-lightbox" class="fixed inset-0 z-[100] flex items-center justify-center opacity-0 pointer-events-none transition-opacity duration-500 bg-[#0F0F10]/95 backdrop-blur-md">
+      <div class="relative w-full h-full flex flex-col transform scale-95 transition-transform duration-500" id="lightbox-frame">
+          
+          <button id="lightbox-close" class="absolute top-4 right-4 sm:top-6 sm:right-6 z-[110] p-2.5 rounded-full ring-1 ring-white/20 hover:ring-luxe bg-black/40 backdrop-blur-md text-white/70 hover:text-white transition-all tap-none">
+              <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M6 18L18 6M6 6l12 12"/></svg>
+          </button>
+
+          <button id="lightbox-prev" class="absolute left-2 sm:left-6 top-1/2 -translate-y-1/2 z-[110] p-2 sm:p-3 rounded-full ring-1 ring-white/20 hover:ring-luxe bg-black/40 backdrop-blur-md text-white/70 hover:text-white transition-all tap-none flex">
+              <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 19l-7-7 7-7"/></svg>
+          </button>
+          <button id="lightbox-next" class="absolute right-2 sm:right-6 top-1/2 -translate-y-1/2 z-[110] p-2 sm:p-3 rounded-full ring-1 ring-white/20 hover:ring-luxe bg-black/40 backdrop-blur-md text-white/70 hover:text-white transition-all tap-none flex">
+              <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5l7 7-7 7"/></svg>
+          </button>
+
+          <div id="lightbox-track" class="flex-1 w-full h-full flex overflow-x-auto snap-x snap-mandatory hide-scrollbar scroll-smooth">
+              </div>
+      </div>
+  </div>
+
+  <div id="gateway-overlay" class="fixed inset-0 z-[120] bg-ink/90 backdrop-blur-md flex flex-col items-center justify-center opacity-0 pointer-events-none transition-opacity duration-500">
+      <div class="relative flex items-center justify-center mb-10">
+          <div class="w-28 h-28 rounded-full border border-white/10 flex items-center justify-center z-10 shadow-2xl overflow-hidden p-2.5">
+              <img src="images/logo.webp" alt="Arabista Logo" class="w-full h-full object-contain opacity-90">
+          </div>
+          <div class="absolute w-28 h-28 rounded-full border-[2px] border-white/5 z-0"></div>
+          <div class="absolute w-28 h-28 rounded-full border-[2px] border-transparent border-t-luxe border-r-luxe/30 animate-spin-slow z-20 drop-shadow-[0_0_12px_rgba(192,160,98,0.4)]"></div>
+      </div>
+      <div class="font-display text-luxe text-2xl tracking-[0.08em] animate-pulse-slow">
+          Securing your selection...
+      </div>
+  </div>
+</body>
+</html>
