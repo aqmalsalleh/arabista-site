@@ -985,6 +985,7 @@
         .then((json) => {
           if (json.status !== 'success') throw new Error("API error");
 
+          appConfig = json.data.config || {};
           const matrix = json.data.matrix || {};
           const config = json.data.config || {};
           const modelPrices = {};
