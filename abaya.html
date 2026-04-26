@@ -1,0 +1,1095 @@
+<!doctype html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>The Abaya Collection — Arabista</title>
+  <meta name="description" content="Explore Arabista's premium abaya collections. Dahlia, Zahra, and Maraya series." />
+  <meta name="theme-color" content="#0F0F10" />
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { 
+            display: ['"Cormorant Garamond"', 'serif'], 
+            sans: ['Inter', 'ui-sans-serif', 'system-ui'] 
+          },
+          colors: { 
+            brand: '#0F0F10', 
+            luxe: '#C0A062', 
+            ink: '#111213' 
+          },
+          boxShadow: { 
+            soft: '0 10px 30px rgba(0,0,0,.08)' 
+          },
+          animation: {
+            'spin-slow': 'spin 1.5s cubic-bezier(0.4, 0, 0.2, 1) infinite',
+            'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite'
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body { background-color: #0F0F10; color: #ffffff; }
+    .hide-scrollbar::-webkit-scrollbar { display: none; }
+    .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    .reveal { opacity: 0; transform: translateY(20px); transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1); }
+    .reveal.show { opacity: 1; transform: translateY(0); }
+    .tap-none { -webkit-tap-highlight-color: transparent; }
+  </style>
+</head>
+<body class="font-sans antialiased selection:bg-luxe selection:text-ink max-w-[100vw] overflow-x-hidden relative tap-none">
+
+  <header class="fixed top-0 inset-x-0 z-50 backdrop-blur supports-[backdrop-filter]:bg-brand/60 bg-brand/80">
+    <div class="max-w-screen-xl mx-auto px-4 sm:px-6">
+      <div class="h-14 grid grid-cols-3 items-center">
+        <div class="col-span-1 flex items-center">
+          <a href="index-staging.html" class="font-display tracking-[0.18em] text-[14px] leading-none hover:text-luxe transition">ARABISTA</a>
+        </div>
+        <div class="col-span-1 flex items-center justify-center">
+          <a href="index-staging.html" aria-label="Arabista Home">
+            <img src="images/logo.png" alt="Arabista logo" class="h-11 w-auto">
+          </a>
+        </div>
+        <div class="col-span-1 flex items-center justify-end gap-3">
+          <button type="button" id="nav-cart-btn" class="relative p-2 -mr-2 text-white hover:text-luxe transition-colors tap-none" aria-label="Open cart">
+            <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
+            <span id="nav-cart-badge" class="absolute top-0 right-0 -mt-0.5 -mr-0.5 flex h-4 w-4 sm:h-[18px] sm:w-[18px] items-center justify-center rounded-full bg-luxe text-[9px] sm:text-[10px] font-bold text-brand opacity-0 scale-0 transition-all duration-300 pointer-events-none">0</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <section class="relative pt-14 min-h-[50vh] sm:min-h-[60vh] flex items-center justify-center overflow-hidden">
+    <img src="images/hero-poster.webp" alt="Arabista Collection" class="absolute inset-0 w-full h-full object-cover brightness-[0.6] scale-105 animate-[pulse-slow_10s_ease-in-out_infinite]" />
+    <div class="absolute inset-0 bg-gradient-to-t from-brand via-brand/40 to-transparent"></div>
+    
+    <div class="relative z-10 text-center px-4 mt-10 reveal">
+      <h1 class="font-display text-4xl sm:text-6xl md:text-7xl font-medium tracking-wide mb-4">The Abaya Collection</h1>
+      <p class="text-white/60 text-sm sm:text-base max-w-lg mx-auto font-light">Timeless design and effortless grace. Crafted for the modern modest wardrobe.</p>
+    </div>
+  </section>
+
+  <div class="sticky top-14 z-40 backdrop-blur-md bg-brand/80 border-b border-white/10">
+    <div class="max-w-screen-xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between">
+      
+      <nav class="flex gap-6 overflow-x-auto hide-scrollbar whitespace-nowrap pr-4" id="category-nav">
+        <button class="nav-btn text-xs uppercase tracking-widest text-luxe font-medium border-b-2 border-luxe py-4 tap-none" data-target="all">All</button>
+        <button class="nav-btn text-xs uppercase tracking-widest text-white/50 hover:text-luxe py-4 transition-colors tap-none" data-target="dahlia">Dahlia</button>
+        <button class="nav-btn text-xs uppercase tracking-widest text-white/50 hover:text-luxe py-4 transition-colors tap-none" data-target="zahra">Zahra</button>
+        <button class="nav-btn text-xs uppercase tracking-widest text-white/50 hover:text-luxe py-4 transition-colors tap-none" data-target="maraya">Maraya</button>
+      </nav>
+
+      <button id="filter-btn" class="shrink-0 p-2.5 rounded-full border border-white/10 text-white/30 cursor-not-allowed transition-colors tap-none" aria-label="Filter" disabled>
+        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path></svg>
+      </button>
+    </div>
+  </div>
+
+  <main class="max-w-screen-xl mx-auto px-4 sm:px-6 py-16 sm:py-24 min-h-[50vh]">
+    <div class="grid grid-cols-2 lg:grid-cols-3 gap-x-4 gap-y-16 sm:gap-x-8 sm:gap-y-24" id="product-grid">
+      
+      <article class="group relative block reveal tap-none product-card" data-sizes="XS,S,M,L,XL,XXL,XXXL" data-category="dahlia">
+        <a href="product-d01-staging.html" class="block tap-none">
+        <div class="relative aspect-[3/4] rounded-2xl overflow-hidden bg-white/5">
+          <img src="images/d01-1-hero.webp" alt="D01" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000 ease-out" />
+          <div class="absolute bottom-6 inset-x-0 flex justify-center opacity-0 group-hover:opacity-100 translate-y-4 group-hover:translate-y-0 transition-all duration-500 hidden lg:flex">
+            <span class="bg-brand/40 backdrop-blur-md border border-white/20 text-white text-[11px] uppercase tracking-widest px-6 py-2.5 rounded-full shadow-soft">View Details</span>
+          </div>
+        </div>
+        <div class="mt-5 flex justify-between items-start gap-4">
+          <div>
+            <h2 class="font-display text-xl sm:text-2xl text-white group-hover:text-luxe transition-colors">D01 Dahlia</h2>
+            <p class="text-white/40 text-[10px] uppercase tracking-widest mt-1">Premium Nidha Dubai</p>
+          </div>
+          <div class="price-container text-sm text-white font-medium transition-opacity duration-500" data-model="D01">
+            <div class="h-4 w-16 bg-white/10 rounded animate-pulse"></div>
+          </div>
+        </div>
+        </a>
+      </article>
+
+      <article class="group relative block reveal tap-none product-card" data-sizes="XS,S,M,L,XL,XXL,XXXL" data-category="dahlia" style="transition-delay: 50ms;">
+        <a href="product-d02-staging.html" class="block tap-none">
+        <div class="relative aspect-[3/4] rounded-2xl overflow-hidden bg-white/5">
+          <img src="images/d02-1-hero.webp" alt="D02" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000 ease-out" />
+          <div class="absolute bottom-6 inset-x-0 flex justify-center opacity-0 group-hover:opacity-100 translate-y-4 group-hover:translate-y-0 transition-all duration-500 hidden lg:flex">
+            <span class="bg-brand/40 backdrop-blur-md border border-white/20 text-white text-[11px] uppercase tracking-widest px-6 py-2.5 rounded-full shadow-soft">View Details</span>
+          </div>
+        </div>
+        <div class="mt-5 flex justify-between items-start gap-4">
+          <div>
+            <h2 class="font-display text-xl sm:text-2xl text-white group-hover:text-luxe transition-colors">D02 Dahlia</h2>
+            <p class="text-white/40 text-[10px] uppercase tracking-widest mt-1">Premium Nidha Dubai</p>
+          </div>
+          <div class="price-container text-sm text-white font-medium transition-opacity duration-500" data-model="D02">
+            <div class="h-4 w-16 bg-white/10 rounded animate-pulse"></div>
+          </div>
+        </div>
+        </a>
+      </article>
+
+      <article class="group relative block reveal tap-none product-card" data-sizes="XS,S,M,L,XL,XXL,XXXL" data-category="dahlia" style="transition-delay: 100ms;">
+        <a href="product-d04-staging.html" class="block tap-none">
+        <div class="relative aspect-[3/4] rounded-2xl overflow-hidden bg-white/5">
+          <img src="images/d04-1-hero.webp" alt="D04" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000 ease-out" />
+          <div class="absolute bottom-6 inset-x-0 flex justify-center opacity-0 group-hover:opacity-100 translate-y-4 group-hover:translate-y-0 transition-all duration-500 hidden lg:flex">
+            <span class="bg-brand/40 backdrop-blur-md border border-white/20 text-white text-[11px] uppercase tracking-widest px-6 py-2.5 rounded-full shadow-soft">View Details</span>
+          </div>
+        </div>
+        <div class="mt-5 flex justify-between items-start gap-4">
+          <div>
+            <h2 class="font-display text-xl sm:text-2xl text-white group-hover:text-luxe transition-colors">D04 Dahlia</h2>
+            <p class="text-white/40 text-[10px] uppercase tracking-widest mt-1">Premium Nidha Dubai</p>
+          </div>
+          <div class="price-container text-sm text-white font-medium transition-opacity duration-500" data-model="D04">
+            <div class="h-4 w-16 bg-white/10 rounded animate-pulse"></div>
+          </div>
+        </div>
+        </a>
+      </article>
+
+      <article class="group relative block reveal tap-none product-card" data-sizes="XS,S,M,L,XL,XXL,XXXL" data-category="dahlia" style="transition-delay: 150ms;">
+        <a href="product-d06-staging.html" class="block tap-none">
+        <div class="relative aspect-[3/4] rounded-2xl overflow-hidden bg-white/5">
+          <img src="images/d06-1-hero.webp" alt="D06" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000 ease-out" />
+          <div class="absolute bottom-6 inset-x-0 flex justify-center opacity-0 group-hover:opacity-100 translate-y-4 group-hover:translate-y-0 transition-all duration-500 hidden lg:flex">
+            <span class="bg-brand/40 backdrop-blur-md border border-white/20 text-white text-[11px] uppercase tracking-widest px-6 py-2.5 rounded-full shadow-soft">View Details</span>
+          </div>
+        </div>
+        <div class="mt-5 flex justify-between items-start gap-4">
+          <div>
+            <h2 class="font-display text-xl sm:text-2xl text-white group-hover:text-luxe transition-colors">D06 Dahlia</h2>
+            <p class="text-white/40 text-[10px] uppercase tracking-widest mt-1">Premium Nidha Dubai</p>
+          </div>
+          <div class="price-container text-sm text-white font-medium transition-opacity duration-500" data-model="D06">
+            <div class="h-4 w-16 bg-white/10 rounded animate-pulse"></div>
+          </div>
+        </div>
+        </a>
+      </article>
+
+      <article class="group relative block reveal tap-none product-card" data-sizes="XS,S,M,L,XL,XXL,XXXL" data-category="zahra">
+        <a href="product-z01-staging.html" class="block tap-none">
+        <div class="relative aspect-[3/4] rounded-2xl overflow-hidden bg-white/5">
+          <img src="images/z01-1-hero.webp" alt="Z01" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000 ease-out" />
+          <div class="absolute bottom-6 inset-x-0 flex justify-center opacity-0 group-hover:opacity-100 translate-y-4 group-hover:translate-y-0 transition-all duration-500 hidden lg:flex">
+            <span class="bg-brand/40 backdrop-blur-md border border-white/20 text-white text-[11px] uppercase tracking-widest px-6 py-2.5 rounded-full shadow-soft">View Details</span>
+          </div>
+        </div>
+        <div class="mt-5 flex justify-between items-start gap-4">
+          <div>
+            <h2 class="font-display text-xl sm:text-2xl text-white group-hover:text-luxe transition-colors">Z01 Zahra</h2>
+            <p class="text-white/40 text-[10px] uppercase tracking-widest mt-1">Premium Nidha Dubai</p>
+          </div>
+          <div class="price-container text-sm text-white font-medium transition-opacity duration-500" data-model="Z01">
+            <div class="h-4 w-16 bg-white/10 rounded animate-pulse"></div>
+          </div>
+        </div>
+        </a>
+      </article>
+
+      <article class="group relative block reveal tap-none product-card" data-sizes="XS,S,M,L,XL,XXL,XXXL" data-category="maraya" style="transition-delay: 50ms;">
+        <a href="product-m01-staging.html" class="block tap-none">
+        <div class="relative aspect-[3/4] rounded-2xl overflow-hidden bg-white/5">
+          <img src="images/m01-1-hero.webp" alt="M01" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000 ease-out" />
+          <div class="absolute bottom-6 inset-x-0 flex justify-center opacity-0 group-hover:opacity-100 translate-y-4 group-hover:translate-y-0 transition-all duration-500 hidden lg:flex">
+            <span class="bg-brand/40 backdrop-blur-md border border-white/20 text-white text-[11px] uppercase tracking-widest px-6 py-2.5 rounded-full shadow-soft">View Details</span>
+          </div>
+        </div>
+        <div class="mt-5 flex justify-between items-start gap-4">
+          <div>
+            <h2 class="font-display text-xl sm:text-2xl text-white group-hover:text-luxe transition-colors">M01 Maraya</h2>
+            <p class="text-white/40 text-[10px] uppercase tracking-widest mt-1">Premium Nidha Dubai</p>
+          </div>
+          <div class="price-container text-sm text-white font-medium transition-opacity duration-500" data-model="M01">
+            <div class="h-4 w-16 bg-white/10 rounded animate-pulse"></div>
+          </div>
+        </div>
+        </a>
+      </article>
+
+      <article class="group relative block reveal tap-none product-card" data-sizes="XS,S,M,L,XL,XXL,XXXL" data-category="maraya" style="transition-delay: 100ms;">
+        <a href="product-m02-staging.html" class="block tap-none">
+        <div class="relative aspect-[3/4] rounded-2xl overflow-hidden bg-white/5">
+          <img src="images/m02-1-hero.webp" alt="M02" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000 ease-out" />
+          <div class="absolute bottom-6 inset-x-0 flex justify-center opacity-0 group-hover:opacity-100 translate-y-4 group-hover:translate-y-0 transition-all duration-500 hidden lg:flex">
+            <span class="bg-brand/40 backdrop-blur-md border border-white/20 text-white text-[11px] uppercase tracking-widest px-6 py-2.5 rounded-full shadow-soft">View Details</span>
+          </div>
+        </div>
+        <div class="mt-5 flex justify-between items-start gap-4">
+          <div>
+            <h2 class="font-display text-xl sm:text-2xl text-white group-hover:text-luxe transition-colors">M02 Maraya</h2>
+            <p class="text-white/40 text-[10px] uppercase tracking-widest mt-1">Premium Nidha Dubai</p>
+          </div>
+          <div class="price-container text-sm text-white font-medium transition-opacity duration-500" data-model="M02">
+            <div class="h-4 w-16 bg-white/10 rounded animate-pulse"></div>
+          </div>
+        </div>
+        </a>
+      </article>
+
+    </div>
+  <div id="cart-overlay" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden opacity-0 transition-opacity duration-300"></div>
+  <div id="cart-drawer" class="fixed inset-y-0 right-0 w-full sm:max-w-md bg-ink border-l border-white/5 z-50 transform translate-x-full transition-transform duration-300 flex flex-col shadow-2xl">
+
+      <div class="p-4 sm:p-6 border-b border-white/5 flex justify-between items-center shrink-0 relative z-10 bg-ink">
+          <h2 class="font-display text-2xl text-white">Your Cart</h2>
+          <button type="button" id="close-cart-btn" class="text-gray-400 hover:text-white tap-none"><svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
+      </div>
+
+      <div class="flex-1 overflow-y-auto overscroll-contain p-4 sm:p-6 flex flex-col gap-8 hide-scrollbar" id="cart-scroll-area">
+          <div id="cart-items-container"></div>
+
+          <div class="space-y-3">
+              <label class="text-[10px] uppercase text-gray-500 tracking-wider block">Shipping Details</label>
+              <input type="text" id="cart-name" class="w-full bg-white/5 border border-white/10 rounded-lg text-white px-4 py-3 text-[16px] focus:border-luxe outline-none transition-colors" placeholder="Full Name">
+              <input type="tel" id="cart-phone" class="w-full bg-white/5 border border-white/10 rounded-lg text-white px-4 py-3 text-[16px] focus:border-luxe outline-none transition-colors" placeholder="Phone (e.g. 0123456789)">
+              <textarea id="cart-address" rows="2" class="w-full bg-white/5 border border-white/10 rounded-lg text-white px-4 py-3 text-[16px] focus:border-luxe outline-none transition-colors" placeholder="Address"></textarea>
+              <div class="grid grid-cols-2 gap-3">
+                  <input type="text" id="cart-postcode" class="w-full bg-white/5 border border-white/10 rounded-lg text-white px-4 py-3 text-[16px] focus:border-luxe outline-none transition-colors" placeholder="Postcode">
+                  <select id="cart-state" class="w-full bg-white/5 border border-white/10 rounded-lg text-white px-4 py-3 text-[16px] focus:border-luxe outline-none appearance-none transition-colors">
+                      <option value="">State...</option>
+                      <option value="Johor">Johor</option><option value="Kedah">Kedah</option><option value="Kelantan">Kelantan</option><option value="Melaka">Melaka</option><option value="Negeri Sembilan">Negeri Sembilan</option><option value="Pahang">Pahang</option><option value="Perak">Perak</option><option value="Perlis">Perlis</option><option value="Pulau Pinang">Pulau Pinang</option><option value="Sabah">Sabah</option><option value="Sarawak">Sarawak</option><option value="Selangor">Selangor</option><option value="Terengganu">Terengganu</option><option value="W.P. Kuala Lumpur">W.P. Kuala Lumpur</option><option value="W.P. Labuan">W.P. Labuan</option><option value="W.P. Putrajaya">W.P. Putrajaya</option>
+                  </select>
+              </div>
+              <button type="button" id="btn-calc-ship" class="hidden"></button>
+          </div>
+      </div>
+
+      <div class="p-4 sm:p-6 pb-8 sm:pb-6 border-t border-white/5 bg-ink shrink-0 relative z-10">
+          <div class="space-y-2 mb-6 text-sm p-5 rounded-2xl border border-luxe/20 bg-gradient-to-t from-brand via-ink to-ink shadow-[0_0_15px_rgba(192,160,98,0.05)]">
+              <div class="flex justify-between text-gray-400"><span>Subtotal</span><span id="cart-subtotal">RM 0.00</span></div>
+              <div class="flex justify-between text-luxe hidden" id="cart-discount-row"><span id="cart-discount-label">Discount</span><span id="cart-discount-amount">-RM 0.00</span></div>
+              <div class="flex justify-between text-gray-400"><span>Shipping</span><span id="cart-shipping">Pending</span></div>
+              <div class="flex justify-between text-white text-lg font-medium pt-3 border-t border-white/10 mt-3"><span>Grand Total</span><span id="cart-total">RM 0.00</span></div>
+          </div>
+          <button type="button" id="btn-checkout" class="w-full bg-luxe text-ink font-medium uppercase tracking-widest py-4 rounded-xl hover:opacity-90 transition shadow-soft disabled:opacity-50 disabled:cursor-not-allowed tap-none">Proceed to Payment</button>
+      </div>
+  </div>
+
+  <div id="gateway-overlay" class="fixed inset-0 z-[120] bg-ink/90 backdrop-blur-md flex flex-col items-center justify-center opacity-0 pointer-events-none transition-opacity duration-500">
+      <div class="relative flex items-center justify-center mb-10">
+          <div class="w-28 h-28 rounded-full border border-white/10 flex items-center justify-center z-10 shadow-2xl overflow-hidden p-2.5">
+              <img src="images/logo.png" alt="Arabista Logo" class="w-full h-full object-contain opacity-90">
+          </div>
+          <div class="absolute w-28 h-28 rounded-full border-[2px] border-white/5 z-0"></div>
+          <div class="absolute w-28 h-28 rounded-full border-[2px] border-transparent border-t-luxe border-r-luxe/30 animate-spin-slow z-20 drop-shadow-[0_0_12px_rgba(192,160,98,0.4)]"></div>
+      </div>
+      <div class="font-display text-luxe text-2xl tracking-[0.08em] animate-pulse-slow">
+          Securing your selection...
+      </div>
+  </div>
+  </main>
+
+  <footer class="border-t border-white/10 py-8 bg-brand mt-10">
+    <div class="max-w-screen-xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+      <p class="text-white/50 text-xs">© <span id="y"></span> Arabista Enterprise. All rights reserved.</p>
+      <nav class="flex items-center gap-4 text-white/50 text-xs uppercase tracking-widest font-medium">
+        <a href="index-staging.html" class="hover:text-luxe transition-colors">Home</a>
+        <a href="https://wa.me/60126913286" target="_blank" class="hover:text-luxe transition-colors">Contact</a>
+      </nav>
+    </div>
+  </footer>
+
+  <div id="toast-notification" class="fixed bottom-10 left-1/2 -translate-x-1/2 bg-white text-ink text-[11px] font-medium uppercase tracking-widest px-8 py-3.5 rounded-full shadow-[0_10px_40px_rgba(255,255,255,0.1)] transition-all duration-500 opacity-0 pointer-events-none translate-y-4 z-50">
+    Advanced Filtering Coming Soon
+  </div>
+
+  <div id="filter-overlay" class="fixed inset-0 bg-brand/80 backdrop-blur-sm z-50 opacity-0 pointer-events-none transition-opacity duration-300"></div>
+
+  <div id="filter-drawer" class="fixed top-0 right-0 h-full w-full sm:w-[400px] bg-ink border-l border-white/10 z-50 translate-x-full transition-transform duration-500 ease-in-out flex flex-col">
+    <div class="h-14 flex items-center justify-between px-6 border-b border-white/10 shrink-0">
+      <h3 class="text-sm font-medium uppercase tracking-widest text-white">Filter & Sort</h3>
+      <button id="close-filter-btn" class="p-2 -mr-2 text-white/50 hover:text-white transition-colors tap-none">
+        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M6 18L18 6M6 6l12 12"></path></svg>
+      </button>
+    </div>
+    <div class="flex-1 overflow-y-auto p-6 space-y-8">
+      <div>
+        <h4 class="text-[10px] uppercase tracking-widest text-white/40 mb-3">Search Design</h4>
+        <div class="relative flex items-center">
+          <input type="text" id="search-input" placeholder="e.g. Z01, Maraya..." class="w-full bg-transparent border-b border-white/20 text-white pb-2 text-sm focus:outline-none focus:border-luxe transition-colors placeholder:text-white/30 tap-none">
+          <button id="search-trigger-btn" class="absolute right-0 bottom-2 text-white/30 hover:text-luxe transition-colors tap-none" aria-label="Search">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+          </button>
+        </div>
+      </div>
+
+      <div>
+        <h4 class="text-[10px] uppercase tracking-widest text-white/40 mb-3">Sort By</h4>
+        <div class="space-y-3">
+          <label class="flex items-center gap-3 cursor-pointer group">
+            <input type="radio" name="sort" value="low-high" class="w-4 h-4 border-white/20 bg-transparent text-luxe focus:ring-luxe/50" checked>
+            <span class="text-sm text-white group-hover:text-luxe transition-colors">Price: Low to High</span>
+          </label>
+          <label class="flex items-center gap-3 cursor-pointer group">
+            <input type="radio" name="sort" value="high-low" class="w-4 h-4 border-white/20 bg-transparent text-luxe focus:ring-luxe/50">
+            <span class="text-sm text-white/70 group-hover:text-white transition-colors">Price: High to Low</span>
+          </label>
+        </div>
+      </div>
+
+      <div>
+        <h4 class="text-[10px] uppercase tracking-widest text-white/40 mb-3">Size</h4>
+        <div class="grid grid-cols-4 gap-2">
+          <label class="py-2 border border-white/10 text-center text-white/50 hover:text-white hover:border-white/30 text-xs font-medium rounded-lg transition-colors cursor-pointer tap-none has-[input:checked]:border-luxe has-[input:checked]:text-luxe">
+            <input type="checkbox" name="size" value="XS" class="sr-only">XS
+          </label>
+          <label class="py-2 border border-white/10 text-center text-white/50 hover:text-white hover:border-white/30 text-xs font-medium rounded-lg transition-colors cursor-pointer tap-none has-[input:checked]:border-luxe has-[input:checked]:text-luxe">
+            <input type="checkbox" name="size" value="S" class="sr-only">S
+          </label>
+          <label class="py-2 border border-white/10 text-center text-white/50 hover:text-white hover:border-white/30 text-xs font-medium rounded-lg transition-colors cursor-pointer tap-none has-[input:checked]:border-luxe has-[input:checked]:text-luxe">
+            <input type="checkbox" name="size" value="M" class="sr-only">M
+          </label>
+          <label class="py-2 border border-white/10 text-center text-white/50 hover:text-white hover:border-white/30 text-xs font-medium rounded-lg transition-colors cursor-pointer tap-none has-[input:checked]:border-luxe has-[input:checked]:text-luxe">
+            <input type="checkbox" name="size" value="L" class="sr-only">L
+          </label>
+          <label class="py-2 border border-white/10 text-center text-white/50 hover:text-white hover:border-white/30 text-xs font-medium rounded-lg transition-colors cursor-pointer tap-none has-[input:checked]:border-luxe has-[input:checked]:text-luxe">
+            <input type="checkbox" name="size" value="XL" class="sr-only">XL
+          </label>
+          <label class="py-2 border border-white/10 text-center text-white/50 hover:text-white hover:border-white/30 text-xs font-medium rounded-lg transition-colors cursor-pointer tap-none has-[input:checked]:border-luxe has-[input:checked]:text-luxe">
+            <input type="checkbox" name="size" value="XXL" class="sr-only">XXL
+          </label>
+          <label class="py-2 border border-white/10 text-center text-white/50 hover:text-white hover:border-white/30 text-xs font-medium rounded-lg transition-colors cursor-pointer tap-none has-[input:checked]:border-luxe has-[input:checked]:text-luxe col-span-1">
+            <input type="checkbox" name="size" value="XXXL" class="sr-only">XXXL
+          </label>
+        </div>
+      </div>
+    </div>
+    <div class="p-6 border-t border-white/10 shrink-0">
+      <button id="apply-filters-btn" class="w-full bg-luxe text-ink font-medium uppercase tracking-widest py-3.5 rounded-xl hover:opacity-90 transition shadow-soft tap-none">Apply</button>
+    </div>
+  </div>
+
+  <script>
+    const RETAIL_API_URL = "https://script.google.com/macros/s/AKfycbwYt7O3EivaEctPcq8WfzpQ_J-7mwlpnRmcR5xHnNEVX2WTBd6NXEMRr3MaTy1sb92c-Q/exec";
+    let appConfig = {};
+    let activeRetailPrice = 0;
+    let activePromoPrice = null;
+
+    // --- GLOBAL CART MANAGER (V2 — 1:1 with product-z01-staging) ---
+    const CartManager = {
+        key: 'arabista_cart',
+        getItems: function() {
+            return JSON.parse(localStorage.getItem(this.key)) || [];
+        },
+        addItem: function(productObj) {
+            const items = this.getItems();
+            items.push(productObj);
+            localStorage.setItem(this.key, JSON.stringify(items));
+            this.updateCartCount();
+        },
+        removeItem: function(id) {
+            const items = this.getItems().filter(item => item.id !== id);
+            localStorage.setItem(this.key, JSON.stringify(items));
+            this.updateCartCount();
+            if (typeof renderCart === 'function') renderCart();
+        },
+        updateQty: function(id, delta) {
+            const items = this.getItems();
+            const item = items.find(i => i.id === id);
+            if (item) {
+                item.qty += delta;
+                if (item.qty <= 0) {
+                    this.removeItem(id);
+                    return;
+                }
+                localStorage.setItem(this.key, JSON.stringify(items));
+                this.updateCartCount();
+                if (typeof renderCart === 'function') renderCart();
+            }
+        },
+        updateCartCount: function() {
+            const count = this.getItems().reduce((total, item) => total + item.qty, 0);
+            const badge = document.getElementById('nav-cart-badge');
+            if (badge) {
+                badge.textContent = count;
+                if (count > 0) {
+                    badge.classList.remove('opacity-0', 'scale-0');
+                    badge.classList.add('opacity-100', 'scale-100');
+                    badge.classList.add('scale-110');
+                    setTimeout(() => badge.classList.remove('scale-110'), 150);
+                } else {
+                    badge.classList.remove('opacity-100', 'scale-100', 'scale-110');
+                    badge.classList.add('opacity-0', 'scale-0');
+                }
+            }
+        }
+    };
+
+    let sessionShippingFee = 0;
+    let sessionPostcode = '';
+
+    function renderCart() {
+        const currentRetailPrice = activeRetailPrice;
+        const container = document.getElementById('cart-items-container');
+        const subtotalEl = document.getElementById('cart-subtotal');
+
+        if (!container || !subtotalEl) return;
+
+        const items = CartManager.getItems();
+        let visualSubtotal = 0;
+        let totalDiscount = 0;
+
+        if (items.length === 0) {
+            container.innerHTML = `<div class="text-center text-white/40 py-10 text-sm">Your cart is currently empty.</div>`;
+            subtotalEl.textContent = `RM 0.00`;
+            const discRow = document.getElementById('cart-discount-row');
+            if (discRow) {
+                discRow.classList.add('hidden');
+                discRow.classList.remove('flex');
+            }
+            updateGrandTotal();
+            return;
+        }
+
+        let html = '';
+        items.forEach(item => {
+            let altHtml = '';
+            let altCost = 0;
+
+            if (item.alterations && Object.keys(item.alterations).length > 0) {
+                altHtml = '<div class="text-white/40 text-[11px] mt-1.5 leading-relaxed space-y-0.5">';
+                for (let [k, v] of Object.entries(item.alterations)) {
+                    let priceDisplay = v.isPromo ? `<del class="text-white/30">RM ${v.standardPrice.toFixed(2)}</del> <span class="text-luxe font-bold ml-1">${v.price === 0 ? "FREE" : `RM ${v.price.toFixed(2)}`}</span>` : `+RM ${v.price.toFixed(2)}`;
+                    altHtml += `<div>${v.name}: ${v.val} <span class="text-white/20 mx-1">|</span> ${priceDisplay}</div>`;
+                    altCost += (v.price || 0);
+                }
+                altHtml += '</div>';
+            }
+
+            const itemRetail = item.retailPrice || currentRetailPrice || item.price;
+            const itemDiscount = Math.max(0, itemRetail - item.price);
+
+            const totalUnitPaid = item.price + altCost;
+            const lineTotal = totalUnitPaid * item.qty;
+
+            const retailLineTotal = (itemRetail + altCost) * item.qty;
+
+            visualSubtotal += retailLineTotal;
+            totalDiscount += (itemDiscount * item.qty);
+
+            const priceOrOOS = `
+            <div class="mt-0.5">
+                ${itemDiscount > 0
+                    ? `<del class="text-white/30 mr-1.5 text-xs">RM ${((itemRetail + altCost) * item.qty).toFixed(2)}</del><span class="text-luxe font-bold text-sm">RM ${lineTotal.toFixed(2)}</span>`
+                    : `<span class="text-luxe font-medium text-sm">RM ${lineTotal.toFixed(2)}</span>`
+                }
+            </div>
+            ${altHtml}
+        `;
+
+            const trashSvg = `<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>`;
+
+            html += `
+            <div class="flex gap-4 pb-5 border-b border-white/10 relative group last:border-0 last:pb-0 transition-all duration-300">
+                <img src="${item.image}" class="w-20 h-24 object-cover rounded-lg border border-white/10 transition-all duration-300" alt="${item.model}">
+                <div class="flex-1 flex flex-col justify-between">
+                    <div>
+                        <div class="flex justify-between items-start">
+                            <div class="text-white font-medium text-[14px] transition-colors">${item.model} ${item.series} <span class="text-white/50 text-xs ml-1 font-normal">(Size ${item.size})</span></div>
+                            <button type="button" onclick="CartManager.removeItem('${item.id}')" class="text-white/30 hover:text-red-400 transition-colors p-1 -mr-2 -mt-1 tap-none" title="Remove item">
+                                ${trashSvg}
+                            </button>
+                        </div>
+                        ${priceOrOOS}
+                    </div>
+                    <div class="flex items-center mt-3">
+                        <div class="flex items-center rounded-md border border-white/15 bg-white/[0.02]">
+                            <button type="button" onclick="CartManager.updateQty('${item.id}', -1)" class="px-3 py-1 text-white/50 hover:text-white tap-none">&minus;</button>
+                            <span class="w-6 text-center text-xs font-medium">${item.qty}</span>
+                            <button type="button" onclick="CartManager.updateQty('${item.id}', 1)" class="px-3 py-1 text-white/50 hover:text-white tap-none">&plus;</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+        });
+
+        html += `
+        <div class="mt-4 pt-4 border-t border-white/10">
+            <button onclick="closeCartDrawer()" class="w-full py-2.5 border border-dashed border-white/20 rounded-xl text-white/60 text-[10px] uppercase tracking-widest hover:border-luxe hover:text-luxe transition-colors tap-none flex items-center justify-center gap-2">
+                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                Add Another Piece
+            </button>
+        </div>
+    `;
+
+        container.innerHTML = html;
+        subtotalEl.textContent = `RM ${visualSubtotal.toFixed(2)}`;
+
+        const discRow = document.getElementById('cart-discount-row');
+        if (discRow) {
+            if (totalDiscount > 0) {
+                document.getElementById('cart-discount-label').textContent = "Total Discount";
+                document.getElementById('cart-discount-amount').textContent = `-RM ${totalDiscount.toFixed(2)}`;
+                document.getElementById('cart-discount-amount').className = "text-luxe font-medium";
+                discRow.classList.remove('hidden');
+                discRow.classList.add('flex');
+            } else {
+                discRow.classList.add('hidden');
+                discRow.classList.remove('flex');
+            }
+        }
+        updateGrandTotal();
+    }
+
+    function updateGrandTotal() {
+        const items = CartManager.getItems();
+        if (items.length === 0) {
+            document.getElementById('cart-total').textContent = `RM 0.00`;
+            return;
+        }
+
+        let baseTotal = 0;
+        items.forEach(item => {
+            let altCost = 0;
+            if (item.alterations) {
+                Object.values(item.alterations).forEach(alt => altCost += (alt.price || 0));
+            }
+            baseTotal += (item.price + altCost) * item.qty;
+        });
+
+        const grandTotal = baseTotal + sessionShippingFee;
+        document.getElementById('cart-total').textContent = `RM ${grandTotal.toFixed(2)}`;
+    }
+
+    document.getElementById('btn-calc-ship').onclick = async () => {
+        const items = CartManager.getItems();
+        if (items.length === 0) return;
+
+        const pc = document.getElementById('cart-postcode').value.trim();
+        if (!pc || pc.length < 5 || isNaN(pc)) {
+            document.getElementById('cart-postcode').classList.add('border-red-500');
+            return;
+        } else {
+            document.getElementById('cart-postcode').classList.remove('border-red-500');
+        }
+
+        let totalCartWeight = 0;
+        items.forEach(item => {
+            totalCartWeight += (item.unitWeight || 1.0) * item.qty;
+        });
+
+        const btn = document.getElementById('btn-calc-ship');
+        btn.textContent = "...";
+
+        try {
+            const res = await fetch(`${RETAIL_API_URL}?action=calc_shipping&postcode=${encodeURIComponent(pc)}&weight=${totalCartWeight}`);
+            const json = await res.json();
+
+            if (json.status === 'success') {
+                sessionPostcode = pc;
+                const freeShipPromo = appConfig['PROMO_FREE_SHIPPING'];
+
+                if (freeShipPromo && freeShipPromo.isActive) {
+                    sessionShippingFee = 0;
+                    document.getElementById('cart-shipping').innerHTML = `<span class="line-through text-gray-500 mr-2">RM ${json.rate.toFixed(2)}</span><span class="text-luxe font-bold">FREE</span>`;
+                } else {
+                    sessionShippingFee = json.rate;
+                    document.getElementById('cart-shipping').textContent = `RM ${json.rate.toFixed(2)} (J&T Express)`;
+                }
+                updateGrandTotal();
+            }
+        } catch (e) {
+            alert("Shipping calculation failed. Please try again.");
+        }
+        btn.textContent = "CALC";
+    };
+
+    const addressInput = document.getElementById('cart-address');
+    const postcodeInput = document.getElementById('cart-postcode');
+    const stateSelect = document.getElementById('cart-state');
+    const calcBtn = document.getElementById('btn-calc-ship');
+
+    function getStateFromPostcode(pc) {
+        const code = parseInt(pc, 10);
+        if (code >= 1000 && code <= 2999) return "Perlis";
+        if (code >= 5000 && code <= 9999) return "Kedah";
+        if (code >= 10000 && code <= 14999) return "Pulau Pinang";
+        if (code >= 15000 && code <= 18999) return "Kelantan";
+        if (code >= 20000 && code <= 28999) return "Pahang";
+        if (code >= 30000 && code <= 36999) return "Perak";
+        if (code >= 39000 && code <= 39999) return "Pahang";
+        if (code >= 40000 && code <= 48999) return "Selangor";
+        if (code >= 50000 && code <= 59999) return "W.P. Kuala Lumpur";
+        if (code >= 60000 && code <= 68999) return "Selangor";
+        if (code >= 69000 && code <= 73999) return "Negeri Sembilan";
+        if (code >= 75000 && code <= 78999) return "Melaka";
+        if (code >= 79000 && code <= 86999) return "Johor";
+        if (code >= 87000 && code <= 87999) return "W.P. Labuan";
+        if (code >= 88000 && code <= 91999) return "Sabah";
+        if (code >= 93000 && code <= 98999) return "Sarawak";
+        return "";
+    }
+
+    addressInput.addEventListener('input', () => {
+        const match = addressInput.value.match(/\b\d{5}\b/);
+        if (match) {
+            const pc = match[0];
+            if (postcodeInput.value !== pc) {
+                postcodeInput.value = pc;
+                const state = getStateFromPostcode(pc);
+                if (state) stateSelect.value = state;
+                calcBtn.click();
+            }
+        }
+    });
+
+    postcodeInput.addEventListener('input', () => {
+        const pc = postcodeInput.value.trim();
+        if (pc.length === 5 && !isNaN(pc)) {
+            const state = getStateFromPostcode(pc);
+            if (state) stateSelect.value = state;
+            calcBtn.click();
+        }
+    });
+
+    document.getElementById('btn-checkout').onclick = async () => {
+        const items = CartManager.getItems();
+        if (items.length === 0) return;
+
+        // Terminal guard: PDP (activeRetail/ activePromo) or catalog (all line items carry price)
+        const currentPrice = activePromoPrice || activeRetailPrice;
+        const lineItemsPriced = items.length > 0 && items.every(i => (Number(i.price) || 0) > 0);
+        if ((!currentPrice || currentPrice <= 0) && !lineItemsPriced) {
+            alert("⚠️ System Busy: Pricing data failed to load securely. Please refresh the page to continue.");
+            window.location.reload();
+            return;
+        }
+
+        const name = document.getElementById('cart-name').value.trim();
+        let rawPhone = document.getElementById('cart-phone').value;
+        let cleanPhone = String(rawPhone).trim().replace(/\D/g, '');
+        if (cleanPhone.startsWith('1')) cleanPhone = '60' + cleanPhone;
+        else if (cleanPhone.startsWith('0')) cleanPhone = '6' + cleanPhone;
+        const phone = cleanPhone;
+
+        const address = document.getElementById('cart-address').value.trim();
+        const state = document.getElementById('cart-state').value;
+        const postcode = document.getElementById('cart-postcode').value.trim();
+
+        if (!name || !phone || !address || !state || !postcode) {
+            alert("Please fill in all shipping details.");
+            return;
+        }
+
+        const shipRow = document.getElementById('cart-shipping');
+        const shipLabel = shipRow ? shipRow.textContent.replace(/\s+/g, ' ').trim() : '';
+        if (shipLabel === 'Pending' || shipLabel === '' || postcode !== sessionPostcode) {
+            alert("Please click 'Calculate Shipping' to update your delivery fee before checking out.");
+            return;
+        }
+
+        const btn = document.getElementById('btn-checkout');
+        btn.textContent = "Securing Order..."; btn.disabled = true;
+
+        const gateway = document.getElementById('gateway-overlay');
+        gateway.classList.remove('opacity-0', 'pointer-events-none');
+
+        let payloadBasePrice = 0;
+        let payloadAltCost = 0;
+        let payloadTotalWeight = 0;
+        let payloadTotalQty = 0;
+
+        const formattedItems = items.map(item => {
+            let unitAltCost = 0;
+            if (item.alterations) {
+                Object.values(item.alterations).forEach(alt => unitAltCost += (alt.price || 0));
+            }
+
+            payloadBasePrice += item.price * item.qty;
+            payloadAltCost += unitAltCost * item.qty;
+            payloadTotalWeight += (item.unitWeight || 1.0) * item.qty;
+            payloadTotalQty += item.qty;
+
+            const signature = `${item.model}-${item.size}|${JSON.stringify(item.alterations || {})}`;
+
+            return {
+                signature: signature,
+                sku: `${item.model}-${item.size}`,
+                size: item.size,
+                qty: item.qty,
+                unitRetailPrice: item.retailPrice || item.price,
+                unitEffectivePrice: item.price,
+                unitAltCost: unitAltCost,
+                unitDiscount: Math.max(0, (item.retailPrice || item.price) - item.price),
+                unitWeight: item.unitWeight || 1.0,
+                alterations: item.alterations || {},
+                isSoldOut: false
+            };
+        });
+
+        const grandTotal = payloadBasePrice + payloadAltCost + sessionShippingFee;
+
+        const payload = {
+            items: formattedItems,
+            basePrice: payloadBasePrice,
+            altCost: payloadAltCost,
+            weightKg: payloadTotalWeight,
+            totalWeight: payloadTotalWeight,
+            totalQty: payloadTotalQty,
+            shippingFee: sessionShippingFee,
+            discount: 0,
+            totalPaid: grandTotal,
+            name: name,
+            phone: phone,
+            email: "",
+            address: address,
+            state: state,
+            postcode: postcode
+        };
+
+        try {
+            const res = await fetch(`${RETAIL_API_URL}?action=reserve_stock`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: `payload=${encodeURIComponent(JSON.stringify(payload))}`
+            });
+            const json = await res.json();
+
+            if (json.status === 'success') {
+                localStorage.removeItem('arabista_cart');
+                window.location.href = json.paymentUrl;
+            } else {
+                gateway.classList.add('opacity-0', 'pointer-events-none');
+
+                if (json.reason === 'out_of_stock' && json.failedSignature) {
+                    alert(`A selected item sold out during checkout. Please review your cart.`);
+                    window.location.reload();
+                } else {
+                    alert("Checkout Error: " + json.message);
+                }
+            }
+        } catch (e) {
+            gateway.classList.add('opacity-0', 'pointer-events-none');
+            alert("System error: " + e.message);
+        }
+        btn.textContent = "Proceed to Payment"; btn.disabled = false;
+    };
+
+    function toggleCart(show) {
+        const overlay = document.getElementById('cart-overlay');
+        const drawer = document.getElementById('cart-drawer');
+        if (show) {
+            if (typeof renderCart === 'function') renderCart();
+            document.body.style.overflow = 'hidden';
+            overlay.classList.remove('hidden');
+            setTimeout(() => overlay.classList.remove('opacity-0'), 10);
+            drawer.classList.remove('translate-x-full');
+        } else {
+            document.body.style.overflow = '';
+            overlay.classList.add('opacity-0');
+            setTimeout(() => overlay.classList.add('hidden'), 300);
+            drawer.classList.add('translate-x-full');
+        }
+    }
+
+    function closeCart() {
+        if (CartManager.getItems().length === 0) {
+            const c = document.getElementById('cart-items-container');
+            if (c) c.innerHTML = '';
+            const subEl = document.getElementById('cart-subtotal');
+            if (subEl) subEl.textContent = 'RM 0.00';
+            const discRow = document.getElementById('cart-discount-row');
+            if (discRow) discRow.classList.add('hidden');
+            if (typeof updateGrandTotal === 'function') updateGrandTotal();
+        }
+        toggleCart(false);
+    }
+
+    function closeCartDrawer() {
+        toggleCart(false);
+    }
+
+    // --- CART INITIALIZATION ---
+    document.addEventListener('DOMContentLoaded', () => {
+        CartManager.updateCartCount();
+        const navCartBtn = document.getElementById('nav-cart-btn');
+        if (navCartBtn) {
+            navCartBtn.addEventListener('click', () => toggleCart(true));
+        }
+        const closeBtn = document.getElementById('close-cart-btn');
+        if (closeBtn) closeBtn.addEventListener('click', () => toggleCart(false));
+        const cartOverlayEl = document.getElementById('cart-overlay');
+        if (cartOverlayEl) cartOverlayEl.addEventListener('click', () => toggleCart(false));
+    });
+
+
+    // --- 1. Reveal Animations ---
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('show'); });
+    }, { threshold: 0.1 });
+    document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+    // --- 2. Dynamic Year ---
+    document.getElementById('y').textContent = new Date().getFullYear();
+
+    // --- 3 & 4. Unified Filtering & Drawer Logic ---
+    const navBtns = document.querySelectorAll('.nav-btn');
+    const products = document.querySelectorAll('.product-card');
+    const searchInput = document.getElementById('search-input');
+    const searchTriggerBtn = document.getElementById('search-trigger-btn');
+    const filterBtn = document.getElementById('filter-btn');
+    const closeFilterBtn = document.getElementById('close-filter-btn');
+    const applyFiltersBtn = document.getElementById('apply-filters-btn');
+    const productGrid = document.getElementById('product-grid');
+    const filterDrawer = document.getElementById('filter-drawer');
+    const filterOverlay = document.getElementById('filter-overlay');
+
+    let activeCategory = 'all';
+    let appliedSizes = [];
+
+    // Core Filtering Engine
+    function runFilters() {
+      const searchTerm = searchInput.value.toLowerCase().trim();
+
+      products.forEach(p => {
+        p.classList.remove('reveal', 'show'); // Reset animation
+
+        const matchCategory = (activeCategory === 'all' || p.getAttribute('data-category') === activeCategory);
+        // Scans the entire text content of the product card (Title, Subtitle, Price)
+        const matchSearch = (searchTerm === '' || p.innerText.toLowerCase().includes(searchTerm));
+        const sizeList = p.dataset.sizes ? p.dataset.sizes.split(',') : [];
+        const matchSize = appliedSizes.length === 0 || appliedSizes.some(s => sizeList.includes(s));
+
+        if (matchCategory && matchSearch && matchSize) {
+          p.style.display = 'block';
+          // Slight delay to allow display:block to render before applying opacity transition
+          setTimeout(() => p.classList.add('reveal', 'show'), 20);
+        } else {
+          p.style.display = 'none';
+        }
+      });
+    }
+
+    // Category Navigation Click
+    navBtns.forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        // Reset styles
+        navBtns.forEach(b => {
+          b.classList.remove('text-luxe', 'border-b-2', 'border-luxe');
+          b.classList.add('text-white/50');
+        });
+        // Set active style
+        e.currentTarget.classList.remove('text-white/50');
+        e.currentTarget.classList.add('text-luxe', 'border-b-2', 'border-luxe');
+        
+        activeCategory = e.currentTarget.getAttribute('data-target');
+        runFilters();
+      });
+    });
+
+    // Drawer Toggle Function
+    function closeFilterPanel() {
+      filterDrawer.classList.add('translate-x-full');
+      filterOverlay.classList.remove('opacity-100');
+      filterOverlay.classList.add('opacity-0', 'pointer-events-none');
+      document.body.style.overflow = '';
+    }
+
+    function toggleFilter() {
+      const isOpen = !filterDrawer.classList.contains('translate-x-full');
+      if (isOpen) {
+        closeFilterPanel();
+      } else {
+        filterDrawer.classList.remove('translate-x-full');
+        filterOverlay.classList.remove('opacity-0', 'pointer-events-none');
+        filterOverlay.classList.add('opacity-100');
+        document.body.style.overflow = 'hidden';
+      }
+    }
+
+    filterBtn.addEventListener('click', toggleFilter);
+    closeFilterBtn.addEventListener('click', toggleFilter);
+    filterOverlay.addEventListener('click', toggleFilter);
+
+    // Search apply: category + text only (keeps size/sort as last applied)
+    function applyAndCloseFilters() {
+      runFilters();
+      toggleFilter();
+    }
+
+    if (applyFiltersBtn && productGrid) {
+      applyFiltersBtn.addEventListener('click', async () => {
+        const originalText = applyFiltersBtn.innerText;
+        applyFiltersBtn.innerText = "UPDATING...";
+        applyFiltersBtn.disabled = true;
+        applyFiltersBtn.classList.add('opacity-50', 'cursor-not-allowed');
+
+        try {
+          await fetchCatalogPrices(true);
+        } finally {
+          applyFiltersBtn.innerText = originalText;
+          applyFiltersBtn.disabled = false;
+          applyFiltersBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+        }
+
+        appliedSizes = Array.from(document.querySelectorAll('input[name="size"]:checked')).map(cb => cb.value);
+        const sortOption = document.querySelector('input[name="sort"]:checked')?.value;
+
+        runFilters();
+
+        if (sortOption === 'low-high' || sortOption === 'high-low') {
+          const articles = Array.from(productGrid.querySelectorAll('article'));
+          articles.sort((a, b) => {
+            const priceA = parseFloat(a.dataset.price) || 9999;
+            const priceB = parseFloat(b.dataset.price) || 9999;
+            return sortOption === 'low-high' ? priceA - priceB : priceB - priceA;
+          });
+          articles.forEach(article => productGrid.appendChild(article));
+        }
+
+        if (typeof closeFilterPanel === 'function') closeFilterPanel();
+      });
+    }
+
+    // Bind Search Triggers
+    searchTriggerBtn.addEventListener('click', applyAndCloseFilters);
+    
+    // Listen for 'Enter' key in the search input
+    searchInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        applyAndCloseFilters();
+      }
+    });
+
+    // --- 5. Dynamic Catalog Price Fetching ---
+    let isFetchingPrices = false;
+
+    function fetchCatalogPrices(forceLive = false) {
+      if (isFetchingPrices) return Promise.resolve();
+      isFetchingPrices = true;
+
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 10000);
+
+      const url = `${RETAIL_API_URL}?action=get_config${forceLive ? '&nocache=true' : ''}&cb=${Date.now().toString(36)}`;
+      return fetch(url, { signal: controller.signal })
+        .then((res) => {
+          clearTimeout(timeoutId);
+          if (!res.ok) throw new Error("Network error");
+          return res.json();
+        })
+        .then((json) => {
+          if (json.status !== 'success') throw new Error("API error");
+
+          appConfig = json.data.config || {};
+          const matrix = json.data.matrix || {};
+          const config = json.data.config || {};
+          const modelPrices = {};
+
+          // 1. Scan the inventoryMatrix for the lowest price per model and per-size stock (for data-sizes)
+          for (let sku in matrix) {
+            const row = matrix[sku];
+            const base = row.baseItem;
+            if (!base) continue;
+
+            const sizeFromSku = sku.startsWith(base + '-')
+                ? sku.slice((base + '-').length)
+                : (row.size != null && String(row.size) ? String(row.size) : '');
+            const stockVal = row.Available_To_Sell ?? row.stock ?? row.qty ?? 0;
+            const stock = parseInt(String(stockVal), 10) || 0;
+
+            if (!modelPrices[base]) {
+                modelPrices[base] = { retail: row.retailPrice, promo: row.promoPrice, matrix: {} };
+            } else {
+                if (row.retailPrice > 0 && (modelPrices[base].retail === 0 || row.retailPrice < modelPrices[base].retail)) {
+                    modelPrices[base].retail = row.retailPrice;
+                }
+                if (row.promoPrice !== null && (modelPrices[base].promo === null || row.promoPrice < modelPrices[base].promo)) {
+                    modelPrices[base].promo = row.promoPrice;
+                }
+            }
+            if (!modelPrices[base].matrix) modelPrices[base].matrix = {};
+            if (sizeFromSku) {
+                const prev = modelPrices[base].matrix[sizeFromSku] || 0;
+                modelPrices[base].matrix[sizeFromSku] = Math.max(prev, stock);
+            }
+          }
+
+          // 2. Smoothly inject prices into the DOM mimicking PDP style
+          document.querySelectorAll('.price-container').forEach(el => {
+            const model = el.getAttribute('data-model');
+            const d = modelPrices[model];
+            const article = el.closest('article');
+            if (article) {
+              if (d && d.retail > 0) {
+                article.dataset.price = d.promo !== null && d.promo < d.retail ? d.promo : d.retail;
+              } else {
+                delete article.dataset.price;
+              }
+              if (d && d.matrix) {
+                const availableSizes = Object.entries(d.matrix)
+                  .filter(([size, stock]) => parseInt(stock) > 0)
+                  .map(([size]) => size);
+                if (availableSizes.length) {
+                  article.dataset.sizes = availableSizes.join(',');
+                } else {
+                  delete article.dataset.sizes;
+                }
+              }
+            }
+            el.style.opacity = '0';
+
+            setTimeout(() => {
+              const d2 = modelPrices[model];
+              if (d2 && d2.retail > 0) {
+                const hasPromo = d2.promo !== null && d2.promo < d2.retail;
+                const label = config[model] && config[model].promoLabel ? config[model].promoLabel : "";
+                
+                if (hasPromo) {
+                  let labelHtml = label ? `<span class="text-[9px] uppercase tracking-widest text-luxe border border-luxe/30 px-1.5 py-0.5 rounded-sm mr-2">${label}</span>` : '';
+                  el.innerHTML = `
+                    <div class="flex items-center justify-end">
+                      ${labelHtml}
+                      <del class="text-white/40 text-xs mr-1.5">RM ${d2.retail.toFixed(0)}</del>
+                      <span class="text-luxe font-medium text-sm">RM ${d2.promo.toFixed(0)}</span>
+                    </div>
+                  `;
+                } else {
+                  el.innerHTML = `<span class="text-white font-medium text-sm">RM ${d2.retail.toFixed(0)}</span>`;
+                }
+              } else {
+                el.innerHTML = `<span class="text-white/30 text-xs">RM --</span>`;
+              }
+              el.style.opacity = '1';
+            }, 300);
+          });
+
+          if (filterBtn) {
+            filterBtn.disabled = false;
+            filterBtn.classList.remove('text-white/30', 'cursor-not-allowed');
+            filterBtn.classList.add('text-white/70', 'hover:text-luxe', 'hover:border-luxe');
+          }
+        })
+        .catch((e) => {
+          console.warn("Failed to fetch catalog prices:", e);
+          document.querySelectorAll('.price-container').forEach(el => {
+            el.innerHTML = `<span class="text-white/30 text-xs">RM --</span>`;
+            el.style.opacity = '1';
+          });
+        })
+        .finally(() => {
+          clearTimeout(timeoutId);
+          isFetchingPrices = false;
+        });
+    }
+
+    // Initialize Fetch on Page Load
+    fetchCatalogPrices();
+
+  </script>
+</body>
+</html>
