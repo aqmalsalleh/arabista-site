@@ -139,7 +139,8 @@
 
         <div class="justify-self-end flex items-center">
           <button type="button" id="nav-cart-btn" class="relative p-2 -mr-2 text-white hover:text-luxe transition-colors tap-none" aria-label="Open cart">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
+            <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
+            <span id="nav-cart-badge" class="absolute top-0 right-0 -mt-0.5 -mr-0.5 flex h-4 w-4 sm:h-[18px] sm:w-[18px] items-center justify-center rounded-full bg-luxe text-[9px] sm:text-[10px] font-bold text-brand opacity-0 scale-0 transition-all duration-300 pointer-events-none">0</span>
           </button>
         </div>
       </div>
@@ -416,10 +417,6 @@
           <button type="button" id="close-cart-btn" class="text-gray-400 hover:text-white tap-none"><svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
       </div>
 
-      <div id="cart-notification" class="hidden bg-red-500/10 border-b border-red-500/20 p-3 text-center text-red-400 text-[11px] tracking-wide shadow-inner transition-all duration-300">
-          Another customer just secured the last piece of a selected item. Please review your cart.
-      </div>
-
       <div class="flex-1 overflow-y-auto overscroll-contain p-4 sm:p-6 flex flex-col gap-8 hide-scrollbar" id="cart-scroll-area">
           <div id="cart-items-container"></div>
 
@@ -468,7 +465,6 @@
     let appConfig = {};
     let inventoryMatrix = {};
     let altEnabled = false;
-    let cartState = null;
     let activeRetailPrice = 0; // Dynamically set on load
     let activePromoPrice = null; // Dynamically set on load
     let activeWeightKg = 1.0;
@@ -507,10 +503,20 @@
         },
         updateCartCount: function() {
             const count = this.getItems().reduce((total, item) => total + item.qty, 0);
-            const cartBtn = document.getElementById('nav-cart-btn');
-            if (cartBtn) {
-                let badge = cartBtn.querySelector('span.absolute');
-                if (badge) badge.innerText = count;
+            const badge = document.getElementById('nav-cart-badge');
+            if (badge) {
+                badge.textContent = count;
+                if (count > 0) {
+                    // Show and pop
+                    badge.classList.remove('opacity-0', 'scale-0');
+                    badge.classList.add('opacity-100', 'scale-100');
+                    badge.classList.add('scale-110');
+                    setTimeout(() => badge.classList.remove('scale-110'), 150);
+                } else {
+                    // Hide
+                    badge.classList.remove('opacity-100', 'scale-100', 'scale-110');
+                    badge.classList.add('opacity-0', 'scale-0');
+                }
             }
         }
     };
