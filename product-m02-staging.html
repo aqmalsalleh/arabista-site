@@ -139,7 +139,8 @@
 
         <div class="justify-self-end flex items-center">
           <button type="button" id="nav-cart-btn" class="relative p-2 -mr-2 text-white hover:text-luxe transition-colors tap-none" aria-label="Open cart">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
+            <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
+            <span id="nav-cart-badge" class="absolute top-0 right-0 -mt-0.5 -mr-0.5 flex h-4 w-4 sm:h-[18px] sm:w-[18px] items-center justify-center rounded-full bg-luxe text-[9px] sm:text-[10px] font-bold text-brand opacity-0 scale-0 transition-all duration-300 pointer-events-none">0</span>
           </button>
         </div>
       </div>
@@ -416,10 +417,6 @@
           <button type="button" id="close-cart-btn" class="text-gray-400 hover:text-white tap-none"><svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
       </div>
 
-      <div id="cart-notification" class="hidden bg-red-500/10 border-b border-red-500/20 p-3 text-center text-red-400 text-[11px] tracking-wide shadow-inner transition-all duration-300">
-          Another customer just secured the last piece of a selected item. Please review your cart.
-      </div>
-
       <div class="flex-1 overflow-y-auto overscroll-contain p-4 sm:p-6 flex flex-col gap-8 hide-scrollbar" id="cart-scroll-area">
           <div id="cart-items-container"></div>
 
@@ -468,10 +465,64 @@
     let appConfig = {};
     let inventoryMatrix = {};
     let altEnabled = false;
-    let cartState = null;
     let activeRetailPrice = 0; // Dynamically set on load
     let activePromoPrice = null; // Dynamically set on load
     let activeWeightKg = 1.0;
+
+    // --- GLOBAL CART MANAGER ---
+    const CartManager = {
+        key: 'arabista_cart',
+        getItems: function() {
+            return JSON.parse(localStorage.getItem(this.key)) || [];
+        },
+        addItem: function(productObj) {
+            const items = this.getItems();
+            items.push(productObj);
+            localStorage.setItem(this.key, JSON.stringify(items));
+            this.updateCartCount();
+        },
+        removeItem: function(id) {
+            const items = this.getItems().filter(item => item.id !== id);
+            localStorage.setItem(this.key, JSON.stringify(items));
+            this.updateCartCount();
+            if (typeof renderCart === 'function') renderCart();
+        },
+        updateQty: function(id, delta) {
+            const items = this.getItems();
+            const item = items.find(i => i.id === id);
+            if (item) {
+                item.qty += delta;
+                if (item.qty <= 0) {
+                    this.removeItem(id);
+                    return;
+                }
+                localStorage.setItem(this.key, JSON.stringify(items));
+                this.updateCartCount();
+                if (typeof renderCart === 'function') renderCart();
+            }
+        },
+        updateCartCount: function() {
+            const count = this.getItems().reduce((total, item) => total + item.qty, 0);
+            const badge = document.getElementById('nav-cart-badge');
+            if (badge) {
+                badge.textContent = count;
+                if (count > 0) {
+                    badge.classList.remove('opacity-0', 'scale-0');
+                    badge.classList.add('opacity-100', 'scale-100');
+                    badge.classList.add('scale-110');
+                    setTimeout(() => badge.classList.remove('scale-110'), 150);
+                } else {
+                    badge.classList.remove('opacity-100', 'scale-100', 'scale-110');
+                    badge.classList.add('opacity-0', 'scale-0');
+                }
+            }
+        }
+    };
+
+    let sessionShippingFee = 0;
+    let sessionPostcode = '';
+
+    document.addEventListener('DOMContentLoaded', () => CartManager.updateCartCount());
 
     // Gallery Logic
     const mediaFiles = [
@@ -920,6 +971,7 @@
         const overlay = document.getElementById('cart-overlay');
         const drawer = document.getElementById('cart-drawer');
         if (show) {
+            if (typeof renderCart === 'function') renderCart();
             document.body.style.overflow = 'hidden';
             overlay.classList.remove('hidden');
             setTimeout(() => overlay.classList.remove('opacity-0'), 10);
@@ -935,288 +987,260 @@
     document.getElementById('close-cart-btn').onclick = () => toggleCart(false);
     document.getElementById('cart-overlay').onclick = () => toggleCart(false);
 
+    function getSelectedAlterationsForCart() {
+        const selectedAlterations = {};
+        if (!altEnabled) return selectedAlterations;
+        document.querySelectorAll('.alt-input').forEach(inp => {
+            const val = parseFloat(inp.value);
+            if (val) {
+                const key = inp.getAttribute('data-key');
+                const sId = key === 'length' ? 'M02_ALT_LENGTH' : (key === 'sleeve' ? 'M02_ALT_SLEEVE' : 'M02_ALT_SHOULDER');
+                const conf = appConfig[sId];
+                if (conf) {
+                    const stdPrice = conf.standardPrice || 0;
+                    const isPromo = conf.promoPrice !== null && conf.promoPrice < stdPrice;
+                    const charged = isPromo ? conf.promoPrice : stdPrice;
+                    const bmNames = { length: 'Labuh', sleeve: 'Lengan', shoulder: 'Bahu' };
+                    selectedAlterations[key] = {
+                        name: bmNames[key] || (key.charAt(0).toUpperCase() + key.slice(1)),
+                        val: val + '"',
+                        price: charged,
+                        standardPrice: stdPrice,
+                        isPromo: isPromo
+                    };
+                }
+            }
+        });
+        return selectedAlterations;
+    }
+
+    function addM02ToLocalCartAndOpenDrawer() {
+        if (!selectedSize) {
+            alert("Please select a size before adding to cart.");
+            return;
+        }
+
+        const currentPrice = activePromoPrice !== null ? activePromoPrice : activeRetailPrice;
+        const currentRetailPrice = activeRetailPrice;
+        const selectedAlterations = getSelectedAlterationsForCart();
+        const cartItem = {
+            id: `M02-${Date.now()}`,
+            model: currentModel,
+            series: 'Maraya Series',
+            size: selectedSize,
+            retailPrice: currentRetailPrice,
+            price: currentPrice,
+            unitWeight: typeof activeWeightKg !== 'undefined' ? activeWeightKg : 1.0,
+            alterations: { ...selectedAlterations },
+            image: 'images/m02-1-hero.webp',
+            qty: 1
+        };
+
+        CartManager.addItem(cartItem);
+        toggleCart(true);
+    }
+
     function closeCart() {
-        if (cartState && (!cartState.items || cartState.items.length === 0)) {
+        if (CartManager.getItems().length === 0) {
             const c = document.getElementById('cart-items-container');
             if (c) c.innerHTML = '';
             const subEl = document.getElementById('cart-subtotal');
             if (subEl) subEl.textContent = 'RM 0.00';
             const discRow = document.getElementById('cart-discount-row');
             if (discRow) discRow.classList.add('hidden');
-            updateGrandTotal();
+            if (typeof updateGrandTotal === 'function') updateGrandTotal();
         }
         toggleCart(false);
     }
 
-    // --- MULTI-LINE-ITEM CART ENGINE ---
-    document.getElementById('add-to-cart-btn').addEventListener('click', () => {
-        if (!selectedSize) {
-            alert("Please select a size first.");
-            document.getElementById('size-calculator-section')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            return;
-        }
-
-        const currentAlterations = {};
-        let altStandardSum = 0;
-        let altPaidSum = 0;
-
-        if (altEnabled) {
-            document.querySelectorAll('.alt-input').forEach(inp => {
-                const val = parseFloat(inp.value);
-                if (val) {
-                    const key = inp.getAttribute('data-key');
-                    const sId = key === 'length' ? 'M02_ALT_LENGTH' : (key === 'sleeve' ? 'M02_ALT_SLEEVE' : 'M02_ALT_SHOULDER');
-                    const conf = appConfig[sId];
-                    if (conf) {
-                        const stdPrice = conf.standardPrice || 0;
-                        const isPromo = conf.promoPrice !== null && conf.promoPrice < stdPrice;
-                        const charged = isPromo ? conf.promoPrice : stdPrice;
-
-                        const bmNames = { length: 'Labuh', sleeve: 'Lengan', shoulder: 'Bahu' };
-                        currentAlterations[key] = {
-                            name: bmNames[key] || (key.charAt(0).toUpperCase() + key.slice(1)),
-                            val: val + '"',
-                            price: charged,
-                            standardPrice: stdPrice,
-                            isPromo: isPromo
-                        };
-                        altStandardSum += stdPrice;
-                        altPaidSum += charged;
-                    }
-                }
-            });
-        }
-
-        const effectivePrice = activePromoPrice !== null ? activePromoPrice : activeRetailPrice;
-        const inputQty = parseInt(document.getElementById('qty').value) || 1;
-        const baseDiscount = activeRetailPrice - effectivePrice;
-        const altDiscount = altStandardSum - altPaidSum;
-        const totalUnitDiscount = baseDiscount + altDiscount;
-
-        // The Configuration Hash: Unique signature for this exact size + alt combo
-        const signature = `${currentModel}-${selectedSize}|${JSON.stringify(currentAlterations)}`;
-
-        // Initialize Cart State if empty
-        if (!cartState) {
-            cartState = {
-                items: [],
-                basePrice: 0, altCost: 0, weightKg: 0, totalQty: 0,
-                shippingFee: 0, discount: 0, promoLabel: '',
-                name: '', phone: '', email: '', address: '', state: '', postcode: ''
-            };
-        }
-
-        // Check if this exact configuration already exists in the cart
-        const existingItem = cartState.items.find(i => i.signature === signature);
-        if (existingItem) {
-            existingItem.qty += inputQty;
-        } else {
-            cartState.items.push({
-                signature: signature,
-                sku: `${currentModel}-${selectedSize}`,
-                size: selectedSize,
-                qty: inputQty,
-                unitRetailPrice: activeRetailPrice,
-                unitEffectivePrice: effectivePrice,
-                unitAltCost: altPaidSum,
-                unitDiscount: totalUnitDiscount,
-                unitWeight: activeWeightKg,
-                alterations: { ...currentAlterations }
-            });
-        }
-
-        updateCartTotals();
-        renderCart();
-
-        // Reset UI for next item
-        document.getElementById('qty').value = 1;
-        toggleCart(true);
-    });
-
-    // Helper: Recalculates root totals for checkout/shipping compatibility
-    function updateCartTotals() {
-        if (!cartState) return;
-        cartState.basePrice = 0; cartState.altCost = 0; cartState.weightKg = 0; cartState.totalQty = 0;
-
-        cartState.items.forEach(item => {
-            cartState.basePrice += item.unitEffectivePrice * item.qty;
-            cartState.altCost += item.unitAltCost * item.qty;
-            cartState.weightKg += item.unitWeight * item.qty;
-            cartState.totalQty += item.qty;
-        });
-
-        // Reset shipping if cart is emptied to force recalc
-        if (cartState.items.length === 0) cartState.shippingFee = 0;
+    function closeCartDrawer() {
+        toggleCart(false);
     }
 
-    // Helper: Internal Cart QTY Adjuster
-    window.updateCartItemQty = function(signature, delta) {
-        if (!cartState) return;
-        const item = cartState.items.find(i => i.signature === signature);
-        if (item) {
-            item.qty += delta;
-            if (item.qty <= 0) {
-                cartState.items = cartState.items.filter(i => i.signature !== signature);
-            }
-            updateCartTotals();
-            cartState.items.length === 0 ? closeCart() : renderCart();
-        }
-    };
+    // --- ADD TO CART (localStorage via CartManager) ---
+    document.getElementById('add-to-cart-btn').addEventListener('click', addM02ToLocalCartAndOpenDrawer);
 
-    // Helper: Remove Item
-    window.removeCartItem = function(signature) {
-        if (!cartState) return;
-        cartState.items = cartState.items.filter(i => i.signature !== signature);
-        updateCartTotals();
-        cartState.items.length === 0 ? closeCart() : renderCart();
-    };
-
+    // --- CART UI RENDERER ---
     function renderCart() {
-        if (!cartState) return;
+        const currentRetailPrice = activeRetailPrice;
         const container = document.getElementById('cart-items-container');
-        if (!cartState.items || cartState.items.length === 0) return;
+        const subtotalEl = document.getElementById('cart-subtotal');
 
-        let html = '';
+        if (!container || !subtotalEl) return;
+
+        const items = CartManager.getItems();
         let visualSubtotal = 0;
         let totalDiscount = 0;
 
-        cartState.items.forEach(item => {
+        if (items.length === 0) {
+            container.innerHTML = `<div class="text-center text-white/40 py-10 text-sm">Your cart is currently empty.</div>`;
+            subtotalEl.textContent = `RM 0.00`;
+            const discRow = document.getElementById('cart-discount-row');
+            if (discRow) {
+                discRow.classList.add('hidden');
+                discRow.classList.remove('flex');
+            }
+            updateGrandTotal();
+            return;
+        }
+
+        let html = '';
+        items.forEach(item => {
             let altHtml = '';
-            if (Object.keys(item.alterations).length > 0) {
+            let altCost = 0;
+
+            if (item.alterations && Object.keys(item.alterations).length > 0) {
                 altHtml = '<div class="text-white/40 text-[11px] mt-1.5 leading-relaxed space-y-0.5">';
                 for (let [k, v] of Object.entries(item.alterations)) {
                     let priceDisplay = v.isPromo ? `<del class="text-white/30">RM ${v.standardPrice.toFixed(2)}</del> <span class="text-luxe font-bold ml-1">${v.price === 0 ? "FREE" : `RM ${v.price.toFixed(2)}`}</span>` : `+RM ${v.price.toFixed(2)}`;
                     altHtml += `<div>${v.name}: ${v.val} <span class="text-white/20 mx-1">|</span> ${priceDisplay}</div>`;
+                    altCost += (v.price || 0);
                 }
                 altHtml += '</div>';
             }
 
-            const itemPaid = (item.unitEffectivePrice + item.unitAltCost) * item.qty;
-            const itemSaved = (item.unitDiscount || 0) * item.qty;
-            const sigJson = JSON.stringify(item.signature);
+            // Handle dynamic discount math
+            const itemRetail = item.retailPrice || currentRetailPrice || item.price;
+            const itemDiscount = Math.max(0, itemRetail - item.price);
 
-            // Only add to totals if the item is NOT sold out
-            if (!item.isSoldOut) {
-                visualSubtotal += (itemPaid + itemSaved);
-                totalDiscount += itemSaved;
-            }
+            const totalUnitPaid = item.price + altCost;
+            const lineTotal = totalUnitPaid * item.qty;
 
-            // Aesthetic States based on Soft Reject
-            const isOOS = item.isSoldOut;
-            const cardBorder = isOOS ? 'border-red-500/30' : 'border-white/10';
-            const imgStyle = isOOS ? 'border-red-500/30 grayscale opacity-40' : 'border-white/10';
-            const titleStyle = isOOS ? 'text-white/40' : 'text-white';
+            // BUGFIX: Subtotal must reflect the raw retail value before discounts
+            const retailLineTotal = (itemRetail + altCost) * item.qty;
 
-            let priceOrOOS = '';
-            let qtyOrEmpty = '';
+            visualSubtotal += retailLineTotal;
+            totalDiscount += (itemDiscount * item.qty);
 
-            if (isOOS) {
-                priceOrOOS = `<div class="mt-2 text-red-500/90 text-[10px] font-bold uppercase tracking-widest bg-red-500/10 inline-block px-2 py-1.5 rounded border border-red-500/20 shadow-[0_0_10px_rgba(239,68,68,0.15)]">[ Sold Out ]</div>`;
-            } else {
-                priceOrOOS = `
-                    <div class="mt-0.5">
-                        ${item.unitEffectivePrice < item.unitRetailPrice
-                            ? `<del class="text-white/30 mr-1.5 text-xs">RM ${(item.unitRetailPrice * item.qty).toFixed(2)}</del><span class="text-luxe font-bold text-sm">RM ${(item.unitEffectivePrice * item.qty).toFixed(2)}</span>`
-                            : `<span class="text-luxe font-medium text-sm">RM ${(item.unitEffectivePrice * item.qty).toFixed(2)}</span>`
-                        }
-                    </div>
-                    ${altHtml}
-                `;
-                qtyOrEmpty = `
-                    <div class="flex items-center mt-3">
-                        <div class="flex items-center rounded-md border border-white/15 bg-white/[0.02]">
-                            <button type="button" onclick='updateCartItemQty(${sigJson}, -1)' class="px-3 py-1 text-white/50 hover:text-white tap-none">&minus;</button>
-                            <span class="w-6 text-center text-xs font-medium">${item.qty}</span>
-                            <button type="button" onclick='updateCartItemQty(${sigJson}, 1)' class="px-3 py-1 text-white/50 hover:text-white tap-none">&plus;</button>
-                        </div>
-                    </div>`;
-            }
-
-            html += `
-                <div class="flex gap-4 pb-5 border-b ${cardBorder} relative group last:border-0 last:pb-0 transition-all duration-300">
-                    <img src="images/m02-1-hero.webp" class="w-20 h-24 object-cover rounded-lg border ${imgStyle} transition-all duration-300" alt="M02">
-                    <div class="flex-1 flex flex-col justify-between">
-                        <div>
-                            <div class="flex justify-between items-start">
-                                <div class="${titleStyle} font-medium text-[14px] transition-colors">M02 Abaya <span class="text-white/50 text-xs ml-1 font-normal">(Size ${item.size})</span></div>
-                                <button type="button" onclick='removeCartItem(${sigJson})' class="text-white/30 hover:text-white transition-colors p-1 -mr-2 -mt-1 tap-none" title="Remove item">
-                                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-                                </button>
-                            </div>
-                            ${priceOrOOS}
-                        </div>
-                        ${qtyOrEmpty}
-                    </div>
-                </div>
-            `;
-        });
-
-        // Add Another Piece Button
-        html += `
-            <div class="mt-4 pt-4 border-t border-white/10">
-                <button onclick="closeCart()" class="w-full py-2.5 border border-dashed border-white/20 rounded-xl text-white/60 text-[10px] uppercase tracking-widest hover:border-luxe hover:text-luxe transition-colors tap-none flex items-center justify-center gap-2">
-                    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-                    Add Another Piece
-                </button>
+            // Strikethrough Logic for the UI
+            const priceOrOOS = `
+            <div class="mt-0.5">
+                ${itemDiscount > 0
+                    ? `<del class="text-white/30 mr-1.5 text-xs">RM ${((itemRetail + altCost) * item.qty).toFixed(2)}</del><span class="text-luxe font-bold text-sm">RM ${lineTotal.toFixed(2)}</span>`
+                    : `<span class="text-luxe font-medium text-sm">RM ${lineTotal.toFixed(2)}</span>`
+                }
             </div>
+            ${altHtml}
         `;
 
+            // Proper Trash Can SVG
+            const trashSvg = `<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>`;
+
+            html += `
+            <div class="flex gap-4 pb-5 border-b border-white/10 relative group last:border-0 last:pb-0 transition-all duration-300">
+                <img src="${item.image}" class="w-20 h-24 object-cover rounded-lg border border-white/10 transition-all duration-300" alt="${item.model}">
+                <div class="flex-1 flex flex-col justify-between">
+                    <div>
+                        <div class="flex justify-between items-start">
+                            <div class="text-white font-medium text-[14px] transition-colors">${item.model} ${item.series} <span class="text-white/50 text-xs ml-1 font-normal">(Size ${item.size})</span></div>
+                            <button type="button" onclick="CartManager.removeItem('${item.id}')" class="text-white/30 hover:text-red-400 transition-colors p-1 -mr-2 -mt-1 tap-none" title="Remove item">
+                                ${trashSvg}
+                            </button>
+                        </div>
+                        ${priceOrOOS}
+                    </div>
+                    <div class="flex items-center mt-3">
+                        <div class="flex items-center rounded-md border border-white/15 bg-white/[0.02]">
+                            <button type="button" onclick="CartManager.updateQty('${item.id}', -1)" class="px-3 py-1 text-white/50 hover:text-white tap-none">&minus;</button>
+                            <span class="w-6 text-center text-xs font-medium">${item.qty}</span>
+                            <button type="button" onclick="CartManager.updateQty('${item.id}', 1)" class="px-3 py-1 text-white/50 hover:text-white tap-none">&plus;</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+        });
+
+        html += `
+        <div class="mt-4 pt-4 border-t border-white/10">
+            <button onclick="closeCartDrawer()" class="w-full py-2.5 border border-dashed border-white/20 rounded-xl text-white/60 text-[10px] uppercase tracking-widest hover:border-luxe hover:text-luxe transition-colors tap-none flex items-center justify-center gap-2">
+                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                Add Another Piece
+            </button>
+        </div>
+    `;
+
         container.innerHTML = html;
+        subtotalEl.textContent = `RM ${visualSubtotal.toFixed(2)}`;
 
-        // Visual Cart Totals Math
-        totalDiscount += cartState.discount || 0; // Catch generic cart-level promos if any
-        document.getElementById('cart-subtotal').textContent = `RM ${visualSubtotal.toFixed(2)}`;
-
+        // Toggle Overall Discount Row
         const discRow = document.getElementById('cart-discount-row');
-        if (totalDiscount > 0) {
-            document.getElementById('cart-discount-label').textContent = "Total Discount";
-            document.getElementById('cart-discount-amount').textContent = `-RM ${totalDiscount.toFixed(2)}`;
-            document.getElementById('cart-discount-amount').className = "text-luxe font-medium";
-            discRow.classList.remove('hidden');
-            discRow.classList.add('flex');
-        } else {
-            discRow.classList.add('hidden');
-            discRow.classList.remove('flex');
+        if (discRow) {
+            if (totalDiscount > 0) {
+                document.getElementById('cart-discount-label').textContent = "Total Discount";
+                document.getElementById('cart-discount-amount').textContent = `-RM ${totalDiscount.toFixed(2)}`;
+                document.getElementById('cart-discount-amount').className = "text-luxe font-medium";
+                discRow.classList.remove('hidden');
+                discRow.classList.add('flex');
+            } else {
+                discRow.classList.add('hidden');
+                discRow.classList.remove('flex');
+            }
         }
-
         updateGrandTotal();
-
-        const shipEl = document.getElementById('cart-shipping');
-        if (shipEl && cartState.shippingFee > 0 && shipEl.textContent.trim() === 'Pending') {
-            shipEl.textContent = `RM ${cartState.shippingFee.toFixed(2)} (J&T Express)`;
-        }
     }
 
     function updateGrandTotal() {
-        if (!cartState) return;
-        const total = (cartState.basePrice + cartState.altCost) - cartState.discount + cartState.shippingFee;
-        document.getElementById('cart-total').textContent = `RM ${total.toFixed(2)}`;
+        const items = CartManager.getItems();
+        if (items.length === 0) {
+            document.getElementById('cart-total').textContent = `RM 0.00`;
+            return;
+        }
+
+        let baseTotal = 0;
+        items.forEach(item => {
+            let altCost = 0;
+            if (item.alterations) {
+                Object.values(item.alterations).forEach(alt => altCost += (alt.price || 0));
+            }
+            baseTotal += (item.price + altCost) * item.qty;
+        });
+
+        const grandTotal = baseTotal + sessionShippingFee;
+        document.getElementById('cart-total').textContent = `RM ${grandTotal.toFixed(2)}`;
     }
 
     document.getElementById('btn-calc-ship').onclick = async () => {
-        if (!cartState) return;
+        const items = CartManager.getItems();
+        if (items.length === 0) return;
+
         const pc = document.getElementById('cart-postcode').value.trim();
-        if (!pc || pc.length < 5 || isNaN(pc)) { document.getElementById('cart-postcode').classList.add('border-red-500'); return; }
-        else document.getElementById('cart-postcode').classList.remove('border-red-500');
+        if (!pc || pc.length < 5 || isNaN(pc)) {
+            document.getElementById('cart-postcode').classList.add('border-red-500');
+            return;
+        } else {
+            document.getElementById('cart-postcode').classList.remove('border-red-500');
+        }
+
+        // Calculate aggregated weight across all cart items
+        let totalCartWeight = 0;
+        items.forEach(item => {
+            totalCartWeight += (item.unitWeight || 1.0) * item.qty;
+        });
 
         const btn = document.getElementById('btn-calc-ship');
         btn.textContent = "...";
+
         try {
-            const res = await fetch(`${RETAIL_API_URL}?action=calc_shipping&postcode=${encodeURIComponent(pc)}&weight=${cartState.weightKg}`);
+            const res = await fetch(`${RETAIL_API_URL}?action=calc_shipping&postcode=${encodeURIComponent(pc)}&weight=${totalCartWeight}`);
             const json = await res.json();
+
             if (json.status === 'success') {
-                cartState.postcode = pc;
+                sessionPostcode = pc;
                 const freeShipPromo = appConfig['PROMO_FREE_SHIPPING'];
+
                 if (freeShipPromo && freeShipPromo.isActive) {
-                    cartState.shippingFee = 0;
+                    sessionShippingFee = 0;
                     document.getElementById('cart-shipping').innerHTML = `<span class="line-through text-gray-500 mr-2">RM ${json.rate.toFixed(2)}</span><span class="text-luxe font-bold">FREE</span>`;
                 } else {
-                    cartState.shippingFee = json.rate;
+                    sessionShippingFee = json.rate;
                     document.getElementById('cart-shipping').textContent = `RM ${json.rate.toFixed(2)} (J&T Express)`;
                 }
                 updateGrandTotal();
             }
-        } catch (e) { alert("Shipping calculation failed."); }
+        } catch (e) {
+            alert("Shipping calculation failed. Please try again.");
+        }
         btn.textContent = "CALC";
     };
 
@@ -1270,93 +1294,117 @@
     });
 
     document.getElementById('btn-checkout').onclick = async () => {
-        // TERMINAL GUARD: Physically block checkout if prices failed to load
+        const items = CartManager.getItems();
+        if (items.length === 0) return;
+
+        // Terminal Guard for dynamic pricing loads
         const currentPrice = activePromoPrice || activeRetailPrice;
         if (!currentPrice || currentPrice <= 0) {
             alert("⚠️ System Busy: Pricing data failed to load securely. Please refresh the page to continue.");
             window.location.reload();
             return;
         }
-        if (!cartState) return;
-        const name = document.getElementById('cart-name').value.trim();
 
-        // --- FRONTEND PHONE SANITIZATION ---
+        const name = document.getElementById('cart-name').value.trim();
         let rawPhone = document.getElementById('cart-phone').value;
-        let cleanPhone = String(rawPhone).trim().replace(/\D/g, ''); // Strip spaces, dashes, and '+'
-        if (cleanPhone.startsWith('1')) {
-             cleanPhone = '60' + cleanPhone; // Catch dropped leading zero
-        } else if (cleanPhone.startsWith('0')) {
-             cleanPhone = '6' + cleanPhone; // Convert '019' to '6019'
-        }
+        let cleanPhone = String(rawPhone).trim().replace(/\D/g, '');
+        if (cleanPhone.startsWith('1')) cleanPhone = '60' + cleanPhone;
+        else if (cleanPhone.startsWith('0')) cleanPhone = '6' + cleanPhone;
         const phone = cleanPhone;
 
         const address = document.getElementById('cart-address').value.trim();
         const state = document.getElementById('cart-state').value;
         const postcode = document.getElementById('cart-postcode').value.trim();
-        // Update state with the DOM inputs just in case they typed without blurring
-        cartState.name = name;
-        cartState.phone = phone;
-        cartState.address = address;
-        cartState.state = state;
-        cartState.postcode = postcode;
 
         if (!name || !phone || !address || !state || !postcode) {
-            alert("Please fill in all shipping details."); 
+            alert("Please fill in all shipping details.");
             return;
         }
 
-        // If they filled the postcode but haven't calculated shipping yet, prompt them gently instead of a generic error
         const shipRow = document.getElementById('cart-shipping');
         const shipLabel = shipRow ? shipRow.textContent.replace(/\s+/g, ' ').trim() : '';
-        if (shipLabel === 'Pending' || shipLabel === '') {
+        if (shipLabel === 'Pending' || shipLabel === '' || postcode !== sessionPostcode) {
             alert("Please click 'Calculate Shipping' to update your delivery fee before checking out.");
             return;
         }
+
         const btn = document.getElementById('btn-checkout');
         btn.textContent = "Securing Order..."; btn.disabled = true;
 
-        // 1. Trigger Immersive Gateway
         const gateway = document.getElementById('gateway-overlay');
         gateway.classList.remove('opacity-0', 'pointer-events-none');
 
-        cartState.email = "";
-        cartState.totalPaid = (cartState.basePrice + cartState.altCost) - cartState.discount + cartState.shippingFee;
+        // TRANSLATOR: Rebuild the precise payload expected by Google Apps Script
+        let payloadBasePrice = 0;
+        let payloadAltCost = 0;
+        let payloadTotalWeight = 0;
+        let payloadTotalQty = 0;
+
+        const formattedItems = items.map(item => {
+            let unitAltCost = 0;
+            if (item.alterations) {
+                Object.values(item.alterations).forEach(alt => unitAltCost += (alt.price || 0));
+            }
+
+            payloadBasePrice += item.price * item.qty;
+            payloadAltCost += unitAltCost * item.qty;
+            payloadTotalWeight += (item.unitWeight || 1.0) * item.qty;
+            payloadTotalQty += item.qty;
+
+            const signature = `${item.model}-${item.size}|${JSON.stringify(item.alterations || {})}`;
+
+            return {
+                signature: signature,
+                sku: `${item.model}-${item.size}`,
+                size: item.size,
+                qty: item.qty,
+                unitRetailPrice: item.retailPrice || item.price,
+                unitEffectivePrice: item.price,
+                unitAltCost: unitAltCost,
+                unitDiscount: Math.max(0, (item.retailPrice || item.price) - item.price),
+                unitWeight: item.unitWeight || 1.0,
+                alterations: item.alterations || {},
+                isSoldOut: false
+            };
+        });
+
+        const grandTotal = payloadBasePrice + payloadAltCost + sessionShippingFee;
 
         const payload = {
-            ...cartState,
-            totalWeight: cartState.weightKg
+            items: formattedItems,
+            basePrice: payloadBasePrice,
+            altCost: payloadAltCost,
+            weightKg: payloadTotalWeight,
+            totalWeight: payloadTotalWeight,
+            totalQty: payloadTotalQty,
+            shippingFee: sessionShippingFee,
+            discount: 0,
+            totalPaid: grandTotal,
+            name: name,
+            phone: phone,
+            email: "",
+            address: address,
+            state: state,
+            postcode: postcode
         };
 
         try {
             const res = await fetch(`${RETAIL_API_URL}?action=reserve_stock`, {
-                method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                 body: `payload=${encodeURIComponent(JSON.stringify(payload))}`
             });
             const json = await res.json();
 
             if (json.status === 'success') {
+                localStorage.removeItem('arabista_cart');
                 window.location.href = json.paymentUrl;
             } else {
-                // Remove Gateway Overlay
                 gateway.classList.add('opacity-0', 'pointer-events-none');
 
                 if (json.reason === 'out_of_stock' && json.failedSignature) {
-                    // Soft Reject Flow
-                    const failedItem = cartState.items.find(i => i.signature === json.failedSignature);
-                    if (failedItem) {
-                        failedItem.isSoldOut = true;
-                    }
-                    renderCart();
-
-                    const notif = document.getElementById('cart-notification');
-                    notif.classList.remove('hidden');
-                    document.getElementById('cart-scroll-area').scrollTop = 0;
-
-                    // --- LIVE MATRIX REFRESH ---
-                    // Silently updates the main page sizing buttons to reflect the sold-out status
-                    await fetchConfig();
-
-                    setTimeout(() => { notif.classList.add('hidden'); }, 8000);
+                    alert(`A selected item sold out during checkout. Please review your cart.`);
+                    window.location.reload();
                 } else {
                     alert("Checkout Error: " + json.message);
                 }
@@ -1403,7 +1451,7 @@
                     }
                 } else {
                     // State B: Add to Cart
-                    mainCartBtn.click();
+                    addM02ToLocalCartAndOpenDrawer();
                 }
             });
         }
