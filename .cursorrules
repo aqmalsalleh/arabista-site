@@ -40,6 +40,29 @@ The ONLY permitted differences between a staging file and its production counter
 3. **API URL:** Staging connects to the Staging Google Apps Script URL. Production connects to the Live Apps Script URL.  
 Never introduce a layout or logic change to Production without also mirroring it in Staging (and vice versa).
 
+## 🛒 OMNICHANNEL CART PORTING PROTOCOL (V2)
+All product pages MUST use the unified `localStorage` Cart Engine. `product-z01-staging.html` is the Master Template. When creating or updating a product page, you MUST adhere to the following strict porting rules:
+
+**1. No In-Memory State:** NEVER use `let cartState = null;`. The cart MUST be globally driven by the `CartManager` object interacting with `localStorage.getItem('arabista_cart')`.
+
+**2. Universal Engine Parity:**
+The following JavaScript functions MUST be exact 1:1 copies from the Z01 Master Template. Do NOT alter their internal logic per page:
+- `CartManager` object (including the `nav-cart-badge` UI animation)
+- `renderCart()`
+- `updateGrandTotal()`
+- The `#btn-calc-ship` and `#btn-checkout` listeners (which execute "Hard Reject" reloads and dynamic array building for Google Apps Script).
+
+**3. Product Identity Mapping:**
+When building the `add[MODEL]ToLocalCartAndOpenDrawer()` payload, you MUST map the following properties to match the specific HTML page:
+- `id`: Must prefix with the model (e.g., `D01-${Date.now()}`).
+- `series`: The correct product family (e.g., 'Dian Series').
+- `image`: The correct hero thumbnail path for the cart drawer.
+- `alterations`: Ensure the `appConfig` keys match the exact model (e.g., `D01_ALT_LENGTH`).
+- Ensure `unitWeight: activeWeightKg` is included in the payload.
+
+**4. UI Strictness:**
+- Do NOT use the legacy `#cart-notification` red banner for sold-out states. Rely on the Hard Reject `alert()` + `window.location.reload()` built into the Master checkout logic.
+
 ## ⚠️ REVIEW INGESTION PROTOCOL
 Whenever you are instructed to inject customer reviews from a CSV file into a product staging page, you MUST strictly follow this exact 5-step process to prevent syntax errors and maintain data integrity:
 
