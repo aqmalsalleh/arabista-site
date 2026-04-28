@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0" />
   <title>M02 Maraya Series Abaya — Arabista (STAGING)</title>
   <meta name="theme-color" content="#111213" />
+  <meta name="robots" content="noindex">
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -471,7 +472,7 @@
 
     // --- GLOBAL CART MANAGER ---
     const CartManager = {
-        key: 'arabista_cart',
+        key: 'arabista_staging_cart',
         getItems: function() {
             return JSON.parse(localStorage.getItem(this.key)) || [];
         },
@@ -1397,7 +1398,7 @@
             const json = await res.json();
 
             if (json.status === 'success') {
-                localStorage.removeItem('arabista_cart');
+                localStorage.removeItem('arabista_staging_cart');
                 window.location.href = json.paymentUrl;
             } else {
                 gateway.classList.add('opacity-0', 'pointer-events-none');

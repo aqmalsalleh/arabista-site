@@ -6,6 +6,7 @@
   <title>The Abaya Collection — Arabista</title>
   <meta name="description" content="Explore Arabista's premium abaya collections. Dahlia, Zahra, and Maraya series." />
   <meta name="theme-color" content="#0F0F10" />
+  <meta name="robots" content="noindex">
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -379,7 +380,7 @@
 
     // --- GLOBAL CART MANAGER (V2 — 1:1 with product-z01-staging) ---
     const CartManager = {
-        key: 'arabista_cart',
+        key: 'arabista_staging_cart',
         getItems: function() {
             return JSON.parse(localStorage.getItem(this.key)) || [];
         },
@@ -759,7 +760,7 @@
             const json = await res.json();
 
             if (json.status === 'success') {
-                localStorage.removeItem('arabista_cart');
+                localStorage.removeItem('arabista_staging_cart');
                 window.location.href = json.paymentUrl;
             } else {
                 gateway.classList.add('opacity-0', 'pointer-events-none');
