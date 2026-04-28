@@ -1,0 +1,712 @@
+<!doctype html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>All Products — Arabista (STAGING)</title>
+  <meta name="theme-color" content="#0F0F10" />
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { 
+            display: ['"Cormorant Garamond"', 'serif'], 
+            sans: ['Inter', 'ui-sans-serif', 'system-ui'] 
+          },
+          colors: { 
+            brand: '#0F0F10', 
+            luxe: '#C0A062', 
+            ink: '#111213' 
+          },
+          boxShadow: { 
+            soft: '0 10px 30px rgba(0,0,0,.08)' 
+          },
+          animation: {
+            'spin-slow': 'spin 3s linear infinite',
+            'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    .hide-scrollbar::-webkit-scrollbar { display: none; }
+    .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    .tap-none { -webkit-tap-highlight-color: transparent; }
+    .reveal { opacity: 0; transform: translateY(20px); transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1); }
+    .reveal.show { opacity: 1; transform: translateY(0); }
+  </style>
+</head>
+<body class="bg-brand text-white font-sans antialiased selection:bg-luxe selection:text-white flex flex-col min-h-screen">
+
+  <div class="bg-luxe text-brand text-[10px] sm:text-xs font-semibold tracking-[0.2em] uppercase text-center py-2 px-4 z-50 relative">
+    Free standard shipping on orders over RM 400
+  </div>
+
+  <header class="sticky top-0 z-40 bg-brand/90 backdrop-blur-md border-b border-white/5 transition-all duration-300">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-16 sm:h-20">
+        <div class="flex-shrink-0">
+          <a href="index.html" class="font-display text-2xl sm:text-3xl tracking-wide text-white hover:text-luxe transition-colors">Arabista</a>
+        </div>
+        <nav class="hidden md:flex space-x-8">
+          <a href="index.html" class="text-xs tracking-widest uppercase text-white/70 hover:text-white transition-colors">Home</a>
+          <a href="abaya.html" class="text-xs tracking-widest uppercase text-white/70 hover:text-white transition-colors">Abaya</a>
+          <a href="products.html" class="text-xs tracking-widest uppercase text-luxe font-medium transition-colors">Catalog</a>
+        </nav>
+        <div class="flex items-center space-x-4">
+          <button type="button" id="nav-cart-btn" class="relative p-2 -mr-2 text-white hover:text-luxe transition-colors tap-none" aria-label="Open cart">
+            <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
+            <span id="nav-cart-badge" class="absolute top-0 right-0 -mt-0.5 -mr-0.5 flex h-4 w-4 sm:h-[18px] sm:w-[18px] items-center justify-center rounded-full bg-luxe text-[9px] sm:text-[10px] font-bold text-brand opacity-0 scale-0 transition-all duration-300 pointer-events-none">0</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="flex-grow">
+    
+    <section class="relative h-[55vh] md:h-[65vh] w-full flex items-center justify-center overflow-hidden border-b border-white/5">
+      <img src="images/z01-1-hero.webp" alt="Arabista Catalog" class="absolute inset-0 w-full h-full object-cover object-top opacity-50 scale-105 transition-transform duration-[15s] ease-out hover:scale-100">
+      <div class="absolute inset-0 bg-gradient-to-t from-brand via-brand/40 to-transparent"></div>
+      
+      <div class="relative z-10 text-center px-4 max-w-3xl mx-auto reveal mt-12">
+        <span class="text-luxe text-[10px] sm:text-xs tracking-[0.3em] uppercase font-semibold mb-4 block">The Master Catalog</span>
+        <h1 class="font-display text-5xl sm:text-6xl md:text-7xl font-medium text-white mb-6 leading-tight">Curated Elegance</h1>
+        <p class="text-white/60 text-sm sm:text-base font-light max-w-xl mx-auto leading-relaxed">
+          Discover our complete portfolio of premium modest wear. Designed in Malaysia, crafted with exquisite detail.
+        </p>
+      </div>
+    </section>
+
+    <section class="pt-12 pb-6 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto border-b border-white/5">
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 reveal">
+        
+        <div class="flex items-center space-x-6 overflow-x-auto hide-scrollbar pb-2">
+          <button class="text-sm tracking-widest uppercase font-medium text-luxe border-b border-luxe pb-1 whitespace-nowrap">Abayas</button>
+          <button class="text-sm tracking-widest uppercase font-medium text-white/30 cursor-not-allowed whitespace-nowrap" title="Coming Soon">Modest Wear</button>
+          <button class="text-sm tracking-widest uppercase font-medium text-white/30 cursor-not-allowed whitespace-nowrap" title="Coming Soon">Accessories</button>
+        </div>
+
+        <div class="flex items-center space-x-4 overflow-x-auto hide-scrollbar pb-2">
+          <span class="text-[10px] text-white/40 uppercase tracking-widest mr-2 whitespace-nowrap">Series:</span>
+          <button class="nav-btn active px-3 py-1 text-xs tracking-widest uppercase rounded-full border border-luxe text-luxe transition-all whitespace-nowrap" data-filter="all">All</button>
+          <button class="nav-btn px-3 py-1 text-xs tracking-widest uppercase rounded-full border border-white/10 text-white/50 hover:text-white hover:border-white/30 transition-all whitespace-nowrap" data-filter="dahlia">Dahlia</button>
+          <button class="nav-btn px-3 py-1 text-xs tracking-widest uppercase rounded-full border border-white/10 text-white/50 hover:text-white hover:border-white/30 transition-all whitespace-nowrap" data-filter="zahra">Zahra</button>
+          <button class="nav-btn px-3 py-1 text-xs tracking-widest uppercase rounded-full border border-white/10 text-white/50 hover:text-white hover:border-white/30 transition-all whitespace-nowrap" data-filter="maraya">Maraya</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="py-12 sm:py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+      <div id="product-grid" class="grid grid-cols-2 lg:grid-cols-4 gap-x-4 gap-y-10 sm:gap-x-6 sm:gap-y-16">
+        
+        <a href="product-z01.html" class="product-card group cursor-pointer reveal block tap-none" data-category="zahra">
+          <div class="relative aspect-[3/4] bg-ink rounded overflow-hidden mb-4 shadow-soft">
+            <img src="images/z01-1-hero.webp" alt="Zahra Series" loading="lazy" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">
+            <div class="absolute inset-0 bg-brand/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+            <div class="absolute top-2 left-2 sm:top-3 sm:left-3 bg-white/10 backdrop-blur-md px-2 py-1 rounded text-[9px] sm:text-[10px] uppercase tracking-widest text-white border border-white/10">Premium</div>
+          </div>
+          <div class="text-center px-1">
+            <p class="text-[10px] sm:text-xs text-luxe tracking-widest uppercase mb-1">Zahra Series</p>
+            <h3 class="font-display text-lg sm:text-xl text-white mb-2 group-hover:text-white/80 transition-colors">Code Z01</h3>
+            <div class="price-container flex justify-center h-5" data-model="Z01"></div>
+          </div>
+        </a>
+
+        <a href="product-d01.html" class="product-card group cursor-pointer reveal block tap-none" data-category="dahlia">
+          <div class="relative aspect-[3/4] bg-ink rounded overflow-hidden mb-4 shadow-soft">
+            <img src="images/d01-1-hero.webp" alt="Dahlia Series D01" loading="lazy" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">
+            <div class="absolute inset-0 bg-brand/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+          </div>
+          <div class="text-center px-1">
+            <p class="text-[10px] sm:text-xs text-white/50 tracking-widest uppercase mb-1">Dahlia Series</p>
+            <h3 class="font-display text-lg sm:text-xl text-white mb-2 group-hover:text-white/80 transition-colors">Code D01</h3>
+            <div class="price-container flex justify-center h-5" data-model="D01"></div>
+          </div>
+        </a>
+
+        <a href="product-d02.html" class="product-card group cursor-pointer reveal block tap-none" data-category="dahlia">
+          <div class="relative aspect-[3/4] bg-ink rounded overflow-hidden mb-4 shadow-soft">
+            <img src="images/d02-1-hero.webp" alt="Dahlia Series D02" loading="lazy" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">
+            <div class="absolute inset-0 bg-brand/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+          </div>
+          <div class="text-center px-1">
+            <p class="text-[10px] sm:text-xs text-white/50 tracking-widest uppercase mb-1">Dahlia Series</p>
+            <h3 class="font-display text-lg sm:text-xl text-white mb-2 group-hover:text-white/80 transition-colors">Code D02</h3>
+            <div class="price-container flex justify-center h-5" data-model="D02"></div>
+          </div>
+        </a>
+
+        <a href="product-d04.html" class="product-card group cursor-pointer reveal block tap-none" data-category="dahlia">
+          <div class="relative aspect-[3/4] bg-ink rounded overflow-hidden mb-4 shadow-soft">
+            <img src="images/d04-1-hero.webp" alt="Dahlia Series D04" loading="lazy" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">
+            <div class="absolute inset-0 bg-brand/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+          </div>
+          <div class="text-center px-1">
+            <p class="text-[10px] sm:text-xs text-white/50 tracking-widest uppercase mb-1">Dahlia Series</p>
+            <h3 class="font-display text-lg sm:text-xl text-white mb-2 group-hover:text-white/80 transition-colors">Code D04</h3>
+            <div class="price-container flex justify-center h-5" data-model="D04"></div>
+          </div>
+        </a>
+
+        <a href="product-d06.html" class="product-card group cursor-pointer reveal block tap-none" data-category="dahlia">
+          <div class="relative aspect-[3/4] bg-ink rounded overflow-hidden mb-4 shadow-soft">
+            <img src="images/d06-1-hero.webp" alt="Dahlia Series D06" loading="lazy" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">
+            <div class="absolute inset-0 bg-brand/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+          </div>
+          <div class="text-center px-1">
+            <p class="text-[10px] sm:text-xs text-white/50 tracking-widest uppercase mb-1">Dahlia Series</p>
+            <h3 class="font-display text-lg sm:text-xl text-white mb-2 group-hover:text-white/80 transition-colors">Code D06</h3>
+            <div class="price-container flex justify-center h-5" data-model="D06"></div>
+          </div>
+        </a>
+
+        <a href="product-m01.html" class="product-card group cursor-pointer reveal block tap-none" data-category="maraya">
+          <div class="relative aspect-[3/4] bg-ink rounded overflow-hidden mb-4 shadow-soft">
+            <img src="images/m01-1-hero.webp" alt="Maraya Series M01" loading="lazy" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">
+            <div class="absolute inset-0 bg-brand/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+          </div>
+          <div class="text-center px-1">
+            <p class="text-[10px] sm:text-xs text-white/50 tracking-widest uppercase mb-1">Maraya Series</p>
+            <h3 class="font-display text-lg sm:text-xl text-white mb-2 group-hover:text-white/80 transition-colors">Code M01</h3>
+            <div class="price-container flex justify-center h-5" data-model="M01"></div>
+          </div>
+        </a>
+
+        <a href="product-m02.html" class="product-card group cursor-pointer reveal block tap-none" data-category="maraya">
+          <div class="relative aspect-[3/4] bg-ink rounded overflow-hidden mb-4 shadow-soft">
+            <img src="images/m02-1-hero.webp" alt="Maraya Series M02" loading="lazy" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">
+            <div class="absolute inset-0 bg-brand/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+          </div>
+          <div class="text-center px-1">
+            <p class="text-[10px] sm:text-xs text-white/50 tracking-widest uppercase mb-1">Maraya Series</p>
+            <h3 class="font-display text-lg sm:text-xl text-white mb-2 group-hover:text-white/80 transition-colors">Code M02</h3>
+            <div class="price-container flex justify-center h-5" data-model="M02"></div>
+          </div>
+        </a>
+
+      </div>
+    </section>
+
+    <div id="cart-overlay" class="fixed inset-0 bg-brand/80 backdrop-blur-sm z-50 opacity-0 pointer-events-none transition-opacity duration-300" onclick="closeCartDrawer()"></div>
+    <div id="cart-drawer" class="fixed top-0 right-0 h-full w-full sm:w-[420px] bg-[#141517] z-50 transform translate-x-full transition-transform duration-400 ease-[cubic-bezier(0.25,0.46,0.45,0.94)] flex flex-col shadow-2xl border-l border-white/5">
+        <div class="flex items-center justify-between p-5 border-b border-white/5 bg-[#141517] relative z-10">
+            <h2 class="font-display text-xl text-white tracking-wide">Your Cart</h2>
+            <button onclick="closeCartDrawer()" class="p-2 -mr-2 text-white/50 hover:text-white transition-colors tap-none">
+                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M6 18L18 6M6 6l12 12"/></svg>
+            </button>
+        </div>
+        <div id="cart-items" class="flex-1 overflow-y-auto p-5 space-y-5 hide-scrollbar relative"></div>
+        <div class="p-5 border-t border-white/5 bg-[#1A1C1E] relative z-10 shadow-[0_-10px_30px_rgba(0,0,0,0.5)]">
+            <div class="space-y-3 mb-5">
+                <div class="flex justify-between text-sm">
+                    <span class="text-white/60">Subtotal</span>
+                    <span id="cart-subtotal" class="text-white font-medium">RM 0</span>
+                </div>
+                <div class="flex justify-between text-sm">
+                    <span class="text-white/60">Alterations</span>
+                    <span id="cart-alt-total" class="text-white font-medium">RM 0</span>
+                </div>
+                <div class="flex justify-between text-sm items-center">
+                    <span class="text-white/60">Shipping <span class="text-[10px] uppercase tracking-widest ml-1 text-white/40">(J&T Express)</span></span>
+                    <span id="cart-shipping" class="text-luxe font-medium">Pending</span>
+                </div>
+                <div class="pt-3 border-t border-white/5 flex justify-between items-end">
+                    <span class="text-white/80 font-medium tracking-wide">Grand Total</span>
+                    <span id="cart-grand-total" class="text-xl font-display font-semibold text-white">RM 0</span>
+                </div>
+            </div>
+            <div class="space-y-3 mb-5">
+                <div class="grid grid-cols-2 gap-3">
+                    <input type="text" id="cart-name" placeholder="Full Name" class="w-full bg-brand border border-white/10 rounded px-3 py-2 text-sm text-white focus:outline-none focus:border-luxe transition-colors" required>
+                    <input type="tel" id="cart-phone" placeholder="Phone (e.g. 012...)" class="w-full bg-brand border border-white/10 rounded px-3 py-2 text-sm text-white focus:outline-none focus:border-luxe transition-colors" required>
+                </div>
+                <input type="text" id="cart-address" placeholder="Full Delivery Address" class="w-full bg-brand border border-white/10 rounded px-3 py-2 text-sm text-white focus:outline-none focus:border-luxe transition-colors" required>
+                <div class="grid grid-cols-2 gap-3">
+                    <input type="text" id="cart-postcode" placeholder="Postcode" class="w-full bg-brand border border-white/10 rounded px-3 py-2 text-sm text-white focus:outline-none focus:border-luxe transition-colors" required>
+                    <select id="cart-state" class="w-full bg-brand border border-white/10 rounded px-3 py-2 text-sm text-white/80 focus:outline-none focus:border-luxe transition-colors appearance-none" required>
+                        <option value="" disabled selected>Select State</option>
+                        <option value="JHR">Johor</option><option value="KDH">Kedah</option><option value="KTN">Kelantan</option><option value="MLK">Melaka</option><option value="NSN">Negeri Sembilan</option><option value="PHG">Pahang</option><option value="PRK">Perak</option><option value="PLS">Perlis</option><option value="PNG">Pulau Pinang</option><option value="SGR">Selangor</option><option value="TRG">Terengganu</option><option value="KUL">W.P. Kuala Lumpur</option><option value="PJY">W.P. Putrajaya</option><option value="LBN">W.P. Labuan</option><option value="SBA">Sabah</option><option value="SRW">Sarawak</option>
+                    </select>
+                </div>
+            </div>
+            <div class="flex gap-2">
+                <button type="button" id="btn-calc-ship" class="flex-1 bg-white/5 hover:bg-white/10 border border-white/10 text-white text-xs uppercase tracking-widest py-3.5 rounded transition-all active:scale-[0.98]">
+                    Calc Shipping
+                </button>
+                <button type="button" id="btn-checkout" class="flex-[2] bg-luxe hover:bg-white text-brand text-xs uppercase tracking-widest font-semibold py-3.5 rounded transition-all shadow-[0_0_20px_rgba(192,160,98,0.2)] hover:shadow-[0_0_25px_rgba(255,255,255,0.4)] active:scale-[0.98]">
+                    Proceed to Payment
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="gateway-overlay" class="fixed inset-0 z-[120] bg-ink/90 backdrop-blur-md flex flex-col items-center justify-center opacity-0 pointer-events-none transition-opacity duration-500">
+        <div class="relative flex items-center justify-center mb-10">
+            <div class="w-28 h-28 rounded-full border border-white/10 flex items-center justify-center z-10 shadow-2xl overflow-hidden p-2.5">
+                <img src="images/logo.png" alt="Arabista Logo" class="w-full h-full object-contain opacity-90">
+            </div>
+            <div class="absolute w-28 h-28 rounded-full border-[2px] border-white/5 z-0"></div>
+            <div class="absolute w-28 h-28 rounded-full border-t-[2px] border-luxe animate-spin-slow z-20"></div>
+            <div class="absolute w-36 h-36 rounded-full bg-luxe/5 animate-pulse-slow z-0"></div>
+        </div>
+        <h3 class="font-display text-3xl text-white mb-2 tracking-wide text-center">Securing Order</h3>
+        <p class="text-white/50 text-sm font-light tracking-widest uppercase text-center max-w-[250px] leading-relaxed">
+            Please wait while we connect to SenangPay gateway
+        </p>
+    </div>
+
+  </main>
+
+  <footer class="border-t border-white/5 py-12 mt-12">
+    <div class="max-w-7xl mx-auto px-4 text-center">
+      <p class="text-white/40 text-xs tracking-widest uppercase">© <span id="y"></span> Arabista Enterprise. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script>
+    // --- OMNICHANNEL CART SYNC & ENGINE ---
+    const RETAIL_API_URL = "https://script.google.com/macros/s/AKfycbw4qGOeC2Sebod06uFnW2u-ZAkj7l8zRdzyWrFEyL1_7eDCn-ks9lVKrd1I226qHxRmQg/exec";
+    let appConfig = {};
+    let activeRetailPrice = null;
+    let activePromoPrice = null;
+
+    const CartManager = {
+        key: 'arabista_cart',
+        getItems: function() { return JSON.parse(localStorage.getItem(this.key)) || []; },
+        saveItems: function(items) { localStorage.setItem(this.key, JSON.stringify(items)); },
+        updateQty: function(signature, delta) {
+            let items = this.getItems();
+            const index = items.findIndex(i => i.signature === signature);
+            if (index !== -1) {
+                items[index].qty += delta;
+                if (items[index].qty <= 0) items.splice(index, 1);
+                this.saveItems(items);
+                renderCart();
+            }
+        },
+        removeItem: function(signature) {
+            let items = this.getItems();
+            items = items.filter(i => i.signature !== signature);
+            this.saveItems(items);
+            renderCart();
+        },
+        clearCart: function() {
+            localStorage.removeItem(this.key);
+            renderCart();
+        },
+        updateCartCount: function() {
+            const count = this.getItems().reduce((total, item) => total + item.qty, 0);
+            const badge = document.getElementById('nav-cart-badge');
+            if (badge) {
+                badge.textContent = count;
+                if (count > 0) {
+                    badge.classList.remove('opacity-0', 'scale-0');
+                    badge.classList.add('opacity-100', 'scale-100');
+                    badge.classList.add('scale-110');
+                    setTimeout(() => badge.classList.remove('scale-110'), 150);
+                } else {
+                    badge.classList.remove('opacity-100', 'scale-100', 'scale-110');
+                    badge.classList.add('opacity-0', 'scale-0');
+                }
+            }
+        }
+    };
+
+    let sessionShippingFee = 0;
+    let sessionPostcode = '';
+
+    function renderCart() {
+        const items = CartManager.getItems();
+        const container = document.getElementById('cart-items');
+        container.innerHTML = '';
+        
+        CartManager.updateCartCount();
+
+        if (items.length === 0) {
+            container.innerHTML = `
+                <div class="h-full flex flex-col items-center justify-center text-center opacity-50">
+                    <svg class="w-12 h-12 text-white mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
+                    <p class="text-white text-sm tracking-widest uppercase">Your cart is empty</p>
+                </div>
+            `;
+            updateGrandTotal();
+            return;
+        }
+
+        items.forEach(item => {
+            let altHtml = '';
+            for (const [k, v] of Object.entries(item.alterations || {})) {
+                altHtml += `<div class="text-[10px] text-white/40 flex justify-between mt-1"><span>${v.name}: ${v.val}</span><span>+RM ${v.price}</span></div>`;
+            }
+            
+            const html = `
+                <div class="flex gap-4 bg-brand/50 p-3 rounded border border-white/5">
+                    <div class="w-20 h-24 bg-ink rounded overflow-hidden flex-shrink-0">
+                        <img src="${item.image}" class="w-full h-full object-cover opacity-80" alt="${item.model}">
+                    </div>
+                    <div class="flex-1 flex flex-col">
+                        <div class="flex justify-between items-start mb-1">
+                            <div>
+                                <h4 class="text-white text-sm font-medium tracking-wide">${item.model}</h4>
+                                <p class="text-luxe text-[10px] tracking-widest uppercase">${item.series}</p>
+                            </div>
+                            <button onclick="CartManager.removeItem('${item.signature}')" class="text-white/30 hover:text-red-400 transition-colors p-1 tap-none">
+                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                            </button>
+                        </div>
+                        <div class="text-[11px] text-white/60 mb-2">Size: <span class="text-white font-medium">${item.size}</span></div>
+                        ${altHtml}
+                        <div class="mt-auto flex justify-between items-center pt-2">
+                            <div class="flex items-center bg-brand border border-white/10 rounded">
+                                <button onclick="CartManager.updateQty('${item.signature}', -1)" class="px-2.5 py-1 text-white/60 hover:text-white transition-colors tap-none">-</button>
+                                <span class="px-2 py-1 text-xs text-white min-w-[24px] text-center">${item.qty}</span>
+                                <button onclick="CartManager.updateQty('${item.signature}', 1)" class="px-2.5 py-1 text-white/60 hover:text-white transition-colors tap-none">+</button>
+                            </div>
+                            <div class="text-white text-sm font-medium">RM ${((item.price + item.unitAltCost) * item.qty).toFixed(2)}</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            container.insertAdjacentHTML('beforeend', html);
+        });
+
+        sessionShippingFee = 0; 
+        document.getElementById('cart-shipping').textContent = 'Pending';
+        document.getElementById('btn-checkout').textContent = 'Proceed to Payment';
+        updateGrandTotal();
+    }
+
+    function updateGrandTotal() {
+        const items = CartManager.getItems();
+        let sub = 0; let alt = 0;
+        items.forEach(i => {
+            sub += (i.price * i.qty);
+            alt += (i.unitAltCost * i.qty);
+        });
+        
+        document.getElementById('cart-subtotal').textContent = `RM ${sub.toFixed(2)}`;
+        document.getElementById('cart-alt-total').textContent = `RM ${alt.toFixed(2)}`;
+        
+        const gTotal = sub + alt + sessionShippingFee;
+        document.getElementById('cart-grand-total').textContent = `RM ${gTotal.toFixed(2)}`;
+    }
+
+    document.getElementById('btn-calc-ship').onclick = async () => {
+        const items = CartManager.getItems();
+        if(items.length === 0) return;
+        
+        const pc = document.getElementById('cart-postcode').value.trim();
+        if(!pc || pc.length < 5) {
+            alert("Please enter a valid 5-digit postcode first.");
+            return;
+        }
+
+        const btn = document.getElementById('btn-calc-ship');
+        btn.textContent = "Calc..."; btn.disabled = true;
+
+        const stateSelect = document.getElementById('cart-state');
+        const prefix = parseInt(pc.substring(0, 2), 10);
+        let autoState = "";
+        if (prefix >= 1 && prefix <= 2) autoState = "PLS";
+        else if (prefix >= 5 && prefix <= 9) autoState = "KDH";
+        else if (prefix >= 10 && prefix <= 14) autoState = "PNG";
+        else if (prefix >= 15 && prefix <= 17) autoState = "KTN";
+        else if (prefix >= 20 && prefix <= 24) autoState = "TRG";
+        else if (prefix >= 25 && prefix <= 28) autoState = "PHG";
+        else if (prefix >= 30 && prefix <= 39) autoState = "PRK";
+        else if (prefix >= 40 && prefix <= 48) autoState = "SGR";
+        else if (prefix >= 50 && prefix <= 60) autoState = "KUL";
+        else if (prefix >= 62 && prefix <= 63) autoState = "PJY";
+        else if (prefix >= 68 && prefix <= 69) autoState = "SGR";
+        else if (prefix >= 70 && prefix <= 73) autoState = "NSN";
+        else if (prefix >= 75 && prefix <= 78) autoState = "MLK";
+        else if (prefix >= 79 && prefix <= 86) autoState = "JHR";
+        else if (prefix >= 87 && prefix <= 87) autoState = "LBN";
+        else if (prefix >= 88 && prefix <= 91) autoState = "SBA";
+        else if (prefix >= 93 && prefix <= 98) autoState = "SRW";
+
+        if (autoState) stateSelect.value = autoState;
+
+        let totalCartWeight = items.reduce((sum, item) => sum + ((item.unitWeight || 1.0) * item.qty), 0);
+
+        try {
+            const res = await fetch(`${RETAIL_API_URL}?action=calc_shipping&postcode=${encodeURIComponent(pc)}&weight=${totalCartWeight}`);
+            const data = await res.json();
+            
+            if(data.status === 'success') {
+                let fee = parseFloat(data.rate);
+                if (appConfig['PROMO_FREE_SHIPPING'] && appConfig['PROMO_FREE_SHIPPING'].isActive) {
+                    fee = 0;
+                    document.getElementById('cart-shipping').innerHTML = `<span class="text-luxe">FREE</span>`;
+                } else {
+                    document.getElementById('cart-shipping').textContent = `RM ${fee.toFixed(2)}`;
+                }
+                sessionShippingFee = fee;
+                sessionPostcode = pc;
+                updateGrandTotal();
+            } else {
+                alert("Shipping calc failed. Please try again.");
+            }
+        } catch(e) {
+            alert("Network error. Please check connection.");
+        } finally {
+            btn.textContent = "Calc Shipping"; btn.disabled = false;
+        }
+    };
+
+    document.getElementById('btn-checkout').onclick = async () => {
+        const items = CartManager.getItems();
+        if (items.length === 0) return;
+
+        const currentPrice = activePromoPrice || activeRetailPrice;
+        const lineItemsPriced = items.length > 0 && items.every(i => (Number(i.price) || 0) > 0);
+        if ((!currentPrice || currentPrice <= 0) && !lineItemsPriced) {
+            alert("⚠️ System Busy: Pricing data failed to load securely. Please refresh the page to continue.");
+            window.location.reload();
+            return;
+        }
+
+        const name = document.getElementById('cart-name').value.trim();
+        let rawPhone = document.getElementById('cart-phone').value;
+        let cleanPhone = String(rawPhone).trim().replace(/\D/g, '');
+        if (cleanPhone.startsWith('1')) cleanPhone = '60' + cleanPhone;
+        else if (cleanPhone.startsWith('0')) cleanPhone = '6' + cleanPhone;
+        const phone = cleanPhone;
+
+        const address = document.getElementById('cart-address').value.trim();
+        const state = document.getElementById('cart-state').value;
+        const postcode = document.getElementById('cart-postcode').value.trim();
+
+        if (!name || !phone || !address || !state || !postcode) {
+            alert("Please fill in all shipping details.");
+            return;
+        }
+
+        const shipRow = document.getElementById('cart-shipping');
+        const shipLabel = shipRow ? shipRow.textContent.replace(/\s+/g, ' ').trim() : '';
+        if (shipLabel === 'Pending' || shipLabel === '' || postcode !== sessionPostcode) {
+            alert("Please click 'Calculate Shipping' to update your delivery fee before checking out.");
+            return;
+        }
+
+        const btn = document.getElementById('btn-checkout');
+        btn.textContent = "Securing Order..."; btn.disabled = true;
+
+        const gateway = document.getElementById('gateway-overlay');
+        gateway.classList.remove('opacity-0', 'pointer-events-none');
+
+        let payloadBasePrice = 0;
+        let payloadAltCost = 0;
+        let payloadTotalWeight = 0;
+        let payloadTotalQty = 0;
+
+        const formattedItems = items.map(item => {
+            const rowBase = parseFloat(item.price) * item.qty;
+            const rowAlt = parseFloat(item.unitAltCost) * item.qty;
+            payloadBasePrice += rowBase;
+            payloadAltCost += rowAlt;
+            payloadTotalWeight += (parseFloat(item.unitWeight) || 1.0) * item.qty;
+            payloadTotalQty += item.qty;
+
+            return {
+                signature: item.signature,
+                sku: `${item.model}-${item.size}`,
+                size: item.size,
+                qty: item.qty,
+                unitRetailPrice: item.retailPrice,
+                unitEffectivePrice: item.price,
+                unitAltCost: item.unitAltCost,
+                unitDiscount: (item.retailPrice - item.price),
+                unitWeight: item.unitWeight || 1.0,
+                alterations: item.alterations || {},
+                isSoldOut: false
+            };
+        });
+
+        const totalPaid = payloadBasePrice + payloadAltCost + sessionShippingFee;
+
+        const payload = {
+            items: formattedItems,
+            basePrice: payloadBasePrice,
+            altCost: payloadAltCost,
+            weightKg: payloadTotalWeight,
+            totalWeight: payloadTotalWeight,
+            totalQty: payloadTotalQty,
+            shippingFee: sessionShippingFee,
+            discount: 0,
+            totalPaid: totalPaid,
+            name: name,
+            phone: phone,
+            email: "",
+            address: address,
+            state: state,
+            postcode: postcode
+        };
+
+        try {
+            const res = await fetch(`${RETAIL_API_URL}?action=reserve_stock`, {
+                method: "POST",
+                body: JSON.stringify(payload)
+            });
+            const data = await res.json();
+            
+            if (data.status === 'success') {
+                CartManager.clearCart();
+                window.location.href = data.paymentUrl;
+            } else if (data.status === 'sold_out') {
+                gateway.classList.add('opacity-0', 'pointer-events-none');
+                btn.textContent = "Proceed to Payment"; btn.disabled = false;
+                alert("A selected item sold out during checkout. Please review your cart.");
+                window.location.reload();
+            } else {
+                throw new Error(data.message || "Unknown error");
+            }
+        } catch (e) {
+            gateway.classList.add('opacity-0', 'pointer-events-none');
+            btn.textContent = "Proceed to Payment"; btn.disabled = false;
+            alert("Connection error: " + e.message);
+        }
+    };
+
+    function toggleCart(show) {
+        const drawer = document.getElementById('cart-drawer');
+        const overlay = document.getElementById('cart-overlay');
+        if (show) {
+            renderCart();
+            drawer.classList.remove('translate-x-full');
+            overlay.classList.remove('opacity-0', 'pointer-events-none');
+        } else {
+            drawer.classList.add('translate-x-full');
+            overlay.classList.add('opacity-0', 'pointer-events-none');
+        }
+    }
+    function closeCartDrawer() { toggleCart(false); }
+
+    // --- INITIALIZATION & REVEAL ANIMATIONS ---
+    document.addEventListener('DOMContentLoaded', () => {
+        CartManager.updateCartCount();
+        const navCartBtn = document.getElementById('nav-cart-btn');
+        if (navCartBtn) navCartBtn.addEventListener('click', () => toggleCart(true));
+        document.getElementById('y').textContent = new Date().getFullYear();
+        fetchCatalogPrices();
+    });
+
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('show'); });
+    }, { threshold: 0.1 });
+    document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+    // --- CATALOG FILTERING LOGIC ---
+    const navBtns = document.querySelectorAll('.nav-btn');
+    function runFilters() {
+      const activeBtn = document.querySelector('.nav-btn.active');
+      const filterValue = activeBtn ? activeBtn.getAttribute('data-filter') : 'all';
+      const items = document.querySelectorAll('.product-card');
+      
+      items.forEach(item => {
+        if (filterValue === 'all' || item.getAttribute('data-category') === filterValue) {
+          item.style.display = 'block';
+          setTimeout(() => item.classList.add('show'), 50);
+        } else {
+          item.classList.remove('show');
+          setTimeout(() => { if (!item.classList.contains('show')) item.style.display = 'none'; }, 300);
+        }
+      });
+    }
+
+    navBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        navBtns.forEach(b => {
+          b.classList.remove('active', 'border-luxe', 'text-luxe');
+          b.classList.add('border-white/10', 'text-white/50');
+        });
+        btn.classList.remove('border-white/10', 'text-white/50');
+        btn.classList.add('active', 'border-luxe', 'text-luxe');
+        runFilters();
+      });
+    });
+
+    // --- DYNAMIC CATALOG PRICE FETCHING ---
+    let isFetchingPrices = false;
+    function fetchCatalogPrices(forceLive = false) {
+      if (isFetchingPrices) return Promise.resolve();
+      isFetchingPrices = true;
+
+      const filterBtn = document.querySelector('.filter-toggle-btn');
+      if (filterBtn) {
+        filterBtn.disabled = true;
+        filterBtn.classList.remove('text-white/70', 'hover:text-luxe', 'hover:border-luxe');
+        filterBtn.classList.add('text-white/30', 'cursor-not-allowed');
+      }
+
+      const url = `${RETAIL_API_URL}?action=get_config${forceLive ? '&nocache=true' : ''}&cb=${Date.now().toString(36)}`;
+      
+      return fetch(url)
+        .then(res => res.json())
+        .then(json => {
+          if (json.status !== 'success') throw new Error("API returned non-success status");
+          appConfig = json.data.config || {};
+          const config = json.data.config;
+          document.querySelectorAll('.price-container').forEach(el => {
+            const model = el.getAttribute('data-model');
+            el.style.opacity = '0';
+            
+            setTimeout(() => {
+              if (config && config[model] && config[model].matrix) {
+                const matrix = config[model].matrix;
+                const d2 = { retail: 0, promo: 0 };
+                const firstKey = Object.keys(matrix)[0];
+                if (firstKey) {
+                  d2.retail = matrix[firstKey].retail;
+                  d2.promo = matrix[firstKey].promo;
+                }
+                
+                if (d2.promo < d2.retail && d2.promo > 0) {
+                  const labelHtml = config.PROMO_FREE_SHIPPING && config.PROMO_FREE_SHIPPING.isActive 
+                    ? `<span class="bg-luxe text-brand px-1.5 py-0.5 text-[8px] uppercase tracking-widest rounded-sm font-bold mr-2">Free Ship</span>`
+                    : `<span class="bg-white/10 text-white px-1.5 py-0.5 text-[8px] uppercase tracking-widest rounded-sm mr-2">Promo</span>`;
+                  el.innerHTML = `
+                    <div class="flex items-center justify-end">
+                      ${labelHtml}
+                      <del class="text-white/40 text-xs mr-1.5">RM ${d2.retail.toFixed(0)}</del>
+                      <span class="text-luxe font-medium text-sm">RM ${d2.promo.toFixed(0)}</span>
+                    </div>
+                  `;
+                } else {
+                  el.innerHTML = `<span class="text-white font-medium text-sm">RM ${d2.retail.toFixed(0)}</span>`;
+                }
+              } else {
+                el.innerHTML = `<span class="text-white/30 text-xs">RM --</span>`;
+              }
+              el.style.opacity = '1';
+            }, 300);
+          });
+
+          if (filterBtn) {
+            filterBtn.disabled = false;
+            filterBtn.classList.remove('text-white/30', 'cursor-not-allowed');
+            filterBtn.classList.add('text-white/70', 'hover:text-luxe', 'hover:border-luxe');
+          }
+        })
+        .catch((e) => {
+          console.warn("Failed to fetch catalog prices:", e);
+          document.querySelectorAll('.price-container').forEach(el => {
+            el.innerHTML = `<span class="text-white/30 text-xs">RM --</span>`;
+            el.style.opacity = '1';
+          });
+        })
+        .finally(() => {
+          isFetchingPrices = false;
+        });
+    }
+  </script>
+</body>
+</html>
