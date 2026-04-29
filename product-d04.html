@@ -125,6 +125,21 @@
         pointer-events: none;
     }
   </style>
+  <script>
+  !function(f,b,e,v,n,t,s)
+  {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+  n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+  if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+  n.queue=[];t=b.createElement(e);t.async=!0;
+  t.src=v;s=b.getElementsByTagName(e)[0];
+  s.parentNode.insertBefore(t,s)}(window, document,'script',
+  'https://connect.facebook.net/en_US/fbevents.js');
+  fbq('init', '815939587846892');
+  fbq('track', 'PageView');
+  </script>
+  <noscript><img height="1" width="1" style="display:none"
+  src="https://www.facebook.com/tr?id=815939587846892&ev=PageView&noscript=1"
+  /></noscript>
 </head>
 <body class="font-sans antialiased pb-8 selection:bg-luxe selection:text-ink max-w-[100vw] overflow-x-hidden relative bg-brand text-white">
 
@@ -1037,6 +1052,16 @@
         };
 
         CartManager.addItem(cartItem);
+        // META PIXEL: Add To Cart Event
+        if (typeof fbq === 'function') {
+            fbq('track', 'AddToCart', {
+                content_name: cartItem.series,
+                content_ids: [cartItem.model],
+                content_type: 'product',
+                value: cartItem.price,
+                currency: 'MYR'
+            });
+        }
         toggleCart(true);
     }
 
@@ -1397,6 +1422,14 @@
             const json = await res.json();
 
             if (json.status === 'success') {
+                // META PIXEL: Initiate Checkout Event
+                if (typeof fbq === 'function') {
+                    fbq('track', 'InitiateCheckout', {
+                        value: grandTotal,
+                        currency: 'MYR',
+                        num_items: payloadTotalQty
+                    });
+                }
                 localStorage.removeItem('arabista_cart');
                 window.location.href = json.paymentUrl;
             } else {
