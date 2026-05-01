@@ -603,7 +603,8 @@
             try {
                 if (i > 0 && btn) btn.innerText = `CONNECTING... (RETRY ${i}/${retries})`;
 
-                const res = await fetch(`${RETAIL_API_URL}?action=get_config&model=${currentModel}`, { signal: controller.signal });
+                const deviceInfo = encodeURIComponent(navigator.userAgent.substring(0, 100));
+                const res = await fetch(`${RETAIL_API_URL}?action=get_config&model=${currentModel}&ua=${deviceInfo}`, { signal: controller.signal });
                 clearTimeout(timeoutId);
                 
                 if (!res.ok) throw new Error(`HTTP Error: ${res.status}`);
