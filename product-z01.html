@@ -728,6 +728,7 @@
 
     function selectSize(size, btnElement) {
         selectedSize = size;
+        logJourneyEvent('SIZE_SELECTED', 'Size: ' + size);
         const sizeChosenEl = document.getElementById('sizeChosen');
         if (sizeChosenEl) sizeChosenEl.textContent = 'Size: ' + size;
         document.querySelectorAll('.size-btn').forEach(b => b.className = "size-btn py-3 border border-white/15 bg-transparent text-white rounded-lg font-medium hover:border-white/40 transition-colors focus:outline-none tap-none");
@@ -889,6 +890,7 @@
     // Alteration Engine
     document.getElementById('toggle-alt-btn').onclick = () => {
         altEnabled = !altEnabled;
+        if (altEnabled) logJourneyEvent('ALTERATION_OPENED', '');
         const knob = document.getElementById('alt-knob');
         const sw = document.getElementById('alt-switch');
         const drawer = document.getElementById('alt-drawer');
@@ -1056,6 +1058,7 @@
         };
 
         CartManager.addItem(cartItem);
+        logJourneyEvent('VIEW_CART', 'Added Z01 Size ' + selectedSize);
         // META PIXEL: Add To Cart Event
         if (typeof fbq === 'function') {
             fbq('track', 'AddToCart', {
@@ -1398,6 +1401,7 @@
         });
 
         const grandTotal = payloadBasePrice + payloadAltCost + sessionShippingFee;
+        logJourneyEvent('INITIATE_CHECKOUT', 'Total Paid: RM ' + grandTotal.toFixed(2));
 
         const payload = {
             items: formattedItems,
@@ -1453,10 +1457,29 @@
         btn.textContent = "Proceed to Payment"; btn.disabled = false;
     };
 
+    // --- SMART JOURNEY LOGGER ---
+    function logJourneyEvent(eventName, eventDetails = "") {
+        let sid = sessionStorage.getItem('arabista_sid');
+        if (!sid) {
+            sid = 'SID-' + Math.random().toString(36).substr(2, 9) + '-' + Date.now();
+            sessionStorage.setItem('arabista_sid', sid);
+        }
+
+        const deviceInfo = encodeURIComponent(navigator.userAgent.substring(0, 100));
+        const detailsParam = encodeURIComponent(eventDetails);
+
+        try {
+            fetch(`${RETAIL_API_URL}?action=log_event&event=${eventName}&details=${detailsParam}&sid=${sid}&ua=${deviceInfo}&model=${currentModel}`);
+        } catch (e) {
+            console.warn("Journey log failed to send.");
+        }
+    }
+
     // Init
     document.getElementById('add-to-cart-btn').disabled = true;
     renderSizeGrid();
     fetchConfig();
+    logJourneyEvent('PAGE_VIEW', 'Z01 Zahra');
 
     // --- CONTEXT-AWARE STICKY BAR ENGINE ---
     document.addEventListener('DOMContentLoaded', () => {
