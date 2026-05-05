@@ -1,19 +1,15 @@
 # 📘 ARABISTA FRONTEND & RETAIL ALTERATION — MASTER BLUEPRINT
 
-**Version:** 2.9 | **Aligned to codebase:** May 4, 2026 
+**Version:** 3.0 | **Aligned to codebase:** May 5, 2026 
 **Canonical detail:** Operational depth, API names, column maps, and DevOps live in `Arabista_Retail_Master_Doc.md` (when maintained alongside this repo). This blueprint is the **product-level story** from project inception: how retail stays isolated, how inventory and checkout behave, and the strict parity rules between Staging and Production frontend files.
+
+**v3.0 (05 May):** **Smart Journey Logger Integration & Cross-Product Syncing.** Added `logJourneyEvent` tracking architecture to HTML files to log customer drop-off points (Page View, Size Select, Alteration, Cart, Checkout) directly to the Google Apps Script backend. Established Rule 4 for adapting the Master Layout (Z01) to other product SKUs.
 
 **v2.9 (04 May):** **Strict Frontend Parity & Mock Pixel Strategy.** Established strict rules for maintaining identical `<body>` logic between `-staging.html` and production `.html` files. Implemented the "Mock Pixel" in staging `<head>` to allow identical `fbq()` calls in the body without polluting live Meta Ads data.
 
 **v2.8 (26 Apr):** **Production** static pages `product-z01.html`, `product-d01.html`, `product-d02.html`, `product-d04.html`, `product-d06.html`, `product-m01.html`, `product-m02.html`, and `abaya.html` were aligned for go-live: each sets **`RETAIL_API_URL`** to the **current production** Retail web app `…/exec` URL; product PDP **`<title>`** strings no longer include **` (STAGING)`** (abaya was already a production-style title). 
 
 **v2.7 (25 Apr):** **`product-d01-staging.html`** (Dahlia D01) is maintained as a **Z01-template sibling**: same client patterns. **`product-z01-staging.html`**, **`product-d01-staging.html`**, and **`abaya-staging.html`** now use **relative** links to **`index-staging.html`**, **`products-staging.html`**, and **`abaya-staging.html`** in nav chrome.
-
-**v2.6 (23 Apr):** **Centralized WhatsApp inbox.** The **Master Webhook Router** now sends **all** inbound **Meta / WhatsApp** payloads to **`SUPPORT_URL`** (Support backend). Retail **`/exec`** receives **non‑Meta** traffic only.
-
-**v2.5 (20 Apr):** **Retail courier standard = J&T Express.** Staging (`Retail_STAGING.gs`) is the reference implementation. 
-
-**v2.4 (20 Apr, PM):** **Dual-environment retail routing + `STGORD-` staging IDs.** The **Master Webhook Router** now carries **production** and **staging** retail endpoints (`PROD_RETAIL_URL` / `STG_RETAIL_URL`).
 
 ---
 
@@ -37,9 +33,11 @@
 
 ---
 
-## 11. Strict Frontend Parity & The Mock Pixel Strategy (CRITICAL AI INSTRUCTIONS)
+## 11. Strict Frontend Parity & Synchronization (CRITICAL AI INSTRUCTIONS)
 
-When an AI agent (like Cursor) is asked to update, modify, or sync Product Detail Pages (PDPs), it **MUST** adhere to the following strict parity rules between Staging (`*-staging.html`) and Production (`*.html`) files.
+When an AI agent (like Cursor) is asked to update, modify, or sync Product Detail Pages (PDPs), it **MUST** adhere to the following strict parity rules. 
+
+**Production (`product-z01.html`) is the Master Template.** Updates are applied to Production first, and then synced to Staging and other products. 
 
 The core philosophy is: **The `<body>` and `script` logic must be 100% identical. All environmental differences are isolated to the `<head>` and a few top-level constants.**
 
@@ -55,11 +53,11 @@ Production files contain live Meta Pixel tracking scripts in the `<head>`. Stagi
     ```
 *   **Result:** You may freely write `fbq('track', 'AddToCart', {...})` anywhere in the `<body>` logic of both files. Do **not** try to remove `fbq()` calls from staging files.
 
-### Rule 2: The 5 Allowed Differences
-When comparing or syncing a Staging file to a Production file, the **only** allowed differences are:
+### Rule 2: The 5 Allowed Differences (Staging vs. Production)
+When comparing or syncing a Staging file to a Production file of the same SKU, the **only** allowed differences are:
 1.  **Title Tag:** `<title>... (STAGING)</title>` vs `<title>...</title>`
-2.  **Robots Meta:** Staging requires `<meta name="robots" content="noindex">`. Production does not.
-3.  **Nav Links:** Staging uses `href="index-staging.html"`. Production uses `href="index.html"`.
+2.  **Robots Meta:** Staging requires `<meta name="robots" content="noindex">` in the `<head>`. Production does not.
+3.  **Nav Links:** Staging uses `href="index-staging.html"`. Production uses standard `href="index.html"`.
 4.  **API URL Constant:** 
     *   Staging: `const RETAIL_API_URL = "...HxRmQg/exec";`
     *   Production: `const RETAIL_API_URL = "...sb92c-Q/exec";`
@@ -67,4 +65,18 @@ When comparing or syncing a Staging file to a Production file, the **only** allo
     *   Staging: `key: 'arabista_staging_cart',`
     *   Production: `key: 'arabista_cart',`
 
-**If you are asked to apply a new feature to all product cards, apply it to the `<body>` identically across both environments, respecting the 5 allowed differences above.**
+### Rule 3: The Smart Journey Logger
+All product pages must include the `logJourneyEvent` function at the bottom of the main `<script>` tag. The funnel is tracked using these **five exact, standardized triggers**:
+1.  **Page Load:** `logJourneyEvent('PAGE_VIEW', 'Z01 Zahra');` (Fires after `fetchConfig()`)
+2.  **Size Click:** `logJourneyEvent('SIZE_SELECTED', 'Size: ' + size);` (Fires inside `selectSize`)
+3.  **Alteration Menu Opened:** `logJourneyEvent('ALTERATION_OPENED', '');` (Fires inside the toggle onclick if `altEnabled` is true)
+4.  **Cart Opened:** `logJourneyEvent('VIEW_CART', 'Added Z01 Size ' + selectedSize);` (Fires inside `addZ01ToLocalCartAndOpenDrawer`)
+5.  **Initiate Checkout:** `logJourneyEvent('INITIATE_CHECKOUT', 'Total Paid: RM ' + grandTotal.toFixed(2));` (Fires inside checkout click, *after* `grandTotal` is calculated).
+
+### Rule 4: Cross-Product Variable Syncing (Z01 -> D01)
+If you are instructed to use the Z01 Master Layout to update or create a new product card (e.g., `product-d01.html`), you must copy the entire Z01 HTML, but carefully update the following **Product-Specific Variables** to match the new SKU:
+1.  **The Title & Hero Text:** (e.g., `<title>D01 Dahlia Series...`, `<h1>ARABISTA | ...`)
+2.  **The Javascript Constant:** `const currentModel = 'D01';`
+3.  **The Gallery Media:** Update the `mediaFiles` array to point to the correct folder (e.g., `images/d01-1-hero.webp`).
+4.  **The Journey Logger Payload:** Update hardcoded text in triggers (e.g., `logJourneyEvent('PAGE_VIEW', 'D01 Dahlia');` and `logJourneyEvent('VIEW_CART', 'Added D01 Size ' + selectedSize);`).
+5.  **Accordion Details:** Update the Description, Features, and Included in Box HTML text to match the new garment specifications.
