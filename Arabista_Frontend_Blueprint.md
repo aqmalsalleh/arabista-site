@@ -1,9 +1,11 @@
 # 📘 ARABISTA FRONTEND & RETAIL ALTERATION — MASTER BLUEPRINT
 
-**Version:** 3.0 | **Aligned to codebase:** May 5, 2026 
+**Version:** 3.1 | **Aligned to codebase:** May 5, 2026 
 **Canonical detail:** Operational depth, API names, column maps, and DevOps live in `Arabista_Retail_Master_Doc.md` (when maintained alongside this repo). This blueprint is the **product-level story** from project inception: how retail stays isolated, how inventory and checkout behave, and the strict parity rules between Staging and Production frontend files.
 
-**v3.0 (05 May):** **Smart Journey Logger Integration & Cross-Product Syncing.** Added `logJourneyEvent` tracking architecture to HTML files to log customer drop-off points (Page View, Size Select, Alteration, Cart, Checkout) directly to the Google Apps Script backend. Established Rule 4 for adapting the Master Layout (Z01) to other product SKUs.
+**v3.1 (05 May):** **GA4 Event Tracking Migration.** Replaced custom journey logger with standard Google Analytics 4 (GA4) e-commerce events (`view_item`, `add_to_cart`, `begin_checkout`) to prevent Apps Script concurrent execution limits during high-traffic sessions.
+
+**v3.0 (05 May):** **Smart Journey Logger Integration & Cross-Product Syncing.** Added tracking architecture to HTML files to log customer drop-off points. Established Rule 4 for adapting the Master Layout (Z01) to other product SKUs.
 
 **v2.9 (04 May):** **Strict Frontend Parity & Mock Pixel Strategy.** Established strict rules for maintaining identical `<body>` logic between `-staging.html` and production `.html` files. Implemented the "Mock Pixel" in staging `<head>` to allow identical `fbq()` calls in the body without polluting live Meta Ads data.
 
@@ -65,18 +67,18 @@ When comparing or syncing a Staging file to a Production file of the same SKU, t
     *   Staging: `key: 'arabista_staging_cart',`
     *   Production: `key: 'arabista_cart',`
 
-### Rule 3: The Smart Journey Logger
-All product pages must include the `logJourneyEvent` function at the bottom of the main `<script>` tag. The funnel is tracked using these **five exact, standardized triggers**:
-1.  **Page Load:** `logJourneyEvent('PAGE_VIEW', 'Z01 Zahra');` (Fires after `fetchConfig()`)
-2.  **Size Click:** `logJourneyEvent('SIZE_SELECTED', 'Size: ' + size);` (Fires inside `selectSize`)
-3.  **Alteration Menu Opened:** `logJourneyEvent('ALTERATION_OPENED', '');` (Fires inside the toggle onclick if `altEnabled` is true)
-4.  **Cart Opened:** `logJourneyEvent('VIEW_CART', 'Added Z01 Size ' + selectedSize);` (Fires inside `addZ01ToLocalCartAndOpenDrawer`)
-5.  **Initiate Checkout:** `logJourneyEvent('INITIATE_CHECKOUT', 'Total Paid: RM ' + grandTotal.toFixed(2));` (Fires inside checkout click, *after* `grandTotal` is calculated).
+### Rule 3: GA4 Event Tracking
+All product pages must implement standard Google Analytics 4 (GA4) event tracking using the global `gtag()` function. The funnel is tracked using these five exact triggers:
+1.  **Page Load:** `gtag('event', 'view_item', { item_id: currentModel, item_name: 'Zahra Series' });` (Fires after `fetchConfig()`)
+2.  **Size Click:** `gtag('event', 'select_item', { item_list_name: 'Size Selection', item_name: size });` (Fires inside `selectSize`)
+3.  **Alteration Menu Opened:** `gtag('event', 'view_alteration_options', { item_id: currentModel });` (Fires inside the toggle onclick if `altEnabled` is true)
+4.  **Cart Opened:** `gtag('event', 'add_to_cart', { currency: 'MYR', value: currentPrice, items: [{ item_id: currentModel, item_variant: selectedSize }] });` (Fires inside `addZ01ToLocalCartAndOpenDrawer`)
+5.  **Initiate Checkout:** `gtag('event', 'begin_checkout', { currency: 'MYR', value: grandTotal });` (Fires inside checkout click, *after* `grandTotal` is calculated).
 
 ### Rule 4: Cross-Product Variable Syncing (Z01 -> D01)
 If you are instructed to use the Z01 Master Layout to update or create a new product card (e.g., `product-d01.html`), you must copy the entire Z01 HTML, but carefully update the following **Product-Specific Variables** to match the new SKU:
 1.  **The Title & Hero Text:** (e.g., `<title>D01 Dahlia Series...`, `<h1>ARABISTA | ...`)
 2.  **The Javascript Constant:** `const currentModel = 'D01';`
 3.  **The Gallery Media:** Update the `mediaFiles` array to point to the correct folder (e.g., `images/d01-1-hero.webp`).
-4.  **The Journey Logger Payload:** Update hardcoded text in triggers (e.g., `logJourneyEvent('PAGE_VIEW', 'D01 Dahlia');` and `logJourneyEvent('VIEW_CART', 'Added D01 Size ' + selectedSize);`).
+4.  **GA4 Event Parameters:** Update hardcoded text in the GA4 triggers (e.g., change `item_name: 'Zahra Series'` to `'Dahlia Series'`).
 5.  **Accordion Details:** Update the Description, Features, and Included in Box HTML text to match the new garment specifications.
