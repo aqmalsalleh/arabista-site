@@ -130,6 +130,14 @@
     // STAGING MOCK PIXEL - Prevents fake data from going to Meta
     function fbq() { console.log('[STAGING PIXEL FIRED]:', arguments); }
   </script>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-Q6KYKNKZW6"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-Q6KYKNKZW6');
+  </script>
 </head>
 <body class="font-sans antialiased pb-8 selection:bg-luxe selection:text-ink max-w-[100vw] overflow-x-hidden relative bg-brand text-white">
 
@@ -718,7 +726,7 @@
 
     function selectSize(size, btnElement) {
         selectedSize = size;
-        logJourneyEvent('SIZE_SELECTED', 'Size: ' + size);
+        gtag('event', 'select_item', { item_list_name: 'Size Selection', item_name: size });
         const sizeChosenEl = document.getElementById('sizeChosen');
         if (sizeChosenEl) sizeChosenEl.textContent = 'Size: ' + size;
         document.querySelectorAll('.size-btn').forEach(b => b.className = "size-btn py-3 border border-white/15 bg-transparent text-white rounded-lg font-medium hover:border-white/40 transition-colors focus:outline-none tap-none");
@@ -880,7 +888,7 @@
     // Alteration Engine
     document.getElementById('toggle-alt-btn').onclick = () => {
         altEnabled = !altEnabled;
-        if (altEnabled) logJourneyEvent('ALTERATION_OPENED', '');
+        if (altEnabled) gtag('event', 'view_alteration_options', { item_id: currentModel });
         const knob = document.getElementById('alt-knob');
         const sw = document.getElementById('alt-switch');
         const drawer = document.getElementById('alt-drawer');
@@ -1048,7 +1056,7 @@
         };
 
         CartManager.addItem(cartItem);
-        logJourneyEvent('VIEW_CART', 'Added Z01 Size ' + selectedSize);
+        gtag('event', 'add_to_cart', { currency: 'MYR', value: currentPrice, items: [{ item_id: currentModel, item_name: 'Zahra Series', item_variant: selectedSize }] });
         // META PIXEL: Add To Cart Event
         if (typeof fbq === 'function') {
             fbq('track', 'AddToCart', {
@@ -1391,7 +1399,7 @@
         });
 
         const grandTotal = payloadBasePrice + payloadAltCost + sessionShippingFee;
-        logJourneyEvent('INITIATE_CHECKOUT', 'Total Paid: RM ' + grandTotal.toFixed(2));
+        gtag('event', 'begin_checkout', { currency: 'MYR', value: grandTotal });
 
         const payload = {
             items: formattedItems,
@@ -1447,29 +1455,12 @@
         btn.textContent = "Proceed to Payment"; btn.disabled = false;
     };
 
-    // --- SMART JOURNEY LOGGER ---
-    function logJourneyEvent(eventName, eventDetails = "") {
-        let sid = sessionStorage.getItem('arabista_sid');
-        if (!sid) {
-            sid = 'SID-' + Math.random().toString(36).substr(2, 9) + '-' + Date.now();
-            sessionStorage.setItem('arabista_sid', sid);
-        }
-
-        const deviceInfo = encodeURIComponent(navigator.userAgent.substring(0, 100));
-        const detailsParam = encodeURIComponent(eventDetails);
-
-        try {
-            fetch(`${RETAIL_API_URL}?action=log_event&event=${eventName}&details=${detailsParam}&sid=${sid}&ua=${deviceInfo}&model=${currentModel}`);
-        } catch (e) {
-            console.warn("Journey log failed to send.");
-        }
-    }
-
     // Init
     document.getElementById('add-to-cart-btn').disabled = true;
     renderSizeGrid();
-    fetchConfig();
-    logJourneyEvent('PAGE_VIEW', 'Z01 Zahra');
+    fetchConfig().then(() => {
+        gtag('event', 'view_item', { item_id: currentModel, item_name: 'Zahra Series' });
+    });
 
     // --- CONTEXT-AWARE STICKY BAR ENGINE ---
     document.addEventListener('DOMContentLoaded', () => {
