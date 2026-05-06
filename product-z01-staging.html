@@ -182,12 +182,14 @@
       <div class="lg:col-span-7 flex flex-col gap-4 min-w-0 w-full reveal">
           <div class="relative aspect-[4/5] bg-white/5 rounded-2xl overflow-hidden shadow-soft ring-1 ring-white/10 group">
               <div class="arabista-gallery-main relative z-0 h-full w-full min-h-0"></div>
-              <!-- Mobile Scroll Arrow -->
-              <button type="button" id="mobile-scroll-chevron" class="absolute bottom-6 left-1/2 -translate-x-1/2 w-10 h-10 rounded-full bg-black/40 backdrop-blur-md border border-white/20 flex items-center justify-center text-luxe animate-bounce lg:hidden z-10 transition-opacity duration-500 tap-none" aria-label="Scroll to details">
+          </div>
+          <div class="arabista-gallery-thumbs flex gap-3 overflow-x-auto hide-scrollbar pb-2" id="gallery-thumbs"></div>
+          <!-- Centered Mobile Scroll Arrow -->
+          <div class="flex justify-center w-full mt-1 mb-2 lg:hidden transition-opacity duration-500" id="mobile-scroll-chevron-container">
+              <button type="button" id="mobile-scroll-chevron" class="w-10 h-10 rounded-full bg-white/[0.02] backdrop-blur-md border border-white/10 flex items-center justify-center text-luxe animate-bounce shadow-[0_0_15px_rgba(192,160,98,0.1)] tap-none" aria-label="Scroll to details">
                   <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
               </button>
           </div>
-          <div class="arabista-gallery-thumbs flex gap-3 overflow-x-auto hide-scrollbar pb-2" id="gallery-thumbs"></div>
       </div>
 
       <div class="lg:col-span-5 flex flex-col min-w-0 w-full lg:pl-4">
@@ -401,12 +403,13 @@
       </div>
   </section>
 
-  <section id="cross-sell-section" class="max-w-screen-xl mx-auto px-4 sm:px-6 pt-10 pb-16 border-t border-white/5 hidden reveal">
+  <section id="cross-sell-section" class="max-w-screen-xl mx-auto px-4 sm:px-6 pt-10 pb-16 border-t border-white/5 reveal">
       <div class="flex items-center justify-between mb-8">
           <h2 class="font-display text-3xl text-white tracking-wide">Explore The Collection</h2>
       </div>
       <div class="flex gap-4 overflow-x-auto snap-x snap-mandatory hide-scrollbar pb-4" id="cross-sell-container">
-          <!-- Dynamic Cross-Sell Cards go here -->
+          <!-- Dynamic Cross-Sell Cards injected via JS -->
+          <div class="w-full text-center py-10 text-white/30 text-xs uppercase tracking-widest animate-pulse" id="cross-sell-loading">Loading Collection...</div>
       </div>
   </section>
   </main>
