@@ -4,6 +4,11 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0" />
   <title>M02 Maraya Series Abaya — Arabista</title>
+  <meta property="og:title" content="M02 Maraya Series Abaya — Arabista" />
+  <meta property="og:description" content="Premium Nidha Dubai Abaya by Arabista. Guaranteed perfect fit with custom alteration services." />
+  <meta property="og:image" content="images/social-preview.jpg" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:image" content="images/social-preview.jpg" />
   <meta name="theme-color" content="#111213" />
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -163,14 +168,16 @@
   </header>
 
   <main class="pt-20">
-    <nav class="max-w-screen-xl mx-auto px-4 sm:px-6 text-xs text-white/60">
-      <ol class="flex items-center gap-2 py-3">
-        <li><a href="index.html" class="hover:text-luxe transition-colors">Home</a></li><li>›</li>
-        <li><a href="products.html" class="hover:text-luxe transition-colors">Products</a></li><li>›</li>
-        <li><a href="abaya.html" class="hover:text-luxe transition-colors">Abaya</a></li><li>›</li>
-        <li class="text-white">M02</li>
-      </ol>
-    </nav>
+    <div class="sticky top-14 z-40 bg-brand/90 backdrop-blur-md border-b border-white/5 mb-4">
+      <nav class="max-w-screen-xl mx-auto px-4 sm:px-6 text-xs text-white/60">
+        <ol class="flex items-center gap-2 py-3">
+          <li><a href="index.html" class="hover:text-luxe transition-colors">Home</a></li><li>›</li>
+          <li><a href="products.html" class="hover:text-luxe transition-colors">Products</a></li><li>›</li>
+          <li><a href="abaya.html" class="hover:text-luxe transition-colors">Abaya</a></li><li>›</li>
+          <li class="text-white">M02</li>
+        </ol>
+      </nav>
+    </div>
 
     <section class="max-w-screen-xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 px-4 sm:px-6 pt-4 pb-4 min-w-0 w-full overflow-hidden">
 
@@ -180,9 +187,16 @@
           </div>
           <div class="arabista-gallery-thumbs flex gap-3 overflow-x-auto hide-scrollbar pb-2" id="gallery-thumbs"></div>
       </div>
+      
+      <!-- Fixed Viewport Mobile Scroll Arrow -->
+      <div id="mobile-scroll-chevron-container" class="fixed bottom-8 left-1/2 -translate-x-1/2 z-[45] lg:hidden transition-opacity duration-500 tap-none flex justify-center">
+          <button type="button" id="mobile-scroll-chevron" class="w-10 h-10 rounded-full bg-black/40 backdrop-blur-md border border-white/20 flex items-center justify-center text-luxe animate-bounce shadow-[0_0_15px_rgba(192,160,98,0.3)]" aria-label="Scroll to details">
+              <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+          </button>
+      </div>
 
       <div class="lg:col-span-5 flex flex-col min-w-0 w-full lg:pl-4">
-          <div class="reveal">
+          <div class="reveal scroll-mt-28" id="product-info-start">
               <h1 class="font-display text-3xl sm:text-4xl text-white mb-3 font-medium tracking-wide mt-2">ARABISTA | Abaya Arab</h1>
               <p class="text-white/60 font-light text-sm mb-2 leading-relaxed">Maraya Series (Code M02) Nidha Premium Dubai</p>
               <div class="mb-6">
@@ -354,7 +368,6 @@
         </div>
       </div>
     </section>
-  </main>
 
   <section id="pdp-review-section" class="max-w-screen-xl mx-auto px-4 sm:px-6 pt-10 pb-8 border-t border-white/5 scroll-mt-14">
       <h2 class="font-display text-3xl sm:text-4xl text-white mb-10 tracking-wide reveal">What Our Customers Say</h2>
@@ -392,6 +405,27 @@
         </div>
       </div>
   </section>
+
+  <section id="cross-sell-section" class="max-w-screen-xl mx-auto px-4 sm:px-6 pt-10 pb-16 border-t border-white/5 reveal">
+      <div class="flex items-center justify-between mb-8">
+          <h2 class="font-display text-3xl text-white tracking-wide">Explore The Collection</h2>
+      </div>
+      <div class="flex gap-4 overflow-x-auto snap-x snap-mandatory hide-scrollbar pb-4" id="cross-sell-container">
+          <!-- Dynamic Cross-Sell Cards injected via JS -->
+          <div class="w-full text-center py-10 text-white/30 text-xs uppercase tracking-widest animate-pulse" id="cross-sell-loading">Loading Collection...</div>
+      </div>
+  </section>
+  </main>
+
+  <footer class="border-t border-white/10 py-8 bg-brand mt-10">
+    <div class="max-w-screen-xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+      <p class="text-white/50 text-xs">© <span id="y"></span> Arabista Enterprise. All rights reserved.</p>
+      <nav class="flex items-center gap-4 text-white/50 text-xs uppercase tracking-widest font-medium">
+        <a href="index.html" class="hover:text-luxe transition-colors">Home</a>
+        <a href="https://wa.me/60126913286" target="_blank" class="hover:text-luxe transition-colors">Contact</a>
+      </nav>
+    </div>
+  </footer>
 
   <div id="size-modal" class="fixed inset-0 bg-ink/90 backdrop-blur-md z-[60] hidden flex-col items-center justify-center p-4 opacity-0 transition-opacity duration-300 [&.show]:opacity-100" style="display:none;">
       <div class="bg-ink border border-white/10 rounded-2xl w-full max-w-2xl overflow-hidden shadow-2xl relative transform scale-95 transition-transform duration-300 [&.show]:scale-100">
@@ -435,17 +469,29 @@
       <div class="flex-1 overflow-y-auto overscroll-contain p-4 sm:p-6 flex flex-col gap-8 hide-scrollbar" id="cart-scroll-area">
           <div id="cart-items-container"></div>
 
-          <div class="space-y-3">
-              <label class="text-[10px] uppercase text-gray-500 tracking-wider block">Shipping Details</label>
-              <input type="text" id="cart-name" class="w-full bg-white/5 border border-white/10 rounded-lg text-white px-4 py-3 text-[16px] focus:border-luxe outline-none transition-colors" placeholder="Full Name">
-              <input type="tel" id="cart-phone" class="w-full bg-white/5 border border-white/10 rounded-lg text-white px-4 py-3 text-[16px] focus:border-luxe outline-none transition-colors" placeholder="Phone (e.g. 0123456789)">
-              <textarea id="cart-address" rows="2" class="w-full bg-white/5 border border-white/10 rounded-lg text-white px-4 py-3 text-[16px] focus:border-luxe outline-none transition-colors" placeholder="Address"></textarea>
-              <div class="grid grid-cols-2 gap-3">
-                  <input type="text" id="cart-postcode" class="w-full bg-white/5 border border-white/10 rounded-lg text-white px-4 py-3 text-[16px] focus:border-luxe outline-none transition-colors" placeholder="Postcode">
-                  <select id="cart-state" class="w-full bg-white/5 border border-white/10 rounded-lg text-white px-4 py-3 text-[16px] focus:border-luxe outline-none appearance-none transition-colors">
-                      <option value="">State...</option>
-                      <option value="Johor">Johor</option><option value="Kedah">Kedah</option><option value="Kelantan">Kelantan</option><option value="Melaka">Melaka</option><option value="Negeri Sembilan">Negeri Sembilan</option><option value="Pahang">Pahang</option><option value="Perak">Perak</option><option value="Perlis">Perlis</option><option value="Pulau Pinang">Pulau Pinang</option><option value="Sabah">Sabah</option><option value="Sarawak">Sarawak</option><option value="Selangor">Selangor</option><option value="Terengganu">Terengganu</option><option value="W.P. Kuala Lumpur">W.P. Kuala Lumpur</option><option value="W.P. Labuan">W.P. Labuan</option><option value="W.P. Putrajaya">W.P. Putrajaya</option>
-                  </select>
+          <div class="space-y-4 p-5 rounded-2xl bg-white/[0.02] border border-white/5 shadow-[0_0_15px_rgba(192,160,98,0.03)]">
+              <div class="flex items-center gap-2 mb-2">
+                  <svg class="w-4 h-4 text-luxe" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                  <h3 class="text-xs uppercase text-luxe tracking-widest font-medium">Shipping Details</h3>
+              </div>
+              <div class="space-y-3">
+                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <input type="text" id="cart-name" class="w-full bg-black/40 border-b border-white/10 rounded-t-lg rounded-b-none text-white px-4 py-3 text-[15px] focus:border-luxe focus:bg-black/60 outline-none transition-all placeholder:text-white/30" placeholder="Full Name">
+                      <input type="tel" id="cart-phone" class="w-full bg-black/40 border-b border-white/10 rounded-t-lg rounded-b-none text-white px-4 py-3 text-[15px] focus:border-luxe focus:bg-black/60 outline-none transition-all placeholder:text-white/30" placeholder="Phone (e.g. 0123456789)">
+                  </div>
+                  <textarea id="cart-address" rows="2" class="w-full bg-black/40 border-b border-white/10 rounded-t-lg rounded-b-none text-white px-4 py-3 text-[15px] focus:border-luxe focus:bg-black/60 outline-none transition-all placeholder:text-white/30" placeholder="Address"></textarea>
+                  <div class="grid grid-cols-2 gap-3">
+                      <input type="text" id="cart-postcode" class="w-full bg-black/40 border-b border-white/10 rounded-t-lg rounded-b-none text-white px-4 py-3 text-[15px] focus:border-luxe focus:bg-black/60 outline-none transition-all placeholder:text-white/30" placeholder="Postcode">
+                      <div class="relative">
+                          <select id="cart-state" class="w-full bg-black/40 border-b border-white/10 rounded-t-lg rounded-b-none text-white pl-4 pr-10 py-3 text-[15px] focus:border-luxe focus:bg-black/60 outline-none appearance-none transition-all cursor-pointer">
+                              <option value="" class="bg-brand">State...</option>
+                              <option value="Johor" class="bg-brand">Johor</option><option value="Kedah" class="bg-brand">Kedah</option><option value="Kelantan" class="bg-brand">Kelantan</option><option value="Melaka" class="bg-brand">Melaka</option><option value="Negeri Sembilan" class="bg-brand">Negeri Sembilan</option><option value="Pahang" class="bg-brand">Pahang</option><option value="Perak" class="bg-brand">Perak</option><option value="Perlis" class="bg-brand">Perlis</option><option value="Pulau Pinang" class="bg-brand">Pulau Pinang</option><option value="Sabah" class="bg-brand">Sabah</option><option value="Sarawak" class="bg-brand">Sarawak</option><option value="Selangor" class="bg-brand">Selangor</option><option value="Terengganu" class="bg-brand">Terengganu</option><option value="W.P. Kuala Lumpur" class="bg-brand">W.P. Kuala Lumpur</option><option value="W.P. Labuan" class="bg-brand">W.P. Labuan</option><option value="W.P. Putrajaya" class="bg-brand">W.P. Putrajaya</option>
+                          </select>
+                          <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-luxe/70">
+                              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                          </div>
+                      </div>
+                  </div>
               </div>
               <button type="button" id="btn-calc-ship" class="hidden"></button>
           </div>
@@ -1770,6 +1816,130 @@
     }, { passive: true });
 
         }
+    });
+    // --- 7. MOBILE CHEVRON SCROLL & FADE ENGINE ---
+    document.addEventListener('DOMContentLoaded', () => {
+        const chevron = document.getElementById('mobile-scroll-chevron');
+        const chevronContainer = document.getElementById('mobile-scroll-chevron-container');
+        const infoStart = document.getElementById('product-info-start');
+        let chevronDismissed = false;
+        
+        if (chevron && chevronContainer && infoStart) {
+            chevron.addEventListener('click', () => {
+                chevronDismissed = true;
+                chevronContainer.classList.add('opacity-0', 'pointer-events-none');
+                infoStart.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            });
+            
+            window.addEventListener('scroll', () => {
+                if (chevronDismissed) return;
+                if (window.scrollY > 150) {
+                    chevronContainer.classList.add('opacity-0', 'pointer-events-none');
+                } else {
+                    chevronContainer.classList.remove('opacity-0', 'pointer-events-none');
+                }
+            }, { passive: true });
+        }
+    });
+
+    // --- 8. DYNAMIC CROSS-SELL (BACKGROUND LOADED) ---
+    document.addEventListener('DOMContentLoaded', () => {
+        const crossSellSection = document.getElementById('cross-sell-section');
+        const crossSellContainer = document.getElementById('cross-sell-container');
+        let crossSellFetched = false;
+
+        function fetchCrossSell() {
+            if (crossSellFetched) return;
+            crossSellFetched = true;
+            
+            const deviceInfo = encodeURIComponent(navigator.userAgent.substring(0, 100));
+            fetch(`${RETAIL_API_URL}?action=get_config&cb=${Date.now().toString(36)}&ua=${deviceInfo}`)
+                .then(res => res.json())
+                .then(json => {
+                    if (json.status !== 'success') {
+                        crossSellSection.classList.add('hidden');
+                        return;
+                    }
+                    
+                    const matrix = json.data.matrix || {};
+                    const models = {};
+                    
+                    for (let sku in matrix) {
+                        const row = matrix[sku];
+                        const base = row.baseItem;
+                        if (!base || base === currentModel) continue;
+                        
+                        const stock = parseInt(row.Available_To_Sell || row.stock || row.qty || 0);
+                        if (stock <= 0) continue; 
+                        
+                        if (!models[base]) {
+                            let seriesName = base + " Series";
+                            if(base.startsWith('D')) seriesName = "Dahlia Series";
+                            if(base.startsWith('Z')) seriesName = "Zahra Series";
+                            if(base.startsWith('M')) seriesName = "Maraya Series";
+
+                            models[base] = { retail: row.retailPrice, promo: row.promoPrice, title: seriesName };
+                        } else {
+                            if (row.retailPrice > 0 && (models[base].retail === 0 || row.retailPrice < models[base].retail)) {
+                                models[base].retail = row.retailPrice;
+                            }
+                            if (row.promoPrice !== null && (models[base].promo === null || row.promoPrice < models[base].promo)) {
+                                models[base].promo = row.promoPrice;
+                            }
+                        }
+                    }
+                    
+                    const modelKeys = Object.keys(models).slice(0, 5); 
+                    if(modelKeys.length === 0) {
+                        crossSellSection.classList.add('hidden');
+                        return;
+                    }
+
+                    const loader = document.getElementById('cross-sell-loading');
+                    if (loader) loader.remove();
+
+                    const isStaging = window.location.href.includes('-staging');
+                    const linkSuffix = isStaging ? '-staging.html' : '.html';
+
+                    let html = '';
+                    modelKeys.forEach(base => {
+                        const d = models[base];
+                        const priceHtml = d.promo !== null && d.promo < d.retail 
+                            ? `<del class="text-white/40 text-xs mr-1.5">RM ${d.retail.toFixed(0)}</del><span class="text-luxe font-medium text-sm">RM ${d.promo.toFixed(0)}</span>`
+                            : `<span class="text-white font-medium text-sm">RM ${d.retail.toFixed(0)}</span>`;
+                            
+                        html += `
+                        <article class="relative block tap-none aspect-[3/4] w-[45vw] sm:w-56 shrink-0 snap-start rounded-2xl overflow-hidden bg-white/5 group border border-white/5 hover:border-white/20 transition-all duration-300">
+                            <a href="product-${base.toLowerCase()}${linkSuffix}" class="block w-full h-full">
+                                <img src="images/${base.toLowerCase()}-1-hero.webp" alt="${base}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out" loading="lazy">
+                                <div class="absolute inset-0 bg-gradient-to-t from-[#111213] via-[#111213]/20 to-transparent opacity-80 group-hover:opacity-100 transition-opacity duration-300"></div>
+                                <div class="absolute bottom-0 inset-x-0 p-4 sm:p-5 flex flex-col justify-end translate-y-2 group-hover:translate-y-0 transition-transform duration-300">
+                                    <h3 class="text-white font-display text-lg sm:text-xl leading-tight mb-1">${base} <span class="block text-[10px] uppercase tracking-widest text-white/50 font-sans mt-0.5">${d.title}</span></h3>
+                                    <div>${priceHtml}</div>
+                                </div>
+                            </a>
+                        </article>`;
+                    });
+                    
+                    html += `
+                    <article class="relative block tap-none aspect-[3/4] w-[45vw] sm:w-56 shrink-0 snap-start rounded-2xl overflow-hidden bg-black/40 border border-white/10 group hover:bg-black/60 hover:border-luxe/30 transition-all duration-300">
+                        <a href="abaya${linkSuffix}" class="flex flex-col items-center justify-center w-full h-full p-4 text-center">
+                            <div class="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center text-luxe mb-4 group-hover:scale-110 group-hover:bg-luxe/10 transition-all duration-300">
+                                <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                            </div>
+                            <span class="text-xs uppercase tracking-widest text-white/70 group-hover:text-white transition-colors">Discover All<br>Collections</span>
+                        </a>
+                    </article>`;
+                    
+                    crossSellContainer.innerHTML = html;
+                })
+                .catch(e => {
+                    console.warn("Cross-sell fetch failed", e);
+                    crossSellSection.classList.add('hidden');
+                });
+        }
+
+        setTimeout(fetchCrossSell, 100);
     });
   </script>
 
