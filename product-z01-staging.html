@@ -1812,6 +1812,138 @@
 
         }
     });
+
+    // --- 7. MOBILE CHEVRON SCROLL & FADE ENGINE ---
+    document.addEventListener('DOMContentLoaded', () => {
+        const chevron = document.getElementById('mobile-scroll-chevron');
+        const chevronContainer = document.getElementById('mobile-scroll-chevron-container');
+        const infoStart = document.getElementById('product-info-start');
+        
+        if (chevron && infoStart) {
+            // Smooth Scroll down on tap
+            chevron.addEventListener('click', () => {
+                infoStart.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            });
+            
+            // Fade out when scrolling past the top
+            window.addEventListener('scroll', () => {
+                if (window.scrollY > 150) {
+                    chevronContainer.classList.add('opacity-0', 'pointer-events-none');
+                } else {
+                    chevronContainer.classList.remove('opacity-0', 'pointer-events-none');
+                }
+            }, { passive: true });
+        }
+    });
+
+    // --- 8. DYNAMIC CROSS-SELL (LAZY LOADED) ---
+    document.addEventListener('DOMContentLoaded', () => {
+        const crossSellSection = document.getElementById('cross-sell-section');
+        const crossSellContainer = document.getElementById('cross-sell-container');
+        const reviewsSection = document.getElementById('pdp-review-section');
+        let crossSellFetched = false;
+
+        function fetchCrossSell() {
+            if (crossSellFetched) return;
+            crossSellFetched = true;
+            
+            // Fetch the entire catalog (hits the 5-min cache)
+            fetch(`${RETAIL_API_URL}?action=get_config&model=ALL`)
+                .then(res => res.json())
+                .then(json => {
+                    if (json.status !== 'success') {
+                        crossSellSection.classList.add('hidden');
+                        return;
+                    }
+                    
+                    const matrix = json.data.matrix || {};
+                    const models = {};
+                    
+                    // Aggregate the lowest prices & check stock for each base model
+                    for (let sku in matrix) {
+                        const row = matrix[sku];
+                        const base = row.baseItem;
+                        // Skip the item the user is currently viewing
+                        if (!base || base === currentModel) continue;
+                        
+                        const stock = parseInt(row.Available_To_Sell || row.stock || row.qty || 0);
+                        if (stock <= 0) continue; // Skip out-of-stock items completely
+                        
+                        if (!models[base]) {
+                            // Assign collection names intelligently
+                            let seriesName = base + " Series";
+                            if(base.startsWith('D')) seriesName = "Dahlia Series";
+                            if(base.startsWith('Z')) seriesName = "Zahra Series";
+                            if(base.startsWith('M')) seriesName = "Maraya Series";
+
+                            models[base] = { retail: row.retailPrice, promo: row.promoPrice, title: seriesName };
+                        } else {
+                            if (row.retailPrice > 0 && (models[base].retail === 0 || row.retailPrice < models[base].retail)) {
+                                models[base].retail = row.retailPrice;
+                            }
+                            if (row.promoPrice !== null && (models[base].promo === null || row.promoPrice < models[base].promo)) {
+                                models[base].promo = row.promoPrice;
+                            }
+                        }
+                    }
+                    
+                    // Pick up to 5 models to show
+                    const modelKeys = Object.keys(models).slice(0, 5); 
+                    if(modelKeys.length === 0) {
+                        crossSellSection.classList.add('hidden');
+                        return;
+                    }
+
+                    let html = '';
+                    modelKeys.forEach(base => {
+                        const d = models[base];
+                        const priceHtml = d.promo !== null && d.promo < d.retail 
+                            ? `<del class="text-white/40 text-xs mr-1.5">RM ${d.retail.toFixed(0)}</del><span class="text-luxe font-medium text-sm">RM ${d.promo.toFixed(0)}</span>`
+                            : `<span class="text-white font-medium text-sm">RM ${d.retail.toFixed(0)}</span>`;
+                            
+                        html += `
+                        <article class="relative block tap-none aspect-[3/4] w-[45vw] sm:w-56 shrink-0 snap-start rounded-2xl overflow-hidden bg-white/5 group border border-white/5 hover:border-white/20 transition-all duration-300">
+                            <a href="product-${base.toLowerCase()}-staging.html" class="block w-full h-full">
+                                <img src="images/${base.toLowerCase()}-1-hero.webp" alt="${base}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out" loading="lazy">
+                                <div class="absolute inset-0 bg-gradient-to-t from-[#111213] via-[#111213]/20 to-transparent opacity-80 group-hover:opacity-100 transition-opacity duration-300"></div>
+                                <div class="absolute bottom-0 inset-x-0 p-4 sm:p-5 flex flex-col justify-end translate-y-2 group-hover:translate-y-0 transition-transform duration-300">
+                                    <h3 class="text-white font-display text-lg sm:text-xl leading-tight mb-1">${base} <span class="block text-[10px] uppercase tracking-widest text-white/50 font-sans mt-0.5">${d.title}</span></h3>
+                                    <div>${priceHtml}</div>
+                                </div>
+                            </a>
+                        </article>`;
+                    });
+                    
+                    // Add the "Discover All" Call-to-Action Card
+                    html += `
+                    <article class="relative block tap-none aspect-[3/4] w-[45vw] sm:w-56 shrink-0 snap-start rounded-2xl overflow-hidden bg-black/40 border border-white/10 group hover:bg-black/60 hover:border-luxe/30 transition-all duration-300">
+                        <a href="abaya-staging.html" class="flex flex-col items-center justify-center w-full h-full p-4 text-center">
+                            <div class="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center text-luxe mb-4 group-hover:scale-110 group-hover:bg-luxe/10 transition-all duration-300">
+                                <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                            </div>
+                            <span class="text-xs uppercase tracking-widest text-white/70 group-hover:text-white transition-colors">Discover All<br>Collections</span>
+                        </a>
+                    </article>`;
+                    
+                    crossSellContainer.innerHTML = html;
+                })
+                .catch(e => {
+                    console.warn("Cross-sell fetch failed", e);
+                    crossSellSection.classList.add('hidden');
+                });
+        }
+
+        // The Observer: Triggers the fetch only when the user scrolls near the reviews
+        if (reviewsSection && crossSellContainer) {
+            const csObserver = new IntersectionObserver((entries) => {
+                if (entries[0].isIntersecting) {
+                    fetchCrossSell();
+                    csObserver.disconnect(); // Stop observing once fetched
+                }
+            }, { rootMargin: '300px' }); // Fire 300px before the reviews enter the screen
+            csObserver.observe(reviewsSection);
+        }
+    });
   </script>
 
   <div id="sticky-buy-bar" class="fixed bottom-0 inset-x-0 z-[45] transform translate-y-full transition-transform duration-500 bg-[#111213]/85 backdrop-blur-xl border-t border-white/5 shadow-[0_-15px_40px_rgba(0,0,0,0.6)] sm:hidden flex items-center justify-between px-5 py-4 pb-[calc(1rem+env(safe-area-inset-bottom,0px))]">
