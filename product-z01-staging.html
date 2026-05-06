@@ -184,13 +184,12 @@
               <div class="arabista-gallery-main relative z-0 h-full w-full min-h-0"></div>
           </div>
           <div class="arabista-gallery-thumbs flex gap-3 overflow-x-auto hide-scrollbar pb-2" id="gallery-thumbs"></div>
-          <!-- Centered Mobile Scroll Arrow -->
-          <div class="flex justify-center w-full mt-1 mb-2 lg:hidden transition-opacity duration-500" id="mobile-scroll-chevron-container">
-              <button type="button" id="mobile-scroll-chevron" class="w-10 h-10 rounded-full bg-white/[0.02] backdrop-blur-md border border-white/10 flex items-center justify-center text-luxe animate-bounce shadow-[0_0_15px_rgba(192,160,98,0.1)] tap-none" aria-label="Scroll to details">
-                  <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-              </button>
-          </div>
       </div>
+      
+      <!-- Fixed Viewport Mobile Scroll Arrow -->
+      <button type="button" id="mobile-scroll-chevron" class="fixed bottom-8 left-1/2 -translate-x-1/2 w-10 h-10 rounded-full bg-black/40 backdrop-blur-md border border-white/20 flex items-center justify-center text-luxe animate-bounce lg:hidden z-[45] transition-opacity duration-500 tap-none shadow-[0_0_15px_rgba(192,160,98,0.3)]" aria-label="Scroll to details">
+          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+      </button>
 
       <div class="lg:col-span-5 flex flex-col min-w-0 w-full lg:pl-4">
           <div class="reveal scroll-mt-28" id="product-info-start">
@@ -1816,21 +1815,24 @@
     // --- 7. MOBILE CHEVRON SCROLL & FADE ENGINE ---
     document.addEventListener('DOMContentLoaded', () => {
         const chevron = document.getElementById('mobile-scroll-chevron');
-        const chevronContainer = document.getElementById('mobile-scroll-chevron-container');
         const infoStart = document.getElementById('product-info-start');
+        let chevronDismissed = false;
         
         if (chevron && infoStart) {
-            // Smooth Scroll down on tap
+            // Smooth Scroll down on tap and instantly hide
             chevron.addEventListener('click', () => {
+                chevronDismissed = true;
+                chevron.classList.add('opacity-0', 'pointer-events-none');
                 infoStart.scrollIntoView({ behavior: 'smooth', block: 'start' });
             });
             
             // Fade out when scrolling past the top
             window.addEventListener('scroll', () => {
+                if (chevronDismissed) return;
                 if (window.scrollY > 150) {
-                    chevronContainer.classList.add('opacity-0', 'pointer-events-none');
+                    chevron.classList.add('opacity-0', 'pointer-events-none');
                 } else {
-                    chevronContainer.classList.remove('opacity-0', 'pointer-events-none');
+                    chevron.classList.remove('opacity-0', 'pointer-events-none');
                 }
             }, { passive: true });
         }
