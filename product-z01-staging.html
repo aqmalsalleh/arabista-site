@@ -310,7 +310,6 @@
           <button type="button" id="add-to-cart-btn" disabled class="w-full bg-luxe text-ink font-medium uppercase tracking-widest py-4 rounded-xl hover:opacity-90 transition shadow-soft mb-10 disabled:opacity-50 disabled:cursor-not-allowed tap-none">
               CONNECTING TO SERVER...
           </button>
-          <input type="hidden" id="qty" value="1" />
           </div>
 
           <div class="flex flex-col gap-3 reveal">
@@ -507,7 +506,6 @@
                       </div>
                   </div>
               </div>
-              <button type="button" id="btn-calc-ship" class="hidden"></button>
           </div>
       </div>
 
@@ -693,6 +691,8 @@
                 
                 if (i === retries) {
                     console.error("All config fetch retries exhausted. Failing closed.");
+                    const altLoading = document.getElementById('alt-loading');
+                    if (altLoading) altLoading.classList.add('hidden');
                     if (btn) {
                         btn.innerText = 'CONNECTION ERROR - PLEASE REFRESH';
                         btn.classList.add('bg-red-900', 'text-white');
@@ -1292,26 +1292,29 @@
         document.getElementById('cart-total').textContent = `RM ${grandTotal.toFixed(2)}`;
     }
 
-    document.getElementById('btn-calc-ship').onclick = async () => {
+    let shippingDebounceTimer;
+
+    async function calculateShipping() {
         const items = CartManager.getItems();
         if (items.length === 0) return;
 
-        const pc = document.getElementById('cart-postcode').value.trim();
+        const pcInput = document.getElementById('cart-postcode');
+        const pc = pcInput.value.trim();
+
         if (!pc || pc.length < 5 || isNaN(pc)) {
-            document.getElementById('cart-postcode').classList.add('border-red-500');
+            pcInput.classList.add('border-red-500');
             return;
         } else {
-            document.getElementById('cart-postcode').classList.remove('border-red-500');
+            pcInput.classList.remove('border-red-500');
         }
 
-        // Calculate aggregated weight across all cart items
         let totalCartWeight = 0;
         items.forEach(item => {
             totalCartWeight += (item.unitWeight || 1.0) * item.qty;
         });
 
-        const btn = document.getElementById('btn-calc-ship');
-        btn.textContent = "...";
+        const shippingDisplay = document.getElementById('cart-shipping');
+        shippingDisplay.innerHTML = `<span class="animate-pulse">Calculating...</span>`;
 
         try {
             const res = await fetch(`${RETAIL_API_URL}?action=calc_shipping&postcode=${encodeURIComponent(pc)}&weight=${totalCartWeight}`);
@@ -1323,24 +1326,26 @@
 
                 if (freeShipPromo && freeShipPromo.isActive) {
                     sessionShippingFee = 0;
-                    document.getElementById('cart-shipping').innerHTML = `<span class="line-through text-gray-500 mr-2">RM ${json.rate.toFixed(2)}</span><span class="text-luxe font-bold">FREE</span>`;
+                    shippingDisplay.innerHTML = `<span class="line-through text-gray-500 mr-2">RM ${json.rate.toFixed(2)}</span><span class="text-luxe font-bold">FREE</span>`;
                 } else {
                     sessionShippingFee = json.rate;
-                    document.getElementById('cart-shipping').textContent = `RM ${json.rate.toFixed(2)} (J&T Express)`;
+                    shippingDisplay.textContent = `RM ${json.rate.toFixed(2)} (J&T Express)`;
                 }
                 updateGrandTotal();
             }
         } catch (e) {
-            alert("Shipping calculation failed. Please try again.");
+            shippingDisplay.textContent = "Error calculating";
         }
-        btn.textContent = "CALC";
-    };
+    }
 
-    // Intelligent Address Engine & Auto-Calc
+    function triggerShippingCalc() {
+        clearTimeout(shippingDebounceTimer);
+        shippingDebounceTimer = setTimeout(calculateShipping, 500);
+    }
+
     const addressInput = document.getElementById('cart-address');
     const postcodeInput = document.getElementById('cart-postcode');
     const stateSelect = document.getElementById('cart-state');
-    const calcBtn = document.getElementById('btn-calc-ship');
 
     function getStateFromPostcode(pc) {
         const code = parseInt(pc, 10);
@@ -1371,7 +1376,7 @@
                 postcodeInput.value = pc;
                 const state = getStateFromPostcode(pc);
                 if (state) stateSelect.value = state;
-                calcBtn.click();
+                triggerShippingCalc();
             }
         }
     });
@@ -1381,7 +1386,7 @@
         if (pc.length === 5 && !isNaN(pc)) {
             const state = getStateFromPostcode(pc);
             if (state) stateSelect.value = state;
-            calcBtn.click();
+            triggerShippingCalc();
         }
     });
 
@@ -1416,7 +1421,7 @@
         const shipRow = document.getElementById('cart-shipping');
         const shipLabel = shipRow ? shipRow.textContent.replace(/\s+/g, ' ').trim() : '';
         if (shipLabel === 'Pending' || shipLabel === '' || postcode !== sessionPostcode) {
-            alert("Please click 'Calculate Shipping' to update your delivery fee before checking out.");
+            alert("Please enter a valid 5-digit postcode and wait for the shipping fee to calculate before checking out.");
             return;
         }
 
