@@ -45,6 +45,11 @@
     .review-text.clamp { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; overflow: hidden; }
     @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
+    @keyframes marquee {
+      0% { transform: translateX(0%); }
+      100% { transform: translateX(-50%); }
+    }
+
     /* --- ARABISTA PREMIUM GALLERY CSS --- */
     .arabista-gallery-main {
         scroll-snap-type: x mandatory;
@@ -230,14 +235,25 @@
               <div class="text-xl text-white font-medium mb-3 min-h-[28px] flex items-center" id="pdp-price-row">
                   <div class="h-6 w-32 bg-white/10 rounded animate-pulse"></div>
               </div>
-              <div class="mt-4 mb-8 flex flex-wrap gap-2 text-[10px] tracking-widest uppercase font-medium">
-                  <span class="px-2.5 py-1 rounded-full bg-white/10 border border-white/10">Premium Nidha</span>
-                  <span class="px-2.5 py-1 rounded-full bg-white/10 border border-white/10">10″ front zip</span>
-                  <span class="px-2.5 py-1 rounded-full bg-white/10 border border-white/10">Pockets (L/R)</span>
-                  <span class="px-2.5 py-1 rounded-full bg-white/10 border border-white/10">Inner sleeve lining</span>
-                  <span class="px-2.5 py-1 rounded-full bg-white/10 border border-white/10">Free shawl 1.9×0.7 m</span>
-                  <span class="px-2.5 py-1 rounded-full bg-white/10 border border-white/10">Premium gift box</span>
-                  <span class="px-2.5 py-1 rounded-full bg-white/10 border border-white/10">Fast delivery</span>
+              <div class="mt-4 mb-8 overflow-hidden relative border-y border-white/5 py-3 bg-white/[0.02]" style="-webkit-mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent); mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);">
+                  <div class="flex w-max animate-[marquee_20s_linear_infinite] items-center gap-8 text-[10px] tracking-widest uppercase font-medium text-luxe">
+                      <!-- Group 1 -->
+                      <span>✦ Premium Nidha</span>
+                      <span>✦ 10″ front zip</span>
+                      <span>✦ Pockets (L/R)</span>
+                      <span>✦ Inner sleeve lining</span>
+                      <span>✦ Free shawl 1.9×0.7 m</span>
+                      <span>✦ Premium gift box</span>
+                      <span>✦ Fast delivery</span>
+                      <!-- Group 2 (For infinite loop) -->
+                      <span>✦ Premium Nidha</span>
+                      <span>✦ 10″ front zip</span>
+                      <span>✦ Pockets (L/R)</span>
+                      <span>✦ Inner sleeve lining</span>
+                      <span>✦ Free shawl 1.9×0.7 m</span>
+                      <span>✦ Premium gift box</span>
+                      <span>✦ Fast delivery</span>
+                  </div>
               </div>
           </div>
 
@@ -1528,8 +1544,19 @@
             }, { threshold: 0 });
             observer.observe(mainCartBtn);
 
-            // 2. Intelligent Button Logic (add to localStorage cart, same as main ATC)
-            stickyBtn.addEventListener('click', addZ01ToLocalCartAndOpenDrawer);
+            // 2. Intelligent Button Logic
+            const sizeCalc = document.getElementById('size-calculator-section');
+            stickyBtn.addEventListener('click', () => {
+                if (!selectedSize) {
+                    // State A: Auto-scroll to Size Calculator
+                    if (sizeCalc) {
+                        sizeCalc.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
+                } else {
+                    // State B: Add to Cart
+                    addZ01ToLocalCartAndOpenDrawer();
+                }
+            });
         }
     });
 
