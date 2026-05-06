@@ -1,7 +1,9 @@
 # 📘 ARABISTA FRONTEND & RETAIL ALTERATION — MASTER BLUEPRINT
 
-**Version:** 3.1 | **Aligned to codebase:** May 5, 2026 
+**Version:** 3.2 | **Aligned to codebase:** May 6, 2026  
 **Canonical detail:** Operational depth, API names, column maps, and DevOps live in `Arabista_Retail_Master_Doc.md` (when maintained alongside this repo). This blueprint is the **product-level story** from project inception: how retail stays isolated, how inventory and checkout behave, and the strict parity rules between Staging and Production frontend files.
+
+**v3.2 (06 May):** **Premium PDP layout pack (social, nav, cross-sell, cart UI).** See **Rule 5** and **Section 12** for the checklist and exact file list. In short: Open Graph + Twitter meta (`og:title` mirrors `<title>`), sticky breadcrumb, fixed mobile chevron + scroll/dismiss behavior, `#product-info-start`, cross-sell rail with background `get_config` fetch (`cb` + truncated `ua`), out-of-stock and `currentModel` filtering, runtime `linkSuffix` for PDP and abaya URLs, site footer, glass cart shipping panel, and `<main>` wrapping reviews + cross-sell with a single closing `</main>`. **Reference implementation:** `product-z01-staging.html`.
 
 **v3.1 (05 May):** **GA4 Event Tracking Migration.** Replaced custom journey logger with standard Google Analytics 4 (GA4) e-commerce events (`view_item`, `add_to_cart`, `begin_checkout`) to prevent Apps Script concurrent execution limits during high-traffic sessions.
 
@@ -26,7 +28,7 @@
 
 | Layer | Staging / production artifact | Role |
 |--------|------------------|------|
-| Product PDP | `product-z01-staging.html` · `product-z01.html` (and `product-d01` … `d06`, `m01`–`m02` staging + non-staging pairs) | `get_config` → cart → `calc_shipping` → `reserve_stock`; optional pre-sale alteration fields. **Non-staging** HTML uses **production** `RETAIL_API_URL` (v2.8). |
+| Product PDP | `product-z01-staging.html` · `product-z01.html` (and `product-d01` … `d06`, `m01`–`m02` staging + non-staging pairs) | `get_config` → cart → `calc_shipping` → `reserve_stock`; optional pre-sale alteration fields. **Non-staging** HTML uses **production** `RETAIL_API_URL` (v2.8). **v3.2:** social meta, sticky breadcrumb, fixed chevron + scripts, cross-sell (background catalog fetch), footer, glass shipping form; see Rule 5 / Section 12. |
 | Abaya grid | `abaya-staging.html` · `abaya.html` | Collection landing; **non-staging** shares the same production `RETAIL_API_URL`. |
 | SenangPay return | `checkout/success-router-staging.html` | Reads `order_id`; sends **`ORD-…`** or **`STGORD-…`** to retail success. |
 | Success / CRM kickoff | `checkout/retail-success-staging.html` | Post-payment screen: order reference, luxury-branded layout, courier-agnostic copy, **Activate Order Updates** CTA. |
@@ -39,9 +41,9 @@
 
 When an AI agent (like Cursor) is asked to update, modify, or sync Product Detail Pages (PDPs), it **MUST** adhere to the following strict parity rules. 
 
-**Production (`product-z01.html`) is the Master Template.** Updates are applied to Production first, and then synced to Staging and other products. 
+**Production (`product-z01.html`) is the parity anchor for go-live.** Feature work may land first on **`product-z01-staging.html`** (reference for complex UI); parity batches then align staging/production pairs and sibling SKUs (Rule 4, Section 12).
 
-The core philosophy is: **The `<body>` and `script` logic must be 100% identical. All environmental differences are isolated to the `<head>` and a few top-level constants.**
+The core philosophy is: **The `<body>` and `script` logic must be 100% identical** aside from the **Rule 2** deltas. All environmental differences are isolated to the `<head>`, nav/footer hrefs, `RETAIL_API_URL`, cart key, and **dynamic** runtime helpers (e.g. cross-sell `linkSuffix`).
 
 ### Rule 1: The "Mock Pixel" Strategy
 Production files contain live Meta Pixel tracking scripts in the `<head>`. Staging files **must not** send data to Meta, but their body logic must remain identical. 
@@ -75,10 +77,35 @@ All product pages must implement standard Google Analytics 4 (GA4) event trackin
 4.  **Cart Opened:** `gtag('event', 'add_to_cart', { currency: 'MYR', value: currentPrice, items: [{ item_id: currentModel, item_variant: selectedSize }] });` (Fires inside `addZ01ToLocalCartAndOpenDrawer`)
 5.  **Initiate Checkout:** `gtag('event', 'begin_checkout', { currency: 'MYR', value: grandTotal });` (Fires inside checkout click, *after* `grandTotal` is calculated).
 
-### Rule 4: Cross-Product Variable Syncing (Z01 -> D01)
-If you are instructed to use the Z01 Master Layout to update or create a new product card (e.g., `product-d01.html`), you must copy the entire Z01 HTML, but carefully update the following **Product-Specific Variables** to match the new SKU:
-1.  **The Title & Hero Text:** (e.g., `<title>D01 Dahlia Series...`, `<h1>ARABISTA | ...`)
-2.  **The Javascript Constant:** `const currentModel = 'D01';`
-3.  **The Gallery Media:** Update the `mediaFiles` array to point to the correct folder (e.g., `images/d01-1-hero.webp`).
-4.  **GA4 Event Parameters:** Update hardcoded text in the GA4 triggers (e.g., change `item_name: 'Zahra Series'` to `'Dahlia Series'`).
-5.  **Accordion Details:** Update the Description, Features, and Included in Box HTML text to match the new garment specifications.
+### Rule 4: Cross-Product Variable Syncing (Z01 layout → any SKU)
+If you are instructed to use the Z01 Master Layout to update or create a new product PDP (e.g., `product-d01.html`, `product-m01-staging.html`), you must copy the **current** Z01 (or series sibling) HTML, then update the following **Product-Specific Variables**:
+1.  **The Title & Hero Copy:** `<title>…</title>` (staging keeps `(STAGING)`); hero subtitle / sticky bar title strings; **`og:title`** must mirror `<title>` exactly after any change.
+2.  **The Javascript Constant:** `const currentModel = 'D01'` (or `M01`, `Z01`, etc.).
+3.  **The Gallery Media:** `mediaFiles` / hero paths (e.g., `images/d01-1-hero.webp`).
+4.  **GA4 Event Parameters:** e.g. `item_name: 'Dahlia Series'` vs `'Zahra Series'` / `'Maraya Series'`.
+5.  **Accordion Details:** Description, Features, Included in Box.
+6.  **Breadcrumb last crumb:** `<li class="text-white">…</li>` (SKU code only).
+
+### Rule 5: Premium PDP chrome (v3.2) — checklist for new PDPs
+When adding or refreshing a product page, include these building blocks so it matches the rest of the fleet:
+
+| Area | What to include |
+|------|-----------------|
+| `<head>` | After `<title>`, Open Graph (`og:title`, `og:description`, `og:image`) + Twitter (`twitter:card`, `twitter:image`). `og:image` path: `images/social-preview.jpg` (asset must exist or path updated). |
+| Layout | `<main>` wraps: sticky breadcrumb wrapper → product grid (gallery + buy column) → size chart → **reviews** (`#pdp-review-section`) → **cross-sell** (`#cross-sell-section`) → **one** `</main>`. |
+| Mobile | Fixed chevron wrapper `#mobile-scroll-chevron-container` + button `#mobile-scroll-chevron`; title column inner wrapper `#product-info-start` with `scroll-mt-28`. |
+| Footer | Below `</main>`, before `#size-modal`: block footer; Home `href` = `index-staging.html` or `index.html` per environment. |
+| Cross-sell | Container includes loading row `#cross-sell-loading`; JS removes it after fetch; hides section on empty API / failure. Uses same stock and `currentModel` exclusion rules as Z01 master. |
+| Cart | “Shipping Details” uses the **glass** fieldset (icon + underline inputs + custom select chevron); IDs unchanged (`cart-name`, `cart-phone`, etc.). |
+
+**Parity note:** Staging and production **`<body>` scripts** stay the same; `linkSuffix` (and nav/footer hrefs) resolves staging vs production **at runtime** or via file variant, so you do not hand-edit product URLs inside the cross-sell template per file when using the shared pattern.
+
+## 12. PDP files with the v3.2 premium pack (inventory)
+
+For audits and future syncs, these **14** HTML files include the chrome described in **Rule 5** and **v3.2** above:
+
+- **Zahra:** `product-z01-staging.html`, `product-z01.html`
+- **Dahlia:** `product-d01-staging.html`, `product-d01.html`, `product-d02-staging.html`, `product-d02.html`, `product-d04-staging.html`, `product-d04.html`, `product-d06-staging.html`, `product-d06.html`
+- **Maraya:** `product-m01-staging.html`, `product-m01.html`, `product-m02-staging.html`, `product-m02.html`
+
+Other PDP SKUs (if added later) should be brought to parity using **`product-z01-staging.html`** as the reference.
