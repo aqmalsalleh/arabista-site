@@ -39,11 +39,16 @@
     input[type="number"]::-webkit-inner-spin-button, input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
     .thumb-active { border-color: #C0A062 !important; opacity: 1 !important; }
 
-    .reveal { opacity: 0; transform: translateY(30px); transition: all 1.8s cubic-bezier(0.16, 1, 0.3, 1); }
+    .reveal { opacity: 0; transform: translateY(20px); transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1); }
     .reveal.show { opacity: 1; transform: translateY(0); }
     .tap-none { -webkit-tap-highlight-color: transparent; }
     .review-text.clamp { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; overflow: hidden; }
     @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+    @keyframes marquee {
+      0% { transform: translateX(0%); }
+      100% { transform: translateX(-50%); }
+    }
 
     /* --- ARABISTA PREMIUM GALLERY CSS --- */
     .arabista-gallery-main {
@@ -230,18 +235,29 @@
               <div class="text-xl text-white font-medium mb-3 min-h-[28px] flex items-center" id="pdp-price-row">
                   <div class="h-6 w-32 bg-white/10 rounded animate-pulse"></div>
               </div>
-              <div class="mt-4 mb-8 flex flex-wrap gap-2 text-[10px] tracking-widest uppercase font-medium">
-                  <span class="px-2.5 py-1 rounded-full bg-white/10 border border-white/10">Premium Nidha</span>
-                  <span class="px-2.5 py-1 rounded-full bg-white/10 border border-white/10">10″ front zip</span>
-                  <span class="px-2.5 py-1 rounded-full bg-white/10 border border-white/10">Pockets (L/R)</span>
-                  <span class="px-2.5 py-1 rounded-full bg-white/10 border border-white/10">Inner sleeve lining</span>
-                  <span class="px-2.5 py-1 rounded-full bg-white/10 border border-white/10">Free shawl 1.9×0.7 m</span>
-                  <span class="px-2.5 py-1 rounded-full bg-white/10 border border-white/10">Premium gift box</span>
-                  <span class="px-2.5 py-1 rounded-full bg-white/10 border border-white/10">Fast delivery</span>
+              <div class="mt-4 mb-8 overflow-hidden relative border-y border-white/5 py-3 bg-white/[0.02]" style="-webkit-mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent); mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);">
+                  <div class="flex w-max animate-[marquee_20s_linear_infinite] items-center gap-8 text-[10px] tracking-widest uppercase font-medium text-luxe">
+                      <!-- Group 1 -->
+                      <span>✦ Premium Nidha</span>
+                      <span>✦ 10″ front zip</span>
+                      <span>✦ Pockets (L/R)</span>
+                      <span>✦ Inner sleeve lining</span>
+                      <span>✦ Free shawl 1.9×0.7 m</span>
+                      <span>✦ Premium gift box</span>
+                      <span>✦ Fast delivery</span>
+                      <!-- Group 2 (Duplicate for infinite loop) -->
+                      <span>✦ Premium Nidha</span>
+                      <span>✦ 10″ front zip</span>
+                      <span>✦ Pockets (L/R)</span>
+                      <span>✦ Inner sleeve lining</span>
+                      <span>✦ Free shawl 1.9×0.7 m</span>
+                      <span>✦ Premium gift box</span>
+                      <span>✦ Fast delivery</span>
+                  </div>
               </div>
           </div>
 
-          <div class="reveal" style="transition-delay: 150ms;">
+          <div class="reveal">
               <div id="size-calculator-section" class="scroll-mt-24 bg-white/5 border border-white/10 rounded-2xl p-5 mb-8 shadow-soft">
               <h3 class="text-sm font-medium text-white uppercase tracking-widest mb-4 flex items-center gap-2">
                   <svg class="w-4 h-4 text-luxe" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
@@ -273,7 +289,7 @@
           </div>
           </div>
 
-          <div class="reveal" style="transition-delay: 300ms;">
+          <div class="reveal">
               <div class="border border-luxe/30 rounded-2xl overflow-hidden mb-10 shadow-[0_0_15px_rgba(192,160,98,0.05)] transition-all duration-300 bg-white/[0.02]">
               <button type="button" class="w-full p-5 flex justify-between items-center text-left tap-none group" id="toggle-alt-btn">
                   <div>
@@ -1587,7 +1603,7 @@
     document.querySelectorAll('.reveal').forEach(el => {
         const io = new IntersectionObserver((entries, obs) => {
             entries.forEach(en => { if (en.isIntersecting) { en.target.classList.add('show'); obs.unobserve(en.target); } });
-        }, { threshold: 0.1, rootMargin: "0px 0px -50px 0px" });
+        }, { threshold: 0.1, rootMargin: "0px 0px 0px 0px" });
         io.observe(el);
     });
 
