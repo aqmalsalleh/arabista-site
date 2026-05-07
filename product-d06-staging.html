@@ -136,6 +136,17 @@
         pointer-events: none;
     }
   </style>
+  <script>
+    // MOCK PIXEL - Prevents fake data from going to Meta if on staging, acts as fallback
+    if (typeof fbq !== 'function') { function fbq() { console.log('[PIXEL FIRED]:', arguments); } }
+  </script>
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-Q6KYKNKZW6"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-Q6KYKNKZW6');
+  </script>
 </head>
 <body class="font-sans antialiased pb-8 selection:bg-luxe selection:text-ink max-w-[100vw] overflow-x-hidden relative bg-brand text-white">
 
@@ -772,6 +783,7 @@
 
     function selectSize(size, btnElement) {
         selectedSize = size;
+        gtag('event', 'select_item', { item_list_name: 'Size Selection', item_name: size });
         const sizeChosenEl = document.getElementById('sizeChosen');
         if (sizeChosenEl) sizeChosenEl.textContent = 'Size: ' + size;
         document.querySelectorAll('.size-btn').forEach(b => b.className = "size-btn py-3 border border-white/15 bg-transparent text-white rounded-lg font-medium hover:border-white/40 transition-colors focus:outline-none tap-none");
@@ -933,6 +945,7 @@
     // Alteration Engine
     document.getElementById('toggle-alt-btn').onclick = () => {
         altEnabled = !altEnabled;
+        if (altEnabled) gtag('event', 'view_alteration_options', { item_id: currentModel });
         const knob = document.getElementById('alt-knob');
         const sw = document.getElementById('alt-switch');
         const drawer = document.getElementById('alt-drawer');
@@ -1100,6 +1113,7 @@
         };
 
         CartManager.addItem(cartItem);
+        gtag('event', 'add_to_cart', { currency: 'MYR', value: currentPrice, items: [{ item_id: currentModel, item_name: 'Dahlia Series', item_variant: selectedSize }] });
         toggleCart(true);
     }
 
@@ -1432,6 +1446,7 @@
         });
 
         const grandTotal = payloadBasePrice + payloadAltCost + sessionShippingFee;
+        gtag('event', 'begin_checkout', { currency: 'MYR', value: grandTotal });
 
         const payload = {
             items: formattedItems,
@@ -1482,7 +1497,9 @@
     // Init
     document.getElementById('add-to-cart-btn').disabled = true;
     renderSizeGrid();
-    fetchConfig();
+    fetchConfig().then(() => {
+        gtag('event', 'view_item', { item_id: currentModel, item_name: 'Dahlia Series' });
+    });
 
     // --- CONTEXT-AWARE STICKY BAR ENGINE ---
     document.addEventListener('DOMContentLoaded', () => {
