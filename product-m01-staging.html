@@ -1114,6 +1114,16 @@
 
         CartManager.addItem(cartItem);
         gtag('event', 'add_to_cart', { currency: 'MYR', value: currentPrice, items: [{ item_id: currentModel, item_name: 'Maraya Series', item_variant: selectedSize }] });
+        // META PIXEL: Add To Cart Event
+        if (typeof fbq === 'function') {
+            fbq('track', 'AddToCart', {
+                content_name: cartItem.series,
+                content_ids: [cartItem.model],
+                content_type: 'product',
+                value: cartItem.price,
+                currency: 'MYR'
+            });
+        }
         toggleCart(true);
     }
 
@@ -1475,6 +1485,14 @@
             const json = await res.json();
 
             if (json.status === 'success') {
+                // META PIXEL: Initiate Checkout Event
+                if (typeof fbq === 'function') {
+                    fbq('track', 'InitiateCheckout', {
+                        value: grandTotal,
+                        currency: 'MYR',
+                        num_items: payloadTotalQty
+                    });
+                }
                 localStorage.removeItem('arabista_staging_cart');
                 window.location.href = json.paymentUrl;
             } else {
