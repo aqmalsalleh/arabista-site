@@ -10,6 +10,7 @@
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:image" content="images/social-preview.jpg" />
   <meta name="theme-color" content="#111213" />
+  <meta name="robots" content="noindex">
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -135,21 +136,6 @@
         pointer-events: none;
     }
   </style>
-  <script>
-  !function(f,b,e,v,n,t,s)
-  {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-  n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-  if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-  n.queue=[];t=b.createElement(e);t.async=!0;
-  t.src=v;s=b.getElementsByTagName(e)[0];
-  s.parentNode.insertBefore(t,s)}(window, document,'script',
-  'https://connect.facebook.net/en_US/fbevents.js');
-  fbq('init', '815939587846892');
-  fbq('track', 'PageView');
-  </script>
-  <noscript><img height="1" width="1" style="display:none"
-  src="https://www.facebook.com/tr?id=815939587846892&ev=PageView&noscript=1"
-  /></noscript>
   <!-- Google tag (gtag.js) -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-Q6KYKNKZW6"></script>
   <script>
@@ -255,7 +241,7 @@
                       <span>✦ Free shawl 1.9×0.7 m</span>
                       <span>✦ Premium gift box</span>
                       <span>✦ Fast delivery</span>
-                      <!-- Group 2 (Duplicate for infinite loop) -->
+                      <!-- Group 2 (For infinite loop) -->
                       <span>✦ Premium Nidha</span>
                       <span>✦ 10″ front zip</span>
                       <span>✦ Pockets (L/R)</span>
@@ -534,7 +520,7 @@
 
   <script>
     const currentModel = 'Z01';
-    const RETAIL_API_URL = "https://script.google.com/macros/s/AKfycbwYt7O3EivaEctPcq8WfzpQ_J-7mwlpnRmcR5xHnNEVX2WTBd6NXEMRr3MaTy1sb92c-Q/exec";
+    const RETAIL_API_URL = "https://script.google.com/macros/s/AKfycbw4qGOeC2Sebod06uFnW2u-ZAkj7l8zRdzyWrFEyL1_7eDCn-ks9lVKrd1I226qHxRmQg/exec";
 
     const baseSizes = {
         'XS': { length: 55, sleeve: 22, shoulder: 14, bust: 36 },
@@ -1850,6 +1836,7 @@
 
         }
     });
+
     // --- 7. MOBILE CHEVRON SCROLL & FADE ENGINE ---
     document.addEventListener('DOMContentLoaded', () => {
         const chevron = document.getElementById('mobile-scroll-chevron');
@@ -1858,12 +1845,14 @@
         let chevronDismissed = false;
         
         if (chevron && chevronContainer && infoStart) {
+            // Smooth Scroll down on tap and instantly hide
             chevron.addEventListener('click', () => {
                 chevronDismissed = true;
                 chevronContainer.classList.add('opacity-0', 'pointer-events-none');
                 infoStart.scrollIntoView({ behavior: 'smooth', block: 'start' });
             });
             
+            // Fade out when scrolling past the top
             window.addEventListener('scroll', () => {
                 if (chevronDismissed) return;
                 if (window.scrollY > 150) {
@@ -1885,6 +1874,7 @@
             if (crossSellFetched) return;
             crossSellFetched = true;
             
+            // Replicate abaya-staging.html fetch mechanism perfectly
             const deviceInfo = encodeURIComponent(navigator.userAgent.substring(0, 100));
             fetch(`${RETAIL_API_URL}?action=get_config&cb=${Date.now().toString(36)}&ua=${deviceInfo}`)
                 .then(res => res.json())
@@ -1897,15 +1887,18 @@
                     const matrix = json.data.matrix || {};
                     const models = {};
                     
+                    // Aggregate the lowest prices for each base model
                     for (let sku in matrix) {
                         const row = matrix[sku];
                         const base = row.baseItem;
+                        // Skip the item the user is currently viewing
                         if (!base || base === currentModel) continue;
                         
                         const stock = parseInt(row.Available_To_Sell || row.stock || row.qty || 0);
-                        if (stock <= 0) continue; 
+                        if (stock <= 0) continue; // Strictly skip out-of-stock SKUs
                         
                         if (!models[base]) {
+                            // Assign collection names intelligently
                             let seriesName = base + " Series";
                             if(base.startsWith('D')) seriesName = "Dahlia Series";
                             if(base.startsWith('Z')) seriesName = "Zahra Series";
@@ -1922,12 +1915,14 @@
                         }
                     }
                     
+                    // Pick up to 5 models to show
                     const modelKeys = Object.keys(models).slice(0, 5); 
                     if(modelKeys.length === 0) {
                         crossSellSection.classList.add('hidden');
                         return;
                     }
 
+                    // Remove the loading pulse text
                     const loader = document.getElementById('cross-sell-loading');
                     if (loader) loader.remove();
 
@@ -1954,11 +1949,12 @@
                         </article>`;
                     });
                     
+                    // Add the "Discover All" Call-to-Action Card
                     html += `
                     <article class="relative block tap-none aspect-[3/4] w-[45vw] sm:w-56 shrink-0 snap-start rounded-2xl overflow-hidden bg-black/40 border border-white/10 group hover:bg-black/60 hover:border-luxe/30 transition-all duration-300">
                         <a href="abaya${linkSuffix}" class="flex flex-col items-center justify-center w-full h-full p-4 text-center">
                             <div class="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center text-luxe mb-4 group-hover:scale-110 group-hover:bg-luxe/10 transition-all duration-300">
-                                <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                                <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
                             </div>
                             <span class="text-xs uppercase tracking-widest text-white/70 group-hover:text-white transition-colors">Discover All<br>Collections</span>
                         </a>
@@ -1972,6 +1968,7 @@
                 });
         }
 
+        // Fire instantly in the background so it is ready when the user scrolls down
         setTimeout(fetchCrossSell, 100);
     });
   </script>
