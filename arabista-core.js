@@ -219,6 +219,15 @@
             const el = byId(id);
             if (el && draft[id] != null) el.value = draft[id];
         });
+
+        // setting .value programmatically does NOT fire 'input', so the
+        // debounced shipping calculator never wakes up after a refresh.
+        // Manually re-fire it so a previously-saved postcode immediately
+        // pulls a fresh quote on page load.
+        const pcInput = byId('cart-postcode');
+        if (pcInput && /^\d{5}$/.test(String(pcInput.value || '').trim())) {
+            pcInput.dispatchEvent(new Event('input', { bubbles: true }));
+        }
     }
 
     function saveDraft() {
@@ -284,9 +293,13 @@
         renderSizeGrid();
         renderReviews();
         bindStaticUi();
-        loadDraft();
-        bindDraftPersistence();
+        // Bind UI listeners (cart drawer, address intelligence) BEFORE
+        // loading the saved draft. loadDraft() dispatches a synthetic
+        // 'input' event on the postcode field to wake the debounced
+        // shipping calculator — that handler must already be attached.
         bindCartUi();
+        bindDraftPersistence();
+        loadDraft();
         updateCartCount();
 
         // Fire view_item analytics regardless of API state.
