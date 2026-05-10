@@ -44,8 +44,12 @@
     const TIKTOK_URL = CTX.tiktokUrl || '';
     const REVIEWS = Array.isArray(CTX.reviews) ? CTX.reviews : [];
 
-    if (!BASE_ITEM || !API_URL) {
-        console.error('[Arabista] Missing ARABISTA_CONTEXT.baseItem or apiUrl — engine inert.');
+    if (!API_URL) {
+        console.warn('[Arabista] Missing ARABISTA_CONTEXT.apiUrl — engine inert.');
+        return;
+    }
+    if (CTX.pageType !== 'catalog' && !BASE_ITEM) {
+        console.warn('[Arabista] Missing ARABISTA_CONTEXT.baseItem for PDP — engine inert.');
         return;
     }
 
@@ -324,10 +328,7 @@
     // ONE API call. No double-fetch penalty.
     // -----------------------------------------------------------
     async function init() {
-        renderGallery();
-        renderSizeGrid();
-        renderReviews();
-        bindStaticUi();
+        // 1. Global Modules (Runs on ALL pages)
         // Bind UI listeners (cart drawer, address intelligence) BEFORE
         // loading the saved draft. loadDraft() dispatches a synthetic
         // 'input' event on the postcode field to wake the debounced
@@ -337,64 +338,72 @@
         loadDraft();
         updateCartCount();
 
-        // Fire view_item analytics regardless of API state.
-        gtagSafe('event', 'view_item', { item_id: BASE_ITEM, item_name: SERIES_NAME });
+        // 2. PDP-Specific Modules (Runs ONLY on Product Pages)
+        if (CTX.pageType !== 'catalog') {
+            renderGallery();
+            renderSizeGrid();
+            renderReviews();
+            bindStaticUi();
 
-        // Single API hit — pulls full catalog so we can hydrate
-        // both this PDP and cross-sell from the same payload.
-        let json;
-        try {
-            const ua = encodeURIComponent(String(navigator.userAgent || '').substring(0, 100));
-            const cb = Date.now().toString(36);
-            const res = await fetch(`${API_URL}?action=get_config&cb=${cb}&ua=${ua}`, { credentials: 'omit' });
-            if (!res.ok) throw new Error('HTTP ' + res.status);
-            json = await res.json();
-        } catch (err) {
-            console.warn('[Arabista] Catalog fetch failed:', err);
-            renderCrossSell({}, true);
-            return;
+            // Fire view_item analytics regardless of API state.
+            gtagSafe('event', 'view_item', { item_id: BASE_ITEM, item_name: SERIES_NAME });
+
+            // Single API hit — pulls full catalog so we can hydrate
+            // both this PDP and cross-sell from the same payload.
+            let json;
+            try {
+                const ua = encodeURIComponent(String(navigator.userAgent || '').substring(0, 100));
+                const cb = Date.now().toString(36);
+                const res = await fetch(`${API_URL}?action=get_config&cb=${cb}&ua=${ua}`, { credentials: 'omit' });
+                if (!res.ok) throw new Error('HTTP ' + res.status);
+                json = await res.json();
+            } catch (err) {
+                console.warn('[Arabista] Catalog fetch failed:', err);
+                renderCrossSell({}, true);
+                return;
+            }
+
+            if (!json || json.status !== 'success' || !json.data) {
+                console.warn('[Arabista] Catalog responded non-success.');
+                renderCrossSell({}, true);
+                return;
+            }
+
+            const matrix = json.data.matrix || {};
+            const config = json.data.config || {};
+            appConfig = config;
+
+            // Distribute: this PDP gets only its own SKUs, cross-sell gets all others.
+            const pdpMatrix = {};
+            Object.keys(matrix).forEach(sku => {
+                const row = matrix[sku];
+                if (row && row.baseItem === BASE_ITEM) pdpMatrix[sku] = row;
+            });
+            inventoryMatrix = pdpMatrix;
+
+            // Adopt model weight if API surfaces one for this base item.
+            if (typeof json.data.modelWeight === 'number' && json.data.modelWeight > 0) {
+                activeWeightKg = json.data.modelWeight;
+            } else {
+                // Fallback: take the first weight from the PDP matrix.
+                const firstRow = pdpMatrix[Object.keys(pdpMatrix)[0]];
+                if (firstRow && firstRow.weightKg) activeWeightKg = firstRow.weightKg;
+            }
+
+            initializeDefaultPricing();
+            applyOOSStyling();
+            renderAlterationFields();
+
+            // Enable Add to Cart UI now that we have data.
+            const atc = byId('add-to-cart-btn');
+            if (atc) {
+                atc.classList.remove('btn-shimmer');
+            }
+            validateAlterations();
+
+            // Hydrate cross-sell from the SAME response.
+            renderCrossSell(matrix, false);
         }
-
-        if (!json || json.status !== 'success' || !json.data) {
-            console.warn('[Arabista] Catalog responded non-success.');
-            renderCrossSell({}, true);
-            return;
-        }
-
-        const matrix = json.data.matrix || {};
-        const config = json.data.config || {};
-        appConfig = config;
-
-        // Distribute: this PDP gets only its own SKUs, cross-sell gets all others.
-        const pdpMatrix = {};
-        Object.keys(matrix).forEach(sku => {
-            const row = matrix[sku];
-            if (row && row.baseItem === BASE_ITEM) pdpMatrix[sku] = row;
-        });
-        inventoryMatrix = pdpMatrix;
-
-        // Adopt model weight if API surfaces one for this base item.
-        if (typeof json.data.modelWeight === 'number' && json.data.modelWeight > 0) {
-            activeWeightKg = json.data.modelWeight;
-        } else {
-            // Fallback: take the first weight from the PDP matrix.
-            const firstRow = pdpMatrix[Object.keys(pdpMatrix)[0]];
-            if (firstRow && firstRow.weightKg) activeWeightKg = firstRow.weightKg;
-        }
-
-        initializeDefaultPricing();
-        applyOOSStyling();
-        renderAlterationFields();
-
-        // Enable Add to Cart UI now that we have data.
-        const atc = byId('add-to-cart-btn');
-        if (atc) {
-            atc.classList.remove('btn-shimmer');
-        }
-        validateAlterations();
-
-        // Hydrate cross-sell from the SAME response.
-        renderCrossSell(matrix, false);
     }
 
     // -----------------------------------------------------------
