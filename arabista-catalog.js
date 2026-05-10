@@ -36,20 +36,28 @@
             }
         });
 
-        // Instantly filter cards using CSS display
+        // Instantly filter cards using CSS display and trigger reveal
         productCards.forEach(card => {
             const cardCat = card.getAttribute('data-category');
             if (category === 'all' || cardCat === category) {
                 card.style.display = 'block';
-                card.style.animation = 'fadeIn 0.4s ease-out forwards';
+                card.classList.remove('show');
+                setTimeout(() => card.classList.add('show'), 20);
             } else {
                 card.style.display = 'none';
+                card.classList.remove('show');
             }
         });
     }
 
     // --- UI EVENT BINDINGS ---
     function bindUI() {
+        // Scroll Reveal Animation
+        const io = new IntersectionObserver((entries) => {
+            entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('show'); });
+        }, { threshold: 0.1 });
+        productCards.forEach(card => io.observe(card));
+
         // Desktop Filter Clicks
         filterBtns.forEach(btn => {
             btn.addEventListener('click', (e) => {
@@ -93,9 +101,9 @@
     async function fetchCatalogData() {
         try {
             // Fetch live config from the staging URL mapped in Context
-            const response = await fetch(`${ctx.apiUrl}?action=get_config&nocache=true&cb=${Date.now()}`, {
-                redirect: 'follow'
-            });
+            const deviceInfo = encodeURIComponent(navigator.userAgent.substring(0, 100));
+            const url = `${ctx.apiUrl}?action=get_config&nocache=true&cb=${Date.now().toString(36)}&ua=${deviceInfo}`;
+            const response = await fetch(url);
             if (!response.ok) throw new Error('Network response was not ok');
             const json = await response.json();
             
