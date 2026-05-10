@@ -4,13 +4,46 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0" />
   <title>D06 Dahlia Series Abaya — Arabista (STAGING)</title>
+  <meta name="description" content="Premium Nidha Dubai Dahlia (D06) Abaya by Arabista. Guaranteed perfect fit with custom alteration services." />
   <meta property="og:title" content="D06 Dahlia Series Abaya — Arabista (STAGING)" />
-  <meta property="og:description" content="Premium Nidha Dubai Abaya by Arabista. Guaranteed perfect fit with custom alteration services." />
+  <meta property="og:description" content="Premium Nidha Dubai Dahlia (D06) Abaya by Arabista. Guaranteed perfect fit with custom alteration services." />
   <meta property="og:image" content="images/social-preview.jpg" />
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:image" content="images/social-preview.jpg" />
   <meta name="theme-color" content="#111213" />
   <meta name="robots" content="noindex">
+
+  <!-- Schema.org Product structured data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org/",
+    "@type": "Product",
+    "name": "D06 Dahlia Series Abaya",
+    "image": [
+      "https://arabista.com/images/d06-1-hero.webp",
+      "https://arabista.com/images/d06-3-portrait-1.webp",
+      "https://arabista.com/images/d06-5-closeup.webp"
+    ],
+    "description": "Premium Nidha Dubai Dahlia (D06) Abaya by Arabista. Cutting 1-Lapis, 10\" front zip, dual pockets, full inner sleeve lining (wudhu' friendly), free 1.9×0.7 m chiffon shawl, premium gift box.",
+    "sku": "D06",
+    "mpn": "ARB-D06",
+    "brand": { "@type": "Brand", "name": "Arabista" },
+    "category": "Apparel > Abaya",
+    "aggregateRating": {
+      "@type": "AggregateRating",
+      "ratingValue": "4.9",
+      "reviewCount": "41"
+    },
+    "offers": {
+      "@type": "Offer",
+      "url": "https://arabista.com/product-d06-staging.html",
+      "priceCurrency": "MYR",
+      "availability": "https://schema.org/InStock",
+      "itemCondition": "https://schema.org/NewCondition",
+      "seller": { "@type": "Organization", "name": "Arabista Enterprise" }
+    }
+  }
+  </script>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -26,13 +59,19 @@
           animation: {
             'spin-slow': 'spin 1.5s cubic-bezier(0.4, 0, 0.2, 1) infinite',
             'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+            'shimmer': 'shimmer 1.6s ease-in-out infinite'
+          },
+          keyframes: {
+            shimmer: {
+              '0%': { backgroundPosition: '-200% 0' },
+              '100%': { backgroundPosition: '200% 0' }
+            }
           }
         }
       }
     }
   </script>
   <style>
-    /* D01 Premium Aesthetics & Animations */
     body { background-color: #111213; color: #ffffff; }
     .hide-scrollbar::-webkit-scrollbar { display: none; }
     .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
@@ -48,6 +87,16 @@
     @keyframes marquee {
       0% { transform: translateX(0%); }
       100% { transform: translateX(-50%); }
+    }
+
+    /* Optimistic-loading subtle shimmer for the Add-to-Cart button */
+    .btn-shimmer {
+      background-image: linear-gradient(90deg,
+        rgba(192,160,98,0.85) 0%,
+        rgba(212,175,55,1) 50%,
+        rgba(192,160,98,0.85) 100%);
+      background-size: 200% 100%;
+      animation: shimmer 1.6s ease-in-out infinite;
     }
 
     /* --- ARABISTA PREMIUM GALLERY CSS --- */
@@ -69,7 +118,7 @@
         user-select: none;
         -webkit-user-drag: none;
         will-change: transform, opacity;
-        transform: translateZ(0); /* Force GPU Acceleration */
+        transform: translateZ(0);
     }
 
     .arabista-gallery-thumbs {
@@ -78,7 +127,6 @@
     }
     .arabista-gallery-thumbs::-webkit-scrollbar { display: none; }
 
-    /* Layout rails for architect scroll math (not part of engine physics block) */
     .arabista-gallery-main {
         display: flex;
         flex-direction: row;
@@ -104,18 +152,18 @@
     #arabista-lightbox.is-open #lightbox-frame { transform: scale(1); }
     .lb-item { scroll-snap-align: center; flex: 0 0 100%; min-width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; padding: 2rem; }
     @media (max-width: 640px) { .lb-item { padding: 0.5rem; } }
-    .lb-media { 
-        max-width: 100%; 
-        max-height: 100%; 
-        object-fit: contain; 
-        border: 1px solid rgba(192, 160, 98, 0.5); 
-        box-shadow: 0 0 30px rgba(192, 160, 98, 0.15); 
+    .lb-media {
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: contain;
+        border: 1px solid rgba(192, 160, 98, 0.5);
+        box-shadow: 0 0 30px rgba(192, 160, 98, 0.15);
         background-color: #111213;
         border-radius: 0.5rem;
     }
     .lb-media::-webkit-media-controls { display: none !important; }
 
-    /* --- ARABISTA OOS AESTHETIC --- */
+    /* --- OOS AESTHETIC --- */
     .size-btn:disabled {
         color: rgba(255, 255, 255, 0.25) !important;
         border-color: rgba(255, 255, 255, 0.08) !important;
@@ -135,27 +183,56 @@
         transform: rotate(-25deg);
         pointer-events: none;
     }
+
+    /* --- iOS VIRTUAL KEYBOARD FIX --- */
+    /* Reserve safe-area space inside the cart drawer so iOS keyboard never hides the active input. */
+    #cart-drawer { padding-bottom: env(safe-area-inset-bottom, 0px); }
   </style>
-  <script>
-    // MOCK PIXEL - Prevents fake data from going to Meta if on staging, acts as fallback
-    if (typeof fbq !== 'function') { function fbq() { console.log('[PIXEL FIRED]:', arguments); } }
-  </script>
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-Q6KYKNKZW6"></script>
+
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-0000000000"></script>
   <script>
     window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
+    function gtag(){ dataLayer.push(arguments); }
     gtag('js', new Date());
-    gtag('config', 'G-Q6KYKNKZW6');
+    gtag('config', 'G-0000000000');
   </script>
+
+  <!-- Meta Pixel -->
+  <script>
+    !function(f,b,e,v,n,t,s)
+    {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+    n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+    if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+    n.queue=[];t=b.createElement(e);t.async=!0;
+    t.src=v;s=b.getElementsByTagName(e)[0];
+    s.parentNode.insertBefore(t,s)}(window, document,'script',
+    'https://connect.facebook.net/en_US/fbevents.js');
+    fbq('init', '0000000000000000');
+    fbq('track', 'PageView');
+  </script>
+  <noscript><img height="1" width="1" style="display:none"
+    src="https://www.facebook.com/tr?id=0000000000000000&ev=PageView&noscript=1" /></noscript>
+  <!-- End Meta Pixel -->
+
+  <!-- TikTok Pixel -->
+  <script>
+    !function (w, d, t) {
+      w.TiktokAnalyticsObject=t;var ttq=w[t]=w[t]||[];ttq.methods=["page","track","identify","instances","debug","on","off","once","ready","alias","group","enableCookie","disableCookie"],ttq.setAndDefer=function(t,e){t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}};for(var i=0;i<ttq.methods.length;i++)ttq.setAndDefer(ttq,ttq.methods[i]);ttq.instance=function(t){for(var e=ttq._i[t]||[],n=0;n<ttq.methods.length;n++)ttq.setAndDefer(e,ttq.methods[n]);return e},ttq.load=function(e,n){var i="https://analytics.tiktok.com/i18n/pixel/events.js";ttq._i=ttq._i||{},ttq._i[e]=[],ttq._i[e]._u=i,ttq._t=ttq._t||{},ttq._t[e]=+new Date,ttq._o=ttq._o||{},ttq._o[e]=n||{};var o=document.createElement("script");o.type="text/javascript",o.async=!0,o.src=i+"?sdkid="+e+"&lib="+t;var a=document.getElementsByTagName("script")[0];a.parentNode.insertBefore(o,a)};
+      ttq.load('TEST_PIXEL_ID');
+      ttq.page();
+    }(window, document, 'ttq');
+  </script>
+  <!-- End TikTok Pixel -->
 </head>
 <body class="font-sans antialiased pb-8 selection:bg-luxe selection:text-ink max-w-[100vw] overflow-x-hidden relative bg-brand text-white">
 
   <header class="fixed top-0 inset-x-0 z-50 backdrop-blur bg-brand/80">
     <div class="max-w-screen-xl mx-auto px-4 sm:px-6">
       <div class="h-14 grid grid-cols-3 items-center">
-        <a href="index-staging.html" class="font-display tracking-[0.18em] text-[14px] text-white tap-none">ARABISTA</a>
+        <a href="index.html" class="font-display tracking-[0.18em] text-[14px] text-white tap-none">ARABISTA</a>
 
-        <a href="index-staging.html" class="justify-self-center tap-none">
+        <a href="index.html" class="justify-self-center tap-none">
           <img src="images/logo.png" alt="Arabista logo" class="h-11 w-auto">
         </a>
 
@@ -173,9 +250,9 @@
     <div class="sticky top-14 z-40 bg-brand/90 backdrop-blur-md border-b border-white/5 mb-4">
       <nav class="max-w-screen-xl mx-auto px-4 sm:px-6 text-xs text-white/60">
         <ol class="flex items-center gap-2 py-3">
-          <li><a href="index-staging.html" class="hover:text-luxe transition-colors">Home</a></li><li>›</li>
-          <li><a href="products-staging.html" class="hover:text-luxe transition-colors">Products</a></li><li>›</li>
-          <li><a href="abaya-staging.html" class="hover:text-luxe transition-colors">Abaya</a></li><li>›</li>
+          <li><a href="index.html" class="hover:text-luxe transition-colors">Home</a></li><li>›</li>
+          <li><a href="products.html" class="hover:text-luxe transition-colors">Products</a></li><li>›</li>
+          <li><a href="abaya.html" class="hover:text-luxe transition-colors">Abaya</a></li><li>›</li>
           <li class="text-white">D06</li>
         </ol>
       </nav>
@@ -189,8 +266,7 @@
           </div>
           <div class="arabista-gallery-thumbs flex gap-3 overflow-x-auto hide-scrollbar pb-2" id="gallery-thumbs"></div>
       </div>
-      
-      <!-- Fixed Viewport Mobile Scroll Arrow -->
+
       <div id="mobile-scroll-chevron-container" class="fixed bottom-8 left-1/2 -translate-x-1/2 z-[45] lg:hidden transition-opacity duration-500 tap-none flex justify-center">
           <button type="button" id="mobile-scroll-chevron" class="w-10 h-10 rounded-full bg-black/40 backdrop-blur-md border border-white/20 flex items-center justify-center text-luxe animate-bounce shadow-[0_0_15px_rgba(192,160,98,0.3)]" aria-label="Scroll to details">
               <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
@@ -203,20 +279,15 @@
               <p class="text-white/60 font-light text-sm mb-2 leading-relaxed">Dahlia Series (Code D06) Nidha Premium Dubai</p>
               <div class="mb-6">
                   <a href="#pdp-review-section" class="group inline-flex items-center gap-3 px-4 py-2.5 rounded-full bg-white/[0.03] border border-white/10 hover:border-luxe/50 hover:bg-white/[0.05] transition-all duration-300 tap-none backdrop-blur-sm shadow-[0_0_15px_rgba(0,0,0,0.1)]">
-
                       <div class="flex items-center gap-1.5">
                           <svg class="w-3.5 h-3.5 text-luxe drop-shadow-[0_0_8px_rgba(192,160,98,0.5)]" viewBox="0 0 20 20" fill="currentColor">
                               <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                           </svg>
                           <span class="text-white font-semibold text-[11px] tracking-wider">4.9</span>
                       </div>
-
                       <div class="w-px h-3.5 bg-white/20"></div>
-
                       <span class="text-white/50 text-[10px] uppercase tracking-widest">41 Reviews</span>
-
                       <div class="w-px h-3.5 bg-white/20 hidden sm:block"></div>
-
                       <div class="hidden sm:flex items-center gap-1.5">
                           <span class="relative flex h-2 w-2">
                             <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
@@ -224,7 +295,6 @@
                           </span>
                           <span class="text-white/80 text-[10px] uppercase tracking-widest font-medium">1.4K Sold on TikTok</span>
                       </div>
-
                       <svg class="w-3.5 h-3.5 text-white/40 group-hover:text-luxe group-hover:translate-x-1 transition-all duration-300 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
                       </svg>
@@ -236,7 +306,6 @@
               </div>
               <div class="mt-4 mb-8 overflow-hidden relative border-y border-white/5 py-3 bg-white/[0.02]" style="-webkit-mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent); mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);">
                   <div class="flex w-max animate-[marquee_20s_linear_infinite] items-center gap-8 text-[10px] tracking-widest uppercase font-medium text-luxe">
-                      <!-- Group 1 -->
                       <span>✦ Premium Nidha</span>
                       <span>✦ 10″ front zip</span>
                       <span>✦ Pockets (L/R)</span>
@@ -244,7 +313,6 @@
                       <span>✦ Free shawl 1.9×0.7 m</span>
                       <span>✦ Premium gift box</span>
                       <span>✦ Fast delivery</span>
-                      <!-- Group 2 (Duplicate for infinite loop) -->
                       <span>✦ Premium Nidha</span>
                       <span>✦ 10″ front zip</span>
                       <span>✦ Pockets (L/R)</span>
@@ -272,7 +340,7 @@
                       <input type="number" id="calc-weight" class="w-full bg-transparent border-b border-white/20 text-white pb-2 text-[16px] focus:outline-none focus:border-luxe transition-colors" placeholder="e.g. 55">
                   </div>
               </div>
-              <button type="button" onclick="calculateSize()" class="text-xs uppercase tracking-widest text-luxe hover:text-white transition-colors tap-none">Suggest Size &rarr;</button>
+              <button type="button" id="btn-calc-size" class="text-xs uppercase tracking-widest text-luxe hover:text-white transition-colors tap-none">Suggest Size &rarr;</button>
               <p id="calc-result" class="mt-3 text-sm text-green-400 hidden font-medium"></p>
           </div>
 
@@ -282,7 +350,7 @@
                       <label class="text-sm font-medium text-white uppercase tracking-widest">Select Size</label>
                       <span id="sizeChosen" class="text-[11px] text-white/45 font-medium tracking-wide truncate"></span>
                   </div>
-                  <button type="button" onclick="document.getElementById('size-modal').style.display='flex'; setTimeout(()=>document.getElementById('size-modal').classList.add('show'),10);" class="text-xs text-gray-500 underline decoration-gray-700 underline-offset-4 hover:text-white tap-none shrink-0">Size Guide</button>
+                  <button type="button" id="btn-size-guide" class="text-xs text-gray-500 underline decoration-gray-700 underline-offset-4 hover:text-white tap-none shrink-0">Size Guide</button>
               </div>
               <div class="grid grid-cols-4 lg:grid-cols-6 gap-3" id="size-grid"></div>
           </div>
@@ -306,8 +374,8 @@
               </div>
           </div>
 
-          <button type="button" id="add-to-cart-btn" disabled class="w-full bg-luxe text-ink font-medium uppercase tracking-widest py-4 rounded-xl hover:opacity-90 transition shadow-soft mb-10 disabled:opacity-50 disabled:cursor-not-allowed tap-none">
-              CONNECTING TO SERVER...
+          <button type="button" id="add-to-cart-btn" disabled class="w-full bg-luxe text-ink font-medium uppercase tracking-widest py-4 rounded-xl hover:opacity-90 transition shadow-soft mb-10 disabled:opacity-50 disabled:cursor-not-allowed tap-none btn-shimmer">
+              Add to Cart
           </button>
           <input type="hidden" id="qty" value="1" />
           </div>
@@ -384,7 +452,7 @@
 
   <section id="pdp-review-section" class="max-w-screen-xl mx-auto px-4 sm:px-6 pt-10 pb-8 border-t border-white/5 scroll-mt-14">
       <h2 class="font-display text-3xl sm:text-4xl text-white mb-10 tracking-wide reveal">What Our Customers Say</h2>
-      
+
       <div class="flex flex-col mb-10 overflow-hidden reveal" style="transition-delay: 150ms;">
         <div class="flex items-center gap-4 mb-6">
             <div class="text-4xl font-semibold text-white">4.9</div>
@@ -424,7 +492,6 @@
           <h2 class="font-display text-3xl text-white tracking-wide">Explore The Collection</h2>
       </div>
       <div class="flex gap-4 overflow-x-auto snap-x snap-mandatory hide-scrollbar pb-4" id="cross-sell-container">
-          <!-- Dynamic Cross-Sell Cards injected via JS -->
           <div class="w-full text-center py-10 text-white/30 text-xs uppercase tracking-widest animate-pulse" id="cross-sell-loading">Loading Collection...</div>
       </div>
   </section>
@@ -434,7 +501,7 @@
     <div class="max-w-screen-xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
       <p class="text-white/50 text-xs">© <span id="y"></span> Arabista Enterprise. All rights reserved.</p>
       <nav class="flex items-center gap-4 text-white/50 text-xs uppercase tracking-widest font-medium">
-        <a href="index-staging.html" class="hover:text-luxe transition-colors">Home</a>
+        <a href="index.html" class="hover:text-luxe transition-colors">Home</a>
         <a href="https://wa.me/60126913286" target="_blank" class="hover:text-luxe transition-colors">Contact</a>
       </nav>
     </div>
@@ -444,7 +511,7 @@
       <div class="bg-ink border border-white/10 rounded-2xl w-full max-w-2xl overflow-hidden shadow-2xl relative transform scale-95 transition-transform duration-300 [&.show]:scale-100">
           <div class="p-6 border-b border-white/10 flex justify-between items-center bg-white/[0.02]">
               <h2 class="font-display text-2xl text-white">Abaya Size Guide</h2>
-              <button type="button" onclick="closeSizeModal()" class="text-gray-400 hover:text-white tap-none"><svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
+              <button type="button" id="size-modal-close" class="text-gray-400 hover:text-white tap-none"><svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
           </div>
           <div class="p-6 overflow-x-auto hide-scrollbar">
               <table class="w-full text-center text-sm">
@@ -489,12 +556,13 @@
               </div>
               <div class="space-y-3">
                   <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                      <input type="text" id="cart-name" class="w-full bg-black/40 border-b border-white/10 rounded-t-lg rounded-b-none text-white px-4 py-3 text-[15px] focus:border-luxe focus:bg-black/60 outline-none transition-all placeholder:text-white/30" placeholder="Full Name">
-                      <input type="tel" id="cart-phone" class="w-full bg-black/40 border-b border-white/10 rounded-t-lg rounded-b-none text-white px-4 py-3 text-[15px] focus:border-luxe focus:bg-black/60 outline-none transition-all placeholder:text-white/30" placeholder="Phone (e.g. 0123456789)">
+                      <input type="text" id="cart-name" autocomplete="name" maxlength="300" class="w-full bg-black/40 border-b border-white/10 rounded-t-lg rounded-b-none text-white px-4 py-3 text-[15px] focus:border-luxe focus:bg-black/60 outline-none transition-all placeholder:text-white/30" placeholder="Full Name">
+                      <input type="tel" id="cart-phone" autocomplete="tel" maxlength="20" class="w-full bg-black/40 border-b border-white/10 rounded-t-lg rounded-b-none text-white px-4 py-3 text-[15px] focus:border-luxe focus:bg-black/60 outline-none transition-all placeholder:text-white/30" placeholder="Phone (e.g. 0123456789)">
                   </div>
-                  <textarea id="cart-address" rows="2" class="w-full bg-black/40 border-b border-white/10 rounded-t-lg rounded-b-none text-white px-4 py-3 text-[15px] focus:border-luxe focus:bg-black/60 outline-none transition-all placeholder:text-white/30" placeholder="Address"></textarea>
+                  <input type="email" id="cart-email" autocomplete="email" maxlength="200" class="w-full bg-black/40 border-b border-white/10 rounded-t-lg rounded-b-none text-white px-4 py-3 text-[15px] focus:border-luxe focus:bg-black/60 outline-none transition-all placeholder:text-white/30" placeholder="Email (optional)">
+                  <textarea id="cart-address" rows="2" autocomplete="street-address" maxlength="300" class="w-full bg-black/40 border-b border-white/10 rounded-t-lg rounded-b-none text-white px-4 py-3 text-[15px] focus:border-luxe focus:bg-black/60 outline-none transition-all placeholder:text-white/30" placeholder="Address"></textarea>
                   <div class="grid grid-cols-2 gap-3">
-                      <input type="text" id="cart-postcode" class="w-full bg-black/40 border-b border-white/10 rounded-t-lg rounded-b-none text-white px-4 py-3 text-[15px] focus:border-luxe focus:bg-black/60 outline-none transition-all placeholder:text-white/30" placeholder="Postcode">
+                      <input type="text" id="cart-postcode" inputmode="numeric" autocomplete="postal-code" maxlength="5" class="w-full bg-black/40 border-b border-white/10 rounded-t-lg rounded-b-none text-white px-4 py-3 text-[15px] focus:border-luxe focus:bg-black/60 outline-none transition-all placeholder:text-white/30" placeholder="Postcode">
                       <div class="relative">
                           <select id="cart-state" class="w-full bg-black/40 border-b border-white/10 rounded-t-lg rounded-b-none text-white pl-4 pr-10 py-3 text-[15px] focus:border-luxe focus:bg-black/60 outline-none appearance-none transition-all cursor-pointer">
                               <option value="" class="bg-brand">State...</option>
@@ -505,8 +573,8 @@
                           </div>
                       </div>
                   </div>
+                  <div id="cart-inline-alert" class="hidden text-[12px] text-rose-300 bg-rose-500/10 border border-rose-500/30 rounded-lg px-3 py-2"></div>
               </div>
-              <button type="button" id="btn-calc-ship" class="hidden"></button>
           </div>
       </div>
 
@@ -520,1446 +588,6 @@
           <button type="button" id="btn-checkout" class="w-full bg-luxe text-ink font-medium uppercase tracking-widest py-4 rounded-xl hover:opacity-90 transition shadow-soft disabled:opacity-50 disabled:cursor-not-allowed tap-none">Proceed to Payment</button>
       </div>
   </div>
-
-  <script>
-    const currentModel = 'D06';
-    const RETAIL_API_URL = "https://script.google.com/macros/s/AKfycbw4qGOeC2Sebod06uFnW2u-ZAkj7l8zRdzyWrFEyL1_7eDCn-ks9lVKrd1I226qHxRmQg/exec";
-
-    const baseSizes = {
-        'XS': { length: 55, sleeve: 22, shoulder: 14, bust: 36 },
-        'S': { length: 55, sleeve: 22, shoulder: 15, bust: 39 },
-        'M': { length: 57, sleeve: 23, shoulder: 16, bust: 40 },
-        'L': { length: 60, sleeve: 23.5, shoulder: 16.5, bust: 43 },
-        'XL': { length: 60, sleeve: 23.5, shoulder: 17.5, bust: 44 },
-        'XXL': { length: 60, sleeve: 23.5, shoulder: 18, bust: 46 },
-        'XXXL': { length: 60, sleeve: 23.5, shoulder: 19, bust: 50 }
-    };
-
-    let selectedSize = null;
-    let appConfig = {};
-    let inventoryMatrix = {};
-    let altEnabled = false;
-    let activeRetailPrice = 0; // Dynamically set on load
-    let activePromoPrice = null; // Dynamically set on load
-    let activeWeightKg = 1.0;
-
-    // --- GLOBAL CART MANAGER ---
-    const CartManager = {
-        key: 'arabista_staging_cart',
-        getItems: function() {
-            return JSON.parse(localStorage.getItem(this.key)) || [];
-        },
-        addItem: function(productObj) {
-            const items = this.getItems();
-            items.push(productObj);
-            localStorage.setItem(this.key, JSON.stringify(items));
-            this.updateCartCount();
-        },
-        removeItem: function(id) {
-            const items = this.getItems().filter(item => item.id !== id);
-            localStorage.setItem(this.key, JSON.stringify(items));
-            this.updateCartCount();
-            if (typeof renderCart === 'function') renderCart();
-        },
-        updateQty: function(id, delta) {
-            const items = this.getItems();
-            const item = items.find(i => i.id === id);
-            if (item) {
-                item.qty += delta;
-                if (item.qty <= 0) {
-                    this.removeItem(id);
-                    return;
-                }
-                localStorage.setItem(this.key, JSON.stringify(items));
-                this.updateCartCount();
-                if (typeof renderCart === 'function') renderCart();
-            }
-        },
-        updateCartCount: function() {
-            const count = this.getItems().reduce((total, item) => total + item.qty, 0);
-            const badge = document.getElementById('nav-cart-badge');
-            if (badge) {
-                badge.textContent = count;
-                if (count > 0) {
-                    badge.classList.remove('opacity-0', 'scale-0');
-                    badge.classList.add('opacity-100', 'scale-100');
-                    badge.classList.add('scale-110');
-                    setTimeout(() => badge.classList.remove('scale-110'), 150);
-                } else {
-                    badge.classList.remove('opacity-100', 'scale-100', 'scale-110');
-                    badge.classList.add('opacity-0', 'scale-0');
-                }
-            }
-        }
-    };
-
-    let sessionShippingFee = 0;
-    let sessionPostcode = '';
-
-    document.addEventListener('DOMContentLoaded', () => CartManager.updateCartCount());
-
-    // Gallery Logic
-    const mediaFiles = [
-        { type: 'img', src: 'images/d06-1-hero.webp' }, { type: 'img', src: 'images/d06-2-angle.webp' },
-        { type: 'img', src: 'images/d06-3-portrait-1.webp' }, { type: 'img', src: 'images/d06-4-portrait-2.webp' },
-        { type: 'img', src: 'images/d06-5-closeup.webp' }, { type: 'img', src: 'images/d06-6-feature-zip.webp' },
-        { type: 'img', src: 'images/d06-7-feature-sleeve.webp' }, { type: 'img', src: 'images/d06-8-feature-pockets.webp' },
-        { type: 'vid', src: 'images/d06-9-video-flow.mp4', thumb: 'images/d06-9-video-poster.webp' } 
-    ];
-
-    const thumbContainer = document.getElementById('gallery-thumbs');
-    const mainGalleryMain = document.querySelector('.arabista-gallery-main');
-
-    mediaFiles.forEach((m, i) => {
-        if (mainGalleryMain) {
-            let mediaEl;
-            if (m.type === 'vid') {
-                mediaEl = document.createElement('video');
-                mediaEl.loop = true;
-                mediaEl.muted = true;
-                mediaEl.playsInline = true;
-            } else {
-                mediaEl = document.createElement('img');
-                mediaEl.alt = 'D06 Abaya';
-            }
-            mediaEl.className = 'arabista-gallery-img';
-            mediaEl.src = m.src;
-            if (i === 0) mediaEl.id = 'main-image';
-            mainGalleryMain.appendChild(mediaEl);
-        }
-        
-        const btn = document.createElement('button');
-        btn.type = 'button';
-        btn.className = `arabista-thumb-btn w-16 h-20 shrink-0 rounded-lg overflow-hidden border-2 border-transparent opacity-50 hover:opacity-100`;
-        if (m.type === 'img') {
-            btn.innerHTML = `<img src="${m.src}" class="w-full h-full object-cover" alt="">`;
-        } else {
-            btn.innerHTML = `<div class="relative w-full h-full"><img src="${m.thumb}" class="w-full h-full object-cover" alt=""><div class="absolute inset-0 bg-black/40 flex items-center justify-center"><svg class="w-6 h-6 text-white pl-1" fill="currentColor" viewBox="0 0 20 20"><path d="M4 4l12 6-12 6V4z"/></svg></div></div>`;
-        }
-        thumbContainer.appendChild(btn);
-    });
-
-    // Fetch Backend with Fortified Soft Lock & Retries
-    async function fetchConfig(retries = 2) {
-        const btn = document.getElementById('add-to-cart-btn');
-        
-        if (RETAIL_API_URL.includes("YOUR_RETAIL")) {
-            appConfig = {}; inventoryMatrix = {};
-            const altLoading = document.getElementById('alt-loading');
-            const altOpts = document.getElementById('alt-fields-container');
-            if (altLoading) altLoading.classList.add('hidden');
-            if (altOpts) altOpts.classList.remove('hidden');
-            document.querySelectorAll('.size-btn').forEach(b => b.classList.remove('animate-pulse', 'pointer-events-none', 'opacity-40'));
-            if (btn) btn.innerText = 'API NOT CONFIGURED';
-            return;
-        }
-        
-        for (let i = 0; i <= retries; i++) {
-            // 8-second window to safely absorb Google Apps Script cold starts
-            const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 8000); 
-
-            try {
-                if (i > 0 && btn) btn.innerText = `CONNECTING... (RETRY ${i}/${retries})`;
-
-                const res = await fetch(`${RETAIL_API_URL}?action=get_config&model=${currentModel}`, { signal: controller.signal });
-                clearTimeout(timeoutId);
-                
-                if (!res.ok) throw new Error(`HTTP Error: ${res.status}`);
-                
-                const json = await res.json();
-                if (json.status !== 'success') throw new Error("API returned non-success status");
-
-                appConfig = json.data.config || {};
-                inventoryMatrix = json.data.matrix || {};
-                activeWeightKg = json.data.modelWeight || 1.0;
-
-                renderAlterationFields();
-                initializeDefaultPricing();
-                applyOOSStyling();
-
-                if (btn) btn.innerText = 'ADD TO CART';
-                
-                return;
-
-            } catch (error) {
-                clearTimeout(timeoutId);
-                console.warn(`Config fetch attempt ${i + 1} failed:`, error);
-                
-                if (i === retries) {
-                    console.error("All config fetch retries exhausted. Failing closed.");
-                    if (btn) {
-                        btn.innerText = 'CONNECTION ERROR - PLEASE REFRESH';
-                        btn.classList.add('bg-red-900', 'text-white');
-                        btn.classList.remove('hover:bg-brand');
-                        btn.disabled = true;
-                    }
-                }
-            }
-        }
-    }
-
-    // --- DYNAMIC PRICING ENGINE ---
-    function initializeDefaultPricing() {
-        let defaultRetail = 0;
-        let defaultPromo = null;
-
-        // Scan the matrix to find baseline prices
-        for (let key in inventoryMatrix) {
-            const row = inventoryMatrix[key];
-            if (row.retailPrice > defaultRetail) defaultRetail = row.retailPrice;
-            if (row.promoPrice !== null) {
-                if (defaultPromo === null || row.promoPrice < defaultPromo) {
-                    defaultPromo = row.promoPrice;
-                }
-            }
-        }
-
-        // Fallback safety if DB is completely empty
-        if (defaultRetail === 0) defaultRetail = 265.00;
-
-        activeRetailPrice = defaultRetail;
-        activePromoPrice = defaultPromo;
-
-        const priceRow = document.getElementById('pdp-price-row');
-        const stickyPriceDisplay = document.getElementById('sticky-price-display');
-
-        let priceHtml = '';
-        if (activePromoPrice !== null && activePromoPrice < activeRetailPrice) {
-            priceHtml = `<del class="text-gray-500 text-lg mr-2">RM ${activeRetailPrice.toFixed(2)}</del><span class="text-luxe">RM ${activePromoPrice.toFixed(2)}</span>`;
-            if (stickyPriceDisplay) stickyPriceDisplay.innerHTML = `<span class="text-white/50 mr-2 text-[12px]">Base &middot;</span> <del class="text-gray-500 mr-2 text-[13px]">RM ${activeRetailPrice.toFixed(2)}</del><span class="text-luxe">RM ${activePromoPrice.toFixed(2)}</span>`;
-        } else {
-            priceHtml = `<span class="text-luxe">RM ${activeRetailPrice.toFixed(2)}</span>`;
-            if (stickyPriceDisplay) stickyPriceDisplay.innerHTML = `<span class="text-white/50 mr-2 text-[12px]">Base &middot;</span> <span class="text-white">RM ${activeRetailPrice.toFixed(2)}</span>`;
-        }
-
-        if (priceRow) priceRow.innerHTML = priceHtml;
-    }
-
-    // --- OOS AESTHETIC ENGINE ---
-    function applyOOSStyling() {
-        const btns = document.querySelectorAll('.size-btn');
-        btns.forEach(btn => {
-            // Strip the loading skeleton state now that data has arrived
-            btn.classList.remove('animate-pulse', 'pointer-events-none', 'opacity-40');
-
-            const size = btn.dataset.size;
-            const sku = `${currentModel}-${size}`;
-            const item = inventoryMatrix[sku];
-            
-            // Handle different variations of stock property naming from backend
-            const stockLevel = item ? (item.Available_To_Sell || item.stock || item.qty || 0) : 0;
-            
-            if (!item || stockLevel <= 0 || stockLevel === "") {
-                btn.disabled = true;
-                // Auto-deselect if the user somehow had an OOS size selected
-                if (selectedSize === size) {
-                    btn.classList.remove('ring-2', 'ring-white/60');
-                    selectedSize = '';
-                    document.getElementById('sizeChosen').textContent = 'Size: —';
-                    if (typeof updateMatrixPricingFromSize === 'function') updateMatrixPricingFromSize(null);
-                }
-            } else {
-                btn.disabled = false;
-            }
-        });
-        validateAlterations();
-    }
-
-    // Size & Matrix Logic
-    function renderSizeGrid() {
-        const grid = document.getElementById('size-grid');
-        Object.keys(baseSizes).forEach(size => {
-            const btn = document.createElement('button');
-            btn.type = 'button';
-            // Start buttons in a locked, pulsing skeleton state
-            btn.className = "size-btn py-3 border border-white/15 bg-transparent text-white rounded-lg font-medium hover:border-white/40 transition-colors focus:outline-none tap-none animate-pulse pointer-events-none opacity-40";
-            btn.textContent = size;
-            btn.dataset.size = size;
-            btn.onclick = () => selectSize(size, btn);
-            grid.appendChild(btn);
-        });
-    }
-
-    function selectSize(size, btnElement) {
-        selectedSize = size;
-        gtag('event', 'select_item', { item_list_name: 'Size Selection', item_name: size });
-        const sizeChosenEl = document.getElementById('sizeChosen');
-        if (sizeChosenEl) sizeChosenEl.textContent = 'Size: ' + size;
-        document.querySelectorAll('.size-btn').forEach(b => b.className = "size-btn py-3 border border-white/15 bg-transparent text-white rounded-lg font-medium hover:border-white/40 transition-colors focus:outline-none tap-none");
-        btnElement.className = "size-btn py-3 border border-luxe bg-luxe text-ink rounded-lg font-medium shadow-[0_0_15px_rgba(192,160,98,0.3)] transition-colors focus:outline-none tap-none";
-
-        // Check Matrix for Alteration Permissions
-        const sku = `${currentModel}-${size}`;
-        const reqAlt = inventoryMatrix[sku] && inventoryMatrix[sku].requiresAlteration !== undefined 
-            ? inventoryMatrix[sku].requiresAlteration 
-            : true; // Default to true if not found
-            
-        const altBtn = document.getElementById('toggle-alt-btn');
-        
-        if (reqAlt === false) {
-            // Visually disable the button
-            altBtn.classList.add('opacity-40', 'pointer-events-none');
-            // Force drawer closed if it is currently open
-            if (typeof altEnabled !== 'undefined' && altEnabled === true) {
-                altEnabled = false;
-                document.getElementById('alt-knob').classList.remove('translate-x-4');
-                document.getElementById('alt-switch').classList.remove('bg-luxe'); 
-                document.getElementById('alt-switch').classList.add('bg-white/10');
-                document.getElementById('alt-drawer').classList.add('hidden'); 
-                document.getElementById('alt-drawer').classList.remove('flex');
-            }
-        } else {
-            // Enable the button
-            altBtn.classList.remove('opacity-40', 'pointer-events-none');
-        }
-
-        updateMatrixPricingFromSize(size);
-        validateAlterations();
-        renderAlterationFields();
-    }
-
-    function updateMatrixPricingFromSize(size) {
-        const priceRow = document.getElementById('pdp-price-row');
-        const stickyPriceDisplay = document.getElementById('sticky-price-display');
-        const stickyBtn = document.getElementById('sticky-btn');
-
-        if (size == null || size === '') {
-            initializeDefaultPricing();
-            if (stickyBtn) {
-                stickyBtn.textContent = 'Select Size';
-                stickyBtn.className = 'px-6 py-2.5 rounded-lg text-[10px] font-medium uppercase tracking-widest transition-all duration-300 tap-none bg-white/10 text-white hover:bg-white/20';
-            }
-            return;
-        }
-
-        const sku = `${currentModel}-${size}`;
-        const matrixRow = inventoryMatrix[sku];
-        if (matrixRow) {
-            activeRetailPrice = matrixRow.retailPrice;
-            activePromoPrice = matrixRow.promoPrice;
-            // activeWeightKg is now globally set on load via dictionary, no longer per-sku
-        }
-        
-        let priceHtml = '';
-        if (activePromoPrice !== null && activePromoPrice < activeRetailPrice) {
-            // Promo Active: Strike-through retail, show promo
-            priceHtml = `<del class="text-gray-500 mr-2 text-[13px]">RM ${activeRetailPrice.toFixed(2)}</del><span class="text-luxe">RM ${activePromoPrice.toFixed(2)}</span>`;
-            priceRow.innerHTML = `<del class="text-gray-500 text-lg mr-2">RM ${activeRetailPrice.toFixed(2)}</del><span class="text-luxe">RM ${activePromoPrice.toFixed(2)}</span>`;
-        } else {
-            // No Promo: Show standard retail
-            priceHtml = `<span class="text-white">RM ${activeRetailPrice.toFixed(2)}</span>`;
-            priceRow.textContent = `RM ${activeRetailPrice.toFixed(2)}`;
-        }
-
-        // --- STICKY BAR CONTEXT SYNC ---
-        if (stickyPriceDisplay) {
-            stickyPriceDisplay.innerHTML = `<span class="text-white/50 mr-2 text-[12px]">Size ${size} &middot;</span> ${priceHtml}`;
-        }
-        
-        if (stickyBtn) {
-            stickyBtn.textContent = "ADD TO CART";
-            stickyBtn.className = "px-6 py-2.5 rounded-lg text-[10px] font-medium uppercase tracking-widest transition-all duration-300 tap-none bg-luxe text-ink shadow-[0_0_15px_rgba(192,160,98,0.2)]";
-        }
-    }
-
-    function calculateSize() {
-        const h = parseFloat(document.getElementById('calc-height').value);
-        const w = parseFloat(document.getElementById('calc-weight').value);
-        const res = document.getElementById('calc-result');
-
-        if (!h || !w) {
-            res.innerHTML = "Please enter both values.";
-            res.className = "mt-3 text-sm text-red-400 font-medium reveal show";
-            res.classList.remove('hidden');
-            return;
-        }
-
-        // 1. Calculate True Width (BMI)
-        const heightM = h / 100;
-        const adjustedWeight = (h <= 155) ? (w - 3) : w;
-        const bmi = adjustedWeight / (heightM * heightM);
-
-        const order = ['XS', 'S', 'M', 'L', 'XL', 'XXL', 'XXXL'];
-        const baseLengths = { 'XS': 55, 'S': 55, 'M': 57, 'L': 60, 'XL': 60, 'XXL': 60, 'XXXL': 60 };
-        const trueShoulders = { 'XS': 14, 'S': 15, 'M': 16, 'L': 16.5, 'XL': 17.5, 'XXL': 18, 'XXXL': 19 };
-
-        let trueSize = "Size Not Available";
-        if (bmi < 19.53) trueSize = 'XS';
-        else if (bmi <= 22.27) trueSize = 'S';
-        else if (bmi <= 25) trueSize = 'M';
-        else if (bmi <= 27.73) trueSize = 'L';
-        else if (bmi <= 30.47) trueSize = 'XL';
-        else if (bmi <= 33.2) trueSize = 'XXL';
-        else if (bmi <= 37.11) trueSize = 'XXXL';
-
-        if (trueSize === "Size Not Available") {
-            res.innerHTML = "Size Not Available for these measurements.";
-            res.className = "mt-3 text-sm text-red-400 font-medium reveal show";
-            res.classList.remove('hidden');
-            return;
-        }
-
-        // 2. Calculate Ideal Length (Height Brackets)
-        let idealLength = 60;
-        if (h < 151) idealLength = 50;
-        else if (h <= 156) idealLength = 52;
-        else if (h <= 163) idealLength = 55;
-        else if (h <= 169) idealLength = 57;
-        else if (h <= 186) idealLength = 60;
-
-        // 3. The "Size Up" Safety Check (Never add fabric)
-        let finalSize = trueSize;
-        let finalSizeIdx = order.indexOf(finalSize);
-
-        while (finalSizeIdx < order.length - 1 && baseLengths[finalSize] < idealLength) {
-            finalSizeIdx++;
-            finalSize = order[finalSizeIdx];
-        }
-
-        // 4. Generate Formatting
-        const needsLengthAlteration = baseLengths[finalSize] > idealLength;
-        const needsShoulderAlteration = finalSize !== trueSize;
-
-        let alterText = "";
-        if (needsLengthAlteration && needsShoulderAlteration) {
-            alterText = `<br><span class="text-gray-400 text-[0.875rem] font-normal">Alter Length: ${idealLength}", Shoulder: ${trueShoulders[trueSize]}"</span>`;
-        } else if (needsLengthAlteration) {
-            alterText = `<br><span class="text-gray-400 text-[0.875rem] font-normal">Alter Length: ${idealLength}"</span>`;
-        } else if (needsShoulderAlteration) {
-            alterText = `<br><span class="text-gray-400 text-[0.875rem] font-normal">Alter Shoulder: ${trueShoulders[trueSize]}"</span>`;
-        }
-
-        res.innerHTML = `<span class="text-luxe font-medium">Recommended Size: ${finalSize}</span>${alterText}`;
-        res.className = "mt-3 text-sm reveal show";
-        res.classList.remove('hidden');
-
-        // Auto-select the size in the grid
-        document.querySelectorAll('.size-btn').forEach(btn => {
-            if (btn.textContent === finalSize) {
-                btn.click();
-            }
-        });
-    }
-
-    // Alteration Engine
-    document.getElementById('toggle-alt-btn').onclick = () => {
-        altEnabled = !altEnabled;
-        if (altEnabled) gtag('event', 'view_alteration_options', { item_id: currentModel });
-        const knob = document.getElementById('alt-knob');
-        const sw = document.getElementById('alt-switch');
-        const drawer = document.getElementById('alt-drawer');
-        if (altEnabled) {
-            knob.classList.add('translate-x-4');
-            sw.classList.add('bg-luxe'); sw.classList.remove('bg-white/10');
-            drawer.classList.remove('hidden'); drawer.classList.add('flex');
-        } else {
-            knob.classList.remove('translate-x-4');
-            sw.classList.remove('bg-luxe'); sw.classList.add('bg-white/10');
-            drawer.classList.add('hidden'); drawer.classList.remove('flex');
-        }
-    };
-
-    function renderAlterationFields() {
-        const container = document.getElementById('alt-fields-container');
-        if (Object.keys(appConfig).length === 0) return;
-        document.getElementById('alt-loading').classList.add('hidden');
-        container.classList.remove('hidden');
-        container.innerHTML = '';
-
-        const services = [
-            { id: 'D06_ALT_LENGTH', label: 'Alter Labuh (Inches)', key: 'length' },
-            { id: 'D06_ALT_SLEEVE', label: 'Alter Lengan (Inches)', key: 'sleeve' },
-            { id: 'D06_ALT_SHOULDER', label: 'Alter Bahu (Inches)', key: 'shoulder' }
-        ];
-
-        services.forEach(s => {
-            const conf = appConfig[s.id];
-            if (!conf || !conf.isActive) return;
-            let priceHtml = ``;
-            if (conf.promoPrice !== null && conf.promoPrice < conf.standardPrice) {
-                const badgeText = conf.promoPrice === 0 ? "FREE" : `PROMO RM ${conf.promoPrice.toFixed(2)}`;
-                priceHtml = `<span class="line-through text-gray-500 mr-2">RM ${conf.standardPrice.toFixed(2)}</span><span class="text-green-400 font-bold">${badgeText}</span>`;
-            } else {
-                priceHtml = `<span class="text-gray-400">RM ${conf.standardPrice.toFixed(2)}</span>`;
-            }
-
-            const baseLimit = selectedSize ? baseSizes[selectedSize][s.key] : "--";
-            const limitHtml = selectedSize ? `<span class="text-luxe font-mono text-[10px] ml-2">(Max: ${baseLimit}")</span>` : ``;
-            const placeholderTxt = selectedSize ? ('\u2264 ' + baseLimit) : 'Select size first';
-
-            container.innerHTML += `
-                <div>
-                    <div class="flex justify-between items-end mb-2">
-                        <label class="text-[10px] uppercase text-gray-400 tracking-wider flex items-center">${s.label} ${limitHtml}</label>
-                        <div class="text-[10px] uppercase tracking-widest">${priceHtml}</div>
-                    </div>
-                    <input type="number" step="0.5" id="alt-input-${s.key}" data-key="${s.key}" ${!selectedSize ? 'disabled' : ''} class="alt-input w-full bg-black/50 border border-white/20 rounded-lg p-3 text-[16px] text-white focus:border-luxe outline-none transition-colors" placeholder="${placeholderTxt}">
-                    <p id="alt-err-${s.key}" class="text-xs text-red-400 mt-2 hidden"></p>
-                </div>
-            `;
-        });
-        document.querySelectorAll('.alt-input').forEach(inp => inp.addEventListener('input', validateAlterations));
-    }
-
-    function validateAlterations() {
-        const atc = document.getElementById('add-to-cart-btn');
-        if (atc && atc.innerText.includes('CONNECTION ERROR')) {
-            atc.disabled = true;
-            return;
-        }
-        if (!selectedSize) { document.getElementById('add-to-cart-btn').disabled = true; return; }
-        let isValid = true;
-        const base = baseSizes[selectedSize];
-        document.querySelectorAll('.alt-input').forEach(inp => {
-            const key = inp.getAttribute('data-key');
-            const val = parseFloat(inp.value);
-            const errEl = document.getElementById(`alt-err-${key}`);
-            if (val && val > base[key]) {
-                if (errEl) { errEl.textContent = `Cannot exceed base size (${base[key]}").`; errEl.classList.remove('hidden'); }
-                inp.classList.add('border-red-400');
-                isValid = false;
-            } else {
-                if (errEl) errEl.classList.add('hidden');
-                inp.classList.remove('border-red-400');
-            }
-        });
-        document.getElementById('add-to-cart-btn').disabled = !isValid;
-    }
-
-    // Accordions & Modals
-    document.querySelectorAll('.accordion-btn').forEach(btn => {
-        btn.onclick = () => {
-            const content = btn.nextElementSibling;
-            const icon = btn.querySelector('.icon-arrow');
-            content.classList.toggle('hidden');
-            icon.classList.toggle('rotate-180');
-        };
-    });
-    function closeSizeModal() {
-        const sm = document.getElementById('size-modal');
-        sm.classList.remove('show');
-        setTimeout(() => { sm.style.display = 'none'; }, 300);
-    }
-
-    // Cart Flow
-    function toggleCart(show) {
-        const overlay = document.getElementById('cart-overlay');
-        const drawer = document.getElementById('cart-drawer');
-        if (show) {
-            if (typeof renderCart === 'function') renderCart();
-            document.body.style.overflow = 'hidden';
-            overlay.classList.remove('hidden');
-            setTimeout(() => overlay.classList.remove('opacity-0'), 10);
-            drawer.classList.remove('translate-x-full');
-        } else {
-            document.body.style.overflow = '';
-            overlay.classList.add('opacity-0');
-            setTimeout(() => overlay.classList.add('hidden'), 300);
-            drawer.classList.add('translate-x-full');
-        }
-    }
-    document.getElementById('nav-cart-btn').onclick = () => toggleCart(true);
-    document.getElementById('close-cart-btn').onclick = () => toggleCart(false);
-    document.getElementById('cart-overlay').onclick = () => toggleCart(false);
-
-    function getSelectedAlterationsForCart() {
-        const selectedAlterations = {};
-        if (!altEnabled) return selectedAlterations;
-        document.querySelectorAll('.alt-input').forEach(inp => {
-            const val = parseFloat(inp.value);
-            if (val) {
-                const key = inp.getAttribute('data-key');
-                const sId = key === 'length' ? 'D06_ALT_LENGTH' : (key === 'sleeve' ? 'D06_ALT_SLEEVE' : 'D06_ALT_SHOULDER');
-                const conf = appConfig[sId];
-                if (conf) {
-                    const stdPrice = conf.standardPrice || 0;
-                    const isPromo = conf.promoPrice !== null && conf.promoPrice < stdPrice;
-                    const charged = isPromo ? conf.promoPrice : stdPrice;
-                    const bmNames = { length: 'Labuh', sleeve: 'Lengan', shoulder: 'Bahu' };
-                    selectedAlterations[key] = {
-                        name: bmNames[key] || (key.charAt(0).toUpperCase() + key.slice(1)),
-                        val: val + '"',
-                        price: charged,
-                        standardPrice: stdPrice,
-                        isPromo: isPromo
-                    };
-                }
-            }
-        });
-        return selectedAlterations;
-    }
-
-    function addD06ToLocalCartAndOpenDrawer() {
-        if (!selectedSize) {
-            alert("Please select a size before adding to cart.");
-            return;
-        }
-
-        const currentPrice = activePromoPrice !== null ? activePromoPrice : activeRetailPrice;
-        const currentRetailPrice = activeRetailPrice;
-        const selectedAlterations = getSelectedAlterationsForCart();
-        const cartItem = {
-            id: `D06-${Date.now()}`,
-            model: currentModel,
-            series: 'Dahlia Series',
-            size: selectedSize,
-            retailPrice: currentRetailPrice,
-            price: currentPrice,
-            unitWeight: typeof activeWeightKg !== 'undefined' ? activeWeightKg : 1.0,
-            alterations: { ...selectedAlterations },
-            image: 'images/d06-1-hero.webp',
-            qty: 1
-        };
-
-        CartManager.addItem(cartItem);
-        gtag('event', 'add_to_cart', { currency: 'MYR', value: currentPrice, items: [{ item_id: currentModel, item_name: 'Dahlia Series', item_variant: selectedSize }] });
-        // META PIXEL: Add To Cart Event
-        if (typeof fbq === 'function') {
-            fbq('track', 'AddToCart', {
-                content_name: cartItem.series,
-                content_ids: [cartItem.model],
-                content_type: 'product',
-                value: cartItem.price,
-                currency: 'MYR'
-            });
-        }
-        toggleCart(true);
-    }
-
-    function closeCart() {
-        if (CartManager.getItems().length === 0) {
-            const c = document.getElementById('cart-items-container');
-            if (c) c.innerHTML = '';
-            const subEl = document.getElementById('cart-subtotal');
-            if (subEl) subEl.textContent = 'RM 0.00';
-            const discRow = document.getElementById('cart-discount-row');
-            if (discRow) discRow.classList.add('hidden');
-            if (typeof updateGrandTotal === 'function') updateGrandTotal();
-        }
-        toggleCart(false);
-    }
-
-    function closeCartDrawer() {
-        toggleCart(false);
-    }
-
-    // --- ADD TO CART (localStorage via CartManager) ---
-    document.getElementById('add-to-cart-btn').addEventListener('click', addD06ToLocalCartAndOpenDrawer);
-
-    // --- CART UI RENDERER ---
-    function renderCart() {
-        const currentRetailPrice = activeRetailPrice;
-        const container = document.getElementById('cart-items-container');
-        const subtotalEl = document.getElementById('cart-subtotal');
-
-        if (!container || !subtotalEl) return;
-
-        const items = CartManager.getItems();
-        let visualSubtotal = 0;
-        let totalDiscount = 0;
-
-        if (items.length === 0) {
-            container.innerHTML = `<div class="text-center text-white/40 py-10 text-sm">Your cart is currently empty.</div>`;
-            subtotalEl.textContent = `RM 0.00`;
-            const discRow = document.getElementById('cart-discount-row');
-            if (discRow) {
-                discRow.classList.add('hidden');
-                discRow.classList.remove('flex');
-            }
-            updateGrandTotal();
-            return;
-        }
-
-        let html = '';
-        items.forEach(item => {
-            let altHtml = '';
-            let altCost = 0;
-
-            if (item.alterations && Object.keys(item.alterations).length > 0) {
-                altHtml = '<div class="text-white/40 text-[11px] mt-1.5 leading-relaxed space-y-0.5">';
-                for (let [k, v] of Object.entries(item.alterations)) {
-                    let priceDisplay = v.isPromo ? `<del class="text-white/30">RM ${v.standardPrice.toFixed(2)}</del> <span class="text-luxe font-bold ml-1">${v.price === 0 ? "FREE" : `RM ${v.price.toFixed(2)}`}</span>` : `+RM ${v.price.toFixed(2)}`;
-                    altHtml += `<div>${v.name}: ${v.val} <span class="text-white/20 mx-1">|</span> ${priceDisplay}</div>`;
-                    altCost += (v.price || 0);
-                }
-                altHtml += '</div>';
-            }
-
-            // Handle dynamic discount math
-            const itemRetail = item.retailPrice || currentRetailPrice || item.price;
-            const itemDiscount = Math.max(0, itemRetail - item.price);
-
-            const totalUnitPaid = item.price + altCost;
-            const lineTotal = totalUnitPaid * item.qty;
-
-            // BUGFIX: Subtotal must reflect the raw retail value before discounts
-            const retailLineTotal = (itemRetail + altCost) * item.qty;
-
-            visualSubtotal += retailLineTotal;
-            totalDiscount += (itemDiscount * item.qty);
-
-            // Strikethrough Logic for the UI
-            const priceOrOOS = `
-            <div class="mt-0.5">
-                ${itemDiscount > 0
-                    ? `<del class="text-white/30 mr-1.5 text-xs">RM ${((itemRetail + altCost) * item.qty).toFixed(2)}</del><span class="text-luxe font-bold text-sm">RM ${lineTotal.toFixed(2)}</span>`
-                    : `<span class="text-luxe font-medium text-sm">RM ${lineTotal.toFixed(2)}</span>`
-                }
-            </div>
-            ${altHtml}
-        `;
-
-            // Proper Trash Can SVG
-            const trashSvg = `<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>`;
-
-            html += `
-            <div class="flex gap-4 pb-5 border-b border-white/10 relative group last:border-0 last:pb-0 transition-all duration-300">
-                <img src="${item.image}" class="w-20 h-24 object-cover rounded-lg border border-white/10 transition-all duration-300" alt="${item.model}">
-                <div class="flex-1 flex flex-col justify-between">
-                    <div>
-                        <div class="flex justify-between items-start">
-                            <div class="text-white font-medium text-[14px] transition-colors">${item.model} ${item.series} <span class="text-white/50 text-xs ml-1 font-normal">(Size ${item.size})</span></div>
-                            <button type="button" onclick="CartManager.removeItem('${item.id}')" class="text-white/30 hover:text-red-400 transition-colors p-1 -mr-2 -mt-1 tap-none" title="Remove item">
-                                ${trashSvg}
-                            </button>
-                        </div>
-                        ${priceOrOOS}
-                    </div>
-                    <div class="flex items-center mt-3">
-                        <div class="flex items-center rounded-md border border-white/15 bg-white/[0.02]">
-                            <button type="button" onclick="CartManager.updateQty('${item.id}', -1)" class="px-3 py-1 text-white/50 hover:text-white tap-none">&minus;</button>
-                            <span class="w-6 text-center text-xs font-medium">${item.qty}</span>
-                            <button type="button" onclick="CartManager.updateQty('${item.id}', 1)" class="px-3 py-1 text-white/50 hover:text-white tap-none">&plus;</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        `;
-        });
-
-        html += `
-        <div class="mt-4 pt-4 border-t border-white/10">
-            <button onclick="closeCartDrawer()" class="w-full py-2.5 border border-dashed border-white/20 rounded-xl text-white/60 text-[10px] uppercase tracking-widest hover:border-luxe hover:text-luxe transition-colors tap-none flex items-center justify-center gap-2">
-                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-                Add Another Piece
-            </button>
-        </div>
-    `;
-
-        container.innerHTML = html;
-        subtotalEl.textContent = `RM ${visualSubtotal.toFixed(2)}`;
-
-        // Toggle Overall Discount Row
-        const discRow = document.getElementById('cart-discount-row');
-        if (discRow) {
-            if (totalDiscount > 0) {
-                document.getElementById('cart-discount-label').textContent = "Total Discount";
-                document.getElementById('cart-discount-amount').textContent = `-RM ${totalDiscount.toFixed(2)}`;
-                document.getElementById('cart-discount-amount').className = "text-luxe font-medium";
-                discRow.classList.remove('hidden');
-                discRow.classList.add('flex');
-            } else {
-                discRow.classList.add('hidden');
-                discRow.classList.remove('flex');
-            }
-        }
-        updateGrandTotal();
-    }
-
-    function updateGrandTotal() {
-        const items = CartManager.getItems();
-        if (items.length === 0) {
-            document.getElementById('cart-total').textContent = `RM 0.00`;
-            return;
-        }
-
-        let baseTotal = 0;
-        items.forEach(item => {
-            let altCost = 0;
-            if (item.alterations) {
-                Object.values(item.alterations).forEach(alt => altCost += (alt.price || 0));
-            }
-            baseTotal += (item.price + altCost) * item.qty;
-        });
-
-        const grandTotal = baseTotal + sessionShippingFee;
-        document.getElementById('cart-total').textContent = `RM ${grandTotal.toFixed(2)}`;
-    }
-
-    document.getElementById('btn-calc-ship').onclick = async () => {
-        const items = CartManager.getItems();
-        if (items.length === 0) return;
-
-        const pc = document.getElementById('cart-postcode').value.trim();
-        if (!pc || pc.length < 5 || isNaN(pc)) {
-            document.getElementById('cart-postcode').classList.add('border-red-500');
-            return;
-        } else {
-            document.getElementById('cart-postcode').classList.remove('border-red-500');
-        }
-
-        // Calculate aggregated weight across all cart items
-        let totalCartWeight = 0;
-        items.forEach(item => {
-            totalCartWeight += (item.unitWeight || 1.0) * item.qty;
-        });
-
-        const btn = document.getElementById('btn-calc-ship');
-        btn.textContent = "...";
-
-        try {
-            const res = await fetch(`${RETAIL_API_URL}?action=calc_shipping&postcode=${encodeURIComponent(pc)}&weight=${totalCartWeight}`);
-            const json = await res.json();
-
-            if (json.status === 'success') {
-                sessionPostcode = pc;
-                const freeShipPromo = appConfig['PROMO_FREE_SHIPPING'];
-
-                if (freeShipPromo && freeShipPromo.isActive) {
-                    sessionShippingFee = 0;
-                    document.getElementById('cart-shipping').innerHTML = `<span class="line-through text-gray-500 mr-2">RM ${json.rate.toFixed(2)}</span><span class="text-luxe font-bold">FREE</span>`;
-                } else {
-                    sessionShippingFee = json.rate;
-                    document.getElementById('cart-shipping').textContent = `RM ${json.rate.toFixed(2)} (J&T Express)`;
-                }
-                updateGrandTotal();
-            }
-        } catch (e) {
-            alert("Shipping calculation failed. Please try again.");
-        }
-        btn.textContent = "CALC";
-    };
-
-    // Intelligent Address Engine & Auto-Calc
-    const addressInput = document.getElementById('cart-address');
-    const postcodeInput = document.getElementById('cart-postcode');
-    const stateSelect = document.getElementById('cart-state');
-    const calcBtn = document.getElementById('btn-calc-ship');
-
-    function getStateFromPostcode(pc) {
-        const code = parseInt(pc, 10);
-        if (code >= 1000 && code <= 2999) return "Perlis";
-        if (code >= 5000 && code <= 9999) return "Kedah";
-        if (code >= 10000 && code <= 14999) return "Pulau Pinang";
-        if (code >= 15000 && code <= 18999) return "Kelantan";
-        if (code >= 20000 && code <= 28999) return "Pahang";
-        if (code >= 30000 && code <= 36999) return "Perak";
-        if (code >= 39000 && code <= 39999) return "Pahang";
-        if (code >= 40000 && code <= 48999) return "Selangor";
-        if (code >= 50000 && code <= 59999) return "W.P. Kuala Lumpur";
-        if (code >= 60000 && code <= 68999) return "Selangor";
-        if (code >= 69000 && code <= 73999) return "Negeri Sembilan";
-        if (code >= 75000 && code <= 78999) return "Melaka";
-        if (code >= 79000 && code <= 86999) return "Johor";
-        if (code >= 87000 && code <= 87999) return "W.P. Labuan";
-        if (code >= 88000 && code <= 91999) return "Sabah";
-        if (code >= 93000 && code <= 98999) return "Sarawak";
-        return "";
-    }
-
-    addressInput.addEventListener('input', () => {
-        const match = addressInput.value.match(/\b\d{5}\b/);
-        if (match) {
-            const pc = match[0];
-            if (postcodeInput.value !== pc) {
-                postcodeInput.value = pc;
-                const state = getStateFromPostcode(pc);
-                if (state) stateSelect.value = state;
-                calcBtn.click();
-            }
-        }
-    });
-
-    postcodeInput.addEventListener('input', () => {
-        const pc = postcodeInput.value.trim();
-        if (pc.length === 5 && !isNaN(pc)) {
-            const state = getStateFromPostcode(pc);
-            if (state) stateSelect.value = state;
-            calcBtn.click();
-        }
-    });
-
-    document.getElementById('btn-checkout').onclick = async () => {
-        const items = CartManager.getItems();
-        if (items.length === 0) return;
-
-        // Terminal Guard for dynamic pricing loads
-        const currentPrice = activePromoPrice || activeRetailPrice;
-        if (!currentPrice || currentPrice <= 0) {
-            alert("⚠️ System Busy: Pricing data failed to load securely. Please refresh the page to continue.");
-            window.location.reload();
-            return;
-        }
-
-        const name = document.getElementById('cart-name').value.trim();
-        let rawPhone = document.getElementById('cart-phone').value;
-        let cleanPhone = String(rawPhone).trim().replace(/\D/g, '');
-        if (cleanPhone.startsWith('1')) cleanPhone = '60' + cleanPhone;
-        else if (cleanPhone.startsWith('0')) cleanPhone = '6' + cleanPhone;
-        const phone = cleanPhone;
-
-        const address = document.getElementById('cart-address').value.trim();
-        const state = document.getElementById('cart-state').value;
-        const postcode = document.getElementById('cart-postcode').value.trim();
-
-        if (!name || !phone || !address || !state || !postcode) {
-            alert("Please fill in all shipping details.");
-            return;
-        }
-
-        const shipRow = document.getElementById('cart-shipping');
-        const shipLabel = shipRow ? shipRow.textContent.replace(/\s+/g, ' ').trim() : '';
-        if (shipLabel === 'Pending' || shipLabel === '' || postcode !== sessionPostcode) {
-            alert("Please click 'Calculate Shipping' to update your delivery fee before checking out.");
-            return;
-        }
-
-        const btn = document.getElementById('btn-checkout');
-        btn.textContent = "Securing Order..."; btn.disabled = true;
-
-        const gateway = document.getElementById('gateway-overlay');
-        gateway.classList.remove('opacity-0', 'pointer-events-none');
-
-        // TRANSLATOR: Rebuild the precise payload expected by Google Apps Script
-        let payloadBasePrice = 0;
-        let payloadAltCost = 0;
-        let payloadTotalWeight = 0;
-        let payloadTotalQty = 0;
-
-        const formattedItems = items.map(item => {
-            let unitAltCost = 0;
-            if (item.alterations) {
-                Object.values(item.alterations).forEach(alt => unitAltCost += (alt.price || 0));
-            }
-
-            payloadBasePrice += item.price * item.qty;
-            payloadAltCost += unitAltCost * item.qty;
-            payloadTotalWeight += (item.unitWeight || 1.0) * item.qty;
-            payloadTotalQty += item.qty;
-
-            const signature = `${item.model}-${item.size}|${JSON.stringify(item.alterations || {})}`;
-
-            return {
-                signature: signature,
-                sku: `${item.model}-${item.size}`,
-                size: item.size,
-                qty: item.qty,
-                unitRetailPrice: item.retailPrice || item.price,
-                unitEffectivePrice: item.price,
-                unitAltCost: unitAltCost,
-                unitDiscount: Math.max(0, (item.retailPrice || item.price) - item.price),
-                unitWeight: item.unitWeight || 1.0,
-                alterations: item.alterations || {},
-                isSoldOut: false
-            };
-        });
-
-        const grandTotal = payloadBasePrice + payloadAltCost + sessionShippingFee;
-        gtag('event', 'begin_checkout', { currency: 'MYR', value: grandTotal });
-
-        const payload = {
-            items: formattedItems,
-            basePrice: payloadBasePrice,
-            altCost: payloadAltCost,
-            weightKg: payloadTotalWeight,
-            totalWeight: payloadTotalWeight,
-            totalQty: payloadTotalQty,
-            shippingFee: sessionShippingFee,
-            discount: 0,
-            totalPaid: grandTotal,
-            name: name,
-            phone: phone,
-            email: "",
-            address: address,
-            state: state,
-            postcode: postcode
-        };
-
-        try {
-            const res = await fetch(`${RETAIL_API_URL}?action=reserve_stock`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                body: `payload=${encodeURIComponent(JSON.stringify(payload))}`
-            });
-            const json = await res.json();
-
-            if (json.status === 'success') {
-                // META PIXEL: Initiate Checkout Event
-                if (typeof fbq === 'function') {
-                    fbq('track', 'InitiateCheckout', {
-                        value: grandTotal,
-                        currency: 'MYR',
-                        num_items: payloadTotalQty
-                    });
-                }
-                localStorage.removeItem('arabista_staging_cart');
-                window.location.href = json.paymentUrl;
-            } else {
-                gateway.classList.add('opacity-0', 'pointer-events-none');
-
-                if (json.reason === 'out_of_stock' && json.failedSignature) {
-                    alert(`A selected item sold out during checkout. Please review your cart.`);
-                    window.location.reload();
-                } else {
-                    alert("Checkout Error: " + json.message);
-                }
-            }
-        } catch (e) {
-            gateway.classList.add('opacity-0', 'pointer-events-none');
-            alert("System error: " + e.message);
-        }
-        btn.textContent = "Proceed to Payment"; btn.disabled = false;
-    };
-
-    // Init
-    document.getElementById('add-to-cart-btn').disabled = true;
-    renderSizeGrid();
-    fetchConfig().then(() => {
-        gtag('event', 'view_item', { item_id: currentModel, item_name: 'Dahlia Series' });
-    });
-
-    // --- CONTEXT-AWARE STICKY BAR ENGINE ---
-    document.addEventListener('DOMContentLoaded', () => {
-        const mainCartBtn = document.getElementById('add-to-cart-btn');
-        const stickyBar = document.getElementById('sticky-buy-bar');
-        const stickyBtn = document.getElementById('sticky-btn');
-
-        if (mainCartBtn && stickyBar && stickyBtn) {
-            // 1. Hide-and-Seek Scroll Observer
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    // Slide up only if user scrolled PAST the main button (top < 0)
-                    if (!entry.isIntersecting && entry.boundingClientRect.top < 0) {
-                        stickyBar.classList.remove('translate-y-full');
-                    } else {
-                        stickyBar.classList.add('translate-y-full');
-                    }
-                });
-            }, { threshold: 0 });
-            observer.observe(mainCartBtn);
-
-            // 2. Intelligent Button Logic
-            const sizeCalc = document.getElementById('size-calculator-section');
-            stickyBtn.addEventListener('click', () => {
-                if (!selectedSize) {
-                    // State A: Auto-scroll to Size Calculator
-                    if (sizeCalc) {
-                        sizeCalc.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                    }
-                } else {
-                    // State B: Add to Cart
-                    addD06ToLocalCartAndOpenDrawer();
-                }
-            });
-        }
-    });
-
-    // --- D01 Reviews Renderer ---
-    (function(){
-        const FULL = [{"username":"5** F**Y M**T","size":"S","rating":5,"original":"Alhamdulillah dah selamat sampai. Ni jubah ke 5 ..memang tak pernah mengecewakan..terbaik👍"},{"username":"m**8","size":"XL","rating":5,"original":"Baju dah Smpai cantik sgt2...lembut&sejuk kain ..memang puas hati.. nanti boleh repeat design lain..terbaiklaa👍👍"},{"username":"h**i","size":"L","rating":5,"original":"Abaya sangat cantik cutting pun best kain also best.gambar nanti update..nak pakai raya.."},{"username":"a**😎","size":"XXXL","rating":5,"original":"Product quality: good.design cantek arabista mmg saya suka.jahitan kemas"},{"username":"c**®","size":"XL","rating":5,"original":"Cantiknya Abaya ni...sekali tengok terus grab sebelum habis."},{"username":"N**r S**r B**i I**l","size":"XXL","rating":5,"original":"Product quality: Super good and comfortable."},{"username":"💬**","size":"S","rating":5,"original":"Sangat puas hati"},{"username":"c**i","size":"M","rating":5,"original":"bagus produk ni"},{"username":"N**n","size":"XL","rating":5,"original":"Kain nida premium sgt cantik, jahitan kemas, design exclusive! Sikit jer kot boleh nak komen, bhgn dada fitting sket, saya amik xl dada 44, saya prefer longgar sket jer lagi.. Tapi overall mmg sgt cantik, packaging wow sgt, terasa exclusive to the max! Tq tau! Mantap! InsyaaAllah repeat order"},{"username":"N**a","size":"XXL","rating":5,"original":"Cantik sgt...love sgt...seller pun baik Dan amat senang berurusan 👍👍👍"},{"username":"a**a b**e A**h Z**n","size":"L","rating":5,"original":"Ok la tp bukan cutting arab ya. Alhamdulillah padan molek"},{"username":"L**n","size":"XL","rating":5,"original":"Dh terima n try material kain mmg best cuma kena potong skit sb bkn baka arab.🤭"},{"username":"Q**n M**","size":"S","rating":5,"original":"Material best. Cutting cantik. Paling suka ada pokey kiri kanan. Harga pun mampu milik"},{"username":"I**n","size":"XL","rating":5,"original":"Jahitan kemas..design cantik..labuh pun ngam sbb saya tinggi 172cm. Boleh repeat design lain. Cuma shawl free tu agak keras la kain dia 😅"},{"username":"S**i A**d","size":"XL","rating":5,"original":"Abaya cantik sangat2...cuma labuh aje..takpe nanti saya pergi kedai potong bahagian bawahnya..cepatnya sampai baju saya..terima kasih sis..Insyallah akan saya repeart lagi sbb ada abaya yang saya berkenan..."},{"username":"A**p","size":"XL","rating":5,"original":"Abaya yg berkualiti dan sgt cantik design. Ada kocek dan zip di depan. jahitan kemas."},{"username":"A**B","size":"S","rating":5,"original":"Nice but material is not suitable for sunny day."},{"username":"s**h N**l j**h","size":"L","rating":5,"original":"Suka sgt cutting jubah ni..kain pun x panas"},{"username":"Q**E **","size":"M","rating":5,"original":"Cantek sngt & selesa . 🤍🤍🤍🤍🤍"},{"username":"n**n","size":"L","rating":5,"original":"cantik n kemas.. Product quality: Terbaik"},{"username":"D**s","size":"XL","rating":4,"original":"Product quality: Baju best.labuh sesuai untuk orang tinggi.yang rendah kene alter. Kain shawl keras.tapi overall boleh repeat beli"},{"username":"C** N**m","size":"XXXL","rating":4,"original":"Cantik sangat dan berkualiti tapi sayang sangat baiu ini tidak muat , ketat bahagian dada yg lain semua ngam. Rezeki anak saya je lah"},{"username":"L**y r**s","size":"XXXL","rating":5,"original":"tersangatla ok..akan beli lagi"},{"username":"d**y","size":"XL","rating":5,"original":"Beautiful and high quality product"},{"username":"y**4","size":"M","rating":5,"original":"Cantik kain lembuat tak panas"},{"username":"A**a H**n","size":"M","rating":5,"original":"jubah cantik...simple ..."},{"username":"**","size":"XXXL","rating":5,"original":"Kali ketiga purchased"},{"username":"L**a H**l","size":"M","rating":5,"original":"Jubah cantek, love sangat"},{"username":"ن**ه","size":"XXXL","rating":5,"original":"poket ada sekit koyak"},{"username":"C**e","size":"M","rating":5,"original":"Nice jubah Nice cutting"},{"username":"h**","size":"M","rating":5,"original":"Jubah dah terima"},{"username":"u**3","size":"L","rating":5,"original":"Cantik🥰"},{"username":"8**5","size":"L","rating":5,"original":"👍👍👍👍"},{"username":"n**r","size":"XXL","rating":5,"original":"The best"},{"username":"w**g","size":"S","rating":5,"original":"Good"},{"username":"y**i","size":"L","rating":5,"original":"❤️"},{"username":"k** i**💕","size":"XXXL","rating":5,"original":"Cantik"},{"username":"s**u","size":"L","rating":5,"original":"👍🏻"},{"username":"u**s","size":"XXXL","rating":5,"original":"Terbaik"},{"username":"A**J","size":"S","rating":5,"original":"Love"},{"username":"m**e","size":"S","rating":5,"original":"So nice"}];
-
-        const PER_PAGE = 5;
-        const list = document.getElementById('reviewList');
-        const prevBtn = document.getElementById('prevBtn');
-        const nextBtn = document.getElementById('nextBtn');
-        const pageNum = document.getElementById('pageNum');
-        const pageTotal = document.getElementById('pageTotal');
-        const tiktokPreview = document.getElementById('tiktokPreview');
-        const reviewsSection = document.getElementById('pdp-review-section');
-
-        const mkStar = (n)=>'★'.repeat(n||5);
-        const esc = (s)=>String(s||'').replace(/[&<>]/g, c=>({ '&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
-        const dot = '<span class="mx-2 text-white/30">•</span>';
-
-        function reviewCard(r){
-          const longOrig = (r.original||'').length > 160;
-          const id = Math.random().toString(36).slice(2,8);
-          return `
-          <article class="p-4 sm:p-5">
-            <div class="text-xs text-white/60 mb-2">
-              <strong class="text-white/80">${esc(r.username)}</strong>${dot}
-              Size: ${esc(r.size||'—')}${dot}
-              <span aria-label="rating" class="text-luxe">${mkStar(r.rating)}</span>
-            </div>
-            <div class="text-sm leading-relaxed">
-              <p class="review-text ${longOrig?'clamp':''}" id="o-${id}">${esc(r.original||'')}</p>
-              ${longOrig?'<button type="button" class="readmore text-xs underline decoration-white/30 hover:text-luxe mt-1 tap-none" data-target="o-'+id+'">Read more</button>':''}
-            </div>
-          </article>`;
-        }
-
-        function renderPage(p){
-          const totalPages = Math.max(1, Math.ceil(FULL.length / PER_PAGE));
-          const clamped = Math.min(Math.max(1, p), totalPages);
-          const start = (clamped - 1) * PER_PAGE;
-          const slice = FULL.slice(start, start + PER_PAGE);
-
-          list.innerHTML = slice.map(reviewCard).join('');
-          pageNum.textContent = clamped;
-          pageTotal.textContent = totalPages;
-
-          prevBtn.disabled = clamped === 1;
-          nextBtn.disabled = clamped === totalPages;
-
-          tiktokPreview.classList.toggle('hidden', clamped !== totalPages);
-        }
-
-        list.addEventListener('click', (e)=>{
-          const b = e.target.closest('.readmore');
-          if(!b) return;
-          const id = b.getAttribute('data-target');
-          const p = document.getElementById(id);
-          if(!p) return;
-          p.classList.toggle('clamp');
-          b.textContent = p.classList.contains('clamp') ? 'Read more' : 'Show less';
-        });
-
-        let current = 1;
-        function scrollReviewsTop(){ reviewsSection.scrollIntoView({behavior:'smooth', block:'start'}); }
-        prevBtn.addEventListener('click', ()=>{ if(current>1){ current--; renderPage(current); scrollReviewsTop(); } });
-        nextBtn.addEventListener('click', ()=>{ const tp=Math.ceil(FULL.length/PER_PAGE); if(current<tp){ current++; renderPage(current); scrollReviewsTop(); } });
-
-        renderPage(current);
-    })();
-
-    // D01 Intersection Observer for .reveal animations
-    document.querySelectorAll('.reveal').forEach(el => {
-        const io = new IntersectionObserver((entries, obs) => {
-            entries.forEach(en => { if (en.isIntersecting) { en.target.classList.add('show'); obs.unobserve(en.target); } });
-        }, { threshold: 0.1, rootMargin: "0px 0px 0px 0px" });
-        io.observe(el);
-    });
-
-    /* --- ARABISTA PREMIUM GALLERY ENGINE --- */
-    document.addEventListener('DOMContentLoaded', () => {
-        const mainContainer = document.querySelector('.arabista-gallery-main');
-        const thumbContainer = document.querySelector('.arabista-gallery-thumbs');
-        const mainImages = mainContainer ? Array.from(mainContainer.querySelectorAll('.arabista-gallery-img')) : [];
-        const thumbnails = thumbContainer ? Array.from(thumbContainer.querySelectorAll('.arabista-thumb-btn')) : [];
-
-        if (mainContainer && thumbContainer && mainImages.length > 0 && thumbnails.length > 0) {
-
-        let isDown = false;
-        let startX;
-        let scrollLeft;
-        let activeIndex = 0;
-
-        // --- PILLAR 3: Desktop Drag Physics ---
-        mainContainer.addEventListener('mousedown', (e) => {
-            isDown = true;
-            mainContainer.classList.add('is-dragging');
-            startX = e.pageX - mainContainer.offsetLeft;
-            scrollLeft = mainContainer.scrollLeft;
-        });
-
-        const stopDragging = () => {
-            if (!isDown) return;
-            isDown = false;
-            mainContainer.classList.remove('is-dragging');
-        };
-
-        mainContainer.addEventListener('mouseleave', stopDragging);
-        mainContainer.addEventListener('mouseup', stopDragging);
-
-        mainContainer.addEventListener('mousemove', (e) => {
-            if (!isDown) return;
-            e.preventDefault();
-            const x = e.pageX - mainContainer.offsetLeft;
-            const walk = (x - startX) * 1.5; // Drag momentum multiplier
-            mainContainer.scrollLeft = scrollLeft - walk;
-        });
-
-        // --- PILLARS 4 & 5: Two-Way Thumbnail Sync ---
-        const syncThumbnails = (index) => {
-            thumbnails.forEach((thumb, i) => {
-                if (i === index) {
-                    thumb.style.opacity = '1';
-                    thumb.style.border = '1px solid #D4AF37'; // Subtle gold active state
-                } else {
-                    thumb.style.opacity = '0.4';
-                    thumb.style.border = 'none';
-                }
-            });
-
-            // Click-to-Center math
-            const activeThumb = thumbnails[index];
-            if (activeThumb) {
-                const targetScroll = activeThumb.offsetLeft - (thumbContainer.clientWidth / 2) + (activeThumb.clientWidth / 2);
-                thumbContainer.scrollTo({ left: targetScroll, behavior: 'smooth' });
-            }
-        };
-
-        // Thumbnail Click triggers Main Gallery Scroll
-        thumbnails.forEach((thumb, index) => {
-            thumb.style.cursor = 'pointer';
-            thumb.style.transition = 'opacity 0.3s ease';
-            thumb.addEventListener('click', () => {
-                const targetImg = mainImages[index];
-                if (targetImg) {
-                    const targetScroll = targetImg.offsetLeft - (mainContainer.clientWidth / 2) + (targetImg.clientWidth / 2);
-                    mainContainer.scrollTo({ left: targetScroll, behavior: 'smooth' });
-                }
-            });
-        });
-
-        // --- PILLARS 1 & 2: GPU 60fps Cinematic Depth-of-Field ---
-        const renderLoop = () => {
-            const containerCenter = mainContainer.scrollLeft + (mainContainer.clientWidth / 2);
-            let closestIndex = 0;
-            let minDistance = Infinity;
-
-            mainImages.forEach((img, index) => {
-                const imgCenter = img.offsetLeft + (img.clientWidth / 2);
-                const distance = Math.abs(containerCenter - imgCenter);
-
-                // Track Active Index for Two-Way Sync
-                if (distance < minDistance) {
-                    minDistance = distance;
-                    closestIndex = index;
-                }
-
-                // Cinematic Scale & Fade Math
-                const effectRange = img.clientWidth * 0.8; 
-                let progress = distance / effectRange;
-                if (progress > 1) progress = 1;
-
-                const scale = 1 - (0.08 * progress); // Floor is 0.92
-                const opacity = 1 - (0.6 * progress); // Floor is 0.4
-
-                img.style.transform = `translate3d(0,0,0) scale(${scale})`;
-                img.style.opacity = opacity;
-            });
-
-            if (closestIndex !== activeIndex) {
-                activeIndex = closestIndex;
-                syncThumbnails(activeIndex);
-                
-                // Cinematic Play/Pause Video Logic
-                mainImages.forEach((media, i) => {
-                    if (media.tagName.toLowerCase() === 'video') {
-                        if (i === activeIndex) {
-                            media.play().catch(e => console.log('Autoplay blocked by browser', e));
-                        } else {
-                            media.pause();
-                        }
-                    }
-                });
-            }
-
-            requestAnimationFrame(renderLoop);
-        };
-
-        // Initialize
-        syncThumbnails(0);
-        renderLoop();
-
-    // --- PILLAR 6: Framed Canvas Pre-Render Engine ---
-    const lightbox = document.getElementById('arabista-lightbox');
-    const lbTrack = document.getElementById('lightbox-track');
-    const lbClose = document.getElementById('lightbox-close');
-    const lbNext = document.getElementById('lightbox-next');
-    const lbPrev = document.getElementById('lightbox-prev');
-    let lbItems = [];
-    let isDraggingImage = false; 
-
-    // Pre-build the lightbox DOM on load
-    mediaFiles.forEach((m) => {
-        const wrapper = document.createElement('div');
-        wrapper.className = 'lb-item shrink-0 w-full h-full snap-center flex items-center justify-center relative';
-        let media;
-        if(m.type === 'vid') {
-            media = document.createElement('video');
-            media.src = m.src; media.loop = true; media.playsInline = true; media.muted = true;
-        } else {
-            media = document.createElement('img');
-            media.src = m.src;
-        }
-        media.className = 'lb-media'; // CSS handles the hugging border and sizing
-        wrapper.appendChild(media);
-        lbTrack.appendChild(wrapper);
-        lbItems.push(media);
-    });
-
-    mainContainer.addEventListener('mousedown', () => { isDraggingImage = false; });
-    mainContainer.addEventListener('mousemove', () => { if (isDown) isDraggingImage = true; });
-    
-    mainContainer.addEventListener('click', (e) => {
-        if (isDraggingImage) return; 
-        openLightbox();
-    });
-
-    const openLightbox = () => {
-        lbTrack.scrollTo({ left: activeIndex * lbTrack.clientWidth, behavior: 'instant' });
-        lightbox.classList.add('is-open');
-        document.body.style.overflow = 'hidden';
-        
-        if(lbItems[activeIndex].tagName.toLowerCase() === 'video') {
-            lbItems[activeIndex].play().catch(e=>console.log(e));
-        }
-    };
-
-    const closeLightbox = () => {
-        lightbox.classList.remove('is-open');
-        document.body.style.overflow = '';
-        
-        const lbIndex = Math.round(lbTrack.scrollLeft / lbTrack.clientWidth);
-        lbItems.forEach(el => { if(el.tagName.toLowerCase() === 'video') el.pause(); });
-        
-        if(lbIndex !== activeIndex && mainImages[lbIndex]) {
-            const targetImg = mainImages[lbIndex];
-            const targetScroll = targetImg.offsetLeft - (mainContainer.clientWidth / 2) + (targetImg.clientWidth / 2);
-            mainContainer.scrollTo({ left: targetScroll, behavior: 'instant' });
-        }
-    };
-
-    lbNext.addEventListener('click', () => lbTrack.scrollBy({ left: lbTrack.clientWidth, behavior: 'smooth' }));
-    lbPrev.addEventListener('click', () => lbTrack.scrollBy({ left: -lbTrack.clientWidth, behavior: 'smooth' }));
-
-    lbClose.addEventListener('click', closeLightbox);
-    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeLightbox(); });
-    lightbox.addEventListener('click', (e) => {
-        if (e.target === lightbox || e.target.classList.contains('lb-item')) closeLightbox();
-    });
-
-    lbTrack.addEventListener('scroll', () => {
-        if(!lightbox.classList.contains('is-open')) return;
-        const currentLbIndex = Math.round(lbTrack.scrollLeft / lbTrack.clientWidth);
-        lbItems.forEach((el, idx) => {
-            if(el.tagName.toLowerCase() === 'video') {
-                if(idx === currentLbIndex) el.play().catch(e=>e);
-                else el.pause();
-            }
-        });
-    }, { passive: true });
-
-        }
-    });
-    // --- 7. MOBILE CHEVRON SCROLL & FADE ENGINE ---
-    document.addEventListener('DOMContentLoaded', () => {
-        const chevron = document.getElementById('mobile-scroll-chevron');
-        const chevronContainer = document.getElementById('mobile-scroll-chevron-container');
-        const infoStart = document.getElementById('product-info-start');
-        let chevronDismissed = false;
-        
-        if (chevron && chevronContainer && infoStart) {
-            chevron.addEventListener('click', () => {
-                chevronDismissed = true;
-                chevronContainer.classList.add('opacity-0', 'pointer-events-none');
-                infoStart.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            });
-            
-            window.addEventListener('scroll', () => {
-                if (chevronDismissed) return;
-                if (window.scrollY > 150) {
-                    chevronContainer.classList.add('opacity-0', 'pointer-events-none');
-                } else {
-                    chevronContainer.classList.remove('opacity-0', 'pointer-events-none');
-                }
-            }, { passive: true });
-        }
-    });
-
-    // --- 8. DYNAMIC CROSS-SELL (BACKGROUND LOADED) ---
-    document.addEventListener('DOMContentLoaded', () => {
-        const crossSellSection = document.getElementById('cross-sell-section');
-        const crossSellContainer = document.getElementById('cross-sell-container');
-        let crossSellFetched = false;
-
-        function fetchCrossSell() {
-            if (crossSellFetched) return;
-            crossSellFetched = true;
-            
-            const deviceInfo = encodeURIComponent(navigator.userAgent.substring(0, 100));
-            fetch(`${RETAIL_API_URL}?action=get_config&cb=${Date.now().toString(36)}&ua=${deviceInfo}`)
-                .then(res => res.json())
-                .then(json => {
-                    if (json.status !== 'success') {
-                        crossSellSection.classList.add('hidden');
-                        return;
-                    }
-                    
-                    const matrix = json.data.matrix || {};
-                    const models = {};
-                    
-                    for (let sku in matrix) {
-                        const row = matrix[sku];
-                        const base = row.baseItem;
-                        if (!base || base === currentModel) continue;
-                        
-                        const stock = parseInt(row.Available_To_Sell || row.stock || row.qty || 0);
-                        if (stock <= 0) continue; 
-                        
-                        if (!models[base]) {
-                            let seriesName = base + " Series";
-                            if(base.startsWith('D')) seriesName = "Dahlia Series";
-                            if(base.startsWith('Z')) seriesName = "Zahra Series";
-                            if(base.startsWith('M')) seriesName = "Maraya Series";
-
-                            models[base] = { retail: row.retailPrice, promo: row.promoPrice, title: seriesName };
-                        } else {
-                            if (row.retailPrice > 0 && (models[base].retail === 0 || row.retailPrice < models[base].retail)) {
-                                models[base].retail = row.retailPrice;
-                            }
-                            if (row.promoPrice !== null && (models[base].promo === null || row.promoPrice < models[base].promo)) {
-                                models[base].promo = row.promoPrice;
-                            }
-                        }
-                    }
-                    
-                    const modelKeys = Object.keys(models).slice(0, 5); 
-                    if(modelKeys.length === 0) {
-                        crossSellSection.classList.add('hidden');
-                        return;
-                    }
-
-                    const loader = document.getElementById('cross-sell-loading');
-                    if (loader) loader.remove();
-
-                    const isStaging = window.location.href.includes('-staging');
-                    const linkSuffix = isStaging ? '-staging.html' : '.html';
-
-                    let html = '';
-                    modelKeys.forEach(base => {
-                        const d = models[base];
-                        const priceHtml = d.promo !== null && d.promo < d.retail 
-                            ? `<del class="text-white/40 text-xs mr-1.5">RM ${d.retail.toFixed(0)}</del><span class="text-luxe font-medium text-sm">RM ${d.promo.toFixed(0)}</span>`
-                            : `<span class="text-white font-medium text-sm">RM ${d.retail.toFixed(0)}</span>`;
-                            
-                        html += `
-                        <article class="relative block tap-none aspect-[3/4] w-[45vw] sm:w-56 shrink-0 snap-start rounded-2xl overflow-hidden bg-white/5 group border border-white/5 hover:border-white/20 transition-all duration-300">
-                            <a href="product-${base.toLowerCase()}${linkSuffix}" class="block w-full h-full">
-                                <img src="images/${base.toLowerCase()}-1-hero.webp" alt="${base}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out" loading="lazy">
-                                <div class="absolute inset-0 bg-gradient-to-t from-[#111213] via-[#111213]/20 to-transparent opacity-80 group-hover:opacity-100 transition-opacity duration-300"></div>
-                                <div class="absolute bottom-0 inset-x-0 p-4 sm:p-5 flex flex-col justify-end translate-y-2 group-hover:translate-y-0 transition-transform duration-300">
-                                    <h3 class="text-white font-display text-lg sm:text-xl leading-tight mb-1">${base} <span class="block text-[10px] uppercase tracking-widest text-white/50 font-sans mt-0.5">${d.title}</span></h3>
-                                    <div>${priceHtml}</div>
-                                </div>
-                            </a>
-                        </article>`;
-                    });
-                    
-                    html += `
-                    <article class="relative block tap-none aspect-[3/4] w-[45vw] sm:w-56 shrink-0 snap-start rounded-2xl overflow-hidden bg-black/40 border border-white/10 group hover:bg-black/60 hover:border-luxe/30 transition-all duration-300">
-                        <a href="abaya${linkSuffix}" class="flex flex-col items-center justify-center w-full h-full p-4 text-center">
-                            <div class="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center text-luxe mb-4 group-hover:scale-110 group-hover:bg-luxe/10 transition-all duration-300">
-                                <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
-                            </div>
-                            <span class="text-xs uppercase tracking-widest text-white/70 group-hover:text-white transition-colors">Discover All<br>Collections</span>
-                        </a>
-                    </article>`;
-                    
-                    crossSellContainer.innerHTML = html;
-                })
-                .catch(e => {
-                    console.warn("Cross-sell fetch failed", e);
-                    crossSellSection.classList.add('hidden');
-                });
-        }
-
-        setTimeout(fetchCrossSell, 100);
-    });
-  </script>
 
   <div id="sticky-buy-bar" class="fixed bottom-0 inset-x-0 z-[45] transform translate-y-full transition-transform duration-500 bg-[#111213]/85 backdrop-blur-xl border-t border-white/5 shadow-[0_-15px_40px_rgba(0,0,0,0.6)] sm:hidden flex items-center justify-between px-5 py-4 pb-[calc(1rem+env(safe-area-inset-bottom,0px))]">
       <div class="flex flex-col">
@@ -1975,20 +603,16 @@
 
   <div id="arabista-lightbox" class="fixed inset-0 z-[100] flex items-center justify-center opacity-0 pointer-events-none transition-opacity duration-500 bg-[#0F0F10]/95 backdrop-blur-md">
       <div class="relative w-full h-full flex flex-col transform scale-95 transition-transform duration-500" id="lightbox-frame">
-          
           <button id="lightbox-close" class="absolute top-4 right-4 sm:top-6 sm:right-6 z-[110] p-2.5 rounded-full ring-1 ring-white/20 hover:ring-luxe bg-black/40 backdrop-blur-md text-white/70 hover:text-white transition-all tap-none">
               <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M6 18L18 6M6 6l12 12"/></svg>
           </button>
-
           <button id="lightbox-prev" class="absolute left-2 sm:left-6 top-1/2 -translate-y-1/2 z-[110] p-2 sm:p-3 rounded-full ring-1 ring-white/20 hover:ring-luxe bg-black/40 backdrop-blur-md text-white/70 hover:text-white transition-all tap-none flex">
               <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 19l-7-7 7-7"/></svg>
           </button>
           <button id="lightbox-next" class="absolute right-2 sm:right-6 top-1/2 -translate-y-1/2 z-[110] p-2 sm:p-3 rounded-full ring-1 ring-white/20 hover:ring-luxe bg-black/40 backdrop-blur-md text-white/70 hover:text-white transition-all tap-none flex">
               <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5l7 7-7 7"/></svg>
           </button>
-
-          <div id="lightbox-track" class="flex-1 w-full h-full flex overflow-x-auto snap-x snap-mandatory hide-scrollbar scroll-smooth">
-              </div>
+          <div id="lightbox-track" class="flex-1 w-full h-full flex overflow-x-auto snap-x snap-mandatory hide-scrollbar scroll-smooth"></div>
       </div>
   </div>
 
@@ -2004,5 +628,71 @@
           Securing your selection...
       </div>
   </div>
+
+  <!--
+    ============================================================
+    GLOBAL CONTEXT INJECTION (Phase 3 architecture)
+    ============================================================
+    The HTML is the product-specific layer; it declares everything
+    that varies between SKUs (model code, copy, gallery, size chart,
+    alteration services, reviews) and hands it to arabista-core.js
+    which is fully product-agnostic.
+  -->
+  <script>
+    window.ARABISTA_CONTEXT = {
+      baseItem: "D06",
+      apiUrl: "https://script.google.com/macros/s/AKfycbw4qGOeC2Sebod06uFnW2u-ZAkj7l8zRdzyWrFEyL1_7eDCn-ks9lVKrd1I226qHxRmQg/exec",
+      seriesName: "Dahlia Series",
+      heroImage: "images/d06-1-hero.webp",
+      cartStorageKey: "arabista_cart_stg",
+      draftStorageKey: "arabista_checkout_draft_stg",
+      gallery: [
+        { type: "img", src: "images/d06-1-hero.webp" },
+        { type: "img", src: "images/d06-2-angle.webp" },
+        { type: "img", src: "images/d06-3-portrait-1.webp" },
+        { type: "img", src: "images/d06-4-portrait-2.webp" },
+        { type: "img", src: "images/d06-5-closeup.webp" },
+        { type: "img", src: "images/d06-6-feature-zip.webp" },
+        { type: "img", src: "images/d06-7-feature-sleeve.webp" },
+        { type: "img", src: "images/d06-8-feature-pockets.webp" },
+        { type: "vid", src: "images/d06-9-video-flow.mp4", thumb: "images/d06-9-video-poster.webp" }
+      ],
+      /* Product dimensional metadata. NOT hardcoded in arabista-core.js. */
+      sizeChart: {
+        XS:   { length: 55, sleeve: 22,   shoulder: 14,   bust: 36 },
+        S:    { length: 55, sleeve: 22,   shoulder: 15,   bust: 39 },
+        M:    { length: 57, sleeve: 23,   shoulder: 16,   bust: 40 },
+        L:    { length: 60, sleeve: 23.5, shoulder: 16.5, bust: 43 },
+        XL:   { length: 60, sleeve: 23.5, shoulder: 17.5, bust: 44 },
+        XXL:  { length: 60, sleeve: 23.5, shoulder: 18,   bust: 46 },
+        XXXL: { length: 60, sleeve: 23.5, shoulder: 19,   bust: 50 }
+      },
+      sizeOrder: ["XS", "S", "M", "L", "XL", "XXL", "XXXL"],
+      alterationServices: [
+        { id: "D06_ALT_LENGTH",   key: "length",   label: "Alter Labuh (Inches)",  bmName: "Labuh"  },
+        { id: "D06_ALT_SLEEVE",   key: "sleeve",   label: "Alter Lengan (Inches)", bmName: "Lengan" },
+        { id: "D06_ALT_SHOULDER", key: "shoulder", label: "Alter Bahu (Inches)",   bmName: "Bahu"   }
+      ],
+      bmiThresholds: [
+        { max: 19.53, size: "XS"  },
+        { max: 22.27, size: "S"   },
+        { max: 25.00, size: "M"   },
+        { max: 27.73, size: "L"   },
+        { max: 30.47, size: "XL"  },
+        { max: 33.20, size: "XXL" },
+        { max: 37.11, size: "XXXL"}
+      ],
+      heightLengthBuckets: [
+        { max: 150, length: 50 },
+        { max: 156, length: 52 },
+        { max: 163, length: 55 },
+        { max: 169, length: 57 },
+        { max: 999, length: 60 }
+      ],
+      tiktokUrl: "https://vt.tiktok.com/ZSHnDRphXWjk2-DE4dI/",
+      reviews: [{"username":"5** F**Y M**T","size":"S","rating":5,"original":"Alhamdulillah dah selamat sampai. Ni jubah ke 5 ..memang tak pernah mengecewakan..terbaik👍"},{"username":"m**8","size":"XL","rating":5,"original":"Baju dah Smpai cantik sgt2...lembut&sejuk kain ..memang puas hati.. nanti boleh repeat design lain..terbaiklaa👍👍"},{"username":"h**i","size":"L","rating":5,"original":"Abaya sangat cantik cutting pun best kain also best.gambar nanti update..nak pakai raya.."},{"username":"a**😎","size":"XXXL","rating":5,"original":"Product quality: good.design cantek arabista mmg saya suka.jahitan kemas"},{"username":"c**®","size":"XL","rating":5,"original":"Cantiknya Abaya ni...sekali tengok terus grab sebelum habis."},{"username":"N**r S**r B**i I**l","size":"XXL","rating":5,"original":"Product quality: Super good and comfortable."},{"username":"💬**","size":"S","rating":5,"original":"Sangat puas hati"},{"username":"c**i","size":"M","rating":5,"original":"bagus produk ni"},{"username":"N**n","size":"XL","rating":5,"original":"Kain nida premium sgt cantik, jahitan kemas, design exclusive! Sikit jer kot boleh nak komen, bhgn dada fitting sket, saya amik xl dada 44, saya prefer longgar sket jer lagi.. Tapi overall mmg sgt cantik, packaging wow sgt, terasa exclusive to the max! Tq tau! Mantap! InsyaaAllah repeat order"},{"username":"N**a","size":"XXL","rating":5,"original":"Cantik sgt...love sgt...seller pun baik Dan amat senang berurusan 👍👍👍"},{"username":"a**a b**e A**h Z**n","size":"L","rating":5,"original":"Ok la tp bukan cutting arab ya. Alhamdulillah padan molek"},{"username":"L**n","size":"XL","rating":5,"original":"Dh terima n try material kain mmg best cuma kena potong skit sb bkn baka arab.🤭"},{"username":"Q**n M**","size":"S","rating":5,"original":"Material best. Cutting cantik. Paling suka ada pokey kiri kanan. Harga pun mampu milik"},{"username":"I**n","size":"XL","rating":5,"original":"Jahitan kemas..design cantik..labuh pun ngam sbb saya tinggi 172cm. Boleh repeat design lain. Cuma shawl free tu agak keras la kain dia 😅"},{"username":"S**i A**d","size":"XL","rating":5,"original":"Abaya cantik sangat2...cuma labuh aje..takpe nanti saya pergi kedai potong bahagian bawahnya..cepatnya sampai baju saya..terima kasih sis..Insyallah akan saya repeart lagi sbb ada abaya yang saya berkenan..."},{"username":"A**p","size":"XL","rating":5,"original":"Abaya yg berkualiti dan sgt cantik design. Ada kocek dan zip di depan. jahitan kemas."},{"username":"A**B","size":"S","rating":5,"original":"Nice but material is not suitable for sunny day."},{"username":"s**h N**l j**h","size":"L","rating":5,"original":"Suka sgt cutting jubah ni..kain pun x panas"},{"username":"Q**E **","size":"M","rating":5,"original":"Cantek sngt & selesa . 🤍🤍🤍🤍🤍"},{"username":"n**n","size":"L","rating":5,"original":"cantik n kemas.. Product quality: Terbaik"},{"username":"D**s","size":"XL","rating":4,"original":"Product quality: Baju best.labuh sesuai untuk orang tinggi.yang rendah kene alter. Kain shawl keras.tapi overall boleh repeat beli"},{"username":"C** N**m","size":"XXXL","rating":4,"original":"Cantik sangat dan berkualiti tapi sayang sangat baiu ini tidak muat , ketat bahagian dada yg lain semua ngam. Rezeki anak saya je lah"},{"username":"L**y r**s","size":"XXXL","rating":5,"original":"tersangatla ok..akan beli lagi"},{"username":"d**y","size":"XL","rating":5,"original":"Beautiful and high quality product"},{"username":"y**4","size":"M","rating":5,"original":"Cantik kain lembuat tak panas"},{"username":"A**a H**n","size":"M","rating":5,"original":"jubah cantik...simple ..."},{"username":"**","size":"XXXL","rating":5,"original":"Kali ketiga purchased"},{"username":"L**a H**l","size":"M","rating":5,"original":"Jubah cantek, love sangat"},{"username":"ن**ه","size":"XXXL","rating":5,"original":"poket ada sekit koyak"},{"username":"C**e","size":"M","rating":5,"original":"Nice jubah Nice cutting"},{"username":"h**","size":"M","rating":5,"original":"Jubah dah terima"},{"username":"u**3","size":"L","rating":5,"original":"Cantik🥰"},{"username":"8**5","size":"L","rating":5,"original":"👍👍👍👍"},{"username":"n**r","size":"XXL","rating":5,"original":"The best"},{"username":"w**g","size":"S","rating":5,"original":"Good"},{"username":"y**i","size":"L","rating":5,"original":"❤️"},{"username":"k** i**💕","size":"XXXL","rating":5,"original":"Cantik"},{"username":"s**u","size":"L","rating":5,"original":"👍🏻"},{"username":"u**s","size":"XXXL","rating":5,"original":"Terbaik"},{"username":"A**J","size":"S","rating":5,"original":"Love"},{"username":"m**e","size":"S","rating":5,"original":"So nice"}]
+    };
+  </script>
+  <script src="arabista-core.js" defer></script>
 </body>
 </html>
