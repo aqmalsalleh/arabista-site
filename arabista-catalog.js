@@ -93,7 +93,7 @@
     async function fetchCatalogData() {
         try {
             // Fetch live config from the staging URL mapped in Context
-            const response = await fetch(`${ctx.apiUrl}?action=get_config&model=ALL&nocache=true`);
+            const response = await fetch(`${ctx.apiUrl}?action=get_config&nocache=true`);
             if (!response.ok) throw new Error('Network response was not ok');
             const json = await response.json();
             
