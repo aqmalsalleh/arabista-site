@@ -40,7 +40,7 @@
         productCards.forEach(card => {
             const cardCat = card.getAttribute('data-category');
             if (category === 'all' || cardCat === category) {
-                card.style.display = 'flex';
+                card.style.display = 'block';
                 card.style.animation = 'fadeIn 0.4s ease-out forwards';
             } else {
                 card.style.display = 'none';
@@ -93,7 +93,9 @@
     async function fetchCatalogData() {
         try {
             // Fetch live config from the staging URL mapped in Context
-            const response = await fetch(`${ctx.apiUrl}?action=get_config&nocache=true`);
+            const response = await fetch(`${ctx.apiUrl}?action=get_config&nocache=true&cb=${Date.now()}`, {
+                redirect: 'follow'
+            });
             if (!response.ok) throw new Error('Network response was not ok');
             const json = await response.json();
             
