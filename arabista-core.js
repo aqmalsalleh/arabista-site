@@ -94,6 +94,7 @@
             try { window.fbq.apply(null, arguments); } catch (_) {}
         }
     }
+    function ttqSafe(event, name, payload) { if (typeof window.ttq === 'object' && typeof window.ttq.track === 'function') { try { window.ttq.track(name, payload); } catch (e) { } } }
 
     function truncateField(v, max) {
         if (v == null) return '';
@@ -153,6 +154,40 @@
             items.push(item);
             this.setItems(items);
             this.afterMutation();
+
+            // Analytics: AddToCart fan-out (GA4 + Meta + TikTok). Centralised here
+            // so EVERY mutation that adds a line is tracked exactly once.
+            const _id   = item && item.model ? String(item.model) : '';
+            const _name = item && item.series ? String(item.series) : _id;
+            const _qty  = parseInt(item && item.qty, 10) || 1;
+            const _price = Number(item && item.price) || 0;
+            const _value = +(_price * _qty).toFixed(2);
+
+            gtagSafe('event', 'add_to_cart', {
+                currency: 'MYR',
+                value: _value,
+                items: [{
+                    item_id:   _id,
+                    item_name: _name,
+                    price:     _price,
+                    quantity:  _qty
+                }]
+            });
+            fbqSafe('track', 'AddToCart', {
+                content_name: _name,
+                content_ids:  [_id],
+                content_type: 'product',
+                value:        _value,
+                currency:     'MYR'
+            });
+            ttqSafe('track', 'AddToCart', {
+                content_type: 'product',
+                content_id:   _id,
+                description:  _name,
+                value:        _value,
+                currency:     'MYR',
+                quantity:     _qty
+            });
         },
         removeItem(id) {
             const items = this.getItems().filter(i => i.id !== id);
@@ -739,20 +774,8 @@
             image: HERO_IMAGE,
             qty: 1
         };
+        // Cart.addItem now owns AddToCart analytics fan-out (GA4 + Meta + TikTok).
         Cart.addItem(cartItem);
-
-        gtagSafe('event', 'add_to_cart', {
-            currency: 'MYR',
-            value: currentPrice,
-            items: [{ item_id: BASE_ITEM, item_name: SERIES_NAME, item_variant: selectedSize }]
-        });
-        fbqSafe('track', 'AddToCart', {
-            content_name: SERIES_NAME,
-            content_ids: [BASE_ITEM],
-            content_type: 'product',
-            value: currentPrice,
-            currency: 'MYR'
-        });
         toggleCartDrawer(true);
     }
 
@@ -1035,7 +1058,6 @@
         });
 
         const grand = payloadBase + payloadAlt + sessionShippingFee;
-        gtagSafe('event', 'begin_checkout', { currency: 'MYR', value: grand });
 
         const payload = {
             items: formatted,
@@ -1055,6 +1077,42 @@
             postcode: postcode
         };
 
+        // Analytics: InitiateCheckout fan-out (GA4 + Meta + TikTok). Fired BEFORE the
+        // network call so the funnel is captured even if reserve_stock rejects (e.g. OOS).
+        const _ckGa4Items = items.map(it => ({
+            item_id:   it.model,
+            item_name: it.series || it.model,
+            price:     Number(it.price) || 0,
+            quantity:  parseInt(it.qty, 10) || 1
+        }));
+        const _ckIds      = items.map(it => it.model);
+        const _ckContents = items.map(it => ({
+            content_id:   it.model,
+            content_name: it.series || it.model,
+            price:        Number(it.price) || 0,
+            quantity:     parseInt(it.qty, 10) || 1
+        }));
+        const _grandRounded = +Number(grand).toFixed(2);
+
+        gtagSafe('event', 'begin_checkout', {
+            currency: 'MYR',
+            value:    _grandRounded,
+            items:    _ckGa4Items
+        });
+        fbqSafe('track', 'InitiateCheckout', {
+            value:        _grandRounded,
+            currency:     'MYR',
+            num_items:    payloadQty,
+            content_type: 'product',
+            content_ids:  _ckIds
+        });
+        ttqSafe('track', 'InitiateCheckout', {
+            content_type: 'product',
+            contents:     _ckContents,
+            value:        _grandRounded,
+            currency:     'MYR'
+        });
+
         try {
             const res = await fetch(`${API_URL}?action=reserve_stock`, {
                 method: 'POST',
@@ -1065,7 +1123,6 @@
             const json = await res.json();
 
             if (json && json.status === 'success') {
-                fbqSafe('track', 'InitiateCheckout', { value: grand, currency: 'MYR', num_items: payloadQty });
                 Cart.clear();
                 // Keep the draft form values (customer might re-checkout if redirect bounces)
                 window.location.href = json.paymentUrl;
