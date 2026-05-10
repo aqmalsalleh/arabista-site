@@ -985,7 +985,8 @@
             if (json && json.status === 'success') {
                 sessionPostcode = pc;
                 sessionShippingDirty = false;
-                const freeShipPromo = appConfig['PROMO_FREE_SHIPPING'];
+                const activeConfig = window.ARABISTA_APP_CONFIG || appConfig || {};
+                const freeShipPromo = activeConfig['PROMO_FREE_SHIPPING'];
                 if (freeShipPromo && freeShipPromo.isActive) {
                     sessionShippingFee = 0;
                     if (shipEl) shipEl.innerHTML = `<span class="line-through text-gray-500 mr-2">RM ${json.rate.toFixed(2)}</span><span class="text-luxe font-bold">FREE</span>`;

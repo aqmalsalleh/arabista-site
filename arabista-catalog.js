@@ -111,6 +111,9 @@
                 throw new Error('Invalid API response');
             }
 
+            // Export config to the global window so arabista-core.js can read promos
+            window.ARABISTA_APP_CONFIG = json.data.config || {};
+
             updateCatalogUI(json.data.matrix);
 
         } catch (error) {
