@@ -116,6 +116,13 @@
 
             updateCatalogUI(json.data.matrix);
 
+            // Re-evaluate shipping now that the promo config is locally available
+            const calcBtn = document.getElementById('btn-calc-ship');
+            const postcode = document.getElementById('cart-postcode');
+            if (calcBtn && postcode && postcode.value.length === 5 && !isNaN(postcode.value)) {
+                calcBtn.click();
+            }
+
         } catch (error) {
             console.error("Failed to fetch catalog pricing:", error);
             // Fallback: Drop skeletons to "RM --" so they don't pulse forever
