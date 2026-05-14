@@ -25,6 +25,10 @@
     const filterOverlay = document.getElementById('filter-overlay');
     const applyFiltersBtn = document.getElementById('apply-filters-btn');
 
+    // Mobile drawer category options — must filter the grid AND sync the
+    // desktop tab state so both surfaces always agree on the active category.
+    const drawerFilterOptions = document.querySelectorAll('.drawer-filter-option');
+
     const searchInput = document.getElementById('search-input');
     const searchTriggerBtn = document.getElementById('search-trigger-btn');
 
@@ -57,6 +61,8 @@
 
     function applyCategory(category) {
         activeCategory = category;
+
+        // Desktop nav tabs
         navBtns.forEach(btn => {
             if (btn.getAttribute('data-target') === category) {
                 btn.classList.add('text-luxe', 'border-b-2', 'border-luxe');
@@ -66,6 +72,17 @@
                 btn.classList.remove('text-luxe', 'border-b-2', 'border-luxe');
             }
         });
+
+        // Mobile drawer options — mirror the active state so reopening
+        // the drawer reflects whatever the user (or another surface) chose.
+        drawerFilterOptions.forEach(opt => {
+            const isActive = opt.getAttribute('data-target') === category;
+            opt.classList.toggle('is-active', isActive);
+            opt.classList.toggle('text-luxe', isActive);
+            opt.classList.toggle('text-white/70', !isActive);
+            opt.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+        });
+
         runFilters();
     }
 
@@ -105,9 +122,21 @@
         }, { threshold: 0.1 });
         productCards.forEach(card => io.observe(card));
 
-        // Navigation Tabs
+        // Navigation Tabs (desktop)
         navBtns.forEach(btn => {
             btn.addEventListener('click', (e) => applyCategory(e.currentTarget.getAttribute('data-target')));
+        });
+
+        // Category options inside the mobile drawer. Tapping one applies the
+        // filter, syncs the desktop tab state, and closes the drawer (categories
+        // are a "tap and go" UX — no separate Apply needed for them).
+        drawerFilterOptions.forEach(opt => {
+            opt.addEventListener('click', (e) => {
+                const target = e.currentTarget.getAttribute('data-target');
+                if (!target) return;
+                applyCategory(target);
+                toggleFilterPanel(false);
+            });
         });
 
         // Mobile Drawer
@@ -155,22 +184,14 @@
             window.ARABISTA_APP_CONFIG = json.data.config || {};
             updateCatalogUI(json.data.matrix);
 
-            // Race-Condition Safety Protocol for Cart Auto-Calc
-            const calcBtn = document.getElementById('btn-calc-ship');
-            const postcode = document.getElementById('cart-postcode');
-            if (calcBtn && postcode && postcode.value.length === 5 && !isNaN(postcode.value)) {
-                let attempts = 0;
-                const triggerShipping = setInterval(() => {
-                    attempts++;
-                    // Only click if the button isn't disabled by arabista-core.js
-                    if (!calcBtn.disabled) {
-                        clearInterval(triggerShipping);
-                        calcBtn.click();
-                    } else if (attempts >= 10) {
-                        clearInterval(triggerShipping); // Fallback timeout
-                    }
-                }, 500);
-            }
+            // Hand-off to arabista-core.js: the live promo config is now in
+            // window.ARABISTA_APP_CONFIG. Core listens for this event and
+            // invalidates any shipping quote it cached before the promos
+            // were available. No DOM-poking, no polling, no setTimeout —
+            // a clean architectural seam between the two engines.
+            window.dispatchEvent(new CustomEvent('arabista:config_ready', {
+                detail: { config: window.ARABISTA_APP_CONFIG }
+            }));
 
         } catch (error) {
             console.error("Failed to fetch catalog pricing:", error);

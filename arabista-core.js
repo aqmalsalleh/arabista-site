@@ -1007,6 +1007,46 @@
     const debouncedCalcShipping = debounce(calcShipping, 600);
 
     // -----------------------------------------------------------
+    // Event-driven cache invalidation — listens for the catalog engine
+    // ('arabista-catalog.js') signalling that the live promo config has
+    // finished downloading. Because calcShipping() reads PROMO_FREE_SHIPPING
+    // at quote-time, any rate quoted *before* the config landed is stale.
+    // We invalidate that cache and silently re-quote — no DOM trickery,
+    // no setTimeout, no synthetic events.
+    // -----------------------------------------------------------
+    function handleConfigReady(e) {
+        const incoming = (e && e.detail && e.detail.config) || window.ARABISTA_APP_CONFIG || {};
+
+        // Adopt the new config into the closure-private cache so calcShipping's
+        // fallback (`activeConfig = window.ARABISTA_APP_CONFIG || appConfig`)
+        // is consistent even if the global is later cleared.
+        appConfig = Object.assign({}, appConfig, incoming);
+
+        // Hard-invalidate any previously-cached shipping quote. Setting both
+        // the dirty flag and clearing the cached postcode ensures:
+        //   • the next checkout will not pass the freshness guard
+        //   • a silent re-quote below cannot accidentally short-circuit
+        sessionShippingDirty = true;
+        sessionPostcode = '';
+
+        // Re-render any alteration fields that were waiting on appConfig
+        // (no-ops on the catalog page — there's no container).
+        renderAlterationFields();
+
+        // If the user already has a valid postcode and a non-empty cart,
+        // transparently pull a fresh quote so the UI reflects the promo.
+        const pcEl = byId('cart-postcode');
+        if (pcEl && isValidMyPostcode(pcEl.value.trim()) && Cart.getItems().length > 0) {
+            calcShipping();
+        }
+    }
+
+    // Registered synchronously (outside init) so the listener is attached
+    // before DOMContentLoaded — we cannot miss the event regardless of
+    // whether catalog.js dispatches it before or after core.js init runs.
+    window.addEventListener('arabista:config_ready', handleConfigReady);
+
+    // -----------------------------------------------------------
     // Checkout
     // -----------------------------------------------------------
     async function doCheckout() {
