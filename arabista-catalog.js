@@ -184,6 +184,13 @@
             window.ARABISTA_APP_CONFIG = json.data.config || {};
             updateCatalogUI(json.data.matrix);
 
+            // Unlock the filter drawer now that sizes and prices are loaded
+            if (filterBtn) {
+                filterBtn.disabled = false;
+                filterBtn.classList.remove('text-white/30', 'cursor-not-allowed');
+                filterBtn.classList.add('text-white/70', 'hover:text-luxe', 'hover:border-luxe');
+            }
+
             // Hand-off to arabista-core.js: the live promo config is now in
             // window.ARABISTA_APP_CONFIG. Core listens for this event and
             // invalidates any shipping quote it cached before the promos
