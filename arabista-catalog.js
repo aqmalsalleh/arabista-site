@@ -139,8 +139,24 @@
             });
         });
 
-        // Mobile Drawer
-        if (filterBtn) filterBtn.addEventListener('click', () => toggleFilterPanel(true));
+        // Mobile Drawer — open trigger is DELEGATED on document, not bound
+        // directly to #filter-btn. The button is natively `disabled` at the
+        // moment scripts execute (deferred), and a directly-bound listener
+        // can silently go dormant on certain mobile WebViews / inside any
+        // third-party DOM shim. Delegating to `document` means:
+        //   • the listener target (document) is never disabled or replaced,
+        //   • the click matches via `closest('#filter-btn')` so the listener
+        //     keeps working even if the button is later re-rendered, and
+        //   • we still honour the "locked until data loads" semantic by
+        //     reading `.disabled` at click-time rather than at bind-time.
+        document.addEventListener('click', (e) => {
+            const trigger = e.target && e.target.closest && e.target.closest('#filter-btn');
+            if (!trigger || trigger.disabled) return;
+            toggleFilterPanel(true);
+        });
+
+        // Close triggers can stay bound directly — they are never disabled,
+        // so the dormancy concern does not apply.
         if (closeFilterBtn) closeFilterBtn.addEventListener('click', () => toggleFilterPanel(false));
         if (filterOverlay) filterOverlay.addEventListener('click', () => toggleFilterPanel(false));
 
