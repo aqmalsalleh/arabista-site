@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>All Products — Arabista (STAGING)</title>
   <meta name="theme-color" content="#0F0F10" />
+  <meta name="robots" content="noindex">
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -42,21 +43,6 @@
     .reveal { opacity: 0; transform: translateY(20px); transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1); }
     .reveal.show { opacity: 1; transform: translateY(0); }
   </style>
-  <script>
-  !function(f,b,e,v,n,t,s)
-  {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-  n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-  if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-  n.queue=[];t=b.createElement(e);t.async=!0;
-  t.src=v;s=b.getElementsByTagName(e)[0];
-  s.parentNode.insertBefore(t,s)}(window, document,'script',
-  'https://connect.facebook.net/en_US/fbevents.js');
-  fbq('init', '815939587846892');
-  fbq('track', 'PageView');
-  </script>
-  <noscript><img height="1" width="1" style="display:none"
-  src="https://www.facebook.com/tr?id=815939587846892&ev=PageView&noscript=1"
-  /></noscript>
 </head>
 <body class="bg-brand text-white font-sans antialiased selection:bg-luxe selection:text-white flex flex-col min-h-screen">
 
@@ -288,13 +274,13 @@
 
   <script>
     // --- OMNICHANNEL CART SYNC & ENGINE ---
-    const RETAIL_API_URL = "https://script.google.com/macros/s/AKfycbw4qGOeC2Sebod06uFnW2u-ZAkj7l8zRdzyWrFEyL1_7eDCn-ks9lVKrd1I226qHxRmQg/exec";
+    const RETAIL_API_URL = "https://script.google.com/macros/s/AKfycbwYt7O3EivaEctPcq8WfzpQ_J-7mwlpnRmcR5xHnNEVX2WTBd6NXEMRr3MaTy1sb92c-Q/exec";
     let appConfig = {};
     let activeRetailPrice = null;
     let activePromoPrice = null;
 
     const CartManager = {
-        key: 'arabista_cart',
+        key: 'arabista_staging_cart',
         getItems: function() { return JSON.parse(localStorage.getItem(this.key)) || []; },
         saveItems: function(items) { localStorage.setItem(this.key, JSON.stringify(items)); },
         updateQty: function(signature, delta) {
@@ -574,14 +560,6 @@
             const data = await res.json();
             
             if (data.status === 'success') {
-                // META PIXEL: Initiate Checkout Event
-                if (typeof fbq === 'function') {
-                    fbq('track', 'InitiateCheckout', {
-                        value: totalPaid,
-                        currency: 'MYR',
-                        num_items: payloadTotalQty
-                    });
-                }
                 CartManager.clearCart();
                 window.location.href = data.paymentUrl;
             } else if (data.status === 'sold_out') {
