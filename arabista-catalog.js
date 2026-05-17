@@ -120,7 +120,7 @@
         const io = new IntersectionObserver((entries) => {
             entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('show'); });
         }, { threshold: 0.1 });
-        productCards.forEach(card => io.observe(card));
+        document.querySelectorAll('.reveal').forEach(el => io.observe(el));
 
         // Navigation Tabs (desktop)
         navBtns.forEach(btn => {
