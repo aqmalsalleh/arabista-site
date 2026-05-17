@@ -961,6 +961,15 @@
     // -----------------------------------------------------------
     // Shipping calculation (debounced)
     // -----------------------------------------------------------
+    // Tailwind skeleton placeholder painted into #cart-shipping while we
+    // intentionally defer the calculation on the catalog page until the
+    // live promo config is locally available (delivered by
+    // arabista-catalog.js via the `arabista:config_ready` event). Quoting
+    // now would lock in a non-promo rate, which would then visibly flicker
+    // to FREE seconds later when the config arrives — a "pricing flicker"
+    // the user can see and that we explicitly want to eliminate.
+    const SHIPPING_SKELETON_HTML = '<div class="h-4 w-16 bg-white/10 rounded animate-pulse"></div>';
+
     async function calcShipping() {
         const items = Cart.getItems();
         const pcEl = byId('cart-postcode');
@@ -974,6 +983,32 @@
             pcEl.classList.remove('border-red-500');
         }
         if (items.length === 0) return;
+
+        // ---- DEFERRED SKELETON GUARD (catalog page only) ----
+        // On the catalog page, the promo config is fetched asynchronously
+        // by arabista-catalog.js and only attached to `window` when that
+        // fetch resolves. If a user opens the cart drawer before then, a
+        // restored postcode would drive us straight into a calc_shipping
+        // call that cannot evaluate PROMO_FREE_SHIPPING — and the price
+        // would flicker from "RM x.xx" to "FREE" the moment the config
+        // arrives. Instead, paint an optimistic skeleton and short-circuit;
+        // handleConfigReady() will re-invoke calcShipping() as soon as the
+        // config lands, so the very first authoritative paint replaces the
+        // skeleton with the correct value (FREE or otherwise) — no flicker.
+        //
+        // We detect "config not yet here" by checking whether the global
+        // has been *defined* (not whether it has keys), because a
+        // legitimately empty config still represents a completed fetch and
+        // must be allowed through — otherwise the user would be trapped in
+        // a perpetual skeleton on a no-promos day.
+        //
+        // PDP is excluded by the pageType gate: arabista-core's own init()
+        // populates appConfig directly there, no event hand-off is involved.
+        if (CTX.pageType === 'catalog' && typeof window.ARABISTA_APP_CONFIG === 'undefined') {
+            const shipElPending = byId('cart-shipping');
+            if (shipElPending) shipElPending.innerHTML = SHIPPING_SKELETON_HTML;
+            return;
+        }
 
         const totalWeight = Cart.totalWeightKg() || (activeWeightKg * (Cart.totalQty() || 1));
         const shipEl = byId('cart-shipping');
