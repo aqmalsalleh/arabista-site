@@ -10,6 +10,7 @@
   <link rel="icon" type="image/png" sizes="32x32" href="images/favicon-32x32.png">
   <link rel="icon" type="image/png" sizes="16x16" href="images/favicon-16x16.png">
   <meta name="robots" content="noindex">
+  <link rel="preload" as="image" href="images/d01-1-hero.webp">
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -46,6 +47,27 @@
     .tap-none { -webkit-tap-highlight-color: transparent; }
     .reveal { opacity: 0; transform: translateY(20px); transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1); }
     .reveal.show { opacity: 1; transform: translateY(0); }
+
+    .crossfade-img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 0;
+      animation: cinematic-fade 15s infinite ease-in-out;
+    }
+    .crossfade-img:nth-child(1) { animation-delay: 0s; }
+    .crossfade-img:nth-child(2) { animation-delay: 5s; }
+    .crossfade-img:nth-child(3) { animation-delay: 10s; }
+
+    @keyframes cinematic-fade {
+      0% { opacity: 0; transform: scale(1); }
+      10% { opacity: 1; transform: scale(1.02); }
+      33% { opacity: 1; transform: scale(1.04); }
+      43% { opacity: 0; transform: scale(1.05); }
+      100% { opacity: 0; transform: scale(1.05); }
+    }
   </style>
 </head>
 <body class="bg-brand text-white font-sans antialiased selection:bg-luxe selection:text-white flex flex-col min-h-screen">
@@ -75,132 +97,33 @@
     </div>
   </header>
 
-  <main class="flex-grow">
+  <main class="max-w-screen-xl mx-auto px-4 sm:px-6 py-20 sm:py-28 min-h-[75vh] flex items-center justify-center">
     
-    <section class="relative h-[55vh] md:h-[65vh] w-full flex items-center justify-center overflow-hidden border-b border-white/5">
-      <img src="images/z01-1-hero.webp" alt="Arabista Catalog" class="absolute inset-0 w-full h-full object-cover object-top opacity-50 scale-105 transition-transform duration-[15s] ease-out hover:scale-100">
-      <div class="absolute inset-0 bg-gradient-to-t from-brand via-brand/40 to-transparent"></div>
+    <a href="abaya-staging.html" class="relative group block w-full max-w-3xl aspect-[4/5] sm:aspect-[16/9] rounded-3xl overflow-hidden shadow-2xl tap-none border border-white/10 reveal">
       
-      <div class="relative z-10 text-center px-4 max-w-3xl mx-auto reveal mt-12">
-        <span class="text-luxe text-[10px] sm:text-xs tracking-[0.3em] uppercase font-semibold mb-4 block">The Master Catalog</span>
-        <h1 class="font-display text-5xl sm:text-6xl md:text-7xl font-medium text-white mb-6 leading-tight">Curated Elegance</h1>
-        <p class="text-white/60 text-sm sm:text-base font-light max-w-xl mx-auto leading-relaxed">
-          Discover our complete portfolio of premium modest wear. Designed in Malaysia, crafted with exquisite detail.
-        </p>
+      <div class="absolute inset-0 bg-brand">
+        <img src="images/d01-1-hero.webp" alt="Dahlia Series" class="crossfade-img" />
+        <img src="images/z01-1-hero.webp" alt="Zahra Series" class="crossfade-img" loading="lazy" />
+        <img src="images/m01-1-hero.webp" alt="Maraya Series" class="crossfade-img" loading="lazy" />
       </div>
-    </section>
 
-    <section class="pt-12 pb-6 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto border-b border-white/5">
-      <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 reveal">
-        
-        <div class="flex items-center space-x-6 overflow-x-auto hide-scrollbar pb-2">
-          <button class="text-sm tracking-widest uppercase font-medium text-luxe border-b border-luxe pb-1 whitespace-nowrap">Abayas</button>
-          <button class="text-sm tracking-widest uppercase font-medium text-white/30 cursor-not-allowed whitespace-nowrap" title="Coming Soon">Modest Wear</button>
-          <button class="text-sm tracking-widest uppercase font-medium text-white/30 cursor-not-allowed whitespace-nowrap" title="Coming Soon">Accessories</button>
-        </div>
+      <div class="absolute inset-0 bg-gradient-to-t from-brand/90 via-brand/20 to-transparent transition-opacity duration-700 group-hover:opacity-80"></div>
 
-        <div class="flex items-center space-x-4 overflow-x-auto hide-scrollbar pb-2">
-          <span class="text-[10px] text-white/40 uppercase tracking-widest mr-2 whitespace-nowrap">Series:</span>
-          <button class="nav-btn active px-3 py-1 text-xs tracking-widest uppercase rounded-full border border-luxe text-luxe transition-all whitespace-nowrap" data-filter="all">All</button>
-          <button class="nav-btn px-3 py-1 text-xs tracking-widest uppercase rounded-full border border-white/10 text-white/50 hover:text-white hover:border-white/30 transition-all whitespace-nowrap" data-filter="dahlia">Dahlia</button>
-          <button class="nav-btn px-3 py-1 text-xs tracking-widest uppercase rounded-full border border-white/10 text-white/50 hover:text-white hover:border-white/30 transition-all whitespace-nowrap" data-filter="zahra">Zahra</button>
-          <button class="nav-btn px-3 py-1 text-xs tracking-widest uppercase rounded-full border border-white/10 text-white/50 hover:text-white hover:border-white/30 transition-all whitespace-nowrap" data-filter="maraya">Maraya</button>
+      <div class="absolute bottom-6 sm:bottom-12 inset-x-6 sm:inset-x-12 flex flex-col items-center sm:items-start text-center sm:text-left">
+        <div class="bg-brand/30 backdrop-blur-md border border-white/20 p-6 sm:p-8 rounded-2xl w-full sm:w-auto shadow-soft transform transition-transform duration-700 group-hover:-translate-y-2">
+          <p class="text-luxe text-[10px] sm:text-xs uppercase tracking-[0.2em] font-medium mb-2">Signature Collection</p>
+          <h2 class="font-display text-3xl sm:text-5xl text-white mb-4">The Abaya Series</h2>
+          <span class="inline-block bg-white text-ink text-[11px] sm:text-xs uppercase tracking-widest px-6 py-3 rounded-full hover:bg-luxe hover:text-white transition-colors font-medium">
+            Explore Collection
+          </span>
         </div>
       </div>
-    </section>
+      
+    </a>
 
-    <section class="py-12 sm:py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-      <div id="product-grid" class="grid grid-cols-2 lg:grid-cols-4 gap-x-4 gap-y-10 sm:gap-x-6 sm:gap-y-16">
-        
-        <a href="product-z01-staging.html" class="product-card group cursor-pointer reveal block tap-none" data-category="zahra">
-          <div class="relative aspect-[3/4] bg-ink rounded overflow-hidden mb-4 shadow-soft">
-            <img src="images/z01-1-hero.webp" alt="Zahra Series" loading="lazy" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">
-            <div class="absolute inset-0 bg-brand/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-            <div class="absolute top-2 left-2 sm:top-3 sm:left-3 bg-white/10 backdrop-blur-md px-2 py-1 rounded text-[9px] sm:text-[10px] uppercase tracking-widest text-white border border-white/10">Premium</div>
-          </div>
-          <div class="text-center px-1">
-            <p class="text-[10px] sm:text-xs text-luxe tracking-widest uppercase mb-1">Zahra Series</p>
-            <h3 class="font-display text-lg sm:text-xl text-white mb-2 group-hover:text-white/80 transition-colors">Code Z01</h3>
-            <div class="price-container flex justify-center h-5" data-model="Z01"></div>
-          </div>
-        </a>
+  </main>
 
-        <a href="product-d01-staging.html" class="product-card group cursor-pointer reveal block tap-none" data-category="dahlia">
-          <div class="relative aspect-[3/4] bg-ink rounded overflow-hidden mb-4 shadow-soft">
-            <img src="images/d01-1-hero.webp" alt="Dahlia Series D01" loading="lazy" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">
-            <div class="absolute inset-0 bg-brand/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-          </div>
-          <div class="text-center px-1">
-            <p class="text-[10px] sm:text-xs text-white/50 tracking-widest uppercase mb-1">Dahlia Series</p>
-            <h3 class="font-display text-lg sm:text-xl text-white mb-2 group-hover:text-white/80 transition-colors">Code D01</h3>
-            <div class="price-container flex justify-center h-5" data-model="D01"></div>
-          </div>
-        </a>
-
-        <a href="product-d02-staging.html" class="product-card group cursor-pointer reveal block tap-none" data-category="dahlia">
-          <div class="relative aspect-[3/4] bg-ink rounded overflow-hidden mb-4 shadow-soft">
-            <img src="images/d02-1-hero.webp" alt="Dahlia Series D02" loading="lazy" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">
-            <div class="absolute inset-0 bg-brand/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-          </div>
-          <div class="text-center px-1">
-            <p class="text-[10px] sm:text-xs text-white/50 tracking-widest uppercase mb-1">Dahlia Series</p>
-            <h3 class="font-display text-lg sm:text-xl text-white mb-2 group-hover:text-white/80 transition-colors">Code D02</h3>
-            <div class="price-container flex justify-center h-5" data-model="D02"></div>
-          </div>
-        </a>
-
-        <a href="product-d04-staging.html" class="product-card group cursor-pointer reveal block tap-none" data-category="dahlia">
-          <div class="relative aspect-[3/4] bg-ink rounded overflow-hidden mb-4 shadow-soft">
-            <img src="images/d04-1-hero.webp" alt="Dahlia Series D04" loading="lazy" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">
-            <div class="absolute inset-0 bg-brand/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-          </div>
-          <div class="text-center px-1">
-            <p class="text-[10px] sm:text-xs text-white/50 tracking-widest uppercase mb-1">Dahlia Series</p>
-            <h3 class="font-display text-lg sm:text-xl text-white mb-2 group-hover:text-white/80 transition-colors">Code D04</h3>
-            <div class="price-container flex justify-center h-5" data-model="D04"></div>
-          </div>
-        </a>
-
-        <a href="product-d06-staging.html" class="product-card group cursor-pointer reveal block tap-none" data-category="dahlia">
-          <div class="relative aspect-[3/4] bg-ink rounded overflow-hidden mb-4 shadow-soft">
-            <img src="images/d06-1-hero.webp" alt="Dahlia Series D06" loading="lazy" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">
-            <div class="absolute inset-0 bg-brand/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-          </div>
-          <div class="text-center px-1">
-            <p class="text-[10px] sm:text-xs text-white/50 tracking-widest uppercase mb-1">Dahlia Series</p>
-            <h3 class="font-display text-lg sm:text-xl text-white mb-2 group-hover:text-white/80 transition-colors">Code D06</h3>
-            <div class="price-container flex justify-center h-5" data-model="D06"></div>
-          </div>
-        </a>
-
-        <a href="product-m01-staging.html" class="product-card group cursor-pointer reveal block tap-none" data-category="maraya">
-          <div class="relative aspect-[3/4] bg-ink rounded overflow-hidden mb-4 shadow-soft">
-            <img src="images/m01-1-hero.webp" alt="Maraya Series M01" loading="lazy" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">
-            <div class="absolute inset-0 bg-brand/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-          </div>
-          <div class="text-center px-1">
-            <p class="text-[10px] sm:text-xs text-white/50 tracking-widest uppercase mb-1">Maraya Series</p>
-            <h3 class="font-display text-lg sm:text-xl text-white mb-2 group-hover:text-white/80 transition-colors">Code M01</h3>
-            <div class="price-container flex justify-center h-5" data-model="M01"></div>
-          </div>
-        </a>
-
-        <a href="product-m02-staging.html" class="product-card group cursor-pointer reveal block tap-none" data-category="maraya">
-          <div class="relative aspect-[3/4] bg-ink rounded overflow-hidden mb-4 shadow-soft">
-            <img src="images/m02-1-hero.webp" alt="Maraya Series M02" loading="lazy" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">
-            <div class="absolute inset-0 bg-brand/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-          </div>
-          <div class="text-center px-1">
-            <p class="text-[10px] sm:text-xs text-white/50 tracking-widest uppercase mb-1">Maraya Series</p>
-            <h3 class="font-display text-lg sm:text-xl text-white mb-2 group-hover:text-white/80 transition-colors">Code M02</h3>
-            <div class="price-container flex justify-center h-5" data-model="M02"></div>
-          </div>
-        </a>
-
-      </div>
-    </section>
-
-    <div id="cart-overlay" class="fixed inset-0 bg-brand/80 backdrop-blur-sm z-50 opacity-0 pointer-events-none transition-opacity duration-300" onclick="closeCartDrawer()"></div>
+  <div id="cart-overlay" class="fixed inset-0 bg-brand/80 backdrop-blur-sm z-50 opacity-0 pointer-events-none transition-opacity duration-300" onclick="closeCartDrawer()"></div>
     <div id="cart-drawer" class="fixed top-0 right-0 h-full w-full sm:w-[420px] bg-[#141517] z-50 transform translate-x-full transition-transform duration-400 ease-[cubic-bezier(0.25,0.46,0.45,0.94)] flex flex-col shadow-2xl border-l border-white/5">
         <div class="flex items-center justify-between p-5 border-b border-white/5 bg-[#141517] relative z-10">
             <h2 class="font-display text-xl text-white tracking-wide">Your Cart</h2>
@@ -267,8 +190,6 @@
             Please wait while we connect to SenangPay gateway
         </p>
     </div>
-
-  </main>
 
   <footer class="border-t border-white/5 py-12 mt-12">
     <div class="max-w-7xl mx-auto px-4 text-center">
