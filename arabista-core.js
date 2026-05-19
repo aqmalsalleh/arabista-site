@@ -48,7 +48,7 @@
         console.warn('[Arabista] Missing ARABISTA_CONTEXT.apiUrl — engine inert.');
         return;
     }
-    if (CTX.pageType !== 'catalog' && !BASE_ITEM) {
+    if (CTX.pageType !== 'catalog' && CTX.pageType !== 'portal' && !BASE_ITEM) {
         console.warn('[Arabista] Missing ARABISTA_CONTEXT.baseItem for PDP — engine inert.');
         return;
     }
@@ -324,6 +324,27 @@
     }
 
     // -----------------------------------------------------------
+    // Lightweight config fetch for portal pages (no catalog.js)
+    // -----------------------------------------------------------
+    async function fetchConfigForCart() {
+        try {
+            const cb = Date.now().toString(36);
+            const res = await fetch(`${API_URL}?action=get_config&cb=${cb}`, { credentials: 'omit' });
+            if (!res.ok) throw new Error('HTTP ' + res.status);
+            const json = await res.json();
+            if (json && json.status === 'success' && json.data) {
+                appConfig = json.data.config || {};
+                window.ARABISTA_APP_CONFIG = appConfig;
+                window.dispatchEvent(new CustomEvent('arabista:config_ready', {
+                    detail: { config: appConfig }
+                }));
+            }
+        } catch (err) {
+            console.warn('[Arabista] Config fetch failed:', err);
+        }
+    }
+
+    // -----------------------------------------------------------
     // Single fetch initializer — services PDP and cross-sell from
     // ONE API call. No double-fetch penalty.
     // -----------------------------------------------------------
@@ -338,7 +359,16 @@
         loadDraft();
         updateCartCount();
 
-        // 2. PDP-Specific Modules (Runs ONLY on Product Pages)
+        // 2. Portal — cart + reveal + promo config (no product grid)
+        if (CTX.pageType === 'portal') {
+            const yEl = byId('y');
+            if (yEl) yEl.textContent = new Date().getFullYear();
+            bindRevealObserver();
+            fetchConfigForCart();
+            return;
+        }
+
+        // 3. PDP-Specific Modules (Runs ONLY on Product Pages)
         if (CTX.pageType !== 'catalog') {
             renderGallery();
             renderSizeGrid();
