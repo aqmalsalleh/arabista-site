@@ -3,10 +3,10 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Arabista Enterprise — Luxury Modestwear & Tailoring</title>
-  <meta name="description" content="The Arabista ecosystem: Premium abaya collections and our dedicated alteration and tailoring hubs." />
-  <meta name="theme-color" content="#0F0F10" />
-  
+  <title>Maison Arabista — An Atelier of Modest Couture</title>
+  <meta name="description" content="Arabista Enterprise — a vertically integrated maison of premium modestwear and a nationwide network of in-house tailoring ateliers." />
+  <meta name="theme-color" content="#0B0B0C" />
+
   <link rel="icon" type="image/x-icon" href="images/favicon.ico">
   <link rel="apple-touch-icon" sizes="180x180" href="images/apple-touch-icon.png">
   <link rel="icon" type="image/png" sizes="32x32" href="images/favicon-32x32.png">
@@ -15,25 +15,38 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=Inter:wght@200;300;400;500;600&display=swap" rel="stylesheet">
+
+  <link rel="preload" as="video" href="images/hero-ios-540p-optimized.mp4" type="video/mp4">
+  <link rel="preload" as="image" href="images/z01-1-hero.webp">
+  <link rel="preload" as="image" href="images/hub-img1.webp">
 
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
       theme: {
         extend: {
-          fontFamily: { 
-            display: ['"Cormorant Garamond"', 'serif'], 
-            sans: ['Inter', 'ui-sans-serif', 'system-ui'] 
+          fontFamily: {
+            display: ['"Cormorant Garamond"', 'serif'],
+            sans: ['Inter', 'ui-sans-serif', 'system-ui']
           },
-          colors: { 
-            brand: '#0F0F10', 
-            luxe: '#C0A062', 
-            ink: '#111213' 
+          colors: {
+            brand: '#0B0B0C',
+            ink: '#111213',
+            obsidian: '#050506',
+            luxe: '#C0A062',
+            champagne: '#D4B896',
+            sand: '#E6C77A',
+            bronze: '#8C6E3F',
+            cream: '#F5F1E8'
           },
-          boxShadow: { 
+          letterSpacing: {
+            'maison': '0.42em'
+          },
+          boxShadow: {
             soft: '0 10px 30px rgba(0,0,0,.08)',
-            glow: '0 0 40px rgba(192,160,98,0.15)'
+            glow: '0 0 60px rgba(192,160,98,0.18)',
+            deep: '0 60px 120px -40px rgba(0,0,0,0.9)'
           }
         }
       }
@@ -41,10 +54,140 @@
   </script>
 
   <style>
-    body { background-color: #0F0F10; color: #ffffff; }
-    .reveal { opacity: 0; transform: translateY(20px); transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1); }
-    .reveal.show { opacity: 1; transform: translateY(0); }
+    :root {
+      --gold-gradient: linear-gradient(120deg, #8C6E3F 0%, #C0A062 35%, #E6C77A 55%, #C0A062 75%, #8C6E3F 100%);
+    }
+    html, body { background-color: #0B0B0C; }
+    body { color: #ffffff; }
     .tap-none { -webkit-tap-highlight-color: transparent; }
+
+    /* Editorial reveal */
+    .reveal { opacity: 0; transform: translateY(28px); transition: opacity 1.1s cubic-bezier(0.16, 1, 0.3, 1), transform 1.1s cubic-bezier(0.16, 1, 0.3, 1); }
+    .reveal.show { opacity: 1; transform: translateY(0); }
+
+    /* Per-character hero reveal */
+    .char {
+      display: inline-block;
+      opacity: 0;
+      transform: translateY(40%) skewY(6deg);
+      animation: charIn 1.4s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+    }
+    @keyframes charIn {
+      to { opacity: 1; transform: translateY(0) skewY(0); }
+    }
+
+    /* Cinematic Ken Burns on hero video */
+    .cinema-zoom {
+      animation: cinemaZoom 28s ease-in-out infinite alternate;
+    }
+    @keyframes cinemaZoom {
+      0%   { transform: scale(1.04) translate3d(0,0,0); }
+      100% { transform: scale(1.14) translate3d(-1%, -1%, 0); }
+    }
+
+    /* Vignette overlay */
+    .vignette::after {
+      content: '';
+      position: absolute; inset: 0;
+      pointer-events: none;
+      background:
+        radial-gradient(ellipse at center, rgba(0,0,0,0) 35%, rgba(11,11,12,0.55) 75%, rgba(11,11,12,0.95) 100%),
+        linear-gradient(to bottom, rgba(11,11,12,0.55) 0%, rgba(11,11,12,0) 25%, rgba(11,11,12,0) 70%, rgba(11,11,12,0.95) 100%);
+    }
+
+    /* Gold shimmer */
+    .gold-text {
+      background: var(--gold-gradient);
+      background-size: 200% auto;
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      animation: shimmer 8s linear infinite;
+    }
+    @keyframes shimmer {
+      0%   { background-position: 0% center; }
+      100% { background-position: 200% center; }
+    }
+
+    .gold-line {
+      height: 1px;
+      background: var(--gold-gradient);
+      background-size: 200% 100%;
+      animation: shimmer 8s linear infinite;
+    }
+
+    /* Marquee */
+    .marquee {
+      display: flex;
+      width: max-content;
+      animation: marquee 60s linear infinite;
+    }
+    .marquee-slow { animation-duration: 90s; }
+    @keyframes marquee {
+      from { transform: translateX(0); }
+      to   { transform: translateX(-50%); }
+    }
+
+    /* Dual gateway hover sync — when one panel is hovered, the other dims & desaturates. */
+    @media (hover: hover) {
+      .gateway-grid:has(.gateway-panel:hover) .gateway-panel:not(:hover) {
+        filter: grayscale(1) brightness(0.35);
+        transform: scale(0.985);
+      }
+      .gateway-panel:hover .gateway-bg {
+        transform: scale(1.06);
+        filter: none;
+      }
+      .gateway-panel:hover .gateway-cta {
+        gap: 1.25rem;
+        color: #E6C77A;
+      }
+      .gateway-panel:hover .gateway-rule { width: 100%; }
+      .gateway-panel:hover .gateway-eyebrow { color: #E6C77A; letter-spacing: 0.5em; }
+    }
+    .gateway-panel { transition: filter 1s ease, transform 1s ease; }
+    .gateway-panel .gateway-bg { transition: transform 1.6s cubic-bezier(0.16, 1, 0.3, 1), filter 1.2s ease; filter: grayscale(0.15) brightness(0.65); }
+    .gateway-panel .gateway-cta { transition: gap 0.6s ease, color 0.6s ease; }
+    .gateway-panel .gateway-rule { transition: width 1.2s cubic-bezier(0.16, 1, 0.3, 1); }
+    .gateway-panel .gateway-eyebrow { transition: color 0.6s ease, letter-spacing 0.8s ease; }
+
+    /* Subtle breathing glow behind the gateway numerals */
+    .gateway-numeral { background: var(--gold-gradient); -webkit-background-clip: text; background-clip: text; color: transparent; }
+
+    /* Section rule */
+    .ornament {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.75rem;
+      color: #C0A062;
+      font-size: 10px;
+      letter-spacing: 0.42em;
+      text-transform: uppercase;
+    }
+    .ornament::before, .ornament::after {
+      content: '';
+      width: 36px;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, #8C6E3F, transparent);
+    }
+
+    /* Scroll cue */
+    .scroll-cue { animation: cueBob 2.4s ease-in-out infinite; }
+    @keyframes cueBob {
+      0%, 100% { transform: translateY(0); opacity: 0.55; }
+      50%      { transform: translateY(10px); opacity: 1; }
+    }
+
+    /* Smooth gallery on touch */
+    .hide-scrollbar::-webkit-scrollbar { display: none; }
+    .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+    /* Reduced motion */
+    @media (prefers-reduced-motion: reduce) {
+      .cinema-zoom, .marquee, .gold-text, .gold-line, .char { animation: none !important; }
+      .char { opacity: 1; transform: none; }
+      .reveal { transition: none; opacity: 1; transform: none; }
+    }
   </style>
 
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-0000000000"></script>
@@ -60,117 +203,375 @@
     fbq('track', 'PageView');
   </script>
 </head>
-<body class="font-sans antialiased selection:bg-luxe selection:text-ink max-w-[100vw] overflow-x-hidden relative tap-none">
+<body class="font-sans antialiased selection:bg-luxe selection:text-ink max-w-[100vw] overflow-x-hidden relative tap-none bg-brand">
 
-  <header class="fixed top-0 inset-x-0 z-50 backdrop-blur-md bg-brand/70 border-b border-white/5">
-    <div class="max-w-screen-xl mx-auto px-4 sm:px-6">
-      <div class="h-16 grid grid-cols-3 items-center">
-        <div class="justify-self-start hidden sm:flex items-center gap-6">
-          <a href="#about" class="text-xs uppercase tracking-widest text-white/60 hover:text-luxe transition-colors font-medium">Our Story</a>
-        </div>
-        
-        <a href="#" class="justify-self-center flex items-center tap-none">
-          <img src="images/logo.png" alt="Arabista logo" class="h-10 sm:h-12 w-auto">
+  <!-- =================================================================
+       ANNOUNCEMENT STRIP — kinetic marquee
+       ================================================================= -->
+  <div class="relative z-40 border-b border-white/5 bg-obsidian/80 backdrop-blur-md overflow-hidden">
+    <div class="marquee marquee-slow py-2.5 text-[10px] uppercase tracking-[0.42em] text-white/40 font-light">
+      <span class="px-8">Maison Arabista</span><span class="text-luxe/60 px-2">✦</span>
+      <span class="px-8">Established Kuala Lumpur · 2019</span><span class="text-luxe/60 px-2">✦</span>
+      <span class="px-8">In‑House Atelier &amp; Alteration Network</span><span class="text-luxe/60 px-2">✦</span>
+      <span class="px-8">Nidha Dubai · Premium Modestwear</span><span class="text-luxe/60 px-2">✦</span>
+      <span class="px-8">Maison Arabista</span><span class="text-luxe/60 px-2">✦</span>
+      <span class="px-8">Established Kuala Lumpur · 2019</span><span class="text-luxe/60 px-2">✦</span>
+      <span class="px-8">In‑House Atelier &amp; Alteration Network</span><span class="text-luxe/60 px-2">✦</span>
+      <span class="px-8">Nidha Dubai · Premium Modestwear</span><span class="text-luxe/60 px-2">✦</span>
+    </div>
+  </div>
+
+  <!-- =================================================================
+       HEADER — agnostic, cart-free
+       ================================================================= -->
+  <header class="fixed top-[37px] inset-x-0 z-50 backdrop-blur-xl bg-brand/50 border-b border-white/5">
+    <div class="max-w-screen-2xl mx-auto px-5 sm:px-10">
+      <div class="h-16 sm:h-20 grid grid-cols-3 items-center">
+        <nav class="justify-self-start flex items-center gap-8">
+          <a href="#heritage" class="text-[10px] sm:text-xs uppercase tracking-[0.32em] text-white/70 hover:text-luxe transition-colors font-light">Our Story</a>
+          <a href="#manifesto" class="hidden md:inline-block text-[10px] sm:text-xs uppercase tracking-[0.32em] text-white/70 hover:text-luxe transition-colors font-light">Maison</a>
+        </nav>
+
+        <a href="#" class="justify-self-center flex items-center tap-none group">
+          <img src="images/logo.png" alt="Arabista" class="h-10 sm:h-12 w-auto transition-transform duration-700 group-hover:scale-105">
         </a>
 
         <div class="justify-self-end flex items-center gap-6">
-          <a href="https://wa.me/60126913286" target="_blank" class="text-xs uppercase tracking-widest text-white/60 hover:text-luxe transition-colors font-medium">Contact</a>
+          <a href="https://wa.me/60126913286" target="_blank" class="text-[10px] sm:text-xs uppercase tracking-[0.32em] text-white/70 hover:text-luxe transition-colors font-light">Contact</a>
         </div>
       </div>
     </div>
   </header>
 
-  <section class="relative h-[85vh] min-h-[600px] flex items-center justify-center overflow-hidden">
-    <video autoplay muted loop playsinline class="absolute inset-0 w-full h-full object-cover opacity-60">
+  <!-- =================================================================
+       I.  THE OPENING — Cinematic full-bleed video hero
+       ================================================================= -->
+  <section class="relative min-h-screen h-screen w-full overflow-hidden vignette flex items-center justify-center">
+    <video autoplay muted loop playsinline preload="auto" class="absolute inset-0 w-full h-full object-cover cinema-zoom">
       <source src="images/hero-ios-540p-optimized.mp4" type="video/mp4" />
     </video>
-    <div class="absolute inset-0 bg-gradient-to-b from-brand/40 via-brand/20 to-brand"></div>
-    
-    <div class="relative z-10 text-center px-4 mt-16 reveal">
-      <h1 class="font-display text-5xl sm:text-7xl font-medium tracking-wide mb-6">Timeless Black.<br>Effortless Grace.</h1>
-      <p class="text-white/60 text-sm sm:text-base max-w-lg mx-auto font-light tracking-wide">Enter the Arabista Ecosystem.</p>
+
+    <!-- Layered film grain / colour wash -->
+    <div class="absolute inset-0 bg-gradient-to-b from-obsidian/30 via-transparent to-obsidian/60"></div>
+    <div class="absolute inset-0 mix-blend-overlay" style="background: radial-gradient(ellipse at 50% 30%, rgba(192,160,98,0.08), transparent 60%);"></div>
+
+    <!-- Corner editorial marks -->
+    <div class="absolute top-6 left-6 sm:top-12 sm:left-12 z-20 flex flex-col items-start text-white/50">
+      <span class="text-[9px] uppercase tracking-[0.5em] font-light">Vol. IV</span>
+      <span class="mt-2 text-[9px] uppercase tracking-[0.5em] font-light">The Gateway</span>
     </div>
-    
-    <div class="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center opacity-50 animate-bounce">
-      <span class="text-[9px] uppercase tracking-widest mb-2">Explore</span>
-      <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path></svg>
+    <div class="absolute top-6 right-6 sm:top-12 sm:right-12 z-20 text-right text-white/50">
+      <span class="block text-[9px] uppercase tracking-[0.5em] font-light">Maison No. 01</span>
+      <span class="block mt-2 text-[9px] uppercase tracking-[0.5em] font-light">Kuala Lumpur</span>
     </div>
+
+    <!-- The Headline -->
+    <div class="relative z-10 text-center px-6 max-w-5xl">
+      <p class="ornament justify-center text-luxe/80 mb-8 sm:mb-12">An Atelier of Modest Couture</p>
+
+      <h1 class="font-display font-light leading-[0.95] tracking-tight text-white text-[18vw] sm:text-[14vw] md:text-[12vw] lg:text-[180px]" aria-label="ARABISTA">
+        <span class="block overflow-hidden">
+          <span class="char" style="animation-delay:0.05s">A</span><span class="char" style="animation-delay:0.12s">R</span><span class="char" style="animation-delay:0.19s">A</span><span class="char" style="animation-delay:0.26s">B</span><span class="char" style="animation-delay:0.33s">I</span><span class="char" style="animation-delay:0.40s">S</span><span class="char" style="animation-delay:0.47s">T</span><span class="char" style="animation-delay:0.54s">A</span>
+        </span>
+      </h1>
+
+      <p class="font-display italic text-white/70 text-xl sm:text-2xl md:text-3xl mt-6 sm:mt-8 reveal" style="transition-delay: 1.2s;">
+        Two destinations. <span class="gold-text font-medium">One House.</span>
+      </p>
+
+      <p class="text-white/45 text-[11px] sm:text-xs uppercase tracking-[0.4em] mt-8 sm:mt-12 font-light max-w-lg mx-auto reveal" style="transition-delay: 1.4s;">
+        Premium modestwear · A network of in‑house ateliers
+      </p>
+    </div>
+
+    <!-- Scroll cue -->
+    <a href="#gateway" class="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center text-white/60 scroll-cue tap-none">
+      <span class="text-[9px] uppercase tracking-[0.5em] font-light mb-3">Enter</span>
+      <span class="w-px h-10 bg-gradient-to-b from-luxe to-transparent"></span>
+    </a>
   </section>
 
-  <section class="py-12 sm:py-20 max-w-screen-xl mx-auto px-4 sm:px-6 relative z-20 -mt-20">
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-10">
-      
-      <a href="products-staging.html" class="group relative aspect-square sm:aspect-[4/5] rounded-3xl overflow-hidden block border border-white/10 hover:border-luxe/50 transition-colors duration-700 reveal shadow-2xl">
-        <img src="images/z01-1-hero.webp" alt="The Abaya Collection" class="absolute inset-0 w-full h-full object-cover brightness-[0.7] group-hover:scale-105 group-hover:brightness-90 transition-all duration-1000 ease-out">
-        <div class="absolute inset-0 bg-gradient-to-t from-brand via-brand/20 to-transparent"></div>
-        <div class="absolute inset-x-0 bottom-0 p-8 sm:p-12 flex flex-col items-start transform transition-transform duration-700 group-hover:-translate-y-2">
-          <p class="text-luxe text-[10px] sm:text-xs uppercase tracking-[0.2em] font-medium mb-2">Signature Retail</p>
-          <h2 class="font-display text-3xl sm:text-4xl text-white mb-6">The Abaya Collection</h2>
-          <span class="inline-flex items-center gap-2 text-xs uppercase tracking-widest font-medium border-b border-luxe pb-1 text-white group-hover:text-luxe transition-colors">
-            Enter Boutique <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
-          </span>
+  <!-- =================================================================
+       II.  THE GATEWAY — Dual Funnel
+       ================================================================= -->
+  <section id="gateway" class="relative bg-brand">
+    <!-- Section opener -->
+    <div class="max-w-screen-2xl mx-auto px-5 sm:px-10 pt-24 sm:pt-32 pb-12 sm:pb-20 text-center">
+      <p class="ornament justify-center mb-6 reveal">Chapter II · The Gateway</p>
+      <h2 class="font-display font-light text-5xl sm:text-7xl md:text-8xl leading-[1.02] reveal" style="transition-delay: 120ms;">
+        Choose your <span class="italic text-luxe">passage</span>.
+      </h2>
+      <p class="mt-8 max-w-xl mx-auto text-white/55 text-sm sm:text-base font-light leading-relaxed reveal" style="transition-delay: 240ms;">
+        Whether you seek a signature garment for the wardrobe of a lifetime, or the steady hand of our tailoring atelier — both paths begin here.
+      </p>
+    </div>
+
+    <!-- The Split -->
+    <div class="gateway-grid grid grid-cols-1 md:grid-cols-2 min-h-[88vh] md:min-h-screen border-y border-white/5">
+
+      <!-- Panel I — The Abaya Collection -->
+      <a href="products-staging.html" class="gateway-panel group relative block overflow-hidden border-b md:border-b-0 md:border-r border-white/5 reveal">
+        <div class="gateway-bg absolute inset-0 w-full h-full">
+          <img src="images/z01-1-hero.webp" alt="The Abaya Collection" class="absolute inset-0 w-full h-full object-cover" />
+        </div>
+        <div class="absolute inset-0 bg-gradient-to-t from-obsidian via-obsidian/30 to-obsidian/10"></div>
+        <div class="absolute inset-0 bg-gradient-to-r from-obsidian/40 to-transparent"></div>
+
+        <!-- Corner numeral -->
+        <div class="absolute top-8 left-8 sm:top-14 sm:left-14 z-10 flex items-baseline gap-3">
+          <span class="font-display gateway-numeral text-5xl sm:text-6xl font-light">I.</span>
+          <span class="text-[10px] uppercase tracking-[0.4em] text-white/50 font-light">Signature Retail</span>
+        </div>
+
+        <!-- Body -->
+        <div class="absolute inset-x-0 bottom-0 p-8 sm:p-14 md:p-16 z-10">
+          <p class="gateway-eyebrow text-[10px] uppercase tracking-[0.4em] text-luxe/80 font-light mb-5">Volume One</p>
+          <h3 class="font-display font-light leading-[0.95] text-white text-5xl sm:text-6xl md:text-7xl mb-3">
+            The <span class="italic">Abaya</span>
+          </h3>
+          <h3 class="font-display font-light leading-[0.95] text-white text-5xl sm:text-6xl md:text-7xl mb-8">
+            Collection
+          </h3>
+          <p class="text-white/55 text-sm sm:text-base font-light leading-relaxed max-w-md mb-10">
+            Dahlia, Zahra, Maraya — three series, hand‑finished in Nidha Dubai. A study in restrained silhouette and considered weight.
+          </p>
+
+          <div class="flex items-center gap-6">
+            <div class="gateway-rule h-px bg-luxe w-12"></div>
+            <span class="gateway-cta inline-flex items-center gap-3 text-xs uppercase tracking-[0.32em] text-white font-medium">
+              Enter Boutique
+              <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.25"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+            </span>
+          </div>
         </div>
       </a>
 
-      <a href="hub-coverage-staging.html" class="group relative aspect-square sm:aspect-[4/5] rounded-3xl overflow-hidden block border border-white/10 hover:border-luxe/50 transition-colors duration-700 reveal shadow-2xl" style="transition-delay: 150ms;">
-        <img src="images/hub-img1.webp" alt="Alteration Hub" class="absolute inset-0 w-full h-full object-cover brightness-[0.6] group-hover:scale-105 group-hover:brightness-[0.85] transition-all duration-1000 ease-out">
-        <div class="absolute inset-0 bg-gradient-to-t from-brand via-brand/20 to-transparent"></div>
-        <div class="absolute inset-x-0 bottom-0 p-8 sm:p-12 flex flex-col items-start transform transition-transform duration-700 group-hover:-translate-y-2">
-          <p class="text-white/60 text-[10px] sm:text-xs uppercase tracking-[0.2em] font-medium mb-2">Service Network</p>
-          <h2 class="font-display text-3xl sm:text-4xl text-white mb-6">Alteration & Tailoring</h2>
-          <span class="inline-flex items-center gap-2 text-xs uppercase tracking-widest font-medium border-b border-white/60 pb-1 text-white group-hover:text-white transition-colors">
-            Book a Service <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
-          </span>
+      <!-- Panel II — Alteration & Tailoring -->
+      <a href="hub-coverage-staging.html" class="gateway-panel group relative block overflow-hidden reveal" style="transition-delay: 180ms;">
+        <div class="gateway-bg absolute inset-0 w-full h-full">
+          <img src="images/hub-img1.webp" alt="Alteration & Tailoring Network" class="absolute inset-0 w-full h-full object-cover" />
+        </div>
+        <div class="absolute inset-0 bg-gradient-to-t from-obsidian via-obsidian/30 to-obsidian/10"></div>
+        <div class="absolute inset-0 bg-gradient-to-l from-obsidian/40 to-transparent"></div>
+
+        <div class="absolute top-8 right-8 sm:top-14 sm:right-14 z-10 flex items-baseline gap-3 flex-row-reverse">
+          <span class="font-display gateway-numeral text-5xl sm:text-6xl font-light">II.</span>
+          <span class="text-[10px] uppercase tracking-[0.4em] text-white/50 font-light">Atelier Network</span>
+        </div>
+
+        <div class="absolute inset-x-0 bottom-0 p-8 sm:p-14 md:p-16 z-10">
+          <p class="gateway-eyebrow text-[10px] uppercase tracking-[0.4em] text-luxe/80 font-light mb-5">Volume Two</p>
+          <h3 class="font-display font-light leading-[0.95] text-white text-5xl sm:text-6xl md:text-7xl mb-3">
+            Alteration <span class="italic">&amp;</span>
+          </h3>
+          <h3 class="font-display font-light leading-[0.95] text-white text-5xl sm:text-6xl md:text-7xl mb-8">
+            Tailoring
+          </h3>
+          <p class="text-white/55 text-sm sm:text-base font-light leading-relaxed max-w-md mb-10">
+            A nationwide constellation of in‑house ateliers — the same hands that craft the collection now keep your wardrobe in service.
+          </p>
+
+          <div class="flex items-center gap-6">
+            <div class="gateway-rule h-px bg-luxe w-12"></div>
+            <span class="gateway-cta inline-flex items-center gap-3 text-xs uppercase tracking-[0.32em] text-white font-medium">
+              Book the Atelier
+              <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.25"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+            </span>
+          </div>
         </div>
       </a>
 
     </div>
   </section>
 
-  <section id="about" class="py-24 max-w-screen-xl mx-auto px-4 sm:px-6 reveal border-t border-white/5 mt-10">
-    <div class="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
-      <div class="order-2 lg:order-1 relative rounded-3xl overflow-hidden shadow-glow border border-white/5 aspect-[4/3] lg:aspect-auto lg:h-[600px]">
-        <img src="images/about-story.webp" alt="Arabista craftsmanship" class="absolute inset-0 w-full h-full object-cover" loading="lazy">
-        <div class="absolute inset-0 bg-brand/10"></div>
+  <!-- =================================================================
+       III.  HERITAGE — Editorial split
+       ================================================================= -->
+  <section id="heritage" class="relative py-24 sm:py-40 overflow-hidden">
+    <div class="max-w-screen-2xl mx-auto px-5 sm:px-10 grid lg:grid-cols-12 gap-10 lg:gap-20 items-center">
+
+      <div class="lg:col-span-7 order-2 lg:order-1 relative reveal">
+        <div class="relative aspect-[4/5] lg:aspect-[5/6] rounded-sm overflow-hidden shadow-deep">
+          <img src="images/about-story.webp" alt="Arabista craftsmanship" class="absolute inset-0 w-full h-full object-cover" loading="lazy">
+          <div class="absolute inset-0 bg-gradient-to-t from-obsidian/40 via-transparent to-transparent"></div>
+        </div>
+        <!-- Frame ornament -->
+        <div class="absolute -top-4 -left-4 w-24 h-px gold-line opacity-70"></div>
+        <div class="absolute -top-4 -left-4 h-24 w-px bg-gradient-to-b from-luxe to-transparent opacity-70"></div>
+        <div class="absolute -bottom-4 -right-4 w-24 h-px gold-line opacity-70"></div>
+        <div class="absolute -bottom-4 -right-4 h-24 w-px bg-gradient-to-t from-luxe to-transparent opacity-70"></div>
+
+        <!-- Caption -->
+        <p class="mt-6 text-[10px] uppercase tracking-[0.42em] text-white/35 font-light">Plate 001 — The Atelier, Kuala Lumpur</p>
       </div>
-      <div class="order-1 lg:order-2">
-        <p class="text-luxe text-[10px] uppercase tracking-[0.2em] font-medium mb-4">Our Heritage</p>
-        <h2 class="font-display text-4xl sm:text-5xl mb-6 leading-tight">Mastering the Art of Modest Luxury.</h2>
-        <p class="text-white/60 text-sm sm:text-base leading-relaxed font-light mb-6">
-          Founded in 2019, Arabista Enterprise is a proud brand specializing in premium black abayas. We control our entire ecosystem—from sourcing authentic Nidha Dubai fabrics to managing our own dedicated production and alteration facilities.
-        </p>
-        <p class="text-white/60 text-sm sm:text-base leading-relaxed font-light">
-          Whether you are purchasing a signature piece from our collection or utilizing our nationwide tailoring hubs, our commitment remains the same: uncompromising quality, practical features, and effortless elegance.
-        </p>
+
+      <div class="lg:col-span-5 order-1 lg:order-2 reveal" style="transition-delay: 150ms;">
+        <p class="ornament mb-8">Chapter III · Heritage</p>
+        <h2 class="font-display font-light text-5xl sm:text-6xl md:text-7xl leading-[1.02] mb-10">
+          We spin our <span class="italic text-luxe">own</span> thread.
+        </h2>
+        <div class="space-y-6 text-white/65 text-base sm:text-lg font-light leading-[1.85] max-w-xl">
+          <p>
+            Founded in <span class="text-white">2019</span> in Kuala Lumpur, Arabista is a vertically integrated maison. We do not outsource craft. From the sourcing of authentic Nidha Dubai cloth to the final stitch on a hemline, every gesture remains within our house.
+          </p>
+          <p>
+            Our retail collection and our alteration ateliers are not separate ventures — they are <span class="italic text-luxe/90">one continuous discipline</span>. The hands that finish the collection are the hands that keep it in service.
+          </p>
+        </div>
+
+        <div class="mt-10 inline-flex items-center gap-5">
+          <div class="h-px w-12 gold-line"></div>
+          <a href="#manifesto" class="text-[11px] uppercase tracking-[0.4em] text-white hover:text-luxe transition-colors font-light">Read the Manifesto</a>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- =================================================================
+       IV.  MANIFESTO — A quiet break
+       ================================================================= -->
+  <section id="manifesto" class="relative py-24 sm:py-40 bg-obsidian border-y border-white/5 overflow-hidden">
+    <div class="absolute inset-0 opacity-30" style="background: radial-gradient(ellipse at 50% 50%, rgba(192,160,98,0.10), transparent 55%);"></div>
+    <div class="relative max-w-4xl mx-auto px-6 text-center reveal">
+      <span class="font-display gold-text text-6xl sm:text-8xl leading-none italic">“</span>
+      <blockquote class="font-display font-light text-3xl sm:text-5xl md:text-6xl leading-[1.15] tracking-tight text-white -mt-6 sm:-mt-10">
+        At Arabista, every stitch is <span class="italic text-luxe">sovereign</span>. We do not delegate craft — we cultivate it.
+      </blockquote>
+      <div class="mt-12 inline-flex items-center gap-4 text-[10px] uppercase tracking-[0.5em] text-white/40 font-light">
+        <span class="w-12 h-px bg-luxe/60"></span>
+        The House of Arabista
+        <span class="w-12 h-px bg-luxe/60"></span>
       </div>
     </div>
   </section>
 
-  <footer class="border-t border-white/10 pt-12 pb-8 bg-brand mt-10">
-    <div class="max-w-screen-xl mx-auto px-4 sm:px-6 flex flex-col md:flex-row items-center justify-between gap-6">
-      <div class="flex items-center gap-3">
-        <img src="images/logo.png" alt="Arabista logo" class="h-8 w-auto opacity-50 grayscale">
-        <p class="text-white/30 text-xs tracking-widest uppercase">Arabista Enterprise</p>
+  <!-- =================================================================
+       V.  METRICS STRIP — Editorial signal
+       ================================================================= -->
+  <section class="relative py-20 sm:py-28">
+    <div class="max-w-screen-2xl mx-auto px-5 sm:px-10 grid grid-cols-2 lg:grid-cols-4 gap-px bg-white/5 border border-white/5 rounded-sm overflow-hidden">
+      <div class="bg-brand p-8 sm:p-12 reveal">
+        <p class="font-display gold-text text-5xl sm:text-6xl font-light leading-none">2019</p>
+        <p class="mt-4 text-[10px] uppercase tracking-[0.42em] text-white/45 font-light">Founded · Kuala Lumpur</p>
       </div>
-      <p class="text-white/30 text-[10px] uppercase tracking-widest">© <span id="y"></span> All rights reserved.</p>
+      <div class="bg-brand p-8 sm:p-12 reveal" style="transition-delay: 80ms;">
+        <p class="font-display gold-text text-5xl sm:text-6xl font-light leading-none">100<span class="text-3xl align-top ml-0.5">%</span></p>
+        <p class="mt-4 text-[10px] uppercase tracking-[0.42em] text-white/45 font-light">In‑House Production</p>
+      </div>
+      <div class="bg-brand p-8 sm:p-12 reveal" style="transition-delay: 160ms;">
+        <p class="font-display gold-text text-5xl sm:text-6xl font-light leading-none">Nidha</p>
+        <p class="mt-4 text-[10px] uppercase tracking-[0.42em] text-white/45 font-light">Dubai · Sole Cloth</p>
+      </div>
+      <div class="bg-brand p-8 sm:p-12 reveal" style="transition-delay: 240ms;">
+        <p class="font-display gold-text text-5xl sm:text-6xl font-light leading-none">∞</p>
+        <p class="mt-4 text-[10px] uppercase tracking-[0.42em] text-white/45 font-light">Lifetime Alterations</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- =================================================================
+       VI.  CLOSING — Return to the Gateway
+       ================================================================= -->
+  <section class="relative py-24 sm:py-36 text-center overflow-hidden">
+    <div class="absolute inset-0 opacity-40" style="background: radial-gradient(ellipse at 50% 100%, rgba(192,160,98,0.12), transparent 60%);"></div>
+    <div class="relative max-w-3xl mx-auto px-6 reveal">
+      <p class="ornament justify-center mb-8">Begin</p>
+      <h2 class="font-display font-light text-5xl sm:text-7xl leading-[1.05] mb-12">
+        Your <span class="italic text-luxe">maison</span> awaits.
+      </h2>
+      <div class="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6">
+        <a href="products-staging.html" class="group inline-flex items-center justify-center gap-3 px-10 py-5 bg-luxe text-ink text-xs uppercase tracking-[0.4em] font-medium hover:bg-sand transition-colors duration-500 min-w-[260px]">
+          Enter Boutique
+          <svg class="w-4 h-4 transition-transform duration-500 group-hover:translate-x-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+        </a>
+        <a href="hub-coverage-staging.html" class="group inline-flex items-center justify-center gap-3 px-10 py-5 border border-luxe/40 text-white text-xs uppercase tracking-[0.4em] font-light hover:border-luxe hover:text-luxe transition-colors duration-500 min-w-[260px]">
+          Book the Atelier
+          <svg class="w-4 h-4 transition-transform duration-500 group-hover:translate-x-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- =================================================================
+       FOOTER — minimalist corporate
+       ================================================================= -->
+  <footer class="relative border-t border-white/5 bg-obsidian">
+
+    <!-- Marquee whisper -->
+    <div class="overflow-hidden border-b border-white/5">
+      <div class="marquee py-6 font-display italic text-white/15 text-3xl sm:text-5xl whitespace-nowrap">
+        <span class="px-8">Arabista</span><span class="text-luxe/30 px-4">✦</span>
+        <span class="px-8">An Atelier of Modest Couture</span><span class="text-luxe/30 px-4">✦</span>
+        <span class="px-8">Arabista</span><span class="text-luxe/30 px-4">✦</span>
+        <span class="px-8">An Atelier of Modest Couture</span><span class="text-luxe/30 px-4">✦</span>
+        <span class="px-8">Arabista</span><span class="text-luxe/30 px-4">✦</span>
+        <span class="px-8">An Atelier of Modest Couture</span><span class="text-luxe/30 px-4">✦</span>
+      </div>
+    </div>
+
+    <div class="max-w-screen-2xl mx-auto px-5 sm:px-10 py-12 sm:py-16">
+      <div class="grid grid-cols-1 md:grid-cols-3 items-start gap-10">
+
+        <div class="flex flex-col items-start gap-4">
+          <img src="images/logo.png" alt="Arabista" class="h-10 w-auto opacity-80">
+          <p class="text-white/35 text-[11px] uppercase tracking-[0.4em] font-light">Arabista Enterprise</p>
+          <p class="text-white/30 text-xs font-light leading-relaxed max-w-xs">
+            A vertically integrated maison of modest couture and tailoring.
+          </p>
+        </div>
+
+        <nav class="flex flex-col items-start md:items-center gap-3 text-[11px] uppercase tracking-[0.32em] font-light">
+          <a href="#heritage" class="text-white/55 hover:text-luxe transition-colors">Our Story</a>
+          <a href="products-staging.html" class="text-white/55 hover:text-luxe transition-colors">The Collection</a>
+          <a href="hub-coverage-staging.html" class="text-white/55 hover:text-luxe transition-colors">The Atelier</a>
+          <a href="https://wa.me/60126913286" target="_blank" class="text-white/55 hover:text-luxe transition-colors">Contact</a>
+        </nav>
+
+        <div class="flex flex-col items-start md:items-end gap-3 text-[11px] uppercase tracking-[0.32em] font-light text-white/40">
+          <span>Kuala Lumpur · Malaysia</span>
+          <span>Est. 2019</span>
+          <span>Maison No. 01</span>
+        </div>
+
+      </div>
+
+      <div class="mt-12 pt-6 border-t border-white/5 flex flex-col md:flex-row items-center justify-between gap-3">
+        <p class="text-white/25 text-[10px] uppercase tracking-[0.42em] font-light">© <span id="y"></span> Arabista Enterprise · All rights reserved</p>
+        <p class="text-white/25 text-[10px] uppercase tracking-[0.42em] font-light">Maison · Vol. IV</p>
+      </div>
     </div>
   </footer>
 
+  <!-- =================================================================
+       LIGHTWEIGHT MOTION — IO + reduced-motion guard
+       (No e-commerce JS. No arabista-core.)
+       ================================================================= -->
   <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      document.getElementById('y').textContent = new Date().getFullYear();
-      
-      const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => { 
+    (function () {
+      'use strict';
+      var y = document.getElementById('y');
+      if (y) y.textContent = new Date().getFullYear();
+
+      var prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      var els = document.querySelectorAll('.reveal');
+
+      if (prefersReducedMotion || !('IntersectionObserver' in window)) {
+        els.forEach(function (el) { el.classList.add('show'); });
+        return;
+      }
+
+      var io = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
           if (entry.isIntersecting) {
             entry.target.classList.add('show');
-            observer.unobserve(entry.target);
+            io.unobserve(entry.target);
           }
         });
-      }, { threshold: 0.15 });
-      
-      document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
-    });
+      }, { threshold: 0.12, rootMargin: '0px 0px -8% 0px' });
+
+      els.forEach(function (el) { io.observe(el); });
+    })();
   </script>
 </body>
 </html>
