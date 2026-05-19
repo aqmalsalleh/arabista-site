@@ -324,23 +324,38 @@
     }
 
     // -----------------------------------------------------------
-    // Lightweight config fetch for portal pages (no catalog.js)
+    // Background catalog fetch for portal pages (no catalog.js).
+    //
+    // The portal page has no product grid, but the cart drawer may
+    // contain previously-added items whose SKUs need to resolve against
+    // the live inventory matrix (OOS revalidation, pricing sanity,
+    // weight lookups). We therefore ALWAYS pull the full get_config
+    // payload — matrix + config — in the background on portal load,
+    // mirroring what arabista-catalog.js does on catalog pages.
+    //
+    // Without the matrix, opening the cart with existing items would
+    // hit an undefined `inventoryMatrix` on any OOS rollback path and
+    // crash. With it, the cart behaves identically across catalog,
+    // portal, and PDP surfaces.
     // -----------------------------------------------------------
-    async function fetchConfigForCart() {
+    async function fetchCatalogForPortal() {
         try {
+            const ua = encodeURIComponent(String(navigator.userAgent || '').substring(0, 100));
             const cb = Date.now().toString(36);
-            const res = await fetch(`${API_URL}?action=get_config&cb=${cb}`, { credentials: 'omit' });
+            const res = await fetch(`${API_URL}?action=get_config&cb=${cb}&ua=${ua}`, { credentials: 'omit' });
             if (!res.ok) throw new Error('HTTP ' + res.status);
             const json = await res.json();
             if (json && json.status === 'success' && json.data) {
                 appConfig = json.data.config || {};
+                inventoryMatrix = json.data.matrix || {};
                 window.ARABISTA_APP_CONFIG = appConfig;
+                window.ARABISTA_MATRIX = inventoryMatrix;
                 window.dispatchEvent(new CustomEvent('arabista:config_ready', {
-                    detail: { config: appConfig }
+                    detail: { config: appConfig, matrix: inventoryMatrix }
                 }));
             }
         } catch (err) {
-            console.warn('[Arabista] Config fetch failed:', err);
+            console.warn('[Arabista] Portal catalog fetch failed:', err);
         }
     }
 
@@ -359,12 +374,15 @@
         loadDraft();
         updateCartCount();
 
-        // 2. Portal — cart + reveal + promo config (no product grid)
+        // 2. Portal — cart + reveal + full catalog hydration (no product grid)
+        // The catalog database (matrix + config) is ALWAYS fetched in the
+        // background here so the cart drawer can resolve existing items
+        // without crashing on OOS revalidation, weight lookups, etc.
         if (CTX.pageType === 'portal') {
             const yEl = byId('y');
             if (yEl) yEl.textContent = new Date().getFullYear();
             bindRevealObserver();
-            fetchConfigForCart();
+            fetchCatalogForPortal();
             return;
         }
 

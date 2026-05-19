@@ -3,16 +3,16 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>All Products — Arabista (STAGING)</title>
-  <meta name="description" content="Arabista Collections Portal — discover our signature Abaya series." />
+  <title>The Abaya Collection — Arabista</title>
+  <meta name="description" content="Explore Arabista's premium abaya collections. Dahlia, Zahra, and Maraya series." />
   <meta name="theme-color" content="#0F0F10" />
+  <link rel="preload" as="image" href="images/d01-1-hero.webp">
   <link rel="icon" type="image/x-icon" href="images/favicon.ico">
   <link rel="apple-touch-icon" sizes="180x180" href="images/apple-touch-icon.png">
   <link rel="icon" type="image/png" sizes="32x32" href="images/favicon-32x32.png">
   <link rel="icon" type="image/png" sizes="16x16" href="images/favicon-16x16.png">
   <meta name="robots" content="noindex">
-  <link rel="preload" as="image" href="images/d01-1-hero.webp">
-
+  
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -44,11 +44,12 @@
   </script>
 
   <style>
+    body { background-color: #0F0F10; color: #ffffff; }
     .hide-scrollbar::-webkit-scrollbar { display: none; }
     .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-    .tap-none { -webkit-tap-highlight-color: transparent; }
-    .reveal { opacity: 0; transform: translateY(20px); transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1); }
+    .reveal { opacity: 0; transform: translateY(20px); transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1); }
     .reveal.show { opacity: 1; transform: translateY(0); }
+    .tap-none { -webkit-tap-highlight-color: transparent; }
 
     .crossfade-img {
       position: absolute;
@@ -98,24 +99,18 @@
     src="https://www.facebook.com/tr?id=0000000000000000&ev=PageView&noscript=1" /></noscript>
   <!-- End Meta Pixel -->
 </head>
-<body class="bg-brand text-white font-sans antialiased selection:bg-luxe selection:text-white flex flex-col min-h-screen">
+<body class="font-sans antialiased selection:bg-luxe selection:text-ink max-w-[100vw] overflow-x-hidden relative tap-none">
 
-  <div class="bg-luxe text-brand text-[10px] sm:text-xs font-semibold tracking-[0.2em] uppercase text-center py-2 px-4 z-50 relative">
-    Free standard shipping on orders over RM 400
-  </div>
+  <header class="fixed top-0 inset-x-0 z-50 backdrop-blur bg-brand/80">
+    <div class="max-w-screen-xl mx-auto px-4 sm:px-6">
+      <div class="h-14 grid grid-cols-3 items-center">
+        <a href="index-staging.html" class="font-display tracking-[0.18em] text-[14px] text-white tap-none">ARABISTA</a>
 
-  <header class="sticky top-0 z-40 bg-brand/90 backdrop-blur-md border-b border-white/5 transition-all duration-300">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="flex items-center justify-between h-16 sm:h-20">
-        <div class="flex-shrink-0">
-          <a href="index.html" class="font-display text-2xl sm:text-3xl tracking-wide text-white hover:text-luxe transition-colors">Arabista</a>
-        </div>
-        <nav class="hidden md:flex space-x-8">
-          <a href="index.html" class="text-xs tracking-widest uppercase text-white/70 hover:text-white transition-colors">Home</a>
-          <a href="abaya-staging.html" class="text-xs tracking-widest uppercase text-white/70 hover:text-white transition-colors">Abaya</a>
-          <a href="products-staging.html" class="text-xs tracking-widest uppercase text-luxe font-medium transition-colors">Catalog</a>
-        </nav>
-        <div class="flex items-center space-x-4">
+        <a href="index-staging.html" class="justify-self-center tap-none">
+          <img src="images/logo.png" alt="Arabista logo" class="h-11 w-auto">
+        </a>
+
+        <div class="justify-self-end flex items-center">
           <button type="button" id="nav-cart-btn" class="relative p-2 -mr-2 text-white hover:text-luxe transition-colors tap-none" aria-label="Open cart">
             <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
             <span id="nav-cart-badge" class="absolute top-0 right-0 -mt-0.5 -mr-0.5 flex h-4 w-4 sm:h-[18px] sm:w-[18px] items-center justify-center rounded-full bg-luxe text-[9px] sm:text-[10px] font-bold text-brand opacity-0 scale-0 transition-all duration-300 pointer-events-none">0</span>
@@ -124,6 +119,16 @@
       </div>
     </div>
   </header>
+
+  <section class="relative pt-14 min-h-[50vh] sm:min-h-[60vh] flex items-center justify-center overflow-hidden">
+    <img src="images/hero-poster.webp" alt="Arabista Collection" class="absolute inset-0 w-full h-full object-cover brightness-[0.6] scale-105 animate-[pulse-slow_10s_ease-in-out_infinite]" />
+    <div class="absolute inset-0 bg-gradient-to-t from-brand via-brand/40 to-transparent"></div>
+    
+    <div class="relative z-10 text-center px-4 mt-10 reveal">
+      <h1 class="font-display text-4xl sm:text-6xl md:text-7xl font-medium tracking-wide mb-4">The Abaya Collection</h1>
+      <p class="text-white/60 text-sm sm:text-base max-w-lg mx-auto font-light">Timeless design and effortless grace. Crafted for the modern modest wardrobe.</p>
+    </div>
+  </section>
 
   <main class="max-w-screen-xl mx-auto px-4 sm:px-6 py-20 sm:py-28 min-h-[75vh] flex items-center justify-center">
     
@@ -150,6 +155,16 @@
     </a>
 
   </main>
+
+  <footer class="border-t border-white/10 pt-8 pb-28 sm:py-8 bg-brand mt-10">
+    <div class="max-w-screen-xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+      <p class="text-white/50 text-xs">© <span id="y"></span> Arabista Enterprise. All rights reserved.</p>
+      <nav class="flex items-center gap-4 text-white/50 text-xs uppercase tracking-widest font-medium">
+        <a href="index-staging.html" class="hover:text-luxe transition-colors">Home</a>
+        <a href="https://wa.me/60126913286" target="_blank" class="hover:text-luxe transition-colors">Contact</a>
+      </nav>
+    </div>
+  </footer>
 
   <div id="cart-overlay" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden opacity-0 transition-opacity duration-300"></div>
   <div id="cart-drawer" class="fixed inset-y-0 right-0 w-full sm:max-w-md bg-ink border-l border-white/5 z-50 transform translate-x-full transition-transform duration-300 flex flex-col shadow-2xl">
@@ -202,36 +217,15 @@
       </div>
   </div>
 
-    <div id="gateway-overlay" class="fixed inset-0 z-[120] bg-ink/90 backdrop-blur-md flex flex-col items-center justify-center opacity-0 pointer-events-none transition-opacity duration-500">
-        <div class="relative flex items-center justify-center mb-10">
-            <div class="w-28 h-28 rounded-full border border-white/10 flex items-center justify-center z-10 shadow-2xl overflow-hidden p-2.5">
-                <img src="images/logo.png" alt="Arabista Logo" class="w-full h-full object-contain opacity-90">
-            </div>
-            <div class="absolute w-28 h-28 rounded-full border-[2px] border-white/5 z-0"></div>
-            <div class="absolute w-28 h-28 rounded-full border-t-[2px] border-luxe animate-spin-slow z-20"></div>
-            <div class="absolute w-36 h-36 rounded-full bg-luxe/5 animate-pulse-slow z-0"></div>
-        </div>
-        <h3 class="font-display text-3xl text-white mb-2 tracking-wide text-center">Securing Order</h3>
-        <p class="text-white/50 text-sm font-light tracking-widest uppercase text-center max-w-[250px] leading-relaxed">
-            Please wait while we connect to SenangPay gateway
-        </p>
-    </div>
-
-
-  <footer class="border-t border-white/5 py-12 mt-12">
-    <div class="max-w-7xl mx-auto px-4 text-center">
-      <p class="text-white/40 text-xs tracking-widest uppercase">© <span id="y"></span> Arabista Enterprise. All rights reserved.</p>
-    </div>
-  </footer>
-
   <script>
     window.ARABISTA_CONTEXT = {
       pageType: "portal",
       apiUrl: "https://script.google.com/macros/s/AKfycbw4qGOeC2Sebod06uFnW2u-ZAkj7l8zRdzyWrFEyL1_7eDCn-ks9lVKrd1I226qHxRmQg/exec",
-      cartStorageKey: "arabista_cart_staging",
-      draftStorageKey: "arabista_checkout_draft_staging"
+      cartStorageKey: "arabista_cart_stg",
+      draftStorageKey: "arabista_checkout_draft_stg"
     };
   </script>
   <script src="arabista-core.js" defer></script>
+  <script src="arabista-catalog.js" defer></script>
 </body>
 </html>
