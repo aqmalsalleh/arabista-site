@@ -1,7 +1,9 @@
 # 📘 ARABISTA FRONTEND & RETAIL ALTERATION — MASTER BLUEPRINT
 
-**Version:** 4.3 | **Aligned to codebase:** May 20, 2026  
+**Version:** 4.4 | **Aligned to codebase:** May 22, 2026  
 **Canonical detail:** Operational depth, API names, column maps, and DevOps live in `Arabista_Retail_Master_Doc.md`. This blueprint is the **product-level story** for the static retail frontend: page archetypes, the dual JavaScript engine, and strict parity rules between staging and production file pairs.
+
+**v4.4 (22 May):** **Global favicon standard (Google Search).** Every tracked `.html` page (root and `checkout/`) now includes `favicon-192x192.png` in the `<head>` icon cluster, immediately after the existing `favicon.ico`, `apple-touch-icon`, `32×32`, and `16×16` links. Root pages use `href="images/favicon-192x192.png"`; `checkout/*` uses `href="../images/favicon-192x192.png"`. The 192×192 PNG satisfies Google’s “multiple of 48px” favicon guidance and is required on **both** staging and production pairs (same relative path; not an environment-specific delta).
 
 **v4.3 (20 May):** **Portal Page architecture.** New top-of-funnel surfaces `products.html` / `products-staging.html` (`pageType: "portal"`) sit above the catalog grid. Portal pages use a **Cinematic Crossfade** hero card, a **master category nav** (anchor links, not filter buttons), and **no product grid**. `arabista-core.js` hydrates the full inventory matrix in the background via `fetchCatalogForPortal()` so the shared cart drawer behaves identically to grid and PDP pages. `arabista-catalog.js` is still loaded on portal pages but **no-ops** immediately when `pageType !== 'catalog'`. Environmental config is centralized in `window.ARABISTA_CONTEXT` (replacing legacy `RETAIL_API_URL` / inline cart key constants). Staging cart keys are now `arabista_cart_stg` and `arabista_checkout_draft_stg`.
 
@@ -302,7 +304,7 @@ When adding or refreshing a product page, include:
 
 | Area | What to include |
 |------|-----------------|
-| `<head>` | After `<title>`, Open Graph + Twitter cards. `og:image`: `images/social-preview.jpg` (or SKU-specific asset). |
+| `<head>` | After `<title>`, Open Graph + Twitter cards. `og:image`: `images/social-preview.jpg` (or SKU-specific asset). **Favicon cluster:** `favicon.ico`, `apple-touch-icon`, `32×32`, `16×16`, **`192×192`** (`images/favicon-192x192.png`; `../images/` in `checkout/`). |
 | Layout | `<main>`: sticky breadcrumb → product grid → size chart → `#pdp-review-section` → `#cross-sell-section` → one `</main>`. |
 | Mobile | `#mobile-scroll-chevron-container`, `#product-info-start` with `scroll-mt-28`. |
 | Footer | Below `</main>`; Home → `index-staging.html` or `index.html`. |
