@@ -1451,6 +1451,7 @@
                 let seriesName = base + ' Series';
                 if (base.startsWith('D')) seriesName = 'Dahlia Series';
                 else if (base.startsWith('Z')) seriesName = 'Zahra Series';
+                else if (base.startsWith('W')) seriesName = 'Warda Series';
                 else if (base.startsWith('M')) seriesName = 'Maraya Series';
                 models[base] = { retail: row.retailPrice, promo: row.promoPrice, title: seriesName };
             } else {
