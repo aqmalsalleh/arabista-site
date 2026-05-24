@@ -222,6 +222,39 @@
     /* Subtle breathing glow behind the gateway numerals */
     .gateway-numeral { background: var(--gold-gradient); -webkit-background-clip: text; background-clip: text; color: transparent; }
 
+    /* -----------------------------------------------------------
+       Soft-lock pattern — "Coming Soon" surfaces
+       Used by hub-coverage entry points while the Alteration Hub
+       is not yet live. Pure CSS; no JS rewiring required.
+       =========================================================== */
+    /* Nav overlay disabled link — beats the .open .nav-link { opacity: 1 } rule
+       so the Tailwind `opacity-50` utility actually takes effect when the menu opens. */
+    #nav-overlay.open .nav-link[aria-disabled="true"] { opacity: 0.5; }
+
+    /* Locked gateway panel — muted baseline, plus full hover-orchestration overrides
+       so the panel doesn't zoom / shimmer gold / dim its sibling like a live panel would. */
+    .gateway-panel.gateway-locked .gateway-bg { filter: grayscale(0.55) brightness(0.5); }
+    @media (hover: hover) {
+      .gateway-panel.gateway-locked:hover .gateway-bg {
+        transform: scale(1);
+        filter: grayscale(0.55) brightness(0.5);
+      }
+      .gateway-panel.gateway-locked:hover .gateway-cta {
+        color: rgba(255, 255, 255, 0.8);
+        gap: 0.75rem;
+      }
+      .gateway-panel.gateway-locked:hover .gateway-rule { width: 3rem; }
+      .gateway-panel.gateway-locked:hover .gateway-eyebrow {
+        color: rgba(255, 255, 255, 0.55);
+        letter-spacing: 0.4em;
+      }
+      /* Don't dim the live panel when the locked one is hovered. */
+      .gateway-grid:has(.gateway-panel.gateway-locked:hover) .gateway-panel:not(:hover) {
+        filter: none;
+        transform: none;
+      }
+    }
+
     /* Section rule */
     .ornament {
       display: inline-flex;
@@ -329,7 +362,10 @@
     <nav class="h-full w-full flex flex-col items-center justify-center gap-8 sm:gap-10 px-6">
       <a href="products.html" class="nav-link font-display font-light text-5xl sm:text-7xl md:text-8xl text-white hover:text-luxe transition-colors tap-none">Shop</a>
       <span class="nav-rule h-px w-16 bg-luxe/60" aria-hidden="true"></span>
-      <a href="hub-coverage.html" class="nav-link font-display font-light text-5xl sm:text-7xl md:text-8xl text-white hover:text-luxe transition-colors tap-none">Alterations</a>
+      <a href="#" onclick="event.preventDefault()" aria-disabled="true" class="nav-link inline-flex flex-col items-center font-display font-light text-5xl sm:text-7xl md:text-8xl text-white cursor-not-allowed opacity-50 transition-colors tap-none">
+        <span>Alterations</span>
+        <span class="font-sans text-[10px] sm:text-xs uppercase tracking-[0.42em] text-luxe/80 font-medium mt-3 sm:mt-4">(Coming Soon)</span>
+      </a>
       <span class="nav-rule h-px w-16 bg-luxe/60" aria-hidden="true"></span>
       <a href="https://wa.me/60126913286" target="_blank" rel="noopener" class="nav-link font-display font-light text-5xl sm:text-7xl md:text-8xl text-white hover:text-luxe transition-colors tap-none">Contact</a>
     </nav>
@@ -429,8 +465,8 @@
         </div>
       </a>
 
-      <!-- Panel II — Abaya Alterations -->
-      <a href="hub-coverage.html" class="gateway-panel group relative overflow-hidden flex flex-col justify-between reveal" style="transition-delay: 180ms;">
+      <!-- Panel II — Abaya Alterations (soft-locked: Coming Soon) -->
+      <a href="#" onclick="event.preventDefault()" aria-disabled="true" class="gateway-panel gateway-locked group relative overflow-hidden flex flex-col justify-between reveal cursor-not-allowed" style="transition-delay: 180ms;">
         <div class="gateway-bg absolute inset-0 w-full h-full">
           <img src="images/hub-img1.webp" alt="Arabista alteration hub" class="absolute inset-0 w-full h-full object-cover" />
         </div>
@@ -454,9 +490,9 @@
 
           <div class="flex items-center gap-6">
             <div class="gateway-rule h-px bg-luxe w-12"></div>
-            <span class="gateway-cta inline-flex items-center gap-3 text-xs uppercase tracking-[0.32em] text-white font-medium">
-              Find a Hub
-              <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.25"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+            <span class="gateway-cta inline-flex items-center gap-3 text-xs uppercase tracking-[0.32em] text-white/80 font-medium">
+              Coming Soon
+              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.25" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 11h14a2 2 0 012 2v7a2 2 0 01-2 2H5a2 2 0 01-2-2v-7a2 2 0 012-2z"/></svg>
             </span>
           </div>
         </div>
@@ -563,9 +599,9 @@
           Shop Abayas
           <svg class="w-4 h-4 transition-transform duration-500 group-hover:translate-x-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
         </a>
-        <a href="hub-coverage.html" class="group inline-flex items-center justify-center gap-3 px-10 py-5 border border-luxe/40 text-white text-xs uppercase tracking-[0.4em] font-light hover:border-luxe hover:text-luxe transition-colors duration-500 min-w-[260px]">
-          Find a Hub
-          <svg class="w-4 h-4 transition-transform duration-500 group-hover:translate-x-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+        <a href="#" onclick="event.preventDefault()" aria-disabled="true" class="inline-flex items-center justify-center gap-3 px-10 py-5 border border-luxe/30 text-white text-xs uppercase tracking-[0.4em] font-light cursor-not-allowed opacity-50 transition-colors duration-500 min-w-[260px]">
+          Coming Soon
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 11h14a2 2 0 012 2v7a2 2 0 01-2 2H5a2 2 0 01-2-2v-7a2 2 0 012-2z"/></svg>
         </a>
       </div>
     </div>
