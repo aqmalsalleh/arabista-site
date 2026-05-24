@@ -266,11 +266,14 @@
       </p>
     </div>
 
-    <!-- Scroll cue — anchored to the viewport bottom with safe padding so it stays visible on first load -->
-    <a href="#gateway" class="absolute left-1/2 -translate-x-1/2 bottom-[max(env(safe-area-inset-bottom),1.25rem)] z-20 flex flex-col items-center text-white scroll-cue tap-none text-shadow-soft">
-      <span class="text-[10px] uppercase tracking-[0.5em] font-medium mb-3">Enter Site</span>
-      <span class="w-px h-10 bg-gradient-to-b from-luxe to-transparent"></span>
-    </a>
+    <!-- Scroll cue — full-width wrapper + flex justify-center guarantees true centering
+         on every viewport. iOS safe-area padding keeps it clear of the home indicator. -->
+    <div class="absolute inset-x-0 bottom-6 sm:bottom-8 z-20 flex justify-center pointer-events-none" style="padding-bottom: env(safe-area-inset-bottom);">
+      <a href="#gateway" class="pointer-events-auto flex flex-col items-center text-white scroll-cue tap-none text-shadow-soft">
+        <span class="text-[10px] uppercase tracking-[0.5em] font-medium mb-3 pl-[0.5em]">Enter Site</span>
+        <span class="w-px h-10 bg-gradient-to-b from-luxe to-transparent"></span>
+      </a>
+    </div>
   </section>
 
   <!-- =================================================================
