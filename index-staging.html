@@ -237,15 +237,14 @@
        100svh = "small viewport height", fits within mobile browser chrome
        so the scroll cue is always visible on initial load.
        ================================================================= -->
-  <section class="relative min-h-[100svh] h-[100svh] w-full overflow-hidden vignette flex items-center justify-center">
+  <section class="relative min-h-[100svh] h-[100svh] w-full overflow-hidden flex items-center justify-center">
     <video autoplay muted loop playsinline preload="auto" class="absolute inset-0 w-full h-full object-cover cinema-zoom">
       <source src="images/hero-ios-540p-optimized.mp4" type="video/mp4" />
     </video>
 
-    <!-- Stronger overlays for text legibility over any video background -->
-    <div class="absolute inset-0 bg-obsidian/35"></div>
-    <div class="absolute inset-0 bg-gradient-to-b from-obsidian/60 via-obsidian/20 to-obsidian/80"></div>
-    <div class="absolute inset-0" style="background: radial-gradient(ellipse at 50% 50%, rgba(11,11,12,0) 0%, rgba(11,11,12,0.45) 70%, rgba(11,11,12,0.85) 100%);"></div>
+    <!-- No darkening overlays — video plays at its natural brightness.
+         Text legibility is handled by .text-shadow-* utilities on the text itself.
+         If the text becomes hard to read on a brighter video, add an overlay div here. -->
 
     <!-- The Headline -->
     <div class="relative z-10 text-center px-6 max-w-5xl">
