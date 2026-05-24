@@ -1,37 +1,642 @@
-<!DOCTYPE html>
-<html lang="en">
+<!doctype html>
+<html lang="en" class="scroll-smooth">
 <head>
-    <meta charset="utf-8">
-    <meta name="theme-color" content="#0F0F10" />
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Arabista Official — Premium Abayas & Tailoring Services</title>
+  <meta name="description" content="Shop Arabista abayas made in-house in Malaysia using Premium Nidha Dubai fabric. Book alterations online and drop off at any Arabista hub nationwide." />
+  <meta name="theme-color" content="#0B0B0C" />
 
-    <link rel="icon" type="image/x-icon" href="images/favicon.ico">
-    <link rel="apple-touch-icon" sizes="180x180" href="images/apple-touch-icon.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="images/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="images/favicon-16x16.png">
+  <link rel="icon" type="image/x-icon" href="images/favicon.ico">
+  <link rel="apple-touch-icon" sizes="180x180" href="images/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="images/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="images/favicon-16x16.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="images/favicon-192x192.png">
+  <meta name="robots" content="noindex">
 
-    <link rel="icon" type="image/png" sizes="192x192" href="images/favicon-192x192.png">
-    <title>Arabista — Redirecting...</title>
-    
-    <meta http-equiv="refresh" content="0; url=abaya.html">
-    
-    <script>
-        window.location.replace("abaya.html");
-    </script>
-    
-    <style>
-        body {
-            background-color: #0F0F10;
-            color: #C0A062;
-            font-family: sans-serif;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            margin: 0;
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=Inter:wght@200;300;400;500;600&display=swap" rel="stylesheet">
+
+  <link rel="preload" as="video" href="images/hero-ios-540p-optimized.mp4" type="video/mp4">
+  <link rel="preload" as="image" href="images/hero-front.jpg">
+  <link rel="preload" as="image" href="images/hub-img1.webp">
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            display: ['"Cormorant Garamond"', 'serif'],
+            sans: ['Inter', 'ui-sans-serif', 'system-ui']
+          },
+          colors: {
+            brand: '#0B0B0C',
+            ink: '#111213',
+            obsidian: '#050506',
+            luxe: '#C0A062',
+            champagne: '#D4B896',
+            sand: '#E6C77A',
+            bronze: '#8C6E3F',
+            cream: '#F5F1E8'
+          },
+          letterSpacing: {
+            'maison': '0.42em'
+          },
+          boxShadow: {
+            soft: '0 10px 30px rgba(0,0,0,.08)',
+            glow: '0 0 60px rgba(192,160,98,0.18)',
+            deep: '0 60px 120px -40px rgba(0,0,0,0.9)'
+          }
         }
-    </style>
+      }
+    }
+  </script>
+
+  <style>
+    :root {
+      --gold-gradient: linear-gradient(120deg, #8C6E3F 0%, #C0A062 35%, #E6C77A 55%, #C0A062 75%, #8C6E3F 100%);
+    }
+    html, body { background-color: #0B0B0C; }
+    body { color: #ffffff; }
+    .tap-none { -webkit-tap-highlight-color: transparent; }
+
+    /* Text shadow utilities for hero legibility over video */
+    .text-shadow-soft { text-shadow: 0 2px 12px rgba(0,0,0,0.55); }
+    .text-shadow-hero { text-shadow: 0 4px 24px rgba(0,0,0,0.7), 0 1px 3px rgba(0,0,0,0.5); }
+
+    /* ===========================================================
+       Full-screen nav overlay — luxury collapse pattern
+       =========================================================== */
+    #nav-overlay {
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.55s cubic-bezier(0.16, 1, 0.3, 1), visibility 0s linear 0.55s;
+    }
+    #nav-overlay.open {
+      opacity: 1;
+      visibility: visible;
+      transition: opacity 0.55s cubic-bezier(0.16, 1, 0.3, 1), visibility 0s linear 0s;
+    }
+    #nav-overlay .nav-link {
+      opacity: 0;
+      transform: translateY(28px);
+      transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1), transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    #nav-overlay.open .nav-link { opacity: 1; transform: translateY(0); }
+    #nav-overlay.open .nav-link:nth-of-type(1) { transition-delay: 0.18s; }
+    #nav-overlay.open .nav-link:nth-of-type(2) { transition-delay: 0.30s; }
+    #nav-overlay.open .nav-link:nth-of-type(3) { transition-delay: 0.42s; }
+    #nav-overlay .nav-rule {
+      opacity: 0;
+      transform: scaleX(0);
+      transform-origin: center;
+      transition: opacity 0.6s ease 0s, transform 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0s;
+    }
+    #nav-overlay.open .nav-rule { opacity: 0.7; transform: scaleX(1); }
+    #nav-overlay.open .nav-rule:nth-of-type(1) { transition-delay: 0.24s; }
+    #nav-overlay.open .nav-rule:nth-of-type(2) { transition-delay: 0.36s; }
+    /* Hamburger lines morph to X on open */
+    #nav-toggle .bar { transition: transform 0.35s ease, opacity 0.35s ease; transform-origin: center; }
+    #nav-toggle.is-open .bar:nth-child(1) { transform: translateY(4px) rotate(45deg); }
+    #nav-toggle.is-open .bar:nth-child(2) { transform: translateY(-4px) rotate(-45deg); }
+
+    /* Editorial reveal */
+    .reveal { opacity: 0; transform: translateY(28px); transition: opacity 1.1s cubic-bezier(0.16, 1, 0.3, 1), transform 1.1s cubic-bezier(0.16, 1, 0.3, 1); }
+    .reveal.show { opacity: 1; transform: translateY(0); }
+
+    /* Per-character hero reveal — premium: lifts up + skew untwists + blur clears */
+    .char {
+      display: inline-block;
+      opacity: 0;
+      transform: translateY(55%) skewY(7deg);
+      filter: blur(8px);
+      animation: charIn 1.8s cubic-bezier(0.2, 0.85, 0.2, 1) forwards;
+    }
+    @keyframes charIn {
+      60% { filter: blur(0); }
+      100% { opacity: 1; transform: translateY(0) skewY(0); filter: blur(0); }
+    }
+
+    /* Hero — elegant staggered entrance for ornament + subtitle */
+    @keyframes heroFadeUp {
+      0%   { opacity: 0; transform: translateY(28px); filter: blur(10px); }
+      60%  { filter: blur(0); }
+      100% { opacity: 1; transform: translateY(0); filter: blur(0); }
+    }
+    @keyframes heroLineExpand {
+      0%   { transform: scaleX(0); opacity: 0; }
+      100% { transform: scaleX(1); opacity: 0.9; }
+    }
+    .hero-ornament {
+      opacity: 0;
+      animation: heroFadeUp 1.4s cubic-bezier(0.16, 1, 0.3, 1) 0.3s forwards;
+    }
+    .hero-ornament::before,
+    .hero-ornament::after {
+      transform: scaleX(0);
+      opacity: 0;
+      transform-origin: center;
+      animation: heroLineExpand 1.6s cubic-bezier(0.16, 1, 0.3, 1) 0.6s forwards;
+    }
+    .hero-subtitle {
+      opacity: 0;
+      animation: heroFadeUp 1.6s cubic-bezier(0.16, 1, 0.3, 1) 2.3s forwards;
+    }
+
+    /* Cinematic Ken Burns on hero video */
+    .cinema-zoom {
+      animation: cinemaZoom 28s ease-in-out infinite alternate;
+    }
+    @keyframes cinemaZoom {
+      0%   { transform: scale(1.04) translate3d(0,0,0); }
+      100% { transform: scale(1.14) translate3d(-1%, -1%, 0); }
+    }
+
+    /* Vignette overlay */
+    .vignette::after {
+      content: '';
+      position: absolute; inset: 0;
+      pointer-events: none;
+      background:
+        radial-gradient(ellipse at center, rgba(0,0,0,0) 35%, rgba(11,11,12,0.55) 75%, rgba(11,11,12,0.95) 100%),
+        linear-gradient(to bottom, rgba(11,11,12,0.55) 0%, rgba(11,11,12,0) 25%, rgba(11,11,12,0) 70%, rgba(11,11,12,0.95) 100%);
+    }
+
+    /* Gold shimmer */
+    .gold-text {
+      background: var(--gold-gradient);
+      background-size: 200% auto;
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      animation: shimmer 8s linear infinite;
+    }
+    @keyframes shimmer {
+      0%   { background-position: 0% center; }
+      100% { background-position: 200% center; }
+    }
+
+    .gold-line {
+      height: 1px;
+      background: var(--gold-gradient);
+      background-size: 200% 100%;
+      animation: shimmer 8s linear infinite;
+    }
+
+    /* Marquee */
+    .marquee {
+      display: flex;
+      width: max-content;
+      animation: marquee 60s linear infinite;
+    }
+    .marquee-slow { animation-duration: 90s; }
+    @keyframes marquee {
+      from { transform: translateX(0); }
+      to   { transform: translateX(-50%); }
+    }
+
+    /* Dual gateway hover sync — when one panel is hovered, the other dims & desaturates. */
+    @media (hover: hover) {
+      .gateway-grid:has(.gateway-panel:hover) .gateway-panel:not(:hover) {
+        filter: grayscale(1) brightness(0.35);
+        transform: scale(0.985);
+      }
+      .gateway-panel:hover .gateway-bg {
+        transform: scale(1.06);
+        filter: none;
+      }
+      .gateway-panel:hover .gateway-cta {
+        gap: 1.25rem;
+        color: #E6C77A;
+      }
+      .gateway-panel:hover .gateway-rule { width: 100%; }
+      .gateway-panel:hover .gateway-eyebrow { color: #E6C77A; letter-spacing: 0.5em; }
+    }
+    .gateway-panel { transition: filter 1s ease, transform 1s ease; }
+    .gateway-panel .gateway-bg { transition: transform 1.6s cubic-bezier(0.16, 1, 0.3, 1), filter 1.2s ease; filter: grayscale(0.15) brightness(0.65); }
+    .gateway-panel .gateway-cta { transition: gap 0.6s ease, color 0.6s ease; }
+    .gateway-panel .gateway-rule { transition: width 1.2s cubic-bezier(0.16, 1, 0.3, 1); }
+    .gateway-panel .gateway-eyebrow { transition: color 0.6s ease, letter-spacing 0.8s ease; }
+
+    /* Subtle breathing glow behind the gateway numerals */
+    .gateway-numeral { background: var(--gold-gradient); -webkit-background-clip: text; background-clip: text; color: transparent; }
+
+    /* Section rule */
+    .ornament {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.75rem;
+      color: #C0A062;
+      font-size: 10px;
+      letter-spacing: 0.42em;
+      text-transform: uppercase;
+    }
+    .ornament::before, .ornament::after {
+      content: '';
+      width: 36px;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, #8C6E3F, transparent);
+    }
+
+    /* Scroll cue */
+    .scroll-cue { animation: cueBob 2.4s ease-in-out infinite; }
+    @keyframes cueBob {
+      0%, 100% { transform: translateY(0); opacity: 0.55; }
+      50%      { transform: translateY(10px); opacity: 1; }
+    }
+
+    /* Smooth gallery on touch */
+    .hide-scrollbar::-webkit-scrollbar { display: none; }
+    .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+    /* Reduced motion */
+    @media (prefers-reduced-motion: reduce) {
+      .cinema-zoom, .marquee, .gold-text, .gold-line, .char,
+      .hero-ornament, .hero-ornament::before, .hero-ornament::after, .hero-subtitle {
+        animation: none !important;
+      }
+      .char { opacity: 1; transform: none; filter: none; }
+      .hero-ornament, .hero-subtitle { opacity: 1; transform: none; filter: none; }
+      .hero-ornament::before, .hero-ornament::after { transform: scaleX(1); opacity: 1; }
+      .reveal { transition: none; opacity: 1; transform: none; }
+    }
+  </style>
+
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-0000000000"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){ dataLayer.push(arguments); }
+    gtag('js', new Date());
+    gtag('config', 'G-0000000000');
+  </script>
+  <script>
+    !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window, document,'script','https://connect.facebook.net/en_US/fbevents.js');
+    fbq('init', '0000000000000000');
+    fbq('track', 'PageView');
+  </script>
 </head>
-<body>
-    <p>Redirecting to Abaya...</p>
+<body class="font-sans antialiased selection:bg-luxe selection:text-ink max-w-[100vw] overflow-x-hidden relative tap-none bg-brand">
+
+  <!-- =================================================================
+       HEADER — minimal: hamburger left, logo centered
+       ================================================================= -->
+  <header id="site-header" class="fixed top-0 inset-x-0 z-50 backdrop-blur-xl bg-brand/50 border-b border-white/5">
+    <div class="max-w-screen-2xl mx-auto px-5 sm:px-10">
+      <div class="h-16 sm:h-20 grid grid-cols-3 items-center">
+        <!-- Hamburger -->
+        <button type="button" id="nav-toggle" aria-label="Open menu" aria-expanded="false" aria-controls="nav-overlay" class="justify-self-start group p-2 -ml-2 tap-none">
+          <span class="block w-7 sm:w-8 space-y-[6px]">
+            <span class="bar block h-px bg-white/80 group-hover:bg-luxe transition-colors"></span>
+            <span class="bar block h-px bg-white/80 group-hover:bg-luxe transition-colors"></span>
+          </span>
+        </button>
+
+        <!-- Logo -->
+        <a href="#" class="justify-self-center flex items-center tap-none group">
+          <img src="images/logo.png" alt="Arabista" class="h-10 sm:h-12 w-auto transition-transform duration-700 group-hover:scale-105">
+        </a>
+
+        <!-- Right spacer keeps logo perfectly centered in the 3-col grid -->
+        <div class="justify-self-end" aria-hidden="true"></div>
+      </div>
+    </div>
+  </header>
+
+  <!-- =================================================================
+       FULL-SCREEN NAV OVERLAY
+       ================================================================= -->
+  <div id="nav-overlay" role="dialog" aria-modal="true" aria-label="Main menu" class="fixed inset-0 z-[60] bg-obsidian/95 backdrop-blur-2xl">
+    <!-- Close button -->
+    <button type="button" id="nav-close" aria-label="Close menu" class="absolute top-5 right-5 sm:top-8 sm:right-8 p-2 text-white/80 hover:text-luxe transition-colors tap-none">
+      <svg class="w-7 h-7 sm:w-8 sm:h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.25">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+      </svg>
+    </button>
+
+    <!-- Centered logo whisper -->
+    <div class="absolute top-5 left-1/2 -translate-x-1/2 sm:top-8 opacity-60">
+      <img src="images/logo.png" alt="" class="h-10 sm:h-12 w-auto">
+    </div>
+
+    <!-- Menu -->
+    <nav class="h-full w-full flex flex-col items-center justify-center gap-8 sm:gap-10 px-6">
+      <a href="products.html" class="nav-link font-display font-light text-5xl sm:text-7xl md:text-8xl text-white hover:text-luxe transition-colors tap-none">Shop</a>
+      <span class="nav-rule h-px w-16 bg-luxe/60" aria-hidden="true"></span>
+      <a href="hub-coverage.html" class="nav-link font-display font-light text-5xl sm:text-7xl md:text-8xl text-white hover:text-luxe transition-colors tap-none">Alterations</a>
+      <span class="nav-rule h-px w-16 bg-luxe/60" aria-hidden="true"></span>
+      <a href="https://wa.me/60126913286" target="_blank" rel="noopener" class="nav-link font-display font-light text-5xl sm:text-7xl md:text-8xl text-white hover:text-luxe transition-colors tap-none">Contact</a>
+    </nav>
+
+    <!-- Bottom footer line -->
+    <p class="absolute bottom-6 left-1/2 -translate-x-1/2 text-[10px] uppercase tracking-[0.4em] text-white/35 font-light whitespace-nowrap">Arabista Official · Est. 2020</p>
+  </div>
+
+  <!-- =================================================================
+       I.  THE OPENING — Cinematic full-bleed video hero
+       100svh = "small viewport height", fits within mobile browser chrome
+       so the scroll cue is always visible on initial load.
+       ================================================================= -->
+  <section class="relative min-h-[100svh] h-[100svh] w-full overflow-hidden flex items-center justify-center">
+    <video autoplay muted loop playsinline preload="auto" class="absolute inset-0 w-full h-full object-cover cinema-zoom">
+      <source src="images/hero-ios-540p-optimized.mp4" type="video/mp4" />
+    </video>
+
+    <!-- No darkening overlays — video plays at its natural brightness.
+         Text legibility is handled by .text-shadow-* utilities on the text itself.
+         If the text becomes hard to read on a brighter video, add an overlay div here. -->
+
+    <!-- The Headline -->
+    <div class="relative z-10 text-center px-6 max-w-5xl">
+      <p class="ornament hero-ornament justify-center text-luxe mb-8 sm:mb-12 text-shadow-soft">Premium Abayas · Online Alteration Hubs</p>
+
+      <h1 class="font-display font-light leading-[0.95] tracking-tight text-white text-[18vw] sm:text-[14vw] md:text-[12vw] lg:text-[180px] text-shadow-hero" aria-label="Arabista Official">
+        <span class="block overflow-hidden">
+          <span class="char" style="animation-delay:0.70s">A</span><span class="char" style="animation-delay:0.80s">R</span><span class="char" style="animation-delay:0.90s">A</span><span class="char" style="animation-delay:1.00s">B</span><span class="char" style="animation-delay:1.10s">I</span><span class="char" style="animation-delay:1.20s">S</span><span class="char" style="animation-delay:1.30s">T</span><span class="char" style="animation-delay:1.40s">A</span>
+        </span>
+      </h1>
+
+      <p class="hero-subtitle font-display italic text-white text-xl sm:text-2xl md:text-3xl mt-6 sm:mt-8 text-shadow-soft">
+        Shop a new abaya. <span class="gold-text font-medium">Alter your current one.</span>
+      </p>
+    </div>
+
+    <!-- Scroll cue — full-width wrapper + flex justify-center guarantees true centering
+         on every viewport. iOS safe-area padding keeps it clear of the home indicator. -->
+    <div class="absolute inset-x-0 bottom-6 sm:bottom-8 z-20 flex justify-center pointer-events-none" style="padding-bottom: env(safe-area-inset-bottom);">
+      <a href="#gateway" class="pointer-events-auto flex flex-col items-center text-white scroll-cue tap-none text-shadow-soft">
+        <span class="text-[10px] uppercase tracking-[0.5em] font-medium mb-3 pl-[0.5em]">Enter Site</span>
+        <span class="w-px h-10 bg-gradient-to-b from-luxe to-transparent"></span>
+      </a>
+    </div>
+  </section>
+
+  <!-- =================================================================
+       II.  THE GATEWAY — Dual Funnel
+       ================================================================= -->
+  <section id="gateway" class="relative bg-brand">
+    <!-- Section opener -->
+    <div class="max-w-screen-2xl mx-auto px-5 sm:px-10 pt-24 sm:pt-32 pb-12 sm:pb-20 text-center">
+      <p class="ornament justify-center mb-6 reveal">What are you looking for?</p>
+      <h2 class="font-display font-light text-5xl sm:text-7xl md:text-8xl leading-[1.02] reveal" style="transition-delay: 120ms;">
+        Shop a new abaya, or <span class="italic text-luxe">alter your current one</span>.
+      </h2>
+      <p class="mt-8 max-w-xl mx-auto text-white/55 text-sm sm:text-base font-light leading-relaxed reveal" style="transition-delay: 240ms;">
+        Buy your next abaya from our online collection, or book an alteration online and drop it off at any of our partner alteration hubs nationwide.
+      </p>
+    </div>
+
+    <!-- The Split — each panel uses flex flex-col so eyebrow sits at top
+         and body sits at bottom with no absolute-position overlap. -->
+    <div class="gateway-grid grid grid-cols-1 md:grid-cols-2 min-h-[88vh] md:min-h-screen border-y border-white/5">
+
+      <!-- Panel I — The Abaya Collection -->
+      <a href="products.html" class="gateway-panel group relative overflow-hidden flex flex-col justify-between border-b md:border-b-0 md:border-r border-white/5 reveal">
+        <div class="gateway-bg absolute inset-0 w-full h-full">
+          <img src="images/hero-front.jpg" alt="Arabista premium abaya collection" class="absolute inset-0 w-full h-full object-cover" />
+        </div>
+        <div class="absolute inset-0 bg-gradient-to-t from-obsidian via-obsidian/40 to-obsidian/10"></div>
+        <div class="absolute inset-0 bg-gradient-to-r from-obsidian/40 to-transparent"></div>
+
+        <!-- Top eyebrow -->
+        <div class="relative z-10 p-8 sm:p-14">
+          <p class="text-[10px] uppercase tracking-[0.4em] text-luxe font-medium">Online Store</p>
+        </div>
+
+        <!-- Bottom content -->
+        <div class="relative z-10 p-8 sm:p-14 md:p-16">
+          <p class="gateway-eyebrow text-[10px] uppercase tracking-[0.4em] text-white/55 font-light mb-5">For New Abayas</p>
+          <h3 class="font-display font-light leading-[0.95] text-white text-5xl sm:text-6xl md:text-7xl mb-8">
+            Shop the <span class="italic">Abaya</span><br/>Collection
+          </h3>
+          <p class="text-white/65 text-sm sm:text-base font-light leading-relaxed max-w-md mb-10">
+            Browse our Dahlia, Zahra, Warda, and Maraya series — abayas made in our own Malaysian workshop using Premium Nidha Dubai fabric, sold direct at the best price.
+          </p>
+
+          <div class="flex items-center gap-6">
+            <div class="gateway-rule h-px bg-luxe w-12"></div>
+            <span class="gateway-cta inline-flex items-center gap-3 text-xs uppercase tracking-[0.32em] text-white font-medium">
+              Shop Abayas
+              <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.25"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+            </span>
+          </div>
+        </div>
+      </a>
+
+      <!-- Panel II — Abaya Alterations -->
+      <a href="hub-coverage.html" class="gateway-panel group relative overflow-hidden flex flex-col justify-between reveal" style="transition-delay: 180ms;">
+        <div class="gateway-bg absolute inset-0 w-full h-full">
+          <img src="images/hub-img1.webp" alt="Arabista alteration hub" class="absolute inset-0 w-full h-full object-cover" />
+        </div>
+        <div class="absolute inset-0 bg-gradient-to-t from-obsidian via-obsidian/40 to-obsidian/10"></div>
+        <div class="absolute inset-0 bg-gradient-to-l from-obsidian/40 to-transparent"></div>
+
+        <!-- Top eyebrow -->
+        <div class="relative z-10 p-8 sm:p-14">
+          <p class="text-[10px] uppercase tracking-[0.4em] text-luxe font-medium">Online Booking</p>
+        </div>
+
+        <!-- Bottom content -->
+        <div class="relative z-10 p-8 sm:p-14 md:p-16">
+          <p class="gateway-eyebrow text-[10px] uppercase tracking-[0.4em] text-white/55 font-light mb-5">For Your Current Abaya</p>
+          <h3 class="font-display font-light leading-[0.95] text-white text-5xl sm:text-6xl md:text-7xl mb-8">
+            Abaya<br/><span class="italic">Alterations</span>
+          </h3>
+          <p class="text-white/65 text-sm sm:text-base font-light leading-relaxed max-w-md mb-10">
+            Book online in seconds, then drop your abaya at any Arabista partner hub. Every hub follows our standard process — same quality, anywhere in Malaysia.
+          </p>
+
+          <div class="flex items-center gap-6">
+            <div class="gateway-rule h-px bg-luxe w-12"></div>
+            <span class="gateway-cta inline-flex items-center gap-3 text-xs uppercase tracking-[0.32em] text-white font-medium">
+              Find a Hub
+              <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.25"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+            </span>
+          </div>
+        </div>
+      </a>
+
+    </div>
+  </section>
+
+  <!-- =================================================================
+       III.  HERITAGE — Centered, consistent with Gateway opener & Closing
+       ================================================================= -->
+  <section id="heritage" class="relative py-24 sm:py-40 overflow-hidden">
+    <div class="max-w-3xl mx-auto px-5 sm:px-10 text-center">
+
+      <!-- Centered figure with gold frame ornaments — natural aspect ratio,
+           no fixed-ratio container, so the image is never cropped. -->
+      <div class="relative w-full max-w-md md:max-w-lg mx-auto mb-16 sm:mb-20 reveal">
+        <div class="relative rounded-sm overflow-hidden shadow-deep">
+          <img src="images/about-story.webp" alt="Arabista premium abaya in Nidha Dubai fabric" class="block w-full h-auto" loading="lazy">
+          <div class="absolute inset-0 bg-gradient-to-t from-obsidian/40 via-transparent to-transparent pointer-events-none"></div>
+        </div>
+        <!-- Frame ornament -->
+        <div class="absolute -top-4 -left-4 w-24 h-px gold-line opacity-70"></div>
+        <div class="absolute -top-4 -left-4 h-24 w-px bg-gradient-to-b from-luxe to-transparent opacity-70"></div>
+        <div class="absolute -bottom-4 -right-4 w-24 h-px gold-line opacity-70"></div>
+        <div class="absolute -bottom-4 -right-4 h-24 w-px bg-gradient-to-t from-luxe to-transparent opacity-70"></div>
+      </div>
+
+      <p class="ornament justify-center mb-6 reveal" style="transition-delay: 120ms;">About Arabista</p>
+      <h2 class="font-display font-light text-5xl sm:text-6xl md:text-7xl leading-[1.02] mb-10 reveal" style="transition-delay: 240ms;">
+        Premium quality. <span class="italic text-luxe">Best price.</span>
+      </h2>
+      <div class="space-y-6 text-white/65 text-base sm:text-lg font-light leading-[1.85] reveal" style="transition-delay: 360ms;">
+        <p>
+          Founded in Kuala Lumpur in <span class="text-white">2020</span>, Arabista produces its own abayas using <span class="text-white">Premium Nidha Dubai</span> fabric — and sells them direct to you online. No retail markup, no middleman — just premium abayas at the best price in the market.
+        </p>
+        <p>
+          For alterations, we partner with a <span class="italic text-luxe/90">nationwide network of trusted alteration hubs</span>. Book online in seconds, drop off your abaya at the nearest hub, and pick it up ready to wear — every hub follows the Arabista standard, so quality stays consistent everywhere.
+        </p>
+      </div>
+
+      <div class="mt-12 inline-flex items-center gap-5 reveal" style="transition-delay: 480ms;">
+        <div class="h-px w-12 gold-line"></div>
+        <a href="#manifesto" class="text-[11px] uppercase tracking-[0.4em] text-white hover:text-luxe transition-colors font-light">Our Promise</a>
+        <div class="h-px w-12 gold-line"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =================================================================
+       IV.  MANIFESTO — A quiet break
+       ================================================================= -->
+  <section id="manifesto" class="relative py-24 sm:py-40 bg-obsidian border-y border-white/5 overflow-hidden">
+    <div class="absolute inset-0 opacity-30" style="background: radial-gradient(ellipse at 50% 50%, rgba(192,160,98,0.10), transparent 55%);"></div>
+    <div class="relative max-w-4xl mx-auto px-6 text-center reveal">
+      <span class="font-display gold-text text-6xl sm:text-8xl leading-none italic">“</span>
+      <blockquote class="font-display font-light text-3xl sm:text-5xl md:text-6xl leading-[1.15] tracking-tight text-white -mt-6 sm:-mt-10">
+        Premium abayas at the <span class="italic text-luxe">best price</span> — made by us, sold direct, altered at any partner hub.
+      </blockquote>
+      <div class="mt-12 inline-flex items-center gap-4 text-[10px] uppercase tracking-[0.5em] text-white/40 font-light">
+        <span class="w-12 h-px bg-luxe/60"></span>
+        The Arabista Promise
+        <span class="w-12 h-px bg-luxe/60"></span>
+      </div>
+    </div>
+  </section>
+
+  <!-- =================================================================
+       V.  METRICS STRIP — Editorial signal
+       ================================================================= -->
+  <section class="relative py-20 sm:py-28">
+    <div class="max-w-screen-2xl mx-auto px-5 sm:px-10 grid grid-cols-2 lg:grid-cols-4 gap-px bg-white/5 border border-white/5 rounded-sm overflow-hidden">
+      <div class="bg-brand p-8 sm:p-12 reveal">
+        <p class="font-display gold-text text-5xl sm:text-6xl font-light leading-none">100<span class="text-3xl align-top ml-0.5">%</span></p>
+        <p class="mt-4 text-[10px] uppercase tracking-[0.42em] text-white/45 font-light">Made by Arabista</p>
+      </div>
+      <div class="bg-brand p-8 sm:p-12 reveal" style="transition-delay: 80ms;">
+        <p class="font-display gold-text text-5xl sm:text-6xl font-light leading-none">Direct</p>
+        <p class="mt-4 text-[10px] uppercase tracking-[0.42em] text-white/45 font-light">Best Online Price</p>
+      </div>
+      <div class="bg-brand p-8 sm:p-12 reveal" style="transition-delay: 160ms;">
+        <p class="font-display gold-text text-5xl sm:text-6xl font-light leading-none">Nidha</p>
+        <p class="mt-4 text-[10px] uppercase tracking-[0.42em] text-white/45 font-light">Premium Abaya Fabric</p>
+      </div>
+      <div class="bg-brand p-8 sm:p-12 reveal" style="transition-delay: 240ms;">
+        <p class="font-display gold-text text-5xl sm:text-6xl font-light leading-none">Online</p>
+        <p class="mt-4 text-[10px] uppercase tracking-[0.42em] text-white/45 font-light">Easy Alteration Booking</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- =================================================================
+       VI.  CLOSING — Return to the Gateway
+       ================================================================= -->
+  <section class="relative py-24 sm:py-36 text-center overflow-hidden">
+    <div class="absolute inset-0 opacity-40" style="background: radial-gradient(ellipse at 50% 100%, rgba(192,160,98,0.12), transparent 60%);"></div>
+    <div class="relative max-w-3xl mx-auto px-6 reveal">
+      <p class="ornament justify-center mb-8">Get Started</p>
+      <h2 class="font-display font-light text-5xl sm:text-7xl leading-[1.05] mb-12">
+        Pick your <span class="italic text-luxe">next step</span>.
+      </h2>
+      <div class="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6">
+        <a href="products.html" class="group inline-flex items-center justify-center gap-3 px-10 py-5 bg-luxe text-ink text-xs uppercase tracking-[0.4em] font-medium hover:bg-sand transition-colors duration-500 min-w-[260px]">
+          Shop Abayas
+          <svg class="w-4 h-4 transition-transform duration-500 group-hover:translate-x-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+        </a>
+        <a href="hub-coverage.html" class="group inline-flex items-center justify-center gap-3 px-10 py-5 border border-luxe/40 text-white text-xs uppercase tracking-[0.4em] font-light hover:border-luxe hover:text-luxe transition-colors duration-500 min-w-[260px]">
+          Find a Hub
+          <svg class="w-4 h-4 transition-transform duration-500 group-hover:translate-x-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <footer class="border-t border-white/10 pt-8 pb-28 sm:py-8 bg-brand mt-10">
+    <div class="max-w-screen-xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+      <p class="text-white/50 text-xs">© <span id="y"></span> Arabista Enterprise. All rights reserved.</p>
+      <nav class="flex items-center gap-4 text-white/50 text-xs uppercase tracking-widest font-medium">
+        <a href="index.html" class="hover:text-luxe transition-colors">Home</a>
+        <a href="https://wa.me/60126913286" target="_blank" class="hover:text-luxe transition-colors">Contact</a>
+      </nav>
+    </div>
+  </footer>
+
+  <!-- =================================================================
+       LIGHTWEIGHT MOTION — IO + reduced-motion guard
+       (No e-commerce JS. No arabista-core.)
+       ================================================================= -->
+  <script>
+    (function () {
+      'use strict';
+      var y = document.getElementById('y');
+      if (y) y.textContent = new Date().getFullYear();
+
+      // ---------------------------------------------------------------
+      // Full-screen nav overlay — hamburger toggle
+      // ---------------------------------------------------------------
+      (function navOverlay () {
+        var overlay = document.getElementById('nav-overlay');
+        var toggle  = document.getElementById('nav-toggle');
+        var close   = document.getElementById('nav-close');
+        if (!overlay || !toggle || !close) return;
+
+        function openNav () {
+          overlay.classList.add('open');
+          toggle.classList.add('is-open');
+          toggle.setAttribute('aria-expanded', 'true');
+          document.body.style.overflow = 'hidden';
+        }
+        function closeNav () {
+          overlay.classList.remove('open');
+          toggle.classList.remove('is-open');
+          toggle.setAttribute('aria-expanded', 'false');
+          document.body.style.overflow = '';
+        }
+
+        toggle.addEventListener('click', openNav);
+        close.addEventListener('click', closeNav);
+        overlay.querySelectorAll('a').forEach(function (a) {
+          a.addEventListener('click', closeNav);
+        });
+        document.addEventListener('keydown', function (e) {
+          if (e.key === 'Escape' && overlay.classList.contains('open')) closeNav();
+        });
+      })();
+
+      var prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      var els = document.querySelectorAll('.reveal');
+
+      if (prefersReducedMotion || !('IntersectionObserver' in window)) {
+        els.forEach(function (el) { el.classList.add('show'); });
+        return;
+      }
+
+      var io = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('show');
+            io.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.12, rootMargin: '0px 0px -8% 0px' });
+
+      els.forEach(function (el) { io.observe(el); });
+    })();
+  </script>
 </body>
 </html>
