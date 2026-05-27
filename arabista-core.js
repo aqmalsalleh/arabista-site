@@ -44,6 +44,22 @@
     const TIKTOK_URL = CTX.tiktokUrl || '';
     const REVIEWS = Array.isArray(CTX.reviews) ? CTX.reviews : [];
 
+    // -----------------------------------------------------------
+    // TikTok Events API (server-side) — click attribution capture
+    // -----------------------------------------------------------
+    // Capture ttclid from the URL on first landing and persist it,
+    // so subsequent navigations within the site can still attribute
+    // the funnel back to the original TikTok click. user_agent and
+    // page_url are read fresh on every page so they always reflect
+    // the actual hit. All three travel: PDP -> backend (ViewContent),
+    // and ride along in the checkout payload -> backend
+    // (InitiateCheckout, CompletePayment).
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.has('ttclid')) localStorage.setItem('arabista_ttclid', urlParams.get('ttclid'));
+    const ttclid = localStorage.getItem('arabista_ttclid') || '';
+    const userAgent = navigator.userAgent;
+    const pageUrl = window.location.href;
+
     if (!API_URL) {
         console.warn('[Arabista] Missing ARABISTA_CONTEXT.apiUrl — engine inert.');
         return;
@@ -439,6 +455,27 @@
             }
 
             initializeDefaultPricing();
+
+            // TikTok Events API — server-side ViewContent (PDP only).
+            // Fired ONLY when we have a real ttclid in storage, so the
+            // backend can drop the call early and we never burn quota
+            // on organic traffic. Fire-and-forget; never blocks render.
+            if (ttclid && BASE_ITEM) {
+                fetch(`${API_URL}?action=tiktok_track`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: `payload=${encodeURIComponent(JSON.stringify({
+                        event: 'ViewContent',
+                        ttclid: ttclid,
+                        userAgent: userAgent,
+                        url: pageUrl,
+                        content_id: BASE_ITEM,
+                        value: activeRetailPrice
+                    }))}`,
+                    credentials: 'omit'
+                }).catch(() => {});
+            }
+
             applyOOSStyling();
             renderAlterationFields();
 
@@ -1207,7 +1244,14 @@
             email: email,
             address: address,
             state: state,
-            postcode: postcode
+            postcode: postcode,
+            // TikTok Events API attribution — server-side InitiateCheckout +
+            // CompletePayment require these to dispatch. Stored verbatim into
+            // Orders.System_Payload so the payment webhook can fire even when
+            // the original browser session is long gone.
+            ttclid: ttclid,
+            userAgent: userAgent,
+            url: pageUrl
         };
 
         // Analytics: InitiateCheckout fan-out (GA4 + Meta + TikTok). Fired BEFORE the
