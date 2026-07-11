@@ -161,6 +161,11 @@
     }
 
     function parseDatabase(rawData) {
+        // Reset maps so Strategy 1 dynamic headers refresh cleanly
+        db.config = {};
+        db.materials = {};
+        db.bom = {};
+
         // 1. Map Config to Key/Value dict
         rawData.config.forEach(c => {
             db.config[c.Variable_Name] = parseFloat(c.Value_RM) || 0;
@@ -283,6 +288,191 @@
         btnModifyPlans.addEventListener('click', openPlanner);
     }
 
+    // --- DATABASE MANAGER ---
+    const btnOpenDbManager = document.getElementById('btn-open-db-manager');
+    const dbManagerOverlay = document.getElementById('db-manager-overlay');
+    const dbManagerDrawer = document.getElementById('db-manager-drawer');
+    const closeDbManagerBtn = document.getElementById('close-db-manager-btn');
+    const recipeDesignSelect = document.getElementById('recipe-design-select');
+    const recipeFieldsContainer = document.getElementById('recipe-fields-container');
+    const btnSaveMaterial = document.getElementById('btn-save-material');
+    const btnAddBomColumn = document.getElementById('btn-add-bom-column');
+    const btnUpdateRecipe = document.getElementById('btn-update-recipe');
+
+    function openDbManager() {
+        populateRecipeDesignSelect();
+        document.body.style.overflow = 'hidden';
+        dbManagerOverlay.classList.remove('hidden');
+        setTimeout(() => dbManagerOverlay.classList.remove('opacity-0'), 10);
+        dbManagerDrawer.classList.remove('translate-x-full');
+    }
+
+    function closeDbManager() {
+        document.body.style.overflow = '';
+        dbManagerOverlay.classList.add('opacity-0');
+        setTimeout(() => dbManagerOverlay.classList.add('hidden'), 300);
+        dbManagerDrawer.classList.add('translate-x-full');
+    }
+
+    function populateRecipeDesignSelect() {
+        if (!recipeDesignSelect) return;
+        const current = recipeDesignSelect.value;
+        recipeDesignSelect.innerHTML = '<option value="">Select Design_Code…</option>';
+        Object.keys(db.bom).sort().forEach(code => {
+            const opt = document.createElement('option');
+            opt.value = code;
+            opt.textContent = code;
+            recipeDesignSelect.appendChild(opt);
+        });
+        if (current && db.bom[current]) {
+            recipeDesignSelect.value = current;
+            renderRecipeFields(current);
+        } else {
+            recipeFieldsContainer.innerHTML = '';
+        }
+    }
+
+    function renderRecipeFields(designCode) {
+        recipeFieldsContainer.innerHTML = '';
+        const bom = db.bom[designCode];
+        if (!bom) return;
+
+        Object.keys(bom).forEach(key => {
+            if (!key.endsWith('_ID') || key === 'Design_Code') return;
+            const prefix = key.slice(0, -3);
+            const qtyKey = prefix + '_Qty';
+            const idVal = bom[key] != null ? bom[key] : '';
+            const qtyVal = bom[qtyKey] != null ? bom[qtyKey] : '';
+
+            const row = document.createElement('div');
+            row.className = 'border border-white/10 rounded-xl p-3 flex flex-col gap-2';
+            row.innerHTML = `
+                <p class="text-white/40 text-[10px] uppercase tracking-widest">${prefix}</p>
+                <input type="text" data-recipe-key="${key}" value="${idVal}" placeholder="${key}" class="recipe-field w-full bg-black/40 border border-white/10 text-white px-3 py-2 text-sm rounded-lg focus:outline-none focus:border-luxe transition-colors placeholder:text-white/30">
+                <input type="number" data-recipe-key="${qtyKey}" value="${qtyVal}" min="0" step="0.01" placeholder="${qtyKey}" class="recipe-field w-full bg-black/40 border border-white/10 text-white px-3 py-2 text-sm rounded-lg focus:outline-none focus:border-luxe transition-colors placeholder:text-white/30">
+            `;
+            recipeFieldsContainer.appendChild(row);
+        });
+
+        const laborRow = document.createElement('div');
+        laborRow.className = 'border border-white/10 rounded-xl p-3 flex flex-col gap-2';
+        laborRow.innerHTML = `
+            <p class="text-white/40 text-[10px] uppercase tracking-widest">Direct Labor (RM)</p>
+            <input type="number" data-recipe-key="Direct_Labor_RM" value="${bom.Direct_Labor_RM != null ? bom.Direct_Labor_RM : ''}" min="0" step="0.01" placeholder="Direct_Labor_RM" class="recipe-field w-full bg-black/40 border border-white/10 text-white px-3 py-2 text-sm rounded-lg focus:outline-none focus:border-luxe transition-colors placeholder:text-white/30">
+        `;
+        recipeFieldsContainer.appendChild(laborRow);
+    }
+
+    async function postManagerAction(action, payloadObj) {
+        const res = await fetch(`${ctx.apiUrl}?action=${action}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: `payload=${encodeURIComponent(JSON.stringify({ ...payloadObj, pin: sessionPin }))}`
+        });
+        const json = await res.json();
+        if (json.status !== 'success') throw new Error(json.message || 'Request failed');
+        return json;
+    }
+
+    if (btnOpenDbManager) btnOpenDbManager.addEventListener('click', openDbManager);
+    if (closeDbManagerBtn) closeDbManagerBtn.addEventListener('click', closeDbManager);
+    if (dbManagerOverlay) dbManagerOverlay.addEventListener('click', closeDbManager);
+
+    if (recipeDesignSelect) {
+        recipeDesignSelect.addEventListener('change', (e) => {
+            const code = e.target.value;
+            if (code) renderRecipeFields(code);
+            else recipeFieldsContainer.innerHTML = '';
+        });
+    }
+
+    if (btnSaveMaterial) {
+        btnSaveMaterial.addEventListener('click', async () => {
+            const Item_ID = document.getElementById('mat-item-id').value.trim();
+            const Category = document.getElementById('mat-category').value.trim();
+            const Description = document.getElementById('mat-description').value.trim();
+            const Unit_Type = document.getElementById('mat-unit-type').value.trim();
+            const Unit_Cost_RM = parseFloat(document.getElementById('mat-unit-cost').value) || 0;
+
+            if (!Item_ID) return alert('Item_ID is required.');
+
+            btnSaveMaterial.disabled = true;
+            btnSaveMaterial.textContent = 'SAVING...';
+            try {
+                await postManagerAction('add_raw_material', {
+                    Item_ID, Category, Description, Unit_Type, Unit_Cost_RM
+                });
+                document.getElementById('mat-item-id').value = '';
+                document.getElementById('mat-category').value = '';
+                document.getElementById('mat-description').value = '';
+                document.getElementById('mat-unit-type').value = '';
+                document.getElementById('mat-unit-cost').value = '';
+                await fetchData();
+                populateRecipeDesignSelect();
+                alert('Material saved.');
+            } catch (err) {
+                alert(err.message || 'Failed to save material.');
+            } finally {
+                btnSaveMaterial.disabled = false;
+                btnSaveMaterial.textContent = 'Save Material';
+            }
+        });
+    }
+
+    if (btnAddBomColumn) {
+        btnAddBomColumn.addEventListener('click', async () => {
+            const Component_Name = document.getElementById('bom-component-name').value.trim();
+            if (!Component_Name) return alert('Component Name is required.');
+
+            btnAddBomColumn.disabled = true;
+            btnAddBomColumn.textContent = 'ADDING...';
+            try {
+                await postManagerAction('add_bom_column', { Component_Name });
+                document.getElementById('bom-component-name').value = '';
+                await fetchData();
+                populateRecipeDesignSelect();
+                alert('BOM column added.');
+            } catch (err) {
+                alert(err.message || 'Failed to add BOM column.');
+            } finally {
+                btnAddBomColumn.disabled = false;
+                btnAddBomColumn.textContent = 'Add Column to Sheet';
+            }
+        });
+    }
+
+    if (btnUpdateRecipe) {
+        btnUpdateRecipe.addEventListener('click', async () => {
+            const Design_Code = recipeDesignSelect.value;
+            if (!Design_Code) return alert('Select a Design_Code first.');
+
+            const recipe = { Design_Code };
+            recipeFieldsContainer.querySelectorAll('.recipe-field').forEach(inp => {
+                const key = inp.dataset.recipeKey;
+                if (!key) return;
+                if (inp.type === 'number') {
+                    recipe[key] = inp.value === '' ? 0 : parseFloat(inp.value);
+                } else {
+                    recipe[key] = inp.value.trim();
+                }
+            });
+
+            btnUpdateRecipe.disabled = true;
+            btnUpdateRecipe.textContent = 'UPDATING...';
+            try {
+                await postManagerAction('save_bom_recipe', recipe);
+                await fetchData();
+                populateRecipeDesignSelect();
+                alert('Recipe updated.');
+            } catch (err) {
+                alert(err.message || 'Failed to update recipe.');
+            } finally {
+                btnUpdateRecipe.disabled = false;
+                btnUpdateRecipe.textContent = 'Update Recipe';
+            }
+        });
+    }
+
     // --- FINANCIAL & PROCUREMENT ENGINE ---
     function calculateEngine() {
         let totalRevenue = 0;
@@ -309,20 +499,21 @@
             const marketing = db.config['Marketing_Per_Unit'] || 5;
             totalVariableCost += ((tailoring + tiktokFee + marketing) * qty);
 
-            // BOM Explosion (Aggregating Procurement)
+            // BOM Explosion (Dynamic — Strategy 1 agnostic headers)
             const addReq = (id, amount) => {
                 if (!id || id === 'NONE' || amount <= 0) return;
                 if (!reqs[id]) reqs[id] = 0;
                 reqs[id] += (amount * qty);
             };
 
-            addReq(bom.Fabric_ID, parseFloat(bom.Fabric_Qty));
-            addReq(bom.Shawl_ID, parseFloat(bom.Shawl_Qty));
-            addReq(bom.Lace_ID, parseFloat(bom.Lace_Qty));
-            addReq(bom.Box_ID, parseFloat(bom.Box_Qty));
-            addReq(bom.Bubble_ID, parseFloat(bom.Bubble_Qty));
-            addReq(bom.ZipLock_ID, parseFloat(bom.ZipLock_Qty));
-            addReq(bom.Accessory_ID, parseFloat(bom.Accessory_Qty));
+            Object.keys(bom).forEach(key => {
+                if (!key.endsWith('_ID') || key === 'Design_Code') return;
+                const prefix = key.slice(0, -3);
+                const id = bom[key];
+                if (!id || id === 'NONE') return;
+                const amount = parseFloat(bom[prefix + '_Qty']) || 0;
+                addReq(id, amount);
+            });
         });
 
         // Calculate COGS and render procurement list

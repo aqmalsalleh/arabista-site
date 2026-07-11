@@ -58,7 +58,10 @@
     <!-- Header -->
     <header class="h-16 border-b border-white/10 flex items-center justify-between px-6 shrink-0 bg-ink">
       <div class="font-display tracking-[0.18em] text-lg text-white uppercase">Arabista <span class="text-luxe font-sans text-[10px] tracking-widest ml-2">Production</span></div>
-      <button id="btn-logout" class="text-white/50 hover:text-white text-xs uppercase tracking-widest transition-colors">Lock Session</button>
+      <div class="flex items-center">
+        <button id="btn-open-db-manager" class="text-luxe hover:text-white text-xs uppercase tracking-widest transition-colors mr-4">DB Manager</button>
+        <button id="btn-logout" class="text-white/50 hover:text-white text-xs uppercase tracking-widest transition-colors">Lock Session</button>
+      </div>
     </header>
 
     <!-- Top Sticky Metrics Bar -->
@@ -153,6 +156,51 @@
 
     <div class="p-6 border-t border-white/10 bg-ink shrink-0">
       <button id="save-planner-btn" class="w-full bg-luxe text-ink font-medium uppercase tracking-widest py-4 rounded-xl hover:opacity-90 transition shadow-soft tap-none">Confirm Selection</button>
+    </div>
+  </div>
+
+  <!-- DATABASE MANAGER DRAWER -->
+  <div id="db-manager-overlay" class="fixed inset-0 z-[60] bg-black/80 backdrop-blur-sm hidden opacity-0 transition-opacity duration-300"></div>
+  <div id="db-manager-drawer" class="fixed inset-y-0 right-0 w-full sm:max-w-lg bg-brand border-l border-white/10 z-[60] transform translate-x-full transition-transform duration-300 flex flex-col shadow-2xl">
+    
+    <div class="p-6 border-b border-white/10 flex justify-between items-center shrink-0 bg-brand">
+      <h2 class="font-display text-2xl text-white">Database Manager</h2>
+      <button id="close-db-manager-btn" class="text-gray-400 hover:text-white tap-none"><svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
+    </div>
+
+    <div class="flex-1 overflow-y-auto overscroll-contain p-6 flex flex-col gap-6 hide-scrollbar">
+
+      <!-- Panel A: Add Raw Material -->
+      <div class="glass-panel p-5 rounded-2xl flex flex-col gap-3">
+        <h3 class="text-luxe text-xs uppercase tracking-widest font-medium mb-1">Add Raw Material</h3>
+        <input type="text" id="mat-item-id" placeholder="Item_ID" class="w-full bg-black/40 border border-white/10 text-white px-3 py-2.5 text-sm rounded-lg focus:outline-none focus:border-luxe transition-colors placeholder:text-white/30">
+        <input type="text" id="mat-category" placeholder="Category" class="w-full bg-black/40 border border-white/10 text-white px-3 py-2.5 text-sm rounded-lg focus:outline-none focus:border-luxe transition-colors placeholder:text-white/30">
+        <input type="text" id="mat-description" placeholder="Description" class="w-full bg-black/40 border border-white/10 text-white px-3 py-2.5 text-sm rounded-lg focus:outline-none focus:border-luxe transition-colors placeholder:text-white/30">
+        <input type="text" id="mat-unit-type" placeholder="Unit_Type (e.g. Meter, Pcs)" class="w-full bg-black/40 border border-white/10 text-white px-3 py-2.5 text-sm rounded-lg focus:outline-none focus:border-luxe transition-colors placeholder:text-white/30">
+        <input type="number" id="mat-unit-cost" placeholder="Unit_Cost_RM" min="0" step="0.01" class="w-full bg-black/40 border border-white/10 text-white px-3 py-2.5 text-sm rounded-lg focus:outline-none focus:border-luxe transition-colors placeholder:text-white/30">
+        <button id="btn-save-material" class="w-full bg-luxe text-ink font-medium uppercase tracking-widest py-3 rounded-xl hover:opacity-90 transition shadow-soft tap-none mt-1">Save Material</button>
+      </div>
+
+      <!-- Panel B: Add BOM Column -->
+      <div class="glass-panel p-5 rounded-2xl flex flex-col gap-3">
+        <h3 class="text-luxe text-xs uppercase tracking-widest font-medium mb-1">Add BOM Column</h3>
+        <p class="text-white/40 text-[10px] mb-1">Creates Component_ID + Component_Qty headers (e.g. BrandTag → BrandTag_ID / BrandTag_Qty)</p>
+        <input type="text" id="bom-component-name" placeholder="Component Name (e.g. BrandTag)" class="w-full bg-black/40 border border-white/10 text-white px-3 py-2.5 text-sm rounded-lg focus:outline-none focus:border-luxe transition-colors placeholder:text-white/30">
+        <button id="btn-add-bom-column" class="w-full bg-white/10 text-white hover:bg-luxe hover:text-ink font-medium uppercase tracking-widest py-3 rounded-xl transition shadow-soft tap-none mt-1">Add Column to Sheet</button>
+      </div>
+
+      <!-- Panel C: Edit Design Recipe -->
+      <div class="glass-panel p-5 rounded-2xl flex flex-col gap-3">
+        <h3 class="text-luxe text-xs uppercase tracking-widest font-medium mb-1">Edit Design Recipe</h3>
+        <select id="recipe-design-select" class="w-full bg-black/40 border border-white/10 text-white px-3 py-2.5 text-sm rounded-lg focus:outline-none focus:border-luxe transition-colors">
+          <option value="">Select Design_Code…</option>
+        </select>
+        <div id="recipe-fields-container" class="flex flex-col gap-3 mt-2">
+          <!-- Populated by JS -->
+        </div>
+        <button id="btn-update-recipe" class="w-full bg-luxe text-ink font-medium uppercase tracking-widest py-3 rounded-xl hover:opacity-90 transition shadow-soft tap-none mt-2">Update Recipe</button>
+      </div>
+
     </div>
   </div>
 
