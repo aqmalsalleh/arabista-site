@@ -28,15 +28,19 @@
     const panelLedger = document.getElementById('panel-ledger');
 
     const btnOpenPlanner = document.getElementById('btn-open-planner');
-    const activePlansList = document.getElementById('active-plans-list');
+    const btnModifyPlans = document.getElementById('btn-modify-plans');
+    const plannerHeroCard = document.getElementById('planner-hero-card');
+    const plannerActiveState = document.getElementById('planner-active-state');
+    const activeCountDisplay = document.getElementById('active-designs-count');
     
     const plannerOverlay = document.getElementById('planner-overlay');
     const plannerDrawer = document.getElementById('planner-drawer');
     const closePlannerBtn = document.getElementById('close-planner-btn');
     const savePlannerBtn = document.getElementById('save-planner-btn');
     const plannerListContainer = document.getElementById('planner-list-container');
+    const plannerSearch = document.getElementById('planner-search');
 
-    // Mobile Tabs Logic
+    // Mobile Tabs Logic (Using hidden/flex to fix absolute positioning issues)
     if (tabPlans && tabLedger) {
         tabPlans.addEventListener('click', () => {
             tabPlans.classList.replace('text-white/40', 'text-luxe');
@@ -44,13 +48,9 @@
             tabLedger.classList.replace('text-luxe', 'text-white/40');
             tabLedger.classList.replace('border-luxe', 'border-transparent');
             
-            panelPlans.classList.replace('opacity-0', 'opacity-100');
-            panelPlans.classList.replace('pointer-events-none', 'pointer-events-auto');
-            panelPlans.classList.replace('z-0', 'z-10');
-            
-            panelLedger.classList.replace('opacity-100', 'opacity-0');
-            panelLedger.classList.replace('pointer-events-auto', 'pointer-events-none');
-            panelLedger.classList.replace('z-10', 'z-0');
+            panelPlans.classList.remove('hidden');
+            panelLedger.classList.add('hidden');
+            panelLedger.classList.remove('block');
         });
 
         tabLedger.addEventListener('click', () => {
@@ -59,13 +59,9 @@
             tabPlans.classList.replace('text-luxe', 'text-white/40');
             tabPlans.classList.replace('border-luxe', 'border-transparent');
             
-            panelLedger.classList.replace('opacity-0', 'opacity-100');
-            panelLedger.classList.replace('pointer-events-none', 'pointer-events-auto');
-            panelLedger.classList.replace('z-0', 'z-10');
-            
-            panelPlans.classList.replace('opacity-100', 'opacity-0');
-            panelPlans.classList.replace('pointer-events-auto', 'pointer-events-none');
-            panelPlans.classList.replace('z-10', 'z-0');
+            panelLedger.classList.remove('hidden');
+            panelLedger.classList.add('block');
+            panelPlans.classList.add('hidden');
         });
     }
 
@@ -236,7 +232,8 @@
             cb.addEventListener('change', (e) => {
                 if(e.target.checked) {
                     wrap.classList.remove('opacity-50', 'pointer-events-none');
-                    if (inp.value === "0" || inp.value === "") inp.value = 50; // default suggestion
+                    inp.value = ''; // Blank out for immediate typing
+                    inp.focus(); 
                 } else {
                     wrap.classList.add('opacity-50', 'pointer-events-none');
                     inp.value = 0;
@@ -245,29 +242,45 @@
             
             plannerListContainer.appendChild(div);
         });
+
+        // Search Filter Logic
+        if (plannerSearch) {
+            plannerSearch.addEventListener('input', (e) => {
+                const term = e.target.value.toLowerCase();
+                const cards = plannerListContainer.children;
+                Array.from(cards).forEach(card => {
+                    const design = card.querySelector('.design-checkbox').dataset.design.toLowerCase();
+                    if (design.includes(term)) {
+                        card.classList.remove('hidden');
+                        card.classList.add('flex');
+                    } else {
+                        card.classList.add('hidden');
+                        card.classList.remove('flex');
+                    }
+                });
+            });
+        }
     }
 
     function renderActivePlans() {
-        activePlansList.innerHTML = '';
         const active = db.plans.filter(p => p.Planned_Qty > 0);
         
         if(active.length === 0) {
-            activePlansList.innerHTML = '<div class="text-white/30 text-sm text-center">No designs selected.</div>';
-            return;
+            plannerHeroCard.classList.remove('hidden');
+            plannerHeroCard.classList.add('flex');
+            plannerActiveState.classList.add('hidden');
+            plannerActiveState.classList.remove('flex');
+        } else {
+            plannerHeroCard.classList.add('hidden');
+            plannerHeroCard.classList.remove('flex');
+            plannerActiveState.classList.remove('hidden');
+            plannerActiveState.classList.add('flex');
+            activeCountDisplay.textContent = active.length;
         }
+    }
 
-        active.forEach(plan => {
-            const div = document.createElement('div');
-            div.className = 'glass-panel p-4 rounded-xl flex items-center justify-between border-l-4 border-l-luxe';
-            div.innerHTML = `
-                <div>
-                    <div class="text-white font-display text-xl">${plan.Design_Code}</div>
-                    <div class="text-white/40 text-[10px] uppercase tracking-widest">RM ${parseFloat(plan.Target_Selling_Price).toFixed(2)}</div>
-                </div>
-                <div class="text-luxe font-medium text-lg">${plan.Planned_Qty} <span class="text-xs text-white/50 font-normal">units</span></div>
-            `;
-            activePlansList.appendChild(div);
-        });
+    if (btnModifyPlans) {
+        btnModifyPlans.addEventListener('click', openPlanner);
     }
 
     // --- FINANCIAL & PROCUREMENT ENGINE ---

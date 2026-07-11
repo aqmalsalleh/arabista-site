@@ -93,16 +93,17 @@
     </div>
 
     <!-- Main Workspace -->
-    <main class="flex-1 overflow-hidden flex flex-col lg:flex-row relative">
+    <main class="flex-1 overflow-hidden flex flex-col lg:flex-row">
       
       <!-- Left Panel: Monthly Plans -->
-      <section id="panel-plans" class="w-full lg:w-1/2 h-full overflow-y-auto hide-scrollbar border-r border-white/10 p-4 sm:p-6 bg-brand absolute lg:relative inset-0 z-10 transition-opacity duration-300 bg-brand">
-        <div class="flex justify-between items-center mb-8">
+      <section id="panel-plans" class="w-full lg:w-1/2 h-full overflow-y-auto hide-scrollbar border-r border-white/10 p-4 sm:p-6 bg-brand flex flex-col">
+        <div class="flex justify-between items-center mb-8 shrink-0">
           <h2 class="font-display text-2xl text-white">Monthly Plans</h2>
           <input type="month" id="plan-month-input" class="bg-black/40 border border-white/10 rounded-lg text-white text-xs px-3 py-1.5 focus:border-luxe outline-none cursor-pointer">
         </div>
         
-        <div class="glass-panel p-6 rounded-2xl flex flex-col items-center text-center">
+        <!-- Empty State Hero Card -->
+        <div id="planner-hero-card" class="glass-panel p-6 rounded-2xl flex flex-col items-center text-center">
           <div class="w-12 h-12 rounded-full bg-white/5 text-luxe flex items-center justify-center mb-4">
             <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 4v16m8-8H4"></path></svg>
           </div>
@@ -111,13 +112,18 @@
           <button id="btn-open-planner" class="w-full bg-white/10 text-white hover:bg-luxe hover:text-ink font-medium uppercase tracking-widest py-3.5 rounded-xl transition shadow-soft tap-none">Select Designs</button>
         </div>
 
-        <div id="active-plans-list" class="mt-8 space-y-3">
-          <!-- Populated by JS when designs are selected -->
+        <!-- Active State Button -->
+        <div id="planner-active-state" class="hidden flex-col gap-4 mt-4">
+          <div class="glass-panel p-6 rounded-2xl flex flex-col items-center text-center">
+             <div class="text-luxe font-display text-5xl mb-2" id="active-designs-count">0</div>
+             <p class="text-white/40 text-xs uppercase tracking-widest mb-6">Designs Planned</p>
+             <button id="btn-modify-plans" class="w-full bg-white/10 text-white hover:bg-luxe hover:text-ink font-medium uppercase tracking-widest py-3.5 rounded-xl transition shadow-soft tap-none">Modify Production Plan</button>
+          </div>
         </div>
       </section>
 
       <!-- Right Panel: Procurement List -->
-      <section id="panel-ledger" class="w-full lg:w-1/2 h-full overflow-y-auto hide-scrollbar p-4 sm:p-6 bg-ink absolute lg:relative inset-0 z-0 opacity-0 lg:opacity-100 pointer-events-none lg:pointer-events-auto transition-opacity duration-300 bg-ink">
+      <section id="panel-ledger" class="w-full lg:w-1/2 h-full overflow-y-auto hide-scrollbar p-4 sm:p-6 bg-ink hidden lg:block">
         <h2 class="font-display text-2xl text-white mb-6">Procurement Ledger</h2>
         <div id="procurement-list" class="space-y-6 pb-20">
           <!-- Populated by JS -->
@@ -135,6 +141,10 @@
     <div class="p-6 border-b border-white/10 flex justify-between items-center shrink-0 bg-brand">
       <h2 class="font-display text-2xl text-white">Select Designs</h2>
       <button id="close-planner-btn" class="text-gray-400 hover:text-white tap-none"><svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
+    </div>
+    
+    <div class="px-6 py-4 border-b border-white/10 bg-brand shrink-0">
+      <input type="text" id="planner-search" placeholder="Search design code..." class="w-full bg-black/40 border border-white/20 text-white px-4 py-2.5 text-sm rounded-lg focus:outline-none focus:border-luxe transition-colors placeholder:text-white/30 tap-none">
     </div>
 
     <div class="flex-1 overflow-y-auto overscroll-contain p-6 flex flex-col gap-4 hide-scrollbar" id="planner-list-container">
