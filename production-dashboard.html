@@ -97,20 +97,29 @@
       
       <!-- Left Panel: Monthly Plans -->
       <section id="panel-plans" class="w-full lg:w-1/2 h-full overflow-y-auto hide-scrollbar border-r border-white/10 p-4 sm:p-6 bg-brand absolute lg:relative inset-0 z-10 transition-opacity duration-300 bg-brand">
-        <div class="flex justify-between items-end mb-6">
+        <div class="flex justify-between items-center mb-8">
           <h2 class="font-display text-2xl text-white">Monthly Plans</h2>
           <input type="month" id="plan-month-input" class="bg-black/40 border border-white/10 rounded-lg text-white text-xs px-3 py-1.5 focus:border-luxe outline-none cursor-pointer">
         </div>
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4" id="plans-grid">
-          <!-- Populated by JS -->
-          <div class="text-white/30 text-sm animate-pulse">Loading models...</div>
+        
+        <div class="glass-panel p-6 rounded-2xl flex flex-col items-center text-center">
+          <div class="w-12 h-12 rounded-full bg-white/5 text-luxe flex items-center justify-center mb-4">
+            <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 4v16m8-8H4"></path></svg>
+          </div>
+          <h3 class="text-white font-medium text-lg mb-1">Plan Production</h3>
+          <p class="text-white/40 text-xs mb-6">Select designs and input quantities to calculate margins and procurement.</p>
+          <button id="btn-open-planner" class="w-full bg-white/10 text-white hover:bg-luxe hover:text-ink font-medium uppercase tracking-widest py-3.5 rounded-xl transition shadow-soft tap-none">Select Designs</button>
+        </div>
+
+        <div id="active-plans-list" class="mt-8 space-y-3">
+          <!-- Populated by JS when designs are selected -->
         </div>
       </section>
 
       <!-- Right Panel: Procurement List -->
-      <section id="panel-ledger" class="w-full lg:w-1/2 h-full overflow-y-auto hide-scrollbar p-4 sm:p-6 bg-ink absolute lg:relative inset-0 z-0 opacity-0 lg:opacity-100 pointer-events-none lg:pointer-events-auto transition-opacity duration-300">
+      <section id="panel-ledger" class="w-full lg:w-1/2 h-full overflow-y-auto hide-scrollbar p-4 sm:p-6 bg-ink absolute lg:relative inset-0 z-0 opacity-0 lg:opacity-100 pointer-events-none lg:pointer-events-auto transition-opacity duration-300 bg-ink">
         <h2 class="font-display text-2xl text-white mb-6">Procurement Ledger</h2>
-        <div id="procurement-list" class="space-y-6">
+        <div id="procurement-list" class="space-y-6 pb-20">
           <!-- Populated by JS -->
           <div class="text-white/30 text-sm animate-pulse">Awaiting input...</div>
         </div>
@@ -119,23 +128,21 @@
     </main>
   </div>
 
-  <!-- QUANTITY MODAL -->
-  <div id="qty-modal" class="fixed inset-0 z-[60] bg-black/80 backdrop-blur-sm flex items-center justify-center hidden opacity-0 transition-opacity duration-300">
-    <div class="glass-panel w-full max-w-xs p-6 rounded-2xl shadow-2xl transform scale-95 transition-transform duration-300 border border-luxe/30 bg-ink">
-      <div class="flex justify-between items-center mb-6">
-        <h3 class="font-display text-2xl text-white" id="modal-design-title">Design</h3>
-        <button id="close-qty-modal" class="text-white/40 hover:text-white tap-none"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
-      </div>
-      <p class="text-white/40 text-xs uppercase tracking-widest mb-2">Target Selling Price</p>
-      <div class="text-luxe font-medium mb-6" id="modal-design-price">RM 0.00</div>
-      
-      <p class="text-white/40 text-xs uppercase tracking-widest mb-2">Planned Quantity</p>
-      <div class="flex items-center gap-3 mb-6">
-        <button id="modal-qty-dec" class="w-12 h-12 rounded-xl bg-white/5 hover:bg-white/10 text-white flex items-center justify-center text-xl transition-colors tap-none">&minus;</button>
-        <input type="number" id="modal-qty-input" min="0" class="flex-1 bg-black/40 border border-white/20 rounded-xl text-center text-white text-2xl py-2 focus:border-luxe outline-none transition-colors">
-        <button id="modal-qty-inc" class="w-12 h-12 rounded-xl bg-white/5 hover:bg-white/10 text-white flex items-center justify-center text-xl transition-colors tap-none">&plus;</button>
-      </div>
-      <button id="save-qty-btn" class="w-full bg-luxe text-ink font-medium uppercase tracking-widest py-3.5 rounded-xl hover:opacity-90 transition shadow-soft tap-none">Save Plan</button>
+  <!-- MULTI-SELECT PLANNER DRAWER -->
+  <div id="planner-overlay" class="fixed inset-0 z-[60] bg-black/80 backdrop-blur-sm hidden opacity-0 transition-opacity duration-300"></div>
+  <div id="planner-drawer" class="fixed inset-y-0 right-0 w-full sm:max-w-md bg-brand border-l border-white/10 z-[60] transform translate-x-full transition-transform duration-300 flex flex-col shadow-2xl">
+    
+    <div class="p-6 border-b border-white/10 flex justify-between items-center shrink-0 bg-brand">
+      <h2 class="font-display text-2xl text-white">Select Designs</h2>
+      <button id="close-planner-btn" class="text-gray-400 hover:text-white tap-none"><svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
+    </div>
+
+    <div class="flex-1 overflow-y-auto overscroll-contain p-6 flex flex-col gap-4 hide-scrollbar" id="planner-list-container">
+      <!-- Populated by JS -->
+    </div>
+
+    <div class="p-6 border-t border-white/10 bg-ink shrink-0">
+      <button id="save-planner-btn" class="w-full bg-luxe text-ink font-medium uppercase tracking-widest py-4 rounded-xl hover:opacity-90 transition shadow-soft tap-none">Confirm Selection</button>
     </div>
   </div>
 

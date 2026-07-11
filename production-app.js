@@ -15,7 +15,6 @@
     const btnLogout = document.getElementById('btn-logout');
     const loginError = document.getElementById('login-error');
     
-    const plansGrid = document.getElementById('plans-grid');
     const procurementList = document.getElementById('procurement-list');
     const metricRevenue = document.getElementById('metric-revenue');
     const metricCogs = document.getElementById('metric-cogs');
@@ -28,16 +27,14 @@
     const panelPlans = document.getElementById('panel-plans');
     const panelLedger = document.getElementById('panel-ledger');
 
-    const qtyModal = document.getElementById('qty-modal');
-    const closeQtyModalBtn = document.getElementById('close-qty-modal');
-    const modalDesignTitle = document.getElementById('modal-design-title');
-    const modalDesignPrice = document.getElementById('modal-design-price');
-    const modalQtyInput = document.getElementById('modal-qty-input');
-    const modalQtyDec = document.getElementById('modal-qty-dec');
-    const modalQtyInc = document.getElementById('modal-qty-inc');
-    const saveQtyBtn = document.getElementById('save-qty-btn');
-
-    let activeModalDesign = null;
+    const btnOpenPlanner = document.getElementById('btn-open-planner');
+    const activePlansList = document.getElementById('active-plans-list');
+    
+    const plannerOverlay = document.getElementById('planner-overlay');
+    const plannerDrawer = document.getElementById('planner-drawer');
+    const closePlannerBtn = document.getElementById('close-planner-btn');
+    const savePlannerBtn = document.getElementById('save-planner-btn');
+    const plannerListContainer = document.getElementById('planner-list-container');
 
     // Mobile Tabs Logic
     if (tabPlans && tabLedger) {
@@ -72,47 +69,37 @@
         });
     }
 
-    // Modal Logic
-    function openQtyModal(design, price, currentQty) {
-        activeModalDesign = design;
-        modalDesignTitle.textContent = design;
-        modalDesignPrice.textContent = `RM ${parseFloat(price).toFixed(2)}`;
-        modalQtyInput.value = currentQty;
-        
-        qtyModal.classList.remove('hidden');
-        setTimeout(() => {
-            qtyModal.classList.replace('opacity-0', 'opacity-100');
-            qtyModal.querySelector('.glass-panel').classList.replace('scale-95', 'scale-100');
-        }, 10);
+    // Planner Drawer Logic
+    function openPlanner() {
+        document.body.style.overflow = 'hidden';
+        plannerOverlay.classList.remove('hidden');
+        setTimeout(() => plannerOverlay.classList.remove('opacity-0'), 10);
+        plannerDrawer.classList.remove('translate-x-full');
     }
 
-    function closeQtyModal() {
-        qtyModal.classList.replace('opacity-100', 'opacity-0');
-        qtyModal.querySelector('.glass-panel').classList.replace('scale-100', 'scale-95');
-        setTimeout(() => qtyModal.classList.add('hidden'), 300);
-        activeModalDesign = null;
+    function closePlanner() {
+        document.body.style.overflow = '';
+        plannerOverlay.classList.add('opacity-0');
+        setTimeout(() => plannerOverlay.classList.add('hidden'), 300);
+        plannerDrawer.classList.add('translate-x-full');
     }
 
-    closeQtyModalBtn.addEventListener('click', closeQtyModal);
-    modalQtyDec.addEventListener('click', () => { modalQtyInput.value = Math.max(0, parseInt(modalQtyInput.value || 0) - 1); });
-    modalQtyInc.addEventListener('click', () => { modalQtyInput.value = parseInt(modalQtyInput.value || 0) + 1; });
-    saveQtyBtn.addEventListener('click', () => {
-        if (!activeModalDesign) return;
-        const newQty = parseInt(modalQtyInput.value || 0);
+    btnOpenPlanner.addEventListener('click', openPlanner);
+    closePlannerBtn.addEventListener('click', closePlanner);
+    plannerOverlay.addEventListener('click', closePlanner);
+    savePlannerBtn.addEventListener('click', () => {
+        // Sync active inputs back to db.plans array
+        const activeInputs = plannerListContainer.querySelectorAll('.planner-qty');
+        activeInputs.forEach(inp => {
+            const design = inp.dataset.design;
+            const qty = parseInt(inp.value) || 0;
+            const plan = db.plans.find(p => p.Design_Code === design);
+            if (plan) plan.Planned_Qty = qty;
+        });
         
-        // Update DB Array
-        const plan = db.plans.find(p => p.Design_Code === activeModalDesign);
-        if (plan) plan.Planned_Qty = newQty;
-        
-        // Update UI Card
-        const display = document.getElementById(`qty-display-${activeModalDesign}`);
-        if (display) {
-            display.textContent = newQty > 0 ? `${newQty} units` : 'Set Quantity';
-            display.className = newQty > 0 ? 'text-luxe font-medium text-sm mt-1' : 'text-white/30 text-xs mt-1 uppercase tracking-widest';
-        }
-        
+        renderActivePlans();
         calculateEngine();
-        closeQtyModal();
+        closePlanner();
     });
 
     // State
@@ -170,7 +157,7 @@
             if (json.status !== 'success') throw new Error(json.message);
             
             parseDatabase(json.data);
-            renderPlans();
+            renderPlannerDrawer(); // Render the drawer checkboxes
             calculateEngine(); // Initial zero-state calculation
         } catch (err) {
             alert('Failed to load database: ' + err.message);
@@ -206,8 +193,12 @@
             db.bom[b.Design_Code] = b;
         });
 
-        // 4. Store Plans
-        db.plans = rawData.plans;
+        // 4. Store Plans and force default Qty to 0
+        db.plans = rawData.plans.map(p => {
+            p.Planned_Qty = 0;
+            return p;
+        });
+        
         if (db.plans.length > 0 && monthInput) {
             let dStr = String(db.plans[0].Plan_Month).trim();
             if (dStr.includes('T')) dStr = dStr.split('T')[0].substring(0, 7);
@@ -216,28 +207,66 @@
     }
 
     // --- UI RENDERING ---
-    function renderPlans() {
-        plansGrid.innerHTML = '';
+    function renderPlannerDrawer() {
+        plannerListContainer.innerHTML = '';
         db.plans.forEach(plan => {
-            const qty = parseInt(plan.Planned_Qty) || 0;
-            const qtyText = qty > 0 ? `${qty} units` : 'Set Quantity';
-            const qtyClass = qty > 0 ? 'text-luxe font-medium text-sm mt-1' : 'text-white/30 text-xs mt-1 uppercase tracking-widest';
-
-            const btn = document.createElement('button');
-            btn.type = 'button';
-            btn.className = 'glass-panel p-5 rounded-2xl flex flex-col items-start w-full text-left hover:bg-white/5 transition-colors tap-none group';
-            btn.innerHTML = `
-                <div class="w-full flex justify-between items-center mb-3">
-                    <div class="text-white font-display text-xl sm:text-2xl">${plan.Design_Code}</div>
-                    <div class="w-8 h-8 rounded-full bg-white/5 group-hover:bg-luxe flex items-center justify-center transition-colors">
-                        <svg class="w-4 h-4 text-white/50 group-hover:text-ink" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
+            const div = document.createElement('div');
+            div.className = 'glass-panel p-4 rounded-xl flex items-center gap-4';
+            div.innerHTML = `
+                <label class="relative flex items-center cursor-pointer">
+                    <input type="checkbox" class="peer sr-only design-checkbox" data-design="${plan.Design_Code}">
+                    <div class="w-6 h-6 border-2 border-white/20 rounded flex items-center justify-center peer-checked:bg-luxe peer-checked:border-luxe transition-colors">
+                        <svg class="w-4 h-4 text-ink opacity-0 peer-checked:opacity-100" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
                     </div>
+                </label>
+                <div class="flex-1">
+                    <div class="text-white font-medium text-lg">${plan.Design_Code}</div>
+                    <div class="text-white/40 text-[10px] uppercase tracking-widest">RM ${parseFloat(plan.Target_Selling_Price).toFixed(2)}</div>
                 </div>
-                <div class="text-white/40 text-[10px] uppercase tracking-widest border-t border-white/10 pt-2 w-full">RM ${parseFloat(plan.Target_Selling_Price).toFixed(2)}</div>
-                <div id="qty-display-${plan.Design_Code}" class="${qtyClass}">${qtyText}</div>
+                <div class="w-24 opacity-50 pointer-events-none transition-opacity qty-wrapper">
+                    <input type="number" min="0" data-design="${plan.Design_Code}" value="0" class="planner-qty w-full bg-black/40 border border-white/10 rounded-lg text-white text-center py-2 focus:border-luxe outline-none transition-colors">
+                </div>
             `;
-            btn.addEventListener('click', () => openQtyModal(plan.Design_Code, plan.Target_Selling_Price, parseInt(plan.Planned_Qty) || 0));
-            plansGrid.appendChild(btn);
+            
+            // Toggle opacity/pointer events of the input field based on checkbox
+            const cb = div.querySelector('.design-checkbox');
+            const wrap = div.querySelector('.qty-wrapper');
+            const inp = div.querySelector('.planner-qty');
+            
+            cb.addEventListener('change', (e) => {
+                if(e.target.checked) {
+                    wrap.classList.remove('opacity-50', 'pointer-events-none');
+                    if (inp.value === "0" || inp.value === "") inp.value = 50; // default suggestion
+                } else {
+                    wrap.classList.add('opacity-50', 'pointer-events-none');
+                    inp.value = 0;
+                }
+            });
+            
+            plannerListContainer.appendChild(div);
+        });
+    }
+
+    function renderActivePlans() {
+        activePlansList.innerHTML = '';
+        const active = db.plans.filter(p => p.Planned_Qty > 0);
+        
+        if(active.length === 0) {
+            activePlansList.innerHTML = '<div class="text-white/30 text-sm text-center">No designs selected.</div>';
+            return;
+        }
+
+        active.forEach(plan => {
+            const div = document.createElement('div');
+            div.className = 'glass-panel p-4 rounded-xl flex items-center justify-between border-l-4 border-l-luxe';
+            div.innerHTML = `
+                <div>
+                    <div class="text-white font-display text-xl">${plan.Design_Code}</div>
+                    <div class="text-white/40 text-[10px] uppercase tracking-widest">RM ${parseFloat(plan.Target_Selling_Price).toFixed(2)}</div>
+                </div>
+                <div class="text-luxe font-medium text-lg">${plan.Planned_Qty} <span class="text-xs text-white/50 font-normal">units</span></div>
+            `;
+            activePlansList.appendChild(div);
         });
     }
 
