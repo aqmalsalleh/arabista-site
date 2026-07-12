@@ -105,7 +105,7 @@
 
     // State
     let sessionPin = '';
-    let db = { config: {}, materials: {}, bom: {}, plans: [], allHistoricalPlans: [], basePrices: {} };
+    let db = { config: {}, materials: {}, bom: {}, plans: [], allHistoricalPlans: [], basePrices: {}, snapshots: [], currentMacroSnapshot: null };
 
     // --- AUTHENTICATION ---
     btnLogin.addEventListener('click', authenticate);
@@ -200,6 +200,7 @@
 
         // 4. Store Historical Plans and extract Base Prices
         db.allHistoricalPlans = rawData.plans;
+        db.snapshots = rawData.snapshots || [];
         db.basePrices = {};
         
         rawData.plans.forEach(p => {
@@ -223,16 +224,17 @@
         
         allDesigns.forEach(code => {
             const historical = db.allHistoricalPlans.find(p => {
-                let pMonth = "";
-                if (String(p.Plan_Month).includes('T')) pMonth = String(p.Plan_Month).split('T')[0].substring(0, 7);
-                else pMonth = String(p.Plan_Month).substring(0, 7);
+                let pMonth = String(p.Plan_Month).includes('T') ? String(p.Plan_Month).split('T')[0].substring(0, 7) : String(p.Plan_Month).substring(0, 7);
                 return pMonth === monthStr && p.Design_Code === code;
             });
 
             db.plans.push({
                 Design_Code: code,
                 Planned_Qty: historical ? (parseInt(historical.Planned_Qty) || 0) : 0,
-                Target_Selling_Price: historical ? (parseFloat(historical.Target_Selling_Price) || 0) : (db.basePrices[code] || 0)
+                Target_Selling_Price: historical ? (parseFloat(historical.Target_Selling_Price) || 0) : (db.basePrices[code] || 0),
+                Locked_Material_COGS_RM: historical ? historical.Locked_Material_COGS_RM : undefined,
+                Locked_Direct_Labor_RM: historical ? historical.Locked_Direct_Labor_RM : undefined,
+                Locked_Var_Overhead_RM: historical ? historical.Locked_Var_Overhead_RM : undefined
             });
         });
 
@@ -257,10 +259,25 @@
             btnSaveMonthPlan.textContent = 'SAVING...';
             
             try {
+                // Assemble locked arrays
+                const payloadPlans = db.plans.map(p => ({
+                    Design_Code: p.Design_Code,
+                    Planned_Qty: p.Planned_Qty,
+                    Target_Selling_Price: p.Target_Selling_Price,
+                    Locked_Material_COGS_RM: p.Locked_Material_COGS_RM !== undefined && p.Locked_Material_COGS_RM !== "" ? p.Locked_Material_COGS_RM : p.Live_Material_COGS_RM,
+                    Locked_Direct_Labor_RM: p.Locked_Direct_Labor_RM !== undefined && p.Locked_Direct_Labor_RM !== "" ? p.Locked_Direct_Labor_RM : p.Live_Direct_Labor_RM,
+                    Locked_Var_Overhead_RM: p.Locked_Var_Overhead_RM !== undefined && p.Locked_Var_Overhead_RM !== "" ? p.Locked_Var_Overhead_RM : p.Live_Var_Overhead_RM
+                }));
+
                 const res = await fetch(`${ctx.apiUrl}?action=save_monthly_plan`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                    body: `payload=${encodeURIComponent(JSON.stringify({ pin: sessionPin, month: currentMonth, plans: db.plans }))}`
+                    body: `payload=${encodeURIComponent(JSON.stringify({ 
+                        pin: sessionPin, 
+                        month: currentMonth, 
+                        plans: payloadPlans, 
+                        snapshot: db.currentMacroSnapshot 
+                    }))}`
                 });
                 const json = await res.json();
                 if (json.status !== 'success') throw new Error(json.message || 'Request failed');
@@ -548,66 +565,80 @@
     function calculateEngine() {
         let totalRevenue = 0;
         let totalCogs = 0;
-        let totalVariableCost = 0; // COGS + Tailoring + TikTok + Marketing
-        
-        let reqs = {}; // To aggregate raw materials
+        let totalVariableCost = 0;
+        let reqs = {}; 
+
+        const fixedOpex = (db.config['Factory_Rental'] || 0) + 
+                          (db.config['Staff_Hostel'] || 0) + 
+                          (db.config['Helper_Salary'] || 0) + 
+                          (db.config['Utilities'] || 0);
 
         db.plans.forEach(plan => {
             const qty = parseInt(plan.Planned_Qty) || 0;
             if (qty <= 0) return;
 
             const design = plan.Design_Code;
-            const price = parseFloat(plan.Target_Selling_Price);
-            const bom = db.bom[design];
-            if (!bom) return;
-
-            // Revenue
+            const price = parseFloat(plan.Target_Selling_Price) || 0;
             totalRevenue += (price * qty);
 
-            // Labor & Variable Overheads
-            const tailoring = parseFloat(bom.Direct_Labor_RM) || 10;
-            const tiktokFee = price * (db.config['TikTok_Fee_Pct'] || 0.20);
-            const marketing = db.config['Marketing_Per_Unit'] || 5;
-            totalVariableCost += ((tailoring + tiktokFee + marketing) * qty);
+            // Routing: If it has frozen history, use it. Otherwise, calculate live.
+            if (plan.Locked_Material_COGS_RM !== undefined && plan.Locked_Material_COGS_RM !== "") {
+                const matCogs = parseFloat(plan.Locked_Material_COGS_RM) || 0;
+                const labor = parseFloat(plan.Locked_Direct_Labor_RM) || 0;
+                const overhead = parseFloat(plan.Locked_Var_Overhead_RM) || 0;
+                
+                totalCogs += (matCogs * qty);
+                totalVariableCost += ((matCogs + labor + overhead) * qty);
+            } else {
+                const bom = db.bom[design];
+                if (!bom) return;
 
-            // BOM Explosion (Dynamic — Strategy 1 agnostic headers)
-            const addReq = (id, amount) => {
-                if (!id || id === 'NONE' || amount <= 0) return;
-                if (!reqs[id]) reqs[id] = 0;
-                reqs[id] += (amount * qty);
-            };
+                const tailoring = parseFloat(bom.Direct_Labor_RM) || 10;
+                const tiktokFee = price * (db.config['TikTok_Fee_Pct'] || 0.20);
+                const marketing = db.config['Marketing_Per_Unit'] || 5;
+                const overhead = tiktokFee + marketing;
+                
+                let designMatCogs = 0;
 
-            Object.keys(bom).forEach(key => {
-                if (!key.endsWith('_ID') || key === 'Design_Code') return;
-                const prefix = key.slice(0, -3);
-                const id = bom[key];
-                if (!id || id === 'NONE') return;
-                const amount = parseFloat(bom[prefix + '_Qty']) || 0;
-                addReq(id, amount);
-            });
+                const addReq = (id, amount) => {
+                    if (!id || id === 'NONE' || amount <= 0) return;
+                    if (!reqs[id]) reqs[id] = 0;
+                    reqs[id] += (amount * qty);
+                    const mat = db.materials[id];
+                    if (mat) designMatCogs += (mat.costRM * amount);
+                };
+
+                Object.keys(bom).forEach(key => {
+                    if (!key.endsWith('_ID') || key === 'Design_Code') return;
+                    const prefix = key.slice(0, -3);
+                    const id = bom[key];
+                    if (!id || id === 'NONE') return;
+                    const amount = parseFloat(bom[prefix + '_Qty']) || 0;
+                    addReq(id, amount);
+                });
+
+                totalCogs += (designMatCogs * qty);
+                totalVariableCost += ((designMatCogs + tailoring + overhead) * qty);
+
+                // Attach live variables for saving
+                plan.Live_Material_COGS_RM = designMatCogs;
+                plan.Live_Direct_Labor_RM = tailoring;
+                plan.Live_Var_Overhead_RM = overhead;
+            }
         });
 
-        // Calculate COGS and render procurement list
-        renderProcurement(reqs);
-
-        // Calculate Totals for Top Bar
-        for (const [id, qty] of Object.entries(reqs)) {
-            const mat = db.materials[id];
-            if (mat) totalCogs += (mat.costRM * qty);
-        }
-
-        totalVariableCost += totalCogs;
-
-        // Fixed OPEX
-        const fixedOpex = (db.config['Factory_Rental'] || 0) + 
-                          (db.config['Staff_Hostel'] || 0) + 
-                          (db.config['Helper_Salary'] || 0) + 
-                          (db.config['Utilities'] || 0);
-
+        // Store Macro Snapshot
         const netProfit = totalRevenue - totalVariableCost - fixedOpex;
+        db.currentMacroSnapshot = {
+            Locked_Fixed_OPEX_RM: fixedOpex,
+            Total_Revenue_RM: totalRevenue,
+            Net_Profit_RM: netProfit
+        };
+
         const profitMargin = totalRevenue > 0 ? (netProfit / totalRevenue) * 100 : 0;
 
-        // Update DOM
+        renderProcurement(reqs);
+
         metricRevenue.textContent = `RM ${totalRevenue.toFixed(2)}`;
         metricCogs.textContent = `RM ${totalCogs.toFixed(2)}`;
         
