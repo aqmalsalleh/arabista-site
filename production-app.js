@@ -294,8 +294,6 @@
     const dbManagerDrawer = document.getElementById('db-manager-drawer');
     const closeDbManagerBtn = document.getElementById('close-db-manager-btn');
     const recipeBulkCheckboxContainer = document.getElementById('recipe-bulk-checkbox-container');
-    const btnSaveMaterial = document.getElementById('btn-save-material');
-    const btnUpdateRecipe = document.getElementById('btn-update-recipe');
 
     function openDbManager() {
         renderBulkCheckboxes();
@@ -350,26 +348,6 @@
                 });
             });
         }
-
-        populateBulkMaterialDropdown();
-    }
-
-    function populateBulkMaterialDropdown() {
-        const dropdown = document.getElementById('bulk-material-dropdown');
-        if (!dropdown) return;
-        dropdown.innerHTML = '<option value="">Select a specific component column…</option>';
-        
-        // Dynamically find custom wide structural headers from first available recipe definition
-        const sampleBom = db.bom[Object.keys(db.bom)[0]] || {};
-        Object.keys(sampleBom).forEach(key => {
-            if (key.endsWith('_ID') && key !== 'Design_Code') {
-                const prefix = key.slice(0, -3);
-                const opt = document.createElement('option');
-                opt.value = prefix;
-                opt.textContent = prefix;
-                dropdown.appendChild(opt);
-            }
-        });
     }
 
     async function postManagerAction(action, payloadObj) {
@@ -424,8 +402,10 @@
         });
     }
 
-    if (btnSaveMaterial) {
-        btnSaveMaterial.addEventListener('click', async () => {
+    const btnPublishComponent = document.getElementById('btn-publish-component');
+    
+    if (btnPublishComponent) {
+        btnPublishComponent.addEventListener('click', async () => {
             const item_id = matItemId.value.trim();
             const category = matCategory.value.trim();
             const description = matDescription.value.trim();
@@ -433,92 +413,58 @@
             const price = parseFloat(matInputPrice.value) || 0;
             const currency = matCurrencySelect.value;
             const columnHeader = bomComponentName.value.trim();
+            const materialQty = document.getElementById('bulk-material-qty').value;
 
-            if (!item_id || !columnHeader) return alert('Run AI Fit and confirm your values first.');
+            if (!item_id || !columnHeader) return alert('Please define the material details (or run AI Fit) first.');
+            if (materialQty === '') return alert('Please set the application quantity.');
 
-            btnSaveMaterial.disabled = true;
-            btnSaveMaterial.textContent = 'SAVING...';
+            const selectedCbs = document.querySelectorAll('.recipe-design-cb:checked');
+            const targetDesigns = Array.from(selectedCbs).map(cb => cb.value);
+            if (targetDesigns.length === 0) return alert('Please select at least one design to assign this component to.');
+
+            btnPublishComponent.disabled = true;
+            btnPublishComponent.textContent = 'PUBLISHING...';
 
             try {
                 const liveExRate = db.config['Exchange_Rate_CNY_RM'] || 0.6001;
-                // Compute backend authoritative standard RM value
                 const resolvedCostRM = currency === 'CNY' ? (price * liveExRate) : price;
 
-                // Step A: Deploy column headers first if they don't exist
-                const exampleBom = db.bom[Object.keys(db.bom)[0]] || {};
-                if (exampleBom[columnHeader + '_ID'] === undefined) {
+                // Step 1: Initialize BOM Columns if new
+                const sampleBom = db.bom[Object.keys(db.bom)[0]] || {};
+                if (sampleBom[columnHeader + '_ID'] === undefined) {
                     await postManagerAction('add_bom_column', { componentName: columnHeader });
                 }
 
-                // Step B: Inject material into ledger
+                // Step 2: Register the raw material
                 await postManagerAction('add_raw_material', {
                     item: { Item_ID: item_id, Category: category, Description: description, Unit_Type: unit, Unit_Cost_RM: resolvedCostRM }
                 });
 
-                // Reset Fields
-                matAiRawName.value = ''; matCategory.value = ''; matInputPrice.value = '';
-                matItemId.value = ''; matDescription.value = ''; matUnitType.value = ''; bomComponentName.value = '';
+                // Step 3: Assign to selected designs
+                const recipeFields = {};
+                recipeFields[columnHeader + '_ID'] = item_id;
+                recipeFields[columnHeader + '_Qty'] = parseFloat(materialQty);
 
-                await fetchData();
-                alert('Material registered and wide database synchronized successfully.');
-            } catch (err) {
-                alert('Transaction aborted: ' + err.message);
-            } finally {
-                btnSaveMaterial.disabled = false;
-                btnSaveMaterial.textContent = 'Save Material';
-            }
-        });
-    }
-
-    if (btnUpdateRecipe) {
-        btnUpdateRecipe.addEventListener('click', async () => {
-            const selectedCbs = document.querySelectorAll('.recipe-design-cb:checked');
-            const targetDesigns = Array.from(selectedCbs).map(cb => cb.value);
-
-            if (targetDesigns.length === 0) return alert('Please tick at least one target design checkbox.');
-
-            const selectedComponentPrefix = document.getElementById('bulk-material-dropdown').value;
-            const materialQtyRaw = document.getElementById('bulk-material-qty').value;
-            const laborCostRaw = document.getElementById('bulk-labor-cost').value;
-
-            const recipeFields = {};
-
-            // Conditionally mount only requested modifications
-            if (selectedComponentPrefix) {
-                if (materialQtyRaw === '') return alert('Please assign a specific quantity value for the selected component.');
-                // Trace item_id matching this dynamic type from our memory array
-                let discoveredItemId = 'NONE';
-                for (const [id, mat] of Object.entries(db.materials)) {
-                    if (mat.category.toLowerCase().replace(/[^a-z0-9]/g, '') === selectedComponentPrefix.toLowerCase().replace(/[^a-z0-9]/g, '')) {
-                        discoveredItemId = id;
-                        break;
-                    }
-                }
-                recipeFields[selectedComponentPrefix + '_ID'] = discoveredItemId;
-                recipeFields[selectedComponentPrefix + '_Qty'] = parseFloat(materialQtyRaw);
-            }
-
-            if (laborCostRaw !== '') {
-                recipeFields['Direct_Labor_RM'] = parseFloat(laborCostRaw);
-            }
-
-            if (Object.keys(recipeFields).length === 0) return alert('Please pick a component item or set labor cost before submitting revisions.');
-
-            btnUpdateRecipe.disabled = true;
-            btnUpdateRecipe.textContent = 'UPDATING BATCH...';
-            try {
                 await postManagerAction('save_bulk_bom_recipes', {
                     designs: targetDesigns,
                     recipeFields: recipeFields
                 });
+
+                // Reset Panel
+                matAiRawName.value = ''; matCategory.value = ''; matInputPrice.value = '';
+                matItemId.value = ''; matDescription.value = ''; matUnitType.value = ''; 
+                bomComponentName.value = ''; document.getElementById('bulk-material-qty').value = '';
+                document.querySelectorAll('.recipe-design-cb').forEach(cb => cb.checked = false);
+                document.getElementById('recipe-master-select-all').checked = false;
+
                 await fetchData();
-                alert(`Successfully updated recipe components across ${targetDesigns.length} designs.`);
+                alert('Component published and instantly assigned to ' + targetDesigns.length + ' designs.');
                 closeDbManager();
             } catch (err) {
-                alert('Batch failure: ' + err.message);
+                alert('Transaction aborted: ' + err.message);
             } finally {
-                btnUpdateRecipe.disabled = false;
-                btnUpdateRecipe.textContent = 'Update Selected Recipes';
+                btnPublishComponent.disabled = false;
+                btnPublishComponent.textContent = 'Publish & Assign Component';
             }
         });
     }
