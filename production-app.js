@@ -294,7 +294,6 @@
     const dbManagerDrawer = document.getElementById('db-manager-drawer');
     const closeDbManagerBtn = document.getElementById('close-db-manager-btn');
     const recipeBulkCheckboxContainer = document.getElementById('recipe-bulk-checkbox-container');
-    const recipeFieldsContainer = document.getElementById('recipe-fields-container');
     const btnSaveMaterial = document.getElementById('btn-save-material');
     const btnUpdateRecipe = document.getElementById('btn-update-recipe');
 
@@ -316,7 +315,7 @@
     function renderBulkCheckboxes() {
         if (!recipeBulkCheckboxContainer) return;
         recipeBulkCheckboxContainer.innerHTML = `
-            <label class="flex items-center gap-3 cursor-pointer text-xs text-luxe font-medium select-none border-b border-white/10 pb-2">
+            <label class="flex items-center gap-3 cursor-pointer text-xs text-luxe font-medium select-none border-b border-white/10 pb-2 w-full">
                 <input type="checkbox" id="recipe-master-select-all" class="rounded border-white/20 bg-black/40 text-luxe focus:ring-0">
                 <span>SELECT ALL DESIGNS</span>
             </label>
@@ -325,7 +324,7 @@
         const designs = Object.keys(db.bom).sort();
         designs.forEach(code => {
             const lbl = document.createElement('label');
-            lbl.className = "flex items-center gap-3 cursor-pointer text-sm text-white/70 select-none hover:text-white";
+            lbl.className = "recipe-bulk-label flex items-center gap-3 cursor-pointer text-sm text-white/70 select-none hover:text-white w-full";
             lbl.innerHTML = `
                 <input type="checkbox" value="${code}" class="recipe-design-cb rounded border-white/20 bg-black/40 text-luxe focus:ring-0">
                 <span>${code}</span>
@@ -333,46 +332,44 @@
             recipeBulkCheckboxContainer.appendChild(lbl);
         });
 
-        // Toggle handling
         const masterCb = document.getElementById('recipe-master-select-all');
         masterCb.addEventListener('change', (e) => {
-            document.querySelectorAll('.recipe-design-cb').forEach(cb => cb.checked = e.target.checked);
+            document.querySelectorAll('.recipe-design-cb').forEach(cb => {
+                if (cb.parentElement.style.display !== 'none') cb.checked = e.target.checked;
+            });
         });
 
-        // Take the first available design as structural layout skeleton baseline for fields
-        if (designs.length > 0) renderRecipeFields(designs[0]);
+        // Bind design text input search filter
+        const searchInput = document.getElementById('recipe-design-search');
+        if (searchInput) {
+            searchInput.addEventListener('input', (e) => {
+                const term = e.target.value.toLowerCase().trim();
+                document.querySelectorAll('.recipe-bulk-label').forEach(lbl => {
+                    const text = lbl.textContent.toLowerCase();
+                    lbl.style.display = text.includes(term) ? 'flex' : 'none';
+                });
+            });
+        }
+
+        populateBulkMaterialDropdown();
     }
 
-    function renderRecipeFields(designCode) {
-        recipeFieldsContainer.innerHTML = '';
-        const bom = db.bom[designCode];
-        if (!bom) return;
-
-        Object.keys(bom).forEach(key => {
-            if (!key.endsWith('_ID') || key === 'Design_Code') return;
-            const prefix = key.slice(0, -3);
-            const qtyKey = prefix + '_Qty';
-            const idHint = bom[key] != null && bom[key] !== '' ? String(bom[key]) : key;
-            const qtyHint = bom[qtyKey] != null && bom[qtyKey] !== '' ? String(bom[qtyKey]) : qtyKey;
-
-            const row = document.createElement('div');
-            row.className = 'border border-white/10 rounded-xl p-3 flex flex-col gap-2';
-            row.innerHTML = `
-                <p class="text-white/40 text-[10px] uppercase tracking-widest">${prefix}</p>
-                <input type="text" data-recipe-key="${key}" value="" placeholder="${idHint}" class="recipe-field w-full bg-black/40 border border-white/10 text-white px-3 py-2 text-sm rounded-lg focus:outline-none focus:border-luxe transition-colors placeholder:text-white/30">
-                <input type="number" data-recipe-key="${qtyKey}" value="" min="0" step="0.01" placeholder="${qtyHint}" class="recipe-field w-full bg-black/40 border border-white/10 text-white px-3 py-2 text-sm rounded-lg focus:outline-none focus:border-luxe transition-colors placeholder:text-white/30">
-            `;
-            recipeFieldsContainer.appendChild(row);
+    function populateBulkMaterialDropdown() {
+        const dropdown = document.getElementById('bulk-material-dropdown');
+        if (!dropdown) return;
+        dropdown.innerHTML = '<option value="">Select a specific component column…</option>';
+        
+        // Dynamically find custom wide structural headers from first available recipe definition
+        const sampleBom = db.bom[Object.keys(db.bom)[0]] || {};
+        Object.keys(sampleBom).forEach(key => {
+            if (key.endsWith('_ID') && key !== 'Design_Code') {
+                const prefix = key.slice(0, -3);
+                const opt = document.createElement('option');
+                opt.value = prefix;
+                opt.textContent = prefix;
+                dropdown.appendChild(opt);
+            }
         });
-
-        const laborHint = bom.Direct_Labor_RM != null ? String(bom.Direct_Labor_RM) : 'Direct_Labor_RM';
-        const laborRow = document.createElement('div');
-        laborRow.className = 'border border-white/10 rounded-xl p-3 flex flex-col gap-2';
-        laborRow.innerHTML = `
-            <p class="text-white/40 text-[10px] uppercase tracking-widest">Direct Labor (RM)</p>
-            <input type="number" data-recipe-key="Direct_Labor_RM" value="" min="0" step="0.01" placeholder="${laborHint}" class="recipe-field w-full bg-black/40 border border-white/10 text-white px-3 py-2 text-sm rounded-lg focus:outline-none focus:border-luxe transition-colors placeholder:text-white/30">
-        `;
-        recipeFieldsContainer.appendChild(laborRow);
     }
 
     async function postManagerAction(action, payloadObj) {
@@ -480,20 +477,32 @@
 
             if (targetDesigns.length === 0) return alert('Please tick at least one target design checkbox.');
 
-            // Build payload containing only the modified variables
-            const recipeFields = {};
-            recipeFieldsContainer.querySelectorAll('.recipe-field').forEach(inp => {
-                const key = inp.dataset.recipeKey;
-                if (!key || inp.value === '') return; // Skip untouched empty values
-                
-                if (inp.type === 'number') {
-                    recipeFields[key] = parseFloat(inp.value);
-                } else {
-                    recipeFields[key] = inp.value.trim();
-                }
-            });
+            const selectedComponentPrefix = document.getElementById('bulk-material-dropdown').value;
+            const materialQtyRaw = document.getElementById('bulk-material-qty').value;
+            const laborCostRaw = document.getElementById('bulk-labor-cost').value;
 
-            if (Object.keys(recipeFields).length === 0) return alert('Please edit at least one field before updating.');
+            const recipeFields = {};
+
+            // Conditionally mount only requested modifications
+            if (selectedComponentPrefix) {
+                if (materialQtyRaw === '') return alert('Please assign a specific quantity value for the selected component.');
+                // Trace item_id matching this dynamic type from our memory array
+                let discoveredItemId = 'NONE';
+                for (const [id, mat] of Object.entries(db.materials)) {
+                    if (mat.category.toLowerCase().replace(/[^a-z0-9]/g, '') === selectedComponentPrefix.toLowerCase().replace(/[^a-z0-9]/g, '')) {
+                        discoveredItemId = id;
+                        break;
+                    }
+                }
+                recipeFields[selectedComponentPrefix + '_ID'] = discoveredItemId;
+                recipeFields[selectedComponentPrefix + '_Qty'] = parseFloat(materialQtyRaw);
+            }
+
+            if (laborCostRaw !== '') {
+                recipeFields['Direct_Labor_RM'] = parseFloat(laborCostRaw);
+            }
+
+            if (Object.keys(recipeFields).length === 0) return alert('Please pick a component item or set labor cost before submitting revisions.');
 
             btnUpdateRecipe.disabled = true;
             btnUpdateRecipe.textContent = 'UPDATING BATCH...';

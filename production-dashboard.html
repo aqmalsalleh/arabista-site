@@ -211,12 +211,26 @@
         <h3 class="text-luxe text-xs uppercase tracking-widest font-medium mb-1">Bulk Design Recipe Editor</h3>
         
         <p class="text-white/40 text-[10px] uppercase tracking-widest">Target Selection (Select Multiple)</p>
-        <div class="glass-panel p-3 rounded-xl max-h-40 overflow-y-auto space-y-2 flex flex-col hide-scrollbar border border-white/10" id="recipe-bulk-checkbox-container">
+        <input type="text" id="recipe-design-search" placeholder="Filter target designs..." class="w-full bg-black/40 border border-white/20 text-white px-3 py-2 text-sm rounded-lg focus:outline-none focus:border-luxe placeholder:text-white/30 mb-1 tap-none">
+        
+        <div class="bg-brand p-3 rounded-xl max-h-40 overflow-y-auto space-y-2 flex flex-col hide-scrollbar border border-white/10" id="recipe-bulk-checkbox-container">
           <!-- Populated by JS dynamically with clear grouped checkboxes -->
         </div>
 
-        <div id="recipe-fields-container" class="flex flex-col gap-3 mt-2">
-          <!-- Populated by JS based on selection baseline -->
+        <p class="text-luxe text-[10px] uppercase tracking-widest font-medium mt-2">Assign Component or Material</p>
+        <div id="recipe-fields-container" class="flex flex-col gap-3">
+          <div class="border border-white/10 rounded-xl p-3 flex flex-col gap-2 bg-black/20">
+            <p class="text-white/40 text-[10px] uppercase tracking-widest">Select Component to Insert/Modify</p>
+            <select id="bulk-material-dropdown" class="w-full bg-black/40 border border-white/10 text-white px-3 py-2.5 text-sm rounded-lg focus:outline-none focus:border-luxe">
+              <!-- Populated by JS with clean dynamic list of Dynamic Custom column prefixes -->
+            </select>
+            <input type="number" id="bulk-material-qty" placeholder="Input Quantity" min="0" step="0.01" class="w-full bg-black/40 border border-white/10 text-white px-3 py-2 text-sm rounded-lg focus:outline-none focus:border-luxe placeholder:text-white/30">
+          </div>
+          
+          <div class="border border-white/10 rounded-xl p-3 flex flex-col gap-2 bg-black/20">
+            <p class="text-white/40 text-[10px] uppercase tracking-widest">Direct Labor Cost (RM)</p>
+            <input type="number" id="bulk-labor-cost" placeholder="Leave blank to keep unchanged" min="0" step="0.01" class="w-full bg-black/40 border border-white/10 text-white px-3 py-2 text-sm rounded-lg focus:outline-none focus:border-luxe placeholder:text-white/30">
+          </div>
         </div>
         <button id="btn-update-recipe" class="w-full bg-luxe text-ink font-medium uppercase tracking-widest py-3.5 rounded-xl hover:opacity-90 transition shadow-soft tap-none mt-2">Update Selected Recipes</button>
       </div>
