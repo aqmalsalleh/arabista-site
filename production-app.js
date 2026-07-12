@@ -293,14 +293,13 @@
     const dbManagerOverlay = document.getElementById('db-manager-overlay');
     const dbManagerDrawer = document.getElementById('db-manager-drawer');
     const closeDbManagerBtn = document.getElementById('close-db-manager-btn');
-    const recipeDesignSelect = document.getElementById('recipe-design-select');
+    const recipeBulkCheckboxContainer = document.getElementById('recipe-bulk-checkbox-container');
     const recipeFieldsContainer = document.getElementById('recipe-fields-container');
     const btnSaveMaterial = document.getElementById('btn-save-material');
-    const btnAddBomColumn = document.getElementById('btn-add-bom-column');
     const btnUpdateRecipe = document.getElementById('btn-update-recipe');
 
     function openDbManager() {
-        populateRecipeDesignSelect();
+        renderBulkCheckboxes();
         document.body.style.overflow = 'hidden';
         dbManagerOverlay.classList.remove('hidden');
         setTimeout(() => dbManagerOverlay.classList.remove('opacity-0'), 10);
@@ -314,22 +313,34 @@
         dbManagerDrawer.classList.add('translate-x-full');
     }
 
-    function populateRecipeDesignSelect() {
-        if (!recipeDesignSelect) return;
-        const current = recipeDesignSelect.value;
-        recipeDesignSelect.innerHTML = '<option value="">Select Design_Code…</option>';
-        Object.keys(db.bom).sort().forEach(code => {
-            const opt = document.createElement('option');
-            opt.value = code;
-            opt.textContent = code;
-            recipeDesignSelect.appendChild(opt);
+    function renderBulkCheckboxes() {
+        if (!recipeBulkCheckboxContainer) return;
+        recipeBulkCheckboxContainer.innerHTML = `
+            <label class="flex items-center gap-3 cursor-pointer text-xs text-luxe font-medium select-none border-b border-white/10 pb-2">
+                <input type="checkbox" id="recipe-master-select-all" class="rounded border-white/20 bg-black/40 text-luxe focus:ring-0">
+                <span>SELECT ALL DESIGNS</span>
+            </label>
+        `;
+        
+        const designs = Object.keys(db.bom).sort();
+        designs.forEach(code => {
+            const lbl = document.createElement('label');
+            lbl.className = "flex items-center gap-3 cursor-pointer text-sm text-white/70 select-none hover:text-white";
+            lbl.innerHTML = `
+                <input type="checkbox" value="${code}" class="recipe-design-cb rounded border-white/20 bg-black/40 text-luxe focus:ring-0">
+                <span>${code}</span>
+            `;
+            recipeBulkCheckboxContainer.appendChild(lbl);
         });
-        if (current && db.bom[current]) {
-            recipeDesignSelect.value = current;
-            renderRecipeFields(current);
-        } else {
-            recipeFieldsContainer.innerHTML = '';
-        }
+
+        // Toggle handling
+        const masterCb = document.getElementById('recipe-master-select-all');
+        masterCb.addEventListener('change', (e) => {
+            document.querySelectorAll('.recipe-design-cb').forEach(cb => cb.checked = e.target.checked);
+        });
+
+        // Take the first available design as structural layout skeleton baseline for fields
+        if (designs.length > 0) renderRecipeFields(designs[0]);
     }
 
     function renderRecipeFields(designCode) {
@@ -341,24 +352,25 @@
             if (!key.endsWith('_ID') || key === 'Design_Code') return;
             const prefix = key.slice(0, -3);
             const qtyKey = prefix + '_Qty';
-            const idVal = bom[key] != null ? bom[key] : '';
-            const qtyVal = bom[qtyKey] != null ? bom[qtyKey] : '';
+            const idHint = bom[key] != null && bom[key] !== '' ? String(bom[key]) : key;
+            const qtyHint = bom[qtyKey] != null && bom[qtyKey] !== '' ? String(bom[qtyKey]) : qtyKey;
 
             const row = document.createElement('div');
             row.className = 'border border-white/10 rounded-xl p-3 flex flex-col gap-2';
             row.innerHTML = `
                 <p class="text-white/40 text-[10px] uppercase tracking-widest">${prefix}</p>
-                <input type="text" data-recipe-key="${key}" value="${idVal}" placeholder="${key}" class="recipe-field w-full bg-black/40 border border-white/10 text-white px-3 py-2 text-sm rounded-lg focus:outline-none focus:border-luxe transition-colors placeholder:text-white/30">
-                <input type="number" data-recipe-key="${qtyKey}" value="${qtyVal}" min="0" step="0.01" placeholder="${qtyKey}" class="recipe-field w-full bg-black/40 border border-white/10 text-white px-3 py-2 text-sm rounded-lg focus:outline-none focus:border-luxe transition-colors placeholder:text-white/30">
+                <input type="text" data-recipe-key="${key}" value="" placeholder="${idHint}" class="recipe-field w-full bg-black/40 border border-white/10 text-white px-3 py-2 text-sm rounded-lg focus:outline-none focus:border-luxe transition-colors placeholder:text-white/30">
+                <input type="number" data-recipe-key="${qtyKey}" value="" min="0" step="0.01" placeholder="${qtyHint}" class="recipe-field w-full bg-black/40 border border-white/10 text-white px-3 py-2 text-sm rounded-lg focus:outline-none focus:border-luxe transition-colors placeholder:text-white/30">
             `;
             recipeFieldsContainer.appendChild(row);
         });
 
+        const laborHint = bom.Direct_Labor_RM != null ? String(bom.Direct_Labor_RM) : 'Direct_Labor_RM';
         const laborRow = document.createElement('div');
         laborRow.className = 'border border-white/10 rounded-xl p-3 flex flex-col gap-2';
         laborRow.innerHTML = `
             <p class="text-white/40 text-[10px] uppercase tracking-widest">Direct Labor (RM)</p>
-            <input type="number" data-recipe-key="Direct_Labor_RM" value="${bom.Direct_Labor_RM != null ? bom.Direct_Labor_RM : ''}" min="0" step="0.01" placeholder="Direct_Labor_RM" class="recipe-field w-full bg-black/40 border border-white/10 text-white px-3 py-2 text-sm rounded-lg focus:outline-none focus:border-luxe transition-colors placeholder:text-white/30">
+            <input type="number" data-recipe-key="Direct_Labor_RM" value="" min="0" step="0.01" placeholder="${laborHint}" class="recipe-field w-full bg-black/40 border border-white/10 text-white px-3 py-2 text-sm rounded-lg focus:outline-none focus:border-luxe transition-colors placeholder:text-white/30">
         `;
         recipeFieldsContainer.appendChild(laborRow);
     }
@@ -378,40 +390,82 @@
     if (closeDbManagerBtn) closeDbManagerBtn.addEventListener('click', closeDbManager);
     if (dbManagerOverlay) dbManagerOverlay.addEventListener('click', closeDbManager);
 
-    if (recipeDesignSelect) {
-        recipeDesignSelect.addEventListener('change', (e) => {
-            const code = e.target.value;
-            if (code) renderRecipeFields(code);
-            else recipeFieldsContainer.innerHTML = '';
+    const matAiRawName = document.getElementById('mat-ai-raw-name');
+    const btnTriggerAi = document.getElementById('btn-trigger-ai');
+    const matCategory = document.getElementById('mat-category');
+    const matInputPrice = document.getElementById('mat-input-price');
+    const matCurrencySelect = document.getElementById('mat-currency-select');
+    const matItemId = document.getElementById('mat-item-id');
+    const matDescription = document.getElementById('mat-description');
+    const matUnitType = document.getElementById('mat-unit-type');
+    const bomComponentName = document.getElementById('bom-component-name');
+
+    // Trigger Gemini 1.5 Flash Content Predictions
+    if (btnTriggerAi) {
+        btnTriggerAi.addEventListener('click', async () => {
+            const rawName = matAiRawName.value.trim();
+            const category = matCategory.value.trim();
+            if (!rawName || !category) return alert('Fill up Item Name and Category first.');
+
+            btnTriggerAi.textContent = '...';
+            btnTriggerAi.disabled = true;
+
+            try {
+                const json = await postManagerAction('draft_material_metadata', { materialName: rawName, category: category });
+                if (json.data) {
+                    matItemId.value = json.data.Item_ID || '';
+                    matDescription.value = json.data.Description || '';
+                    matUnitType.value = json.data.Unit_Type || '';
+                    bomComponentName.value = json.data.BOM_Column || '';
+                }
+            } catch (err) {
+                alert('AI Prediction dropped: ' + err.message);
+            } finally {
+                btnTriggerAi.textContent = 'AI Fit';
+                btnTriggerAi.disabled = false;
+            }
         });
     }
 
     if (btnSaveMaterial) {
         btnSaveMaterial.addEventListener('click', async () => {
-            const Item_ID = document.getElementById('mat-item-id').value.trim();
-            const Category = document.getElementById('mat-category').value.trim();
-            const Description = document.getElementById('mat-description').value.trim();
-            const Unit_Type = document.getElementById('mat-unit-type').value.trim();
-            const Unit_Cost_RM = parseFloat(document.getElementById('mat-unit-cost').value) || 0;
+            const item_id = matItemId.value.trim();
+            const category = matCategory.value.trim();
+            const description = matDescription.value.trim();
+            const unit = matUnitType.value.trim();
+            const price = parseFloat(matInputPrice.value) || 0;
+            const currency = matCurrencySelect.value;
+            const columnHeader = bomComponentName.value.trim();
 
-            if (!Item_ID) return alert('Item_ID is required.');
+            if (!item_id || !columnHeader) return alert('Run AI Fit and confirm your values first.');
 
             btnSaveMaterial.disabled = true;
             btnSaveMaterial.textContent = 'SAVING...';
+
             try {
+                const liveExRate = db.config['Exchange_Rate_CNY_RM'] || 0.6001;
+                // Compute backend authoritative standard RM value
+                const resolvedCostRM = currency === 'CNY' ? (price * liveExRate) : price;
+
+                // Step A: Deploy column headers first if they don't exist
+                const exampleBom = db.bom[Object.keys(db.bom)[0]] || {};
+                if (exampleBom[columnHeader + '_ID'] === undefined) {
+                    await postManagerAction('add_bom_column', { componentName: columnHeader });
+                }
+
+                // Step B: Inject material into ledger
                 await postManagerAction('add_raw_material', {
-                    Item_ID, Category, Description, Unit_Type, Unit_Cost_RM
+                    item: { Item_ID: item_id, Category: category, Description: description, Unit_Type: unit, Unit_Cost_RM: resolvedCostRM }
                 });
-                document.getElementById('mat-item-id').value = '';
-                document.getElementById('mat-category').value = '';
-                document.getElementById('mat-description').value = '';
-                document.getElementById('mat-unit-type').value = '';
-                document.getElementById('mat-unit-cost').value = '';
+
+                // Reset Fields
+                matAiRawName.value = ''; matCategory.value = ''; matInputPrice.value = '';
+                matItemId.value = ''; matDescription.value = ''; matUnitType.value = ''; bomComponentName.value = '';
+
                 await fetchData();
-                populateRecipeDesignSelect();
-                alert('Material saved.');
+                alert('Material registered and wide database synchronized successfully.');
             } catch (err) {
-                alert(err.message || 'Failed to save material.');
+                alert('Transaction aborted: ' + err.message);
             } finally {
                 btnSaveMaterial.disabled = false;
                 btnSaveMaterial.textContent = 'Save Material';
@@ -419,56 +473,43 @@
         });
     }
 
-    if (btnAddBomColumn) {
-        btnAddBomColumn.addEventListener('click', async () => {
-            const Component_Name = document.getElementById('bom-component-name').value.trim();
-            if (!Component_Name) return alert('Component Name is required.');
-
-            btnAddBomColumn.disabled = true;
-            btnAddBomColumn.textContent = 'ADDING...';
-            try {
-                await postManagerAction('add_bom_column', { Component_Name });
-                document.getElementById('bom-component-name').value = '';
-                await fetchData();
-                populateRecipeDesignSelect();
-                alert('BOM column added.');
-            } catch (err) {
-                alert(err.message || 'Failed to add BOM column.');
-            } finally {
-                btnAddBomColumn.disabled = false;
-                btnAddBomColumn.textContent = 'Add Column to Sheet';
-            }
-        });
-    }
-
     if (btnUpdateRecipe) {
         btnUpdateRecipe.addEventListener('click', async () => {
-            const Design_Code = recipeDesignSelect.value;
-            if (!Design_Code) return alert('Select a Design_Code first.');
+            const selectedCbs = document.querySelectorAll('.recipe-design-cb:checked');
+            const targetDesigns = Array.from(selectedCbs).map(cb => cb.value);
 
-            const recipe = { Design_Code };
+            if (targetDesigns.length === 0) return alert('Please tick at least one target design checkbox.');
+
+            // Build payload containing only the modified variables
+            const recipeFields = {};
             recipeFieldsContainer.querySelectorAll('.recipe-field').forEach(inp => {
                 const key = inp.dataset.recipeKey;
-                if (!key) return;
+                if (!key || inp.value === '') return; // Skip untouched empty values
+                
                 if (inp.type === 'number') {
-                    recipe[key] = inp.value === '' ? 0 : parseFloat(inp.value);
+                    recipeFields[key] = parseFloat(inp.value);
                 } else {
-                    recipe[key] = inp.value.trim();
+                    recipeFields[key] = inp.value.trim();
                 }
             });
 
+            if (Object.keys(recipeFields).length === 0) return alert('Please edit at least one field before updating.');
+
             btnUpdateRecipe.disabled = true;
-            btnUpdateRecipe.textContent = 'UPDATING...';
+            btnUpdateRecipe.textContent = 'UPDATING BATCH...';
             try {
-                await postManagerAction('save_bom_recipe', recipe);
+                await postManagerAction('save_bulk_bom_recipes', {
+                    designs: targetDesigns,
+                    recipeFields: recipeFields
+                });
                 await fetchData();
-                populateRecipeDesignSelect();
-                alert('Recipe updated.');
+                alert(`Successfully updated recipe components across ${targetDesigns.length} designs.`);
+                closeDbManager();
             } catch (err) {
-                alert(err.message || 'Failed to update recipe.');
+                alert('Batch failure: ' + err.message);
             } finally {
                 btnUpdateRecipe.disabled = false;
-                btnUpdateRecipe.textContent = 'Update Recipe';
+                btnUpdateRecipe.textContent = 'Update Selected Recipes';
             }
         });
     }

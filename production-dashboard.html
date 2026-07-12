@@ -29,6 +29,8 @@
     .hide-scrollbar::-webkit-scrollbar { display: none; }
     .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     .glass-panel { background-color: rgba(255, 255, 255, 0.02); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.1); }
+    /* Strict iOS Mobile Auto-Zoom Viewport Deflector Rule */
+    input[type="text"], input[type="password"], input[type="number"], input[type="month"], select { font-size: 16px !important; }
     input[type="number"]::-webkit-inner-spin-button, input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
   </style>
   <script>
@@ -170,35 +172,53 @@
 
     <div class="flex-1 overflow-y-auto overscroll-contain p-6 flex flex-col gap-6 hide-scrollbar">
 
-      <!-- Panel A: Add Raw Material -->
+      <!-- Panel A: Frictionless AI Raw Material Entry -->
       <div class="glass-panel p-5 rounded-2xl flex flex-col gap-3">
-        <h3 class="text-luxe text-xs uppercase tracking-widest font-medium mb-1">Add Raw Material</h3>
-        <input type="text" id="mat-item-id" placeholder="Item_ID" class="w-full bg-black/40 border border-white/10 text-white px-3 py-2.5 text-sm rounded-lg focus:outline-none focus:border-luxe transition-colors placeholder:text-white/30">
-        <input type="text" id="mat-category" placeholder="Category" class="w-full bg-black/40 border border-white/10 text-white px-3 py-2.5 text-sm rounded-lg focus:outline-none focus:border-luxe transition-colors placeholder:text-white/30">
-        <input type="text" id="mat-description" placeholder="Description" class="w-full bg-black/40 border border-white/10 text-white px-3 py-2.5 text-sm rounded-lg focus:outline-none focus:border-luxe transition-colors placeholder:text-white/30">
-        <input type="text" id="mat-unit-type" placeholder="Unit_Type (e.g. Meter, Pcs)" class="w-full bg-black/40 border border-white/10 text-white px-3 py-2.5 text-sm rounded-lg focus:outline-none focus:border-luxe transition-colors placeholder:text-white/30">
-        <input type="number" id="mat-unit-cost" placeholder="Unit_Cost_RM" min="0" step="0.01" class="w-full bg-black/40 border border-white/10 text-white px-3 py-2.5 text-sm rounded-lg focus:outline-none focus:border-luxe transition-colors placeholder:text-white/30">
-        <button id="btn-save-material" class="w-full bg-luxe text-ink font-medium uppercase tracking-widest py-3 rounded-xl hover:opacity-90 transition shadow-soft tap-none mt-1">Save Material</button>
-      </div>
-
-      <!-- Panel B: Add BOM Column -->
-      <div class="glass-panel p-5 rounded-2xl flex flex-col gap-3">
-        <h3 class="text-luxe text-xs uppercase tracking-widest font-medium mb-1">Add BOM Column</h3>
-        <p class="text-white/40 text-[10px] mb-1">Creates Component_ID + Component_Qty headers (e.g. BrandTag → BrandTag_ID / BrandTag_Qty)</p>
-        <input type="text" id="bom-component-name" placeholder="Component Name (e.g. BrandTag)" class="w-full bg-black/40 border border-white/10 text-white px-3 py-2.5 text-sm rounded-lg focus:outline-none focus:border-luxe transition-colors placeholder:text-white/30">
-        <button id="btn-add-bom-column" class="w-full bg-white/10 text-white hover:bg-luxe hover:text-ink font-medium uppercase tracking-widest py-3 rounded-xl transition shadow-soft tap-none mt-1">Add Column to Sheet</button>
-      </div>
-
-      <!-- Panel C: Edit Design Recipe -->
-      <div class="glass-panel p-5 rounded-2xl flex flex-col gap-3">
-        <h3 class="text-luxe text-xs uppercase tracking-widest font-medium mb-1">Edit Design Recipe</h3>
-        <select id="recipe-design-select" class="w-full bg-black/40 border border-white/10 text-white px-3 py-2.5 text-sm rounded-lg focus:outline-none focus:border-luxe transition-colors">
-          <option value="">Select Design_Code…</option>
-        </select>
-        <div id="recipe-fields-container" class="flex flex-col gap-3 mt-2">
-          <!-- Populated by JS -->
+        <h3 class="text-luxe text-xs uppercase tracking-widest font-medium mb-1">Frictionless Material Entry</h3>
+        <div class="flex gap-2">
+          <input type="text" id="mat-ai-raw-name" placeholder="Item Name (e.g. Satin Brand Tag)" class="flex-1 bg-black/40 border border-white/10 text-white px-3 py-2.5 rounded-lg focus:outline-none focus:border-luxe transition-colors placeholder:text-white/30">
+          <button id="btn-trigger-ai" class="bg-white/10 px-3 rounded-lg text-luxe text-xs uppercase tracking-widest hover:bg-white/20 transition-all">AI Fit</button>
         </div>
-        <button id="btn-update-recipe" class="w-full bg-luxe text-ink font-medium uppercase tracking-widest py-3 rounded-xl hover:opacity-90 transition shadow-soft tap-none mt-2">Update Recipe</button>
+        <input type="text" id="mat-category" placeholder="Category (e.g. Accessories, Fabric, Packaging)" class="w-full bg-black/40 border border-white/10 text-white px-3 py-2.5 rounded-lg focus:outline-none focus:border-luxe transition-colors placeholder:text-white/30">
+        
+        <div class="grid grid-cols-2 gap-2">
+          <input type="number" id="mat-input-price" placeholder="Supplier Price" min="0" step="0.01" class="w-full bg-black/40 border border-white/10 text-white px-3 py-2.5 rounded-lg focus:outline-none focus:border-luxe transition-colors placeholder:text-white/30">
+          <select id="mat-currency-select" class="w-full bg-black/40 border border-white/10 text-white px-3 py-2.5 rounded-lg focus:outline-none focus:border-luxe transition-colors">
+            <option value="CNY">CNY (China)</option>
+            <option value="RM">RM (Local)</option>
+          </select>
+        </div>
+
+        <!-- Optional Accordion for Manual Review Overwrite fields -->
+        <details class="group border border-white/5 rounded-xl bg-black/20">
+          <summary class="list-none flex justify-between items-center p-3 cursor-pointer text-white/40 text-xs uppercase tracking-widest">
+            <span>Review Auto-Filled Ledger Fields</span>
+            <svg class="w-4 h-4 transition-transform group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+          </summary>
+          <div class="p-3 border-t border-white/5 flex flex-col gap-2.5">
+            <input type="text" id="mat-item-id" placeholder="Item_ID (AI Auto-Filled)" class="w-full bg-black/40 border border-white/10 text-white px-3 py-2.5 text-sm rounded-lg focus:border-luxe outline-none">
+            <input type="text" id="mat-description" placeholder="Description (AI Auto-Filled)" class="w-full bg-black/40 border border-white/10 text-white px-3 py-2.5 text-sm rounded-lg focus:border-luxe outline-none">
+            <input type="text" id="mat-unit-type" placeholder="Unit_Type (AI Auto-Filled)" class="w-full bg-black/40 border border-white/10 text-white px-3 py-2.5 text-sm rounded-lg focus:border-luxe outline-none">
+            <input type="text" id="bom-component-name" placeholder="BOM Column Header (AI Auto-Filled)" class="w-full bg-black/40 border border-white/10 text-white px-3 py-2.5 text-sm rounded-lg focus:border-luxe outline-none">
+          </div>
+        </details>
+
+        <button id="btn-save-material" class="w-full bg-luxe text-ink font-medium uppercase tracking-widest py-3.5 rounded-xl hover:opacity-90 transition shadow-soft tap-none mt-1">Save Material</button>
+      </div>
+
+      <!-- Panel C: Bulk Design Recipe Manager -->
+      <div class="glass-panel p-5 rounded-2xl flex flex-col gap-3">
+        <h3 class="text-luxe text-xs uppercase tracking-widest font-medium mb-1">Bulk Design Recipe Editor</h3>
+        
+        <p class="text-white/40 text-[10px] uppercase tracking-widest">Target Selection (Select Multiple)</p>
+        <div class="glass-panel p-3 rounded-xl max-h-40 overflow-y-auto space-y-2 flex flex-col hide-scrollbar border border-white/10" id="recipe-bulk-checkbox-container">
+          <!-- Populated by JS dynamically with clear grouped checkboxes -->
+        </div>
+
+        <div id="recipe-fields-container" class="flex flex-col gap-3 mt-2">
+          <!-- Populated by JS based on selection baseline -->
+        </div>
+        <button id="btn-update-recipe" class="w-full bg-luxe text-ink font-medium uppercase tracking-widest py-3.5 rounded-xl hover:opacity-90 transition shadow-soft tap-none mt-2">Update Selected Recipes</button>
       </div>
 
     </div>
