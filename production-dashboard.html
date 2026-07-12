@@ -48,7 +48,7 @@
       <h1 class="font-display tracking-[0.18em] text-2xl text-white mb-2 uppercase">Arabista</h1>
       <p class="text-white/50 text-xs uppercase tracking-widest mb-8">Production Engine</p>
       
-      <input type="password" id="pin-input" maxlength="6" class="w-full bg-ink border border-white/20 rounded-lg text-center text-white px-4 py-3 text-2xl tracking-[0.5em] focus:border-luxe outline-none transition-colors mb-4 placeholder:text-white/20" placeholder="••••••">
+      <input type="password" id="pin-input" inputmode="numeric" pattern="[0-9]*" maxlength="6" class="w-full bg-ink border border-white/20 rounded-lg text-center text-white px-4 py-3 text-2xl tracking-[0.5em] focus:border-luxe outline-none transition-colors mb-4 placeholder:text-white/20" placeholder="••••••">
       
       <button id="btn-login" class="w-full bg-luxe text-ink font-medium uppercase tracking-widest py-3.5 rounded-xl hover:opacity-90 transition shadow-soft">Authenticate</button>
       <p id="login-error" class="text-red-400 text-xs mt-4 hidden">Invalid PIN or Network Error</p>
@@ -123,7 +123,8 @@
              <div class="text-luxe font-display text-5xl mb-2" id="active-designs-count">0</div>
              <p class="text-white/40 text-xs uppercase tracking-widest mb-6">Designs Planned</p>
              <button id="btn-modify-plans" class="w-full bg-white/10 text-white hover:bg-white/20 font-medium uppercase tracking-widest py-3.5 rounded-xl transition shadow-soft tap-none mb-3">Modify Plan Targets</button>
-             <button id="btn-save-month-plan" class="w-full bg-luxe text-ink font-medium uppercase tracking-widest py-3.5 rounded-xl hover:opacity-90 transition shadow-soft tap-none">Save Month to Database</button>
+             <button id="btn-save-month-plan" class="w-full bg-luxe text-ink font-medium uppercase tracking-widest py-3.5 rounded-xl hover:opacity-90 transition shadow-soft tap-none mb-3">Save Month to Database</button>
+             <button id="btn-clear-month-plan" class="w-full border border-red-500/30 text-red-400 hover:bg-red-500/10 font-medium uppercase tracking-widest py-3 rounded-xl transition shadow-soft tap-none">Clear Month Plan</button>
           </div>
         </div>
       </section>
@@ -149,8 +150,15 @@
       <button id="close-planner-btn" class="text-gray-400 hover:text-white tap-none"><svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
     </div>
     
-    <div class="px-6 py-4 border-b border-white/10 bg-brand shrink-0">
+    <div class="px-6 pt-4 pb-3 border-b border-white/10 bg-brand shrink-0 flex flex-col gap-3">
       <input type="text" id="planner-search" placeholder="Search design code..." class="w-full bg-black/40 border border-white/20 text-white px-4 py-2.5 text-sm rounded-lg focus:outline-none focus:border-luxe transition-colors placeholder:text-white/30 tap-none">
+      <div class="flex items-center justify-between">
+        <span class="text-white/40 text-[10px] uppercase tracking-widest">Show Planned Only</span>
+        <label class="relative inline-flex items-center cursor-pointer">
+          <input type="checkbox" id="toggle-planned-only" class="sr-only peer">
+          <div class="w-8 h-4 bg-white/10 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-luxe"></div>
+        </label>
+      </div>
     </div>
 
     <div class="flex-1 overflow-y-auto overscroll-contain p-6 flex flex-col gap-4 hide-scrollbar" id="planner-list-container">

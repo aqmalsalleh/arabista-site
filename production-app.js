@@ -80,7 +80,6 @@
         plannerDrawer.classList.add('translate-x-full');
     }
 
-    btnOpenPlanner.addEventListener('click', openPlanner);
     closePlannerBtn.addEventListener('click', closePlanner);
     plannerOverlay.addEventListener('click', closePlanner);
     savePlannerBtn.addEventListener('click', () => {
@@ -292,6 +291,36 @@
         });
     }
 
+    const btnClearMonthPlan = document.getElementById('btn-clear-month-plan');
+    if (btnClearMonthPlan) {
+        btnClearMonthPlan.addEventListener('click', async () => {
+            const currentMonth = monthInput.value;
+            if (!currentMonth) return;
+            if (!confirm(`Are you absolutely sure you want to permanently clear the production plan for ${currentMonth}?`)) return;
+
+            btnClearMonthPlan.disabled = true;
+            btnClearMonthPlan.textContent = 'DELETING...';
+
+            try {
+                const res = await fetch(`${ctx.apiUrl}?action=delete_monthly_plan`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: `payload=${encodeURIComponent(JSON.stringify({ pin: sessionPin, month: currentMonth }))}`
+                });
+                const json = await res.json();
+                if (json.status !== 'success') throw new Error(json.message);
+                
+                await fetchData();
+                alert(`All planning data for ${currentMonth} has been cleared.`);
+            } catch (err) {
+                alert('Deletion failed: ' + err.message);
+            } finally {
+                btnClearMonthPlan.disabled = false;
+                btnClearMonthPlan.textContent = 'Clear Month Plan';
+            }
+        });
+    }
+
     // --- UI RENDERING ---
     function renderPlannerDrawer() {
         plannerListContainer.innerHTML = '';
@@ -337,28 +366,54 @@
                     wrap.classList.add('opacity-50', 'pointer-events-none');
                     qtyInp.value = '';
                 }
+                if (window.applyDrawerFilters) window.applyDrawerFilters();
             });
             
             plannerListContainer.appendChild(div);
         });
 
-        // Search Filter Logic
-        if (plannerSearch) {
-            plannerSearch.addEventListener('input', (e) => {
-                const term = e.target.value.toLowerCase();
-                const cards = plannerListContainer.children;
-                Array.from(cards).forEach(card => {
-                    const design = card.querySelector('.design-checkbox').dataset.design.toLowerCase();
-                    if (design.includes(term)) {
-                        card.classList.remove('hidden');
-                        card.classList.add('flex');
-                    } else {
-                        card.classList.add('hidden');
-                        card.classList.remove('flex');
-                    }
-                });
+        // Unified Smart Filter Logic
+        const togglePlannedOnly = document.getElementById('toggle-planned-only');
+        
+        const applyDrawerFilters = () => {
+            const searchEl = document.getElementById('planner-search');
+            const toggleEl = document.getElementById('toggle-planned-only');
+            const term = searchEl ? searchEl.value.toLowerCase() : '';
+            const showPlannedOnly = toggleEl ? toggleEl.checked : false;
+            
+            Array.from(plannerListContainer.children).forEach(card => {
+                const cb = card.querySelector('.design-checkbox');
+                const design = cb.dataset.design.toLowerCase();
+                const isPlanned = cb.checked;
+                
+                const matchesSearch = design.includes(term);
+                const matchesToggle = !showPlannedOnly || isPlanned;
+                
+                if (matchesSearch && matchesToggle) {
+                    card.classList.remove('hidden');
+                    card.classList.add('flex');
+                } else {
+                    card.classList.add('hidden');
+                    card.classList.remove('flex');
+                }
             });
+        };
+
+        if (plannerSearch || document.getElementById('planner-search')) {
+            const searchNode = document.getElementById('planner-search');
+            if (searchNode) {
+                searchNode.replaceWith(searchNode.cloneNode(true));
+                document.getElementById('planner-search').addEventListener('input', applyDrawerFilters);
+            }
         }
+        if (togglePlannedOnly) {
+            togglePlannedOnly.replaceWith(togglePlannedOnly.cloneNode(true));
+            document.getElementById('toggle-planned-only').addEventListener('change', applyDrawerFilters);
+        }
+
+        // Attach global filter triggers to window for external buttons
+        window.applyDrawerFilters = applyDrawerFilters;
+        applyDrawerFilters();
     }
 
     function renderActivePlans() {
@@ -379,7 +434,25 @@
     }
 
     if (btnModifyPlans) {
-        btnModifyPlans.addEventListener('click', openPlanner);
+        btnModifyPlans.replaceWith(btnModifyPlans.cloneNode(true));
+        document.getElementById('btn-modify-plans').addEventListener('click', () => {
+            const toggle = document.getElementById('toggle-planned-only');
+            if (toggle) toggle.checked = true;
+            if (window.applyDrawerFilters) window.applyDrawerFilters();
+            openPlanner();
+        });
+    }
+
+    if (btnOpenPlanner) {
+        btnOpenPlanner.replaceWith(btnOpenPlanner.cloneNode(true));
+        document.getElementById('btn-open-planner').addEventListener('click', () => {
+            const toggle = document.getElementById('toggle-planned-only');
+            const search = document.getElementById('planner-search');
+            if (toggle) toggle.checked = false;
+            if (search) search.value = '';
+            if (window.applyDrawerFilters) window.applyDrawerFilters();
+            openPlanner();
+        });
     }
 
     // --- COMPONENT PUBLISHER (DATABASE MANAGER) ---
