@@ -469,6 +469,9 @@
         dbManagerOverlay.classList.remove('hidden');
         setTimeout(() => dbManagerOverlay.classList.remove('opacity-0'), 10);
         dbManagerDrawer.classList.remove('translate-x-full');
+        renderMaterialEditor();
+        renderConfigEditor();
+        populateBomDropdown();
     }
 
     function closeDbManager() {
@@ -764,5 +767,158 @@
         }
         procurementList.innerHTML = html;
     }
+
+    // --- MASTER SETTINGS TABS & EDITORS ---
+    const tabBtns = document.querySelectorAll('.settings-tab-btn');
+    const panels = document.querySelectorAll('.settings-panel');
+
+    tabBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            tabBtns.forEach(b => { b.classList.remove('bg-luxe', 'text-ink'); b.classList.add('text-white/40', 'hover:bg-white/5'); });
+            btn.classList.remove('text-white/40', 'hover:bg-white/5');
+            btn.classList.add('bg-luxe', 'text-ink');
+
+            panels.forEach(p => {
+                p.classList.add('hidden');
+                p.classList.remove('flex');
+            });
+            const target = document.getElementById(btn.dataset.target);
+            if (target) {
+                target.classList.remove('hidden');
+                target.classList.add('flex');
+            }
+        });
+    });
+
+    // Materials Render & Save
+    const matEditorList = document.getElementById('material-editor-list');
+    function renderMaterialEditor() {
+        if (!matEditorList) return;
+        matEditorList.innerHTML = '';
+        Object.entries(db.materials).forEach(([id, mat]) => {
+            matEditorList.innerHTML += `
+                <div class="glass-panel p-3 rounded-xl flex items-center justify-between gap-3">
+                    <div class="flex-1 truncate">
+                        <p class="text-white text-sm truncate">${mat.desc}</p>
+                        <p class="text-white/40 text-[10px] uppercase tracking-widest">${id} • ${mat.unit}</p>
+                    </div>
+                    <div class="w-24 shrink-0">
+                        <input type="number" step="0.01" data-mat-id="${id}" value="${mat.costRM}" class="mat-price-input w-full bg-black/40 border border-white/10 rounded-lg text-white text-center py-2 text-sm focus:border-luxe outline-none">
+                    </div>
+                </div>`;
+        });
+    }
+
+    document.getElementById('btn-save-materials')?.addEventListener('click', async (e) => {
+        const btn = e.target;
+        const updates = Array.from(document.querySelectorAll('.mat-price-input')).map(inp => ({
+            id: inp.dataset.matId, price: parseFloat(inp.value) || 0
+        }));
+        btn.textContent = 'UPDATING...';
+        try {
+            await postManagerAction('update_material_prices', { updates });
+            await fetchData();
+            alert('Material Catalog updated successfully.');
+        } catch(err) { alert('Error: ' + err.message); }
+        btn.textContent = 'Update Catalog Prices';
+    });
+
+    // Config Render & Save
+    const configEditorList = document.getElementById('config-editor-list');
+    function renderConfigEditor() {
+        if (!configEditorList) return;
+        configEditorList.innerHTML = '';
+        Object.entries(db.config).forEach(([key, val]) => {
+            configEditorList.innerHTML += `
+                <div class="glass-panel p-3 rounded-xl flex items-center justify-between gap-3">
+                    <div class="flex-1 truncate text-white/70 text-xs uppercase tracking-widest">${key.replace(/_/g, ' ')}</div>
+                    <div class="w-24 shrink-0">
+                        <input type="number" step="0.01" data-config-key="${key}" value="${val}" class="config-val-input w-full bg-black/40 border border-white/10 rounded-lg text-white text-center py-2 text-sm focus:border-luxe outline-none">
+                    </div>
+                </div>`;
+        });
+    }
+
+    document.getElementById('btn-save-config')?.addEventListener('click', async (e) => {
+        const btn = e.target;
+        const updates = Array.from(document.querySelectorAll('.config-val-input')).map(inp => ({
+            name: inp.dataset.configKey, value: parseFloat(inp.value) || 0
+        }));
+        btn.textContent = 'UPDATING...';
+        try {
+            await postManagerAction('update_global_config', { updates });
+            await fetchData();
+            alert('Global Config updated successfully.');
+        } catch(err) { alert('Error: ' + err.message); }
+        btn.textContent = 'Update Operations';
+    });
+
+    // BOM Render & Save
+    const bomEditorSelect = document.getElementById('bom-editor-select');
+    const bomEditorFields = document.getElementById('bom-editor-fields');
+
+    function populateBomDropdown() {
+        if (!bomEditorSelect) return;
+        bomEditorSelect.innerHTML = '<option value="">Select Design to Edit...</option>';
+        Object.keys(db.bom).sort().forEach(code => {
+            bomEditorSelect.innerHTML += `<option value="${code}">${code}</option>`;
+        });
+    }
+
+    bomEditorSelect?.addEventListener('change', (e) => {
+        bomEditorFields.innerHTML = '';
+        const code = e.target.value;
+        if (!code || !db.bom[code]) return;
+
+        const bom = db.bom[code];
+        Object.keys(bom).forEach(key => {
+            if (!key.endsWith('_ID') || key === 'Design_Code') return;
+            const prefix = key.slice(0, -3);
+            const qtyKey = prefix + '_Qty';
+            const compId = bom[key];
+            if (!compId || compId === 'NONE') return;
+
+            const matName = db.materials[compId] ? db.materials[compId].desc : compId;
+            const matQty = parseFloat(bom[qtyKey]) || 0;
+
+            bomEditorFields.innerHTML += `
+                <div class="glass-panel p-3 rounded-xl flex items-center justify-between gap-3">
+                    <div class="flex-1 truncate">
+                        <p class="text-white text-sm truncate">${matName}</p>
+                        <p class="text-white/40 text-[10px] uppercase tracking-widest">${prefix}</p>
+                    </div>
+                    <div class="w-24 shrink-0">
+                        <input type="number" step="0.01" data-bom-key="${qtyKey}" value="${matQty}" class="bom-qty-input w-full bg-black/40 border border-white/10 rounded-lg text-white text-center py-2 text-sm focus:border-luxe outline-none">
+                    </div>
+                </div>`;
+        });
+
+        bomEditorFields.innerHTML += `
+            <div class="glass-panel p-3 rounded-xl flex items-center justify-between gap-3 border border-luxe/30 mt-2">
+                <div class="flex-1 text-luxe text-xs uppercase tracking-widest">Direct Labor (RM)</div>
+                <div class="w-24 shrink-0">
+                    <input type="number" step="0.01" data-bom-key="Direct_Labor_RM" value="${parseFloat(bom.Direct_Labor_RM) || 0}" class="bom-qty-input w-full bg-black/40 border border-white/10 rounded-lg text-white text-center py-2 text-sm focus:border-luxe outline-none">
+                </div>
+            </div>`;
+    });
+
+    document.getElementById('btn-save-bom-recipe')?.addEventListener('click', async (e) => {
+        const btn = e.target;
+        const design = bomEditorSelect.value;
+        if (!design) return;
+
+        const recipeFields = {};
+        document.querySelectorAll('.bom-qty-input').forEach(inp => {
+            recipeFields[inp.dataset.bomKey] = parseFloat(inp.value) || 0;
+        });
+
+        btn.textContent = 'SAVING...';
+        try {
+            await postManagerAction('save_single_recipe', { design, recipeFields });
+            await fetchData();
+            alert('Recipe overwritten successfully.');
+        } catch(err) { alert('Error: ' + err.message); }
+        btn.textContent = 'Save Recipe Changes';
+    });
 
 })();
