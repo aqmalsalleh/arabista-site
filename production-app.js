@@ -288,12 +288,13 @@
         btnModifyPlans.addEventListener('click', openPlanner);
     }
 
-    // --- DATABASE MANAGER ---
+    // --- COMPONENT PUBLISHER (DATABASE MANAGER) ---
     const btnOpenDbManager = document.getElementById('btn-open-db-manager');
     const dbManagerOverlay = document.getElementById('db-manager-overlay');
     const dbManagerDrawer = document.getElementById('db-manager-drawer');
     const closeDbManagerBtn = document.getElementById('close-db-manager-btn');
     const recipeBulkCheckboxContainer = document.getElementById('recipe-bulk-checkbox-container');
+    const recipeDesignSearch = document.getElementById('recipe-design-search');
 
     function openDbManager() {
         renderBulkCheckboxes();
@@ -337,10 +338,9 @@
             });
         });
 
-        // Bind design text input search filter
-        const searchInput = document.getElementById('recipe-design-search');
-        if (searchInput) {
-            searchInput.addEventListener('input', (e) => {
+        if (recipeDesignSearch) {
+            recipeDesignSearch.value = ''; // Clear search on open
+            recipeDesignSearch.addEventListener('input', (e) => {
                 const term = e.target.value.toLowerCase().trim();
                 document.querySelectorAll('.recipe-bulk-label').forEach(lbl => {
                     const text = lbl.textContent.toLowerCase();
@@ -374,8 +374,8 @@
     const matDescription = document.getElementById('mat-description');
     const matUnitType = document.getElementById('mat-unit-type');
     const bomComponentName = document.getElementById('bom-component-name');
+    const btnPublishComponent = document.getElementById('btn-publish-component');
 
-    // Trigger Gemini 1.5 Flash Content Predictions
     if (btnTriggerAi) {
         btnTriggerAi.addEventListener('click', async () => {
             const rawName = matAiRawName.value.trim();
@@ -401,8 +401,6 @@
             }
         });
     }
-
-    const btnPublishComponent = document.getElementById('btn-publish-component');
     
     if (btnPublishComponent) {
         btnPublishComponent.addEventListener('click', async () => {
