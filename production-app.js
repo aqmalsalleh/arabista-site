@@ -84,13 +84,18 @@
     closePlannerBtn.addEventListener('click', closePlanner);
     plannerOverlay.addEventListener('click', closePlanner);
     savePlannerBtn.addEventListener('click', () => {
-        // Sync active inputs back to db.plans array
-        const activeInputs = plannerListContainer.querySelectorAll('.planner-qty');
-        activeInputs.forEach(inp => {
-            const design = inp.dataset.design;
-            const qty = parseInt(inp.value) || 0;
+        const cbs = plannerListContainer.querySelectorAll('.design-checkbox');
+        cbs.forEach(cb => {
+            const design = cb.dataset.design;
+            const card = cb.closest('.glass-panel');
+            const qtyInp = card.querySelector('.planner-qty');
+            const priceInp = card.querySelector('.planner-price');
+            
             const plan = db.plans.find(p => p.Design_Code === design);
-            if (plan) plan.Planned_Qty = qty;
+            if (plan) {
+                plan.Planned_Qty = cb.checked ? (parseInt(qtyInp.value) || 0) : 0;
+                plan.Target_Selling_Price = parseFloat(priceInp.value) || 0;
+            }
         });
         
         renderActivePlans();
@@ -100,7 +105,7 @@
 
     // State
     let sessionPin = '';
-    let db = { config: {}, materials: {}, bom: {}, plans: [] };
+    let db = { config: {}, materials: {}, bom: {}, plans: [], allHistoricalPlans: [], basePrices: {} };
 
     // --- AUTHENTICATION ---
     btnLogin.addEventListener('click', authenticate);
@@ -153,8 +158,7 @@
             if (json.status !== 'success') throw new Error(json.message);
             
             parseDatabase(json.data);
-            renderPlannerDrawer(); // Render the drawer checkboxes
-            calculateEngine(); // Initial zero-state calculation
+            // loadMonthState (via parseDatabase) handles drawer + metrics render
         } catch (err) {
             alert('Failed to load database: ' + err.message);
         }
@@ -194,17 +198,81 @@
             db.bom[b.Design_Code] = b;
         });
 
-        // 4. Store Plans and force default Qty to 0
-        db.plans = rawData.plans.map(p => {
-            p.Planned_Qty = 0;
-            return p;
-        });
+        // 4. Store Historical Plans and extract Base Prices
+        db.allHistoricalPlans = rawData.plans;
+        db.basePrices = {};
         
-        if (db.plans.length > 0 && monthInput) {
-            let dStr = String(db.plans[0].Plan_Month).trim();
-            if (dStr.includes('T')) dStr = dStr.split('T')[0].substring(0, 7);
-            monthInput.value = dStr;
+        rawData.plans.forEach(p => {
+            db.basePrices[p.Design_Code] = parseFloat(p.Target_Selling_Price) || 0;
+        });
+
+        if (monthInput && !monthInput.value) {
+            let d = new Date();
+            let mm = ('0' + (d.getMonth() + 1)).slice(-2);
+            monthInput.value = d.getFullYear() + '-' + mm;
         }
+        
+        loadMonthState(monthInput.value);
+    }
+
+    // Historical Time-Travel Engine
+    function loadMonthState(monthStr) {
+        if (!monthStr) return;
+        db.plans = [];
+        const allDesigns = Object.keys(db.bom).sort();
+        
+        allDesigns.forEach(code => {
+            const historical = db.allHistoricalPlans.find(p => {
+                let pMonth = "";
+                if (String(p.Plan_Month).includes('T')) pMonth = String(p.Plan_Month).split('T')[0].substring(0, 7);
+                else pMonth = String(p.Plan_Month).substring(0, 7);
+                return pMonth === monthStr && p.Design_Code === code;
+            });
+
+            db.plans.push({
+                Design_Code: code,
+                Planned_Qty: historical ? (parseInt(historical.Planned_Qty) || 0) : 0,
+                Target_Selling_Price: historical ? (parseFloat(historical.Target_Selling_Price) || 0) : (db.basePrices[code] || 0)
+            });
+        });
+
+        renderPlannerDrawer();
+        renderActivePlans();
+        calculateEngine();
+    }
+
+    if (monthInput) {
+        monthInput.addEventListener('change', (e) => {
+            loadMonthState(e.target.value);
+        });
+    }
+
+    const btnSaveMonthPlan = document.getElementById('btn-save-month-plan');
+    if (btnSaveMonthPlan) {
+        btnSaveMonthPlan.addEventListener('click', async () => {
+            const currentMonth = monthInput.value;
+            if (!currentMonth) return alert("Please select a month first.");
+            
+            btnSaveMonthPlan.disabled = true;
+            btnSaveMonthPlan.textContent = 'SAVING...';
+            
+            try {
+                const res = await fetch(`${ctx.apiUrl}?action=save_monthly_plan`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: `payload=${encodeURIComponent(JSON.stringify({ pin: sessionPin, month: currentMonth, plans: db.plans }))}`
+                });
+                const json = await res.json();
+                if (json.status !== 'success') throw new Error(json.message || 'Request failed');
+                await fetchData();
+                alert(`Production plan for ${currentMonth} synchronized to database.`);
+            } catch (err) {
+                alert('Save failed: ' + err.message);
+            } finally {
+                btnSaveMonthPlan.disabled = false;
+                btnSaveMonthPlan.textContent = 'Save Month to Database';
+            }
+        });
     }
 
     // --- UI RENDERING ---
@@ -222,26 +290,35 @@
                 </label>
                 <div class="flex-1">
                     <div class="text-white font-medium text-lg">${plan.Design_Code}</div>
-                    <div class="text-white/40 text-[10px] uppercase tracking-widest">RM ${parseFloat(plan.Target_Selling_Price).toFixed(2)}</div>
+                    <div class="text-white/40 text-[10px] uppercase tracking-widest">Target Selection</div>
                 </div>
-                <div class="w-24 opacity-50 pointer-events-none transition-opacity qty-wrapper">
-                    <input type="number" min="0" data-design="${plan.Design_Code}" value="0" class="planner-qty w-full bg-black/40 border border-white/10 rounded-lg text-white text-center py-2 focus:border-luxe outline-none transition-colors">
+                <div class="flex gap-2 opacity-50 pointer-events-none transition-opacity qty-wrapper">
+                    <div class="w-20">
+                        <p class="text-white/40 text-[8px] uppercase tracking-widest mb-1">Price (RM)</p>
+                        <input type="number" min="0" step="0.01" value="${plan.Target_Selling_Price}" class="planner-price w-full bg-black/40 border border-white/10 rounded-lg text-white text-center py-2 focus:border-luxe outline-none transition-colors">
+                    </div>
+                    <div class="w-20">
+                        <p class="text-white/40 text-[8px] uppercase tracking-widest mb-1">Quantity</p>
+                        <input type="number" min="0" value="${plan.Planned_Qty > 0 ? plan.Planned_Qty : ''}" class="planner-qty w-full bg-black/40 border border-white/10 rounded-lg text-white text-center py-2 focus:border-luxe outline-none transition-colors">
+                    </div>
                 </div>
             `;
             
-            // Toggle opacity/pointer events of the input field based on checkbox
             const cb = div.querySelector('.design-checkbox');
             const wrap = div.querySelector('.qty-wrapper');
-            const inp = div.querySelector('.planner-qty');
+            const qtyInp = div.querySelector('.planner-qty');
             
+            if (plan.Planned_Qty > 0) cb.checked = true;
+            if (cb.checked) wrap.classList.remove('opacity-50', 'pointer-events-none');
+
             cb.addEventListener('change', (e) => {
                 if(e.target.checked) {
                     wrap.classList.remove('opacity-50', 'pointer-events-none');
-                    inp.value = ''; // Blank out for immediate typing
-                    inp.focus(); 
+                    if(qtyInp.value === '' || qtyInp.value === '0') qtyInp.value = '';
+                    qtyInp.focus(); 
                 } else {
                     wrap.classList.add('opacity-50', 'pointer-events-none');
-                    inp.value = 0;
+                    qtyInp.value = '';
                 }
             });
             
