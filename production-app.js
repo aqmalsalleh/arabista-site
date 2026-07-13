@@ -942,9 +942,10 @@
                 <div class="glass-panel p-3 rounded-xl flex flex-col gap-2">
                     <div class="text-luxe text-[10px] uppercase tracking-widest">${prefix} Component</div>
                     <div class="flex gap-2">
-                        <select data-bom-id-key="${prefix + '_ID'}" class="bom-field-select flex-1 bg-black/40 border border-white/10 rounded-lg text-white px-2 py-2 text-sm focus:border-luxe outline-none truncate">
+                        <select id="select-${prefix}" data-bom-id-key="${prefix + '_ID'}" class="bom-field-select flex-1 bg-black/40 border border-white/10 rounded-lg text-white px-2 py-2 text-sm focus:border-luxe outline-none truncate">
                             ${materialOptions}
                         </select>
+                        <button type="button" class="btn-quick-add-mat bg-white/10 text-white/70 hover:bg-luxe hover:text-ink px-3 rounded-lg transition tap-none font-bold" data-prefix="${prefix}">+</button>
                         <input type="number" step="0.01" placeholder="Qty" data-bom-qty-key="${prefix + '_Qty'}" value="${currentQty > 0 ? currentQty : ''}" class="bom-field-input w-20 bg-black/40 border border-white/10 rounded-lg text-white text-center py-2 text-sm focus:border-luxe outline-none">
                     </div>
                 </div>`;
@@ -957,6 +958,13 @@
                     <input type="number" step="0.01" id="bom-labor-input" value="${parseFloat(sourceBom.Direct_Labor_RM) || 0}" class="w-full bg-black/40 border border-white/10 rounded-lg text-white text-center py-2 text-sm focus:border-luxe outline-none">
                 </div>
             </div>`;
+
+        // Bind Quick-Add Modal Triggers (after all innerHTML writes)
+        document.querySelectorAll('.btn-quick-add-mat').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                openQuickAddModal(e.target.dataset.prefix);
+            });
+        });
     }
 
     btnSaveBomRecipe?.addEventListener('click', async () => {
@@ -1008,6 +1016,71 @@
         } catch (err) { alert('Error: ' + err.message); }
         btnDeleteDesign.textContent = 'Delete';
         btnDeleteDesign.disabled = false;
+    });
+
+    // --- INLINE QUICK-ADD MATERIAL LOGIC ---
+    const quickAddModal = document.getElementById('quick-add-modal');
+    const quickAddModalInner = document.getElementById('quick-add-modal-inner');
+
+    function openQuickAddModal(prefix) {
+        document.getElementById('quick-add-category').textContent = prefix;
+        document.getElementById('quick-add-prefix').value = prefix;
+        document.getElementById('quick-add-id').value = '';
+        document.getElementById('quick-add-desc').value = '';
+        document.getElementById('quick-add-unit').value = prefix.toLowerCase() === 'fabric' ? 'Meter' : 'Piece';
+        document.getElementById('quick-add-price').value = '';
+
+        quickAddModal.classList.remove('hidden');
+        setTimeout(() => {
+            quickAddModal.classList.remove('opacity-0');
+            quickAddModalInner.classList.remove('scale-95');
+        }, 10);
+    }
+
+    function closeQuickAddModal() {
+        quickAddModal.classList.add('opacity-0');
+        quickAddModalInner.classList.add('scale-95');
+        setTimeout(() => quickAddModal.classList.add('hidden'), 300);
+    }
+
+    document.getElementById('btn-close-quick-add')?.addEventListener('click', closeQuickAddModal);
+
+    document.getElementById('btn-save-quick-add')?.addEventListener('click', async () => {
+        const btn = document.getElementById('btn-save-quick-add');
+        const prefix = document.getElementById('quick-add-prefix').value;
+        const Item_ID = document.getElementById('quick-add-id').value.trim().toUpperCase();
+        const Description = document.getElementById('quick-add-desc').value.trim();
+        const Unit_Type = document.getElementById('quick-add-unit').value.trim();
+        const Unit_Cost_RM = parseFloat(document.getElementById('quick-add-price').value) || 0;
+
+        if (!Item_ID || !Description) return alert('Item ID and Description are required.');
+
+        btn.disabled = true;
+        btn.textContent = 'SAVING...';
+
+        try {
+            await postManagerAction('add_raw_material', {
+                item: { Item_ID, Category: prefix, Description, Unit_Type, Unit_Cost_RM }
+            });
+            await fetchData(); // Seamlessly update background memory
+            alert('Material catalog updated successfully.');
+            closeQuickAddModal();
+
+            // Surgically inject the new material into the dropdown without wiping out unsaved quantity edits
+            const selectEl = document.getElementById(`select-${prefix}`);
+            if (selectEl) {
+                const newOption = document.createElement('option');
+                newOption.value = Item_ID;
+                newOption.text = `${Description} - RM${Unit_Cost_RM.toFixed(2)}`;
+                selectEl.appendChild(newOption);
+                selectEl.value = Item_ID;
+            }
+        } catch (err) {
+            alert('Error: ' + err.message);
+        } finally {
+            btn.disabled = false;
+            btn.textContent = 'Save Material';
+        }
     });
 
 })();
