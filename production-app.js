@@ -176,18 +176,18 @@
 
         const exRate = db.config['Exchange_Rate_CNY_RM'] || 0.6001;
 
-        // 2. Map Materials and enforce RM pricing (handles both CNY and RM raw data)
+        // 2. Map Materials to retain original currency and calculate live RM cost
         rawData.materials.forEach(m => {
-            let costRM = 0;
-            if (m.Unit_Cost_CNY) {
-                costRM = parseFloat(m.Unit_Cost_CNY) * exRate;
-            } else if (m.Unit_Cost_RM) {
-                costRM = parseFloat(m.Unit_Cost_RM);
-            }
+            let currency = m.Currency || 'RM';
+            let origCost = parseFloat(m.Original_Cost) || parseFloat(m.Unit_Cost_RM) || 0; 
+            let costRM = currency === 'CNY' ? origCost * exRate : origCost;
+            
             db.materials[m.Item_ID] = {
                 category: m.Category,
                 desc: m.Description,
                 unit: m.Unit_Type,
+                currency: currency,
+                origCost: origCost,
                 costRM: costRM
             };
         });
@@ -594,18 +594,15 @@
             btnPublishComponent.textContent = 'PUBLISHING...';
 
             try {
-                const liveExRate = db.config['Exchange_Rate_CNY_RM'] || 0.6001;
-                const resolvedCostRM = currency === 'CNY' ? (price * liveExRate) : price;
-
                 // Step 1: Initialize BOM Columns if new
                 const sampleBom = db.bom[Object.keys(db.bom)[0]] || {};
                 if (sampleBom[columnHeader + '_ID'] === undefined) {
                     await postManagerAction('add_bom_column', { componentName: columnHeader });
                 }
 
-                // Step 2: Register the raw material
+                // Step 2: Register the raw material natively
                 await postManagerAction('add_raw_material', {
-                    item: { Item_ID: item_id, Category: category, Description: description, Unit_Type: unit, Unit_Cost_RM: resolvedCostRM }
+                    item: { Item_ID: item_id, Category: category, Description: description, Unit_Type: unit, Currency: currency, Original_Cost: price }
                 });
 
                 // Step 3: Assign to selected designs
@@ -796,14 +793,19 @@
         if (!matEditorList) return;
         matEditorList.innerHTML = '';
         Object.entries(db.materials).forEach(([id, mat]) => {
+            const displayCostRM = mat.currency === 'CNY' ? `(≈ RM ${mat.costRM.toFixed(2)})` : '';
             matEditorList.innerHTML += `
                 <div class="glass-panel p-3 rounded-xl flex items-center justify-between gap-3">
                     <div class="flex-1 truncate">
                         <p class="text-white text-sm truncate">${mat.desc}</p>
                         <p class="text-white/40 text-[10px] uppercase tracking-widest">${id} • ${mat.unit}</p>
                     </div>
-                    <div class="w-24 shrink-0">
-                        <input type="number" step="0.01" data-mat-id="${id}" value="${mat.costRM}" class="mat-price-input w-full bg-black/40 border border-white/10 rounded-lg text-white text-center py-2 text-sm focus:border-luxe outline-none">
+                    <div class="w-32 flex flex-col items-end shrink-0">
+                        <div class="flex items-center gap-1 w-full bg-black/40 border border-white/10 rounded-lg overflow-hidden">
+                            <span class="text-white/50 text-[10px] pl-2 font-medium">${mat.currency}</span>
+                            <input type="number" step="0.01" data-mat-id="${id}" value="${mat.origCost}" class="mat-price-input flex-1 bg-transparent text-white text-right py-2 pr-2 text-sm focus:outline-none">
+                        </div>
+                        <span class="text-[9px] text-white/30 mt-1 mr-1">${displayCostRM}</span>
                     </div>
                 </div>`;
         });
@@ -1025,11 +1027,25 @@
     function openQuickAddModal(prefix) {
         document.getElementById('quick-add-category').textContent = prefix;
         document.getElementById('quick-add-prefix').value = prefix;
-        document.getElementById('quick-add-id').value = '';
-        document.getElementById('quick-add-desc').value = '';
-        document.getElementById('quick-add-unit').value = prefix.toLowerCase() === 'fabric' ? 'Meter' : 'Piece';
-        document.getElementById('quick-add-price').value = '';
-
+        
+        const selectEl = document.getElementById(`select-${prefix}`);
+        const selectedId = selectEl ? selectEl.value : 'NONE';
+        
+        if (selectedId !== 'NONE' && db.materials[selectedId]) {
+            const mat = db.materials[selectedId];
+            document.getElementById('quick-add-id').value = selectedId + '-NEW';
+            document.getElementById('quick-add-desc').value = mat.desc + ' (Copy)';
+            document.getElementById('quick-add-unit').value = mat.unit;
+            document.getElementById('quick-add-currency').value = mat.currency || 'RM';
+            document.getElementById('quick-add-price').value = mat.origCost;
+        } else {
+            document.getElementById('quick-add-id').value = '';
+            document.getElementById('quick-add-desc').value = '';
+            document.getElementById('quick-add-unit').value = prefix.toLowerCase() === 'fabric' ? 'Meter' : 'Piece';
+            document.getElementById('quick-add-currency').value = 'RM';
+            document.getElementById('quick-add-price').value = '';
+        }
+        
         quickAddModal.classList.remove('hidden');
         setTimeout(() => {
             quickAddModal.classList.remove('opacity-0');
@@ -1051,7 +1067,8 @@
         const Item_ID = document.getElementById('quick-add-id').value.trim().toUpperCase();
         const Description = document.getElementById('quick-add-desc').value.trim();
         const Unit_Type = document.getElementById('quick-add-unit').value.trim();
-        const Unit_Cost_RM = parseFloat(document.getElementById('quick-add-price').value) || 0;
+        const Currency = document.getElementById('quick-add-currency').value;
+        const Original_Cost = parseFloat(document.getElementById('quick-add-price').value) || 0;
 
         if (!Item_ID || !Description) return alert('Item ID and Description are required.');
 
@@ -1060,18 +1077,18 @@
 
         try {
             await postManagerAction('add_raw_material', {
-                item: { Item_ID, Category: prefix, Description, Unit_Type, Unit_Cost_RM }
+                item: { Item_ID, Category: prefix, Description, Unit_Type, Currency, Original_Cost }
             });
-            await fetchData(); // Seamlessly update background memory
+            await fetchData();
             alert('Material catalog updated successfully.');
             closeQuickAddModal();
 
-            // Surgically inject the new material into the dropdown without wiping out unsaved quantity edits
             const selectEl = document.getElementById(`select-${prefix}`);
             if (selectEl) {
                 const newOption = document.createElement('option');
                 newOption.value = Item_ID;
-                newOption.text = `${Description} - RM${Unit_Cost_RM.toFixed(2)}`;
+                const costRM = Currency === 'CNY' ? Original_Cost * (db.config['Exchange_Rate_CNY_RM'] || 0.6001) : Original_Cost;
+                newOption.text = `${Description} - RM${costRM.toFixed(2)}`;
                 selectEl.appendChild(newOption);
                 selectEl.value = Item_ID;
             }
