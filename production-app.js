@@ -853,42 +853,99 @@
         btn.textContent = 'Update Operations';
     });
 
-    // BOM Render & Save
+    // --- TAB 4: RECIPE MANAGER (BOM CRUD) ---
     const bomEditorSelect = document.getElementById('bom-editor-select');
+    const bomCloneSelect = document.getElementById('bom-clone-select');
     const bomEditorFields = document.getElementById('bom-editor-fields');
+    const bomNewDesignCode = document.getElementById('bom-new-design-code');
+    const btnDeleteDesign = document.getElementById('btn-delete-design');
+    const btnSaveBomRecipe = document.getElementById('btn-save-bom-recipe');
+
+    let bomMode = 'edit';
+
+    document.getElementById('mode-edit-design')?.addEventListener('click', (e) => {
+        bomMode = 'edit';
+        e.target.classList.replace('text-white/40', 'text-white');
+        e.target.classList.add('bg-white/10');
+        document.getElementById('mode-add-design').classList.replace('text-white', 'text-white/40');
+        document.getElementById('mode-add-design').classList.remove('bg-white/10');
+        document.getElementById('bom-edit-container').classList.remove('hidden');
+        document.getElementById('bom-edit-container').classList.add('flex');
+        document.getElementById('bom-create-container').classList.add('hidden');
+        document.getElementById('bom-create-container').classList.remove('flex');
+        if (bomEditorSelect.value) {
+            btnDeleteDesign.classList.remove('hidden');
+            renderBomRecipeFields(bomEditorSelect.value);
+        } else {
+            btnDeleteDesign.classList.add('hidden');
+            bomEditorFields.innerHTML = '';
+        }
+    });
+
+    document.getElementById('mode-add-design')?.addEventListener('click', (e) => {
+        bomMode = 'create';
+        e.target.classList.replace('text-white/40', 'text-white');
+        e.target.classList.add('bg-white/10');
+        document.getElementById('mode-edit-design').classList.replace('text-white', 'text-white/40');
+        document.getElementById('mode-edit-design').classList.remove('bg-white/10');
+        document.getElementById('bom-create-container').classList.remove('hidden');
+        document.getElementById('bom-create-container').classList.add('flex');
+        document.getElementById('bom-edit-container').classList.add('hidden');
+        document.getElementById('bom-edit-container').classList.remove('flex');
+        btnDeleteDesign.classList.add('hidden');
+        bomEditorFields.innerHTML = '';
+        if (bomCloneSelect.value) renderBomRecipeFields(bomCloneSelect.value);
+    });
 
     function populateBomDropdown() {
-        if (!bomEditorSelect) return;
-        bomEditorSelect.innerHTML = '<option value="">Select Design to Edit...</option>';
-        Object.keys(db.bom).sort().forEach(code => {
-            bomEditorSelect.innerHTML += `<option value="${code}">${code}</option>`;
-        });
+        if (!bomEditorSelect || !bomCloneSelect) return;
+        const optionsHTML = '<option value="">Select Design...</option>' +
+            Object.keys(db.bom).sort().map(code => `<option value="${code}">${code}</option>`).join('');
+        bomEditorSelect.innerHTML = optionsHTML;
+        bomCloneSelect.innerHTML = '<option value="">Clone Recipe From...</option>' +
+            Object.keys(db.bom).sort().map(code => `<option value="${code}">${code}</option>`).join('');
     }
 
     bomEditorSelect?.addEventListener('change', (e) => {
+        if (bomMode === 'edit') {
+            if (e.target.value) btnDeleteDesign.classList.remove('hidden');
+            else btnDeleteDesign.classList.add('hidden');
+            renderBomRecipeFields(e.target.value);
+        }
+    });
+
+    bomCloneSelect?.addEventListener('change', (e) => {
+        if (bomMode === 'create') renderBomRecipeFields(e.target.value);
+    });
+
+    function renderBomRecipeFields(code) {
         bomEditorFields.innerHTML = '';
-        const code = e.target.value;
         if (!code || !db.bom[code]) return;
 
-        const bom = db.bom[code];
-        Object.keys(bom).forEach(key => {
-            if (!key.endsWith('_ID') || key === 'Design_Code') return;
-            const prefix = key.slice(0, -3);
-            const qtyKey = prefix + '_Qty';
-            const compId = bom[key];
-            if (!compId || compId === 'NONE') return;
+        const sourceBom = db.bom[code];
 
-            const matName = db.materials[compId] ? db.materials[compId].desc : compId;
-            const matQty = parseFloat(bom[qtyKey]) || 0;
+        // Extract all dynamic component columns from the BOM database structural headers
+        const sampleBom = db.bom[Object.keys(db.bom)[0]] || {};
+        const prefixes = Object.keys(sampleBom).filter(k => k.endsWith('_ID') && k !== 'Design_Code').map(k => k.slice(0, -3));
+
+        prefixes.forEach(prefix => {
+            const currentId = sourceBom[prefix + '_ID'] || 'NONE';
+            const currentQty = parseFloat(sourceBom[prefix + '_Qty']) || 0;
+
+            let materialOptions = `<option value="NONE">None</option>`;
+            Object.entries(db.materials).forEach(([matId, mat]) => {
+                const selected = (currentId === matId) ? 'selected' : '';
+                materialOptions += `<option value="${matId}" ${selected}>${mat.desc} - RM${mat.costRM.toFixed(2)}</option>`;
+            });
 
             bomEditorFields.innerHTML += `
-                <div class="glass-panel p-3 rounded-xl flex items-center justify-between gap-3">
-                    <div class="flex-1 truncate">
-                        <p class="text-white text-sm truncate">${matName}</p>
-                        <p class="text-white/40 text-[10px] uppercase tracking-widest">${prefix}</p>
-                    </div>
-                    <div class="w-24 shrink-0">
-                        <input type="number" step="0.01" data-bom-key="${qtyKey}" value="${matQty}" class="bom-qty-input w-full bg-black/40 border border-white/10 rounded-lg text-white text-center py-2 text-sm focus:border-luxe outline-none">
+                <div class="glass-panel p-3 rounded-xl flex flex-col gap-2">
+                    <div class="text-luxe text-[10px] uppercase tracking-widest">${prefix} Component</div>
+                    <div class="flex gap-2">
+                        <select data-bom-id-key="${prefix + '_ID'}" class="bom-field-select flex-1 bg-black/40 border border-white/10 rounded-lg text-white px-2 py-2 text-sm focus:border-luxe outline-none truncate">
+                            ${materialOptions}
+                        </select>
+                        <input type="number" step="0.01" placeholder="Qty" data-bom-qty-key="${prefix + '_Qty'}" value="${currentQty > 0 ? currentQty : ''}" class="bom-field-input w-20 bg-black/40 border border-white/10 rounded-lg text-white text-center py-2 text-sm focus:border-luxe outline-none">
                     </div>
                 </div>`;
         });
@@ -897,28 +954,60 @@
             <div class="glass-panel p-3 rounded-xl flex items-center justify-between gap-3 border border-luxe/30 mt-2">
                 <div class="flex-1 text-luxe text-xs uppercase tracking-widest">Direct Labor (RM)</div>
                 <div class="w-24 shrink-0">
-                    <input type="number" step="0.01" data-bom-key="Direct_Labor_RM" value="${parseFloat(bom.Direct_Labor_RM) || 0}" class="bom-qty-input w-full bg-black/40 border border-white/10 rounded-lg text-white text-center py-2 text-sm focus:border-luxe outline-none">
+                    <input type="number" step="0.01" id="bom-labor-input" value="${parseFloat(sourceBom.Direct_Labor_RM) || 0}" class="w-full bg-black/40 border border-white/10 rounded-lg text-white text-center py-2 text-sm focus:border-luxe outline-none">
                 </div>
             </div>`;
-    });
+    }
 
-    document.getElementById('btn-save-bom-recipe')?.addEventListener('click', async (e) => {
-        const btn = e.target;
-        const design = bomEditorSelect.value;
-        if (!design) return;
+    btnSaveBomRecipe?.addEventListener('click', async () => {
+        const design = bomMode === 'edit' ? bomEditorSelect.value : bomNewDesignCode.value.trim().toUpperCase();
+        if (!design) return alert('Please provide or select a Design Code.');
+
+        if (bomMode === 'create' && db.bom[design]) {
+            return alert('This Design Code already exists. Please use Edit mode or choose a new code.');
+        }
 
         const recipeFields = {};
-        document.querySelectorAll('.bom-qty-input').forEach(inp => {
-            recipeFields[inp.dataset.bomKey] = parseFloat(inp.value) || 0;
-        });
+        document.querySelectorAll('.bom-field-select').forEach(sel => { recipeFields[sel.dataset.bomIdKey] = sel.value; });
+        document.querySelectorAll('.bom-field-input').forEach(inp => { recipeFields[inp.dataset.bomQtyKey] = parseFloat(inp.value) || 0; });
+        recipeFields['Direct_Labor_RM'] = parseFloat(document.getElementById('bom-labor-input').value) || 0;
 
-        btn.textContent = 'SAVING...';
+        btnSaveBomRecipe.textContent = 'SAVING...';
+        btnSaveBomRecipe.disabled = true;
         try {
             await postManagerAction('save_single_recipe', { design, recipeFields });
             await fetchData();
-            alert('Recipe overwritten successfully.');
-        } catch(err) { alert('Error: ' + err.message); }
-        btn.textContent = 'Save Recipe Changes';
+            alert(`Recipe for ${design} saved successfully.`);
+            if (bomMode === 'create') {
+                bomNewDesignCode.value = '';
+                populateBomDropdown();
+                document.getElementById('mode-edit-design').click();
+                bomEditorSelect.value = design;
+                renderBomRecipeFields(design);
+                btnDeleteDesign.classList.remove('hidden');
+            }
+        } catch (err) { alert('Error: ' + err.message); }
+        btnSaveBomRecipe.textContent = 'Save Recipe';
+        btnSaveBomRecipe.disabled = false;
+    });
+
+    btnDeleteDesign?.addEventListener('click', async () => {
+        const design = bomEditorSelect.value;
+        if (!design) return;
+        if (!confirm(`Are you sure you want to permanently delete design ${design} from the BOM Master?`)) return;
+
+        btnDeleteDesign.textContent = '...';
+        btnDeleteDesign.disabled = true;
+        try {
+            await postManagerAction('delete_design', { designCode: design });
+            await fetchData();
+            alert(`${design} deleted successfully.`);
+            bomEditorFields.innerHTML = '';
+            populateBomDropdown();
+            btnDeleteDesign.classList.add('hidden');
+        } catch (err) { alert('Error: ' + err.message); }
+        btnDeleteDesign.textContent = 'Delete';
+        btnDeleteDesign.disabled = false;
     });
 
 })();
