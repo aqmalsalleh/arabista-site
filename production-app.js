@@ -104,7 +104,7 @@
 
     // State
     let sessionPin = '';
-    let db = { config: {}, materials: {}, bom: {}, plans: [], allHistoricalPlans: [], basePrices: {}, snapshots: [], currentMacroSnapshot: null };
+    let db = { config: {}, configRaw: [], materials: {}, bom: {}, plans: [], allHistoricalPlans: [], basePrices: {}, snapshots: [], currentMacroSnapshot: null };
 
     // --- AUTHENTICATION ---
     btnLogin.addEventListener('click', authenticate);
@@ -169,7 +169,9 @@
         db.materials = {};
         db.bom = {};
 
-        // 1. Map Config to Key/Value dict
+        // 1. Store Raw Config for category-based routing
+        db.config = {};
+        db.configRaw = rawData.config; 
         rawData.config.forEach(c => {
             db.config[c.Variable_Name] = parseFloat(c.Value_RM) || 0;
         });
@@ -641,10 +643,11 @@
         let totalVariableCost = 0;
         let reqs = {}; 
 
-        const fixedOpex = (db.config['Factory_Rental'] || 0) + 
-                          (db.config['Staff_Hostel'] || 0) + 
-                          (db.config['Helper_Salary'] || 0) + 
-                          (db.config['Utilities'] || 0);
+        // 1. Intelligently sum all Fixed OPEX from the database
+        let fixedOpex = 0;
+        db.configRaw.forEach(c => {
+            if (c.Account_Category === 'Fixed OPEX') fixedOpex += (parseFloat(c.Value_RM) || 0);
+        });
 
         db.plans.forEach(plan => {
             const qty = parseInt(plan.Planned_Qty) || 0;
@@ -667,9 +670,19 @@
                 if (!bom) return;
 
                 const tailoring = parseFloat(bom.Direct_Labor_RM) || 10;
-                const tiktokFee = price * (db.config['TikTok_Fee_Pct'] || 0.20);
-                const marketing = db.config['Marketing_Per_Unit'] || 5;
-                const overhead = tiktokFee + marketing;
+                
+                // 2. Intelligently calculate Variable Selling Overheads
+                let dynamicOverhead = 0;
+                db.configRaw.forEach(c => {
+                    if (c.Account_Category === 'Variable Selling') {
+                        const val = parseFloat(c.Value_RM) || 0;
+                        if (c.Variable_Name.includes('_Pct')) {
+                            dynamicOverhead += (price * val);
+                        } else {
+                            dynamicOverhead += val;
+                        }
+                    }
+                });
                 
                 let designMatCogs = 0;
 
@@ -691,12 +704,12 @@
                 });
 
                 totalCogs += (designMatCogs * qty);
-                totalVariableCost += ((designMatCogs + tailoring + overhead) * qty);
+                totalVariableCost += ((designMatCogs + tailoring + dynamicOverhead) * qty);
 
                 // Attach live variables for saving
                 plan.Live_Material_COGS_RM = designMatCogs;
                 plan.Live_Direct_Labor_RM = tailoring;
-                plan.Live_Var_Overhead_RM = overhead;
+                plan.Live_Var_Overhead_RM = dynamicOverhead;
             }
         });
 
@@ -830,10 +843,17 @@
     function renderConfigEditor() {
         if (!configEditorList) return;
         configEditorList.innerHTML = '';
-        Object.entries(db.config).forEach(([key, val]) => {
+        db.configRaw.forEach(c => {
+            const key = c.Variable_Name;
+            const val = parseFloat(c.Value_RM) || 0;
+            const cat = c.Account_Category || 'Operations';
+            
             configEditorList.innerHTML += `
                 <div class="glass-panel p-3 rounded-xl flex items-center justify-between gap-3">
-                    <div class="flex-1 truncate text-white/70 text-xs uppercase tracking-widest">${key.replace(/_/g, ' ')}</div>
+                    <div class="flex-1 truncate">
+                        <p class="text-white text-sm truncate">${key.replace(/_/g, ' ')}</p>
+                        <p class="text-white/40 text-[10px] uppercase tracking-widest">${cat}</p>
+                    </div>
                     <div class="w-24 shrink-0">
                         <input type="number" step="0.01" data-config-key="${key}" value="${val}" class="config-val-input w-full bg-black/40 border border-white/10 rounded-lg text-white text-center py-2 text-sm focus:border-luxe outline-none">
                     </div>
