@@ -199,13 +199,13 @@
             db.bom[b.Design_Code] = b;
         });
 
-        // 4. Store Historical Plans and extract Base Prices
+        // 4. Store Historical Plans and exact Base Prices from BOM
         db.allHistoricalPlans = rawData.plans;
         db.snapshots = rawData.snapshots || [];
         db.basePrices = {};
         
-        rawData.plans.forEach(p => {
-            db.basePrices[p.Design_Code] = parseFloat(p.Target_Selling_Price) || 0;
+        Object.keys(db.bom).forEach(code => {
+            db.basePrices[code] = parseFloat(db.bom[code].Base_Selling_Price) || 0;
         });
 
         if (monthInput && !monthInput.value) {
@@ -341,9 +341,10 @@
                     <div class="text-white/40 text-[10px] uppercase tracking-widest">Target Selection</div>
                 </div>
                 <div class="flex gap-2 opacity-50 pointer-events-none transition-opacity qty-wrapper">
-                    <div class="w-20">
+                    <div class="w-20 relative pb-4">
                         <p class="text-white/40 text-[8px] uppercase tracking-widest mb-1">Price (RM)</p>
                         <input type="number" min="0" step="0.01" value="${plan.Target_Selling_Price}" class="planner-price w-full bg-black/40 border border-white/10 rounded-lg text-white text-center py-2 focus:border-luxe outline-none transition-colors">
+                        <div class="planner-margin-indicator absolute bottom-0 left-0 right-0 text-center text-[9px] font-medium whitespace-nowrap"></div>
                     </div>
                     <div class="w-20">
                         <p class="text-white/40 text-[8px] uppercase tracking-widest mb-1">Quantity</p>
@@ -355,6 +356,19 @@
             const cb = div.querySelector('.design-checkbox');
             const wrap = div.querySelector('.qty-wrapper');
             const qtyInp = div.querySelector('.planner-qty');
+
+            const priceInp = div.querySelector('.planner-price');
+            const marginInd = div.querySelector('.planner-margin-indicator');
+            
+            const updateDrawerMargin = () => {
+                const currentPrice = parseFloat(priceInp.value) || 0;
+                const metrics = calculateUnitMargin(plan.Design_Code, currentPrice);
+                marginInd.textContent = `${metrics.marginPct.toFixed(1)}%`;
+                marginInd.className = `planner-margin-indicator absolute bottom-0 left-0 right-0 text-center text-[9px] font-medium whitespace-nowrap ${metrics.marginPct >= 0 ? 'text-luxe' : 'text-red-400'}`;
+            };
+            
+            priceInp.addEventListener('input', updateDrawerMargin);
+            updateDrawerMargin(); // Calculate on render
             
             if (plan.Planned_Qty > 0) cb.checked = true;
             if (cb.checked) wrap.classList.remove('opacity-50', 'pointer-events-none');
@@ -634,6 +648,46 @@
                 btnPublishComponent.textContent = 'Publish & Assign Component';
             }
         });
+    }
+
+    // --- FINANCIAL MATH UTILITY ---
+    function calculateUnitMargin(designCode, targetPrice, recipeOverrides = null) {
+        let matCost = 0;
+        let labor = 0;
+        
+        if (recipeOverrides) {
+            matCost = recipeOverrides.matCost;
+            labor = recipeOverrides.labor;
+        } else {
+            const bom = db.bom[designCode];
+            if (!bom) return { totalUnitCost: 0, marginRM: 0, marginPct: 0 };
+            
+            labor = parseFloat(bom.Direct_Labor_RM) || 0;
+            Object.keys(bom).forEach(key => {
+                if (!key.endsWith('_ID') || key === 'Design_Code') return;
+                const prefix = key.slice(0, -3);
+                const id = bom[key];
+                if (!id || id === 'NONE') return;
+                const qty = parseFloat(bom[prefix + '_Qty']) || 0;
+                const mat = db.materials[id];
+                if (mat) matCost += (mat.costRM * qty);
+            });
+        }
+
+        let varOverhead = 0;
+        db.configRaw.forEach(c => {
+            if (c.Account_Category === 'Variable Selling') {
+                const val = parseFloat(c.Value_RM) || 0;
+                if (c.Variable_Name.includes('_Pct')) varOverhead += (targetPrice * val);
+                else varOverhead += val;
+            }
+        });
+
+        const totalUnitCost = matCost + labor + varOverhead;
+        const marginRM = targetPrice - totalUnitCost;
+        const marginPct = targetPrice > 0 ? (marginRM / targetPrice) * 100 : 0;
+
+        return { totalUnitCost, marginRM, marginPct };
     }
 
     // --- FINANCIAL & PROCUREMENT ENGINE ---
@@ -946,6 +1000,14 @@
 
         const sourceBom = db.bom[code];
 
+        bomEditorFields.innerHTML += `
+            <div class="glass-panel p-3 rounded-xl flex items-center justify-between gap-3 border border-luxe/50 mb-3 bg-luxe/5">
+                <div class="flex-1 text-luxe text-xs uppercase tracking-widest font-bold">Base Selling Price</div>
+                <div class="w-24 shrink-0">
+                    <input type="number" step="0.01" id="bom-base-price-input" value="${parseFloat(sourceBom.Base_Selling_Price) || 0}" class="w-full bg-black/40 border border-luxe/30 rounded-lg text-white text-center py-2 text-sm focus:border-luxe outline-none">
+                </div>
+            </div>`;
+
         // Extract all dynamic component columns from the BOM database structural headers
         const sampleBom = db.bom[Object.keys(db.bom)[0]] || {};
         const prefixes = Object.keys(sampleBom).filter(k => k.endsWith('_ID') && k !== 'Design_Code').map(k => k.slice(0, -3));
@@ -981,12 +1043,55 @@
                 </div>
             </div>`;
 
+        bomEditorFields.innerHTML += `
+            <div id="recipe-sandbox-card" class="glass-panel p-4 rounded-xl border border-white/20 mt-4 bg-ink shadow-soft flex flex-col gap-2 transition-all">
+                <div class="flex justify-between items-center border-b border-white/10 pb-2 mb-1">
+                    <span class="text-white/70 text-xs uppercase tracking-widest">Est. Unit Cost (Materials + OPEX)</span>
+                    <span id="sandbox-unit-cost" class="text-white font-medium text-sm">RM 0.00</span>
+                </div>
+                <div class="flex justify-between items-center">
+                    <span class="text-luxe text-xs uppercase tracking-widest font-bold">Contribution Margin</span>
+                    <span id="sandbox-margin" class="font-display text-xl text-luxe">0.00%</span>
+                </div>
+            </div>`;
+
         // Bind Quick-Add Modal Triggers (after all innerHTML writes)
         document.querySelectorAll('.btn-quick-add-mat').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 openQuickAddModal(e.target.dataset.prefix);
             });
         });
+
+        const updateSandbox = () => {
+            const currentPrice = parseFloat(document.getElementById('bom-base-price-input').value) || 0;
+            const labor = parseFloat(document.getElementById('bom-labor-input').value) || 0;
+            
+            let matCost = 0;
+            document.querySelectorAll('.bom-field-select').forEach(sel => {
+                const id = sel.value;
+                if (id !== 'NONE' && db.materials[id]) {
+                    const prefix = sel.dataset.bomIdKey.slice(0, -3);
+                    const qtyInput = document.querySelector(`input[data-bom-qty-key="${prefix}_Qty"]`);
+                    const qty = qtyInput ? (parseFloat(qtyInput.value) || 0) : 0;
+                    matCost += (db.materials[id].costRM * qty);
+                }
+            });
+
+            const metrics = calculateUnitMargin(code, currentPrice, { matCost, labor });
+            
+            document.getElementById('sandbox-unit-cost').textContent = `RM ${metrics.totalUnitCost.toFixed(2)}`;
+            const marginEl = document.getElementById('sandbox-margin');
+            marginEl.textContent = `${metrics.marginRM >= 0 ? '+' : ''}RM ${metrics.marginRM.toFixed(2)} (${metrics.marginPct.toFixed(1)}%)`;
+            marginEl.className = `font-display text-xl sm:text-2xl ${metrics.marginPct >= 0 ? 'text-luxe' : 'text-red-400'}`;
+        };
+
+        // Attach to all inputs for true live-simulation
+        document.getElementById('bom-base-price-input').addEventListener('input', updateSandbox);
+        document.getElementById('bom-labor-input').addEventListener('input', updateSandbox);
+        document.querySelectorAll('.bom-field-input').forEach(el => el.addEventListener('input', updateSandbox));
+        document.querySelectorAll('.bom-field-select').forEach(el => el.addEventListener('change', updateSandbox));
+
+        updateSandbox(); // Run once immediately
     }
 
     btnSaveBomRecipe?.addEventListener('click', async () => {
@@ -1001,6 +1106,7 @@
         document.querySelectorAll('.bom-field-select').forEach(sel => { recipeFields[sel.dataset.bomIdKey] = sel.value; });
         document.querySelectorAll('.bom-field-input').forEach(inp => { recipeFields[inp.dataset.bomQtyKey] = parseFloat(inp.value) || 0; });
         recipeFields['Direct_Labor_RM'] = parseFloat(document.getElementById('bom-labor-input').value) || 0;
+        recipeFields['Base_Selling_Price'] = parseFloat(document.getElementById('bom-base-price-input').value) || 0;
 
         btnSaveBomRecipe.textContent = 'SAVING...';
         btnSaveBomRecipe.disabled = true;
