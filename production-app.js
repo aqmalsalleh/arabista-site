@@ -41,29 +41,58 @@
     const plannerSearch = document.getElementById('planner-search');
 
     // Mobile Tabs Logic (Using hidden/flex to fix absolute positioning issues)
+    const tabPerformance = document.getElementById('tab-performance');
+    const panelPerformance = document.getElementById('panel-performance');
+
+    function resetMobileTabStyles() {
+        [tabPlans, tabLedger, tabPerformance].forEach(tab => {
+            if (!tab) return;
+            tab.classList.replace('text-luxe', 'text-white/40');
+            tab.classList.replace('border-luxe', 'border-transparent');
+        });
+    }
+
     if (tabPlans && tabLedger) {
         tabPlans.addEventListener('click', () => {
+            resetMobileTabStyles();
             tabPlans.classList.replace('text-white/40', 'text-luxe');
             tabPlans.classList.replace('border-transparent', 'border-luxe');
-            tabLedger.classList.replace('text-luxe', 'text-white/40');
-            tabLedger.classList.replace('border-luxe', 'border-transparent');
             
             panelPlans.classList.remove('hidden');
             panelLedger.classList.add('hidden');
             panelLedger.classList.remove('block');
+            if (panelPerformance) {
+                panelPerformance.classList.add('hidden');
+                panelPerformance.classList.remove('block');
+            }
         });
 
         tabLedger.addEventListener('click', () => {
+            resetMobileTabStyles();
             tabLedger.classList.replace('text-white/40', 'text-luxe');
             tabLedger.classList.replace('border-transparent', 'border-luxe');
-            tabPlans.classList.replace('text-luxe', 'text-white/40');
-            tabPlans.classList.replace('border-luxe', 'border-transparent');
             
             panelLedger.classList.remove('hidden');
             panelLedger.classList.add('block');
             panelPlans.classList.add('hidden');
+            if (panelPerformance) {
+                panelPerformance.classList.add('hidden');
+                panelPerformance.classList.remove('block');
+            }
         });
     }
+
+    tabPerformance?.addEventListener('click', () => {
+        resetMobileTabStyles();
+        tabPerformance.classList.replace('text-white/40', 'text-luxe');
+        tabPerformance.classList.replace('border-transparent', 'border-luxe');
+        
+        panelPerformance.classList.remove('hidden');
+        panelPerformance.classList.add('block');
+        panelPlans.classList.add('hidden');
+        panelLedger.classList.add('hidden');
+        panelLedger.classList.remove('block');
+    });
 
     // Planner Drawer Logic
     function openPlanner() {
@@ -104,7 +133,7 @@
 
     // State
     let sessionPin = '';
-    let db = { config: {}, configRaw: [], materials: {}, bom: {}, plans: [], allHistoricalPlans: [], basePrices: {}, snapshots: [], currentMacroSnapshot: null };
+    let db = { config: {}, configRaw: [], materials: {}, bom: {}, plans: [], allHistoricalPlans: [], basePrices: {}, snapshots: [], actualsMicro: [], actualsMacro: [], aiThinking: [], currentMacroSnapshot: null };
 
     // --- AUTHENTICATION ---
     btnLogin.addEventListener('click', authenticate);
@@ -202,6 +231,9 @@
         // 4. Store Historical Plans and exact Base Prices from BOM
         db.allHistoricalPlans = rawData.plans;
         db.snapshots = rawData.snapshots || [];
+        db.actualsMicro = rawData.actualsMicro || [];
+        db.actualsMacro = rawData.actualsMacro || [];
+        db.aiThinking = rawData.aiThinking || [];
         db.basePrices = {};
         
         Object.keys(db.bom).forEach(code => {
@@ -690,6 +722,101 @@
         return { totalUnitCost, marginRM, marginPct };
     }
 
+    // --- AI CHART DRAWER DISPLAY STATE CONTROLLERS ---
+    const btnOpenAiChat = document.getElementById('btn-open-ai-chat');
+    const aiChatOverlay = document.getElementById('ai-chat-overlay');
+    const aiChatDrawer = document.getElementById('ai-chat-drawer');
+    const closeAiChatBtn = document.getElementById('close-ai-chat-btn');
+    const aiChatFileInput = document.getElementById('ai-chat-file-input');
+    const aiFilePreviewCard = document.getElementById('ai-file-preview-card');
+    const aiFileName = document.getElementById('ai-file-name');
+    const btnRemoveAiFile = document.getElementById('btn-remove-ai-file');
+
+    function openAiChat() {
+        document.body.style.overflow = 'hidden';
+        aiChatOverlay.classList.remove('hidden');
+        setTimeout(() => aiChatOverlay.classList.remove('opacity-0'), 10);
+        aiChatDrawer.classList.remove('translate-x-full');
+    }
+    function closeAiChat() {
+        document.body.style.overflow = '';
+        aiChatOverlay.classList.add('opacity-0');
+        setTimeout(() => aiChatOverlay.classList.add('hidden'), 300);
+        aiChatDrawer.classList.add('translate-x-full');
+    }
+    btnOpenAiChat?.addEventListener('click', openAiChat);
+    closeAiChatBtn?.addEventListener('click', closeAiChat);
+    aiChatOverlay?.addEventListener('click', closeAiChat);
+
+    aiChatFileInput?.addEventListener('change', (e) => {
+        if (e.target.files.length > 0) {
+            aiFileName.textContent = e.target.files[0].name;
+            aiFilePreviewCard.classList.remove('hidden');
+            aiFilePreviewCard.classList.add('flex');
+        }
+    });
+    btnRemoveAiFile?.addEventListener('click', () => {
+        aiChatFileInput.value = '';
+        aiFilePreviewCard.classList.replace('flex', 'hidden');
+    });
+
+    // Performance Rendering Loop Engine Hook
+    function renderPerformanceDashboard(currentMonthStr) {
+        const volumeContainer = document.getElementById('performance-volume-list');
+        if (!volumeContainer) return;
+        volumeContainer.innerHTML = '';
+
+        const actualMacro = db.actualsMacro.find(m => String(m.Plan_Month).substring(0, 7) === currentMonthStr) || {
+            Actual_Revenue_RM: 0, Actual_Platform_Fees_RM: 0, Actual_Ad_Spend_RM: 0
+        };
+
+        const targetRevenue = parseFloat(metricRevenue.textContent.replace(/[^0-9.]/g, '')) || 0;
+
+        const actRev = parseFloat(actualMacro.Actual_Revenue_RM) || 0;
+        const actFees = (parseFloat(actualMacro.Actual_Platform_Fees_RM) || 0) + (parseFloat(actualMacro.Actual_Ad_Spend_RM) || 0);
+
+        document.getElementById('var-actual-revenue').textContent = `RM ${actRev.toFixed(2)}`;
+        document.getElementById('var-planned-revenue').textContent = `Target: RM ${targetRevenue.toFixed(2)}`;
+
+        const revVarBadge = document.getElementById('var-revenue-badge');
+        const revDelta = actRev - targetRevenue;
+        revVarBadge.textContent = `${revDelta >= 0 ? '+' : ''}RM ${revDelta.toFixed(2)} vs Target`;
+        revVarBadge.className = `text-[10px] mt-1 font-medium ${revDelta >= 0 ? 'text-luxe' : 'text-red-400'}`;
+
+        document.getElementById('var-actual-fees').textContent = `RM ${actFees.toFixed(2)}`;
+
+        // Smart Defaulting: Pull planned tracking array parameters to cross-match unit variations
+        db.plans.forEach(plan => {
+            const plannedQty = plan.Planned_Qty || 0;
+            const historyRows = db.actualsMicro.filter(a => String(a.Date).substring(0, 7) === currentMonthStr && a.Design_Code === plan.Design_Code);
+
+            let actProd = 0;
+            let actSold = 0;
+            historyRows.forEach(h => {
+                actProd += parseInt(h.Qty_Produced) || 0;
+                actSold += parseInt(h.Qty_Sold) || 0;
+            });
+
+            // If no data exists yet, apply Smart Default Mirroring values visually
+            const displayProd = historyRows.length > 0 ? actProd : plannedQty;
+            const displaySold = historyRows.length > 0 ? actSold : 0;
+            const assetInventory = displayProd - displaySold;
+
+            volumeContainer.innerHTML += `
+                <div class="border-b border-white/5 pb-2 last:border-0 flex flex-col gap-1">
+                    <div class="flex justify-between items-center">
+                        <span class="text-white text-xs font-medium">${plan.Design_Code}</span>
+                        <span class="text-[10px] bg-white/5 px-1.5 py-0.5 rounded text-white/50">Asset: ${assetInventory} pcs</span>
+                    </div>
+                    <div class="grid grid-cols-3 text-[10px] text-white/40">
+                        <div>Plan: <span class="text-white/60">${plannedQty}</span></div>
+                        <div>Prod: <span class="text-white/60">${displayProd}</span></div>
+                        <div>Sold: <span class="text-luxe font-medium">${displaySold}</span></div>
+                    </div>
+                </div>`;
+        });
+    }
+
     // --- FINANCIAL & PROCUREMENT ENGINE ---
     function calculateEngine() {
         let totalRevenue = 0;
@@ -789,6 +916,8 @@
 
         metricProfit.textContent = `RM ${netProfit.toFixed(2)}`;
         metricProfit.className = netProfit >= 0 ? 'font-display text-2xl sm:text-3xl text-luxe' : 'font-display text-2xl sm:text-3xl text-red-400';
+
+        if (monthInput) renderPerformanceDashboard(monthInput.value);
     }
 
     function renderProcurement(reqs) {
