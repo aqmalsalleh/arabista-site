@@ -1355,4 +1355,84 @@
         }
     });
 
+    // --- AI CHAT INTERFACE & PAYLOAD PIPELINE ---
+    const chatLog = document.getElementById('ai-chat-log');
+    const chatInput = document.getElementById('ai-chat-input');
+    const btnSendAiMessage = document.getElementById('btn-send-ai-message');
+
+    function appendChatBubble(role, text) {
+        const div = document.createElement('div');
+        div.className = `glass-panel p-4 rounded-xl border max-w-[85%] mt-2 flex flex-col gap-1 ${role === 'user' ? 'self-end bg-white/5 border-white/10' : 'self-start border-luxe/20 bg-ink/30'}`;
+        div.innerHTML = `
+            <p class="text-[9px] uppercase tracking-widest font-semibold ${role === 'user' ? 'text-white/40 text-right' : 'text-luxe'}">${role === 'user' ? 'You' : 'Arabista Brain v4.0'}</p>
+            <p class="text-white/80 text-xs leading-relaxed ${role === 'user' ? 'text-right' : ''} whitespace-pre-wrap">${text}</p>
+        `;
+        chatLog.appendChild(div);
+        chatLog.scrollTop = chatLog.scrollHeight;
+    }
+
+    btnSendAiMessage?.addEventListener('click', async () => {
+        const prompt = chatInput.value.trim();
+        const file = aiChatFileInput.files[0];
+
+        if (!prompt && !file) return;
+
+        btnSendAiMessage.disabled = true;
+        btnSendAiMessage.textContent = '...';
+
+        appendChatBubble('user', prompt || '[Attached Document / Image]');
+
+        let imageBase64 = null;
+        let imageMime = null;
+
+        if (file) {
+            imageMime = file.type;
+            const reader = new FileReader();
+            imageBase64 = await new Promise((resolve) => {
+                reader.onload = (e) => resolve(e.target.result.split(',')[1]);
+                reader.readAsDataURL(file);
+            });
+        }
+
+        const currentMonth = document.getElementById('plan-month-input').value;
+        const currentPlans = db.plans.filter(p => p.Planned_Qty > 0);
+
+        const contextPayload = {
+            plans: currentPlans,
+            config: db.config
+        };
+
+        try {
+            const res = await postManagerAction('ai_copilot_request', {
+                prompt: prompt,
+                imageBase64: imageBase64,
+                imageMime: imageMime,
+                context: contextPayload,
+                month: currentMonth
+            });
+
+            appendChatBubble('ai', res.data.chat_response);
+
+            // Instantly refresh the local state to pull down the newly updated actuals
+            await fetchData();
+
+            // Cleanup UI
+            chatInput.value = '';
+            document.getElementById('btn-remove-ai-file').click();
+
+        } catch (err) {
+            appendChatBubble('ai', `System Diagnostic Error: ${err.message}`);
+        } finally {
+            btnSendAiMessage.disabled = false;
+            btnSendAiMessage.textContent = 'Send';
+        }
+    });
+
+    chatInput?.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            btnSendAiMessage.click();
+        }
+    });
+
 })();
