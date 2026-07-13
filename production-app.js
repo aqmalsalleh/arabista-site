@@ -133,7 +133,8 @@
 
     // State
     let sessionPin = '';
-    let db = { config: {}, configRaw: [], materials: {}, bom: {}, plans: [], allHistoricalPlans: [], basePrices: {}, snapshots: [], actualsMicro: [], actualsMacro: [], aiThinking: [], currentMacroSnapshot: null };
+    let db = { config: {}, configRaw: [], materials: {}, bom: {}, plans: [], allHistoricalPlans: [], basePrices: {}, snapshots: [], actualsMicro: [], actualsMacro: [], actualsCosting: [], aiThinking: [], lastReqs: {}, currentMacroSnapshot: null };
+    let currentDashboardMode = 'plan';
 
     // --- AUTHENTICATION ---
     btnLogin.addEventListener('click', authenticate);
@@ -233,6 +234,7 @@
         db.snapshots = rawData.snapshots || [];
         db.actualsMicro = rawData.actualsMicro || [];
         db.actualsMacro = rawData.actualsMacro || [];
+        db.actualsCosting = rawData.actualsCosting || [];
         db.aiThinking = rawData.aiThinking || [];
         db.basePrices = {};
         
@@ -750,7 +752,9 @@
 
     aiChatFileInput?.addEventListener('change', (e) => {
         if (e.target.files.length > 0) {
-            aiFileName.textContent = e.target.files[0].name;
+            aiFileName.textContent = e.target.files.length > 1
+                ? `${e.target.files.length} files attached`
+                : e.target.files[0].name;
             aiFilePreviewCard.classList.remove('hidden');
             aiFilePreviewCard.classList.add('flex');
         }
@@ -758,6 +762,28 @@
     btnRemoveAiFile?.addEventListener('click', () => {
         aiChatFileInput.value = '';
         aiFilePreviewCard.classList.replace('flex', 'hidden');
+    });
+
+    // Plan vs Actual metrics toggle
+    document.getElementById('toggle-view-plan')?.addEventListener('click', (e) => {
+        currentDashboardMode = 'plan';
+        e.target.classList.replace('text-white/40', 'text-white');
+        e.target.classList.add('bg-white/10');
+        document.getElementById('toggle-view-actual').classList.replace('text-white', 'text-white/40');
+        document.getElementById('toggle-view-actual').classList.remove('bg-white/10');
+        const logBtn = document.getElementById('btn-log-actual-procurement');
+        if (logBtn) logBtn.classList.add('hidden');
+        calculateEngine();
+    });
+    document.getElementById('toggle-view-actual')?.addEventListener('click', (e) => {
+        currentDashboardMode = 'actual';
+        e.target.classList.replace('text-white/40', 'text-white');
+        e.target.classList.add('bg-white/10');
+        document.getElementById('toggle-view-plan').classList.replace('text-white', 'text-white/40');
+        document.getElementById('toggle-view-plan').classList.remove('bg-white/10');
+        const logBtn = document.getElementById('btn-log-actual-procurement');
+        if (logBtn) logBtn.classList.remove('hidden');
+        calculateEngine();
     });
 
     // Performance Rendering Loop Engine Hook
@@ -770,7 +796,10 @@
             Actual_Revenue_RM: 0, Actual_Platform_Fees_RM: 0, Actual_Ad_Spend_RM: 0
         };
 
-        const targetRevenue = parseFloat(metricRevenue.textContent.replace(/[^0-9.]/g, '')) || 0;
+        // Always compare against theoretical plan revenue (not the mode-swapped metric)
+        const targetRevenue = db.plans.reduce((sum, p) => {
+            return sum + ((parseFloat(p.Target_Selling_Price) || 0) * (parseInt(p.Planned_Qty) || 0));
+        }, 0);
 
         const actRev = parseFloat(actualMacro.Actual_Revenue_RM) || 0;
         const actFees = (parseFloat(actualMacro.Actual_Platform_Fees_RM) || 0) + (parseFloat(actualMacro.Actual_Ad_Spend_RM) || 0);
@@ -784,6 +813,16 @@
         revVarBadge.className = `text-[10px] mt-1 font-medium ${revDelta >= 0 ? 'text-luxe' : 'text-red-400'}`;
 
         document.getElementById('var-actual-fees').textContent = `RM ${actFees.toFixed(2)}`;
+
+        const remarksCard = document.getElementById('var-remarks-card');
+        const remarksText = document.getElementById('var-ai-remarks');
+        const aiRemarkStr = actualMacro.AI_Remarks || actualMacro.ai_remarks || "";
+        if (aiRemarkStr && remarksCard && remarksText) {
+            remarksCard.classList.remove('hidden');
+            remarksText.textContent = aiRemarkStr;
+        } else if (remarksCard) {
+            remarksCard.classList.add('hidden');
+        }
 
         // Smart Defaulting: Pull planned tracking array parameters to cross-match unit variations
         db.plans.forEach(plan => {
@@ -800,6 +839,12 @@
             // If no data exists yet, apply Smart Default Mirroring values visually
             const displayProd = historyRows.length > 0 ? actProd : plannedQty;
             const displaySold = historyRows.length > 0 ? actSold : 0;
+
+            // Zero-Filter: skip designs with no plan and no activity
+            if (plannedQty === 0 && displayProd === 0 && displaySold === 0) {
+                return;
+            }
+
             const assetInventory = displayProd - displaySold;
 
             volumeContainer.innerHTML += `
@@ -905,6 +950,7 @@
         const profitMargin = totalRevenue > 0 ? (netProfit / totalRevenue) * 100 : 0;
 
         renderProcurement(reqs);
+        db.lastReqs = reqs;
 
         metricRevenue.textContent = `RM ${totalRevenue.toFixed(2)}`;
         metricCogs.textContent = `RM ${totalCogs.toFixed(2)}`;
@@ -916,6 +962,21 @@
 
         metricProfit.textContent = `RM ${netProfit.toFixed(2)}`;
         metricProfit.className = netProfit >= 0 ? 'font-display text-2xl sm:text-3xl text-luxe' : 'font-display text-2xl sm:text-3xl text-red-400';
+
+        // Conditionally swap top metrics for Actual (Settled) view
+        if (currentDashboardMode === 'actual' && monthInput) {
+            const actMacro = db.actualsMacro.find(m => String(m.Plan_Month).substring(0, 7) === monthInput.value) || {};
+            const rev = parseFloat(actMacro.Actual_Revenue_RM) || 0;
+            const fees = (parseFloat(actMacro.Actual_Platform_Fees_RM) || 0) + (parseFloat(actMacro.Actual_Ad_Spend_RM) || 0);
+            const settledProfit = rev - fees - fixedOpex - totalCogs;
+            metricRevenue.textContent = `RM ${rev.toFixed(2)}`;
+            metricProfit.textContent = `RM ${settledProfit.toFixed(2)}`;
+            metricProfit.className = settledProfit >= 0 ? 'font-display text-2xl sm:text-3xl text-luxe' : 'font-display text-2xl sm:text-3xl text-red-400';
+            if (metricMargin) {
+                metricMargin.textContent = rev > 0 ? `${((settledProfit / rev) * 100).toFixed(2)}%` : '0.00%';
+                metricMargin.className = settledProfit >= 0 ? 'font-display text-xl sm:text-2xl text-white' : 'font-display text-xl sm:text-2xl text-red-400';
+            }
+        }
 
         if (monthInput) renderPerformanceDashboard(monthInput.value);
     }
@@ -1373,25 +1434,25 @@
 
     btnSendAiMessage?.addEventListener('click', async () => {
         const prompt = chatInput.value.trim();
-        const file = aiChatFileInput.files[0];
+        const files = aiChatFileInput.files;
 
-        if (!prompt && !file) return;
+        if (!prompt && (!files || files.length === 0)) return;
 
         btnSendAiMessage.disabled = true;
         btnSendAiMessage.textContent = '...';
 
         appendChatBubble('user', prompt || '[Attached Document / Image]');
 
-        let imageBase64 = null;
-        let imageMime = null;
-
-        if (file) {
-            imageMime = file.type;
-            const reader = new FileReader();
-            imageBase64 = await new Promise((resolve) => {
-                reader.onload = (e) => resolve(e.target.result.split(',')[1]);
-                reader.readAsDataURL(file);
-            });
+        let imagesArray = [];
+        if (files.length > 0) {
+            for (let i = 0; i < files.length; i++) {
+                const reader = new FileReader();
+                const base64 = await new Promise((resolve) => {
+                    reader.onload = (e) => resolve(e.target.result.split(',')[1]);
+                    reader.readAsDataURL(files[i]);
+                });
+                imagesArray.push({ mimeType: files[i].type, data: base64 });
+            }
         }
 
         const currentMonth = document.getElementById('plan-month-input').value;
@@ -1405,8 +1466,7 @@
         try {
             const res = await postManagerAction('ai_copilot_request', {
                 prompt: prompt,
-                imageBase64: imageBase64,
-                imageMime: imageMime,
+                images: imagesArray,
                 context: contextPayload,
                 month: currentMonth
             });
@@ -1432,6 +1492,104 @@
         if (e.key === 'Enter' && !e.shiftKey) {
             e.preventDefault();
             btnSendAiMessage.click();
+        }
+    });
+
+    // --- ACTUALS PROCUREMENT LOGGING MODAL ---
+    const actualsModal = document.getElementById('actuals-modal');
+    const actualsModalInner = document.getElementById('actuals-modal-inner');
+    const actualsModalList = document.getElementById('actuals-modal-list');
+    const btnLogActualProcurement = document.getElementById('btn-log-actual-procurement');
+    const btnCloseActuals = document.getElementById('btn-close-actuals');
+    const btnSaveActuals = document.getElementById('btn-save-actuals');
+
+    function openActualsModal() {
+        if (!actualsModalList) return;
+        actualsModalList.innerHTML = '';
+
+        const groups = {};
+        Object.entries(db.lastReqs || {}).forEach(([id, qty]) => {
+            const mat = db.materials[id];
+            if (!mat) return;
+            if (!groups[mat.category]) groups[mat.category] = [];
+            groups[mat.category].push({
+                id,
+                desc: mat.desc,
+                unit: mat.unit,
+                qty: qty,
+                costRM: mat.costRM * qty
+            });
+        });
+
+        if (Object.keys(groups).length === 0) {
+            actualsModalList.innerHTML = '<p class="text-white/40 text-sm">No planned procurement for this month. Add plan quantities first.</p>';
+        } else {
+            Object.entries(groups).forEach(([category, items]) => {
+                let html = `<div class="flex flex-col gap-2"><h4 class="text-luxe text-[10px] uppercase tracking-widest border-b border-white/10 pb-1">${category}</h4>`;
+                items.forEach(item => {
+                    html += `
+                        <div class="glass-panel p-3 rounded-xl flex flex-col gap-2" data-item-id="${item.id}" data-item-category="${category}">
+                            <div class="text-white text-sm truncate">${item.desc}</div>
+                            <p class="text-white/40 text-[10px] uppercase tracking-widest">Plan: ${item.qty.toFixed(1)} ${item.unit} · RM ${item.costRM.toFixed(2)}</p>
+                            <div class="flex gap-2">
+                                <input type="number" step="0.01" class="actual-qty-input w-1/2 bg-black/40 border border-white/10 rounded-lg text-white text-center py-2 text-sm outline-none focus:border-luxe" placeholder="Actual Qty" value="${item.qty.toFixed(1)}">
+                                <input type="number" step="0.01" class="actual-cost-input w-1/2 bg-black/40 border border-white/10 rounded-lg text-white text-center py-2 text-sm outline-none focus:border-luxe" placeholder="Total Cost RM" value="${item.costRM.toFixed(2)}">
+                            </div>
+                        </div>`;
+                });
+                html += `</div>`;
+                actualsModalList.innerHTML += html;
+            });
+        }
+
+        actualsModal.classList.remove('hidden');
+        setTimeout(() => {
+            actualsModal.classList.remove('opacity-0');
+            actualsModalInner.classList.remove('scale-95');
+        }, 10);
+    }
+
+    function closeActualsModal() {
+        actualsModal.classList.add('opacity-0');
+        actualsModalInner.classList.add('scale-95');
+        setTimeout(() => actualsModal.classList.add('hidden'), 300);
+    }
+
+    btnLogActualProcurement?.addEventListener('click', openActualsModal);
+    btnCloseActuals?.addEventListener('click', closeActualsModal);
+    actualsModal?.addEventListener('click', (e) => { if (e.target === actualsModal) closeActualsModal(); });
+
+    btnSaveActuals?.addEventListener('click', async () => {
+        const month = monthInput?.value;
+        if (!month) return alert('Select a plan month first.');
+
+        const items = [];
+        actualsModalList.querySelectorAll('[data-item-id]').forEach(row => {
+            const qty = parseFloat(row.querySelector('.actual-qty-input')?.value) || 0;
+            const cost = parseFloat(row.querySelector('.actual-cost-input')?.value) || 0;
+            if (qty <= 0 && cost <= 0) return;
+            items.push({
+                id: row.dataset.itemId,
+                category: row.dataset.itemCategory,
+                qty,
+                cost
+            });
+        });
+
+        if (items.length === 0) return alert('Enter at least one actual qty or cost.');
+
+        btnSaveActuals.disabled = true;
+        btnSaveActuals.textContent = 'SAVING...';
+        try {
+            await postManagerAction('save_actuals_costing', { month, items });
+            await fetchData();
+            alert('Actual procurement logged successfully.');
+            closeActualsModal();
+        } catch (err) {
+            alert('Error: ' + err.message);
+        } finally {
+            btnSaveActuals.disabled = false;
+            btnSaveActuals.textContent = 'Save to Ledger';
         }
     });
 
