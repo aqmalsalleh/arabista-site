@@ -15,7 +15,7 @@
     const btnLogout = document.getElementById('btn-logout');
     const loginError = document.getElementById('login-error');
     
-    const procurementList = document.getElementById('procurement-list');
+    const procurementList = document.getElementById('plan-procurement-list') || document.getElementById('procurement-list');
     const metricRevenue = document.getElementById('metric-revenue');
     const metricCogs = document.getElementById('metric-cogs');
     const metricProfit = document.getElementById('metric-profit');
@@ -40,59 +40,32 @@
     const plannerListContainer = document.getElementById('planner-list-container');
     const plannerSearch = document.getElementById('planner-search');
 
-    // Mobile Tabs Logic (Using hidden/flex to fix absolute positioning issues)
-    const tabPerformance = document.getElementById('tab-performance');
-    const panelPerformance = document.getElementById('panel-performance');
+    // --- 3-PILLAR TAB NAVIGATION ---
+    const tabPlan = document.getElementById('tab-nav-plan');
+    const tabActual = document.getElementById('tab-nav-actual');
+    const tabAnalysis = document.getElementById('tab-nav-analysis');
+    const pillarPlan = document.getElementById('pillar-plan');
+    const pillarActual = document.getElementById('pillar-actual');
+    const pillarAnalysis = document.getElementById('pillar-analysis');
 
-    function resetMobileTabStyles() {
-        [tabPlans, tabLedger, tabPerformance].forEach(tab => {
-            if (!tab) return;
-            tab.classList.replace('text-luxe', 'text-white/40');
-            tab.classList.replace('border-luxe', 'border-transparent');
+    function switchPillar(targetTab, targetPillar) {
+        [tabPlan, tabActual, tabAnalysis].forEach(t => {
+            if (!t) return;
+            t.classList.remove('font-bold', 'text-luxe', 'border-luxe');
+            t.classList.add('font-medium', 'text-white/40', 'border-transparent');
         });
-    }
+        targetTab.classList.remove('font-medium', 'text-white/40', 'border-transparent');
+        targetTab.classList.add('font-bold', 'text-luxe', 'border-luxe');
 
-    if (tabPlans && tabLedger) {
-        tabPlans.addEventListener('click', () => {
-            resetMobileTabStyles();
-            tabPlans.classList.replace('text-white/40', 'text-luxe');
-            tabPlans.classList.replace('border-transparent', 'border-luxe');
-            
-            panelPlans.classList.remove('hidden');
-            panelLedger.classList.add('hidden');
-            panelLedger.classList.remove('block');
-            if (panelPerformance) {
-                panelPerformance.classList.add('hidden');
-                panelPerformance.classList.remove('block');
-            }
-        });
-
-        tabLedger.addEventListener('click', () => {
-            resetMobileTabStyles();
-            tabLedger.classList.replace('text-white/40', 'text-luxe');
-            tabLedger.classList.replace('border-transparent', 'border-luxe');
-            
-            panelLedger.classList.remove('hidden');
-            panelLedger.classList.add('block');
-            panelPlans.classList.add('hidden');
-            if (panelPerformance) {
-                panelPerformance.classList.add('hidden');
-                panelPerformance.classList.remove('block');
-            }
-        });
-    }
-
-    tabPerformance?.addEventListener('click', () => {
-        resetMobileTabStyles();
-        tabPerformance.classList.replace('text-white/40', 'text-luxe');
-        tabPerformance.classList.replace('border-transparent', 'border-luxe');
+        [pillarPlan, pillarActual, pillarAnalysis].forEach(p => { if (p) p.classList.add('hidden'); });
+        targetPillar.classList.remove('hidden');
         
-        panelPerformance.classList.remove('hidden');
-        panelPerformance.classList.add('block');
-        panelPlans.classList.add('hidden');
-        panelLedger.classList.add('hidden');
-        panelLedger.classList.remove('block');
-    });
+        if (targetPillar === pillarAnalysis) renderAnalysisPillar(); // Lazy render temporal math
+    }
+
+    tabPlan?.addEventListener('click', () => switchPillar(tabPlan, pillarPlan));
+    tabActual?.addEventListener('click', () => switchPillar(tabActual, pillarActual));
+    tabAnalysis?.addEventListener('click', () => switchPillar(tabAnalysis, pillarAnalysis));
 
     // Planner Drawer Logic
     function openPlanner() {
@@ -126,20 +99,19 @@
             }
         });
         
-        renderActivePlans();
         calculateEngine();
         closePlanner();
     });
 
     // State
     let sessionPin = '';
-    let db = { config: {}, configRaw: [], materials: {}, bom: {}, plans: [], allHistoricalPlans: [], basePrices: {}, snapshots: [], actualsMicro: [], actualsMacro: [], actualsCosting: [], aiThinking: [], lastReqs: {}, currentMacroSnapshot: null };
+    let db = { config: {}, configRaw: [], materials: {}, bom: {}, plans: [], allHistoricalPlans: [], basePrices: {}, snapshots: [], actualsMicro: [], actualsMacro: [], actualsCosting: [], extraCosts: [], currentExtraCosts: [], aiThinking: [], lastReqs: {}, currentMacroSnapshot: null };
     let currentDashboardMode = 'plan';
 
     // --- AUTHENTICATION ---
     btnLogin.addEventListener('click', authenticate);
     pinInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') authenticate(); });
-    btnLogout.addEventListener('click', () => location.reload());
+    btnLogout?.addEventListener('click', () => location.reload());
 
     async function authenticate() {
         const pin = pinInput.value.trim();
@@ -235,6 +207,7 @@
         db.actualsMicro = rawData.actualsMicro || [];
         db.actualsMacro = rawData.actualsMacro || [];
         db.actualsCosting = rawData.actualsCosting || [];
+        db.extraCosts = rawData.extraCosts || [];
         db.aiThinking = rawData.aiThinking || [];
         db.basePrices = {};
         
@@ -273,8 +246,12 @@
             });
         });
 
+        db.currentExtraCosts = db.extraCosts.filter(c => {
+            let cMonth = String(c.Plan_Month).includes('T') ? String(c.Plan_Month).split('T')[0].substring(0, 7) : String(c.Plan_Month).substring(0, 7);
+            return cMonth === monthStr;
+        });
+
         renderPlannerDrawer();
-        renderActivePlans();
         calculateEngine();
     }
 
@@ -284,48 +261,65 @@
         });
     }
 
-    const btnSaveMonthPlan = document.getElementById('btn-save-month-plan');
-    if (btnSaveMonthPlan) {
-        btnSaveMonthPlan.addEventListener('click', async () => {
+    const btnSavePlan = document.getElementById('btn-save-plan');
+    if (btnSavePlan) {
+        btnSavePlan.addEventListener('click', async () => {
             const currentMonth = monthInput.value;
             if (!currentMonth) return alert("Please select a month first.");
-            
-            btnSaveMonthPlan.disabled = true;
-            btnSaveMonthPlan.textContent = 'SAVING...';
-            
+            btnSavePlan.disabled = true;
+            btnSavePlan.textContent = 'SAVING...';
             try {
-                // Assemble locked arrays
                 const payloadPlans = db.plans.map(p => ({
-                    Design_Code: p.Design_Code,
-                    Planned_Qty: p.Planned_Qty,
-                    Target_Selling_Price: p.Target_Selling_Price,
-                    Locked_Material_COGS_RM: p.Locked_Material_COGS_RM !== undefined && p.Locked_Material_COGS_RM !== "" ? p.Locked_Material_COGS_RM : p.Live_Material_COGS_RM,
-                    Locked_Direct_Labor_RM: p.Locked_Direct_Labor_RM !== undefined && p.Locked_Direct_Labor_RM !== "" ? p.Locked_Direct_Labor_RM : p.Live_Direct_Labor_RM,
-                    Locked_Var_Overhead_RM: p.Locked_Var_Overhead_RM !== undefined && p.Locked_Var_Overhead_RM !== "" ? p.Locked_Var_Overhead_RM : p.Live_Var_Overhead_RM
+                    Design_Code: p.Design_Code, Planned_Qty: p.Planned_Qty, Target_Selling_Price: p.Target_Selling_Price,
+                    Locked_Material_COGS_RM: p.Live_Material_COGS_RM, Locked_Direct_Labor_RM: p.Live_Direct_Labor_RM, Locked_Var_Overhead_RM: p.Live_Var_Overhead_RM
                 }));
-
-                const res = await fetch(`${ctx.apiUrl}?action=save_monthly_plan`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                    body: `payload=${encodeURIComponent(JSON.stringify({ 
-                        pin: sessionPin, 
-                        month: currentMonth, 
-                        plans: payloadPlans, 
-                        snapshot: db.currentMacroSnapshot 
-                    }))}`
-                });
-                const json = await res.json();
-                if (json.status !== 'success') throw new Error(json.message || 'Request failed');
+                await postManagerAction('save_monthly_plan', { month: currentMonth, plans: payloadPlans, snapshot: db.currentMacroSnapshot });
+                // Map sheet-facing keys (GAS expects name/category/cost)
+                const extrasPayload = (db.currentExtraCosts || []).map(ex => ({
+                    name: ex.Cost_Name || ex.name,
+                    category: ex.Category || ex.category || 'Operational',
+                    cost: parseFloat(ex.Cost_RM != null ? ex.Cost_RM : ex.cost) || 0
+                }));
+                await postManagerAction('save_monthly_extra_costs', { month: currentMonth, extras: extrasPayload });
                 await fetchData();
-                alert(`Production plan for ${currentMonth} synchronized to database.`);
-            } catch (err) {
-                alert('Save failed: ' + err.message);
-            } finally {
-                btnSaveMonthPlan.disabled = false;
-                btnSaveMonthPlan.textContent = 'Save Month to Database';
-            }
+                alert(`Master Plan for ${currentMonth} synchronized.`);
+            } catch (err) { alert('Save failed: ' + err.message); } 
+            finally { btnSavePlan.disabled = false; btnSavePlan.textContent = 'Save Master Plan'; }
         });
     }
+
+    document.getElementById('btn-add-extra-cost')?.addEventListener('click', () => {
+        const name = prompt("Enter Cost Name (e.g. June Studio Rental):");
+        if (!name) return;
+        const cost = prompt("Enter Cost Amount (RM):");
+        if (!cost || isNaN(cost)) return;
+        db.currentExtraCosts.push({ Cost_Name: name, Category: 'Operational', Cost_RM: parseFloat(cost) });
+        calculateEngine();
+    });
+
+    document.getElementById('btn-save-actuals')?.addEventListener('click', async () => {
+        const currentMonth = monthInput.value;
+        const btn = document.getElementById('btn-save-actuals');
+        btn.disabled = true; btn.textContent = 'SAVING LEDGER...';
+        
+        const micro = [];
+        document.querySelectorAll('.actual-vol-row').forEach(row => {
+            micro.push({ design: row.dataset.design, prod: parseInt(row.querySelector('.act-prod').value) || 0, sold: parseInt(row.querySelector('.act-sold').value) || 0 });
+        });
+        
+        const costing = [];
+        document.querySelectorAll('.actual-cost-row').forEach(row => {
+            costing.push({ id: row.dataset.id, category: row.dataset.category, qty: parseFloat(row.querySelector('.act-qty').value) || 0, cost: parseFloat(row.querySelector('.act-cost').value) || 0, remarks: row.querySelector('.act-remarks').value.trim() });
+        });
+
+        try {
+            await postManagerAction('save_actual_pillar', { month: currentMonth, micro, costing });
+            await fetchData();
+            alert(`Actuals for ${currentMonth} secured to ledger.`);
+        } catch (err) { alert('Save failed: ' + err.message); } 
+        finally { btn.disabled = false; btn.textContent = 'Save Actuals to Ledger'; }
+    });
+
 
     const btnClearMonthPlan = document.getElementById('btn-clear-month-plan');
     if (btnClearMonthPlan) {
@@ -467,19 +461,38 @@
     }
 
     function renderActivePlans() {
+        const list = document.getElementById('plan-designs-list');
         const active = db.plans.filter(p => p.Planned_Qty > 0);
-        
-        if(active.length === 0) {
-            plannerHeroCard.classList.remove('hidden');
-            plannerHeroCard.classList.add('flex');
-            plannerActiveState.classList.add('hidden');
-            plannerActiveState.classList.remove('flex');
-        } else {
-            plannerHeroCard.classList.add('hidden');
-            plannerHeroCard.classList.remove('flex');
-            plannerActiveState.classList.remove('hidden');
-            plannerActiveState.classList.add('flex');
-            activeCountDisplay.textContent = active.length;
+
+        if (list) {
+            if (active.length === 0) {
+                list.innerHTML = '<div class="text-white/30 text-sm">No designs planned for this month. Tap Modify Targets to begin.</div>';
+            } else {
+                list.innerHTML = active.map(p => `
+                    <div class="glass-panel p-3 rounded-xl flex justify-between items-center gap-3">
+                        <div>
+                            <div class="text-white font-medium">${p.Design_Code}</div>
+                            <div class="text-white/40 text-[10px] uppercase tracking-widest">RM ${parseFloat(p.Target_Selling_Price || 0).toFixed(2)} / unit</div>
+                        </div>
+                        <div class="text-luxe font-display text-xl">${p.Planned_Qty}</div>
+                    </div>
+                `).join('');
+            }
+        }
+
+        if (plannerHeroCard && plannerActiveState) {
+            if (active.length === 0) {
+                plannerHeroCard.classList.remove('hidden');
+                plannerHeroCard.classList.add('flex');
+                plannerActiveState.classList.add('hidden');
+                plannerActiveState.classList.remove('flex');
+            } else {
+                plannerHeroCard.classList.add('hidden');
+                plannerHeroCard.classList.remove('flex');
+                plannerActiveState.classList.remove('hidden');
+                plannerActiveState.classList.add('flex');
+                if (activeCountDisplay) activeCountDisplay.textContent = active.length;
+            }
         }
     }
 
@@ -764,154 +777,24 @@
         aiFilePreviewCard.classList.replace('flex', 'hidden');
     });
 
-    // Plan vs Actual metrics toggle
-    document.getElementById('toggle-view-plan')?.addEventListener('click', (e) => {
-        currentDashboardMode = 'plan';
-        e.target.classList.replace('text-white/40', 'text-white');
-        e.target.classList.add('bg-white/10');
-        document.getElementById('toggle-view-actual').classList.replace('text-white', 'text-white/40');
-        document.getElementById('toggle-view-actual').classList.remove('bg-white/10');
-        const logBtn = document.getElementById('btn-log-actual-procurement');
-        if (logBtn) logBtn.classList.add('hidden');
-        calculateEngine();
-    });
-    document.getElementById('toggle-view-actual')?.addEventListener('click', (e) => {
-        currentDashboardMode = 'actual';
-        e.target.classList.replace('text-white/40', 'text-white');
-        e.target.classList.add('bg-white/10');
-        document.getElementById('toggle-view-plan').classList.replace('text-white', 'text-white/40');
-        document.getElementById('toggle-view-plan').classList.remove('bg-white/10');
-        const logBtn = document.getElementById('btn-log-actual-procurement');
-        if (logBtn) logBtn.classList.remove('hidden');
-        calculateEngine();
-    });
-
-    // Performance Rendering Loop Engine Hook
-    function renderPerformanceDashboard(currentMonthStr) {
-        const volumeContainer = document.getElementById('performance-volume-list');
-        if (!volumeContainer) return;
-        volumeContainer.innerHTML = '';
-
-        const actualMacro = db.actualsMacro.find(m => String(m.Plan_Month).substring(0, 7) === currentMonthStr) || {
-            Actual_Revenue_RM: 0, Actual_Platform_Fees_RM: 0, Actual_Ad_Spend_RM: 0
-        };
-
-        // Always compare against theoretical plan revenue (not the mode-swapped metric)
-        const targetRevenue = db.plans.reduce((sum, p) => {
-            return sum + ((parseFloat(p.Target_Selling_Price) || 0) * (parseInt(p.Planned_Qty) || 0));
-        }, 0);
-
-        const actRev = parseFloat(actualMacro.Actual_Revenue_RM) || 0;
-        const actFees = (parseFloat(actualMacro.Actual_Platform_Fees_RM) || 0) + (parseFloat(actualMacro.Actual_Ad_Spend_RM) || 0);
-
-        document.getElementById('var-actual-revenue').textContent = `RM ${actRev.toFixed(2)}`;
-        document.getElementById('var-planned-revenue').textContent = `Target: RM ${targetRevenue.toFixed(2)}`;
-
-        const revVarBadge = document.getElementById('var-revenue-badge');
-        const revDelta = actRev - targetRevenue;
-        revVarBadge.textContent = `${revDelta >= 0 ? '+' : ''}RM ${revDelta.toFixed(2)} vs Target`;
-        revVarBadge.className = `text-[10px] mt-1 font-medium ${revDelta >= 0 ? 'text-luxe' : 'text-red-400'}`;
-
-        document.getElementById('var-actual-fees').textContent = `RM ${actFees.toFixed(2)}`;
-
-        const remarksCard = document.getElementById('var-remarks-card');
-        const remarksText = document.getElementById('var-ai-remarks');
-        const aiRemarkStr = actualMacro.AI_Remarks || actualMacro.ai_remarks || "";
-        if (aiRemarkStr && remarksCard && remarksText) {
-            remarksCard.classList.remove('hidden');
-            remarksText.textContent = aiRemarkStr;
-        } else if (remarksCard) {
-            remarksCard.classList.add('hidden');
-        }
-
-        // Smart Defaulting: Pull planned tracking array parameters to cross-match unit variations
-        db.plans.forEach(plan => {
-            const plannedQty = plan.Planned_Qty || 0;
-            const historyRows = db.actualsMicro.filter(a => String(a.Date).substring(0, 7) === currentMonthStr && a.Design_Code === plan.Design_Code);
-
-            let actProd = 0;
-            let actSold = 0;
-            historyRows.forEach(h => {
-                actProd += parseInt(h.Qty_Produced) || 0;
-                actSold += parseInt(h.Qty_Sold) || 0;
-            });
-
-            // If no data exists yet, apply Smart Default Mirroring values visually
-            const displayProd = historyRows.length > 0 ? actProd : plannedQty;
-            const displaySold = historyRows.length > 0 ? actSold : 0;
-
-            // Zero-Filter: skip designs with no plan and no activity
-            if (plannedQty === 0 && displayProd === 0 && displaySold === 0) {
-                return;
-            }
-
-            const assetInventory = displayProd - displaySold;
-
-            volumeContainer.innerHTML += `
-                <div class="border-b border-white/5 pb-2 last:border-0 flex flex-col gap-1">
-                    <div class="flex justify-between items-center">
-                        <span class="text-white text-xs font-medium">${plan.Design_Code}</span>
-                        <span class="text-[10px] bg-white/5 px-1.5 py-0.5 rounded text-white/50">Asset: ${assetInventory} pcs</span>
-                    </div>
-                    <div class="grid grid-cols-3 text-[10px] text-white/40">
-                        <div>Plan: <span class="text-white/60">${plannedQty}</span></div>
-                        <div>Prod: <span class="text-white/60">${displayProd}</span></div>
-                        <div>Sold: <span class="text-luxe font-medium">${displaySold}</span></div>
-                    </div>
-                </div>`;
-        });
-    }
-
-    // --- FINANCIAL & PROCUREMENT ENGINE ---
+    // --- TEMPORAL ERP CALCULATION ENGINE ---
     function calculateEngine() {
-        let totalRevenue = 0;
-        let totalCogs = 0;
-        let totalVariableCost = 0;
+        let planRev = 0, planCogs = 0, planVarOverhead = 0, planQtyTotal = 0;
         let reqs = {}; 
-
-        // 1. Intelligently sum all Fixed OPEX from the database
         let fixedOpex = 0;
-        db.configRaw.forEach(c => {
-            if (c.Account_Category === 'Fixed OPEX') fixedOpex += (parseFloat(c.Value_RM) || 0);
-        });
+        
+        db.configRaw.forEach(c => { if (c.Account_Category === 'Fixed OPEX') fixedOpex += (parseFloat(c.Value_RM) || 0); });
 
         db.plans.forEach(plan => {
             const qty = parseInt(plan.Planned_Qty) || 0;
             if (qty <= 0) return;
-
-            const design = plan.Design_Code;
+            planQtyTotal += qty;
             const price = parseFloat(plan.Target_Selling_Price) || 0;
-            totalRevenue += (price * qty);
+            planRev += (price * qty);
 
-            // Routing: If it has frozen history, use it. Otherwise, calculate live.
-            if (plan.Locked_Material_COGS_RM !== undefined && plan.Locked_Material_COGS_RM !== "") {
-                const matCogs = parseFloat(plan.Locked_Material_COGS_RM) || 0;
-                const labor = parseFloat(plan.Locked_Direct_Labor_RM) || 0;
-                const overhead = parseFloat(plan.Locked_Var_Overhead_RM) || 0;
-                
-                totalCogs += (matCogs * qty);
-                totalVariableCost += ((matCogs + labor + overhead) * qty);
-            } else {
-                const bom = db.bom[design];
-                if (!bom) return;
-
-                const tailoring = parseFloat(bom.Direct_Labor_RM) || 10;
-                
-                // 2. Intelligently calculate Variable Selling Overheads
-                let dynamicOverhead = 0;
-                db.configRaw.forEach(c => {
-                    if (c.Account_Category === 'Variable Selling') {
-                        const val = parseFloat(c.Value_RM) || 0;
-                        if (c.Variable_Name.includes('_Pct')) {
-                            dynamicOverhead += (price * val);
-                        } else {
-                            dynamicOverhead += val;
-                        }
-                    }
-                });
-                
-                let designMatCogs = 0;
-
+            let designMatCogs = 0;
+            const bom = db.bom[plan.Design_Code];
+            if (bom) {
                 const addReq = (id, amount) => {
                     if (!id || id === 'NONE' || amount <= 0) return;
                     if (!reqs[id]) reqs[id] = 0;
@@ -919,108 +802,226 @@
                     const mat = db.materials[id];
                     if (mat) designMatCogs += (mat.costRM * amount);
                 };
-
                 Object.keys(bom).forEach(key => {
                     if (!key.endsWith('_ID') || key === 'Design_Code') return;
-                    const prefix = key.slice(0, -3);
-                    const id = bom[key];
-                    if (!id || id === 'NONE') return;
-                    const amount = parseFloat(bom[prefix + '_Qty']) || 0;
-                    addReq(id, amount);
+                    const amount = parseFloat(bom[key.slice(0, -3) + '_Qty']) || 0;
+                    addReq(bom[key], amount);
                 });
-
-                totalCogs += (designMatCogs * qty);
-                totalVariableCost += ((designMatCogs + tailoring + dynamicOverhead) * qty);
-
-                // Attach live variables for saving
-                plan.Live_Material_COGS_RM = designMatCogs;
-                plan.Live_Direct_Labor_RM = tailoring;
-                plan.Live_Var_Overhead_RM = dynamicOverhead;
             }
+
+            const matCogs = plan.Locked_Material_COGS_RM !== undefined && plan.Locked_Material_COGS_RM !== "" ? parseFloat(plan.Locked_Material_COGS_RM) || 0 : designMatCogs;
+            const labor = plan.Locked_Direct_Labor_RM !== undefined && plan.Locked_Direct_Labor_RM !== "" ? parseFloat(plan.Locked_Direct_Labor_RM) || 0 : parseFloat(bom?.Direct_Labor_RM) || 10;
+            
+            // Reconstruct overheads based on explicitly named variables
+            let dynamicOverhead = 0;
+            db.configRaw.forEach(c => {
+                if (c.Account_Category === 'Variable Selling') {
+                    const val = parseFloat(c.Value_RM) || 0;
+                    dynamicOverhead += c.Variable_Name.includes('_Pct') ? (price * val) : val;
+                }
+            });
+            const overhead = plan.Locked_Var_Overhead_RM !== undefined && plan.Locked_Var_Overhead_RM !== "" ? parseFloat(plan.Locked_Var_Overhead_RM) || 0 : dynamicOverhead;
+
+            planCogs += (matCogs * qty);
+            planVarOverhead += ((matCogs + labor + overhead) * qty);
+
+            plan.Live_Material_COGS_RM = matCogs;
+            plan.Live_Direct_Labor_RM = labor;
+            plan.Live_Var_Overhead_RM = overhead;
         });
 
-        // Store Macro Snapshot
-        const netProfit = totalRevenue - totalVariableCost - fixedOpex;
-        db.currentMacroSnapshot = {
-            Locked_Fixed_OPEX_RM: fixedOpex,
-            Total_Revenue_RM: totalRevenue,
-            Net_Profit_RM: netProfit
-        };
+        let totalExtraCosts = 0;
+        (db.currentExtraCosts || []).forEach(ex => totalExtraCosts += (parseFloat(ex.Cost_RM) || 0));
 
-        const profitMargin = totalRevenue > 0 ? (netProfit / totalRevenue) * 100 : 0;
-
-        renderProcurement(reqs);
+        const planNetProfit = planRev - planVarOverhead - fixedOpex - totalExtraCosts;
+        const planMargin = planRev > 0 ? (planNetProfit / planRev) * 100 : 0;
+        
+        db.currentMacroSnapshot = { Locked_Fixed_OPEX_RM: fixedOpex, Total_Revenue_RM: planRev, Net_Profit_RM: planNetProfit };
         db.lastReqs = reqs;
 
-        metricRevenue.textContent = `RM ${totalRevenue.toFixed(2)}`;
-        metricCogs.textContent = `RM ${totalCogs.toFixed(2)}`;
-        
-        if (metricMargin) {
-            metricMargin.textContent = `${profitMargin.toFixed(2)}%`;
-            metricMargin.className = profitMargin >= 0 ? 'font-display text-xl sm:text-2xl text-white' : 'font-display text-xl sm:text-2xl text-red-400';
-        }
+        renderPlanPillar(planRev, planCogs, planNetProfit, planMargin, reqs);
+        renderActualPillar(fixedOpex, reqs);
+    }
 
-        metricProfit.textContent = `RM ${netProfit.toFixed(2)}`;
-        metricProfit.className = netProfit >= 0 ? 'font-display text-2xl sm:text-3xl text-luxe' : 'font-display text-2xl sm:text-3xl text-red-400';
+    function renderPlanPillar(rev, cogs, profit, margin, reqs) {
+        document.getElementById('plan-metrics-container').innerHTML = `
+            <div class="glass-panel p-4 rounded-xl border border-white/5"><p class="text-white/40 text-[9px] uppercase tracking-widest mb-1">Target Revenue</p><div class="text-xl font-display text-white">RM ${rev.toFixed(2)}</div></div>
+            <div class="glass-panel p-4 rounded-xl border border-white/5"><p class="text-white/40 text-[9px] uppercase tracking-widest mb-1">Target COGS</p><div class="text-xl font-display text-white">RM ${cogs.toFixed(2)}</div></div>
+            <div class="glass-panel p-4 rounded-xl border border-white/5"><p class="text-white/40 text-[9px] uppercase tracking-widest mb-1">Target Margin</p><div class="text-xl font-display ${margin >= 0 ? 'text-white' : 'text-red-400'}">${margin.toFixed(2)}%</div></div>
+            <div class="glass-panel p-4 rounded-xl border ${profit >= 0 ? 'border-luxe/30 bg-luxe/5' : 'border-red-500/30 bg-red-500/5'}"><p class="text-luxe text-[9px] uppercase tracking-widest mb-1 font-bold">Est. Net Profit</p><div class="text-2xl font-display ${profit >= 0 ? 'text-luxe' : 'text-red-400'}">RM ${profit.toFixed(2)}</div></div>
+        `;
 
-        // Conditionally swap top metrics for Actual (Settled) view
-        if (currentDashboardMode === 'actual' && monthInput) {
-            const actMacro = db.actualsMacro.find(m => String(m.Plan_Month).substring(0, 7) === monthInput.value) || {};
-            const rev = parseFloat(actMacro.Actual_Revenue_RM) || 0;
-            const fees = (parseFloat(actMacro.Actual_Platform_Fees_RM) || 0) + (parseFloat(actMacro.Actual_Ad_Spend_RM) || 0);
-            const settledProfit = rev - fees - fixedOpex - totalCogs;
-            metricRevenue.textContent = `RM ${rev.toFixed(2)}`;
-            metricProfit.textContent = `RM ${settledProfit.toFixed(2)}`;
-            metricProfit.className = settledProfit >= 0 ? 'font-display text-2xl sm:text-3xl text-luxe' : 'font-display text-2xl sm:text-3xl text-red-400';
-            if (metricMargin) {
-                metricMargin.textContent = rev > 0 ? `${((settledProfit / rev) * 100).toFixed(2)}%` : '0.00%';
-                metricMargin.className = settledProfit >= 0 ? 'font-display text-xl sm:text-2xl text-white' : 'font-display text-xl sm:text-2xl text-red-400';
+        const designList = document.getElementById('plan-designs-list');
+        designList.innerHTML = '';
+        db.plans.filter(p => p.Planned_Qty > 0).forEach(p => {
+            designList.innerHTML += `<div class="flex justify-between items-center bg-black/40 p-3 rounded-lg border border-white/5"><span class="text-white text-sm font-medium">${p.Design_Code}</span><span class="text-white/60 text-xs">${p.Planned_Qty} pcs @ RM ${p.Target_Selling_Price}</span></div>`;
+        });
+        if (designList.innerHTML === '') designList.innerHTML = '<p class="text-white/30 text-xs">No designs planned. Modify targets to begin.</p>';
+
+        const extrasList = document.getElementById('plan-extras-list');
+        extrasList.innerHTML = '';
+        (db.currentExtraCosts || []).forEach((ex, index) => {
+            extrasList.innerHTML += `<div class="flex justify-between items-center bg-black/40 p-3 rounded-lg border border-white/5"><div class="flex flex-col"><span class="text-white text-sm">${ex.Cost_Name}</span><span class="text-white/40 text-[9px] uppercase tracking-widest">${ex.Category}</span></div><div class="flex items-center gap-3"><span class="text-red-400 text-sm">-RM ${parseFloat(ex.Cost_RM).toFixed(2)}</span><button class="text-white/30 hover:text-red-400 tap-none btn-remove-extra" data-index="${index}">×</button></div></div>`;
+        });
+        document.querySelectorAll('.btn-remove-extra').forEach(btn => {
+            btn.addEventListener('click', (e) => { db.currentExtraCosts.splice(e.target.dataset.index, 1); calculateEngine(); });
+        });
+
+        const procureList = document.getElementById('plan-procurement-list');
+        procureList.innerHTML = '';
+        Object.entries(reqs).forEach(([id, qty]) => {
+            const mat = db.materials[id];
+            if (mat) procureList.innerHTML += `<div class="flex justify-between items-center border-b border-white/5 pb-2 last:border-0"><div class="flex flex-col"><span class="text-white text-sm">${mat.desc}</span><span class="text-white/40 text-[9px] uppercase tracking-widest">${id}</span></div><div class="text-right"><div class="text-white/80 text-xs">${qty.toFixed(1)} ${mat.unit}</div><div class="text-white/40 text-[10px]">RM ${(mat.costRM * qty).toFixed(2)}</div></div></div>`;
+        });
+
+        // Keep planner hero card in sync with active plan count
+        const active = db.plans.filter(p => p.Planned_Qty > 0);
+        if (plannerHeroCard && plannerActiveState) {
+            if (active.length === 0) {
+                plannerHeroCard.classList.remove('hidden');
+                plannerHeroCard.classList.add('flex');
+                plannerActiveState.classList.add('hidden');
+                plannerActiveState.classList.remove('flex');
+            } else {
+                plannerHeroCard.classList.add('hidden');
+                plannerHeroCard.classList.remove('flex');
+                plannerActiveState.classList.remove('hidden');
+                plannerActiveState.classList.add('flex');
+                if (activeCountDisplay) activeCountDisplay.textContent = active.length;
             }
         }
-
-        if (monthInput) renderPerformanceDashboard(monthInput.value);
     }
 
-    function renderProcurement(reqs) {
-        // Group materials by category
-        const groups = {};
-        for (const [id, qty] of Object.entries(reqs)) {
-            const mat = db.materials[id];
-            if (!mat) continue;
-            if (!groups[mat.category]) groups[mat.category] = [];
-            
-            const costRM = mat.costRM * qty;
-            groups[mat.category].push({
-                desc: mat.desc,
-                qty: qty,
-                unit: mat.unit,
-                costRM: costRM
-            });
+    function renderActualPillar(fixedOpex, reqs) {
+        const monthStr = monthInput.value;
+        const aMacro = db.actualsMacro.find(m => String(m.Plan_Month).substring(0, 7) === monthStr) || { Actual_Revenue_RM: 0, Actual_Platform_Fees_RM: 0, Actual_Ad_Spend_RM: 0 };
+        const microHistory = db.actualsMicro.filter(a => String(a.Date).substring(0, 7) === monthStr);
+        const costingHistory = db.actualsCosting.filter(c => String(c.Month).substring(0, 7) === monthStr);
+
+        let actualCogs = 0;
+        costingHistory.forEach(c => actualCogs += (parseFloat(c.Actual_Total_Cost_RM) || 0));
+        
+        const rev = parseFloat(aMacro.Actual_Revenue_RM) || 0;
+        const fees = (parseFloat(aMacro.Actual_Platform_Fees_RM) || 0) + (parseFloat(aMacro.Actual_Ad_Spend_RM) || 0);
+        
+        let actualProfit = 0, actualMargin = 0;
+        if (rev > 0 || actualCogs > 0) { // Only calculate if actuals exist
+            actualProfit = rev - fees - fixedOpex - actualCogs;
+            actualMargin = rev > 0 ? (actualProfit / rev) * 100 : 0;
         }
 
-        if (Object.keys(groups).length === 0) {
-            procurementList.innerHTML = '<div class="text-white/30 text-sm">No production planned.</div>';
-            return;
-        }
+        document.getElementById('actual-metrics-container').innerHTML = `
+            <div class="glass-panel p-4 rounded-xl border border-white/5"><p class="text-white/40 text-[9px] uppercase tracking-widest mb-1">Settled Net Revenue</p><div class="text-xl font-display text-white">RM ${rev.toFixed(2)}</div></div>
+            <div class="glass-panel p-4 rounded-xl border border-white/5"><p class="text-white/40 text-[9px] uppercase tracking-widest mb-1">Actual Direct Costs</p><div class="text-xl font-display text-white">RM ${actualCogs.toFixed(2)}</div></div>
+            <div class="glass-panel p-4 rounded-xl border border-white/5"><p class="text-white/40 text-[9px] uppercase tracking-widest mb-1">Realized Margin</p><div class="text-xl font-display ${actualMargin >= 0 ? 'text-white' : 'text-red-400'}">${actualMargin.toFixed(2)}%</div></div>
+            <div class="glass-panel p-4 rounded-xl border ${actualProfit >= 0 ? 'border-luxe/30 bg-luxe/5' : 'border-red-500/30 bg-red-500/5'}"><p class="text-luxe text-[9px] uppercase tracking-widest mb-1 font-bold">Settled Profit</p><div class="text-2xl font-display ${actualProfit >= 0 ? 'text-luxe' : 'text-red-400'}">RM ${actualProfit.toFixed(2)}</div></div>
+        `;
 
-        let html = '';
-        for (const [category, items] of Object.entries(groups)) {
-            html += `<div class="mb-6"><h3 class="text-luxe text-[10px] uppercase tracking-widest mb-3 border-b border-white/10 pb-2">${category}</h3>`;
-            items.forEach(i => {
-                html += `
-                    <div class="flex justify-between items-center mb-2">
-                        <div>
-                            <div class="text-white text-sm">${i.desc}</div>
-                            <div class="text-white/40 text-xs">${i.qty.toFixed(1)} ${i.unit}</div>
-                        </div>
-                        <div class="text-white font-medium text-sm">RM ${i.costRM.toFixed(2)}</div>
+        const volList = document.getElementById('actual-designs-list');
+        volList.innerHTML = '';
+        db.plans.forEach(p => {
+            const hist = microHistory.find(h => h.Design_Code === p.Design_Code);
+            const prod = hist ? parseInt(hist.Qty_Produced) || 0 : parseInt(p.Planned_Qty) || 0;
+            const sold = hist ? parseInt(hist.Qty_Sold) || 0 : 0;
+            if (p.Planned_Qty === 0 && prod === 0 && sold === 0) return; // Zero-Filter
+
+            volList.innerHTML += `
+                <div class="glass-panel p-3 rounded-xl flex items-center justify-between gap-3 actual-vol-row" data-design="${p.Design_Code}">
+                    <div class="flex-1"><span class="text-white text-sm font-medium">${p.Design_Code}</span><span class="text-white/40 text-[9px] uppercase tracking-widest block">Plan: ${p.Planned_Qty}</span></div>
+                    <div class="flex gap-2 w-40">
+                        <input type="number" class="act-prod w-1/2 bg-black/40 border border-white/10 rounded text-white text-center py-1 text-xs focus:border-luxe outline-none" placeholder="Prod" value="${prod}">
+                        <input type="number" class="act-sold w-1/2 bg-black/40 border border-white/10 rounded text-luxe text-center py-1 text-xs focus:border-luxe outline-none font-bold" placeholder="Sold" value="${sold}">
                     </div>
-                `;
-            });
-            html += `</div>`;
-        }
-        procurementList.innerHTML = html;
+                </div>`;
+        });
+
+        const costList = document.getElementById('actual-costing-list');
+        costList.innerHTML = '';
+        Object.entries(reqs).forEach(([id, planQty]) => {
+            const mat = db.materials[id];
+            if (!mat) return;
+            const hist = costingHistory.find(c => c.Item_ID === id);
+            const actQty = hist ? parseFloat(hist.Actual_Qty) || 0 : planQty;
+            const actCost = hist ? parseFloat(hist.Actual_Total_Cost_RM) || 0 : (mat.costRM * planQty);
+            const remarks = hist ? hist.Remarks : '';
+
+            costList.innerHTML += `
+                <div class="glass-panel p-3 rounded-xl flex flex-col gap-2 actual-cost-row" data-id="${id}" data-category="${mat.category}">
+                    <div class="flex justify-between items-center"><span class="text-white text-sm truncate">${mat.desc}</span><span class="text-white/40 text-[9px] uppercase tracking-widest">${mat.category}</span></div>
+                    <div class="flex gap-2">
+                        <input type="number" step="0.01" class="act-qty w-1/3 bg-black/40 border border-white/10 rounded text-white text-center py-1.5 text-xs focus:border-luxe outline-none" placeholder="Actual ${mat.unit}" value="${actQty.toFixed(1)}">
+                        <input type="number" step="0.01" class="act-cost w-1/3 bg-black/40 border border-white/10 rounded text-white text-center py-1.5 text-xs focus:border-luxe outline-none" placeholder="Total RM" value="${actCost.toFixed(2)}">
+                        <input type="text" class="act-remarks w-1/3 bg-black/40 border border-white/10 rounded text-white/80 px-2 py-1.5 text-xs focus:border-luxe outline-none" placeholder="Remarks..." value="${remarks || ''}">
+                    </div>
+                </div>`;
+        });
     }
+
+    function renderAnalysisPillar() {
+        const monthStr = monthInput.value;
+        const aMacro = db.actualsMacro.find(m => String(m.Plan_Month).substring(0, 7) === monthStr) || { Actual_Revenue_RM: 0, Actual_Platform_Fees_RM: 0, Actual_Ad_Spend_RM: 0, AI_Remarks: "" };
+        
+        let planRev = 0, planQty = 0;
+        db.plans.forEach(p => { planRev += (parseFloat(p.Target_Selling_Price) || 0) * (parseInt(p.Planned_Qty) || 0); planQty += parseInt(p.Planned_Qty) || 0; });
+
+        const actRev = parseFloat(aMacro.Actual_Revenue_RM) || 0;
+        const actPlatFees = parseFloat(aMacro.Actual_Platform_Fees_RM) || 0;
+        const actAdSpend = parseFloat(aMacro.Actual_Ad_Spend_RM) || 0;
+
+        // Isolate exact explicit variables for variance mapping
+        const budgPlatFees = planRev * (db.config['TikTok_Fee_Pct'] || db.config['Platform_Commission_Pct'] || 0.20);
+        const budgAdSpend = planQty * (db.config['Marketing_Per_Unit'] || 5.00);
+
+        const revDelta = actRev - planRev;
+        const platDelta = actPlatFees - budgPlatFees;
+        const adDelta = actAdSpend - budgAdSpend;
+
+        document.getElementById('analysis-variance-cards').innerHTML = `
+            <div class="glass-panel p-4 rounded-xl"><p class="text-white/40 text-[9px] uppercase tracking-widest mb-1">Revenue Variance</p><div class="text-xl font-display text-white">RM ${actRev.toFixed(2)}</div><div class="text-xs ${revDelta >= 0 ? 'text-luxe' : 'text-red-400'} mt-1 font-medium">${revDelta >= 0 ? '+' : ''}RM ${revDelta.toFixed(2)} vs Target (RM ${planRev.toFixed(0)})</div></div>
+            <div class="glass-panel p-4 rounded-xl"><p class="text-white/40 text-[9px] uppercase tracking-widest mb-1">Platform Fees (Settled)</p><div class="text-xl font-display text-white">RM ${actPlatFees.toFixed(2)}</div><div class="text-xs ${platDelta <= 0 ? 'text-luxe' : 'text-red-400'} mt-1 font-medium">${platDelta > 0 ? 'Over budget by' : 'Under budget by'} RM ${Math.abs(platDelta).toFixed(2)}</div></div>
+            <div class="glass-panel p-4 rounded-xl"><p class="text-white/40 text-[9px] uppercase tracking-widest mb-1">Ad Spend (Settled)</p><div class="text-xl font-display text-white">RM ${actAdSpend.toFixed(2)}</div><div class="text-xs ${adDelta <= 0 ? 'text-luxe' : 'text-red-400'} mt-1 font-medium">${adDelta > 0 ? 'Over budget by' : 'Under budget by'} RM ${Math.abs(adDelta).toFixed(2)}</div></div>
+        `;
+
+        const remarksStr = aMacro.AI_Remarks || aMacro.ai_remarks || "";
+        const remarksCard = document.getElementById('analysis-ai-remarks');
+        if (remarksStr) {
+            remarksCard.classList.remove('hidden');
+            remarksCard.innerHTML = `<span class="text-luxe text-[9px] uppercase tracking-widest font-bold">AI Financial Autopsy</span><p class="text-white/80 text-sm leading-relaxed mt-2">${remarksStr}</p>`;
+        } else remarksCard.classList.add('hidden');
+
+        // Temporal Inventory Math (Carry Forward)
+        const invList = document.getElementById('analysis-inventory-list');
+        invList.innerHTML = '';
+        db.plans.forEach(p => {
+            let openingAsset = 0;
+            // Sum all history BEFORE the currently selected month
+            db.actualsMicro.forEach(a => {
+                if (a.Design_Code !== p.Design_Code) return;
+                const rowMonth = String(a.Date).substring(0, 7);
+                if (rowMonth < monthStr) {
+                    openingAsset += (parseInt(a.Qty_Produced) || 0) - (parseInt(a.Qty_Sold) || 0);
+                }
+            });
+            
+            const currentHist = db.actualsMicro.find(a => String(a.Date).substring(0, 7) === monthStr && a.Design_Code === p.Design_Code);
+            const currentProd = currentHist ? parseInt(currentHist.Qty_Produced) || 0 : parseInt(p.Planned_Qty) || 0;
+            const currentSold = currentHist ? parseInt(currentHist.Qty_Sold) || 0 : 0;
+            const closingAsset = openingAsset + currentProd - currentSold;
+
+            if (p.Planned_Qty === 0 && currentProd === 0 && currentSold === 0 && openingAsset === 0) return; // Zero-Filter
+
+            invList.innerHTML += `
+                <div class="glass-panel p-3 rounded-xl flex flex-col gap-2">
+                    <div class="flex justify-between items-center"><span class="text-white text-sm font-medium">${p.Design_Code}</span><span class="text-luxe text-xs font-bold font-display">Close: ${closingAsset} pcs</span></div>
+                    <div class="grid grid-cols-3 text-[10px] text-white/50 border-t border-white/5 pt-2">
+                        <div>Opening: <span class="text-white">${openingAsset}</span></div>
+                        <div class="text-center">+ Prod: <span class="text-white">${currentProd}</span></div>
+                        <div class="text-right">- Sold: <span class="text-white">${currentSold}</span></div>
+                    </div>
+                </div>`;
+        });
+    }
+
 
     // --- MASTER SETTINGS TABS & EDITORS ---
     const tabBtns = document.querySelectorAll('.settings-tab-btn');
@@ -1492,104 +1493,6 @@
         if (e.key === 'Enter' && !e.shiftKey) {
             e.preventDefault();
             btnSendAiMessage.click();
-        }
-    });
-
-    // --- ACTUALS PROCUREMENT LOGGING MODAL ---
-    const actualsModal = document.getElementById('actuals-modal');
-    const actualsModalInner = document.getElementById('actuals-modal-inner');
-    const actualsModalList = document.getElementById('actuals-modal-list');
-    const btnLogActualProcurement = document.getElementById('btn-log-actual-procurement');
-    const btnCloseActuals = document.getElementById('btn-close-actuals');
-    const btnSaveActuals = document.getElementById('btn-save-actuals');
-
-    function openActualsModal() {
-        if (!actualsModalList) return;
-        actualsModalList.innerHTML = '';
-
-        const groups = {};
-        Object.entries(db.lastReqs || {}).forEach(([id, qty]) => {
-            const mat = db.materials[id];
-            if (!mat) return;
-            if (!groups[mat.category]) groups[mat.category] = [];
-            groups[mat.category].push({
-                id,
-                desc: mat.desc,
-                unit: mat.unit,
-                qty: qty,
-                costRM: mat.costRM * qty
-            });
-        });
-
-        if (Object.keys(groups).length === 0) {
-            actualsModalList.innerHTML = '<p class="text-white/40 text-sm">No planned procurement for this month. Add plan quantities first.</p>';
-        } else {
-            Object.entries(groups).forEach(([category, items]) => {
-                let html = `<div class="flex flex-col gap-2"><h4 class="text-luxe text-[10px] uppercase tracking-widest border-b border-white/10 pb-1">${category}</h4>`;
-                items.forEach(item => {
-                    html += `
-                        <div class="glass-panel p-3 rounded-xl flex flex-col gap-2" data-item-id="${item.id}" data-item-category="${category}">
-                            <div class="text-white text-sm truncate">${item.desc}</div>
-                            <p class="text-white/40 text-[10px] uppercase tracking-widest">Plan: ${item.qty.toFixed(1)} ${item.unit} · RM ${item.costRM.toFixed(2)}</p>
-                            <div class="flex gap-2">
-                                <input type="number" step="0.01" class="actual-qty-input w-1/2 bg-black/40 border border-white/10 rounded-lg text-white text-center py-2 text-sm outline-none focus:border-luxe" placeholder="Actual Qty" value="${item.qty.toFixed(1)}">
-                                <input type="number" step="0.01" class="actual-cost-input w-1/2 bg-black/40 border border-white/10 rounded-lg text-white text-center py-2 text-sm outline-none focus:border-luxe" placeholder="Total Cost RM" value="${item.costRM.toFixed(2)}">
-                            </div>
-                        </div>`;
-                });
-                html += `</div>`;
-                actualsModalList.innerHTML += html;
-            });
-        }
-
-        actualsModal.classList.remove('hidden');
-        setTimeout(() => {
-            actualsModal.classList.remove('opacity-0');
-            actualsModalInner.classList.remove('scale-95');
-        }, 10);
-    }
-
-    function closeActualsModal() {
-        actualsModal.classList.add('opacity-0');
-        actualsModalInner.classList.add('scale-95');
-        setTimeout(() => actualsModal.classList.add('hidden'), 300);
-    }
-
-    btnLogActualProcurement?.addEventListener('click', openActualsModal);
-    btnCloseActuals?.addEventListener('click', closeActualsModal);
-    actualsModal?.addEventListener('click', (e) => { if (e.target === actualsModal) closeActualsModal(); });
-
-    btnSaveActuals?.addEventListener('click', async () => {
-        const month = monthInput?.value;
-        if (!month) return alert('Select a plan month first.');
-
-        const items = [];
-        actualsModalList.querySelectorAll('[data-item-id]').forEach(row => {
-            const qty = parseFloat(row.querySelector('.actual-qty-input')?.value) || 0;
-            const cost = parseFloat(row.querySelector('.actual-cost-input')?.value) || 0;
-            if (qty <= 0 && cost <= 0) return;
-            items.push({
-                id: row.dataset.itemId,
-                category: row.dataset.itemCategory,
-                qty,
-                cost
-            });
-        });
-
-        if (items.length === 0) return alert('Enter at least one actual qty or cost.');
-
-        btnSaveActuals.disabled = true;
-        btnSaveActuals.textContent = 'SAVING...';
-        try {
-            await postManagerAction('save_actuals_costing', { month, items });
-            await fetchData();
-            alert('Actual procurement logged successfully.');
-            closeActualsModal();
-        } catch (err) {
-            alert('Error: ' + err.message);
-        } finally {
-            btnSaveActuals.disabled = false;
-            btnSaveActuals.textContent = 'Save to Ledger';
         }
     });
 

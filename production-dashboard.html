@@ -41,7 +41,7 @@
     };
   </script>
 </head>
-<body class="font-sans antialiased selection:bg-luxe selection:text-ink max-w-[100vw] overflow-x-hidden relative h-screen flex flex-col">
+<body class="font-sans antialiased selection:bg-luxe selection:text-ink max-w-[100vw] overflow-x-hidden relative h-[100dvh] flex flex-col overscroll-none">
 
   <!-- AUTH OVERLAY -->
   <div id="admin-login-overlay" class="fixed inset-0 z-50 bg-brand flex flex-col items-center justify-center transition-opacity duration-500">
@@ -57,148 +57,107 @@
   </div>
 
   <!-- DASHBOARD -->
-  <div id="dashboard-container" class="hidden flex-col h-full opacity-0 transition-opacity duration-700">
-    <!-- Header -->
-    <header class="h-16 border-b border-white/10 flex items-center justify-between px-6 shrink-0 bg-ink">
-      <div class="font-display tracking-[0.18em] text-lg text-white uppercase">Arabista <span class="text-luxe font-sans text-[10px] tracking-widest ml-2">Production</span></div>
-      <div class="flex items-center">
-        <button id="btn-open-ai-chat" class="text-luxe hover:text-white text-xs uppercase tracking-widest transition-colors mr-4 flex items-center gap-1">
+  <div id="dashboard-container" class="hidden flex-col h-full min-h-0 flex-1 opacity-0 transition-opacity duration-700">
+    <!-- Header & Month Master Switch -->
+    <header class="border-b border-white/10 px-4 sm:px-6 py-3 shrink-0 bg-ink z-50 flex flex-wrap gap-4 items-center justify-between">
+      <div class="font-display tracking-[0.18em] text-lg text-white uppercase flex items-center">
+         Arabista <span class="text-luxe font-sans text-[10px] tracking-widest ml-2 hidden sm:inline">Production</span>
+      </div>
+      
+      <!-- Master Month Selector -->
+      <div class="flex items-center gap-3 bg-black/40 border border-white/10 rounded-lg px-2 sm:px-4 py-1.5 focus-within:border-luxe transition-colors">
+         <span class="text-white/40 text-[10px] uppercase tracking-widest hidden sm:block">Timeline</span>
+         <input type="month" id="plan-month-input" class="bg-transparent text-luxe text-sm outline-none cursor-pointer font-medium">
+      </div>
+
+      <div class="flex items-center gap-3 sm:gap-4">
+        <button id="btn-open-ai-chat" class="text-luxe hover:text-white text-[10px] sm:text-xs uppercase tracking-widest transition-colors flex items-center gap-1 tap-none">
           <span class="inline-block w-2 h-2 rounded-full bg-luxe animate-pulse"></span>AI Lounge
         </button>
-        <button id="btn-open-db-manager" class="text-luxe hover:text-white text-xs uppercase tracking-widest transition-colors mr-4">DB Manager</button>
-        <button id="btn-logout" class="text-white/50 hover:text-white text-xs uppercase tracking-widest transition-colors">Lock Session</button>
+        <button id="btn-open-db-manager" class="text-white/50 hover:text-white text-[10px] sm:text-xs uppercase tracking-widest transition-colors tap-none">Settings</button>
+        <button id="btn-logout" class="text-white/30 hover:text-white text-[10px] sm:text-xs uppercase tracking-widest transition-colors tap-none">Lock</button>
       </div>
     </header>
 
-    <!-- Top Sticky Metrics Bar -->
-    <div class="glass-panel sticky top-0 z-40 border-b-0 border-x-0">
-      <div class="max-w-screen-2xl mx-auto px-6">
-      <div class="pt-3 pb-1 flex justify-between items-center border-b border-white/5 mb-2">
-         <span class="text-[10px] text-white/50 uppercase tracking-widest font-medium">Dashboard View</span>
-         <div class="flex bg-black/40 rounded-lg p-1 border border-white/10 shrink-0">
-            <button id="toggle-view-plan" class="px-4 py-1 text-[10px] uppercase tracking-widest bg-white/10 rounded text-white font-medium transition-colors tap-none">Plan (Theoretical)</button>
-            <button id="toggle-view-actual" class="px-4 py-1 text-[10px] uppercase tracking-widest text-white/40 rounded hover:text-white transition-colors tap-none">Actual (Settled)</button>
-         </div>
-      </div>
-      <div class="py-4 grid grid-cols-2 sm:flex sm:flex-row justify-between items-center gap-4">
-        <div>
-          <p class="text-white/40 text-[10px] uppercase tracking-widest mb-1">Total Revenue</p>
-          <div class="font-display text-xl sm:text-2xl text-white" id="metric-revenue">RM 0.00</div>
-        </div>
-        <div class="hidden sm:block w-px h-8 bg-white/10"></div>
-        <div>
-          <p class="text-white/40 text-[10px] uppercase tracking-widest mb-1">Procurement Cost</p>
-          <div class="font-display text-xl sm:text-2xl text-white" id="metric-cogs">RM 0.00</div>
-        </div>
-        <div class="hidden sm:block w-px h-8 bg-white/10"></div>
-        <div>
-          <p class="text-white/40 text-[10px] uppercase tracking-widest mb-1">Profit Margin</p>
-          <div class="font-display text-xl sm:text-2xl text-white" id="metric-margin">0.00%</div>
-        </div>
-        <div class="hidden sm:block w-px h-8 bg-white/10"></div>
-        <div class="text-right sm:text-left">
-          <p class="text-luxe text-[10px] uppercase tracking-widest mb-1 font-medium">Net Profit</p>
-          <div class="font-display text-2xl sm:text-3xl text-luxe" id="metric-profit">RM 0.00</div>
-        </div>
-      </div>
-      </div>
-    </div>
-
-    <!-- Mobile Tabs -->
-    <div class="flex lg:hidden border-b border-white/10 bg-ink shrink-0">
-      <button id="tab-plans" class="flex-1 py-3 text-[10px] uppercase tracking-wider font-medium text-luxe border-b-2 border-luxe tap-none">Plans</button>
-      <button id="tab-ledger" class="flex-1 py-3 text-[10px] uppercase tracking-wider font-medium text-white/40 border-b-2 border-transparent tap-none">Procure</button>
-      <button id="tab-performance" class="flex-1 py-3 text-[10px] uppercase tracking-wider font-medium text-white/40 border-b-2 border-transparent tap-none">Variance</button>
+    <!-- Unified 3-Pillar Tab Navigation -->
+    <div class="flex border-b border-white/10 bg-ink shrink-0 px-4 sm:px-6 gap-6">
+      <button id="tab-nav-plan" class="py-4 text-[10px] sm:text-xs uppercase tracking-wider font-bold text-luxe border-b-2 border-luxe tap-none transition-colors">Plan</button>
+      <button id="tab-nav-actual" class="py-4 text-[10px] sm:text-xs uppercase tracking-wider font-medium text-white/40 border-b-2 border-transparent hover:text-white tap-none transition-colors">Actual</button>
+      <button id="tab-nav-analysis" class="py-4 text-[10px] sm:text-xs uppercase tracking-wider font-medium text-white/40 border-b-2 border-transparent hover:text-white tap-none transition-colors">Analysis</button>
     </div>
 
     <!-- Main Workspace -->
-    <main class="flex-1 overflow-hidden flex flex-col lg:flex-row">
+    <main class="flex-1 overflow-y-auto hide-scrollbar bg-brand relative flex flex-col">
       
-      <!-- Left Panel: Monthly Plans -->
-      <section id="panel-plans" class="w-full lg:w-1/3 h-full overflow-y-auto hide-scrollbar border-r border-white/10 p-4 sm:p-6 bg-brand flex flex-col">
-        <div class="flex justify-between items-center mb-8 shrink-0">
-          <h2 class="font-display text-2xl text-white">Monthly Plans</h2>
-          <input type="month" id="plan-month-input" class="bg-black/40 border border-white/10 rounded-lg text-white text-xs px-3 py-1.5 focus:border-luxe outline-none cursor-pointer">
-        </div>
-        
-        <!-- Empty State Hero Card -->
-        <div id="planner-hero-card" class="glass-panel p-6 rounded-2xl flex flex-col items-center text-center">
-          <div class="w-12 h-12 rounded-full bg-white/5 text-luxe flex items-center justify-center mb-4">
-            <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 4v16m8-8H4"></path></svg>
-          </div>
-          <h3 class="text-white font-medium text-lg mb-1">Plan Production</h3>
-          <p class="text-white/40 text-xs mb-6">Select designs and input quantities to calculate margins and procurement.</p>
-          <button id="btn-open-planner" class="w-full bg-white/10 text-white hover:bg-luxe hover:text-ink font-medium uppercase tracking-widest py-3.5 rounded-xl transition shadow-soft tap-none">Select Designs</button>
-        </div>
-
-        <!-- Active State Button -->
-        <div id="planner-active-state" class="hidden flex-col gap-4 mt-4">
-          <div class="glass-panel p-6 rounded-2xl flex flex-col items-center text-center">
-             <div class="text-luxe font-display text-5xl mb-2" id="active-designs-count">0</div>
-             <p class="text-white/40 text-xs uppercase tracking-widest mb-6">Designs Planned</p>
-             <button id="btn-modify-plans" class="w-full bg-white/10 text-white hover:bg-white/20 font-medium uppercase tracking-widest py-3.5 rounded-xl transition shadow-soft tap-none mb-3">Modify Plan Targets</button>
-             <button id="btn-save-month-plan" class="w-full bg-luxe text-ink font-medium uppercase tracking-widest py-3.5 rounded-xl hover:opacity-90 transition shadow-soft tap-none mb-3">Save Month to Database</button>
-             <button id="btn-clear-month-plan" class="w-full border border-red-500/30 text-red-400 hover:bg-red-500/10 font-medium uppercase tracking-widest py-3 rounded-xl transition shadow-soft tap-none">Clear Month Plan</button>
-          </div>
-        </div>
+      <!-- PILLAR 1: PLAN -->
+      <section id="pillar-plan" class="w-full max-w-screen-xl mx-auto p-4 sm:p-6 flex flex-col gap-6">
+         <!-- Metrics injected here by JS -->
+         <div id="plan-metrics-container" class="grid grid-cols-2 md:grid-cols-4 gap-4"></div>
+         
+         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- Left: Designs & Production -->
+            <div class="flex flex-col gap-4">
+               <div class="flex justify-between items-center border-b border-white/10 pb-2">
+                  <h3 class="text-luxe text-xs uppercase tracking-widest font-bold">Planned Production</h3>
+                  <button id="btn-open-planner" class="text-[10px] bg-white/10 hover:bg-white/20 text-white px-3 py-1.5 rounded transition-colors tap-none">Modify Targets</button>
+               </div>
+               <div id="plan-designs-list" class="flex flex-col gap-3"></div>
+               
+               <div class="flex justify-between items-center border-b border-white/10 pb-2 mt-4">
+                  <h3 class="text-luxe text-xs uppercase tracking-widest font-bold">Monthly Extra Costs</h3>
+                  <button id="btn-add-extra-cost" class="text-[10px] bg-white/10 hover:bg-white/20 text-white px-3 py-1.5 rounded transition-colors tap-none">+ Add Cost</button>
+               </div>
+               <div id="plan-extras-list" class="flex flex-col gap-3"></div>
+               <button id="btn-save-plan" class="mt-4 w-full bg-luxe text-ink font-bold uppercase tracking-widest py-3.5 rounded-xl hover:opacity-90 transition tap-none shadow-soft">Save Master Plan</button>
+            </div>
+            <!-- Right: Auto Procurement Ledger -->
+            <div class="flex flex-col gap-4 bg-ink/50 p-4 sm:p-6 rounded-2xl border border-white/5">
+               <h3 class="text-white text-lg font-display mb-2">Theoretical Procurement</h3>
+               <div id="plan-procurement-list" class="flex flex-col gap-4"></div>
+            </div>
+         </div>
       </section>
 
-      <!-- Right Panel: Procurement List -->
-      <section id="panel-ledger" class="w-full lg:w-1/3 h-full overflow-y-auto hide-scrollbar p-4 sm:p-6 bg-ink hidden lg:block border-r border-white/10">
-        <div class="flex justify-between items-center mb-6">
-           <h2 class="font-display text-2xl text-white">Procurement Ledger</h2>
-           <button id="btn-log-actual-procurement" class="text-[10px] bg-white/10 hover:bg-luxe hover:text-ink text-white px-3 py-1.5 rounded uppercase tracking-widest transition-colors tap-none hidden">Log Actuals</button>
-        </div>
-        <div id="procurement-list" class="space-y-6 pb-20">
-          <!-- Populated by JS -->
-          <div class="text-white/30 text-sm animate-pulse">Awaiting input...</div>
-        </div>
+      <!-- PILLAR 2: ACTUAL -->
+      <section id="pillar-actual" class="w-full max-w-screen-xl mx-auto p-4 sm:p-6 flex flex-col gap-6 hidden">
+         <div id="actual-metrics-container" class="grid grid-cols-2 md:grid-cols-4 gap-4"></div>
+         <p class="text-white/40 text-[10px] uppercase tracking-widest mb-2 border-l-2 border-luxe pl-2">Use the AI Lounge to extract data from screenshots, or manually override the exact realized metrics below.</p>
+         
+         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- Left: Realized Production & Sales -->
+            <div class="flex flex-col gap-4">
+               <h3 class="text-luxe text-xs uppercase tracking-widest font-bold border-b border-white/10 pb-2">Realized Volume</h3>
+               <div id="actual-designs-list" class="flex flex-col gap-3"></div>
+               <button id="btn-save-actuals" class="mt-4 w-full bg-luxe text-ink font-bold uppercase tracking-widest py-3.5 rounded-xl hover:opacity-90 transition tap-none shadow-soft">Save Actuals to Ledger</button>
+            </div>
+            <!-- Right: Actual Costing & Remarks -->
+            <div class="flex flex-col gap-4 bg-ink/50 p-4 sm:p-6 rounded-2xl border border-white/5">
+               <h3 class="text-white text-lg font-display mb-2">Actual Costing & Remarks</h3>
+               <div id="actual-costing-list" class="flex flex-col gap-4"></div>
+            </div>
+         </div>
       </section>
 
-      <!-- Center/Right Panel: Variance Performance Dashboard -->
-      <section id="panel-performance" class="w-full lg:w-1/3 h-full overflow-y-auto hide-scrollbar p-4 sm:p-6 bg-brand border-l border-white/10 hidden lg:block">
-        <h2 class="font-display text-2xl text-white mb-2">Performance Variance</h2>
-        <p class="text-white/40 text-[10px] uppercase tracking-widest mb-6">Real-Time Reconciliation vs. Actuals</p>
-        
-        <div class="space-y-4">
-            <!-- Revenue Variance Card -->
-            <div class="glass-panel p-4 rounded-xl flex flex-col gap-1">
-                <span class="text-white/40 text-[9px] uppercase tracking-widest">Revenue Delta</span>
-                <div class="flex justify-between items-baseline">
-                    <div class="text-xl font-display text-white" id="var-actual-revenue">RM 0.00</div>
-                    <div class="text-xs font-medium text-white/40" id="var-planned-revenue">Target: RM 0.00</div>
-                </div>
-                <div id="var-revenue-badge" class="text-[10px] mt-1 font-medium">0.00% Variance</div>
+      <!-- PILLAR 3: ANALYSIS -->
+      <section id="pillar-analysis" class="w-full max-w-screen-xl mx-auto p-4 sm:p-6 flex flex-col gap-6 hidden">
+         <div class="flex items-center justify-between border-b border-white/10 pb-2">
+            <h2 class="font-display text-2xl text-white">CFO Variance Dashboard</h2>
+            <span class="text-luxe text-[10px] uppercase tracking-widest bg-luxe/10 px-2 py-1 rounded">Temporal ERP Active</span>
+         </div>
+         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- Col 1: Financial Autopsy -->
+            <div class="flex flex-col gap-4 lg:col-span-2">
+                <div id="analysis-ai-remarks" class="glass-panel p-5 rounded-2xl border-luxe/30 bg-luxe/5 hidden"></div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4" id="analysis-variance-cards"></div>
             </div>
-
-            <!-- Platform Fees Leakage Card -->
-            <div class="glass-panel p-4 rounded-xl flex flex-col gap-1">
-                <span class="text-white/40 text-[9px] uppercase tracking-widest">Platform Fees & Ad Spend Cost</span>
-                <div class="flex justify-between items-baseline">
-                    <div class="text-xl font-display text-white" id="var-actual-fees">RM 0.00</div>
-                    <div class="text-xs font-medium text-white/40" id="var-planned-fees">Budgeted: RM 0.00</div>
-                </div>
+            <!-- Col 2: Inventory Assets (Carry Forward) -->
+            <div class="flex flex-col gap-4">
+                <h3 class="text-luxe text-xs uppercase tracking-widest font-bold border-b border-white/10 pb-2">Inventory Assets</h3>
+                <p class="text-white/40 text-[9px] uppercase tracking-widest leading-relaxed">Opening balance carried forward from beginning of time up to the start of this month.</p>
+                <div id="analysis-inventory-list" class="flex flex-col gap-2"></div>
             </div>
-
-            <!-- AI Discrepancy Remarks -->
-            <div id="var-remarks-card" class="glass-panel p-4 rounded-xl flex flex-col gap-1 hidden bg-luxe/5 border-luxe/20">
-                <span class="text-luxe text-[9px] uppercase tracking-widest font-bold">AI Financial Autopsy</span>
-                <p id="var-ai-remarks" class="text-white/80 text-xs leading-relaxed mt-1"></p>
-            </div>
-
-            <!-- Production & Sales Volume Variance -->
-            <details class="glass-panel p-4 rounded-xl flex flex-col gap-3 group" open>
-                <summary class="list-none flex justify-between items-center cursor-pointer text-luxe text-[10px] uppercase tracking-widest border-b border-white/5 pb-1 font-medium">
-                    <span>Volume tracking & inventory assets</span>
-                    <svg class="w-4 h-4 transition-transform group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-                </summary>
-                <div id="performance-volume-list" class="flex flex-col gap-2.5 mt-3">
-                    <!-- Dynamic Rows populated by JS -->
-                </div>
-            </details>
-        </div>
+         </div>
       </section>
-
     </main>
   </div>
 
@@ -394,7 +353,7 @@
       </div>
       <div class="flex gap-2 shrink-0">
           <button id="btn-close-actuals" class="w-1/3 border border-white/20 text-white/50 hover:text-white font-medium uppercase tracking-widest py-3 rounded-xl text-xs transition tap-none">Cancel</button>
-          <button id="btn-save-actuals" class="flex-1 bg-luxe text-ink font-medium uppercase tracking-widest py-3 rounded-xl hover:opacity-90 transition text-xs tap-none">Save to Ledger</button>
+          <button id="btn-save-actuals-modal" class="flex-1 bg-luxe text-ink font-medium uppercase tracking-widest py-3 rounded-xl hover:opacity-90 transition text-xs tap-none">Save to Ledger</button>
       </div>
     </div>
   </div>
