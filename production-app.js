@@ -637,8 +637,8 @@
         }
     }
 
-    async function postManagerAction(action, payloadObj) {
-        showLoader('Executing...');
+    async function postManagerAction(action, payloadObj, opts = {}) {
+        if (!opts.skipLoader) showLoader('Executing...');
         try {
             const res = await fetch(`${ctx.apiUrl}?action=${action}`, {
                 method: 'POST',
@@ -649,7 +649,7 @@
             if (json.status !== 'success') throw new Error(json.message || 'Request failed');
             return json;
         } finally {
-            hideLoader();
+            if (!opts.skipLoader) hideLoader();
         }
     }
 
@@ -838,40 +838,44 @@
 
     // --- TEMPORAL ERP CALCULATION ENGINE ---
     function calculateEngine() {
-        let planRev = 0, planCogs = 0, planVarOverhead = 0, planQtyTotal = 0;
+        let planRev = 0, planCogs = 0, planVarOverhead = 0, planQtyTotal = 0, targetSoldTotal = 0;
         let reqs = {}; 
         let fixedOpex = 0;
+        
+        const sellThroughPct = parseFloat(document.getElementById('plan-sell-through')?.value) || 100;
         
         db.configRaw.forEach(c => { if (c.Account_Category === 'Fixed OPEX') fixedOpex += (parseFloat(c.Value_RM) || 0); });
 
         db.plans.forEach(plan => {
-            const qty = parseInt(plan.Planned_Qty) || 0;
-            if (qty <= 0) return;
-            planQtyTotal += qty;
+            const prodQty = parseInt(plan.Planned_Qty) || 0;
+            if (prodQty <= 0) return;
+            
+            const soldQty = Math.round(prodQty * (sellThroughPct / 100));
+            planQtyTotal += prodQty;
+            targetSoldTotal += soldQty;
+            
             const price = parseFloat(plan.Target_Selling_Price) || 0;
-            planRev += (price * qty);
+            planRev += (price * soldQty); // Revenue strictly on sold qty
 
             let designMatCogs = 0;
             const bom = db.bom[plan.Design_Code];
             if (bom) {
-                const addReq = (id, amount) => {
-                    if (!id || id === 'NONE' || amount <= 0) return;
-                    if (!reqs[id]) reqs[id] = 0;
-                    reqs[id] += (amount * qty);
-                    const mat = db.materials[id];
-                    if (mat) designMatCogs += (mat.costRM * amount);
-                };
                 Object.keys(bom).forEach(key => {
                     if (!key.endsWith('_ID') || key === 'Design_Code') return;
+                    const id = bom[key];
                     const amount = parseFloat(bom[key.slice(0, -3) + '_Qty']) || 0;
-                    addReq(bom[key], amount);
+                    if (!id || id === 'NONE' || amount <= 0) return;
+                    
+                    if (!reqs[id]) reqs[id] = 0;
+                    reqs[id] += (amount * prodQty); // Production requires 100% materials
+                    const mat = db.materials[id];
+                    if (mat) designMatCogs += (mat.costRM * amount);
                 });
             }
 
             const matCogs = plan.Locked_Material_COGS_RM !== undefined && plan.Locked_Material_COGS_RM !== "" ? parseFloat(plan.Locked_Material_COGS_RM) || 0 : designMatCogs;
             const labor = plan.Locked_Direct_Labor_RM !== undefined && plan.Locked_Direct_Labor_RM !== "" ? parseFloat(plan.Locked_Direct_Labor_RM) || 0 : parseFloat(bom?.Direct_Labor_RM) || 10;
             
-            // Reconstruct overheads based on explicitly named variables
             let dynamicOverhead = 0;
             db.configRaw.forEach(c => {
                 if (c.Account_Category === 'Variable Selling') {
@@ -881,8 +885,8 @@
             });
             const overhead = plan.Locked_Var_Overhead_RM !== undefined && plan.Locked_Var_Overhead_RM !== "" ? parseFloat(plan.Locked_Var_Overhead_RM) || 0 : dynamicOverhead;
 
-            planCogs += (matCogs * qty);
-            planVarOverhead += ((matCogs + labor + overhead) * qty);
+            planCogs += (matCogs * prodQty); // COGS incurred for 100% production
+            planVarOverhead += ((matCogs + labor) * prodQty) + (overhead * soldQty); // Platform fees only on sold items
 
             plan.Live_Material_COGS_RM = matCogs;
             plan.Live_Direct_Labor_RM = labor;
@@ -893,20 +897,27 @@
         (db.currentExtraCosts || []).forEach(ex => totalExtraCosts += (parseFloat(ex.Cost_RM) || 0));
 
         const planNetProfit = planRev - planVarOverhead - fixedOpex - totalExtraCosts;
-        const planMargin = planRev > 0 ? (planNetProfit / planRev) * 100 : 0;
+        
+        // Split Margins
+        const perfectGrossRev = planQtyTotal * (planRev / (targetSoldTotal || 1)); 
+        const perfectMargin = perfectGrossRev > 0 ? ((perfectGrossRev - planCogs - (planVarOverhead / (targetSoldTotal || 1) * planQtyTotal)) / perfectGrossRev) * 100 : 0;
+        const cashMargin = planRev > 0 ? (planNetProfit / planRev) * 100 : 0;
         
         db.currentMacroSnapshot = { Locked_Fixed_OPEX_RM: fixedOpex, Total_Revenue_RM: planRev, Net_Profit_RM: planNetProfit };
         db.lastReqs = reqs;
 
-        renderPlanPillar(planRev, planCogs, planNetProfit, planMargin, reqs);
+        renderPlanPillar(planRev, planCogs, planNetProfit, perfectMargin, cashMargin, sellThroughPct, reqs);
         renderActualPillar(fixedOpex, reqs);
     }
 
-    function renderPlanPillar(rev, cogs, profit, margin, reqs) {
+    document.getElementById('plan-sell-through')?.addEventListener('input', calculateEngine);
+
+    function renderPlanPillar(rev, cogs, profit, perfectMargin, cashMargin, sellThroughPct, reqs) {
         document.getElementById('plan-metrics-container').innerHTML = `
-            <div class="glass-panel p-4 rounded-xl border border-white/5"><p class="text-white/40 text-[9px] uppercase tracking-widest mb-1">Target Revenue</p><div class="text-xl font-display text-white">RM ${rev.toFixed(2)}</div></div>
-            <div class="glass-panel p-4 rounded-xl border border-white/5"><p class="text-white/40 text-[9px] uppercase tracking-widest mb-1">Target COGS</p><div class="text-xl font-display text-white">RM ${cogs.toFixed(2)}</div></div>
-            <div class="glass-panel p-4 rounded-xl border border-white/5"><p class="text-white/40 text-[9px] uppercase tracking-widest mb-1">Target Margin</p><div class="text-xl font-display ${margin >= 0 ? 'text-white' : 'text-red-400'}">${margin.toFixed(2)}%</div></div>
+            <div class="glass-panel p-4 rounded-xl border border-white/5"><p class="text-white/40 text-[9px] uppercase tracking-widest mb-1">Revenue (${sellThroughPct}% Sold)</p><div class="text-xl font-display text-white">RM ${rev.toFixed(2)}</div></div>
+            <div class="glass-panel p-4 rounded-xl border border-white/5"><p class="text-white/40 text-[9px] uppercase tracking-widest mb-1">COGS (100% Prod)</p><div class="text-xl font-display text-white">RM ${cogs.toFixed(2)}</div></div>
+            <div class="glass-panel p-4 rounded-xl border border-white/5"><p class="text-white/40 text-[9px] uppercase tracking-widest mb-1">Unit Gross Margin</p><div class="text-xl font-display text-white">${perfectMargin.toFixed(1)}%</div></div>
+            <div class="glass-panel p-4 rounded-xl border border-white/5"><p class="text-white/40 text-[9px] uppercase tracking-widest mb-1">Net Cash Margin</p><div class="text-xl font-display ${cashMargin >= 0 ? 'text-white' : 'text-red-400'}">${cashMargin.toFixed(1)}%</div></div>
             <div class="glass-panel p-4 rounded-xl border ${profit >= 0 ? 'border-luxe/30 bg-luxe/5' : 'border-red-500/30 bg-red-500/5'}"><p class="text-luxe text-[9px] uppercase tracking-widest mb-1 font-bold">Est. Net Profit</p><div class="text-2xl font-display ${profit >= 0 ? 'text-luxe' : 'text-red-400'}">RM ${profit.toFixed(2)}</div></div>
         `;
 
@@ -958,7 +969,12 @@
         const costingHistory = db.actualsCosting.filter(c => String(c.Month).substring(0, 7) === monthStr);
 
         let actualCogs = 0;
-        costingHistory.forEach(c => actualCogs += (parseFloat(c.Actual_Total_Cost_RM) || 0));
+        Object.entries(reqs).forEach(([id, planQty]) => {
+            const hist = costingHistory.find(c => c.Item_ID === id);
+            const mat = db.materials[id];
+            const actCost = hist ? parseFloat(hist.Actual_Total_Cost_RM) || 0 : (mat ? mat.costRM * planQty : 0);
+            actualCogs += actCost;
+        });
         
         const rev = parseFloat(aMacro.Actual_Revenue_RM) || 0;
         const fees = (parseFloat(aMacro.Actual_Platform_Fees_RM) || 0) + (parseFloat(aMacro.Actual_Ad_Spend_RM) || 0);
@@ -1043,10 +1059,6 @@
 
         const remarksStr = aMacro.AI_Remarks || aMacro.ai_remarks || "";
         const remarksCard = document.getElementById('analysis-ai-remarks');
-        if (remarksStr) {
-            remarksCard.classList.remove('hidden');
-            remarksCard.innerHTML = `<span class="text-luxe text-[9px] uppercase tracking-widest font-bold">AI Financial Autopsy</span><p class="text-white/80 text-sm leading-relaxed mt-2">${remarksStr}</p>`;
-        } else remarksCard.classList.add('hidden');
 
         // Temporal Inventory Math (Carry Forward)
         const invList = document.getElementById('analysis-inventory-list');
@@ -1079,6 +1091,42 @@
                     </div>
                 </div>`;
         });
+
+        let actCogs = 0;
+        const costingHistory = db.actualsCosting.filter(c => String(c.Month).substring(0, 7) === monthStr);
+        Object.entries(db.lastReqs || {}).forEach(([id, planQty]) => {
+            const hist = costingHistory.find(c => c.Item_ID === id);
+            const mat = db.materials[id];
+            actCogs += hist ? parseFloat(hist.Actual_Total_Cost_RM) || 0 : (mat ? mat.costRM * planQty : 0);
+        });
+        
+        let planCogs = 0;
+        db.plans.forEach(p => { 
+            const prod = parseInt(p.Planned_Qty) || 0; 
+            planCogs += (p.Live_Material_COGS_RM || 0) * prod; 
+            planCogs += (p.Live_Direct_Labor_RM || 0) * prod; 
+        });
+        
+        let totalExtra = 0;
+        (db.currentExtraCosts || []).forEach(ex => totalExtra += parseFloat(ex.Cost_RM) || 0);
+
+        const expDelta = actCogs - (planCogs + totalExtra);
+
+        const expCards = document.getElementById('analysis-expenditure-cards');
+        if (expCards) {
+            expCards.innerHTML = `
+            <div class="glass-panel p-4 rounded-xl"><p class="text-white/40 text-[9px] uppercase tracking-widest mb-1">Planned Direct Costs + Extras</p><div class="text-xl font-display text-white">RM ${(planCogs + totalExtra).toFixed(2)}</div></div>
+            <div class="glass-panel p-4 rounded-xl"><p class="text-white/40 text-[9px] uppercase tracking-widest mb-1">Actual Expenditure Ledger</p><div class="text-xl font-display text-white">RM ${actCogs.toFixed(2)}</div><div class="text-xs ${expDelta <= 0 ? 'text-luxe' : 'text-red-400'} mt-1 font-medium">${expDelta > 0 ? 'Overspent by' : 'Saved'} RM ${Math.abs(expDelta).toFixed(2)}</div></div>
+        `;
+        }
+        
+        if (remarksCard) {
+            if (remarksStr) {
+                remarksCard.classList.remove('hidden');
+                // Parse markdown bolding basic support
+                remarksCard.innerHTML = `<span class="text-luxe text-[9px] uppercase tracking-widest font-bold">CFO Report</span><div class="text-white/80 text-sm leading-relaxed mt-2 whitespace-pre-wrap">${remarksStr.replace(/\*\*(.*?)\*\*/g, '<strong class="text-white">$1</strong>')}</div>`;
+            } else remarksCard.classList.add('hidden');
+        }
     }
 
 
@@ -1503,6 +1551,15 @@
 
         appendChatBubble('user', prompt || '[Attached Document / Image]');
 
+        // Show Typing Indicator
+        const typingId = 'typing-' + Date.now();
+        const typingDiv = document.createElement('div');
+        typingDiv.id = typingId;
+        typingDiv.className = `glass-panel p-4 rounded-xl border border-luxe/20 max-w-[85%] mt-2 self-start bg-ink/30`;
+        typingDiv.innerHTML = `<p class="text-luxe text-[9px] uppercase tracking-widest font-semibold mb-1">Arabista Brain v4.0</p><p class="text-white/80 text-xs typing-dots">Thinking</p>`;
+        chatLog.appendChild(typingDiv);
+        chatLog.scrollTop = chatLog.scrollHeight;
+
         let imagesArray = [];
         if (files.length > 0) {
             for (let i = 0; i < files.length; i++) {
@@ -1529,8 +1586,9 @@
                 images: imagesArray,
                 context: contextPayload,
                 month: currentMonth
-            });
+            }, { skipLoader: true });
 
+            document.getElementById(typingId)?.remove();
             appendChatBubble('ai', res.data.chat_response);
 
             // Instantly refresh the local state to pull down the newly updated actuals
@@ -1541,6 +1599,7 @@
             document.getElementById('btn-remove-ai-file').click();
 
         } catch (err) {
+            document.getElementById(typingId)?.remove();
             appendChatBubble('ai', `System Diagnostic Error: ${err.message}`);
         } finally {
             btnSendAiMessage.disabled = false;
@@ -1552,6 +1611,30 @@
         if (e.key === 'Enter' && !e.shiftKey) {
             e.preventDefault();
             btnSendAiMessage.click();
+        }
+    });
+
+    document.getElementById('btn-generate-autopsy')?.addEventListener('click', async () => {
+        const currentMonth = monthInput.value;
+        const btn = document.getElementById('btn-generate-autopsy');
+        btn.disabled = true;
+        btn.innerHTML = '<span class="inline-block w-2 h-2 rounded-full bg-luxe animate-ping mr-1"></span> Analyzing...';
+
+        const context = {
+            plans: db.plans.filter(p => p.Planned_Qty > 0),
+            macro: db.actualsMacro.find(m => String(m.Plan_Month).substring(0, 7) === currentMonth),
+            micro: db.actualsMicro.filter(a => String(a.Date).substring(0, 7) === currentMonth),
+            extra: db.currentExtraCosts
+        };
+
+        try {
+            await postManagerAction('generate_cfo_autopsy', { month: currentMonth, financialContext: context });
+            await fetchData();
+            if (pillarAnalysis && !pillarAnalysis.classList.contains('hidden')) renderAnalysisPillar();
+        } catch (err) { alert('Autopsy failed: ' + err.message); }
+        finally {
+            btn.disabled = false;
+            btn.innerHTML = 'Generate CFO Report';
         }
     });
 
