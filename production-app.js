@@ -885,8 +885,10 @@
             });
             const overhead = plan.Locked_Var_Overhead_RM !== undefined && plan.Locked_Var_Overhead_RM !== "" ? parseFloat(plan.Locked_Var_Overhead_RM) || 0 : dynamicOverhead;
 
-            planCogs += (matCogs * prodQty); // COGS incurred for 100% production
-            planVarOverhead += ((matCogs + labor) * prodQty) + (overhead * soldQty); // Platform fees only on sold items
+            // CORRECT MATH: COGS is strictly manufacturing. Overhead is strictly variable selling.
+            const unitCogs = matCogs + labor;
+            planCogs += (unitCogs * prodQty); 
+            planVarOverhead += (overhead * soldQty); 
 
             plan.Live_Material_COGS_RM = matCogs;
             plan.Live_Direct_Labor_RM = labor;
@@ -896,11 +898,14 @@
         let totalExtraCosts = 0;
         (db.currentExtraCosts || []).forEach(ex => totalExtraCosts += (parseFloat(ex.Cost_RM) || 0));
 
-        const planNetProfit = planRev - planVarOverhead - fixedOpex - totalExtraCosts;
+        // Net Profit = Cash in the bank
+        const planNetProfit = planRev - planCogs - planVarOverhead - fixedOpex - totalExtraCosts;
         
         // Split Margins
         const perfectGrossRev = planQtyTotal * (planRev / (targetSoldTotal || 1)); 
-        const perfectMargin = perfectGrossRev > 0 ? ((perfectGrossRev - planCogs - (planVarOverhead / (targetSoldTotal || 1) * planQtyTotal)) / perfectGrossRev) * 100 : 0;
+        // Perfect Margin = (Total theoretical revenue - COGS for all units - Overheads if all units sold) / Theoretical Revenue
+        const perfectMargin = perfectGrossRev > 0 ? ((perfectGrossRev - planCogs - ((planVarOverhead / (targetSoldTotal || 1)) * planQtyTotal)) / perfectGrossRev) * 100 : 0;
+        
         const cashMargin = planRev > 0 ? (planNetProfit / planRev) * 100 : 0;
         
         db.currentMacroSnapshot = { Locked_Fixed_OPEX_RM: fixedOpex, Total_Revenue_RM: planRev, Net_Profit_RM: planNetProfit };
