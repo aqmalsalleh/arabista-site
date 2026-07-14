@@ -1821,10 +1821,14 @@
         btn.disabled = true;
         btn.innerHTML = '<span class="inline-block w-2 h-2 rounded-full bg-luxe animate-ping mr-1"></span> Analyzing...';
 
+        const snap = db.snapshots.find(s => String(s.Plan_Month).substring(0, 7) === currentMonth) || {};
         const context = {
+            targetSellThrough: parseFloat(snap.Target_Sell_Through_Pct) || 100,
             plans: db.plans.filter(p => p.Planned_Qty > 0),
             macro: db.actualsMacro.find(m => String(m.Plan_Month).substring(0, 7) === currentMonth),
             micro: db.actualsMicro.filter(a => String(a.Date).substring(0, 7) === currentMonth),
+            costing: db.actualsCosting.filter(c => String(c.Month).substring(0, 7) === currentMonth),
+            opex: (db.actualsOpex || []).filter(o => String(o.Month).substring(0, 7) === currentMonth),
             extra: db.currentExtraCosts
         };
 
