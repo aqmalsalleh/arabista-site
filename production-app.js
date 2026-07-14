@@ -323,24 +323,48 @@
         const currentMonth = monthInput.value;
         const btn = document.getElementById('btn-save-actuals');
         btn.disabled = true; btn.textContent = 'SAVING LEDGER...';
+        showLoader('Securing Actuals...');
         
         const micro = [];
+        let autoRev = 0, autoFees = 0, autoAds = 0;
         document.querySelectorAll('.actual-vol-row').forEach(row => {
-            micro.push({ design: row.dataset.design, prod: parseInt(row.querySelector('.act-prod').value) || 0, sold: parseInt(row.querySelector('.act-sold').value) || 0 });
+            const design = row.dataset.design;
+            const prod = parseInt(row.querySelector('.act-prod').value) || 0;
+            const sold = parseInt(row.querySelector('.act-sold').value) || 0;
+            micro.push({ design, prod, sold });
+            
+            const p = db.plans.find(x => x.Design_Code === design);
+            if (p) autoRev += sold * parseFloat(p.Target_Selling_Price || 0);
+            autoAds += sold * (db.config['Marketing_Per_Unit'] || 5.00);
         });
+        autoFees = autoRev * (db.config['TikTok_Fee_Pct'] || db.config['Platform_Commission_Pct'] || 0.20);
         
         const costing = [];
         document.querySelectorAll('.actual-cost-row').forEach(row => {
             costing.push({ id: row.dataset.id, category: row.dataset.category, qty: parseFloat(row.querySelector('.act-qty').value) || 0, cost: parseFloat(row.querySelector('.act-cost').value) || 0, remarks: row.querySelector('.act-remarks').value.trim() });
         });
 
+        const manualRevStr = document.getElementById('manual-macro-rev')?.value;
+        const manualFeesStr = document.getElementById('manual-macro-fees')?.value;
+        const manualAdsStr = document.getElementById('manual-macro-ads')?.value;
+
+        const macro = {
+            revenue: manualRevStr !== '' && manualRevStr !== undefined ? parseFloat(manualRevStr) : autoRev,
+            fees: manualFeesStr !== '' && manualFeesStr !== undefined ? parseFloat(manualFeesStr) : autoFees,
+            ads: manualAdsStr !== '' && manualAdsStr !== undefined ? parseFloat(manualAdsStr) : autoAds
+        };
+
+        let fixedOpex = 0;
+        db.configRaw.forEach(c => { if (c.Account_Category === 'Fixed OPEX') fixedOpex += (parseFloat(c.Value_RM) || 0); });
+
         try {
-            await postManagerAction('save_actual_pillar', { month: currentMonth, micro, costing });
+            await postManagerAction('save_actual_pillar', { month: currentMonth, micro, costing, macro, fixedOpex }, { skipLoader: true });
             await fetchData();
             alert(`Actuals for ${currentMonth} secured to ledger.`);
         } catch (err) { alert('Save failed: ' + err.message); } 
-        finally { btn.disabled = false; btn.textContent = 'Save Actuals to Ledger'; }
+        finally { btn.disabled = false; btn.textContent = 'Save Actuals to Ledger'; hideLoader(); }
     });
+
 
 
     document.addEventListener('click', async (e) => {
@@ -969,33 +993,9 @@
 
     function renderActualPillar(fixedOpex, reqs) {
         const monthStr = monthInput.value;
-        const aMacro = db.actualsMacro.find(m => String(m.Plan_Month).substring(0, 7) === monthStr) || { Actual_Revenue_RM: 0, Actual_Platform_Fees_RM: 0, Actual_Ad_Spend_RM: 0 };
+        const aMacro = db.actualsMacro.find(m => String(m.Plan_Month).substring(0, 7) === monthStr) || {};
         const microHistory = db.actualsMicro.filter(a => String(a.Date).substring(0, 7) === monthStr);
         const costingHistory = db.actualsCosting.filter(c => String(c.Month).substring(0, 7) === monthStr);
-
-        let actualCogs = 0;
-        Object.entries(reqs).forEach(([id, planQty]) => {
-            const hist = costingHistory.find(c => c.Item_ID === id);
-            const mat = db.materials[id];
-            const actCost = hist ? parseFloat(hist.Actual_Total_Cost_RM) || 0 : (mat ? mat.costRM * planQty : 0);
-            actualCogs += actCost;
-        });
-        
-        const rev = parseFloat(aMacro.Actual_Revenue_RM) || 0;
-        const fees = (parseFloat(aMacro.Actual_Platform_Fees_RM) || 0) + (parseFloat(aMacro.Actual_Ad_Spend_RM) || 0);
-        
-        let actualProfit = 0, actualMargin = 0;
-        if (rev > 0 || actualCogs > 0) { // Only calculate if actuals exist
-            actualProfit = rev - fees - fixedOpex - actualCogs;
-            actualMargin = rev > 0 ? (actualProfit / rev) * 100 : 0;
-        }
-
-        document.getElementById('actual-metrics-container').innerHTML = `
-            <div class="glass-panel p-4 rounded-xl border border-white/5"><p class="text-white/40 text-[9px] uppercase tracking-widest mb-1">Settled Net Revenue</p><div class="text-xl font-display text-white">RM ${rev.toFixed(2)}</div></div>
-            <div class="glass-panel p-4 rounded-xl border border-white/5"><p class="text-white/40 text-[9px] uppercase tracking-widest mb-1">Actual Direct Costs</p><div class="text-xl font-display text-white">RM ${actualCogs.toFixed(2)}</div></div>
-            <div class="glass-panel p-4 rounded-xl border border-white/5"><p class="text-white/40 text-[9px] uppercase tracking-widest mb-1">Realized Margin</p><div class="text-xl font-display ${actualMargin >= 0 ? 'text-white' : 'text-red-400'}">${actualMargin.toFixed(2)}%</div></div>
-            <div class="glass-panel p-4 rounded-xl border ${actualProfit >= 0 ? 'border-luxe/30 bg-luxe/5' : 'border-red-500/30 bg-red-500/5'}"><p class="text-luxe text-[9px] uppercase tracking-widest mb-1 font-bold">Settled Profit</p><div class="text-2xl font-display ${actualProfit >= 0 ? 'text-luxe' : 'text-red-400'}">RM ${actualProfit.toFixed(2)}</div></div>
-        `;
 
         const volList = document.getElementById('actual-designs-list');
         volList.innerHTML = '';
@@ -1035,7 +1035,78 @@
                     </div>
                 </div>`;
         });
+
+        // Set Manual Macro fields if previously saved
+        if (document.getElementById('manual-macro-rev')) {
+            document.getElementById('manual-macro-rev').value = aMacro.Actual_Revenue_RM !== undefined && aMacro.Actual_Revenue_RM !== null ? aMacro.Actual_Revenue_RM : '';
+            document.getElementById('manual-macro-fees').value = aMacro.Actual_Platform_Fees_RM !== undefined && aMacro.Actual_Platform_Fees_RM !== null ? aMacro.Actual_Platform_Fees_RM : '';
+            document.getElementById('manual-macro-ads').value = aMacro.Actual_Ad_Spend_RM !== undefined && aMacro.Actual_Ad_Spend_RM !== null ? aMacro.Actual_Ad_Spend_RM : '';
+        }
+
+        // Live Update Engine for Actuals
+        const liveUpdateActuals = () => {
+            let actualCogs = 0;
+            document.querySelectorAll('.actual-cost-row').forEach(row => {
+                actualCogs += parseFloat(row.querySelector('.act-cost').value) || 0;
+            });
+
+            let autoRev = 0, autoFees = 0, autoAds = 0;
+            document.querySelectorAll('.actual-vol-row').forEach(row => {
+                const design = row.dataset.design;
+                const sold = parseInt(row.querySelector('.act-sold').value) || 0;
+                const plan = db.plans.find(p => p.Design_Code === design);
+                if (plan) {
+                    autoRev += sold * parseFloat(plan.Target_Selling_Price || 0);
+                }
+                autoAds += sold * (db.config['Marketing_Per_Unit'] || 5.00);
+            });
+            autoFees = autoRev * (db.config['TikTok_Fee_Pct'] || db.config['Platform_Commission_Pct'] || 0.20);
+
+            const manualRevStr = document.getElementById('manual-macro-rev')?.value;
+            const manualFeesStr = document.getElementById('manual-macro-fees')?.value;
+            const manualAdsStr = document.getElementById('manual-macro-ads')?.value;
+
+            const finalRev = manualRevStr !== '' && manualRevStr !== undefined ? parseFloat(manualRevStr) : autoRev;
+            const finalFees = manualFeesStr !== '' && manualFeesStr !== undefined ? parseFloat(manualFeesStr) : autoFees;
+            const finalAds = manualAdsStr !== '' && manualAdsStr !== undefined ? parseFloat(manualAdsStr) : autoAds;
+            
+            const totalFees = finalFees + finalAds;
+            
+            let actualProfit = 0, actualMargin = 0;
+            if (finalRev > 0 || actualCogs > 0) {
+                actualProfit = finalRev - totalFees - fixedOpex - actualCogs;
+                actualMargin = finalRev > 0 ? (actualProfit / finalRev) * 100 : 0;
+            }
+
+            document.getElementById('actual-metrics-container').innerHTML = `
+                <div class="glass-panel p-4 rounded-xl border border-white/5"><p class="text-white/40 text-[9px] uppercase tracking-widest mb-1">Settled Net Revenue</p><div class="text-xl font-display text-white">RM ${finalRev.toFixed(2)}</div></div>
+                <div class="glass-panel p-4 rounded-xl border border-white/5"><p class="text-white/40 text-[9px] uppercase tracking-widest mb-1">Actual Direct Costs</p><div class="text-xl font-display text-white">RM ${actualCogs.toFixed(2)}</div></div>
+                <div class="glass-panel p-4 rounded-xl border border-white/5"><p class="text-white/40 text-[9px] uppercase tracking-widest mb-1">Realized Margin</p><div class="text-xl font-display ${actualMargin >= 0 ? 'text-white' : 'text-red-400'}">${actualMargin.toFixed(1)}%</div></div>
+                <div class="glass-panel p-4 rounded-xl border ${actualProfit >= 0 ? 'border-luxe/30 bg-luxe/5' : 'border-red-500/30 bg-red-500/5'}"><p class="text-luxe text-[9px] uppercase tracking-widest mb-1 font-bold">Settled Profit</p><div class="text-2xl font-display ${actualProfit >= 0 ? 'text-luxe' : 'text-red-400'}">RM ${actualProfit.toFixed(2)}</div></div>
+            `;
+
+            if (currentDashboardMode === 'actual') {
+                const metricRevenue = document.getElementById('metric-revenue');
+                const metricProfit = document.getElementById('metric-profit');
+                const metricMargin = document.getElementById('metric-margin');
+                if (metricRevenue) metricRevenue.textContent = `RM ${finalRev.toFixed(2)}`;
+                if (metricProfit) {
+                    metricProfit.textContent = `RM ${actualProfit.toFixed(2)}`;
+                    metricProfit.className = actualProfit >= 0 ? 'font-display text-2xl sm:text-3xl text-luxe' : 'font-display text-2xl sm:text-3xl text-red-400';
+                }
+                if (metricMargin) {
+                    metricMargin.textContent = `${actualMargin.toFixed(1)}%`;
+                    metricMargin.className = actualProfit >= 0 ? 'font-display text-xl sm:text-2xl text-white' : 'font-display text-xl sm:text-2xl text-red-400';
+                }
+            }
+        };
+
+        document.querySelectorAll('.act-sold, .act-prod, .act-cost, #manual-macro-rev, #manual-macro-fees, #manual-macro-ads').forEach(el => {
+            el.addEventListener('input', liveUpdateActuals);
+        });
+        liveUpdateActuals(); // Boot live math instantly
     }
+
 
     function renderAnalysisPillar() {
         const monthStr = monthInput.value;
