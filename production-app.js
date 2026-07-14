@@ -21,6 +21,24 @@
     const metricProfit = document.getElementById('metric-profit');
     const metricMargin = document.getElementById('metric-margin');
     const monthInput = document.getElementById('plan-month-input');
+
+    const globalLoader = document.getElementById('global-loader');
+    const globalLoaderText = document.getElementById('global-loader-text');
+
+    function showLoader(text = 'Syncing Database...') {
+        if (globalLoaderText) globalLoaderText.textContent = text;
+        globalLoader.classList.remove('hidden');
+        globalLoader.classList.add('flex');
+        setTimeout(() => globalLoader.classList.remove('opacity-0'), 10);
+    }
+
+    function hideLoader() {
+        globalLoader.classList.add('opacity-0');
+        setTimeout(() => {
+            globalLoader.classList.add('hidden');
+            globalLoader.classList.remove('flex');
+        }, 300);
+    }
     
     const tabPlans = document.getElementById('tab-plans');
     const tabLedger = document.getElementById('tab-ledger');
@@ -137,6 +155,7 @@
                     dashboard.classList.remove('hidden');
                     dashboard.classList.add('flex');
                     setTimeout(() => dashboard.style.opacity = '1', 50);
+                    showLoader('Authenticating...');
                     fetchData();
                 }, 500);
             } else {
@@ -153,6 +172,7 @@
 
     // --- DATA FETCH & NORMALIZE ---
     async function fetchData() {
+        showLoader('Fetching Database...');
         try {
             const res = await fetch(`${ctx.apiUrl}?action=get_production_data&pin=${sessionPin}`);
             const json = await res.json();
@@ -162,6 +182,8 @@
             // loadMonthState (via parseDatabase) handles drawer + metrics render
         } catch (err) {
             alert('Failed to load database: ' + err.message);
+        } finally {
+            hideLoader();
         }
     }
 
@@ -349,6 +371,36 @@
                 btn.textContent = 'Reset & Clear Plan';
             }
         }
+
+        if (e.target && e.target.id === 'btn-clear-actuals') {
+            const currentMonth = monthInput.value;
+            if (!currentMonth) return;
+            if (!confirm(`Are you absolutely sure you want to permanently clear the Actuals data for ${currentMonth}?`)) return;
+
+            const btn = e.target;
+            btn.disabled = true;
+            btn.textContent = 'DELETING...';
+            showLoader('Clearing Actuals...');
+
+            try {
+                const res = await fetch(`${ctx.apiUrl}?action=delete_monthly_actuals`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: `payload=${encodeURIComponent(JSON.stringify({ pin: sessionPin, month: currentMonth }))}`
+                });
+                const json = await res.json();
+                if (json.status !== 'success') throw new Error(json.message);
+                
+                await fetchData();
+                alert(`Actuals data for ${currentMonth} has been cleared.`);
+            } catch (err) {
+                alert('Deletion failed: ' + err.message);
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Reset & Clear Actuals';
+                hideLoader();
+            }
+        }
     });
 
     // --- UI RENDERING ---
@@ -508,7 +560,9 @@
 
     if (btnOpenPlanner) {
         btnOpenPlanner.replaceWith(btnOpenPlanner.cloneNode(true));
-        document.getElementById('btn-open-planner').addEventListener('click', () => {
+        document.getElementById('btn-open-planner').addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
             const toggle = document.getElementById('toggle-planned-only');
             const search = document.getElementById('planner-search');
             if (toggle) toggle.checked = false;
@@ -584,14 +638,19 @@
     }
 
     async function postManagerAction(action, payloadObj) {
-        const res = await fetch(`${ctx.apiUrl}?action=${action}`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            body: `payload=${encodeURIComponent(JSON.stringify({ ...payloadObj, pin: sessionPin }))}`
-        });
-        const json = await res.json();
-        if (json.status !== 'success') throw new Error(json.message || 'Request failed');
-        return json;
+        showLoader('Executing...');
+        try {
+            const res = await fetch(`${ctx.apiUrl}?action=${action}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: `payload=${encodeURIComponent(JSON.stringify({ ...payloadObj, pin: sessionPin }))}`
+            });
+            const json = await res.json();
+            if (json.status !== 'success') throw new Error(json.message || 'Request failed');
+            return json;
+        } finally {
+            hideLoader();
+        }
     }
 
     if (btnOpenDbManager) btnOpenDbManager.addEventListener('click', openDbManager);
