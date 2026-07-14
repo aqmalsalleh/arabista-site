@@ -321,15 +321,15 @@
     });
 
 
-    const btnClearMonthPlan = document.getElementById('btn-clear-month-plan');
-    if (btnClearMonthPlan) {
-        btnClearMonthPlan.addEventListener('click', async () => {
+    document.addEventListener('click', async (e) => {
+        if (e.target && e.target.id === 'btn-clear-month-plan') {
             const currentMonth = monthInput.value;
             if (!currentMonth) return;
             if (!confirm(`Are you absolutely sure you want to permanently clear the production plan for ${currentMonth}?`)) return;
 
-            btnClearMonthPlan.disabled = true;
-            btnClearMonthPlan.textContent = 'DELETING...';
+            const btn = e.target;
+            btn.disabled = true;
+            btn.textContent = 'DELETING...';
 
             try {
                 const res = await fetch(`${ctx.apiUrl}?action=delete_monthly_plan`, {
@@ -340,16 +340,16 @@
                 const json = await res.json();
                 if (json.status !== 'success') throw new Error(json.message);
                 
-                await fetchData();
+                await fetchData(); // Refresh state
                 alert(`All planning data for ${currentMonth} has been cleared.`);
             } catch (err) {
                 alert('Deletion failed: ' + err.message);
             } finally {
-                btnClearMonthPlan.disabled = false;
-                btnClearMonthPlan.textContent = 'Clear Month Plan';
+                btn.disabled = false;
+                btn.textContent = 'Reset & Clear Plan';
             }
-        });
-    }
+        }
+    });
 
     // --- UI RENDERING ---
     function renderPlannerDrawer() {
