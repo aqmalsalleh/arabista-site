@@ -185,6 +185,17 @@
                       <p class="text-white/30 text-[9px] uppercase tracking-widest px-2 mt-1">Leave blank to auto-calculate mathematically from Realized Volume.</p>
                   </div>
                </details>
+               <!-- Realized OPEX & Overheads -->
+               <details class="group bg-ink/30 border border-white/5 rounded-xl p-4 transition-all mt-4">
+                  <summary class="list-none flex justify-between items-center cursor-pointer tap-none">
+                     <div class="flex items-center gap-2">
+                         <svg class="w-4 h-4 text-white/40 transition-transform group-open:rotate-90" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                         <h3 class="text-luxe text-xs uppercase tracking-widest font-bold">Realized OPEX & Overheads</h3>
+                     </div>
+                  </summary>
+                  <p class="text-white/40 text-[9px] uppercase tracking-widest mt-4 mb-2">Override standard budgets with actual bank deductions.</p>
+                  <div id="actual-opex-list" class="flex flex-col gap-3 border-t border-white/5 pt-4"></div>
+               </details>
                <button id="btn-save-actuals" class="mt-4 w-full bg-luxe text-ink font-bold uppercase tracking-widest py-3.5 rounded-xl hover:opacity-90 transition tap-none shadow-soft">Save Actuals to Ledger</button>
                <button id="btn-clear-actuals" class="mt-2 w-full border border-red-500/30 text-red-400 hover:bg-red-500/10 font-bold uppercase tracking-widest py-3 rounded-xl transition shadow-soft tap-none text-[10px] sm:text-xs">Reset & Clear Actuals</button>
             </div>
@@ -195,6 +206,9 @@
                    <svg class="w-5 h-5 text-white/40 transition-transform group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                </summary>
                <div id="actual-costing-list" class="flex flex-col gap-4 mt-4"></div>
+               
+               <!-- Direct Labor Override -->
+               <div id="actual-labor-container" class="border-t border-white/10 pt-4 mt-2"></div>
             </details>
          </div>
       </section>
@@ -213,7 +227,16 @@
                     <button id="btn-generate-autopsy" class="text-[10px] bg-luxe/20 text-luxe hover:bg-luxe hover:text-ink px-4 py-1.5 rounded font-bold uppercase tracking-widest transition-colors tap-none flex items-center gap-1">Generate CFO Report</button>
                 </div>
                 
-                <div id="analysis-ai-remarks" class="glass-panel p-5 rounded-2xl border-luxe/30 bg-luxe/5 hidden"></div>
+                <div id="analysis-ai-remarks" class="glass-panel p-5 rounded-2xl border-luxe/30 bg-luxe/5 hidden flex-col gap-0"></div>
+                
+                <!-- Interactive CFO Chat -->
+                <div id="cfo-chat-container" class="hidden flex-col gap-2 mt-1">
+                    <div id="cfo-chat-history" class="flex flex-col gap-2 max-h-60 overflow-y-auto hide-scrollbar px-2"></div>
+                    <div class="flex items-center gap-2 bg-black/40 border border-white/10 rounded-xl px-3 py-1.5 focus-within:border-luxe transition-colors mt-2">
+                        <input type="text" id="cfo-chat-input" placeholder="Ask the CFO about this report..." class="flex-1 bg-transparent text-white text-sm outline-none placeholder:text-white/20">
+                        <button id="btn-send-cfo-chat" class="bg-luxe text-ink px-4 py-1.5 text-xs uppercase tracking-widest font-bold rounded-lg hover:opacity-90 transition-all tap-none shrink-0">Ask</button>
+                    </div>
+                </div>
                 
                 <h4 class="text-white/60 text-[10px] uppercase tracking-widest mt-2">Revenue & Variable Fees Variance</h4>
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-4" id="analysis-variance-cards"></div>

@@ -123,7 +123,7 @@
 
     // State
     let sessionPin = '';
-    let db = { config: {}, configRaw: [], materials: {}, bom: {}, plans: [], allHistoricalPlans: [], basePrices: {}, snapshots: [], actualsMicro: [], actualsMacro: [], actualsCosting: [], extraCosts: [], currentExtraCosts: [], aiThinking: [], lastReqs: {}, currentMacroSnapshot: null };
+    let db = { config: {}, configRaw: [], materials: {}, bom: {}, plans: [], allHistoricalPlans: [], basePrices: {}, snapshots: [], actualsMicro: [], actualsMacro: [], actualsCosting: [], actualsOpex: [], extraCosts: [], currentExtraCosts: [], aiThinking: [], lastReqs: {}, currentMacroSnapshot: null };
     let currentDashboardMode = 'plan';
 
     // --- AUTHENTICATION ---
@@ -229,6 +229,7 @@
         db.actualsMicro = rawData.actualsMicro || [];
         db.actualsMacro = rawData.actualsMacro || [];
         db.actualsCosting = rawData.actualsCosting || [];
+        db.actualsOpex = rawData.actualsOpex || [];
         db.extraCosts = rawData.extraCosts || [];
         db.aiThinking = rawData.aiThinking || [];
         db.basePrices = {};
@@ -273,6 +274,11 @@
             return cMonth === monthStr;
         });
 
+        // Target Sell-Through Memory Load
+        const snap = db.snapshots.find(s => String(s.Plan_Month).substring(0, 7) === monthStr);
+        const stInput = document.getElementById('plan-sell-through');
+        if (stInput) stInput.value = snap && snap.Target_Sell_Through_Pct ? parseFloat(snap.Target_Sell_Through_Pct) : 100;
+
         renderPlannerDrawer();
         calculateEngine();
     }
@@ -295,7 +301,12 @@
                     Design_Code: p.Design_Code, Planned_Qty: p.Planned_Qty, Target_Selling_Price: p.Target_Selling_Price,
                     Locked_Material_COGS_RM: p.Live_Material_COGS_RM, Locked_Direct_Labor_RM: p.Live_Direct_Labor_RM, Locked_Var_Overhead_RM: p.Live_Var_Overhead_RM
                 }));
-                await postManagerAction('save_monthly_plan', { month: currentMonth, plans: payloadPlans, snapshot: db.currentMacroSnapshot });
+                await postManagerAction('save_monthly_plan', { 
+                    month: currentMonth, 
+                    plans: payloadPlans, 
+                    snapshot: db.currentMacroSnapshot,
+                    sellThroughPct: parseFloat(document.getElementById('plan-sell-through')?.value) || 100
+                });
                 // Map sheet-facing keys (GAS expects name/category/cost)
                 const extrasPayload = (db.currentExtraCosts || []).map(ex => ({
                     name: ex.Cost_Name || ex.name,
@@ -344,6 +355,11 @@
             costing.push({ id: row.dataset.id, category: row.dataset.category, qty: parseFloat(row.querySelector('.act-qty').value) || 0, cost: parseFloat(row.querySelector('.act-cost').value) || 0, remarks: row.querySelector('.act-remarks').value.trim() });
         });
 
+        const opex = [];
+        document.querySelectorAll('.actual-opex-row').forEach(row => {
+            opex.push({ name: row.dataset.name, cost: parseFloat(row.querySelector('.act-opex-val').value) || 0 });
+        });
+
         const manualRevStr = document.getElementById('manual-macro-rev')?.value;
         const manualFeesStr = document.getElementById('manual-macro-fees')?.value;
         const manualAdsStr = document.getElementById('manual-macro-ads')?.value;
@@ -354,17 +370,13 @@
             ads: manualAdsStr !== '' && manualAdsStr !== undefined ? parseFloat(manualAdsStr) : autoAds
         };
 
-        let fixedOpex = 0;
-        db.configRaw.forEach(c => { if (c.Account_Category === 'Fixed OPEX') fixedOpex += (parseFloat(c.Value_RM) || 0); });
-
         try {
-            await postManagerAction('save_actual_pillar', { month: currentMonth, micro, costing, macro, fixedOpex }, { skipLoader: true });
+            await postManagerAction('save_actual_pillar', { month: currentMonth, micro, costing, macro, opex }, { skipLoader: true });
             await fetchData();
             alert(`Actuals for ${currentMonth} secured to ledger.`);
         } catch (err) { alert('Save failed: ' + err.message); } 
         finally { btn.disabled = false; btn.textContent = 'Save Actuals to Ledger'; hideLoader(); }
     });
-
 
 
     document.addEventListener('click', async (e) => {
@@ -991,11 +1003,12 @@
         }
     }
 
-    function renderActualPillar(fixedOpex, reqs) {
+    function renderActualPillar(fixedOpex_ignored, reqs) {
         const monthStr = monthInput.value;
         const aMacro = db.actualsMacro.find(m => String(m.Plan_Month).substring(0, 7) === monthStr) || {};
         const microHistory = db.actualsMicro.filter(a => String(a.Date).substring(0, 7) === monthStr);
         const costingHistory = db.actualsCosting.filter(c => String(c.Month).substring(0, 7) === monthStr);
+        const opexHistory = (db.actualsOpex || []).filter(o => String(o.Month).substring(0, 7) === monthStr);
 
         const volList = document.getElementById('actual-designs-list');
         volList.innerHTML = '';
@@ -1003,7 +1016,7 @@
             const hist = microHistory.find(h => h.Design_Code === p.Design_Code);
             const prod = hist ? parseInt(hist.Qty_Produced) || 0 : parseInt(p.Planned_Qty) || 0;
             const sold = hist ? parseInt(hist.Qty_Sold) || 0 : 0;
-            if (p.Planned_Qty === 0 && prod === 0 && sold === 0) return; // Zero-Filter
+            if (p.Planned_Qty === 0 && prod === 0 && sold === 0) return;
 
             volList.innerHTML += `
                 <div class="glass-panel p-3 rounded-xl flex items-center justify-between gap-3 actual-vol-row" data-design="${p.Design_Code}">
@@ -1023,7 +1036,6 @@
             const hist = costingHistory.find(c => c.Item_ID === id);
             const actQty = hist ? parseFloat(hist.Actual_Qty) || 0 : planQty;
             const actCost = hist ? parseFloat(hist.Actual_Total_Cost_RM) || 0 : (mat.costRM * planQty);
-            const remarks = hist ? hist.Remarks : '';
 
             costList.innerHTML += `
                 <div class="glass-panel p-3 rounded-xl flex flex-col gap-2 actual-cost-row" data-id="${id}" data-category="${mat.category}">
@@ -1031,33 +1043,70 @@
                     <div class="flex gap-2">
                         <input type="number" step="0.01" class="act-qty w-1/3 bg-black/40 border border-white/10 rounded text-white text-center py-1.5 text-xs focus:border-luxe outline-none" placeholder="Actual ${mat.unit}" value="${actQty.toFixed(1)}">
                         <input type="number" step="0.01" class="act-cost w-1/3 bg-black/40 border border-white/10 rounded text-white text-center py-1.5 text-xs focus:border-luxe outline-none" placeholder="Total RM" value="${actCost.toFixed(2)}">
-                        <input type="text" class="act-remarks w-1/3 bg-black/40 border border-white/10 rounded text-white/80 px-2 py-1.5 text-xs focus:border-luxe outline-none" placeholder="Remarks..." value="${remarks || ''}">
+                        <input type="text" class="act-remarks w-1/3 bg-black/40 border border-white/10 rounded text-white/80 px-2 py-1.5 text-xs focus:border-luxe outline-none" placeholder="Remarks..." value="${hist ? (hist.Remarks || '') : ''}">
                     </div>
                 </div>`;
         });
 
-        // Set Manual Macro fields if previously saved
+        // Inject Direct Labor Override
+        const laborContainer = document.getElementById('actual-labor-container');
+        if (laborContainer) {
+            let totalPlanLabor = 0;
+            db.plans.forEach(p => { totalPlanLabor += (p.Live_Direct_Labor_RM || 0) * (parseInt(p.Planned_Qty) || 0); });
+            const histLabor = costingHistory.find(c => c.Item_ID === 'DIRECT-LABOR');
+            const actLaborCost = histLabor ? parseFloat(histLabor.Actual_Total_Cost_RM) || 0 : totalPlanLabor;
+
+            laborContainer.innerHTML = `
+                <div class="glass-panel p-3 rounded-xl flex flex-col gap-2 actual-cost-row border-l-2 border-luxe" data-id="DIRECT-LABOR" data-category="Operational">
+                    <div class="flex justify-between items-center"><span class="text-luxe text-sm font-bold">Direct Labor / Tailoring</span><span class="text-white/40 text-[9px] uppercase tracking-widest">Operational</span></div>
+                    <div class="flex gap-2">
+                        <input type="hidden" class="act-qty" value="1">
+                        <input type="number" step="0.01" class="act-cost w-1/2 bg-black/40 border border-white/10 rounded text-white text-center py-1.5 text-xs focus:border-luxe outline-none" placeholder="Total RM" value="${actLaborCost.toFixed(2)}">
+                        <input type="text" class="act-remarks w-1/2 bg-black/40 border border-white/10 rounded text-white/80 px-2 py-1.5 text-xs focus:border-luxe outline-none" placeholder="Remarks..." value="${histLabor ? (histLabor.Remarks || '') : ''}">
+                    </div>
+                </div>`;
+        }
+
+        // Render Realized OPEX Overrides
+        const opexList = document.getElementById('actual-opex-list');
+        if (opexList) {
+            opexList.innerHTML = '';
+            db.configRaw.filter(c => c.Account_Category === 'Fixed OPEX' || c.Variable_Name === 'Freight_Cost_Per_Unit').forEach(c => {
+                const histOp = opexHistory.find(o => o.Config_Name === c.Variable_Name);
+                let defaultVal = parseFloat(c.Value_RM) || 0;
+                if (c.Variable_Name === 'Freight_Cost_Per_Unit') {
+                    let totalSold = 0; document.querySelectorAll('.act-sold').forEach(inp => totalSold += parseInt(inp.value) || 0);
+                    defaultVal = totalSold * defaultVal;
+                }
+                const actOpCost = histOp ? parseFloat(histOp.Actual_Cost_RM) || 0 : defaultVal;
+                
+                opexList.innerHTML += `
+                    <div class="flex items-center justify-between bg-black/40 border border-white/10 rounded-lg p-2 actual-opex-row" data-name="${c.Variable_Name}">
+                        <span class="text-white/70 text-xs px-2 truncate flex-1">${c.Variable_Name.replace(/_/g, ' ')}</span>
+                        <input type="number" step="0.01" class="act-opex-val bg-transparent text-white text-right text-sm outline-none focus:text-luxe w-1/3" value="${actOpCost.toFixed(2)}">
+                    </div>`;
+            });
+        }
+
         if (document.getElementById('manual-macro-rev')) {
             document.getElementById('manual-macro-rev').value = aMacro.Actual_Revenue_RM !== undefined && aMacro.Actual_Revenue_RM !== null ? aMacro.Actual_Revenue_RM : '';
             document.getElementById('manual-macro-fees').value = aMacro.Actual_Platform_Fees_RM !== undefined && aMacro.Actual_Platform_Fees_RM !== null ? aMacro.Actual_Platform_Fees_RM : '';
             document.getElementById('manual-macro-ads').value = aMacro.Actual_Ad_Spend_RM !== undefined && aMacro.Actual_Ad_Spend_RM !== null ? aMacro.Actual_Ad_Spend_RM : '';
         }
 
-        // Live Update Engine for Actuals
         const liveUpdateActuals = () => {
             let actualCogs = 0;
-            document.querySelectorAll('.actual-cost-row').forEach(row => {
-                actualCogs += parseFloat(row.querySelector('.act-cost').value) || 0;
-            });
+            document.querySelectorAll('.actual-cost-row').forEach(row => { actualCogs += parseFloat(row.querySelector('.act-cost').value) || 0; });
+
+            let liveFixedOpex = 0;
+            document.querySelectorAll('.actual-opex-row').forEach(row => { liveFixedOpex += parseFloat(row.querySelector('.act-opex-val').value) || 0; });
 
             let autoRev = 0, autoFees = 0, autoAds = 0;
             document.querySelectorAll('.actual-vol-row').forEach(row => {
                 const design = row.dataset.design;
                 const sold = parseInt(row.querySelector('.act-sold').value) || 0;
                 const plan = db.plans.find(p => p.Design_Code === design);
-                if (plan) {
-                    autoRev += sold * parseFloat(plan.Target_Selling_Price || 0);
-                }
+                if (plan) autoRev += sold * parseFloat(plan.Target_Selling_Price || 0);
                 autoAds += sold * (db.config['Marketing_Per_Unit'] || 5.00);
             });
             autoFees = autoRev * (db.config['TikTok_Fee_Pct'] || db.config['Platform_Commission_Pct'] || 0.20);
@@ -1074,7 +1123,7 @@
             
             let actualProfit = 0, actualMargin = 0;
             if (finalRev > 0 || actualCogs > 0) {
-                actualProfit = finalRev - totalFees - fixedOpex - actualCogs;
+                actualProfit = finalRev - totalFees - liveFixedOpex - actualCogs;
                 actualMargin = finalRev > 0 ? (actualProfit / finalRev) * 100 : 0;
             }
 
@@ -1084,97 +1133,129 @@
                 <div class="glass-panel p-4 rounded-xl border border-white/5"><p class="text-white/40 text-[9px] uppercase tracking-widest mb-1">Realized Margin</p><div class="text-xl font-display ${actualMargin >= 0 ? 'text-white' : 'text-red-400'}">${actualMargin.toFixed(1)}%</div></div>
                 <div class="glass-panel p-4 rounded-xl border ${actualProfit >= 0 ? 'border-luxe/30 bg-luxe/5' : 'border-red-500/30 bg-red-500/5'}"><p class="text-luxe text-[9px] uppercase tracking-widest mb-1 font-bold">Settled Profit</p><div class="text-2xl font-display ${actualProfit >= 0 ? 'text-luxe' : 'text-red-400'}">RM ${actualProfit.toFixed(2)}</div></div>
             `;
-
-            if (currentDashboardMode === 'actual') {
-                const metricRevenue = document.getElementById('metric-revenue');
-                const metricProfit = document.getElementById('metric-profit');
-                const metricMargin = document.getElementById('metric-margin');
-                if (metricRevenue) metricRevenue.textContent = `RM ${finalRev.toFixed(2)}`;
-                if (metricProfit) {
-                    metricProfit.textContent = `RM ${actualProfit.toFixed(2)}`;
-                    metricProfit.className = actualProfit >= 0 ? 'font-display text-2xl sm:text-3xl text-luxe' : 'font-display text-2xl sm:text-3xl text-red-400';
-                }
-                if (metricMargin) {
-                    metricMargin.textContent = `${actualMargin.toFixed(1)}%`;
-                    metricMargin.className = actualProfit >= 0 ? 'font-display text-xl sm:text-2xl text-white' : 'font-display text-xl sm:text-2xl text-red-400';
-                }
-            }
         };
 
-        document.querySelectorAll('.act-sold, .act-prod, .act-cost, #manual-macro-rev, #manual-macro-fees, #manual-macro-ads').forEach(el => {
+        document.querySelectorAll('.act-sold, .act-prod, .act-cost, .act-opex-val, #manual-macro-rev, #manual-macro-fees, #manual-macro-ads').forEach(el => {
             el.addEventListener('input', liveUpdateActuals);
         });
-        liveUpdateActuals(); // Boot live math instantly
+        liveUpdateActuals();
     }
 
 
     function renderAnalysisPillar() {
         const monthStr = monthInput.value;
         const aMacro = db.actualsMacro.find(m => String(m.Plan_Month).substring(0, 7) === monthStr) || { Actual_Revenue_RM: 0, Actual_Platform_Fees_RM: 0, Actual_Ad_Spend_RM: 0, AI_Remarks: "" };
+        const snap = db.snapshots.find(s => String(s.Plan_Month).substring(0, 7) === monthStr) || {};
+        const stPct = parseFloat(snap.Target_Sell_Through_Pct) || 100;
         
-        let planRev = 0, planQty = 0;
-        db.plans.forEach(p => { planRev += (parseFloat(p.Target_Selling_Price) || 0) * (parseInt(p.Planned_Qty) || 0); planQty += parseInt(p.Planned_Qty) || 0; });
+        let planRev = 0, planQty = 0, targetSoldQty = 0;
+        db.plans.forEach(p => { 
+            const prod = parseInt(p.Planned_Qty) || 0;
+            const sold = Math.round(prod * (stPct / 100));
+            planQty += prod; targetSoldQty += sold;
+            planRev += (parseFloat(p.Target_Selling_Price) || 0) * sold; 
+        });
 
         const actRev = parseFloat(aMacro.Actual_Revenue_RM) || 0;
         const actPlatFees = parseFloat(aMacro.Actual_Platform_Fees_RM) || 0;
         const actAdSpend = parseFloat(aMacro.Actual_Ad_Spend_RM) || 0;
 
-        // Isolate exact explicit variables for variance mapping
         const budgPlatFees = planRev * (db.config['TikTok_Fee_Pct'] || db.config['Platform_Commission_Pct'] || 0.20);
-        const budgAdSpend = planQty * (db.config['Marketing_Per_Unit'] || 5.00);
+        const budgAdSpend = targetSoldQty * (db.config['Marketing_Per_Unit'] || 5.00);
 
         const revDelta = actRev - planRev;
         const platDelta = actPlatFees - budgPlatFees;
         const adDelta = actAdSpend - budgAdSpend;
 
         document.getElementById('analysis-variance-cards').innerHTML = `
-            <div class="glass-panel p-4 rounded-xl"><p class="text-white/40 text-[9px] uppercase tracking-widest mb-1">Revenue Variance</p><div class="text-xl font-display text-white">RM ${actRev.toFixed(2)}</div><div class="text-xs ${revDelta >= 0 ? 'text-luxe' : 'text-red-400'} mt-1 font-medium">${revDelta >= 0 ? '+' : ''}RM ${revDelta.toFixed(2)} vs Target (RM ${planRev.toFixed(0)})</div></div>
-            <div class="glass-panel p-4 rounded-xl"><p class="text-white/40 text-[9px] uppercase tracking-widest mb-1">Platform Fees (Settled)</p><div class="text-xl font-display text-white">RM ${actPlatFees.toFixed(2)}</div><div class="text-xs ${platDelta <= 0 ? 'text-luxe' : 'text-red-400'} mt-1 font-medium">${platDelta > 0 ? 'Over budget by' : 'Under budget by'} RM ${Math.abs(platDelta).toFixed(2)}</div></div>
-            <div class="glass-panel p-4 rounded-xl"><p class="text-white/40 text-[9px] uppercase tracking-widest mb-1">Ad Spend (Settled)</p><div class="text-xl font-display text-white">RM ${actAdSpend.toFixed(2)}</div><div class="text-xs ${adDelta <= 0 ? 'text-luxe' : 'text-red-400'} mt-1 font-medium">${adDelta > 0 ? 'Over budget by' : 'Under budget by'} RM ${Math.abs(adDelta).toFixed(2)}</div></div>
+            <div class="glass-panel p-4 rounded-xl"><p class="text-white/40 text-[9px] uppercase tracking-widest mb-1">Revenue Variance</p><div class="text-xl font-display text-white">RM ${actRev.toFixed(2)}</div><div class="text-[10px] text-white/50 mt-1 mb-1">Target: RM ${planRev.toFixed(0)} (${stPct}% ST)</div><div class="text-xs ${revDelta >= 0 ? 'text-luxe' : 'text-red-400'} font-medium">${revDelta >= 0 ? '+' : ''}RM ${revDelta.toFixed(2)}</div></div>
+            <div class="glass-panel p-4 rounded-xl"><p class="text-white/40 text-[9px] uppercase tracking-widest mb-1">Platform Fees</p><div class="text-xl font-display text-white">RM ${actPlatFees.toFixed(2)}</div><div class="text-[10px] text-white/50 mt-1 mb-1">Budget: RM ${budgPlatFees.toFixed(0)} (${stPct}% ST)</div><div class="text-xs ${platDelta <= 0 ? 'text-luxe' : 'text-red-400'} font-medium">${platDelta > 0 ? 'Over budget by' : 'Saved'} RM ${Math.abs(platDelta).toFixed(2)}</div></div>
+            <div class="glass-panel p-4 rounded-xl"><p class="text-white/40 text-[9px] uppercase tracking-widest mb-1">Ad Spend</p><div class="text-xl font-display text-white">RM ${actAdSpend.toFixed(2)}</div><div class="text-[10px] text-white/50 mt-1 mb-1">Budget: RM ${budgAdSpend.toFixed(0)} (${stPct}% ST)</div><div class="text-xs ${adDelta <= 0 ? 'text-luxe' : 'text-red-400'} font-medium">${adDelta > 0 ? 'Over budget by' : 'Saved'} RM ${Math.abs(adDelta).toFixed(2)}</div></div>
         `;
 
         const remarksStr = aMacro.AI_Remarks || aMacro.ai_remarks || "";
         const remarksCard = document.getElementById('analysis-ai-remarks');
+        const chatContainer = document.getElementById('cfo-chat-container');
 
-        // Temporal Inventory Math (Carry Forward)
+        // Universal Temporal Asset Math
         const invList = document.getElementById('analysis-inventory-list');
-        invList.innerHTML = '';
+        invList.innerHTML = `<h4 class="text-white/60 text-[9px] uppercase tracking-widest mb-2 border-b border-white/5 pb-1">Finished Goods</h4>`;
+        
         db.plans.forEach(p => {
             let openingAsset = 0;
-            // Sum all history BEFORE the currently selected month
             db.actualsMicro.forEach(a => {
                 if (a.Design_Code !== p.Design_Code) return;
-                const rowMonth = String(a.Date).substring(0, 7);
-                if (rowMonth < monthStr) {
-                    openingAsset += (parseInt(a.Qty_Produced) || 0) - (parseInt(a.Qty_Sold) || 0);
-                }
+                if (String(a.Date).substring(0, 7) < monthStr) openingAsset += (parseInt(a.Qty_Produced) || 0) - (parseInt(a.Qty_Sold) || 0);
             });
-            
-            const currentHist = db.actualsMicro.find(a => String(a.Date).substring(0, 7) === monthStr && a.Design_Code === p.Design_Code);
-            const currentProd = currentHist ? parseInt(currentHist.Qty_Produced) || 0 : parseInt(p.Planned_Qty) || 0;
-            const currentSold = currentHist ? parseInt(currentHist.Qty_Sold) || 0 : 0;
+            const hist = db.actualsMicro.find(a => String(a.Date).substring(0, 7) === monthStr && a.Design_Code === p.Design_Code);
+            const currentProd = hist ? parseInt(hist.Qty_Produced) || 0 : parseInt(p.Planned_Qty) || 0;
+            const currentSold = hist ? parseInt(hist.Qty_Sold) || 0 : 0;
             const closingAsset = openingAsset + currentProd - currentSold;
 
-            if (p.Planned_Qty === 0 && currentProd === 0 && currentSold === 0 && openingAsset === 0) return; // Zero-Filter
+            if (p.Planned_Qty === 0 && currentProd === 0 && currentSold === 0 && openingAsset === 0) return;
 
             invList.innerHTML += `
-                <div class="glass-panel p-3 rounded-xl flex flex-col gap-2">
+                <div class="glass-panel p-3 rounded-xl flex flex-col gap-2 mb-2">
                     <div class="flex justify-between items-center"><span class="text-white text-sm font-medium">${p.Design_Code}</span><span class="text-luxe text-xs font-bold font-display">Close: ${closingAsset} pcs</span></div>
                     <div class="grid grid-cols-3 text-[10px] text-white/50 border-t border-white/5 pt-2">
-                        <div>Opening: <span class="text-white">${openingAsset}</span></div>
-                        <div class="text-center">+ Prod: <span class="text-white">${currentProd}</span></div>
-                        <div class="text-right">- Sold: <span class="text-white">${currentSold}</span></div>
+                        <div>Open: <span class="text-white">${openingAsset}</span></div><div class="text-center">+ Prod: <span class="text-white">${currentProd}</span></div><div class="text-right">- Sold: <span class="text-white">${currentSold}</span></div>
                     </div>
                 </div>`;
         });
 
+        // Raw Material Carry-Forward Math
+        let matLedger = {};
+        db.actualsCosting.forEach(c => {
+            if (c.Category === 'Operational' || c.Item_ID === 'DIRECT-LABOR') return;
+            if (String(c.Month).substring(0, 7) <= monthStr) {
+                if (!matLedger[c.Item_ID]) matLedger[c.Item_ID] = { procured: 0, consumed: 0 };
+                matLedger[c.Item_ID].procured += parseFloat(c.Actual_Qty) || 0;
+            }
+        });
+        db.actualsMicro.forEach(m => {
+            if (String(m.Date).substring(0, 7) <= monthStr) {
+                const bom = db.bom[m.Design_Code];
+                const prod = parseInt(m.Qty_Produced) || 0;
+                if (bom && prod > 0) {
+                    Object.keys(bom).forEach(k => {
+                        if (k.endsWith('_ID') && k !== 'Design_Code') {
+                            const id = bom[k]; const qty = parseFloat(bom[k.slice(0, -3) + '_Qty']) || 0;
+                            if (id && id !== 'NONE') {
+                                if (!matLedger[id]) matLedger[id] = { procured: 0, consumed: 0 };
+                                matLedger[id].consumed += (qty * prod);
+                            }
+                        }
+                    });
+                }
+            }
+        });
+        
+        let hasMaterials = false;
+        let matHtml = `<h4 class="text-white/60 text-[9px] uppercase tracking-widest mt-4 mb-2 border-b border-white/5 pb-1">Raw Materials</h4>`;
+        Object.entries(matLedger).forEach(([id, data]) => {
+            const asset = data.procured - data.consumed;
+            if (asset > 0.01 || asset < -0.01) { 
+                const mat = db.materials[id];
+                if (mat) {
+                    hasMaterials = true;
+                    matHtml += `
+                    <div class="glass-panel p-3 rounded-xl flex justify-between items-center gap-2 mb-2">
+                        <div class="flex flex-col"><span class="text-white text-sm truncate max-w-[150px]">${mat.desc}</span><span class="text-white/40 text-[9px] uppercase tracking-widest">${id}</span></div>
+                        <div class="text-right text-luxe text-sm font-bold font-display">${asset.toFixed(1)} ${mat.unit}</div>
+                    </div>`;
+                }
+            }
+        });
+        if (hasMaterials) invList.innerHTML += matHtml;
+
         let actCogs = 0;
         const costingHistory = db.actualsCosting.filter(c => String(c.Month).substring(0, 7) === monthStr);
-        Object.entries(db.lastReqs || {}).forEach(([id, planQty]) => {
-            const hist = costingHistory.find(c => c.Item_ID === id);
-            const mat = db.materials[id];
-            actCogs += hist ? parseFloat(hist.Actual_Total_Cost_RM) || 0 : (mat ? mat.costRM * planQty : 0);
-        });
+        costingHistory.forEach(c => actCogs += parseFloat(c.Actual_Total_Cost_RM) || 0);
+        // Fallback for UI if not saved yet
+        if (costingHistory.length === 0) {
+            Object.entries(db.lastReqs || {}).forEach(([id, planQty]) => { const mat = db.materials[id]; actCogs += mat ? mat.costRM * planQty : 0; });
+            db.plans.forEach(p => actCogs += (p.Live_Direct_Labor_RM || 0) * (parseInt(p.Planned_Qty) || 0));
+        }
         
         let planCogs = 0;
         db.plans.forEach(p => { 
@@ -1183,27 +1264,71 @@
             planCogs += (p.Live_Direct_Labor_RM || 0) * prod; 
         });
         
-        let totalExtra = 0;
-        (db.currentExtraCosts || []).forEach(ex => totalExtra += parseFloat(ex.Cost_RM) || 0);
+        let totalExtra = 0; (db.currentExtraCosts || []).forEach(ex => totalExtra += parseFloat(ex.Cost_RM) || 0);
 
         const expDelta = actCogs - (planCogs + totalExtra);
-
         const expCards = document.getElementById('analysis-expenditure-cards');
         if (expCards) {
             expCards.innerHTML = `
             <div class="glass-panel p-4 rounded-xl"><p class="text-white/40 text-[9px] uppercase tracking-widest mb-1">Planned Direct Costs + Extras</p><div class="text-xl font-display text-white">RM ${(planCogs + totalExtra).toFixed(2)}</div></div>
             <div class="glass-panel p-4 rounded-xl"><p class="text-white/40 text-[9px] uppercase tracking-widest mb-1">Actual Expenditure Ledger</p><div class="text-xl font-display text-white">RM ${actCogs.toFixed(2)}</div><div class="text-xs ${expDelta <= 0 ? 'text-luxe' : 'text-red-400'} mt-1 font-medium">${expDelta > 0 ? 'Overspent by' : 'Saved'} RM ${Math.abs(expDelta).toFixed(2)}</div></div>
-        `;
+            `;
         }
         
-        if (remarksCard) {
+        if (remarksCard && chatContainer) {
             if (remarksStr) {
-                remarksCard.classList.remove('hidden');
-                // Parse markdown bolding basic support
-                remarksCard.innerHTML = `<span class="text-luxe text-[9px] uppercase tracking-widest font-bold">CFO Report</span><div class="text-white/80 text-sm leading-relaxed mt-2 whitespace-pre-wrap">${remarksStr.replace(/\*\*(.*?)\*\*/g, '<strong class="text-white">$1</strong>')}</div>`;
-            } else remarksCard.classList.add('hidden');
+                remarksCard.classList.remove('hidden'); chatContainer.classList.remove('hidden'); chatContainer.classList.add('flex');
+                remarksCard.innerHTML = `<span class="text-luxe text-[9px] uppercase tracking-widest font-bold">CFO Report</span><div class="text-white/80 text-sm leading-relaxed mt-2 whitespace-pre-wrap" id="ai-autopsy-text">${remarksStr.replace(/\*\*(.*?)\*\*/g, '<strong class="text-white">$1</strong>')}</div>`;
+            } else {
+                remarksCard.classList.add('hidden'); chatContainer.classList.add('hidden'); chatContainer.classList.remove('flex');
+                const histEl = document.getElementById('cfo-chat-history');
+                if (histEl) histEl.innerHTML = ''; // Clear chat history if no report
+            }
         }
     }
+
+    // CFO Interactive Chat Submission
+    document.getElementById('btn-send-cfo-chat')?.addEventListener('click', async () => {
+        const input = document.getElementById('cfo-chat-input');
+        const q = input.value.trim();
+        if (!q) return;
+        input.value = '';
+        
+        const history = document.getElementById('cfo-chat-history');
+        history.innerHTML += `<div class="self-end bg-white/5 border border-white/10 p-3 rounded-xl max-w-[85%] mt-2"><p class="text-white/80 text-xs">${q}</p></div>`;
+        history.scrollTop = history.scrollHeight;
+
+        const currentMonth = monthInput.value;
+        const autopsyText = document.getElementById('ai-autopsy-text')?.innerText || '';
+        const context = {
+            plans: db.plans.filter(p => p.Planned_Qty > 0),
+            macro: db.actualsMacro.find(m => String(m.Plan_Month).substring(0, 7) === currentMonth),
+            micro: db.actualsMicro.filter(a => String(a.Date).substring(0, 7) === currentMonth),
+            costing: db.actualsCosting.filter(c => String(c.Month).substring(0, 7) === currentMonth),
+            opex: (db.actualsOpex || []).filter(o => String(o.Month).substring(0, 7) === currentMonth)
+        };
+
+        const typingId = 'cfo-typing-' + Date.now();
+        history.innerHTML += `<div id="${typingId}" class="self-start border border-luxe/20 bg-ink/30 p-3 rounded-xl max-w-[85%] mt-2 flex items-center gap-2"><p class="text-luxe text-[9px] uppercase tracking-widest font-bold">CFO</p><p class="text-white/80 text-xs typing-dots text-luxe">Analyzing</p></div>`;
+        history.scrollTop = history.scrollHeight;
+
+        try {
+            const res = await postManagerAction('cfo_followup_chat', { month: currentMonth, question: q, financialContext: context, autopsyText: autopsyText }, { skipLoader: true });
+            document.getElementById(typingId)?.remove();
+            history.innerHTML += `<div class="self-start border border-luxe/20 bg-ink/30 p-3 rounded-xl max-w-[85%] mt-2 flex flex-col gap-1"><p class="text-luxe text-[9px] uppercase tracking-widest font-bold">CFO Reply</p><p class="text-white/80 text-xs whitespace-pre-wrap">${res.data.reply.replace(/\*\*(.*?)\*\*/g, '<strong class="text-white">$1</strong>')}</p></div>`;
+        } catch (err) {
+            document.getElementById(typingId)?.remove();
+            history.innerHTML += `<div class="self-start border border-red-500/30 bg-red-500/10 p-3 rounded-xl max-w-[85%] mt-2"><p class="text-red-400 text-xs">System Error: ${err.message}</p></div>`;
+        }
+        history.scrollTop = history.scrollHeight;
+    });
+
+    document.getElementById('cfo-chat-input')?.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            document.getElementById('btn-send-cfo-chat')?.click();
+        }
+    });
 
 
     // --- MASTER SETTINGS TABS & EDITORS ---
