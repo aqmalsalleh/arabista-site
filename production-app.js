@@ -1821,9 +1821,41 @@
         btn.disabled = true;
         btn.innerHTML = '<span class="inline-block w-2 h-2 rounded-full bg-luxe animate-ping mr-1"></span> Analyzing...';
 
+        // Pre-calculate Material Assets so the AI doesn't have to guess
+        let matLedger = {};
+        db.actualsCosting.forEach(c => {
+            if (c.Category === 'Operational' || c.Item_ID === 'DIRECT-LABOR') return;
+            if (String(c.Month).substring(0, 7) <= currentMonth) {
+                if (!matLedger[c.Item_ID]) matLedger[c.Item_ID] = { procured: 0, consumed: 0, desc: db.materials[c.Item_ID]?.desc };
+                matLedger[c.Item_ID].procured += parseFloat(c.Actual_Qty) || 0;
+            }
+        });
+        db.actualsMicro.forEach(m => {
+            if (String(m.Date).substring(0, 7) <= currentMonth) {
+                const bom = db.bom[m.Design_Code];
+                const prod = parseInt(m.Qty_Produced) || 0;
+                if (bom && prod > 0) {
+                    Object.keys(bom).forEach(k => {
+                        if (k.endsWith('_ID') && k !== 'Design_Code') {
+                            const id = bom[k]; const qty = parseFloat(bom[k.slice(0, -3) + '_Qty']) || 0;
+                            if (id && id !== 'NONE') {
+                                if (!matLedger[id]) matLedger[id] = { procured: 0, consumed: 0, desc: db.materials[id]?.desc };
+                                matLedger[id].consumed += (qty * prod);
+                            }
+                        }
+                    });
+                }
+            }
+        });
+        const materialAssets = Object.entries(matLedger).map(([id, data]) => ({
+            id, name: data.desc, procured: data.procured, consumed: data.consumed, surplus: data.procured - data.consumed
+        })).filter(m => Math.abs(m.surplus) > 0.01);
+
         const snap = db.snapshots.find(s => String(s.Plan_Month).substring(0, 7) === currentMonth) || {};
         const context = {
             targetSellThrough: parseFloat(snap.Target_Sell_Through_Pct) || 100,
+            config: db.configRaw,
+            materialAssets: materialAssets,
             plans: db.plans.filter(p => p.Planned_Qty > 0),
             macro: db.actualsMacro.find(m => String(m.Plan_Month).substring(0, 7) === currentMonth),
             micro: db.actualsMicro.filter(a => String(a.Date).substring(0, 7) === currentMonth),
@@ -1835,7 +1867,7 @@
         try {
             await postManagerAction('generate_cfo_autopsy', { month: currentMonth, financialContext: context });
             await fetchData();
-            if (pillarAnalysis && !pillarAnalysis.classList.contains('hidden')) renderAnalysisPillar();
+            if (typeof pillarAnalysis !== 'undefined' && !pillarAnalysis.classList.contains('hidden')) renderAnalysisPillar();
         } catch (err) { alert('Autopsy failed: ' + err.message); }
         finally {
             btn.disabled = false;
