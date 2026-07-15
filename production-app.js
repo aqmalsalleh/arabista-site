@@ -955,11 +955,10 @@
 
     function renderPlanPillar(rev, cogs, profit, perfectMargin, cashMargin, sellThroughPct, reqs) {
         document.getElementById('plan-metrics-container').innerHTML = `
-            <div class="glass-panel p-4 rounded-xl border border-white/5"><p class="text-white/40 text-[9px] uppercase tracking-widest mb-1">Revenue (${sellThroughPct}% Sold)</p><div class="text-xl font-display text-white">RM ${rev.toFixed(2)}</div></div>
-            <div class="glass-panel p-4 rounded-xl border border-white/5"><p class="text-white/40 text-[9px] uppercase tracking-widest mb-1">COGS (100% Prod)</p><div class="text-xl font-display text-white">RM ${cogs.toFixed(2)}</div></div>
-            <div class="glass-panel p-4 rounded-xl border border-white/5"><p class="text-white/40 text-[9px] uppercase tracking-widest mb-1">Unit Gross Margin</p><div class="text-xl font-display text-white">${perfectMargin.toFixed(1)}%</div></div>
-            <div class="glass-panel p-4 rounded-xl border border-white/5"><p class="text-white/40 text-[9px] uppercase tracking-widest mb-1">Net Cash Margin</p><div class="text-xl font-display ${cashMargin >= 0 ? 'text-white' : 'text-red-400'}">${cashMargin.toFixed(1)}%</div></div>
-            <div class="glass-panel p-4 rounded-xl border ${profit >= 0 ? 'border-luxe/30 bg-luxe/5' : 'border-red-500/30 bg-red-500/5'}"><p class="text-luxe text-[9px] uppercase tracking-widest mb-1 font-bold">Est. Net Profit</p><div class="text-2xl font-display ${profit >= 0 ? 'text-luxe' : 'text-red-400'}">RM ${profit.toFixed(2)}</div></div>
+            <div class="glass-panel p-4 rounded-xl border border-white/5"><p class="text-white/40 text-[9px] uppercase tracking-widest mb-1">Target Revenue (${sellThroughPct}% Sold)</p><div class="text-xl font-display text-white">RM ${rev.toFixed(2)}</div></div>
+            <div class="glass-panel p-4 rounded-xl border border-white/5"><p class="text-white/40 text-[9px] uppercase tracking-widest mb-1">Target COGS (100% Prod)</p><div class="text-xl font-display text-white">RM ${cogs.toFixed(2)}</div></div>
+            <div class="glass-panel p-4 rounded-xl border border-white/5"><p class="text-white/40 text-[9px] uppercase tracking-widest mb-1">Target Margins</p><div class="text-lg font-display text-white">Unit: ${perfectMargin.toFixed(1)}% <span class="text-white/30 text-sm ml-1">| Cash: <span class="${cashMargin >= 0 ? 'text-white' : 'text-red-400'}">${cashMargin.toFixed(1)}%</span></span></div></div>
+            <div class="glass-panel p-4 rounded-xl border ${profit >= 0 ? 'border-luxe/30 bg-luxe/5' : 'border-red-500/30 bg-red-500/5'}"><p class="text-luxe text-[9px] uppercase tracking-widest mb-1 font-bold">Est. Net Profit (at ${sellThroughPct}% ST)</p><div class="text-2xl font-display ${profit >= 0 ? 'text-luxe' : 'text-red-400'}">RM ${profit.toFixed(2)}</div></div>
         `;
 
         const designList = document.getElementById('plan-designs-list');
@@ -1139,6 +1138,74 @@
             el.addEventListener('input', liveUpdateActuals);
         });
         liveUpdateActuals();
+
+        // Auto-Fill Draft Event Listeners
+        const aiFileInput = document.getElementById('actual-ai-file');
+        const btnTriggerAi = document.getElementById('btn-trigger-actual-ai');
+        const btnRunAi = document.getElementById('btn-run-actual-ai');
+        const filenameDisplay = document.getElementById('actual-ai-filename');
+
+        btnTriggerAi?.addEventListener('click', () => aiFileInput.click());
+
+        aiFileInput?.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                filenameDisplay.textContent = e.target.files.length > 1 ? `${e.target.files.length} Files Selected` : e.target.files[0].name;
+                btnTriggerAi.classList.add('border-luxe', 'text-luxe');
+                btnRunAi.classList.remove('hidden');
+            } else {
+                filenameDisplay.textContent = 'Select Screenshots...';
+                btnTriggerAi.classList.remove('border-luxe', 'text-luxe');
+                btnRunAi.classList.add('hidden');
+            }
+        });
+
+        btnRunAi?.addEventListener('click', async () => {
+            const files = aiFileInput.files;
+            if (!files || files.length === 0) return;
+            
+            btnRunAi.disabled = true;
+            btnRunAi.innerHTML = '<span class="inline-block w-3 h-3 border-2 border-ink border-t-transparent rounded-full animate-spin"></span>';
+            
+            let imagesArray = [];
+            for (let i = 0; i < files.length; i++) {
+                const reader = new FileReader();
+                const base64 = await new Promise((resolve) => { reader.onload = (e) => resolve(e.target.result.split(',')[1]); reader.readAsDataURL(files[i]); });
+                imagesArray.push({ mimeType: files[i].type, data: base64 });
+            }
+
+            try {
+                // Call a new drafting route that ONLY extracts, DOES NOT save.
+                const res = await postManagerAction('extract_actuals_draft', { images: imagesArray, month: monthInput.value }, { skipLoader: true });
+                
+                // Populate DOM visually (User must still click Save to Ledger)
+                if (res.data.macro) {
+                    if (document.getElementById('manual-macro-rev') && res.data.macro.revenue) document.getElementById('manual-macro-rev').value = res.data.macro.revenue;
+                    if (document.getElementById('manual-macro-fees') && res.data.macro.platform_fees) document.getElementById('manual-macro-fees').value = res.data.macro.platform_fees;
+                    if (document.getElementById('manual-macro-ads') && res.data.macro.ad_spend) document.getElementById('manual-macro-ads').value = res.data.macro.ad_spend;
+                }
+                
+                if (res.data.micro && Array.isArray(res.data.micro)) {
+                    document.querySelectorAll('.actual-vol-row').forEach(row => {
+                        const design = row.dataset.design;
+                        const match = res.data.micro.find(m => m.design === design);
+                        if (match) {
+                            if (match.qty_produced) row.querySelector('.act-prod').value = match.qty_produced;
+                            if (match.qty_sold) row.querySelector('.act-sold').value = match.qty_sold;
+                        }
+                    });
+                }
+                liveUpdateActuals();
+                alert('Draft extraction complete. Review the numbers and click "Save Actuals to Ledger" to confirm.');
+            } catch (err) { alert('Extraction Error: ' + err.message); }
+            finally {
+                btnRunAi.disabled = false;
+                btnRunAi.innerHTML = 'Auto-Fill';
+                aiFileInput.value = '';
+                filenameDisplay.textContent = 'Select Screenshots...';
+                btnRunAi.classList.add('hidden');
+                btnTriggerAi.classList.remove('border-luxe', 'text-luxe');
+            }
+        });
     }
 
 
@@ -1148,36 +1215,78 @@
         const snap = db.snapshots.find(s => String(s.Plan_Month).substring(0, 7) === monthStr) || {};
         const stPct = parseFloat(snap.Target_Sell_Through_Pct) || 100;
         
-        let planRev = 0, planQty = 0, targetSoldQty = 0;
+        let planRevTarget = 0, planRevMax = 0, planQtyTotal = 0, actualProducedTotal = 0;
         db.plans.forEach(p => { 
             const prod = parseInt(p.Planned_Qty) || 0;
-            const sold = Math.round(prod * (stPct / 100));
-            planQty += prod; targetSoldQty += sold;
-            planRev += (parseFloat(p.Target_Selling_Price) || 0) * sold; 
+            const soldTarget = Math.round(prod * (stPct / 100));
+            planQtyTotal += prod;
+            planRevTarget += (parseFloat(p.Target_Selling_Price) || 0) * soldTarget; 
+            planRevMax += (parseFloat(p.Target_Selling_Price) || 0) * prod;
+            
+            const hist = db.actualsMicro.find(a => String(a.Date).substring(0, 7) === monthStr && a.Design_Code === p.Design_Code);
+            actualProducedTotal += hist ? parseInt(hist.Qty_Produced) || 0 : 0;
         });
 
         const actRev = parseFloat(aMacro.Actual_Revenue_RM) || 0;
+        const revDeltaTarget = actRev - planRevTarget;
+
+        let fixedOpexBudget = 0;
+        db.configRaw.forEach(c => { if (c.Account_Category === 'Fixed OPEX') fixedOpexBudget += (parseFloat(c.Value_RM) || 0); });
+        
+        const budgPlatFees = planRevTarget * (db.config['TikTok_Fee_Pct'] || db.config['Platform_Commission_Pct'] || 0.20);
+        const budgAdSpend = (planQtyTotal * (stPct / 100)) * (db.config['Marketing_Per_Unit'] || 5.00);
+        const totalBudgetOpex = fixedOpexBudget + budgPlatFees + budgAdSpend;
+
         const actPlatFees = parseFloat(aMacro.Actual_Platform_Fees_RM) || 0;
         const actAdSpend = parseFloat(aMacro.Actual_Ad_Spend_RM) || 0;
+        let actualFixedOpexLedger = 0;
+        const opexHistory = (db.actualsOpex || []).filter(o => String(o.Month).substring(0, 7) === monthStr);
+        opexHistory.forEach(o => actualFixedOpexLedger += parseFloat(o.Actual_Cost_RM) || 0);
+        if (opexHistory.length === 0) actualFixedOpexLedger = fixedOpexBudget;
 
-        const budgPlatFees = planRev * (db.config['TikTok_Fee_Pct'] || db.config['Platform_Commission_Pct'] || 0.20);
-        const budgAdSpend = targetSoldQty * (db.config['Marketing_Per_Unit'] || 5.00);
+        const totalActualOpex = actualFixedOpexLedger + actPlatFees + actAdSpend;
+        const opexDelta = totalActualOpex - totalBudgetOpex;
 
-        const revDelta = actRev - planRev;
-        const platDelta = actPlatFees - budgPlatFees;
-        const adDelta = actAdSpend - budgAdSpend;
+        const perfCards = document.getElementById('analysis-performance-cards');
+        if (perfCards) {
+            perfCards.innerHTML = `
+                <div class="glass-panel p-4 rounded-xl">
+                    <p class="text-white/40 text-[9px] uppercase tracking-widest mb-1">Revenue Realization</p>
+                    <div class="text-xl font-display text-white">RM ${actRev.toFixed(2)}</div>
+                    <div class="text-[10px] text-white/50 mt-1 mb-1">Target: RM ${planRevTarget.toFixed(0)} (${stPct}% ST) | Max: RM ${planRevMax.toFixed(0)}</div>
+                    <div class="text-xs ${revDeltaTarget >= 0 ? 'text-luxe' : 'text-red-400'} font-medium">${revDeltaTarget >= 0 ? '+' : ''}RM ${revDeltaTarget.toFixed(2)} vs Target</div>
+                </div>
+                <div class="glass-panel p-4 rounded-xl">
+                    <p class="text-white/40 text-[9px] uppercase tracking-widest mb-1">Production Volume</p>
+                    <div class="text-xl font-display text-white">${actualProducedTotal} pcs</div>
+                    <div class="text-[10px] text-white/50 mt-1 mb-1">Planned Production: ${planQtyTotal} pcs</div>
+                    <div class="text-xs ${actualProducedTotal >= planQtyTotal ? 'text-luxe' : 'text-white/50'} font-medium">${actualProducedTotal - planQtyTotal >= 0 ? '+' : ''}${actualProducedTotal - planQtyTotal} vs Plan</div>
+                </div>`;
+        }
 
-        document.getElementById('analysis-variance-cards').innerHTML = `
-            <div class="glass-panel p-4 rounded-xl"><p class="text-white/40 text-[9px] uppercase tracking-widest mb-1">Revenue Variance</p><div class="text-xl font-display text-white">RM ${actRev.toFixed(2)}</div><div class="text-[10px] text-white/50 mt-1 mb-1">Target: RM ${planRev.toFixed(0)} (${stPct}% ST)</div><div class="text-xs ${revDelta >= 0 ? 'text-luxe' : 'text-red-400'} font-medium">${revDelta >= 0 ? '+' : ''}RM ${revDelta.toFixed(2)}</div></div>
-            <div class="glass-panel p-4 rounded-xl"><p class="text-white/40 text-[9px] uppercase tracking-widest mb-1">Platform Fees</p><div class="text-xl font-display text-white">RM ${actPlatFees.toFixed(2)}</div><div class="text-[10px] text-white/50 mt-1 mb-1">Budget: RM ${budgPlatFees.toFixed(0)} (${stPct}% ST)</div><div class="text-xs ${platDelta <= 0 ? 'text-luxe' : 'text-red-400'} font-medium">${platDelta > 0 ? 'Over budget by' : 'Saved'} RM ${Math.abs(platDelta).toFixed(2)}</div></div>
-            <div class="glass-panel p-4 rounded-xl"><p class="text-white/40 text-[9px] uppercase tracking-widest mb-1">Ad Spend</p><div class="text-xl font-display text-white">RM ${actAdSpend.toFixed(2)}</div><div class="text-[10px] text-white/50 mt-1 mb-1">Budget: RM ${budgAdSpend.toFixed(0)} (${stPct}% ST)</div><div class="text-xs ${adDelta <= 0 ? 'text-luxe' : 'text-red-400'} font-medium">${adDelta > 0 ? 'Over budget by' : 'Saved'} RM ${Math.abs(adDelta).toFixed(2)}</div></div>
-        `;
+        const opexCards = document.getElementById('analysis-opex-cards');
+        if (opexCards) {
+            opexCards.innerHTML = `
+                <div class="glass-panel p-4 rounded-xl">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <p class="text-white/40 text-[9px] uppercase tracking-widest mb-1">Total OPEX & Selling Costs</p>
+                            <div class="text-xl font-display text-white">RM ${totalActualOpex.toFixed(2)}</div>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-white/40 text-[9px] uppercase tracking-widest mb-1">Budget</p>
+                            <div class="text-sm font-display text-white/70">RM ${totalBudgetOpex.toFixed(2)}</div>
+                        </div>
+                    </div>
+                    <div class="text-xs ${opexDelta <= 0 ? 'text-luxe' : 'text-red-400'} font-medium mt-2">${opexDelta > 0 ? 'Over budget by' : 'Under budget by'} RM ${Math.abs(opexDelta).toFixed(2)}</div>
+                    <p class="text-white/30 text-[9px] uppercase tracking-widest mt-1">Includes Fixed OPEX, Platform Fees, and Ad Spend.</p>
+                </div>`;
+        }
 
         const remarksStr = aMacro.AI_Remarks || aMacro.ai_remarks || "";
         const remarksCard = document.getElementById('analysis-ai-remarks');
         const chatContainer = document.getElementById('cfo-chat-container');
 
-        // Universal Temporal Asset Math
         const invList = document.getElementById('analysis-inventory-list');
         invList.innerHTML = `<h4 class="text-white/60 text-[9px] uppercase tracking-widest mb-2 border-b border-white/5 pb-1">Finished Goods</h4>`;
         
@@ -1203,67 +1312,58 @@
                 </div>`;
         });
 
-        // Raw Material Carry-Forward Math
-        let matLedger = {};
-        db.actualsCosting.forEach(c => {
-            if (c.Category === 'Operational' || c.Item_ID === 'DIRECT-LABOR') return;
-            if (String(c.Month).substring(0, 7) <= monthStr) {
-                if (!matLedger[c.Item_ID]) matLedger[c.Item_ID] = { procured: 0, consumed: 0 };
-                matLedger[c.Item_ID].procured += parseFloat(c.Actual_Qty) || 0;
-            }
-        });
-        db.actualsMicro.forEach(m => {
-            if (String(m.Date).substring(0, 7) <= monthStr) {
-                const bom = db.bom[m.Design_Code];
-                const prod = parseInt(m.Qty_Produced) || 0;
-                if (bom && prod > 0) {
-                    Object.keys(bom).forEach(k => {
-                        if (k.endsWith('_ID') && k !== 'Design_Code') {
-                            const id = bom[k]; const qty = parseFloat(bom[k.slice(0, -3) + '_Qty']) || 0;
-                            if (id && id !== 'NONE') {
-                                if (!matLedger[id]) matLedger[id] = { procured: 0, consumed: 0 };
-                                matLedger[id].consumed += (qty * prod);
-                            }
-                        }
-                    });
-                }
-            }
+        // Strict Material Asset Calculation (Procured vs PLANNED Production)
+        let monthMatLedger = {};
+        const costingHistory = db.actualsCosting.filter(c => String(c.Month).substring(0, 7) === monthStr);
+        costingHistory.forEach(c => {
+             if (c.Category === 'Operational' || c.Item_ID === 'DIRECT-LABOR') return;
+             if (!monthMatLedger[c.Item_ID]) monthMatLedger[c.Item_ID] = { procured: 0, plannedToConsume: 0 };
+             monthMatLedger[c.Item_ID].procured += parseFloat(c.Actual_Qty) || 0;
         });
         
+        db.plans.forEach(p => {
+             const bom = db.bom[p.Design_Code];
+             const prodPlan = parseInt(p.Planned_Qty) || 0;
+             if (bom && prodPlan > 0) {
+                 Object.keys(bom).forEach(k => {
+                     if (k.endsWith('_ID') && k !== 'Design_Code') {
+                         const id = bom[k]; const qty = parseFloat(bom[k.slice(0, -3) + '_Qty']) || 0;
+                         if (id && id !== 'NONE') {
+                             if (!monthMatLedger[id]) monthMatLedger[id] = { procured: 0, plannedToConsume: 0 };
+                             monthMatLedger[id].plannedToConsume += (qty * prodPlan);
+                         }
+                     }
+                 });
+             }
+        });
+
         let hasMaterials = false;
-        let matHtml = `<h4 class="text-white/60 text-[9px] uppercase tracking-widest mt-4 mb-2 border-b border-white/5 pb-1">Raw Materials</h4>`;
-        Object.entries(matLedger).forEach(([id, data]) => {
-            const asset = data.procured - data.consumed;
-            if (asset > 0.01 || asset < -0.01) { 
+        let matHtml = `<h4 class="text-white/60 text-[9px] uppercase tracking-widest mt-4 mb-2 border-b border-white/5 pb-1">Raw Materials (Actual vs. Planned Prod)</h4>`;
+        Object.entries(monthMatLedger).forEach(([id, data]) => {
+            const surplus = data.procured - data.plannedToConsume;
+            if (surplus > 0.01 || surplus < -0.01) { 
                 const mat = db.materials[id];
                 if (mat) {
                     hasMaterials = true;
                     matHtml += `
                     <div class="glass-panel p-3 rounded-xl flex justify-between items-center gap-2 mb-2">
                         <div class="flex flex-col"><span class="text-white text-sm truncate max-w-[150px]">${mat.desc}</span><span class="text-white/40 text-[9px] uppercase tracking-widest">${id}</span></div>
-                        <div class="text-right text-luxe text-sm font-bold font-display">${asset.toFixed(1)} ${mat.unit}</div>
+                        <div class="text-right">
+                           <div class="text-luxe text-sm font-bold font-display">${surplus > 0 ? '+' : ''}${surplus.toFixed(1)} ${mat.unit}</div>
+                           <div class="text-[9px] text-white/40">Procured: ${data.procured.toFixed(1)} | Plan: ${data.plannedToConsume.toFixed(1)}</div>
+                        </div>
                     </div>`;
                 }
             }
         });
         if (hasMaterials) invList.innerHTML += matHtml;
 
-        let actCogs = 0;
-        const costingHistory = db.actualsCosting.filter(c => String(c.Month).substring(0, 7) === monthStr);
-        costingHistory.forEach(c => actCogs += parseFloat(c.Actual_Total_Cost_RM) || 0);
-        // Fallback for UI if not saved yet
+        let actCogs = 0; costingHistory.forEach(c => actCogs += parseFloat(c.Actual_Total_Cost_RM) || 0);
         if (costingHistory.length === 0) {
             Object.entries(db.lastReqs || {}).forEach(([id, planQty]) => { const mat = db.materials[id]; actCogs += mat ? mat.costRM * planQty : 0; });
             db.plans.forEach(p => actCogs += (p.Live_Direct_Labor_RM || 0) * (parseInt(p.Planned_Qty) || 0));
         }
-        
-        let planCogs = 0;
-        db.plans.forEach(p => { 
-            const prod = parseInt(p.Planned_Qty) || 0; 
-            planCogs += (p.Live_Material_COGS_RM || 0) * prod; 
-            planCogs += (p.Live_Direct_Labor_RM || 0) * prod; 
-        });
-        
+        let planCogs = 0; db.plans.forEach(p => { const prod = parseInt(p.Planned_Qty) || 0; planCogs += (p.Live_Material_COGS_RM || 0) * prod; planCogs += (p.Live_Direct_Labor_RM || 0) * prod; });
         let totalExtra = 0; (db.currentExtraCosts || []).forEach(ex => totalExtra += parseFloat(ex.Cost_RM) || 0);
 
         const expDelta = actCogs - (planCogs + totalExtra);
@@ -1278,11 +1378,11 @@
         if (remarksCard && chatContainer) {
             if (remarksStr) {
                 remarksCard.classList.remove('hidden'); chatContainer.classList.remove('hidden'); chatContainer.classList.add('flex');
-                remarksCard.innerHTML = `<span class="text-luxe text-[9px] uppercase tracking-widest font-bold">CFO Report</span><div class="text-white/80 text-sm leading-relaxed mt-2 whitespace-pre-wrap" id="ai-autopsy-text">${remarksStr.replace(/\*\*(.*?)\*\*/g, '<strong class="text-white">$1</strong>')}</div>`;
+                remarksCard.innerHTML = `<span class="text-luxe text-[9px] uppercase tracking-widest font-bold">Executive Report</span><div class="text-white/80 text-sm leading-relaxed mt-2 whitespace-pre-wrap" id="ai-autopsy-text">${remarksStr.replace(/\*\*(.*?)\*\*/g, '<strong class="text-white">$1</strong>')}</div>`;
             } else {
                 remarksCard.classList.add('hidden'); chatContainer.classList.add('hidden'); chatContainer.classList.remove('flex');
                 const histEl = document.getElementById('cfo-chat-history');
-                if (histEl) histEl.innerHTML = ''; // Clear chat history if no report
+                if (histEl) histEl.innerHTML = '';
             }
         }
     }
@@ -1815,41 +1915,39 @@
         }
     });
 
-    document.getElementById('btn-generate-autopsy')?.addEventListener('click', async () => {
+    document.getElementById('btn-generate-executive-report')?.addEventListener('click', async () => {
         const currentMonth = monthInput.value;
-        const btn = document.getElementById('btn-generate-autopsy');
+        const btn = document.getElementById('btn-generate-executive-report');
         btn.disabled = true;
         btn.innerHTML = '<span class="inline-block w-2 h-2 rounded-full bg-luxe animate-ping mr-1"></span> Analyzing...';
 
-        // Pre-calculate Material Assets so the AI doesn't have to guess
-        let matLedger = {};
-        db.actualsCosting.forEach(c => {
-            if (c.Category === 'Operational' || c.Item_ID === 'DIRECT-LABOR') return;
-            if (String(c.Month).substring(0, 7) <= currentMonth) {
-                if (!matLedger[c.Item_ID]) matLedger[c.Item_ID] = { procured: 0, consumed: 0, desc: db.materials[c.Item_ID]?.desc };
-                matLedger[c.Item_ID].procured += parseFloat(c.Actual_Qty) || 0;
-            }
+        // Pre-calculate strict Material Assets vs Plan
+        let monthMatLedger = {};
+        const costingHistory = db.actualsCosting.filter(c => String(c.Month).substring(0, 7) === currentMonth);
+        costingHistory.forEach(c => {
+             if (c.Category === 'Operational' || c.Item_ID === 'DIRECT-LABOR') return;
+             if (!monthMatLedger[c.Item_ID]) monthMatLedger[c.Item_ID] = { procured: 0, plannedToConsume: 0, desc: db.materials[c.Item_ID]?.desc };
+             monthMatLedger[c.Item_ID].procured += parseFloat(c.Actual_Qty) || 0;
         });
-        db.actualsMicro.forEach(m => {
-            if (String(m.Date).substring(0, 7) <= currentMonth) {
-                const bom = db.bom[m.Design_Code];
-                const prod = parseInt(m.Qty_Produced) || 0;
-                if (bom && prod > 0) {
-                    Object.keys(bom).forEach(k => {
-                        if (k.endsWith('_ID') && k !== 'Design_Code') {
-                            const id = bom[k]; const qty = parseFloat(bom[k.slice(0, -3) + '_Qty']) || 0;
-                            if (id && id !== 'NONE') {
-                                if (!matLedger[id]) matLedger[id] = { procured: 0, consumed: 0, desc: db.materials[id]?.desc };
-                                matLedger[id].consumed += (qty * prod);
-                            }
-                        }
-                    });
-                }
-            }
+        db.plans.forEach(p => {
+             const bom = db.bom[p.Design_Code];
+             const prodPlan = parseInt(p.Planned_Qty) || 0;
+             if (bom && prodPlan > 0) {
+                 Object.keys(bom).forEach(k => {
+                     if (k.endsWith('_ID') && k !== 'Design_Code') {
+                         const id = bom[k]; const qty = parseFloat(bom[k.slice(0, -3) + '_Qty']) || 0;
+                         if (id && id !== 'NONE') {
+                             if (!monthMatLedger[id]) monthMatLedger[id] = { procured: 0, plannedToConsume: 0, desc: db.materials[id]?.desc };
+                             monthMatLedger[id].plannedToConsume += (qty * prodPlan);
+                         }
+                     }
+                 });
+             }
         });
-        const materialAssets = Object.entries(matLedger).map(([id, data]) => ({
-            id, name: data.desc, procured: data.procured, consumed: data.consumed, surplus: data.procured - data.consumed
-        })).filter(m => Math.abs(m.surplus) > 0.01);
+        
+        const materialAssets = Object.entries(monthMatLedger).map(([id, data]) => ({
+            id, name: data.desc, procured: data.procured, plannedToConsume: data.plannedToConsume, deviation: data.procured - data.plannedToConsume
+        })).filter(m => Math.abs(m.deviation) > 0.01);
 
         const snap = db.snapshots.find(s => String(s.Plan_Month).substring(0, 7) === currentMonth) || {};
         const context = {
@@ -1865,13 +1963,13 @@
         };
 
         try {
-            await postManagerAction('generate_cfo_autopsy', { month: currentMonth, financialContext: context });
+            await postManagerAction('generate_executive_report', { month: currentMonth, financialContext: context });
             await fetchData();
             if (typeof pillarAnalysis !== 'undefined' && !pillarAnalysis.classList.contains('hidden')) renderAnalysisPillar();
-        } catch (err) { alert('Autopsy failed: ' + err.message); }
+        } catch (err) { alert('Report failed: ' + err.message); }
         finally {
             btn.disabled = false;
-            btn.innerHTML = 'Generate CFO Report';
+            btn.innerHTML = 'Generate Executive Report';
         }
     });
 
