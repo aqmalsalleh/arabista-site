@@ -957,7 +957,7 @@
         document.getElementById('plan-metrics-container').innerHTML = `
             <div class="glass-panel p-4 rounded-xl border border-white/5"><p class="text-white/40 text-[9px] uppercase tracking-widest mb-1">Target Revenue (${sellThroughPct}% Sold)</p><div class="text-xl font-display text-white">RM ${rev.toFixed(2)}</div></div>
             <div class="glass-panel p-4 rounded-xl border border-white/5"><p class="text-white/40 text-[9px] uppercase tracking-widest mb-1">Target COGS (100% Prod)</p><div class="text-xl font-display text-white">RM ${cogs.toFixed(2)}</div></div>
-            <div class="glass-panel p-4 rounded-xl border border-white/5"><p class="text-white/40 text-[9px] uppercase tracking-widest mb-1">Target Margins</p><div class="text-lg font-display text-white">Unit: ${perfectMargin.toFixed(1)}% <span class="text-white/30 text-sm ml-1">| Cash: <span class="${cashMargin >= 0 ? 'text-white' : 'text-red-400'}">${cashMargin.toFixed(1)}%</span></span></div></div>
+            <div class="glass-panel p-4 rounded-xl border border-white/5"><p class="text-white/40 text-[9px] uppercase tracking-widest mb-1">Overall Profit Margin</p><div class="text-xl font-display ${cashMargin >= 0 ? 'text-white' : 'text-red-400'}">${cashMargin.toFixed(1)}%</div></div>
             <div class="glass-panel p-4 rounded-xl border ${profit >= 0 ? 'border-luxe/30 bg-luxe/5' : 'border-red-500/30 bg-red-500/5'}"><p class="text-luxe text-[9px] uppercase tracking-widest mb-1 font-bold">Est. Net Profit (at ${sellThroughPct}% ST)</p><div class="text-2xl font-display ${profit >= 0 ? 'text-luxe' : 'text-red-400'}">RM ${profit.toFixed(2)}</div></div>
         `;
 
@@ -1066,6 +1066,14 @@
                 </div>`;
         }
 
+        // Calculate reference sold volume for Freight defaults
+        let actualSoldSum = 0;
+        microHistory.forEach(a => actualSoldSum += parseInt(a.Qty_Sold) || 0);
+        let planSoldSum = 0;
+        const stPct = parseFloat(document.getElementById('plan-sell-through')?.value) || 100;
+        db.plans.forEach(p => { planSoldSum += Math.round((parseInt(p.Planned_Qty) || 0) * (stPct / 100)); });
+        const refSold = actualSoldSum > 0 ? actualSoldSum : planSoldSum;
+
         // Render Realized OPEX Overrides
         const opexList = document.getElementById('actual-opex-list');
         if (opexList) {
@@ -1074,8 +1082,7 @@
                 const histOp = opexHistory.find(o => o.Config_Name === c.Variable_Name);
                 let defaultVal = parseFloat(c.Value_RM) || 0;
                 if (c.Variable_Name === 'Freight_Cost_Per_Unit') {
-                    let totalSold = 0; document.querySelectorAll('.act-sold').forEach(inp => totalSold += parseInt(inp.value) || 0);
-                    defaultVal = totalSold * defaultVal;
+                    defaultVal = refSold * defaultVal;
                 }
                 const actOpCost = histOp ? parseFloat(histOp.Actual_Cost_RM) || 0 : defaultVal;
                 
@@ -1264,6 +1271,24 @@
                 </div>`;
         }
 
+        const targetSoldQty = planQtyTotal * (stPct / 100);
+
+        let opexBreakdownHtml = `<div class="mt-2 flex flex-col gap-1 text-[10px] text-white/70">`;
+        opexBreakdownHtml += `<div class="flex justify-between border-b border-white/5 pb-1 mb-1"><span class="font-bold text-white/50">Category</span><span class="font-bold text-white/50">Actual / Budget</span></div>`;
+        opexBreakdownHtml += `<div class="flex justify-between"><span>Platform Fees</span><span>RM ${actPlatFees.toFixed(2)} / RM ${budgPlatFees.toFixed(2)}</span></div>`;
+        opexBreakdownHtml += `<div class="flex justify-between"><span>Ad Spend</span><span>RM ${actAdSpend.toFixed(2)} / RM ${budgAdSpend.toFixed(2)}</span></div>`;
+        
+        db.configRaw.forEach(c => {
+            if (c.Account_Category === 'Fixed OPEX' || c.Variable_Name === 'Freight_Cost_Per_Unit') {
+                const histOp = opexHistory.find(o => o.Config_Name === c.Variable_Name);
+                let defaultVal = parseFloat(c.Value_RM) || 0;
+                if (c.Variable_Name === 'Freight_Cost_Per_Unit') defaultVal = targetSoldQty * defaultVal;
+                const actOpCost = histOp ? parseFloat(histOp.Actual_Cost_RM) || 0 : defaultVal;
+                opexBreakdownHtml += `<div class="flex justify-between"><span>${c.Variable_Name.replace(/_/g, ' ')}</span><span>RM ${actOpCost.toFixed(2)} / RM ${defaultVal.toFixed(2)}</span></div>`;
+            }
+        });
+        opexBreakdownHtml += `</div>`;
+
         const opexCards = document.getElementById('analysis-opex-cards');
         if (opexCards) {
             opexCards.innerHTML = `
@@ -1280,6 +1305,13 @@
                     </div>
                     <div class="text-xs ${opexDelta <= 0 ? 'text-luxe' : 'text-red-400'} font-medium mt-2">${opexDelta > 0 ? 'Over budget by' : 'Under budget by'} RM ${Math.abs(opexDelta).toFixed(2)}</div>
                     <p class="text-white/30 text-[9px] uppercase tracking-widest mt-1">Includes Fixed OPEX, Platform Fees, and Ad Spend.</p>
+                    <details class="mt-3 border-t border-white/10 pt-2 group">
+                        <summary class="text-[10px] text-white/50 cursor-pointer list-none uppercase tracking-widest flex items-center justify-between">
+                            View Breakdown
+                            <svg class="w-3 h-3 transition-transform group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                        </summary>
+                        ${opexBreakdownHtml}
+                    </details>
                 </div>`;
         }
 
@@ -1950,8 +1982,39 @@
         })).filter(m => Math.abs(m.deviation) > 0.01);
 
         const snap = db.snapshots.find(s => String(s.Plan_Month).substring(0, 7) === currentMonth) || {};
+        const stPct = parseFloat(snap.Target_Sell_Through_Pct) || 100;
+
+        let planRevTarget = 0, planQtyTotal = 0, actualSoldTotal = 0, planTotalLabor = 0;
+        db.plans.forEach(p => { 
+            const prod = parseInt(p.Planned_Qty) || 0;
+            const soldTarget = Math.round(prod * (stPct / 100));
+            planQtyTotal += prod; 
+            planRevTarget += (parseFloat(p.Target_Selling_Price) || 0) * soldTarget; 
+            planTotalLabor += (parseFloat(p.Live_Direct_Labor_RM) || parseFloat(db.bom[p.Design_Code]?.Direct_Labor_RM) || 0) * prod;
+            const hist = db.actualsMicro.find(a => String(a.Date).substring(0, 7) === currentMonth && a.Design_Code === p.Design_Code);
+            actualSoldTotal += hist ? parseInt(hist.Qty_Sold) || 0 : 0;
+        });
+
+        const aMacro = db.actualsMacro.find(m => String(m.Plan_Month).substring(0, 7) === currentMonth) || {};
+        const actPlatFees = parseFloat(aMacro.Actual_Platform_Fees_RM) || 0;
+        const actAdSpend = parseFloat(aMacro.Actual_Ad_Spend_RM) || 0;
+
+        const budgPlatFees = planRevTarget * (db.config['TikTok_Fee_Pct'] || db.config['Platform_Commission_Pct'] || 0.20);
+        const budgAdSpend = (planQtyTotal * (stPct / 100)) * (db.config['Marketing_Per_Unit'] || 5.00);
+
+        const histLabor = db.actualsCosting.find(c => String(c.Month).substring(0, 7) === currentMonth && c.Item_ID === 'DIRECT-LABOR');
+        const actLaborCost = histLabor ? parseFloat(histLabor.Actual_Total_Cost_RM) || 0 : planTotalLabor;
+
+        const computedVariances = {
+            salesVolume: { target: Math.round(planQtyTotal * (stPct / 100)), actual: actualSoldTotal },
+            platformFees: { budget: budgPlatFees, actual: actPlatFees, variance: actPlatFees - budgPlatFees, defaultPct: (db.config['TikTok_Fee_Pct'] || db.config['Platform_Commission_Pct'] || 0.20) * 100 },
+            adSpend: { budget: budgAdSpend, actual: actAdSpend, variance: actAdSpend - budgAdSpend, budgetPerUnit: db.config['Marketing_Per_Unit'] || 5.00, actualPerUnit: actualSoldTotal > 0 ? (actAdSpend / actualSoldTotal) : 0 },
+            directLabor: { budget: planTotalLabor, actual: actLaborCost, variance: actLaborCost - planTotalLabor }
+        };
+
         const context = {
-            targetSellThrough: parseFloat(snap.Target_Sell_Through_Pct) || 100,
+            targetSellThrough: stPct,
+            computedVariances: computedVariances,
             config: db.configRaw,
             materialAssets: materialAssets,
             plans: db.plans.filter(p => p.Planned_Qty > 0),
