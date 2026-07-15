@@ -102,7 +102,7 @@
       <!-- PILLAR 1: PLAN -->
       <section id="pillar-plan" class="w-full max-w-screen-xl mx-auto p-4 sm:p-6 flex flex-col gap-6">
          <!-- Metrics injected here by JS -->
-         <div id="plan-metrics-container" class="grid grid-cols-2 md:grid-cols-5 gap-4"></div>
+         <div id="plan-metrics-container" class="grid grid-cols-2 md:grid-cols-4 gap-4"></div>
          
          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <!-- Left: Designs & Production -->
@@ -147,6 +147,22 @@
 
       <!-- PILLAR 2: ACTUAL -->
       <section id="pillar-actual" class="w-full max-w-screen-xl mx-auto p-4 sm:p-6 flex flex-col gap-6 hidden">
+         <!-- AI Auto-Fill Extraction Zone -->
+         <div class="glass-panel p-4 rounded-xl border border-luxe/30 bg-luxe/5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+             <div>
+                 <h3 class="text-luxe text-xs uppercase tracking-widest font-bold flex items-center gap-2"><span class="inline-block w-2 h-2 rounded-full bg-luxe animate-pulse"></span> Smart Extraction</h3>
+                 <p class="text-white/60 text-[10px] uppercase tracking-widest mt-1">Upload settlement screenshots. AI will draft the inputs below for your review.</p>
+             </div>
+             <div class="flex items-center gap-2 w-full sm:w-auto">
+                 <input type="file" id="actual-ai-file" accept="image/*" multiple class="hidden">
+                 <button id="btn-trigger-actual-ai" class="bg-black/40 border border-white/10 hover:border-luxe text-white px-4 py-2 text-xs uppercase tracking-widest rounded-lg transition-colors flex-1 sm:flex-none tap-none text-left truncate flex items-center gap-2">
+                     <svg class="w-4 h-4 text-white/50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
+                     <span id="actual-ai-filename">Select Screenshots...</span>
+                 </button>
+                 <button id="btn-run-actual-ai" class="bg-luxe text-ink px-4 py-2 text-xs uppercase tracking-widest font-bold rounded-lg hover:opacity-90 transition-all tap-none shrink-0 hidden">Auto-Fill</button>
+             </div>
+         </div>
+
          <div id="actual-metrics-container" class="grid grid-cols-2 md:grid-cols-4 gap-4"></div>
          <p class="text-white/40 text-[10px] uppercase tracking-widest mb-2 border-l-2 border-luxe pl-2">Use the AI Lounge to extract data from screenshots, or manually override the exact realized metrics below.</p>
          
@@ -216,15 +232,15 @@
       <!-- PILLAR 3: ANALYSIS -->
       <section id="pillar-analysis" class="w-full max-w-screen-xl mx-auto p-4 sm:p-6 flex flex-col gap-6 hidden">
          <div class="flex items-center justify-between border-b border-white/10 pb-2">
-            <h2 class="font-display text-2xl text-white">CFO Variance Dashboard</h2>
+            <h2 class="font-display text-2xl text-white">Monthly Executive Analysis</h2>
             <span class="text-luxe text-[10px] uppercase tracking-widest bg-luxe/10 px-2 py-1 rounded">Temporal ERP Active</span>
          </div>
          <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <!-- Col 1: Financial & Expenditure Autopsy -->
             <div class="flex flex-col gap-6 lg:col-span-2">
                 <div class="flex justify-between items-end border-b border-white/10 pb-2">
-                    <h3 class="text-luxe text-xs uppercase tracking-widest font-bold">AI Financial Autopsy</h3>
-                    <button id="btn-generate-autopsy" class="text-[10px] bg-luxe/20 text-luxe hover:bg-luxe hover:text-ink px-4 py-1.5 rounded font-bold uppercase tracking-widest transition-colors tap-none flex items-center gap-1">Generate CFO Report</button>
+                    <h3 class="text-luxe text-xs uppercase tracking-widest font-bold">Executive Summary</h3>
+                    <button id="btn-generate-executive-report" class="text-[10px] bg-luxe/20 text-luxe hover:bg-luxe hover:text-ink px-4 py-1.5 rounded font-bold uppercase tracking-widest transition-colors tap-none flex items-center gap-1">Generate Executive Report</button>
                 </div>
                 
                 <div id="analysis-ai-remarks" class="glass-panel p-5 rounded-2xl border-luxe/30 bg-luxe/5 hidden flex-col gap-0"></div>
@@ -238,11 +254,15 @@
                     </div>
                 </div>
                 
-                <h4 class="text-white/60 text-[10px] uppercase tracking-widest mt-2">Revenue & Variable Fees Variance</h4>
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4" id="analysis-variance-cards"></div>
+                <h4 class="text-white/60 text-[10px] uppercase tracking-widest mt-4 border-b border-white/5 pb-1">Performance vs. Plan</h4>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4" id="analysis-performance-cards">
+                    <!-- Populated by JS -->
+                </div>
 
-                <h4 class="text-white/60 text-[10px] uppercase tracking-widest mt-2 border-t border-white/5 pt-4">Direct Costs & Expenditure Reconciliation</h4>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4" id="analysis-expenditure-cards"></div>
+                <h4 class="text-white/60 text-[10px] uppercase tracking-widest mt-4 border-b border-white/5 pb-1">Total Operating Expenditure (OPEX & Selling)</h4>
+                <div class="grid grid-cols-1 gap-4" id="analysis-opex-cards">
+                    <!-- Populated by JS -->
+                </div>
             </div>
             <!-- Col 2: Inventory Assets (Carry Forward) -->
             <details class="group flex flex-col gap-4 bg-ink/30 border border-white/5 rounded-xl p-4">
