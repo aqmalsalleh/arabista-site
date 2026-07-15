@@ -939,9 +939,9 @@
         
         // Split Margins
         const perfectGrossRev = planQtyTotal * (planRev / (targetSoldTotal || 1)); 
-        // Perfect Margin = (Total theoretical revenue - COGS for all units - Overheads if all units sold) / Theoretical Revenue
-        const perfectMargin = perfectGrossRev > 0 ? ((perfectGrossRev - planCogs - ((planVarOverhead / (targetSoldTotal || 1)) * planQtyTotal)) / perfectGrossRev) * 100 : 0;
-        
+        // Perfect Margin = (Total theoretical revenue - Total Costs if all units sold) / Theoretical Revenue
+        const totalCosts100 = planCogs + ((planVarOverhead / (targetSoldTotal || 1)) * planQtyTotal) + fixedOpex + totalExtraCosts;
+        const perfectMargin = perfectGrossRev > 0 ? ((perfectGrossRev - totalCosts100) / perfectGrossRev) * 100 : 0;
         const cashMargin = planRev > 0 ? (planNetProfit / planRev) * 100 : 0;
         
         db.currentMacroSnapshot = { Locked_Fixed_OPEX_RM: fixedOpex, Total_Revenue_RM: planRev, Net_Profit_RM: planNetProfit };
@@ -957,7 +957,7 @@
         document.getElementById('plan-metrics-container').innerHTML = `
             <div class="glass-panel p-4 rounded-xl border border-white/5"><p class="text-white/40 text-[9px] uppercase tracking-widest mb-1">Target Revenue (${sellThroughPct}% Sold)</p><div class="text-xl font-display text-white">RM ${rev.toFixed(2)}</div></div>
             <div class="glass-panel p-4 rounded-xl border border-white/5"><p class="text-white/40 text-[9px] uppercase tracking-widest mb-1">Target COGS (100% Prod)</p><div class="text-xl font-display text-white">RM ${cogs.toFixed(2)}</div></div>
-            <div class="glass-panel p-4 rounded-xl border border-white/5"><p class="text-white/40 text-[9px] uppercase tracking-widest mb-1">Overall Profit Margin</p><div class="text-xl font-display ${cashMargin >= 0 ? 'text-white' : 'text-red-400'}">${cashMargin.toFixed(1)}%</div></div>
+            <div class="glass-panel p-4 rounded-xl border border-white/5"><p class="text-white/40 text-[9px] uppercase tracking-widest mb-1">Overall Profit Margins</p><div class="text-lg font-display text-white">100% Sold: ${perfectMargin.toFixed(1)}% <span class="text-white/30 text-sm ml-1">| Target: <span class="${cashMargin >= 0 ? 'text-white' : 'text-red-400'}">${cashMargin.toFixed(1)}%</span></span></div></div>
             <div class="glass-panel p-4 rounded-xl border ${profit >= 0 ? 'border-luxe/30 bg-luxe/5' : 'border-red-500/30 bg-red-500/5'}"><p class="text-luxe text-[9px] uppercase tracking-widest mb-1 font-bold">Est. Net Profit (at ${sellThroughPct}% ST)</p><div class="text-2xl font-display ${profit >= 0 ? 'text-luxe' : 'text-red-400'}">RM ${profit.toFixed(2)}</div></div>
         `;
 
@@ -1290,6 +1290,31 @@
         opexBreakdownHtml += `</div>`;
 
         const opexCards = document.getElementById('analysis-opex-cards');
+
+        // Strict Material Asset Calculation (Procured vs PLANNED Production)
+        let monthMatLedger = {};
+        const costingHistory = db.actualsCosting.filter(c => String(c.Month).substring(0, 7) === monthStr);
+        costingHistory.forEach(c => {
+             if (c.Category === 'Operational' || c.Item_ID === 'DIRECT-LABOR') return;
+             if (!monthMatLedger[c.Item_ID]) monthMatLedger[c.Item_ID] = { procured: 0, plannedToConsume: 0 };
+             monthMatLedger[c.Item_ID].procured += parseFloat(c.Actual_Qty) || 0;
+        });
+        db.plans.forEach(p => {
+             const bom = db.bom[p.Design_Code];
+             const prodPlan = parseInt(p.Planned_Qty) || 0;
+             if (bom && prodPlan > 0) {
+                 Object.keys(bom).forEach(k => {
+                     if (k.endsWith('_ID') && k !== 'Design_Code') {
+                         const id = bom[k]; const qty = parseFloat(bom[k.slice(0, -3) + '_Qty']) || 0;
+                         if (id && id !== 'NONE') {
+                             if (!monthMatLedger[id]) monthMatLedger[id] = { procured: 0, plannedToConsume: 0 };
+                             monthMatLedger[id].plannedToConsume += (qty * prodPlan);
+                         }
+                     }
+                 });
+             }
+        });
+
         if (opexCards) {
             opexCards.innerHTML = `
                 <div class="glass-panel p-4 rounded-xl">
@@ -1313,6 +1338,34 @@
                         ${opexBreakdownHtml}
                     </details>
                 </div>`;
+
+            let matBreakdownHtml = `<div class="mt-2 flex flex-col gap-1 text-[10px] text-white/70">`;
+            matBreakdownHtml += `<div class="flex justify-between border-b border-white/5 pb-1 mb-1"><span class="font-bold text-white/50">Component</span><span class="font-bold text-white/50">Actual / Plan (100% Prod)</span></div>`;
+            
+            let hasMatBreakdown = false;
+            Object.entries(monthMatLedger).forEach(([id, data]) => {
+                const mat = db.materials[id];
+                if (mat) {
+                    hasMatBreakdown = true;
+                    const costDiff = (data.procured * mat.costRM) - (data.plannedToConsume * mat.costRM);
+                    matBreakdownHtml += `<div class="flex justify-between"><span>${mat.desc} (${id})</span><span>${data.procured.toFixed(1)} / ${data.plannedToConsume.toFixed(1)} ${mat.unit} <span class="${costDiff <= 0 ? 'text-luxe' : 'text-red-400'}">(${costDiff > 0 ? '+' : ''}RM ${costDiff.toFixed(2)})</span></span></div>`;
+                }
+            });
+            matBreakdownHtml += `</div>`;
+
+            if (hasMatBreakdown) {
+                opexCards.innerHTML += `
+                    <div class="glass-panel p-4 rounded-xl mt-4">
+                        <p class="text-white/40 text-[9px] uppercase tracking-widest mb-1">Material Procurement Analysis</p>
+                        <details class="mt-1 group open:pb-2">
+                            <summary class="text-xs text-white/80 cursor-pointer list-none flex items-center justify-between font-medium">
+                                Plan vs. Actual Consumption
+                                <svg class="w-4 h-4 transition-transform group-open:rotate-180 text-white/40" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                            </summary>
+                            ${matBreakdownHtml}
+                        </details>
+                    </div>`;
+            }
         }
 
         const remarksStr = aMacro.AI_Remarks || aMacro.ai_remarks || "";
@@ -1342,31 +1395,6 @@
                         <div>Open: <span class="text-white">${openingAsset}</span></div><div class="text-center">+ Prod: <span class="text-white">${currentProd}</span></div><div class="text-right">- Sold: <span class="text-white">${currentSold}</span></div>
                     </div>
                 </div>`;
-        });
-
-        // Strict Material Asset Calculation (Procured vs PLANNED Production)
-        let monthMatLedger = {};
-        const costingHistory = db.actualsCosting.filter(c => String(c.Month).substring(0, 7) === monthStr);
-        costingHistory.forEach(c => {
-             if (c.Category === 'Operational' || c.Item_ID === 'DIRECT-LABOR') return;
-             if (!monthMatLedger[c.Item_ID]) monthMatLedger[c.Item_ID] = { procured: 0, plannedToConsume: 0 };
-             monthMatLedger[c.Item_ID].procured += parseFloat(c.Actual_Qty) || 0;
-        });
-        
-        db.plans.forEach(p => {
-             const bom = db.bom[p.Design_Code];
-             const prodPlan = parseInt(p.Planned_Qty) || 0;
-             if (bom && prodPlan > 0) {
-                 Object.keys(bom).forEach(k => {
-                     if (k.endsWith('_ID') && k !== 'Design_Code') {
-                         const id = bom[k]; const qty = parseFloat(bom[k.slice(0, -3) + '_Qty']) || 0;
-                         if (id && id !== 'NONE') {
-                             if (!monthMatLedger[id]) monthMatLedger[id] = { procured: 0, plannedToConsume: 0 };
-                             monthMatLedger[id].plannedToConsume += (qty * prodPlan);
-                         }
-                     }
-                 });
-             }
         });
 
         let hasMaterials = false;
