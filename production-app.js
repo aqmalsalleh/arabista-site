@@ -1363,7 +1363,7 @@
         const expCards = document.getElementById('analysis-expenditure-cards');
         if (expCards) {
             let directCostBreakdownHtml = `<div class="mt-2 flex flex-col gap-1 text-[10px] text-white/70">`;
-            directCostBreakdownHtml += `<div class="flex justify-between border-b border-white/5 pb-1 mb-1"><span class="font-bold text-white/50">Component</span><span class="font-bold text-white/50">Actual / Plan (100% Prod)</span></div>`;
+            directCostBreakdownHtml += `<div class="flex justify-between border-b border-white/5 pb-1 mb-1"><span class="font-bold text-white/50">Component</span><span class="font-bold text-white/50">Actual / Budget (100% Prod)</span></div>`;
             
             const histLabor = costingHistory.find(c => c.Item_ID === 'DIRECT-LABOR');
             let planTotalLabor = 0; db.plans.forEach(p => planTotalLabor += (parseFloat(p.Live_Direct_Labor_RM) || parseFloat(db.bom[p.Design_Code]?.Direct_Labor_RM) || 0) * (parseInt(p.Planned_Qty) || 0));
@@ -1408,7 +1408,6 @@
             `;
         }
 
-        // --- INVENTORY ASSETS: FINISHED GOODS RESTORE ---
         const invList = document.getElementById('analysis-inventory-list');
         if (invList) {
             invList.innerHTML = `<h4 class="text-white/60 text-[9px] uppercase tracking-widest mb-2 border-b border-white/5 pb-1">Finished Goods Carry-Forward</h4>`;
@@ -1433,6 +1432,27 @@
                         </div>
                     </div>`;
             });
+
+            let hasMaterials = false;
+            let matHtml = `<h4 class="text-white/60 text-[9px] uppercase tracking-widest mt-4 mb-2 border-b border-white/5 pb-1">Raw Materials (Actual vs. Planned Prod)</h4>`;
+            Object.entries(monthMatLedger).forEach(([id, data]) => {
+                const surplus = data.procured - data.plannedToConsume;
+                if (surplus > 0.01 || surplus < -0.01) { 
+                    const mat = db.materials[id];
+                    if (mat) {
+                        hasMaterials = true;
+                        matHtml += `
+                        <div class="glass-panel p-3 rounded-xl flex justify-between items-center gap-2 mb-2">
+                            <div class="flex flex-col"><span class="text-white text-sm truncate max-w-[150px]">${mat.desc}</span><span class="text-white/40 text-[9px] uppercase tracking-widest">${id}</span></div>
+                            <div class="text-right">
+                               <div class="${surplus > 0 ? 'text-luxe' : 'text-red-400'} text-sm font-bold font-display">${surplus > 0 ? '+' : ''}${surplus.toFixed(1)} ${mat.unit}</div>
+                               <div class="text-[9px] text-white/40">Procured: ${data.procured.toFixed(1)} | Plan: ${data.plannedToConsume.toFixed(1)}</div>
+                            </div>
+                        </div>`;
+                    }
+                }
+            });
+            if (hasMaterials) invList.innerHTML += matHtml;
         }
 
         // Ensure OPEX variance is also colored correctly
