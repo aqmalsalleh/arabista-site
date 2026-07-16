@@ -957,7 +957,13 @@
         document.getElementById('plan-metrics-container').innerHTML = `
             <div class="glass-panel p-4 rounded-xl border border-white/5"><p class="text-white/40 text-[9px] uppercase tracking-widest mb-1">Target Revenue (${sellThroughPct}% Sold)</p><div class="text-xl font-display text-white">RM ${rev.toFixed(2)}</div></div>
             <div class="glass-panel p-4 rounded-xl border border-white/5"><p class="text-white/40 text-[9px] uppercase tracking-widest mb-1">Target COGS (100% Prod)</p><div class="text-xl font-display text-white">RM ${cogs.toFixed(2)}</div></div>
-            <div class="glass-panel p-4 rounded-xl border border-white/5"><p class="text-white/40 text-[9px] uppercase tracking-widest mb-1">Overall Profit Margins</p><div class="text-lg font-display text-white">100% Sold: ${perfectMargin.toFixed(1)}% <span class="text-white/30 text-sm ml-1">| Target: <span class="${cashMargin >= 0 ? 'text-white' : 'text-red-400'}">${cashMargin.toFixed(1)}%</span></span></div></div>
+            <div class="glass-panel p-4 rounded-xl border border-white/5">
+                <p class="text-white/40 text-[9px] uppercase tracking-widest mb-1">Profit Margins</p>
+                <div class="flex flex-col mt-1">
+                    <div class="text-lg font-display ${cashMargin >= 0 ? 'text-white' : 'text-red-400'}"><span class="text-white/40 text-[10px] uppercase tracking-widest mr-2">Target:</span>${cashMargin.toFixed(1)}%</div>
+                    <div class="text-lg font-display text-white"><span class="text-white/40 text-[10px] uppercase tracking-widest mr-2">All:</span>${perfectMargin.toFixed(1)}%</div>
+                </div>
+            </div>
             <div class="glass-panel p-4 rounded-xl border ${profit >= 0 ? 'border-luxe/30 bg-luxe/5' : 'border-red-500/30 bg-red-500/5'}"><p class="text-luxe text-[9px] uppercase tracking-widest mb-1 font-bold">Est. Net Profit (at ${sellThroughPct}% ST)</p><div class="text-2xl font-display ${profit >= 0 ? 'text-luxe' : 'text-red-400'}">RM ${profit.toFixed(2)}</div></div>
         `;
 
@@ -1152,67 +1158,67 @@
         const btnRunAi = document.getElementById('btn-run-actual-ai');
         const filenameDisplay = document.getElementById('actual-ai-filename');
 
-        btnTriggerAi?.addEventListener('click', () => aiFileInput.click());
+        if (btnTriggerAi) btnTriggerAi.onclick = () => aiFileInput.click();
 
-        aiFileInput?.addEventListener('change', (e) => {
-            if (e.target.files.length > 0) {
-                filenameDisplay.textContent = e.target.files.length > 1 ? `${e.target.files.length} Files Selected` : e.target.files[0].name;
-                btnTriggerAi.classList.add('border-luxe', 'text-luxe');
-                btnRunAi.classList.remove('hidden');
-            } else {
-                filenameDisplay.textContent = 'Select Screenshots...';
-                btnTriggerAi.classList.remove('border-luxe', 'text-luxe');
-                btnRunAi.classList.add('hidden');
-            }
-        });
-
-        btnRunAi?.addEventListener('click', async () => {
-            const files = aiFileInput.files;
-            if (!files || files.length === 0) return;
-            
-            btnRunAi.disabled = true;
-            btnRunAi.innerHTML = '<span class="inline-block w-3 h-3 border-2 border-ink border-t-transparent rounded-full animate-spin"></span>';
-            
-            let imagesArray = [];
-            for (let i = 0; i < files.length; i++) {
-                const reader = new FileReader();
-                const base64 = await new Promise((resolve) => { reader.onload = (e) => resolve(e.target.result.split(',')[1]); reader.readAsDataURL(files[i]); });
-                imagesArray.push({ mimeType: files[i].type, data: base64 });
-            }
-
-            try {
-                // Call a new drafting route that ONLY extracts, DOES NOT save.
-                const res = await postManagerAction('extract_actuals_draft', { images: imagesArray, month: monthInput.value }, { skipLoader: true });
-                
-                // Populate DOM visually (User must still click Save to Ledger)
-                if (res.data.macro) {
-                    if (document.getElementById('manual-macro-rev') && res.data.macro.revenue) document.getElementById('manual-macro-rev').value = res.data.macro.revenue;
-                    if (document.getElementById('manual-macro-fees') && res.data.macro.platform_fees) document.getElementById('manual-macro-fees').value = res.data.macro.platform_fees;
-                    if (document.getElementById('manual-macro-ads') && res.data.macro.ad_spend) document.getElementById('manual-macro-ads').value = res.data.macro.ad_spend;
+        if (aiFileInput) {
+            aiFileInput.onchange = (e) => {
+                if (e.target.files.length > 0) {
+                    filenameDisplay.textContent = e.target.files.length > 1 ? `${e.target.files.length} Files Selected` : e.target.files[0].name;
+                    btnTriggerAi.classList.add('border-luxe', 'text-luxe');
+                    btnRunAi.classList.remove('hidden');
+                } else {
+                    filenameDisplay.textContent = 'Select Screenshots...';
+                    btnTriggerAi.classList.remove('border-luxe', 'text-luxe');
+                    btnRunAi.classList.add('hidden');
                 }
+            };
+        }
+
+        if (btnRunAi) {
+            btnRunAi.onclick = async () => {
+                const files = aiFileInput.files;
+                if (!files || files.length === 0) return;
                 
-                if (res.data.micro && Array.isArray(res.data.micro)) {
-                    document.querySelectorAll('.actual-vol-row').forEach(row => {
-                        const design = row.dataset.design;
-                        const match = res.data.micro.find(m => m.design === design);
-                        if (match) {
-                            if (match.qty_produced) row.querySelector('.act-prod').value = match.qty_produced;
-                            if (match.qty_sold) row.querySelector('.act-sold').value = match.qty_sold;
-                        }
-                    });
+                btnRunAi.disabled = true;
+                btnRunAi.innerHTML = '<span class="inline-block w-3 h-3 border-2 border-ink border-t-transparent rounded-full animate-spin"></span>';
+                
+                let imagesArray = [];
+                for (let i = 0; i < files.length; i++) {
+                    const reader = new FileReader();
+                    const base64 = await new Promise((resolve) => { reader.onload = (e) => resolve(e.target.result.split(',')[1]); reader.readAsDataURL(files[i]); });
+                    imagesArray.push({ mimeType: files[i].type, data: base64 });
                 }
-                liveUpdateActuals();
-                alert('Draft extraction complete. Review the numbers and click "Save Actuals to Ledger" to confirm.');
-            } catch (err) { alert('Extraction Error: ' + err.message); }
-            finally {
-                btnRunAi.disabled = false;
-                btnRunAi.innerHTML = 'Auto-Fill';
-                aiFileInput.value = '';
-                filenameDisplay.textContent = 'Select Screenshots...';
-                btnRunAi.classList.add('hidden');
-                btnTriggerAi.classList.remove('border-luxe', 'text-luxe');
-            }
-        });
+
+                try {
+                    const res = await postManagerAction('extract_actuals_draft', { images: imagesArray, month: monthInput.value }, { skipLoader: true });
+                    if (res.data.macro) {
+                        if (document.getElementById('manual-macro-rev') && res.data.macro.revenue) document.getElementById('manual-macro-rev').value = res.data.macro.revenue;
+                        if (document.getElementById('manual-macro-fees') && res.data.macro.platform_fees) document.getElementById('manual-macro-fees').value = res.data.macro.platform_fees;
+                        if (document.getElementById('manual-macro-ads') && res.data.macro.ad_spend) document.getElementById('manual-macro-ads').value = res.data.macro.ad_spend;
+                    }
+                    if (res.data.micro && Array.isArray(res.data.micro)) {
+                        document.querySelectorAll('.actual-vol-row').forEach(row => {
+                            const design = row.dataset.design;
+                            const match = res.data.micro.find(m => m.design === design);
+                            if (match) {
+                                if (match.qty_produced) row.querySelector('.act-prod').value = match.qty_produced;
+                                if (match.qty_sold) row.querySelector('.act-sold').value = match.qty_sold;
+                            }
+                        });
+                    }
+                    liveUpdateActuals();
+                    alert('Draft extraction complete. Review the numbers and click "Save Actuals to Ledger" to confirm.');
+                } catch (err) { alert('Extraction Error: ' + err.message); }
+                finally {
+                    btnRunAi.disabled = false;
+                    btnRunAi.innerHTML = 'Auto-Fill';
+                    aiFileInput.value = '';
+                    filenameDisplay.textContent = 'Select Screenshots...';
+                    btnRunAi.classList.add('hidden');
+                    btnTriggerAi.classList.remove('border-luxe', 'text-luxe');
+                }
+            };
+        }
     }
 
 
@@ -1328,7 +1334,7 @@
                             <div class="text-sm font-display text-white/70">RM ${totalBudgetOpex.toFixed(2)}</div>
                         </div>
                     </div>
-                    <div class="text-xs ${opexDelta <= 0 ? 'text-luxe' : 'text-red-400'} font-medium mt-2">${opexDelta > 0 ? 'Over budget by' : 'Under budget by'} RM ${Math.abs(opexDelta).toFixed(2)}</div>
+                    <div class="text-xs ${opexDelta <= 0 ? 'text-green-400' : 'text-red-400'} font-medium mt-2">${opexDelta > 0 ? 'Overspent by' : 'Saved'} RM ${Math.abs(opexDelta).toFixed(2)}</div>
                     <p class="text-white/30 text-[9px] uppercase tracking-widest mt-1">Includes Fixed OPEX, Platform Fees, and Ad Spend.</p>
                     <details class="mt-3 border-t border-white/10 pt-2 group">
                         <summary class="text-[10px] text-white/50 cursor-pointer list-none uppercase tracking-widest flex items-center justify-between">
@@ -1338,34 +1344,6 @@
                         ${opexBreakdownHtml}
                     </details>
                 </div>`;
-
-            let matBreakdownHtml = `<div class="mt-2 flex flex-col gap-1 text-[10px] text-white/70">`;
-            matBreakdownHtml += `<div class="flex justify-between border-b border-white/5 pb-1 mb-1"><span class="font-bold text-white/50">Component</span><span class="font-bold text-white/50">Actual / Plan (100% Prod)</span></div>`;
-            
-            let hasMatBreakdown = false;
-            Object.entries(monthMatLedger).forEach(([id, data]) => {
-                const mat = db.materials[id];
-                if (mat) {
-                    hasMatBreakdown = true;
-                    const costDiff = (data.procured * mat.costRM) - (data.plannedToConsume * mat.costRM);
-                    matBreakdownHtml += `<div class="flex justify-between"><span>${mat.desc} (${id})</span><span>${data.procured.toFixed(1)} / ${data.plannedToConsume.toFixed(1)} ${mat.unit} <span class="${costDiff <= 0 ? 'text-luxe' : 'text-red-400'}">(${costDiff > 0 ? '+' : ''}RM ${costDiff.toFixed(2)})</span></span></div>`;
-                }
-            });
-            matBreakdownHtml += `</div>`;
-
-            if (hasMatBreakdown) {
-                opexCards.innerHTML += `
-                    <div class="glass-panel p-4 rounded-xl mt-4">
-                        <p class="text-white/40 text-[9px] uppercase tracking-widest mb-1">Material Procurement Analysis</p>
-                        <details class="mt-1 group open:pb-2">
-                            <summary class="text-xs text-white/80 cursor-pointer list-none flex items-center justify-between font-medium">
-                                Plan vs. Actual Consumption
-                                <svg class="w-4 h-4 transition-transform group-open:rotate-180 text-white/40" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-                            </summary>
-                            ${matBreakdownHtml}
-                        </details>
-                    </div>`;
-            }
         }
 
         const remarksStr = aMacro.AI_Remarks || aMacro.ai_remarks || "";
@@ -1397,42 +1375,68 @@
                 </div>`;
         });
 
-        let hasMaterials = false;
-        let matHtml = `<h4 class="text-white/60 text-[9px] uppercase tracking-widest mt-4 mb-2 border-b border-white/5 pb-1">Raw Materials (Actual vs. Planned Prod)</h4>`;
-        Object.entries(monthMatLedger).forEach(([id, data]) => {
-            const surplus = data.procured - data.plannedToConsume;
-            if (surplus > 0.01 || surplus < -0.01) { 
-                const mat = db.materials[id];
-                if (mat) {
-                    hasMaterials = true;
-                    matHtml += `
-                    <div class="glass-panel p-3 rounded-xl flex justify-between items-center gap-2 mb-2">
-                        <div class="flex flex-col"><span class="text-white text-sm truncate max-w-[150px]">${mat.desc}</span><span class="text-white/40 text-[9px] uppercase tracking-widest">${id}</span></div>
-                        <div class="text-right">
-                           <div class="text-luxe text-sm font-bold font-display">${surplus > 0 ? '+' : ''}${surplus.toFixed(1)} ${mat.unit}</div>
-                           <div class="text-[9px] text-white/40">Procured: ${data.procured.toFixed(1)} | Plan: ${data.plannedToConsume.toFixed(1)}</div>
-                        </div>
-                    </div>`;
-                }
-            }
-        });
-        if (hasMaterials) invList.innerHTML += matHtml;
-
         let actCogs = 0; costingHistory.forEach(c => actCogs += parseFloat(c.Actual_Total_Cost_RM) || 0);
         if (costingHistory.length === 0) {
             Object.entries(db.lastReqs || {}).forEach(([id, planQty]) => { const mat = db.materials[id]; actCogs += mat ? mat.costRM * planQty : 0; });
             db.plans.forEach(p => actCogs += (p.Live_Direct_Labor_RM || 0) * (parseInt(p.Planned_Qty) || 0));
         }
         let planCogs = 0; db.plans.forEach(p => { const prod = parseInt(p.Planned_Qty) || 0; planCogs += (p.Live_Material_COGS_RM || 0) * prod; planCogs += (p.Live_Direct_Labor_RM || 0) * prod; });
-        let totalExtra = 0; (db.currentExtraCosts || []).forEach(ex => totalExtra += parseFloat(ex.Cost_RM) || 0);
 
-        const expDelta = actCogs - (planCogs + totalExtra);
+        const expDelta = actCogs - planCogs;
         const expCards = document.getElementById('analysis-expenditure-cards');
         if (expCards) {
+            let directCostBreakdownHtml = `<div class="mt-2 flex flex-col gap-1 text-[10px] text-white/70">`;
+            directCostBreakdownHtml += `<div class="flex justify-between border-b border-white/5 pb-1 mb-1"><span class="font-bold text-white/50">Component</span><span class="font-bold text-white/50">Actual / Plan (100% Prod)</span></div>`;
+            
+            const histLabor = costingHistory.find(c => c.Item_ID === 'DIRECT-LABOR');
+            let planTotalLabor = 0; db.plans.forEach(p => planTotalLabor += (parseFloat(p.Live_Direct_Labor_RM) || parseFloat(db.bom[p.Design_Code]?.Direct_Labor_RM) || 0) * (parseInt(p.Planned_Qty) || 0));
+            const actLaborCost = histLabor ? parseFloat(histLabor.Actual_Total_Cost_RM) || 0 : planTotalLabor;
+            const laborDelta = actLaborCost - planTotalLabor;
+            
+            directCostBreakdownHtml += `<div class="flex justify-between"><span>Direct Labor</span><span>RM ${actLaborCost.toFixed(2)} / RM ${planTotalLabor.toFixed(2)} <span class="${laborDelta <= 0 ? 'text-green-400' : 'text-red-400'}">(${laborDelta > 0 ? '+' : ''}RM ${laborDelta.toFixed(2)})</span></span></div>`;
+
+            Object.entries(monthMatLedger).forEach(([id, data]) => {
+                const mat = db.materials[id];
+                if (mat) {
+                    const actCost = data.procured * mat.costRM;
+                    const planCost = data.plannedToConsume * mat.costRM;
+                    const costDiff = actCost - planCost;
+                    directCostBreakdownHtml += `<div class="flex justify-between"><span>${mat.desc} (${id})</span><span>RM ${actCost.toFixed(2)} / RM ${planCost.toFixed(2)} <span class="${costDiff <= 0 ? 'text-green-400' : 'text-red-400'}">(${costDiff > 0 ? '+' : ''}RM ${costDiff.toFixed(2)})</span></span></div>`;
+                }
+            });
+            directCostBreakdownHtml += `</div>`;
+
             expCards.innerHTML = `
-            <div class="glass-panel p-4 rounded-xl"><p class="text-white/40 text-[9px] uppercase tracking-widest mb-1">Planned Direct Costs + Extras</p><div class="text-xl font-display text-white">RM ${(planCogs + totalExtra).toFixed(2)}</div></div>
-            <div class="glass-panel p-4 rounded-xl"><p class="text-white/40 text-[9px] uppercase tracking-widest mb-1">Actual Expenditure Ledger</p><div class="text-xl font-display text-white">RM ${actCogs.toFixed(2)}</div><div class="text-xs ${expDelta <= 0 ? 'text-luxe' : 'text-red-400'} mt-1 font-medium">${expDelta > 0 ? 'Overspent by' : 'Saved'} RM ${Math.abs(expDelta).toFixed(2)}</div></div>
+                <div class="glass-panel p-4 rounded-xl sm:col-span-2">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <p class="text-white/40 text-[9px] uppercase tracking-widest mb-1">Total Direct Costs (Materials & Labor)</p>
+                            <div class="text-xl font-display text-white">RM ${actCogs.toFixed(2)}</div>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-white/40 text-[9px] uppercase tracking-widest mb-1">Budget</p>
+                            <div class="text-sm font-display text-white/70">RM ${planCogs.toFixed(2)}</div>
+                        </div>
+                    </div>
+                    <div class="text-xs ${expDelta <= 0 ? 'text-green-400' : 'text-red-400'} font-medium mt-2">${expDelta > 0 ? 'Overspent by' : 'Saved'} RM ${Math.abs(expDelta).toFixed(2)}</div>
+                    <details class="mt-3 border-t border-white/10 pt-2 group">
+                        <summary class="text-[10px] text-white/50 cursor-pointer list-none uppercase tracking-widest flex items-center justify-between">
+                            View Breakdown
+                            <svg class="w-3 h-3 transition-transform group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                        </summary>
+                        ${directCostBreakdownHtml}
+                    </details>
+                </div>
             `;
+        }
+
+        // Ensure OPEX variance is also colored correctly
+        if (opexCards) {
+            const opexVarianceEl = opexCards.querySelector('.mt-2.text-xs, .text-xs.font-medium.mt-2');
+            if (opexVarianceEl) {
+                opexVarianceEl.className = `text-xs ${opexDelta <= 0 ? 'text-green-400' : 'text-red-400'} font-medium mt-2`;
+                opexVarianceEl.textContent = `${opexDelta > 0 ? 'Overspent by' : 'Saved'} RM ${Math.abs(opexDelta).toFixed(2)}`;
+            }
         }
         
         if (remarksCard && chatContainer) {
@@ -2030,13 +2034,21 @@
         const budgPlatFees = planRevTarget * (db.config['TikTok_Fee_Pct'] || db.config['Platform_Commission_Pct'] || 0.20);
         const budgAdSpend = (planQtyTotal * (stPct / 100)) * (db.config['Marketing_Per_Unit'] || 5.00);
 
+        const actRev = parseFloat(aMacro.Actual_Revenue_RM) || 0;
+        const revVarianceRM = actRev - planRevTarget;
+        const targetSoldVol = Math.round(planQtyTotal * (stPct / 100));
+        
+        const actPlatPct = actRev > 0 ? (actPlatFees / actRev) * 100 : 0;
+        const actAdPerUnit = actualSoldTotal > 0 ? (actAdSpend / actualSoldTotal) : 0;
+
         const histLabor = db.actualsCosting.find(c => String(c.Month).substring(0, 7) === currentMonth && c.Item_ID === 'DIRECT-LABOR');
         const actLaborCost = histLabor ? parseFloat(histLabor.Actual_Total_Cost_RM) || 0 : planTotalLabor;
 
         const computedVariances = {
-            salesVolume: { target: Math.round(planQtyTotal * (stPct / 100)), actual: actualSoldTotal },
-            platformFees: { budget: budgPlatFees, actual: actPlatFees, variance: actPlatFees - budgPlatFees, defaultPct: (db.config['TikTok_Fee_Pct'] || db.config['Platform_Commission_Pct'] || 0.20) * 100 },
-            adSpend: { budget: budgAdSpend, actual: actAdSpend, variance: actAdSpend - budgAdSpend, budgetPerUnit: db.config['Marketing_Per_Unit'] || 5.00, actualPerUnit: actualSoldTotal > 0 ? (actAdSpend / actualSoldTotal) : 0 },
+            revenue: { target: planRevTarget, actual: actRev, variance: revVarianceRM },
+            salesVolume: { target: targetSoldVol, actual: actualSoldTotal },
+            platformFees: { budget: budgPlatFees, actual: actPlatFees, variance: actPlatFees - budgPlatFees, actualPct: actPlatPct },
+            adSpend: { budget: budgAdSpend, actual: actAdSpend, variance: actAdSpend - budgAdSpend, budgetPerUnit: db.config['Marketing_Per_Unit'] || 5.00, actualPerUnit: actAdPerUnit },
             directLabor: { budget: planTotalLabor, actual: actLaborCost, variance: actLaborCost - planTotalLabor }
         };
 
