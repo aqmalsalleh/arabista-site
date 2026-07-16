@@ -1281,8 +1281,10 @@
 
         let opexBreakdownHtml = `<div class="mt-2 flex flex-col gap-1 text-[10px] text-white/70">`;
         opexBreakdownHtml += `<div class="flex justify-between border-b border-white/5 pb-1 mb-1"><span class="font-bold text-white/50">Category</span><span class="font-bold text-white/50">Actual / Budget</span></div>`;
-        opexBreakdownHtml += `<div class="flex justify-between"><span>Platform Fees</span><span>RM ${actPlatFees.toFixed(2)} / RM ${budgPlatFees.toFixed(2)}</span></div>`;
-        opexBreakdownHtml += `<div class="flex justify-between"><span>Ad Spend</span><span>RM ${actAdSpend.toFixed(2)} / RM ${budgAdSpend.toFixed(2)}</span></div>`;
+        const platDelta = actPlatFees - budgPlatFees;
+        opexBreakdownHtml += `<div class="flex justify-between"><span>Platform Fees</span><span>RM ${actPlatFees.toFixed(2)} / RM ${budgPlatFees.toFixed(2)} <span class="${platDelta <= 0 ? 'text-green-400' : 'text-red-400'}">(${platDelta > 0 ? '+' : ''}RM ${platDelta.toFixed(2)})</span></span></div>`;
+        const adDelta = actAdSpend - budgAdSpend;
+        opexBreakdownHtml += `<div class="flex justify-between"><span>Ad Spend</span><span>RM ${actAdSpend.toFixed(2)} / RM ${budgAdSpend.toFixed(2)} <span class="${adDelta <= 0 ? 'text-green-400' : 'text-red-400'}">(${adDelta > 0 ? '+' : ''}RM ${adDelta.toFixed(2)})</span></span></div>`;
         
         db.configRaw.forEach(c => {
             if (c.Account_Category === 'Fixed OPEX' || c.Variable_Name === 'Freight_Cost_Per_Unit') {
@@ -1290,7 +1292,8 @@
                 let defaultVal = parseFloat(c.Value_RM) || 0;
                 if (c.Variable_Name === 'Freight_Cost_Per_Unit') defaultVal = targetSoldQty * defaultVal;
                 const actOpCost = histOp ? parseFloat(histOp.Actual_Cost_RM) || 0 : defaultVal;
-                opexBreakdownHtml += `<div class="flex justify-between"><span>${c.Variable_Name.replace(/_/g, ' ')}</span><span>RM ${actOpCost.toFixed(2)} / RM ${defaultVal.toFixed(2)}</span></div>`;
+                const opDelta = actOpCost - defaultVal;
+                opexBreakdownHtml += `<div class="flex justify-between"><span>${c.Variable_Name.replace(/_/g, ' ')}</span><span>RM ${actOpCost.toFixed(2)} / RM ${defaultVal.toFixed(2)} <span class="${opDelta <= 0 ? 'text-green-400' : 'text-red-400'}">(${opDelta > 0 ? '+' : ''}RM ${opDelta.toFixed(2)})</span></span></div>`;
             }
         });
         opexBreakdownHtml += `</div>`;
@@ -1350,31 +1353,6 @@
         const remarksCard = document.getElementById('analysis-ai-remarks');
         const chatContainer = document.getElementById('cfo-chat-container');
 
-        const invList = document.getElementById('analysis-inventory-list');
-        invList.innerHTML = `<h4 class="text-white/60 text-[9px] uppercase tracking-widest mb-2 border-b border-white/5 pb-1">Finished Goods</h4>`;
-        
-        db.plans.forEach(p => {
-            let openingAsset = 0;
-            db.actualsMicro.forEach(a => {
-                if (a.Design_Code !== p.Design_Code) return;
-                if (String(a.Date).substring(0, 7) < monthStr) openingAsset += (parseInt(a.Qty_Produced) || 0) - (parseInt(a.Qty_Sold) || 0);
-            });
-            const hist = db.actualsMicro.find(a => String(a.Date).substring(0, 7) === monthStr && a.Design_Code === p.Design_Code);
-            const currentProd = hist ? parseInt(hist.Qty_Produced) || 0 : parseInt(p.Planned_Qty) || 0;
-            const currentSold = hist ? parseInt(hist.Qty_Sold) || 0 : 0;
-            const closingAsset = openingAsset + currentProd - currentSold;
-
-            if (p.Planned_Qty === 0 && currentProd === 0 && currentSold === 0 && openingAsset === 0) return;
-
-            invList.innerHTML += `
-                <div class="glass-panel p-3 rounded-xl flex flex-col gap-2 mb-2">
-                    <div class="flex justify-between items-center"><span class="text-white text-sm font-medium">${p.Design_Code}</span><span class="text-luxe text-xs font-bold font-display">Close: ${closingAsset} pcs</span></div>
-                    <div class="grid grid-cols-3 text-[10px] text-white/50 border-t border-white/5 pt-2">
-                        <div>Open: <span class="text-white">${openingAsset}</span></div><div class="text-center">+ Prod: <span class="text-white">${currentProd}</span></div><div class="text-right">- Sold: <span class="text-white">${currentSold}</span></div>
-                    </div>
-                </div>`;
-        });
-
         let actCogs = 0; costingHistory.forEach(c => actCogs += parseFloat(c.Actual_Total_Cost_RM) || 0);
         if (costingHistory.length === 0) {
             Object.entries(db.lastReqs || {}).forEach(([id, planQty]) => { const mat = db.materials[id]; actCogs += mat ? mat.costRM * planQty : 0; });
@@ -1382,7 +1360,6 @@
         }
         let planCogs = 0; db.plans.forEach(p => { const prod = parseInt(p.Planned_Qty) || 0; planCogs += (p.Live_Material_COGS_RM || 0) * prod; planCogs += (p.Live_Direct_Labor_RM || 0) * prod; });
 
-        const expDelta = actCogs - planCogs;
         const expCards = document.getElementById('analysis-expenditure-cards');
         if (expCards) {
             let directCostBreakdownHtml = `<div class="mt-2 flex flex-col gap-1 text-[10px] text-white/70">`;
@@ -1406,6 +1383,7 @@
             });
             directCostBreakdownHtml += `</div>`;
 
+            const expDelta = actCogs - planCogs;
             expCards.innerHTML = `
                 <div class="glass-panel p-4 rounded-xl sm:col-span-2">
                     <div class="flex justify-between items-start">
@@ -1428,6 +1406,33 @@
                     </details>
                 </div>
             `;
+        }
+
+        // --- INVENTORY ASSETS: FINISHED GOODS RESTORE ---
+        const invList = document.getElementById('analysis-inventory-list');
+        if (invList) {
+            invList.innerHTML = `<h4 class="text-white/60 text-[9px] uppercase tracking-widest mb-2 border-b border-white/5 pb-1">Finished Goods Carry-Forward</h4>`;
+            db.plans.forEach(p => {
+                let openingAsset = 0;
+                db.actualsMicro.forEach(a => {
+                    if (a.Design_Code !== p.Design_Code) return;
+                    if (String(a.Date).substring(0, 7) < monthStr) openingAsset += (parseInt(a.Qty_Produced) || 0) - (parseInt(a.Qty_Sold) || 0);
+                });
+                const hist = db.actualsMicro.find(a => String(a.Date).substring(0, 7) === monthStr && a.Design_Code === p.Design_Code);
+                const currentProd = hist ? parseInt(hist.Qty_Produced) || 0 : parseInt(p.Planned_Qty) || 0;
+                const currentSold = hist ? parseInt(hist.Qty_Sold) || 0 : 0;
+                const closingAsset = openingAsset + currentProd - currentSold;
+
+                if (p.Planned_Qty === 0 && currentProd === 0 && currentSold === 0 && openingAsset === 0) return;
+
+                invList.innerHTML += `
+                    <div class="glass-panel p-3 rounded-xl flex flex-col gap-2 mb-2">
+                        <div class="flex justify-between items-center"><span class="text-white text-sm font-medium">${p.Design_Code}</span><span class="text-luxe text-xs font-bold font-display">Close: ${closingAsset} pcs</span></div>
+                        <div class="grid grid-cols-3 text-[10px] text-white/50 border-t border-white/5 pt-2">
+                            <div>Open: <span class="text-white">${openingAsset}</span></div><div class="text-center">+ Prod: <span class="text-white">${currentProd}</span></div><div class="text-right">- Sold: <span class="text-white">${currentSold}</span></div>
+                        </div>
+                    </div>`;
+            });
         }
 
         // Ensure OPEX variance is also colored correctly
