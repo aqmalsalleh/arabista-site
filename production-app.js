@@ -1363,14 +1363,14 @@
         const expCards = document.getElementById('analysis-expenditure-cards');
         if (expCards) {
             let directCostBreakdownHtml = `<div class="mt-2 flex flex-col gap-1 text-[10px] text-white/70">`;
-            directCostBreakdownHtml += `<div class="flex justify-between border-b border-white/5 pb-1 mb-1"><span class="font-bold text-white/50">Component</span><span class="font-bold text-white/50">Actual / Budget (100% Prod)</span></div>`;
+            directCostBreakdownHtml += `<div class="flex justify-between border-b border-white/5 pb-1 mb-1"><span class="font-bold text-white/50">Component</span><span class="font-bold text-white/50">Actual Procured vs. Plan 100% Prod</span></div>`;
             
             const histLabor = costingHistory.find(c => c.Item_ID === 'DIRECT-LABOR');
             let planTotalLabor = 0; db.plans.forEach(p => planTotalLabor += (parseFloat(p.Live_Direct_Labor_RM) || parseFloat(db.bom[p.Design_Code]?.Direct_Labor_RM) || 0) * (parseInt(p.Planned_Qty) || 0));
             const actLaborCost = histLabor ? parseFloat(histLabor.Actual_Total_Cost_RM) || 0 : planTotalLabor;
             const laborDelta = actLaborCost - planTotalLabor;
             
-            directCostBreakdownHtml += `<div class="flex justify-between"><span>Direct Labor</span><span>RM ${actLaborCost.toFixed(2)} / RM ${planTotalLabor.toFixed(2)} <span class="${laborDelta <= 0 ? 'text-green-400' : 'text-red-400'}">(${laborDelta > 0 ? '+' : ''}RM ${laborDelta.toFixed(2)})</span></span></div>`;
+            directCostBreakdownHtml += `<div class="flex justify-between"><span>Direct Labor (Actual vs. Plan)</span><span>RM ${actLaborCost.toFixed(2)} / RM ${planTotalLabor.toFixed(2)} <span class="${laborDelta <= 0 ? 'text-green-400' : 'text-red-400'}">(${laborDelta > 0 ? '+' : ''}RM ${laborDelta.toFixed(2)})</span></span></div>`;
 
             Object.entries(monthMatLedger).forEach(([id, data]) => {
                 const mat = db.materials[id];
@@ -1426,27 +1426,33 @@
 
                 invList.innerHTML += `
                     <div class="glass-panel p-3 rounded-xl flex flex-col gap-2 mb-2">
-                        <div class="flex justify-between items-center"><span class="text-white text-sm font-medium">${p.Design_Code}</span><span class="text-luxe text-xs font-bold font-display">Close: ${closingAsset} pcs</span></div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-white text-sm font-medium">${p.Design_Code}</span>
+                            <span class="text-luxe text-xs font-bold font-display">Closing Balance: ${closingAsset} pcs</span>
+                        </div>
                         <div class="grid grid-cols-3 text-[10px] text-white/50 border-t border-white/5 pt-2">
-                            <div>Open: <span class="text-white">${openingAsset}</span></div><div class="text-center">+ Prod: <span class="text-white">${currentProd}</span></div><div class="text-right">- Sold: <span class="text-white">${currentSold}</span></div>
+                            <div>Opening Balance: <span class="text-white">${openingAsset}</span></div>
+                            <div class="text-center">+ Produced: <span class="text-white">${currentProd}</span></div>
+                            <div class="text-right">- Sold: <span class="text-white">${currentSold}</span></div>
                         </div>
                     </div>`;
             });
 
             let hasMaterials = false;
-            let matHtml = `<h4 class="text-white/60 text-[9px] uppercase tracking-widest mt-4 mb-2 border-b border-white/5 pb-1">Raw Materials (Actual vs. Planned Prod)</h4>`;
+            let matHtml = `<h4 class="text-white/60 text-[9px] uppercase tracking-widest mt-4 mb-2 border-b border-white/5 pb-1">Raw Materials (Actual Procured vs. Planned Consumption)</h4>`;
             Object.entries(monthMatLedger).forEach(([id, data]) => {
                 const surplus = data.procured - data.plannedToConsume;
                 if (surplus > 0.01 || surplus < -0.01) { 
                     const mat = db.materials[id];
                     if (mat) {
                         hasMaterials = true;
+                        const labelText = surplus > 0 ? '(Surplus)' : '(Shortage)';
                         matHtml += `
                         <div class="glass-panel p-3 rounded-xl flex justify-between items-center gap-2 mb-2">
                             <div class="flex flex-col"><span class="text-white text-sm truncate max-w-[150px]">${mat.desc}</span><span class="text-white/40 text-[9px] uppercase tracking-widest">${id}</span></div>
                             <div class="text-right">
-                               <div class="${surplus > 0 ? 'text-luxe' : 'text-red-400'} text-sm font-bold font-display">${surplus > 0 ? '+' : ''}${surplus.toFixed(1)} ${mat.unit}</div>
-                               <div class="text-[9px] text-white/40">Procured: ${data.procured.toFixed(1)} | Plan: ${data.plannedToConsume.toFixed(1)}</div>
+                               <div class="${surplus > 0 ? 'text-luxe' : 'text-red-400'} text-sm font-bold font-display">${surplus > 0 ? '+' : ''}${surplus.toFixed(1)} ${mat.unit} ${labelText}</div>
+                               <div class="text-[9px] text-white/40">Procured: ${data.procured.toFixed(1)} | Planned: ${data.plannedToConsume.toFixed(1)}</div>
                             </div>
                         </div>`;
                     }
