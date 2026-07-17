@@ -962,6 +962,10 @@
 
         renderPlanPillar(planRev, planCogs, planNetProfit, perfectMargin, cashMargin, sellThroughPct, reqs);
         renderActualPillar(fixedOpex, reqs);
+
+        if (pillarAnalysis && !pillarAnalysis.classList.contains('hidden')) {
+            renderAnalysisPillar();
+        }
     }
 
     document.getElementById('plan-sell-through')?.addEventListener('input', calculateEngine);
@@ -1282,7 +1286,7 @@
         const snap = db.snapshots.find(s => String(s.Plan_Month).substring(0, 7) === monthStr) || {};
         const stPct = parseFloat(snap.Target_Sell_Through_Pct) || 100;
         
-        let planRevTarget = 0, planRevMax = 0, planQtyTotal = 0, actualProducedTotal = 0;
+        let planRevTarget = 0, planRevMax = 0, planQtyTotal = 0, actualProducedTotal = 0, actualSoldTotal = 0;
         db.plans.forEach(p => { 
             const prod = parseInt(p.Planned_Qty) || 0;
             const soldTarget = Math.round(prod * (stPct / 100));
@@ -1292,6 +1296,7 @@
             
             const hist = db.actualsMicro.find(a => String(a.Date).substring(0, 7) === monthStr && a.Design_Code === p.Design_Code);
             actualProducedTotal += hist ? parseInt(hist.Qty_Produced) || 0 : 0;
+            actualSoldTotal += hist ? parseInt(hist.Qty_Sold) || 0 : 0;
         });
 
         const actRev = parseFloat(aMacro.Actual_Revenue_RM) || 0;
@@ -1313,6 +1318,7 @@
 
         const totalActualOpex = actualFixedOpexLedger + actPlatFees + actAdSpend;
         const opexDelta = totalActualOpex - totalBudgetOpex;
+        const targetSoldVol = Math.round(planQtyTotal * (stPct / 100));
 
         const perfCards = document.getElementById('analysis-performance-cards');
         if (perfCards) {
@@ -1324,10 +1330,35 @@
                     <div class="text-xs ${revDeltaTarget >= 0 ? 'text-luxe' : 'text-red-400'} font-medium">${revDeltaTarget >= 0 ? '+' : ''}RM ${revDeltaTarget.toFixed(2)} vs Target</div>
                 </div>
                 <div class="glass-panel p-4 rounded-xl">
-                    <p class="text-white/40 text-[9px] uppercase tracking-widest mb-1">Production Volume</p>
-                    <div class="text-xl font-display text-white">${actualProducedTotal} pcs</div>
-                    <div class="text-[10px] text-white/50 mt-1 mb-1">Planned Production: ${planQtyTotal} pcs</div>
-                    <div class="text-xs ${actualProducedTotal >= planQtyTotal ? 'text-luxe' : 'text-white/50'} font-medium">${actualProducedTotal - planQtyTotal >= 0 ? '+' : ''}${actualProducedTotal - planQtyTotal} vs Plan</div>
+                    <p class="text-white/40 text-[9px] uppercase tracking-widest mb-2 border-b border-white/5 pb-1">Volume & Realization</p>
+                    <div class="flex justify-between items-end mb-2">
+                        <div>
+                            <p class="text-white/50 text-[10px]">Produced</p>
+                            <div class="text-lg font-display text-white">${actualProducedTotal} <span class="text-xs text-white/40">/ ${planQtyTotal}</span></div>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-white/50 text-[10px]">Sold</p>
+                            <div class="text-lg font-display text-white">${actualSoldTotal} <span class="text-xs text-white/40">/ ${targetSoldVol}</span></div>
+                        </div>
+                    </div>
+                    <div class="text-xs ${actualSoldTotal >= targetSoldVol ? 'text-luxe' : 'text-red-400'} font-medium mt-2 border-t border-white/5 pt-2">${actualSoldTotal - targetSoldVol >= 0 ? '+' : ''}${actualSoldTotal - targetSoldVol} units vs Target ST</div>
+                </div>
+                <div class="glass-panel p-4 rounded-xl sm:col-span-2">
+                    <p class="text-white/40 text-[9px] uppercase tracking-widest mb-2 border-b border-white/5 pb-1">Margin Analysis</p>
+                    <div class="grid grid-cols-3 gap-4 text-center">
+                        <div>
+                            <p class="text-white/50 text-[10px] mb-1">Plan (100% Prod)</p>
+                            <div class="text-lg font-display text-white">${(db.latestPlanMargins?.perfect || 0).toFixed(1)}%</div>
+                        </div>
+                        <div class="border-l border-white/5">
+                            <p class="text-white/50 text-[10px] mb-1">Plan (Target ST)</p>
+                            <div class="text-lg font-display text-white">${(db.latestPlanMargins?.cash || 0).toFixed(1)}%</div>
+                        </div>
+                        <div class="border-l border-white/5">
+                            <p class="text-luxe text-[10px] uppercase tracking-widest font-bold mb-1">Actual Realized</p>
+                            <div class="text-xl font-display ${(db.latestActualMargin || 0) >= 0 ? 'text-luxe' : 'text-red-400'}">${(db.latestActualMargin || 0).toFixed(1)}%</div>
+                        </div>
+                    </div>
                 </div>`;
         }
 
@@ -1354,8 +1385,40 @@
 
         const opexCards = document.getElementById('analysis-opex-cards');
 
-        // Strict Material Asset Calculation (Procured vs PLANNED Production)
+        // Pre-calculate strict Material Assets vs Plan
         let monthMatLedger = {};
+        
+        // Compute Historical Carry Forward
+        let matCarryForward = {};
+        Object.keys(db.materials).forEach(id => { matCarryForward[id] = 0; });
+        
+        db.actualsCosting.forEach(c => {
+            if (c.Category === 'Operational' || c.Item_ID === 'DIRECT-LABOR') return;
+            const cMonth = String(c.Month).includes('T') ? String(c.Month).split('T')[0].substring(0, 7) : String(c.Month).substring(0, 7);
+            if (cMonth < monthStr && matCarryForward[c.Item_ID] !== undefined) {
+                matCarryForward[c.Item_ID] += (parseFloat(c.Actual_Qty) || 0);
+            }
+        });
+        
+        db.actualsMicro.forEach(a => {
+            const aMonth = String(a.Date).includes('T') ? String(a.Date).split('T')[0].substring(0, 7) : String(a.Date).substring(0, 7);
+            if (aMonth < monthStr) {
+                const bom = db.bom[a.Design_Code];
+                const actProd = parseInt(a.Qty_Produced) || 0;
+                if (bom && actProd > 0) {
+                    Object.keys(bom).forEach(k => {
+                        if (k.endsWith('_ID') && k !== 'Design_Code') {
+                            const id = bom[k]; 
+                            const qty = parseFloat(bom[k.slice(0, -3) + '_Qty']) || 0;
+                            if (id && id !== 'NONE' && matCarryForward[id] !== undefined) {
+                                matCarryForward[id] -= (qty * actProd);
+                            }
+                        }
+                    });
+                }
+            }
+        });
+
         const costingHistory = db.actualsCosting.filter(c => String(c.Month).substring(0, 7) === monthStr);
         costingHistory.forEach(c => {
              if (c.Category === 'Operational' || c.Item_ID === 'DIRECT-LABOR') return;
@@ -1493,20 +1556,30 @@
             });
 
             let hasMaterials = false;
-            let matHtml = `<h4 class="text-white/60 text-[9px] uppercase tracking-widest mt-4 mb-2 border-b border-white/5 pb-1">Raw Materials (Actual Procured vs. Planned Consumption)</h4>`;
-            Object.entries(monthMatLedger).forEach(([id, data]) => {
-                const surplus = data.procured - data.plannedToConsume;
-                if (surplus > 0.01 || surplus < -0.01) { 
+            let matHtml = `<h4 class="text-white/60 text-[9px] uppercase tracking-widest mt-4 mb-2 border-b border-white/5 pb-1">Raw Materials Ledger</h4>`;
+            
+            Object.keys(db.materials).forEach(id => {
+                const opening = matCarryForward[id] || 0;
+                const currentData = monthMatLedger[id] || { procured: 0, plannedToConsume: 0 };
+                const procured = currentData.procured || 0;
+                const planned = currentData.plannedToConsume || 0;
+                const closing = opening + procured - planned;
+                
+                if (Math.abs(opening) > 0.01 || Math.abs(procured) > 0.01 || Math.abs(planned) > 0.01) { 
                     const mat = db.materials[id];
                     if (mat) {
                         hasMaterials = true;
-                        const labelText = surplus > 0 ? '(Surplus)' : '(Shortage)';
+                        const labelText = closing > 0.01 ? '(Surplus)' : closing < -0.01 ? '(Shortage)' : '';
                         matHtml += `
-                        <div class="glass-panel p-3 rounded-xl flex justify-between items-center gap-2 mb-2">
-                            <div class="flex flex-col"><span class="text-white text-sm truncate max-w-[150px]">${mat.desc}</span><span class="text-white/40 text-[9px] uppercase tracking-widest">${id}</span></div>
-                            <div class="text-right">
-                               <div class="${surplus > 0 ? 'text-luxe' : 'text-red-400'} text-sm font-bold font-display">${surplus > 0 ? '+' : ''}${surplus.toFixed(1)} ${mat.unit} ${labelText}</div>
-                               <div class="text-[9px] text-white/40">Procured: ${data.procured.toFixed(1)} | Planned: ${data.plannedToConsume.toFixed(1)}</div>
+                        <div class="glass-panel p-3 rounded-xl flex flex-col gap-2 mb-2">
+                            <div class="flex justify-between items-center">
+                                <div class="flex flex-col"><span class="text-white text-sm font-medium truncate max-w-[150px]">${mat.desc}</span><span class="text-white/40 text-[9px] uppercase tracking-widest">${id}</span></div>
+                                <span class="${closing >= -0.01 ? 'text-luxe' : 'text-red-400'} text-xs font-bold font-display">Close: ${closing.toFixed(1)} ${mat.unit} ${labelText}</span>
+                            </div>
+                            <div class="grid grid-cols-3 text-[10px] text-white/50 border-t border-white/5 pt-2">
+                                <div>Open: <span class="text-white">${opening.toFixed(1)}</span></div>
+                                <div class="text-center">+ In: <span class="text-white">${procured.toFixed(1)}</span></div>
+                                <div class="text-right">- Plan Out: <span class="text-white">${planned.toFixed(1)}</span></div>
                             </div>
                         </div>`;
                     }
@@ -2070,8 +2143,35 @@
         btn.disabled = true;
         btn.innerHTML = '<span class="inline-block w-2 h-2 rounded-full bg-luxe animate-ping mr-1"></span> Analyzing...';
 
-        // Pre-calculate strict Material Assets vs Plan
         let monthMatLedger = {};
+        let matCarryForward = {};
+        Object.keys(db.materials).forEach(id => { matCarryForward[id] = 0; });
+        db.actualsCosting.forEach(c => {
+            if (c.Category === 'Operational' || c.Item_ID === 'DIRECT-LABOR') return;
+            const cMonth = String(c.Month).includes('T') ? String(c.Month).split('T')[0].substring(0, 7) : String(c.Month).substring(0, 7);
+            if (cMonth < currentMonth && matCarryForward[c.Item_ID] !== undefined) {
+                matCarryForward[c.Item_ID] += (parseFloat(c.Actual_Qty) || 0);
+            }
+        });
+        db.actualsMicro.forEach(a => {
+            const aMonth = String(a.Date).includes('T') ? String(a.Date).split('T')[0].substring(0, 7) : String(a.Date).substring(0, 7);
+            if (aMonth < currentMonth) {
+                const bom = db.bom[a.Design_Code];
+                const actProd = parseInt(a.Qty_Produced) || 0;
+                if (bom && actProd > 0) {
+                    Object.keys(bom).forEach(k => {
+                        if (k.endsWith('_ID') && k !== 'Design_Code') {
+                            const id = bom[k]; 
+                            const qty = parseFloat(bom[k.slice(0, -3) + '_Qty']) || 0;
+                            if (id && id !== 'NONE' && matCarryForward[id] !== undefined) {
+                                matCarryForward[id] -= (qty * actProd);
+                            }
+                        }
+                    });
+                }
+            }
+        });
+
         const costingHistory = db.actualsCosting.filter(c => String(c.Month).substring(0, 7) === currentMonth);
         costingHistory.forEach(c => {
              if (c.Category === 'Operational' || c.Item_ID === 'DIRECT-LABOR') return;
@@ -2094,9 +2194,16 @@
              }
         });
         
-        const materialAssets = Object.entries(monthMatLedger).map(([id, data]) => ({
-            id, name: data.desc, procured: data.procured, plannedToConsume: data.plannedToConsume, deviation: data.procured - data.plannedToConsume
-        })).filter(m => Math.abs(m.deviation) > 0.01);
+        const materialAssets = Object.keys(db.materials).map(id => {
+            const opening = matCarryForward[id] || 0;
+            const currentData = monthMatLedger[id] || { procured: 0, plannedToConsume: 0, desc: db.materials[id].desc };
+            const closing = opening + (currentData.procured || 0) - (currentData.plannedToConsume || 0);
+            return {
+                id, name: currentData.desc || db.materials[id].desc,
+                openingBalance: opening, procured: currentData.procured || 0, plannedToConsume: currentData.plannedToConsume || 0,
+                closingBalance: closing, deviation: closing
+            };
+        }).filter(m => Math.abs(m.openingBalance) > 0.01 || Math.abs(m.procured) > 0.01 || Math.abs(m.plannedToConsume) > 0.01);
 
         const snap = db.snapshots.find(s => String(s.Plan_Month).substring(0, 7) === currentMonth) || {};
         const stPct = parseFloat(snap.Target_Sell_Through_Pct) || 100;
