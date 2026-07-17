@@ -274,6 +274,8 @@
             return cMonth === monthStr;
         });
 
+        db.sandboxMatOverrides = {}; // Reset sandbox on month change
+
         // Target Sell-Through Memory Load
         const snap = db.snapshots.find(s => String(s.Plan_Month).substring(0, 7) === monthStr);
         const stInput = document.getElementById('plan-sell-through');
@@ -904,12 +906,22 @@
                     
                     if (!reqs[id]) reqs[id] = 0;
                     reqs[id] += (amount * prodQty); // Production requires 100% materials
+                    
                     const mat = db.materials[id];
-                    if (mat) designMatCogs += (mat.costRM * amount);
+                    if (mat) {
+                        let isExcluded = false;
+                        let costRMToUse = mat.costRM;
+                        if (db.sandboxMatOverrides && db.sandboxMatOverrides[id]) {
+                            if (db.sandboxMatOverrides[id].excluded) isExcluded = true;
+                            if (db.sandboxMatOverrides[id].costRM !== undefined) costRMToUse = db.sandboxMatOverrides[id].costRM;
+                        }
+                        if (!isExcluded) designMatCogs += (costRMToUse * amount);
+                    }
                 });
             }
 
-            const matCogs = plan.Locked_Material_COGS_RM !== undefined && plan.Locked_Material_COGS_RM !== "" ? parseFloat(plan.Locked_Material_COGS_RM) || 0 : designMatCogs;
+            let hasSandboxOverride = db.sandboxMatOverrides && Object.keys(db.sandboxMatOverrides).length > 0;
+            const matCogs = (plan.Locked_Material_COGS_RM !== undefined && plan.Locked_Material_COGS_RM !== "" && !hasSandboxOverride) ? parseFloat(plan.Locked_Material_COGS_RM) || 0 : designMatCogs;
             const labor = plan.Locked_Direct_Labor_RM !== undefined && plan.Locked_Direct_Labor_RM !== "" ? parseFloat(plan.Locked_Direct_Labor_RM) || 0 : parseFloat(bom?.Direct_Labor_RM) || 10;
             
             let dynamicOverhead = 0;
@@ -944,6 +956,7 @@
         const perfectMargin = perfectGrossRev > 0 ? ((perfectGrossRev - totalCosts100) / perfectGrossRev) * 100 : 0;
         const cashMargin = planRev > 0 ? (planNetProfit / planRev) * 100 : 0;
         
+        db.latestPlanMargins = { perfect: perfectMargin, cash: cashMargin };
         db.currentMacroSnapshot = { Locked_Fixed_OPEX_RM: fixedOpex, Total_Revenue_RM: planRev, Net_Profit_RM: planNetProfit };
         db.lastReqs = reqs;
 
@@ -987,7 +1000,47 @@
         procureList.innerHTML = '';
         Object.entries(reqs).forEach(([id, qty]) => {
             const mat = db.materials[id];
-            if (mat) procureList.innerHTML += `<div class="flex justify-between items-center border-b border-white/5 pb-2 last:border-0"><div class="flex flex-col"><span class="text-white text-sm">${mat.desc}</span><span class="text-white/40 text-[9px] uppercase tracking-widest">${id}</span></div><div class="text-right"><div class="text-white/80 text-xs">${qty.toFixed(1)} ${mat.unit}</div><div class="text-white/40 text-[10px]">RM ${(mat.costRM * qty).toFixed(2)}</div></div></div>`;
+            if (mat) {
+                const override = (db.sandboxMatOverrides && db.sandboxMatOverrides[id]) || {};
+                const isExcluded = override.excluded || false;
+                const costRM = override.costRM !== undefined ? override.costRM : mat.costRM;
+                
+                procureList.innerHTML += `
+                <div class="flex items-center gap-3 border-b border-white/5 pb-3 mb-2 last:border-0 last:pb-0 last:mb-0 ${isExcluded ? 'opacity-50' : ''}">
+                    <input type="checkbox" class="sandbox-cb rounded border-white/20 bg-black/40 text-luxe focus:ring-0" data-id="${id}" ${isExcluded ? '' : 'checked'}>
+                    <div class="flex flex-col flex-1">
+                        <span class="text-white text-sm line-clamp-1">${mat.desc}</span>
+                        <span class="text-white/40 text-[9px] uppercase tracking-widest">${id}</span>
+                    </div>
+                    <div class="flex flex-col items-end gap-1 w-24">
+                        <span class="text-white/80 text-xs">${qty.toFixed(1)} ${mat.unit}</span>
+                        <div class="flex items-center gap-1 bg-black/40 border border-white/10 rounded px-1.5 w-full">
+                            <span class="text-white/40 text-[9px]">RM</span>
+                            <input type="number" step="0.01" class="sandbox-price w-full bg-transparent text-white text-right text-xs py-1 focus:outline-none" data-id="${id}" value="${costRM.toFixed(2)}" ${isExcluded ? 'disabled' : ''}>
+                        </div>
+                    </div>
+                </div>`;
+            }
+        });
+
+        document.querySelectorAll('.sandbox-cb').forEach(cb => {
+            cb.addEventListener('change', (e) => {
+                const id = e.target.dataset.id;
+                if (!db.sandboxMatOverrides) db.sandboxMatOverrides = {};
+                if (!db.sandboxMatOverrides[id]) db.sandboxMatOverrides[id] = {};
+                db.sandboxMatOverrides[id].excluded = !e.target.checked;
+                calculateEngine();
+            });
+        });
+
+        document.querySelectorAll('.sandbox-price').forEach(inp => {
+            inp.addEventListener('change', (e) => {
+                const id = e.target.dataset.id;
+                if (!db.sandboxMatOverrides) db.sandboxMatOverrides = {};
+                if (!db.sandboxMatOverrides[id]) db.sandboxMatOverrides[id] = {};
+                db.sandboxMatOverrides[id].costRM = parseFloat(e.target.value) || 0;
+                calculateEngine();
+            });
         });
 
         // Keep planner hero card in sync with active plan count
@@ -1138,6 +1191,7 @@
                 actualProfit = finalRev - totalFees - liveFixedOpex - actualCogs;
                 actualMargin = finalRev > 0 ? (actualProfit / finalRev) * 100 : 0;
             }
+            db.latestActualMargin = actualMargin;
 
             document.getElementById('actual-metrics-container').innerHTML = `
                 <div class="glass-panel p-4 rounded-xl border border-white/5"><p class="text-white/40 text-[9px] uppercase tracking-widest mb-1">Settled Net Revenue</p><div class="text-xl font-display text-white">RM ${finalRev.toFixed(2)}</div></div>
@@ -2080,7 +2134,12 @@
             salesVolume: { target: targetSoldVol, actual: actualSoldTotal },
             platformFees: { budget: budgPlatFees, actual: actPlatFees, variance: actPlatFees - budgPlatFees, actualPct: actPlatPct },
             adSpend: { budget: budgAdSpend, actual: actAdSpend, variance: actAdSpend - budgAdSpend, budgetPerUnit: db.config['Marketing_Per_Unit'] || 5.00, actualPerUnit: actAdPerUnit },
-            directLabor: { budget: planTotalLabor, actual: actLaborCost, variance: actLaborCost - planTotalLabor }
+            directLabor: { budget: planTotalLabor, actual: actLaborCost, variance: actLaborCost - planTotalLabor },
+            margins: {
+                plan100: db.latestPlanMargins?.perfect || 0,
+                planTarget: db.latestPlanMargins?.cash || 0,
+                actual: db.latestActualMargin || 0
+            }
         };
 
         const context = {
