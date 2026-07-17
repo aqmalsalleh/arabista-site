@@ -112,7 +112,9 @@
             
             const plan = db.plans.find(p => p.Design_Code === design);
             if (plan) {
+                const zeroQtyInp = card.querySelector('.planner-zero-qty');
                 plan.Planned_Qty = cb.checked ? (parseInt(qtyInp.value) || 0) : 0;
+                plan.Zero_Cost_Qty = cb.checked ? (parseInt(zeroQtyInp.value) || 0) : 0;
                 plan.Target_Selling_Price = parseFloat(priceInp.value) || 0;
             }
         });
@@ -262,6 +264,7 @@
             db.plans.push({
                 Design_Code: code,
                 Planned_Qty: historical ? (parseInt(historical.Planned_Qty) || 0) : 0,
+                Zero_Cost_Qty: historical ? (parseInt(historical.Zero_Cost_Qty) || 0) : 0,
                 Target_Selling_Price: historical ? (parseFloat(historical.Target_Selling_Price) || 0) : (db.basePrices[code] || 0),
                 Locked_Material_COGS_RM: historical ? historical.Locked_Material_COGS_RM : undefined,
                 Locked_Direct_Labor_RM: historical ? historical.Locked_Direct_Labor_RM : undefined,
@@ -300,7 +303,7 @@
             btnSavePlan.textContent = 'SAVING...';
             try {
                 const payloadPlans = db.plans.map(p => ({
-                    Design_Code: p.Design_Code, Planned_Qty: p.Planned_Qty, Target_Selling_Price: p.Target_Selling_Price,
+                    Design_Code: p.Design_Code, Planned_Qty: p.Planned_Qty, Zero_Cost_Qty: p.Zero_Cost_Qty, Target_Selling_Price: p.Target_Selling_Price,
                     Locked_Material_COGS_RM: p.Live_Material_COGS_RM, Locked_Direct_Labor_RM: p.Live_Direct_Labor_RM, Locked_Var_Overhead_RM: p.Live_Var_Overhead_RM
                 }));
                 await postManagerAction('save_monthly_plan', { 
@@ -458,15 +461,19 @@
                     <div class="text-white font-medium text-lg">${plan.Design_Code}</div>
                     <div class="text-white/40 text-[10px] uppercase tracking-widest">Target Selection</div>
                 </div>
-                <div class="flex gap-2 opacity-50 pointer-events-none transition-opacity qty-wrapper">
-                    <div class="w-20 relative pb-4">
-                        <p class="text-white/40 text-[8px] uppercase tracking-widest mb-1">Price (RM)</p>
-                        <input type="number" min="0" step="0.01" value="${plan.Target_Selling_Price}" class="planner-price w-full bg-black/40 border border-white/10 rounded-lg text-white text-center py-2 focus:border-luxe outline-none transition-colors">
+                <div class="flex gap-1 sm:gap-2 opacity-50 pointer-events-none transition-opacity qty-wrapper">
+                    <div class="w-16 sm:w-20 relative pb-4">
+                        <p class="text-white/40 text-[8px] uppercase tracking-widest mb-1">Price</p>
+                        <input type="number" min="0" step="0.01" value="${plan.Target_Selling_Price}" class="planner-price w-full bg-black/40 border border-white/10 rounded-lg text-white text-center py-1.5 focus:border-luxe outline-none transition-colors text-xs">
                         <div class="planner-margin-indicator absolute bottom-0 left-0 right-0 text-center text-[9px] font-medium whitespace-nowrap"></div>
                     </div>
-                    <div class="w-20">
-                        <p class="text-white/40 text-[8px] uppercase tracking-widest mb-1">Quantity</p>
-                        <input type="number" min="0" value="${plan.Planned_Qty > 0 ? plan.Planned_Qty : ''}" class="planner-qty w-full bg-black/40 border border-white/10 rounded-lg text-white text-center py-2 focus:border-luxe outline-none transition-colors">
+                    <div class="w-14 sm:w-16">
+                        <p class="text-white/40 text-[8px] uppercase tracking-widest mb-1">Prod</p>
+                        <input type="number" min="0" value="${plan.Planned_Qty > 0 ? plan.Planned_Qty : ''}" class="planner-qty w-full bg-black/40 border border-white/10 rounded-lg text-white text-center py-1.5 focus:border-luxe outline-none transition-colors text-xs" placeholder="0">
+                    </div>
+                    <div class="w-14 sm:w-16">
+                        <p class="text-white/40 text-[8px] uppercase tracking-widest mb-1 text-luxe truncate">0-Cost</p>
+                        <input type="number" min="0" value="${plan.Zero_Cost_Qty > 0 ? plan.Zero_Cost_Qty : ''}" class="planner-zero-qty w-full bg-black/40 border border-luxe/30 rounded-lg text-luxe text-center py-1.5 focus:border-luxe outline-none transition-colors text-xs placeholder:text-luxe/30" placeholder="0">
                     </div>
                 </div>
             `;
@@ -474,6 +481,7 @@
             const cb = div.querySelector('.design-checkbox');
             const wrap = div.querySelector('.qty-wrapper');
             const qtyInp = div.querySelector('.planner-qty');
+            const zeroQtyInp = div.querySelector('.planner-zero-qty');
 
             const priceInp = div.querySelector('.planner-price');
             const marginInd = div.querySelector('.planner-margin-indicator');
@@ -488,7 +496,7 @@
             priceInp.addEventListener('input', updateDrawerMargin);
             updateDrawerMargin(); // Calculate on render
             
-            if (plan.Planned_Qty > 0) cb.checked = true;
+            if (plan.Planned_Qty > 0 || plan.Zero_Cost_Qty > 0) cb.checked = true;
             if (cb.checked) wrap.classList.remove('opacity-50', 'pointer-events-none');
 
             cb.addEventListener('change', (e) => {
@@ -499,6 +507,7 @@
                 } else {
                     wrap.classList.add('opacity-50', 'pointer-events-none');
                     qtyInp.value = '';
+                    zeroQtyInp.value = '';
                 }
                 if (window.applyDrawerFilters) window.applyDrawerFilters();
             });
@@ -876,7 +885,7 @@
 
     // --- TEMPORAL ERP CALCULATION ENGINE ---
     function calculateEngine() {
-        let planRev = 0, planCogs = 0, planVarOverhead = 0, planQtyTotal = 0, targetSoldTotal = 0;
+        let planRev = 0, planCogs = 0, planVarOverhead = 0, planQtyTotal = 0, planVolTotal = 0, targetSoldTotal = 0;
         let reqs = {}; 
         let fixedOpex = 0;
         
@@ -886,10 +895,13 @@
 
         db.plans.forEach(plan => {
             const prodQty = parseInt(plan.Planned_Qty) || 0;
-            if (prodQty <= 0) return;
+            const zeroQty = parseInt(plan.Zero_Cost_Qty) || 0;
+            const totalVol = prodQty + zeroQty;
+            if (totalVol <= 0) return;
             
-            const soldQty = Math.round(prodQty * (sellThroughPct / 100));
-            planQtyTotal += prodQty;
+            const soldQty = Math.round(totalVol * (sellThroughPct / 100));
+            planQtyTotal += prodQty; // Strictly manufacturing metrics
+            planVolTotal += totalVol; // Sellable assets
             targetSoldTotal += soldQty;
             
             const price = parseFloat(plan.Target_Selling_Price) || 0;
@@ -950,9 +962,9 @@
         const planNetProfit = planRev - planCogs - planVarOverhead - fixedOpex - totalExtraCosts;
         
         // Split Margins
-        const perfectGrossRev = planQtyTotal * (planRev / (targetSoldTotal || 1)); 
+        const perfectGrossRev = planVolTotal * (planRev / (targetSoldTotal || 1)); 
         // Perfect Margin = (Total theoretical revenue - Total Costs if all units sold) / Theoretical Revenue
-        const totalCosts100 = planCogs + ((planVarOverhead / (targetSoldTotal || 1)) * planQtyTotal) + fixedOpex + totalExtraCosts;
+        const totalCosts100 = planCogs + ((planVarOverhead / (targetSoldTotal || 1)) * planVolTotal) + fixedOpex + totalExtraCosts;
         const perfectMargin = perfectGrossRev > 0 ? ((perfectGrossRev - totalCosts100) / perfectGrossRev) * 100 : 0;
         const cashMargin = planRev > 0 ? (planNetProfit / planRev) * 100 : 0;
         
@@ -986,8 +998,10 @@
 
         const designList = document.getElementById('plan-designs-list');
         designList.innerHTML = '';
-        db.plans.filter(p => p.Planned_Qty > 0).forEach(p => {
-            designList.innerHTML += `<div class="flex justify-between items-center bg-black/40 p-3 rounded-lg border border-white/5"><span class="text-white text-sm font-medium">${p.Design_Code}</span><span class="text-white/60 text-xs">${p.Planned_Qty} pcs @ RM ${p.Target_Selling_Price}</span></div>`;
+        db.plans.filter(p => p.Planned_Qty > 0 || p.Zero_Cost_Qty > 0).forEach(p => {
+            const vol = (parseInt(p.Planned_Qty) || 0) + (parseInt(p.Zero_Cost_Qty) || 0);
+            const zTag = p.Zero_Cost_Qty > 0 ? `<span class="text-luxe bg-luxe/10 px-1 rounded ml-1 text-[8px]">+${p.Zero_Cost_Qty} Free</span>` : '';
+            designList.innerHTML += `<div class="flex justify-between items-center bg-black/40 p-3 rounded-lg border border-white/5"><span class="text-white text-sm font-medium">${p.Design_Code}${zTag}</span><span class="text-white/60 text-xs">${vol} pcs @ RM ${p.Target_Selling_Price}</span></div>`;
         });
         if (designList.innerHTML === '') designList.innerHTML = '<p class="text-white/30 text-xs">No designs planned. Modify targets to begin.</p>';
 
@@ -1165,7 +1179,33 @@
 
         const liveUpdateActuals = () => {
             let actualCogs = 0;
-            document.querySelectorAll('.actual-cost-row').forEach(row => { actualCogs += parseFloat(row.querySelector('.act-cost').value) || 0; });
+            let autoFxFee = 0;
+            const exRate = db.config['Exchange_Rate_CNY_RM'] || 0.6001;
+
+            document.querySelectorAll('.actual-cost-row').forEach(row => { 
+                const actCost = parseFloat(row.querySelector('.act-cost').value) || 0;
+                actualCogs += actCost; 
+
+                const id = row.dataset.id;
+                const actQty = parseFloat(row.querySelector('.act-qty').value) || 0;
+                const mat = db.materials[id];
+                
+                // Calculate isolated true FX slippage for CNY items based on Actual Qty procured
+                if (mat && mat.currency === 'CNY' && actQty > 0 && actCost > 0) {
+                    const expectedBaseCost = actQty * mat.origCost * exRate;
+                    autoFxFee += (actCost - expectedBaseCost);
+                }
+            });
+
+            // Automatically overwrite the Monthly FX Bank Fees OPEX input
+            const fxOpexRow = document.querySelector('.actual-opex-row[data-name="Monthly_FX_Bank_Fees"]');
+            if (fxOpexRow) {
+                const fxInput = fxOpexRow.querySelector('.act-opex-val');
+                if (autoFxFee !== 0 || fxInput.dataset.autoManaged === 'true') {
+                    fxInput.value = autoFxFee.toFixed(2);
+                    fxInput.dataset.autoManaged = 'true';
+                }
+            }
 
             let liveFixedOpex = 0;
             document.querySelectorAll('.actual-opex-row').forEach(row => { liveFixedOpex += parseFloat(row.querySelector('.act-opex-val').value) || 0; });
@@ -1205,7 +1245,7 @@
             `;
         };
 
-        document.querySelectorAll('.act-sold, .act-prod, .act-cost, .act-opex-val, #manual-macro-rev, #manual-macro-fees, #manual-macro-ads').forEach(el => {
+        document.querySelectorAll('.act-sold, .act-prod, .act-qty, .act-cost, .act-opex-val, #manual-macro-rev, #manual-macro-fees, #manual-macro-ads').forEach(el => {
             el.addEventListener('input', liveUpdateActuals);
         });
         liveUpdateActuals();
