@@ -2113,56 +2113,56 @@
     const bulkInvoiceList = document.getElementById('bulk-invoice-list');
     const bulkInvoiceTotalRm = document.getElementById('bulk-invoice-total-rm');
 
-    document.addEventListener('click', (e) => {
-        if (e.target && e.target.id === 'btn-open-bulk-invoice') {
-            bulkInvoiceList.innerHTML = '';
-            bulkInvoiceTotalRm.value = '';
+    document.getElementById('btn-open-bulk-invoice')?.addEventListener('click', (e) => {
+        e.stopPropagation(); // Prevents the <details> accordion from toggling
+
+        bulkInvoiceList.innerHTML = '';
+        bulkInvoiceTotalRm.value = '';
+        
+        const costRows = document.querySelectorAll('.actual-cost-row');
+        if (costRows.length === 0) return alert('No active procurement rows available.');
+
+        costRows.forEach(row => {
+            const id = row.dataset.id;
+            if (id === 'DIRECT-LABOR') return; 
             
-            const costRows = document.querySelectorAll('.actual-cost-row');
-            if (costRows.length === 0) return alert('No active procurement rows available.');
-
-            costRows.forEach(row => {
-                const id = row.dataset.id;
-                if (id === 'DIRECT-LABOR') return; 
-                
-                const mat = db.materials[id];
-                if (!mat) return;
-                
-                const currentQty = row.querySelector('.act-qty').value || '';
-                
-                const label = document.createElement('label');
-                label.className = "flex items-center gap-3 p-2 bg-black/40 border border-white/5 rounded-lg cursor-pointer hover:border-white/10 transition-colors group";
-                label.innerHTML = `
-                    <input type="checkbox" class="bulk-item-cb rounded border-white/20 bg-black/40 text-luxe focus:ring-0" data-id="${id}">
-                    <div class="flex-1 truncate">
-                        <span class="text-white text-xs block truncate">${mat.desc}</span>
-                        <span class="text-white/40 text-[9px] uppercase tracking-widest">${id}</span>
-                    </div>
-                    <input type="number" step="0.01" class="bulk-item-qty w-24 bg-black/40 border border-white/10 rounded text-white text-right px-2 py-1.5 text-xs focus:border-luxe outline-none opacity-0 pointer-events-none transition-opacity" placeholder="Qty (${mat.unit})" value="${currentQty}">
-                `;
-                
-                const cb = label.querySelector('.bulk-item-cb');
-                const qtyInput = label.querySelector('.bulk-item-qty');
-                
-                cb.addEventListener('change', (ev) => {
-                    if (ev.target.checked) {
-                        qtyInput.classList.remove('opacity-0', 'pointer-events-none');
-                        qtyInput.focus();
-                    } else {
-                        qtyInput.classList.add('opacity-0', 'pointer-events-none');
-                    }
-                });
-                
-                qtyInput.addEventListener('click', (ev) => ev.preventDefault());
-                bulkInvoiceList.appendChild(label);
+            const mat = db.materials[id];
+            if (!mat) return;
+            
+            const currentQty = row.querySelector('.act-qty').value || '';
+            
+            const label = document.createElement('label');
+            label.className = "flex items-center gap-3 p-2 bg-black/40 border border-white/5 rounded-lg cursor-pointer hover:border-white/10 transition-colors group";
+            label.innerHTML = `
+                <input type="checkbox" class="bulk-item-cb rounded border-white/20 bg-black/40 text-luxe focus:ring-0" data-id="${id}">
+                <div class="flex-1 truncate">
+                    <span class="text-white text-xs block truncate">${mat.desc}</span>
+                    <span class="text-white/40 text-[9px] uppercase tracking-widest">${id}</span>
+                </div>
+                <input type="number" step="0.01" class="bulk-item-qty w-24 bg-black/40 border border-white/10 rounded text-white text-right px-2 py-1.5 text-xs focus:border-luxe outline-none opacity-0 pointer-events-none transition-opacity" placeholder="Qty (${mat.unit})" value="${currentQty}">
+            `;
+            
+            const cb = label.querySelector('.bulk-item-cb');
+            const qtyInput = label.querySelector('.bulk-item-qty');
+            
+            cb.addEventListener('change', (ev) => {
+                if (ev.target.checked) {
+                    qtyInput.classList.remove('opacity-0', 'pointer-events-none');
+                    qtyInput.focus();
+                } else {
+                    qtyInput.classList.add('opacity-0', 'pointer-events-none');
+                }
             });
+            
+            qtyInput.addEventListener('click', (ev) => ev.preventDefault());
+            bulkInvoiceList.appendChild(label);
+        });
 
-            bulkInvoiceModal.classList.remove('hidden');
-            setTimeout(() => {
-                bulkInvoiceModal.classList.remove('opacity-0');
-                bulkInvoiceModalInner.classList.remove('scale-95');
-            }, 10);
-        }
+        bulkInvoiceModal.classList.remove('hidden');
+        setTimeout(() => {
+            bulkInvoiceModal.classList.remove('opacity-0');
+            bulkInvoiceModalInner.classList.remove('scale-95');
+        }, 10);
     });
 
     document.getElementById('btn-close-bulk-invoice')?.addEventListener('click', () => {
