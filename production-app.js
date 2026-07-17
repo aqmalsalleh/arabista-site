@@ -956,7 +956,7 @@
         const perfectMargin = perfectGrossRev > 0 ? ((perfectGrossRev - totalCosts100) / perfectGrossRev) * 100 : 0;
         const cashMargin = planRev > 0 ? (planNetProfit / planRev) * 100 : 0;
         
-        db.latestPlanMargins = { perfect: perfectMargin, cash: cashMargin };
+        db.latestPlanMargins = { perfect: perfectMargin, perfectRM: perfectGrossRev - totalCosts100, cash: cashMargin, cashRM: planNetProfit };
         db.currentMacroSnapshot = { Locked_Fixed_OPEX_RM: fixedOpex, Total_Revenue_RM: planRev, Net_Profit_RM: planNetProfit };
         db.lastReqs = reqs;
 
@@ -1195,7 +1195,7 @@
                 actualProfit = finalRev - totalFees - liveFixedOpex - actualCogs;
                 actualMargin = finalRev > 0 ? (actualProfit / finalRev) * 100 : 0;
             }
-            db.latestActualMargin = actualMargin;
+            db.latestActualMargin = { margin: actualMargin, profit: actualProfit };
 
             document.getElementById('actual-metrics-container').innerHTML = `
                 <div class="glass-panel p-4 rounded-xl border border-white/5"><p class="text-white/40 text-[9px] uppercase tracking-widest mb-1">Settled Net Revenue</p><div class="text-xl font-display text-white">RM ${finalRev.toFixed(2)}</div></div>
@@ -1349,14 +1349,17 @@
                         <div>
                             <p class="text-white/50 text-[10px] mb-1">Plan (100% Prod)</p>
                             <div class="text-lg font-display text-white">${(db.latestPlanMargins?.perfect || 0).toFixed(1)}%</div>
+                            <div class="text-[10px] text-white/40 mt-1">RM ${(db.latestPlanMargins?.perfectRM || 0).toFixed(2)}</div>
                         </div>
                         <div class="border-l border-white/5">
                             <p class="text-white/50 text-[10px] mb-1">Plan (Target ST)</p>
                             <div class="text-lg font-display text-white">${(db.latestPlanMargins?.cash || 0).toFixed(1)}%</div>
+                            <div class="text-[10px] text-white/40 mt-1">RM ${(db.latestPlanMargins?.cashRM || 0).toFixed(2)}</div>
                         </div>
                         <div class="border-l border-white/5">
                             <p class="text-luxe text-[10px] uppercase tracking-widest font-bold mb-1">Actual Realized</p>
-                            <div class="text-xl font-display ${(db.latestActualMargin || 0) >= 0 ? 'text-luxe' : 'text-red-400'}">${(db.latestActualMargin || 0).toFixed(1)}%</div>
+                            <div class="text-xl font-display ${(db.latestActualMargin?.margin || 0) >= 0 ? 'text-luxe' : 'text-red-400'}">${(db.latestActualMargin?.margin || 0).toFixed(1)}%</div>
+                            <div class="text-[10px] text-white/40 mt-1">RM ${(db.latestActualMargin?.profit || 0).toFixed(2)}</div>
                         </div>
                     </div>
                 </div>`;
@@ -1422,7 +1425,7 @@
         const costingHistory = db.actualsCosting.filter(c => String(c.Month).substring(0, 7) === monthStr);
         costingHistory.forEach(c => {
              if (c.Category === 'Operational' || c.Item_ID === 'DIRECT-LABOR') return;
-             if (!monthMatLedger[c.Item_ID]) monthMatLedger[c.Item_ID] = { procured: 0, plannedToConsume: 0 };
+             if (!monthMatLedger[c.Item_ID]) monthMatLedger[c.Item_ID] = { procured: 0, plannedToConsume: 0, actualConsumed: 0 };
              monthMatLedger[c.Item_ID].procured += parseFloat(c.Actual_Qty) || 0;
         });
         db.plans.forEach(p => {
@@ -1433,12 +1436,27 @@
                      if (k.endsWith('_ID') && k !== 'Design_Code') {
                          const id = bom[k]; const qty = parseFloat(bom[k.slice(0, -3) + '_Qty']) || 0;
                          if (id && id !== 'NONE') {
-                             if (!monthMatLedger[id]) monthMatLedger[id] = { procured: 0, plannedToConsume: 0 };
+                             if (!monthMatLedger[id]) monthMatLedger[id] = { procured: 0, plannedToConsume: 0, actualConsumed: 0 };
                              monthMatLedger[id].plannedToConsume += (qty * prodPlan);
                          }
                      }
                  });
              }
+        });
+        db.actualsMicro.filter(a => String(a.Date).substring(0, 7) === monthStr).forEach(a => {
+            const bom = db.bom[a.Design_Code];
+            const actProd = parseInt(a.Qty_Produced) || 0;
+            if (bom && actProd > 0) {
+                Object.keys(bom).forEach(k => {
+                    if (k.endsWith('_ID') && k !== 'Design_Code') {
+                        const id = bom[k]; const qty = parseFloat(bom[k.slice(0, -3) + '_Qty']) || 0;
+                        if (id && id !== 'NONE') {
+                            if (!monthMatLedger[id]) monthMatLedger[id] = { procured: 0, plannedToConsume: 0, actualConsumed: 0 };
+                            monthMatLedger[id].actualConsumed += (qty * actProd);
+                        }
+                    }
+                });
+            }
         });
 
         if (opexCards) {
@@ -1560,12 +1578,13 @@
             
             Object.keys(db.materials).forEach(id => {
                 const opening = matCarryForward[id] || 0;
-                const currentData = monthMatLedger[id] || { procured: 0, plannedToConsume: 0 };
+                const currentData = monthMatLedger[id] || { procured: 0, plannedToConsume: 0, actualConsumed: 0 };
                 const procured = currentData.procured || 0;
                 const planned = currentData.plannedToConsume || 0;
-                const closing = opening + procured - planned;
+                const actualOut = currentData.actualConsumed || 0;
+                const closing = opening + procured - actualOut;
                 
-                if (Math.abs(opening) > 0.01 || Math.abs(procured) > 0.01 || Math.abs(planned) > 0.01) { 
+                if (Math.abs(opening) > 0.01 || Math.abs(procured) > 0.01 || Math.abs(planned) > 0.01 || Math.abs(actualOut) > 0.01) { 
                     const mat = db.materials[id];
                     if (mat) {
                         hasMaterials = true;
@@ -1576,10 +1595,11 @@
                                 <div class="flex flex-col"><span class="text-white text-sm font-medium truncate max-w-[150px]">${mat.desc}</span><span class="text-white/40 text-[9px] uppercase tracking-widest">${id}</span></div>
                                 <span class="${closing >= -0.01 ? 'text-luxe' : 'text-red-400'} text-xs font-bold font-display">Close: ${closing.toFixed(1)} ${mat.unit} ${labelText}</span>
                             </div>
-                            <div class="grid grid-cols-3 text-[10px] text-white/50 border-t border-white/5 pt-2">
-                                <div>Open: <span class="text-white">${opening.toFixed(1)}</span></div>
-                                <div class="text-center">+ In: <span class="text-white">${procured.toFixed(1)}</span></div>
-                                <div class="text-right">- Plan Out: <span class="text-white">${planned.toFixed(1)}</span></div>
+                            <div class="grid grid-cols-4 gap-1 text-[9px] text-white/50 border-t border-white/5 pt-2">
+                                <div>Open: <span class="text-white block">${opening.toFixed(1)}</span></div>
+                                <div class="text-center">+ In: <span class="text-white block">${procured.toFixed(1)}</span></div>
+                                <div class="text-center">- Plan Out: <span class="text-white block">${planned.toFixed(1)}</span></div>
+                                <div class="text-right">- Act Out: <span class="text-white block">${actualOut.toFixed(1)}</span></div>
                             </div>
                         </div>`;
                     }
@@ -2175,7 +2195,7 @@
         const costingHistory = db.actualsCosting.filter(c => String(c.Month).substring(0, 7) === currentMonth);
         costingHistory.forEach(c => {
              if (c.Category === 'Operational' || c.Item_ID === 'DIRECT-LABOR') return;
-             if (!monthMatLedger[c.Item_ID]) monthMatLedger[c.Item_ID] = { procured: 0, plannedToConsume: 0, desc: db.materials[c.Item_ID]?.desc };
+             if (!monthMatLedger[c.Item_ID]) monthMatLedger[c.Item_ID] = { procured: 0, plannedToConsume: 0, actualConsumed: 0, desc: db.materials[c.Item_ID]?.desc };
              monthMatLedger[c.Item_ID].procured += parseFloat(c.Actual_Qty) || 0;
         });
         db.plans.forEach(p => {
@@ -2186,24 +2206,40 @@
                      if (k.endsWith('_ID') && k !== 'Design_Code') {
                          const id = bom[k]; const qty = parseFloat(bom[k.slice(0, -3) + '_Qty']) || 0;
                          if (id && id !== 'NONE') {
-                             if (!monthMatLedger[id]) monthMatLedger[id] = { procured: 0, plannedToConsume: 0, desc: db.materials[id]?.desc };
+                             if (!monthMatLedger[id]) monthMatLedger[id] = { procured: 0, plannedToConsume: 0, actualConsumed: 0, desc: db.materials[id]?.desc };
                              monthMatLedger[id].plannedToConsume += (qty * prodPlan);
                          }
                      }
                  });
              }
         });
+        db.actualsMicro.filter(a => String(a.Date).substring(0, 7) === currentMonth).forEach(a => {
+            const bom = db.bom[a.Design_Code];
+            const actProd = parseInt(a.Qty_Produced) || 0;
+            if (bom && actProd > 0) {
+                Object.keys(bom).forEach(k => {
+                    if (k.endsWith('_ID') && k !== 'Design_Code') {
+                        const id = bom[k]; const qty = parseFloat(bom[k.slice(0, -3) + '_Qty']) || 0;
+                        if (id && id !== 'NONE') {
+                            if (!monthMatLedger[id]) monthMatLedger[id] = { procured: 0, plannedToConsume: 0, actualConsumed: 0, desc: db.materials[id]?.desc };
+                            monthMatLedger[id].actualConsumed += (qty * actProd);
+                        }
+                    }
+                });
+            }
+        });
         
         const materialAssets = Object.keys(db.materials).map(id => {
             const opening = matCarryForward[id] || 0;
-            const currentData = monthMatLedger[id] || { procured: 0, plannedToConsume: 0, desc: db.materials[id].desc };
-            const closing = opening + (currentData.procured || 0) - (currentData.plannedToConsume || 0);
+            const currentData = monthMatLedger[id] || { procured: 0, plannedToConsume: 0, actualConsumed: 0, desc: db.materials[id].desc };
+            const actualOut = currentData.actualConsumed || 0;
+            const closing = opening + (currentData.procured || 0) - actualOut;
             return {
                 id, name: currentData.desc || db.materials[id].desc,
-                openingBalance: opening, procured: currentData.procured || 0, plannedToConsume: currentData.plannedToConsume || 0,
+                openingBalance: opening, procured: currentData.procured || 0, plannedToConsume: currentData.plannedToConsume || 0, actualConsumed: actualOut,
                 closingBalance: closing, deviation: closing
             };
-        }).filter(m => Math.abs(m.openingBalance) > 0.01 || Math.abs(m.procured) > 0.01 || Math.abs(m.plannedToConsume) > 0.01);
+        }).filter(m => Math.abs(m.openingBalance) > 0.01 || Math.abs(m.procured) > 0.01 || Math.abs(m.plannedToConsume) > 0.01 || Math.abs(m.actualConsumed) > 0.01);
 
         const snap = db.snapshots.find(s => String(s.Plan_Month).substring(0, 7) === currentMonth) || {};
         const stPct = parseFloat(snap.Target_Sell_Through_Pct) || 100;
@@ -2245,7 +2281,7 @@
             margins: {
                 plan100: db.latestPlanMargins?.perfect || 0,
                 planTarget: db.latestPlanMargins?.cash || 0,
-                actual: db.latestActualMargin || 0
+                actual: db.latestActualMargin?.margin || 0
             }
         };
 
