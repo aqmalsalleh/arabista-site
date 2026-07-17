@@ -2107,6 +2107,112 @@
         }
     });
 
+    // --- BULK INVOICE SPLITTER LOGIC ---
+    const bulkInvoiceModal = document.getElementById('bulk-invoice-modal');
+    const bulkInvoiceModalInner = document.getElementById('bulk-invoice-modal-inner');
+    const bulkInvoiceList = document.getElementById('bulk-invoice-list');
+    const bulkInvoiceTotalRm = document.getElementById('bulk-invoice-total-rm');
+
+    document.addEventListener('click', (e) => {
+        if (e.target && e.target.id === 'btn-open-bulk-invoice') {
+            bulkInvoiceList.innerHTML = '';
+            bulkInvoiceTotalRm.value = '';
+            
+            const costRows = document.querySelectorAll('.actual-cost-row');
+            if (costRows.length === 0) return alert('No active procurement rows available.');
+
+            costRows.forEach(row => {
+                const id = row.dataset.id;
+                if (id === 'DIRECT-LABOR') return; 
+                
+                const mat = db.materials[id];
+                if (!mat) return;
+                
+                const currentQty = row.querySelector('.act-qty').value || '';
+                
+                const label = document.createElement('label');
+                label.className = "flex items-center gap-3 p-2 bg-black/40 border border-white/5 rounded-lg cursor-pointer hover:border-white/10 transition-colors group";
+                label.innerHTML = `
+                    <input type="checkbox" class="bulk-item-cb rounded border-white/20 bg-black/40 text-luxe focus:ring-0" data-id="${id}">
+                    <div class="flex-1 truncate">
+                        <span class="text-white text-xs block truncate">${mat.desc}</span>
+                        <span class="text-white/40 text-[9px] uppercase tracking-widest">${id}</span>
+                    </div>
+                    <input type="number" step="0.01" class="bulk-item-qty w-24 bg-black/40 border border-white/10 rounded text-white text-right px-2 py-1.5 text-xs focus:border-luxe outline-none opacity-0 pointer-events-none transition-opacity" placeholder="Qty (${mat.unit})" value="${currentQty}">
+                `;
+                
+                const cb = label.querySelector('.bulk-item-cb');
+                const qtyInput = label.querySelector('.bulk-item-qty');
+                
+                cb.addEventListener('change', (ev) => {
+                    if (ev.target.checked) {
+                        qtyInput.classList.remove('opacity-0', 'pointer-events-none');
+                        qtyInput.focus();
+                    } else {
+                        qtyInput.classList.add('opacity-0', 'pointer-events-none');
+                    }
+                });
+                
+                qtyInput.addEventListener('click', (ev) => ev.preventDefault());
+                bulkInvoiceList.appendChild(label);
+            });
+
+            bulkInvoiceModal.classList.remove('hidden');
+            setTimeout(() => {
+                bulkInvoiceModal.classList.remove('opacity-0');
+                bulkInvoiceModalInner.classList.remove('scale-95');
+            }, 10);
+        }
+    });
+
+    document.getElementById('btn-close-bulk-invoice')?.addEventListener('click', () => {
+        bulkInvoiceModal.classList.add('opacity-0');
+        bulkInvoiceModalInner.classList.add('scale-95');
+        setTimeout(() => bulkInvoiceModal.classList.add('hidden'), 300);
+    });
+
+    document.getElementById('btn-apply-bulk-invoice')?.addEventListener('click', () => {
+        const totalRM = parseFloat(bulkInvoiceTotalRm.value);
+        if (!totalRM || totalRM <= 0) return alert('Please enter a valid Total Invoice Paid (RM).');
+
+        const selectedItems = [];
+        let totalTheoreticalRM = 0;
+        const exRate = db.config['Exchange_Rate_CNY_RM'] || 0.6001;
+
+        bulkInvoiceList.querySelectorAll('.bulk-item-cb:checked').forEach(cb => {
+            const id = cb.dataset.id;
+            const qtyInput = cb.closest('label').querySelector('.bulk-item-qty');
+            const actualQty = parseFloat(qtyInput.value) || 0;
+            const mat = db.materials[id];
+            
+            if (actualQty > 0 && mat) {
+                const theoreticalCost = actualQty * mat.origCost * (mat.currency === 'CNY' ? exRate : 1);
+                selectedItems.push({ id, actualQty, theoreticalCost });
+                totalTheoreticalRM += theoreticalCost;
+            }
+        });
+
+        if (selectedItems.length === 0) return alert('Please select at least one item and enter its quantity.');
+        if (totalTheoreticalRM === 0) return alert('Theoretical total is zero. Check material base prices.');
+
+        selectedItems.forEach(item => {
+            const row = document.querySelector('.actual-cost-row[data-id="' + item.id + '"]');
+            if (row) {
+                const weight = item.theoreticalCost / totalTheoreticalRM;
+                const distributedCost = totalRM * weight;
+                
+                row.querySelector('.act-qty').value = item.actualQty.toFixed(1);
+                row.querySelector('.act-cost').value = distributedCost.toFixed(2);
+                row.querySelector('.act-remarks').value = "Bulk Invoice Split";
+            }
+        });
+
+        const actQtyInputs = document.querySelectorAll('.act-qty');
+        if (actQtyInputs.length > 0) actQtyInputs[0].dispatchEvent(new Event('input'));
+
+        document.getElementById('btn-close-bulk-invoice').click();
+    });
+
     // --- AI CHAT INTERFACE & PAYLOAD PIPELINE ---
     const chatLog = document.getElementById('ai-chat-log');
     const chatInput = document.getElementById('ai-chat-input');
