@@ -365,12 +365,20 @@
             opex.push({ name: row.dataset.name, cost: parseFloat(row.querySelector('.act-opex-val').value) || 0 });
         });
 
-        const manualRevStr = document.getElementById('manual-macro-rev')?.value;
+        const revSettled = document.getElementById('manual-macro-rev-tt-settled')?.value;
+        const revPending = document.getElementById('manual-macro-rev-tt-pending')?.value;
+        const revOther = document.getElementById('manual-macro-rev-other')?.value;
+        
+        let manualRevTotal = undefined;
+        if (revSettled !== '' && revSettled !== undefined) manualRevTotal = (manualRevTotal || 0) + parseFloat(revSettled);
+        if (revPending !== '' && revPending !== undefined) manualRevTotal = (manualRevTotal || 0) + parseFloat(revPending);
+        if (revOther !== '' && revOther !== undefined) manualRevTotal = (manualRevTotal || 0) + parseFloat(revOther);
+
         const manualFeesStr = document.getElementById('manual-macro-fees')?.value;
         const manualAdsStr = document.getElementById('manual-macro-ads')?.value;
 
         const macro = {
-            revenue: manualRevStr !== '' && manualRevStr !== undefined ? parseFloat(manualRevStr) : autoRev,
+            revenue: manualRevTotal !== undefined ? manualRevTotal : autoRev,
             fees: manualFeesStr !== '' && manualFeesStr !== undefined ? parseFloat(manualFeesStr) : autoFees,
             ads: manualAdsStr !== '' && manualAdsStr !== undefined ? parseFloat(manualAdsStr) : autoAds
         };
@@ -1096,7 +1104,15 @@
 
             volList.innerHTML += `
                 <div class="glass-panel p-3 rounded-xl flex items-center justify-between gap-3 actual-vol-row" data-design="${p.Design_Code}">
-                    <div class="flex-1"><span class="text-white text-sm font-medium">${p.Design_Code}</span><span class="text-white/40 text-[9px] uppercase tracking-widest block">Plan: ${p.Planned_Qty}</span></div>
+                    <div class="flex-1">
+                        <div class="flex items-center gap-2">
+                            <span class="text-white text-sm font-medium">${p.Design_Code}</span>
+                            <button class="btn-sync-vol text-white/30 hover:text-luxe transition-colors tap-none shrink-0" data-theo-prod="${p.Planned_Qty}" title="Sync Prod to Plan">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                            </button>
+                        </div>
+                        <span class="text-white/40 text-[9px] uppercase tracking-widest block">Plan: ${p.Planned_Qty}</span>
+                    </div>
                     <div class="flex gap-2 w-40">
                         <input type="number" class="act-prod w-1/2 bg-black/40 border border-white/10 rounded text-white text-center py-1 text-xs focus:border-luxe outline-none" placeholder="Prod" value="${prod}">
                         <input type="number" class="act-sold w-1/2 bg-black/40 border border-white/10 rounded text-luxe text-center py-1 text-xs focus:border-luxe outline-none font-bold" placeholder="Sold" value="${sold}">
@@ -1114,12 +1130,14 @@
             const actCost = hist ? parseFloat(hist.Actual_Total_Cost_RM) || 0 : (mat.costRM * planQty);
 
             const theoCost = mat.costRM * planQty;
+            const isLocked = hist ? true : false;
 
             costList.innerHTML += `
-                <div class="glass-panel p-3 rounded-xl flex flex-col gap-2 actual-cost-row" data-id="${id}" data-category="${mat.category}">
+                <div class="glass-panel p-3 rounded-xl flex flex-col gap-2 actual-cost-row" data-id="${id}" data-category="${mat.category}" data-locked="${isLocked}">
                     <div class="flex justify-between items-center">
                         <div class="flex items-center gap-2 truncate">
                             <span class="text-white text-sm truncate">${mat.desc}</span>
+                            <span class="lock-icon text-luxe text-xs ${isLocked ? '' : 'hidden'}">🔒</span>
                             <button class="btn-sync-row text-white/30 hover:text-luxe transition-colors tap-none shrink-0" data-theo-qty="${planQty}" data-theo-cost="${theoCost}" title="Sync to Plan">
                                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
                             </button>
@@ -1141,12 +1159,14 @@
             db.plans.forEach(p => { totalPlanLabor += (p.Live_Direct_Labor_RM || 0) * (parseInt(p.Planned_Qty) || 0); });
             const histLabor = costingHistory.find(c => c.Item_ID === 'DIRECT-LABOR');
             const actLaborCost = histLabor ? parseFloat(histLabor.Actual_Total_Cost_RM) || 0 : totalPlanLabor;
+            const isLockedLabor = histLabor ? true : false;
 
             laborContainer.innerHTML = `
-                <div class="glass-panel p-3 rounded-xl flex flex-col gap-2 actual-cost-row border-l-2 border-luxe" data-id="DIRECT-LABOR" data-category="Operational">
+                <div class="glass-panel p-3 rounded-xl flex flex-col gap-2 actual-cost-row border-l-2 border-luxe" data-id="DIRECT-LABOR" data-category="Operational" data-locked="${isLockedLabor}">
                     <div class="flex justify-between items-center">
                         <div class="flex items-center gap-2">
                             <span class="text-luxe text-sm font-bold">Direct Labor / Tailoring</span>
+                            <span class="lock-icon text-luxe text-xs ${isLockedLabor ? '' : 'hidden'}">🔒</span>
                             <button class="btn-sync-row text-white/30 hover:text-luxe transition-colors tap-none shrink-0" data-theo-qty="1" data-theo-cost="${totalPlanLabor}" title="Sync to Plan">
                                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
                             </button>
@@ -1189,8 +1209,8 @@
             });
         }
 
-        if (document.getElementById('manual-macro-rev')) {
-            document.getElementById('manual-macro-rev').value = aMacro.Actual_Revenue_RM !== undefined && aMacro.Actual_Revenue_RM !== null ? aMacro.Actual_Revenue_RM : '';
+        if (document.getElementById('manual-macro-rev-tt-settled')) {
+            document.getElementById('manual-macro-rev-tt-settled').value = aMacro.Actual_Revenue_RM !== undefined && aMacro.Actual_Revenue_RM !== null ? aMacro.Actual_Revenue_RM : '';
             document.getElementById('manual-macro-fees').value = aMacro.Actual_Platform_Fees_RM !== undefined && aMacro.Actual_Platform_Fees_RM !== null ? aMacro.Actual_Platform_Fees_RM : '';
             document.getElementById('manual-macro-ads').value = aMacro.Actual_Ad_Spend_RM !== undefined && aMacro.Actual_Ad_Spend_RM !== null ? aMacro.Actual_Ad_Spend_RM : '';
         }
@@ -1208,14 +1228,12 @@
                 const actQty = parseFloat(row.querySelector('.act-qty').value) || 0;
                 const mat = db.materials[id];
                 
-                // Calculate isolated true FX slippage for CNY items based on Actual Qty procured
                 if (mat && mat.currency === 'CNY' && actQty > 0 && actCost > 0) {
                     const expectedBaseCost = actQty * mat.origCost * exRate;
                     autoFxFee += (actCost - expectedBaseCost);
                 }
             });
 
-            // Automatically overwrite the Monthly FX Bank Fees OPEX input
             const fxOpexRow = document.querySelector('.actual-opex-row[data-name="Monthly_FX_Bank_Fees"]');
             if (fxOpexRow) {
                 const fxInput = fxOpexRow.querySelector('.act-opex-val');
@@ -1238,11 +1256,19 @@
             });
             autoFees = autoRev * (db.config['TikTok_Fee_Pct'] || db.config['Platform_Commission_Pct'] || 0.20);
 
-            const manualRevStr = document.getElementById('manual-macro-rev')?.value;
+            const revSettled = document.getElementById('manual-macro-rev-tt-settled')?.value;
+            const revPending = document.getElementById('manual-macro-rev-tt-pending')?.value;
+            const revOther = document.getElementById('manual-macro-rev-other')?.value;
+            
+            let manualRevTotal = undefined;
+            if (revSettled !== '' && revSettled !== undefined) manualRevTotal = (manualRevTotal || 0) + parseFloat(revSettled);
+            if (revPending !== '' && revPending !== undefined) manualRevTotal = (manualRevTotal || 0) + parseFloat(revPending);
+            if (revOther !== '' && revOther !== undefined) manualRevTotal = (manualRevTotal || 0) + parseFloat(revOther);
+
             const manualFeesStr = document.getElementById('manual-macro-fees')?.value;
             const manualAdsStr = document.getElementById('manual-macro-ads')?.value;
 
-            const finalRev = manualRevStr !== '' && manualRevStr !== undefined ? parseFloat(manualRevStr) : autoRev;
+            const finalRev = manualRevTotal !== undefined ? manualRevTotal : autoRev;
             const finalFees = manualFeesStr !== '' && manualFeesStr !== undefined ? parseFloat(manualFeesStr) : autoFees;
             const finalAds = manualAdsStr !== '' && manualAdsStr !== undefined ? parseFloat(manualAdsStr) : autoAds;
             
@@ -1263,14 +1289,32 @@
             `;
         };
 
-        document.querySelectorAll('.act-sold, .act-prod, .act-qty, .act-cost, .act-opex-val, #manual-macro-rev, #manual-macro-fees, #manual-macro-ads').forEach(el => {
+        document.querySelectorAll('.act-sold, .act-prod, .act-qty, .act-cost, .act-opex-val, #manual-macro-rev-tt-settled, #manual-macro-rev-tt-pending, #manual-macro-rev-other, #manual-macro-fees, #manual-macro-ads').forEach(el => {
             el.addEventListener('input', liveUpdateActuals);
+        });
+
+        // Add auto-lock mechanism for manual inputs
+        document.querySelectorAll('.act-qty, .act-cost').forEach(inp => {
+            inp.addEventListener('input', (e) => {
+                const row = e.target.closest('.actual-cost-row');
+                if (row) {
+                    row.dataset.locked = "true";
+                    const lockIcon = row.querySelector('.lock-icon');
+                    if (lockIcon) lockIcon.classList.remove('hidden');
+                }
+            });
         });
 
         document.querySelectorAll('.btn-sync-row').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 e.preventDefault();
                 const row = btn.closest('.actual-cost-row');
+                
+                // Unlock
+                row.dataset.locked = "false";
+                const lockIcon = row.querySelector('.lock-icon');
+                if (lockIcon) lockIcon.classList.add('hidden');
+
                 const theoQty = parseFloat(btn.dataset.theoQty) || 0;
                 const theoCost = parseFloat(btn.dataset.theoCost) || 0;
                 
@@ -1284,11 +1328,50 @@
                 if (remarksInp) remarksInp.value = 'Synced to Plan';
 
                 liveUpdateActuals();
-                
-                // Add visual pulse feedback
                 row.classList.add('border-luxe', 'bg-luxe/5');
                 setTimeout(() => row.classList.remove('border-luxe', 'bg-luxe/5'), 400);
             });
+        });
+
+        document.querySelectorAll('.btn-sync-vol').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                const row = btn.closest('.actual-vol-row');
+                const theoProd = parseInt(btn.dataset.theoProd) || 0;
+                
+                const prodInp = row.querySelector('.act-prod');
+                if (prodInp) prodInp.value = theoProd;
+
+                liveUpdateActuals();
+                row.classList.add('border-luxe', 'bg-luxe/5');
+                setTimeout(() => row.classList.remove('border-luxe', 'bg-luxe/5'), 400);
+            });
+        });
+        
+        document.getElementById('btn-bulk-sync-costing')?.addEventListener('click', (e) => {
+            e.stopPropagation();
+            document.querySelectorAll('.actual-cost-row').forEach(row => {
+                if (row.dataset.locked === "true") return; // Skip locked rows
+                
+                const btn = row.querySelector('.btn-sync-row');
+                if (!btn) return;
+                
+                const theoQty = parseFloat(btn.dataset.theoQty) || 0;
+                const theoCost = parseFloat(btn.dataset.theoCost) || 0;
+                
+                const qtyInp = row.querySelector('.act-qty');
+                if (qtyInp && qtyInp.type !== 'hidden') qtyInp.value = theoQty.toFixed(1);
+                
+                const costInp = row.querySelector('.act-cost');
+                if (costInp) costInp.value = theoCost.toFixed(2);
+                
+                const remarksInp = row.querySelector('.act-remarks');
+                if (remarksInp) remarksInp.value = 'Synced to Plan';
+                
+                row.classList.add('border-luxe', 'bg-luxe/5');
+                setTimeout(() => row.classList.remove('border-luxe', 'bg-luxe/5'), 400);
+            });
+            liveUpdateActuals();
         });
 
         liveUpdateActuals();
@@ -1333,7 +1416,7 @@
                 try {
                     const res = await postManagerAction('extract_actuals_draft', { images: imagesArray, month: monthInput.value }, { skipLoader: true });
                     if (res.data.macro) {
-                        if (document.getElementById('manual-macro-rev') && res.data.macro.revenue) document.getElementById('manual-macro-rev').value = res.data.macro.revenue;
+                        if (document.getElementById('manual-macro-rev-tt-settled') && res.data.macro.revenue) document.getElementById('manual-macro-rev-tt-settled').value = res.data.macro.revenue;
                         if (document.getElementById('manual-macro-fees') && res.data.macro.platform_fees) document.getElementById('manual-macro-fees').value = res.data.macro.platform_fees;
                         if (document.getElementById('manual-macro-ads') && res.data.macro.ad_spend) document.getElementById('manual-macro-ads').value = res.data.macro.ad_spend;
                     }
@@ -2247,6 +2330,10 @@
                 row.querySelector('.act-qty').value = item.actualQty.toFixed(1);
                 row.querySelector('.act-cost').value = distributedCost.toFixed(2);
                 row.querySelector('.act-remarks').value = "Bulk Invoice Split";
+                
+                row.dataset.locked = "true";
+                const lockIcon = row.querySelector('.lock-icon');
+                if (lockIcon) lockIcon.classList.remove('hidden');
             }
         });
 
