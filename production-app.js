@@ -357,7 +357,8 @@
         
         const costing = [];
         document.querySelectorAll('.actual-cost-row').forEach(row => {
-            const isLocked = row.querySelector('.act-lock-cb') ? row.querySelector('.act-lock-cb').checked : false;
+            const lockState = row.querySelector('.act-lock-state');
+            const isLocked = lockState ? (lockState.value === 'true') : false;
             costing.push({ 
                 id: row.dataset.id, 
                 category: row.dataset.category, 
@@ -1110,14 +1111,19 @@
             const sold = hist ? parseInt(hist.Qty_Sold) || 0 : 0;
             if (p.Planned_Qty === 0 && prod === 0 && sold === 0) return;
 
+            const isVolSync = prod === parseInt(p.Planned_Qty);
+            const highlightClasses = !isVolSync ? '!border-yellow-400/50 !bg-yellow-400/10' : '';
+            const dismissBtn = !isVolSync ? `<button class="btn-dismiss-highlight text-yellow-400/50 hover:text-yellow-400 ml-2 tap-none shrink-0" title="Dismiss Alert"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>` : '';
+
             volList.innerHTML += `
-                <div class="glass-panel p-3 rounded-xl flex items-center justify-between gap-3 actual-vol-row" data-design="${p.Design_Code}">
+                <div class="glass-panel p-3 rounded-xl flex items-center justify-between gap-3 actual-vol-row transition-colors ${highlightClasses}" data-design="${p.Design_Code}">
                     <div class="flex-1">
                         <div class="flex items-center gap-2">
                             <span class="text-white text-sm font-medium">${p.Design_Code}</span>
                             <button class="btn-sync-vol text-white/30 hover:text-luxe transition-colors tap-none shrink-0" data-theo-prod="${p.Planned_Qty}" title="Sync Prod to Plan">
                                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
                             </button>
+                            ${dismissBtn}
                         </div>
                         <span class="text-white/40 text-[9px] uppercase tracking-widest block">Plan: ${p.Planned_Qty}</span>
                     </div>
@@ -1143,15 +1149,23 @@
             // ZERO-FILTER: Skip rendering if plan is zero, actual is zero, and it isn't locked.
             if (planQty === 0 && actQty === 0 && actCost === 0 && !isLocked) return;
 
+            const isCostSync = Math.abs(actCost - theoCost) < 0.05 && Math.abs(actQty - planQty) < 0.05;
+            const highlightClasses = !isCostSync ? '!border-yellow-400/50 !bg-yellow-400/10' : '';
+            const dismissBtn = !isCostSync ? `<button class="btn-dismiss-highlight text-yellow-400/50 hover:text-yellow-400 tap-none shrink-0" title="Dismiss Alert"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>` : '';
+
             costList.innerHTML += `
-                <div class="glass-panel p-3 rounded-xl flex flex-col gap-2 actual-cost-row" data-id="${id}" data-category="${mat.category}">
+                <div class="glass-panel p-3 rounded-xl flex flex-col gap-2 actual-cost-row transition-colors ${highlightClasses}" data-id="${id}" data-category="${mat.category}">
                     <div class="flex justify-between items-center">
                         <div class="flex items-center gap-2 truncate">
-                            <input type="checkbox" class="act-lock-cb rounded border-white/20 bg-black/40 text-luxe focus:ring-0" title="Lock this row" ${isLocked ? 'checked' : ''}>
+                            <button class="btn-toggle-lock text-xs tap-none shrink-0 ${isLocked ? 'text-luxe' : 'text-white/20 hover:text-white/50'}" title="Toggle Lock">
+                                <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C9.243 2 7 4.243 7 7v3H6c-1.103 0-2 .897-2 2v8c0 1.103.897 2 2 2h12c1.103 0 2-.897 2-2v-8c0-1.103-.897-2-2-2h-1V7c0-2.757-2.243-5-5-5zm-3 5c0-1.654 1.346-3 3-3s3 1.346 3 3v3H9V7zm8 7v6H5v-6h14z"></path></svg>
+                            </button>
+                            <input type="hidden" class="act-lock-state" value="${isLocked}">
                             <span class="text-white text-sm truncate">${mat.desc}</span>
                             <button class="btn-sync-row text-white/30 hover:text-luxe transition-colors tap-none shrink-0" data-theo-qty="${planQty}" data-theo-cost="${theoCost}" title="Sync to Plan">
                                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
                             </button>
+                            ${dismissBtn}
                         </div>
                         <span class="text-white/40 text-[9px] uppercase tracking-widest shrink-0 ml-2">${mat.category}</span>
                     </div>
@@ -1172,15 +1186,23 @@
             const actLaborCost = histLabor ? parseFloat(histLabor.Actual_Total_Cost_RM) || 0 : totalPlanLabor;
             const isLockedLabor = histLabor && (histLabor.Locked === true || histLabor.Locked === 'true' || histLabor.Locked === 'TRUE');
 
+            const isLaborSync = Math.abs(actLaborCost - totalPlanLabor) < 0.05;
+            const highlightClasses = !isLaborSync ? '!border-yellow-400/50 !bg-yellow-400/10' : '';
+            const dismissBtn = !isLaborSync ? `<button class="btn-dismiss-highlight text-yellow-400/50 hover:text-yellow-400 tap-none shrink-0" title="Dismiss Alert"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>` : '';
+
             laborContainer.innerHTML = `
-                <div class="glass-panel p-3 rounded-xl flex flex-col gap-2 actual-cost-row border-l-2 border-luxe" data-id="DIRECT-LABOR" data-category="Operational">
+                <div class="glass-panel p-3 rounded-xl flex flex-col gap-2 actual-cost-row border-l-2 border-luxe transition-colors ${highlightClasses}" data-id="DIRECT-LABOR" data-category="Operational">
                     <div class="flex justify-between items-center">
                         <div class="flex items-center gap-2">
-                            <input type="checkbox" class="act-lock-cb rounded border-white/20 bg-black/40 text-luxe focus:ring-0" title="Lock this row" ${isLockedLabor ? 'checked' : ''}>
+                            <button class="btn-toggle-lock text-xs tap-none shrink-0 ${isLockedLabor ? 'text-luxe' : 'text-white/20 hover:text-white/50'}" title="Toggle Lock">
+                                <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C9.243 2 7 4.243 7 7v3H6c-1.103 0-2 .897-2 2v8c0 1.103.897 2 2 2h12c1.103 0 2-.897 2-2v-8c0-1.103-.897-2-2-2h-1V7c0-2.757-2.243-5-5-5zm-3 5c0-1.654 1.346-3 3-3s3 1.346 3 3v3H9V7zm8 7v6H5v-6h14z"></path></svg>
+                            </button>
+                            <input type="hidden" class="act-lock-state" value="${isLockedLabor}">
                             <span class="text-luxe text-sm font-bold">Direct Labor / Tailoring</span>
                             <button class="btn-sync-row text-white/30 hover:text-luxe transition-colors tap-none shrink-0" data-theo-qty="1" data-theo-cost="${totalPlanLabor}" title="Sync to Plan">
                                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
                             </button>
+                            ${dismissBtn}
                         </div>
                         <span class="text-white/40 text-[9px] uppercase tracking-widest shrink-0 ml-2">Operational</span>
                     </div>
@@ -1304,14 +1326,37 @@
             el.addEventListener('input', liveUpdateActuals);
         });
 
+        document.querySelectorAll('.btn-toggle-lock').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                const stateInp = btn.nextElementSibling;
+                const isCurrentlyLocked = stateInp.value === 'true';
+                stateInp.value = (!isCurrentlyLocked).toString();
+                
+                if (!isCurrentlyLocked) {
+                    btn.classList.replace('text-white/20', 'text-luxe');
+                    btn.classList.remove('hover:text-white/50');
+                } else {
+                    btn.classList.replace('text-luxe', 'text-white/20');
+                    btn.classList.add('hover:text-white/50');
+                }
+            });
+        });
+
+        document.querySelectorAll('.btn-dismiss-highlight').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                const row = btn.closest('.glass-panel');
+                row.classList.remove('!border-yellow-400/50', '!bg-yellow-400/10');
+                btn.remove();
+            });
+        });
+
         document.querySelectorAll('.btn-sync-row').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 e.preventDefault();
                 const row = btn.closest('.actual-cost-row');
                 
-                const lockCb = row.querySelector('.act-lock-cb');
-                if (lockCb) lockCb.checked = false; // Automatically unlock when explicitly syncing
-
                 const theoQty = parseFloat(btn.dataset.theoQty) || 0;
                 const theoCost = parseFloat(btn.dataset.theoCost) || 0;
                 
@@ -1323,6 +1368,10 @@
                 
                 const remarksInp = row.querySelector('.act-remarks');
                 if (remarksInp) remarksInp.value = 'Synced to Plan';
+
+                row.classList.remove('!border-yellow-400/50', '!bg-yellow-400/10');
+                const dismiss = row.querySelector('.btn-dismiss-highlight');
+                if (dismiss) dismiss.remove();
 
                 liveUpdateActuals();
                 row.classList.add('border-luxe', 'bg-luxe/5');
@@ -1339,17 +1388,40 @@
                 const prodInp = row.querySelector('.act-prod');
                 if (prodInp) prodInp.value = theoProd;
 
+                row.classList.remove('!border-yellow-400/50', '!bg-yellow-400/10');
+                const dismiss = row.querySelector('.btn-dismiss-highlight');
+                if (dismiss) dismiss.remove();
+
                 liveUpdateActuals();
                 row.classList.add('border-luxe', 'bg-luxe/5');
                 setTimeout(() => row.classList.remove('border-luxe', 'bg-luxe/5'), 400);
             });
         });
         
+        document.getElementById('btn-bulk-sync-volume')?.addEventListener('click', (e) => {
+            e.stopPropagation();
+            document.querySelectorAll('.actual-vol-row').forEach(row => {
+                const btn = row.querySelector('.btn-sync-vol');
+                if (!btn) return;
+                const theoProd = parseInt(btn.dataset.theoProd) || 0;
+                const prodInp = row.querySelector('.act-prod');
+                if (prodInp) prodInp.value = theoProd;
+                
+                row.classList.remove('!border-yellow-400/50', '!bg-yellow-400/10');
+                const dismiss = row.querySelector('.btn-dismiss-highlight');
+                if (dismiss) dismiss.remove();
+                
+                row.classList.add('border-luxe', 'bg-luxe/5');
+                setTimeout(() => row.classList.remove('border-luxe', 'bg-luxe/5'), 400);
+            });
+            liveUpdateActuals();
+        });
+
         document.getElementById('btn-bulk-sync-costing')?.addEventListener('click', (e) => {
             e.stopPropagation();
             document.querySelectorAll('.actual-cost-row').forEach(row => {
-                const lockCb = row.querySelector('.act-lock-cb');
-                if (lockCb && lockCb.checked) return; // Safely skip locked rows
+                const lockState = row.querySelector('.act-lock-state');
+                if (lockState && lockState.value === "true") return; // Safely skip locked rows
                 
                 const btn = row.querySelector('.btn-sync-row');
                 if (!btn) return;
@@ -1366,6 +1438,10 @@
                 const remarksInp = row.querySelector('.act-remarks');
                 if (remarksInp) remarksInp.value = 'Synced to Plan';
                 
+                row.classList.remove('!border-yellow-400/50', '!bg-yellow-400/10');
+                const dismiss = row.querySelector('.btn-dismiss-highlight');
+                if (dismiss) dismiss.remove();
+
                 row.classList.add('border-luxe', 'bg-luxe/5');
                 setTimeout(() => row.classList.remove('border-luxe', 'bg-luxe/5'), 400);
             });
@@ -2329,8 +2405,13 @@
                 row.querySelector('.act-cost').value = distributedCost.toFixed(2);
                 row.querySelector('.act-remarks').value = "Bulk Invoice Split";
                 
-                const lockCb = row.querySelector('.act-lock-cb');
-                if (lockCb) lockCb.checked = true;
+                const lockState = row.querySelector('.act-lock-state');
+                if (lockState) lockState.value = "true";
+                const lockBtn = row.querySelector('.btn-toggle-lock');
+                if (lockBtn) {
+                    lockBtn.classList.replace('text-white/20', 'text-luxe');
+                    lockBtn.classList.remove('hover:text-white/50');
+                }
             }
         });
 
