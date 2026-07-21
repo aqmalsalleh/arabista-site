@@ -1149,7 +1149,13 @@
             // ZERO-FILTER: Skip rendering if plan is zero, actual is zero, and it isn't locked.
             if (planQty === 0 && actQty === 0 && actCost === 0 && !isLocked) return;
 
-            const isCostSync = Math.abs(actCost - theoCost) < 0.05 && Math.abs(actQty - planQty) < 0.05;
+            let isCostSync = true;
+            if (Math.abs(actQty - planQty) > 0.05) {
+                isCostSync = false; // Volume mismatch
+            } else if (Math.abs(actCost - theoCost) > 5.00) {
+                isCostSync = false; // Cost mismatch outside RM 5.00 FX tolerance
+            }
+            
             const highlightClasses = !isCostSync ? '!border-yellow-400/50 !bg-yellow-400/10' : '';
             const dismissBtn = !isCostSync ? `<button class="btn-dismiss-highlight text-yellow-400/50 hover:text-yellow-400 tap-none shrink-0" title="Dismiss Alert"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>` : '';
 
@@ -1157,7 +1163,7 @@
                 <div class="glass-panel p-3 rounded-xl flex flex-col gap-2 actual-cost-row transition-colors ${highlightClasses}" data-id="${id}" data-category="${mat.category}">
                     <div class="flex justify-between items-center">
                         <div class="flex items-center gap-2 truncate">
-                            <button class="btn-toggle-lock text-xs tap-none shrink-0 ${isLocked ? 'text-luxe' : 'text-white/20 hover:text-white/50'}" title="Toggle Lock">
+                            <button class="btn-toggle-lock text-xs tap-none shrink-0 ${isLocked ? 'text-luxe' : 'text-white/40 hover:text-white'}" title="Toggle Lock">
                                 <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C9.243 2 7 4.243 7 7v3H6c-1.103 0-2 .897-2 2v8c0 1.103.897 2 2 2h12c1.103 0 2-.897 2-2v-8c0-1.103-.897-2-2-2h-1V7c0-2.757-2.243-5-5-5zm-3 5c0-1.654 1.346-3 3-3s3 1.346 3 3v3H9V7zm8 7v6H5v-6h14z"></path></svg>
                             </button>
                             <input type="hidden" class="act-lock-state" value="${isLocked}">
@@ -1186,7 +1192,7 @@
             const actLaborCost = histLabor ? parseFloat(histLabor.Actual_Total_Cost_RM) || 0 : totalPlanLabor;
             const isLockedLabor = histLabor && (histLabor.Locked === true || histLabor.Locked === 'true' || histLabor.Locked === 'TRUE');
 
-            const isLaborSync = Math.abs(actLaborCost - totalPlanLabor) < 0.05;
+            const isLaborSync = Math.abs(actLaborCost - totalPlanLabor) <= 5.00;
             const highlightClasses = !isLaborSync ? '!border-yellow-400/50 !bg-yellow-400/10' : '';
             const dismissBtn = !isLaborSync ? `<button class="btn-dismiss-highlight text-yellow-400/50 hover:text-yellow-400 tap-none shrink-0" title="Dismiss Alert"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>` : '';
 
@@ -1194,7 +1200,7 @@
                 <div class="glass-panel p-3 rounded-xl flex flex-col gap-2 actual-cost-row border-l-2 border-luxe transition-colors ${highlightClasses}" data-id="DIRECT-LABOR" data-category="Operational">
                     <div class="flex justify-between items-center">
                         <div class="flex items-center gap-2">
-                            <button class="btn-toggle-lock text-xs tap-none shrink-0 ${isLockedLabor ? 'text-luxe' : 'text-white/20 hover:text-white/50'}" title="Toggle Lock">
+                            <button class="btn-toggle-lock text-xs tap-none shrink-0 ${isLockedLabor ? 'text-luxe' : 'text-white/40 hover:text-white'}" title="Toggle Lock">
                                 <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C9.243 2 7 4.243 7 7v3H6c-1.103 0-2 .897-2 2v8c0 1.103.897 2 2 2h12c1.103 0 2-.897 2-2v-8c0-1.103-.897-2-2-2h-1V7c0-2.757-2.243-5-5-5zm-3 5c0-1.654 1.346-3 3-3s3 1.346 3 3v3H9V7zm8 7v6H5v-6h14z"></path></svg>
                             </button>
                             <input type="hidden" class="act-lock-state" value="${isLockedLabor}">
@@ -1334,11 +1340,11 @@
                 stateInp.value = (!isCurrentlyLocked).toString();
                 
                 if (!isCurrentlyLocked) {
-                    btn.classList.replace('text-white/20', 'text-luxe');
-                    btn.classList.remove('hover:text-white/50');
+                    btn.classList.replace('text-white/40', 'text-luxe');
+                    btn.classList.remove('hover:text-white');
                 } else {
-                    btn.classList.replace('text-luxe', 'text-white/20');
-                    btn.classList.add('hover:text-white/50');
+                    btn.classList.replace('text-luxe', 'text-white/40');
+                    btn.classList.add('hover:text-white');
                 }
             });
         });
@@ -2409,8 +2415,8 @@
                 if (lockState) lockState.value = "true";
                 const lockBtn = row.querySelector('.btn-toggle-lock');
                 if (lockBtn) {
-                    lockBtn.classList.replace('text-white/20', 'text-luxe');
-                    lockBtn.classList.remove('hover:text-white/50');
+                    lockBtn.classList.replace('text-white/40', 'text-luxe');
+                    lockBtn.classList.remove('hover:text-white');
                 }
             }
         });
