@@ -1950,9 +1950,14 @@
             const displayCostRM = mat.currency === 'CNY' ? `(≈ RM ${mat.costRM.toFixed(2)})` : '';
             matEditorList.innerHTML += `
                 <div class="glass-panel p-3 rounded-xl flex items-center justify-between gap-3">
-                    <div class="flex-1 truncate">
-                        <p class="text-white text-sm truncate">${mat.desc}</p>
-                        <p class="text-white/40 text-[10px] uppercase tracking-widest">${id} • ${mat.unit}</p>
+                    <div class="flex-1 truncate flex items-center gap-2">
+                        <button class="btn-delete-mat text-white/20 hover:text-red-400 transition-colors tap-none shrink-0" data-mat-id="${id}" title="Delete Material">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                        </button>
+                        <div class="truncate">
+                            <p class="text-white text-sm truncate">${mat.desc}</p>
+                            <p class="text-white/40 text-[10px] uppercase tracking-widest">${id} • ${mat.unit}</p>
+                        </div>
                     </div>
                     <div class="w-32 flex flex-col items-end shrink-0">
                         <div class="flex items-center gap-1 w-full bg-black/40 border border-white/10 rounded-lg overflow-hidden">
@@ -1962,6 +1967,29 @@
                         <span class="text-[9px] text-white/30 mt-1 mr-1">${displayCostRM}</span>
                     </div>
                 </div>`;
+        });
+
+        document.querySelectorAll('.btn-delete-mat').forEach(btn => {
+            btn.addEventListener('click', async (e) => {
+                e.preventDefault();
+                const id = btn.currentTarget.dataset.matId;
+                if (!confirm(`Are you absolutely sure you want to permanently delete material ${id}?\n\nWARNING: Ensure no active designs are currently using this material in their recipes.`)) return;
+
+                btn.disabled = true;
+                btn.innerHTML = '<span class="inline-block w-3 h-3 border-2 border-red-400 border-t-transparent rounded-full animate-spin"></span>';
+                
+                try {
+                    await postManagerAction('delete_raw_material', { itemId: id });
+                    await fetchData();
+                    alert(`Material ${id} successfully deleted.`);
+                    renderMaterialEditor();
+                    populateBomDropdown();
+                } catch (err) {
+                    alert('Error: ' + err.message);
+                    btn.disabled = false;
+                    btn.innerHTML = '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>';
+                }
+            });
         });
     }
 
@@ -2116,8 +2144,11 @@
                         <select id="select-${prefix}" data-bom-id-key="${prefix + '_ID'}" class="bom-field-select flex-1 bg-black/40 border border-white/10 rounded-lg text-white px-2 py-2 text-sm focus:border-luxe outline-none truncate">
                             ${materialOptions}
                         </select>
-                        <button type="button" class="btn-quick-add-mat bg-white/10 text-white/70 hover:bg-luxe hover:text-ink px-3 rounded-lg transition tap-none font-bold" data-prefix="${prefix}">+</button>
-                        <input type="number" step="0.01" placeholder="Qty" data-bom-qty-key="${prefix + '_Qty'}" value="${currentQty > 0 ? currentQty : ''}" class="bom-field-input w-20 bg-black/40 border border-white/10 rounded-lg text-white text-center py-2 text-sm focus:border-luxe outline-none">
+                        <button type="button" class="btn-quick-add-mat bg-white/10 text-white/70 hover:bg-luxe hover:text-ink px-3 rounded-lg transition tap-none font-bold shrink-0" data-prefix="${prefix}">+</button>
+                        <input type="number" step="0.01" placeholder="Qty" data-bom-qty-key="${prefix + '_Qty'}" value="${currentQty > 0 ? currentQty : ''}" class="bom-field-input w-20 bg-black/40 border border-white/10 rounded-lg text-white text-center py-2 text-sm focus:border-luxe outline-none shrink-0">
+                        <button type="button" class="btn-delete-bom-column text-white/20 hover:text-red-400 transition-colors tap-none px-2 flex items-center justify-center shrink-0" data-prefix="${prefix}" title="Delete Entire Component Category">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                        </button>
                     </div>
                 </div>`;
         });
@@ -2146,6 +2177,33 @@
         document.querySelectorAll('.btn-quick-add-mat').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 openQuickAddModal(e.target.dataset.prefix);
+            });
+        });
+
+        document.querySelectorAll('.btn-delete-bom-column').forEach(btn => {
+            btn.addEventListener('click', async (e) => {
+                e.preventDefault();
+                const prefix = e.currentTarget.dataset.prefix;
+                if (!confirm(`Are you absolutely sure you want to permanently delete the "${prefix}" component category from the ENTIRE database?\n\nWARNING: This will remove the ${prefix}_ID and ${prefix}_Qty columns from ALL designs in the BOM_Master sheet.`)) return;
+
+                btn.disabled = true;
+                btn.innerHTML = '<span class="inline-block w-3 h-3 border-2 border-red-400 border-t-transparent rounded-full animate-spin"></span>';
+                
+                try {
+                    await postManagerAction('delete_bom_column', { prefix });
+                    await fetchData();
+                    alert(`Component category "${prefix}" successfully deleted.`);
+                    // Re-render the recipe fields
+                    if (bomMode === 'edit' && bomEditorSelect.value) {
+                        renderBomRecipeFields(bomEditorSelect.value);
+                    } else if (bomMode === 'create' && bomCloneSelect.value) {
+                        renderBomRecipeFields(bomCloneSelect.value);
+                    }
+                } catch (err) {
+                    alert('Error: ' + err.message);
+                    btn.disabled = false;
+                    btn.innerHTML = '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>';
+                }
             });
         });
 
