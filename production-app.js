@@ -1972,7 +1972,7 @@
         document.querySelectorAll('.btn-delete-mat').forEach(btn => {
             btn.addEventListener('click', async (e) => {
                 e.preventDefault();
-                const id = btn.currentTarget.dataset.matId;
+                const id = btn.dataset.matId; // FIXED: Using btn.dataset directly
                 if (!confirm(`Are you absolutely sure you want to permanently delete material ${id}?\n\nWARNING: Ensure no active designs are currently using this material in their recipes.`)) return;
 
                 btn.disabled = true;
