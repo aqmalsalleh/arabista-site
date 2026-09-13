@@ -2123,35 +2123,56 @@
                 </div>
             </div>`;
 
-        // Extract all dynamic component columns from the BOM database structural headers
         const sampleBom = db.bom[Object.keys(db.bom)[0]] || {};
         const prefixes = Object.keys(sampleBom).filter(k => k.endsWith('_ID') && k !== 'Design_Code').map(k => k.slice(0, -3));
+
+        let componentsHtml = '';
+        let hiddenPrefixes = [];
 
         prefixes.forEach(prefix => {
             const currentId = sourceBom[prefix + '_ID'] || 'NONE';
             const currentQty = parseFloat(sourceBom[prefix + '_Qty']) || 0;
 
+            const isHidden = (currentId === 'NONE' || currentId === '') && currentQty === 0;
+            if (isHidden) hiddenPrefixes.push(prefix);
+
             let materialOptions = `<option value="NONE">None</option>`;
+            let currentUnit = '-';
             Object.entries(db.materials).forEach(([matId, mat]) => {
                 const selected = (currentId === matId) ? 'selected' : '';
+                if (currentId === matId) currentUnit = mat.unit || '-';
                 materialOptions += `<option value="${matId}" ${selected}>${mat.desc} - RM${mat.costRM.toFixed(2)}</option>`;
             });
 
-            bomEditorFields.innerHTML += `
-                <div class="glass-panel p-3 rounded-xl flex flex-col gap-2">
+            componentsHtml += `
+                <div class="glass-panel p-3 rounded-xl flex flex-col gap-2 recipe-component-row ${isHidden ? 'hidden' : ''}" data-prefix="${prefix}">
                     <div class="text-luxe text-[10px] uppercase tracking-widest">${prefix} Component</div>
-                    <div class="flex gap-2">
-                        <select id="select-${prefix}" data-bom-id-key="${prefix + '_ID'}" class="bom-field-select flex-1 bg-black/40 border border-white/10 rounded-lg text-white px-2 py-2 text-sm focus:border-luxe outline-none truncate">
+                    <div class="flex gap-2 items-start">
+                        <select id="select-${prefix}" data-bom-id-key="${prefix + '_ID'}" class="bom-field-select flex-1 bg-black/40 border border-white/10 rounded-lg text-white px-2 py-2 text-sm focus:border-luxe outline-none truncate h-[38px]">
                             ${materialOptions}
                         </select>
-                        <button type="button" class="btn-quick-add-mat bg-white/10 text-white/70 hover:bg-luxe hover:text-ink px-3 rounded-lg transition tap-none font-bold shrink-0" data-prefix="${prefix}">+</button>
-                        <input type="number" step="0.01" placeholder="Qty" data-bom-qty-key="${prefix + '_Qty'}" value="${currentQty > 0 ? currentQty : ''}" class="bom-field-input w-20 bg-black/40 border border-white/10 rounded-lg text-white text-center py-2 text-sm focus:border-luxe outline-none shrink-0">
-                        <button type="button" class="btn-delete-bom-column text-white/20 hover:text-red-400 transition-colors tap-none px-2 flex items-center justify-center shrink-0" data-prefix="${prefix}" title="Delete Entire Component Category">
+                        <button type="button" class="btn-quick-add-mat bg-white/10 text-white/70 hover:bg-luxe hover:text-ink px-3 py-2 rounded-lg transition tap-none font-bold shrink-0 h-[38px]" data-prefix="${prefix}">+</button>
+                        <div class="flex flex-col w-20 shrink-0">
+                            <input type="number" step="0.01" placeholder="Qty" data-bom-qty-key="${prefix + '_Qty'}" value="${currentQty > 0 ? currentQty : ''}" class="bom-field-input w-full bg-black/40 border border-white/10 rounded-lg text-white text-center py-2 text-sm focus:border-luxe outline-none h-[38px]">
+                            <span class="component-unit-label text-[9px] text-white/40 uppercase tracking-widest text-center mt-1 truncate w-full" id="unit-${prefix}">${currentUnit}</span>
+                        </div>
+                        <button type="button" class="btn-clear-recipe-comp text-white/20 hover:text-red-400 transition-colors tap-none px-2 flex items-center justify-center shrink-0 h-[38px]" data-prefix="${prefix}" title="Remove Component from Recipe">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
                         </button>
                     </div>
                 </div>`;
         });
+
+        bomEditorFields.innerHTML += componentsHtml;
+
+        bomEditorFields.innerHTML += `
+            <div class="flex gap-2 mt-2 items-center justify-center border border-dashed border-white/10 rounded-xl p-3 bg-black/20" id="add-component-container">
+                <select id="add-component-dropdown" class="flex-1 bg-black/40 border border-white/10 rounded-lg text-white px-2 py-2 text-sm focus:border-luxe outline-none">
+                    <option value="">+ Add Component...</option>
+                </select>
+                <button type="button" id="btn-reveal-component" class="bg-luxe text-ink px-4 py-2 rounded-lg transition tap-none font-bold text-xs uppercase tracking-widest disabled:opacity-50" disabled>Add</button>
+            </div>
+        `;
 
         bomEditorFields.innerHTML += `
             <div class="glass-panel p-3 rounded-xl flex items-center justify-between gap-3 border border-luxe/30 mt-2">
@@ -2173,37 +2194,70 @@
                 </div>
             </div>`;
 
-        // Bind Quick-Add Modal Triggers (after all innerHTML writes)
+        const updateAddComponentDropdown = () => {
+            const dd = document.getElementById('add-component-dropdown');
+            const btn = document.getElementById('btn-reveal-component');
+            if (!dd) return;
+            
+            dd.innerHTML = '<option value="">+ Add Component...</option>';
+            let hasOptions = false;
+            
+            document.querySelectorAll('.recipe-component-row.hidden').forEach(row => {
+                const prefix = row.dataset.prefix;
+                dd.innerHTML += `<option value="${prefix}">${prefix}</option>`;
+                hasOptions = true;
+            });
+            
+            if (!hasOptions) {
+                dd.innerHTML = '<option value="">No more components</option>';
+                dd.disabled = true;
+                btn.disabled = true;
+            } else {
+                dd.disabled = false;
+                btn.disabled = false;
+            }
+        };
+
+        updateAddComponentDropdown();
+
+        document.getElementById('btn-reveal-component').addEventListener('click', (e) => {
+            e.preventDefault();
+            const dd = document.getElementById('add-component-dropdown');
+            const prefix = dd.value;
+            if (!prefix) return;
+            
+            const row = document.querySelector(`.recipe-component-row[data-prefix="${prefix}"]`);
+            if (row) {
+                row.classList.remove('hidden');
+                updateAddComponentDropdown();
+            }
+        });
+
         document.querySelectorAll('.btn-quick-add-mat').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 openQuickAddModal(e.target.dataset.prefix);
             });
         });
 
-        document.querySelectorAll('.btn-delete-bom-column').forEach(btn => {
-            btn.addEventListener('click', async (e) => {
+        document.querySelectorAll('.btn-clear-recipe-comp').forEach(btn => {
+            btn.addEventListener('click', (e) => {
                 e.preventDefault();
                 const prefix = e.currentTarget.dataset.prefix;
-                if (!confirm(`Are you absolutely sure you want to permanently delete the "${prefix}" component category from the ENTIRE database?\n\nWARNING: This will remove the ${prefix}_ID and ${prefix}_Qty columns from ALL designs in the BOM_Master sheet.`)) return;
-
-                btn.disabled = true;
-                btn.innerHTML = '<span class="inline-block w-3 h-3 border-2 border-red-400 border-t-transparent rounded-full animate-spin"></span>';
+                const selectEl = document.getElementById(`select-${prefix}`);
+                const qtyInp = document.querySelector(`input[data-bom-qty-key="${prefix}_Qty"]`);
+                const unitLabel = document.getElementById(`unit-${prefix}`);
                 
-                try {
-                    await postManagerAction('delete_bom_column', { prefix });
-                    await fetchData();
-                    alert(`Component category "${prefix}" successfully deleted.`);
-                    // Re-render the recipe fields
-                    if (bomMode === 'edit' && bomEditorSelect.value) {
-                        renderBomRecipeFields(bomEditorSelect.value);
-                    } else if (bomMode === 'create' && bomCloneSelect.value) {
-                        renderBomRecipeFields(bomCloneSelect.value);
-                    }
-                } catch (err) {
-                    alert('Error: ' + err.message);
-                    btn.disabled = false;
-                    btn.innerHTML = '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>';
+                if (selectEl) selectEl.value = 'NONE';
+                if (qtyInp) qtyInp.value = '';
+                if (unitLabel) unitLabel.textContent = '-';
+                
+                const row = e.currentTarget.closest('.recipe-component-row');
+                if (row) {
+                    row.classList.add('hidden');
+                    updateAddComponentDropdown();
                 }
+                
+                updateSandbox();
             });
         });
 
@@ -2214,11 +2268,16 @@
             let matCost = 0;
             document.querySelectorAll('.bom-field-select').forEach(sel => {
                 const id = sel.value;
+                const prefix = sel.dataset.bomIdKey.slice(0, -3);
+                const unitLabel = document.getElementById(`unit-${prefix}`);
+
                 if (id !== 'NONE' && db.materials[id]) {
-                    const prefix = sel.dataset.bomIdKey.slice(0, -3);
                     const qtyInput = document.querySelector(`input[data-bom-qty-key="${prefix}_Qty"]`);
                     const qty = qtyInput ? (parseFloat(qtyInput.value) || 0) : 0;
                     matCost += (db.materials[id].costRM * qty);
+                    if (unitLabel) unitLabel.textContent = db.materials[id].unit || '-';
+                } else {
+                    if (unitLabel) unitLabel.textContent = '-';
                 }
             });
 
@@ -2230,13 +2289,12 @@
             marginEl.className = `font-display text-xl sm:text-2xl ${metrics.marginPct >= 0 ? 'text-luxe' : 'text-red-400'}`;
         };
 
-        // Attach to all inputs for true live-simulation
         document.getElementById('bom-base-price-input').addEventListener('input', updateSandbox);
         document.getElementById('bom-labor-input').addEventListener('input', updateSandbox);
         document.querySelectorAll('.bom-field-input').forEach(el => el.addEventListener('input', updateSandbox));
         document.querySelectorAll('.bom-field-select').forEach(el => el.addEventListener('change', updateSandbox));
 
-        updateSandbox(); // Run once immediately
+        updateSandbox(); 
     }
 
     btnSaveBomRecipe?.addEventListener('click', async () => {
@@ -2248,8 +2306,15 @@
         }
 
         const recipeFields = {};
-        document.querySelectorAll('.bom-field-select').forEach(sel => { recipeFields[sel.dataset.bomIdKey] = sel.value; });
-        document.querySelectorAll('.bom-field-input').forEach(inp => { recipeFields[inp.dataset.bomQtyKey] = parseFloat(inp.value) || 0; });
+        document.querySelectorAll('.bom-field-select').forEach(sel => { 
+            recipeFields[sel.dataset.bomIdKey] = sel.value === 'NONE' ? '' : sel.value; 
+        });
+        document.querySelectorAll('.bom-field-input').forEach(inp => { 
+            const prefix = inp.dataset.bomQtyKey.replace('_Qty', '');
+            const selectEl = document.getElementById(`select-${prefix}`);
+            const isNone = selectEl && selectEl.value === 'NONE';
+            recipeFields[inp.dataset.bomQtyKey] = isNone ? '' : (parseFloat(inp.value) || 0); 
+        });
         recipeFields['Direct_Labor_RM'] = parseFloat(document.getElementById('bom-labor-input').value) || 0;
         recipeFields['Base_Selling_Price'] = parseFloat(document.getElementById('bom-base-price-input').value) || 0;
 
