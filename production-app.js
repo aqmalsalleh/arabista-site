@@ -131,6 +131,12 @@
     // --- AUTHENTICATION ---
     btnLogin.addEventListener('click', authenticate);
     pinInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') authenticate(); });
+    pinInput.addEventListener('input', () => { 
+        if (pinInput.value.trim().length === 6 && !btnLogin.disabled) {
+            pinInput.blur(); // Hide mobile keyboard
+            authenticate();
+        }
+    });
     btnLogout?.addEventListener('click', () => location.reload());
 
     async function authenticate() {
@@ -147,7 +153,15 @@
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                 body: `payload=${encodeURIComponent(JSON.stringify({ pin }))}`
             });
-            const json = await res.json();
+            
+            const textResponse = await res.text();
+            let json;
+            try {
+                json = JSON.parse(textResponse);
+            } catch (parseError) {
+                // Catches Google Apps Script cold-start HTML redirects
+                throw new Error('Google Server syncing... Please try again.');
+            }
             
             if (json.status === 'success') {
                 sessionPin = pin;
