@@ -2146,11 +2146,11 @@
                 <div class="glass-panel p-3 rounded-xl flex flex-col gap-2 recipe-component-row ${isHidden ? 'hidden' : ''}" data-prefix="${prefix}">
                     <div class="text-luxe text-[10px] uppercase tracking-widest">${prefix} Component</div>
                     <div class="flex gap-2 items-start">
-                        <select id="select-${prefix}" data-bom-id-key="${prefix + '_ID'}" class="bom-field-select flex-1 bg-black/40 border border-white/10 rounded-lg text-white px-2 py-2 text-sm focus:border-luxe outline-none truncate h-[38px]">
+                        <select id="select-${prefix}" data-bom-id-key="${prefix + '_ID'}" class="bom-field-select flex-1 min-w-0 w-0 bg-black/40 border border-white/10 rounded-lg text-white px-2 py-2 text-sm focus:border-luxe outline-none truncate h-[38px]">
                             ${materialOptions}
                         </select>
                         <button type="button" class="btn-quick-add-mat bg-white/10 text-white/70 hover:bg-luxe hover:text-ink px-3 py-2 rounded-lg transition tap-none font-bold shrink-0 h-[38px]" data-prefix="${prefix}">+</button>
-                        <div class="flex flex-col w-20 shrink-0">
+                        <div class="flex flex-col w-16 sm:w-20 shrink-0">
                             <input type="number" step="0.01" placeholder="Qty" data-bom-qty-key="${prefix + '_Qty'}" value="${currentQty > 0 ? currentQty : ''}" class="bom-field-input w-full bg-black/40 border border-white/10 rounded-lg text-white text-center py-2 text-sm focus:border-luxe outline-none h-[38px]">
                             <span class="component-unit-label text-[9px] text-white/40 uppercase tracking-widest text-center mt-1 truncate w-full" id="unit-${prefix}">${currentUnit}</span>
                         </div>
@@ -2165,10 +2165,10 @@
 
         bomEditorFields.innerHTML += `
             <div class="flex gap-2 mt-2 items-center justify-center border border-dashed border-white/10 rounded-xl p-3 bg-black/20" id="add-component-container">
-                <select id="add-component-dropdown" class="flex-1 bg-black/40 border border-white/10 rounded-lg text-white px-2 py-2 text-sm focus:border-luxe outline-none">
+                <select id="add-component-dropdown" class="flex-1 min-w-0 w-0 bg-black/40 border border-white/10 rounded-lg text-white px-2 py-2 text-sm focus:border-luxe outline-none truncate">
                     <option value="">+ Add Component...</option>
                 </select>
-                <button type="button" id="btn-reveal-component" class="bg-luxe text-ink px-4 py-2 rounded-lg transition tap-none font-bold text-xs uppercase tracking-widest disabled:opacity-50" disabled>Add</button>
+                <button type="button" id="btn-reveal-component" class="bg-luxe text-ink px-4 py-2 rounded-lg transition tap-none font-bold text-xs uppercase tracking-widest shrink-0 disabled:opacity-50" disabled>Add</button>
             </div>
         `;
 

@@ -327,7 +327,7 @@
 
   <!-- DATABASE MANAGER DRAWER -->
   <div id="db-manager-overlay" class="fixed inset-0 z-[60] bg-black/80 backdrop-blur-sm hidden opacity-0 transition-opacity duration-300"></div>
-  <div id="db-manager-drawer" class="fixed inset-y-0 right-0 w-full sm:max-w-lg bg-brand border-l border-white/10 z-[60] transform translate-x-full transition-transform duration-300 flex flex-col shadow-2xl">
+  <div id="db-manager-drawer" class="fixed inset-y-0 right-0 w-full sm:max-w-lg min-w-0 bg-brand border-l border-white/10 z-[60] transform translate-x-full transition-transform duration-300 flex flex-col shadow-2xl">
     
     <div class="p-6 border-b border-white/10 flex justify-between items-center shrink-0 bg-brand">
       <h2 class="font-display text-2xl text-white">Master Settings</h2>
@@ -342,7 +342,7 @@
       <button class="settings-tab-btn text-white/40 hover:text-white hover:bg-white/5 whitespace-nowrap px-4 py-2 rounded-lg text-xs uppercase tracking-widest font-medium transition-colors tap-none" data-target="panel-bom">Recipes</button>
     </div>
 
-    <div class="flex-1 overflow-y-auto overscroll-contain p-6 flex flex-col hide-scrollbar">
+    <div class="flex-1 overflow-y-auto overflow-x-hidden overscroll-contain p-6 flex flex-col min-w-0 hide-scrollbar">
       
       <!-- TAB 1: Publisher -->
       <div id="panel-publisher" class="settings-panel flex flex-col gap-6">
@@ -352,8 +352,8 @@
         
         <p class="text-white/40 text-[10px] uppercase tracking-widest mt-2 border-t border-white/10 pt-3">1. Define Material</p>
         <div class="flex gap-2">
-          <input type="text" id="mat-ai-raw-name" placeholder="Item Name (e.g. Satin Brand Tag)" class="flex-1 bg-black/40 border border-white/10 text-white px-3 py-2.5 rounded-lg focus:outline-none focus:border-luxe transition-colors placeholder:text-white/30">
-          <button id="btn-trigger-ai" class="bg-white/10 px-3 rounded-lg text-luxe text-xs uppercase tracking-widest hover:bg-white/20 transition-all">AI Fit</button>
+          <input type="text" id="mat-ai-raw-name" placeholder="Item Name (e.g. Satin Brand Tag)" class="flex-1 min-w-0 w-0 bg-black/40 border border-white/10 text-white px-3 py-2.5 rounded-lg focus:outline-none focus:border-luxe transition-colors placeholder:text-white/30">
+          <button id="btn-trigger-ai" class="bg-white/10 px-3 rounded-lg text-luxe text-xs uppercase tracking-widest hover:bg-white/20 transition-all shrink-0">AI Fit</button>
         </div>
         <input type="text" id="mat-category" placeholder="Category (e.g. Accessories, Packaging)" class="w-full bg-black/40 border border-white/10 text-white px-3 py-2.5 rounded-lg focus:outline-none focus:border-luxe transition-colors placeholder:text-white/30">
         <div class="grid grid-cols-2 gap-2">
@@ -427,7 +427,7 @@
           </select>
         </div>
 
-        <div id="bom-editor-fields" class="flex flex-col gap-3 mt-2"></div>
+        <div id="bom-editor-fields" class="flex flex-col gap-3 mt-2 min-w-0"></div>
 
         <div class="flex gap-2 mt-2">
             <button id="btn-delete-design" class="hidden w-1/3 border border-red-500/30 text-red-400 font-medium uppercase tracking-widest py-4 rounded-xl hover:bg-red-500/10 transition shadow-soft tap-none text-xs">Delete</button>
