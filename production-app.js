@@ -1117,19 +1117,19 @@
 
             volList.innerHTML += `
                 <div class="glass-panel p-3 rounded-xl flex items-center justify-between gap-3 actual-vol-row transition-colors ${highlightClasses}" data-design="${p.Design_Code}">
-                    <div class="flex-1">
+                    <div class="flex-1 min-w-0">
                         <div class="flex items-center gap-2">
-                            <span class="text-white text-sm font-medium">${p.Design_Code}</span>
+                            <span class="text-white text-sm font-medium truncate flex-1">${p.Design_Code}</span>
                             <button class="btn-sync-vol text-white/30 hover:text-luxe transition-colors tap-none shrink-0" data-theo-prod="${p.Planned_Qty}" title="Sync Prod to Plan">
                                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
                             </button>
                             ${dismissBtn}
                         </div>
-                        <span class="text-white/40 text-[9px] uppercase tracking-widest block">Plan: ${p.Planned_Qty}</span>
+                        <span class="text-white/40 text-[9px] uppercase tracking-widest block truncate">Plan: ${p.Planned_Qty}</span>
                     </div>
-                    <div class="flex gap-2 w-40">
-                        <input type="number" class="act-prod w-1/2 bg-black/40 border border-white/10 rounded text-white text-center py-1 text-xs focus:border-luxe outline-none" placeholder="Prod" value="${prod}">
-                        <input type="number" class="act-sold w-1/2 bg-black/40 border border-white/10 rounded text-luxe text-center py-1 text-xs focus:border-luxe outline-none font-bold" placeholder="Sold" value="${sold}">
+                    <div class="flex gap-2 w-32 sm:w-40 shrink-0">
+                        <input type="number" class="act-prod flex-1 w-0 bg-black/40 border border-white/10 rounded text-white text-center py-1 text-xs focus:border-luxe outline-none" placeholder="Prod" value="${prod}">
+                        <input type="number" class="act-sold flex-1 w-0 bg-black/40 border border-white/10 rounded text-luxe text-center py-1 text-xs focus:border-luxe outline-none font-bold" placeholder="Sold" value="${sold}">
                     </div>
                 </div>`;
         });
@@ -1146,14 +1146,13 @@
             const theoCost = mat.costRM * planQty;
             const isLocked = hist && (hist.Locked === true || hist.Locked === 'true' || hist.Locked === 'TRUE');
 
-            // ZERO-FILTER: Skip rendering if plan is zero, actual is zero, and it isn't locked.
             if (planQty === 0 && actQty === 0 && actCost === 0 && !isLocked) return;
 
             let isCostSync = true;
             if (Math.abs(actQty - planQty) > 0.05) {
-                isCostSync = false; // Volume mismatch
+                isCostSync = false;
             } else if (Math.abs(actCost - theoCost) > 5.00) {
-                isCostSync = false; // Cost mismatch outside RM 5.00 FX tolerance
+                isCostSync = false;
             }
             
             const highlightClasses = !isCostSync ? '!border-yellow-400/50 !bg-yellow-400/10' : '';
@@ -1161,29 +1160,28 @@
 
             costList.innerHTML += `
                 <div class="glass-panel p-3 rounded-xl flex flex-col gap-2 actual-cost-row transition-colors ${highlightClasses}" data-id="${id}" data-category="${mat.category}">
-                    <div class="flex justify-between items-center">
-                        <div class="flex items-center gap-2 truncate">
+                    <div class="flex justify-between items-center gap-2">
+                        <div class="flex-1 flex items-center gap-2 min-w-0">
                             <button class="btn-toggle-lock text-xs tap-none shrink-0 ${isLocked ? 'text-luxe' : 'text-white/40 hover:text-white'}" title="Toggle Lock">
                                 <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C9.243 2 7 4.243 7 7v3H6c-1.103 0-2 .897-2 2v8c0 1.103.897 2 2 2h12c1.103 0 2-.897 2-2v-8c0-1.103-.897-2-2-2h-1V7c0-2.757-2.243-5-5-5zm-3 5c0-1.654 1.346-3 3-3s3 1.346 3 3v3H9V7zm8 7v6H5v-6h14z"></path></svg>
                             </button>
                             <input type="hidden" class="act-lock-state" value="${isLocked}">
-                            <span class="text-white text-sm truncate">${mat.desc}</span>
+                            <span class="text-white text-sm truncate flex-1">${mat.desc}</span>
                             <button class="btn-sync-row text-white/30 hover:text-luxe transition-colors tap-none shrink-0" data-theo-qty="${planQty}" data-theo-cost="${theoCost}" title="Sync to Plan">
                                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
                             </button>
                             ${dismissBtn}
                         </div>
-                        <span class="text-white/40 text-[9px] uppercase tracking-widest shrink-0 ml-2">${mat.category}</span>
+                        <span class="text-white/40 text-[9px] uppercase tracking-widest shrink-0">${mat.category}</span>
                     </div>
                     <div class="flex gap-2">
-                        <input type="number" step="0.01" class="act-qty w-1/3 bg-black/40 border border-white/10 rounded text-white text-center py-1.5 text-xs focus:border-luxe outline-none" placeholder="Actual ${mat.unit}" value="${actQty.toFixed(1)}">
-                        <input type="number" step="0.01" class="act-cost w-1/3 bg-black/40 border border-white/10 rounded text-white text-center py-1.5 text-xs focus:border-luxe outline-none" placeholder="Total RM" value="${actCost.toFixed(2)}">
-                        <input type="text" class="act-remarks w-1/3 bg-black/40 border border-white/10 rounded text-white/80 px-2 py-1.5 text-xs focus:border-luxe outline-none" placeholder="Remarks..." value="${hist ? (hist.Remarks || '') : ''}">
+                        <input type="number" step="0.01" class="act-qty flex-1 w-0 bg-black/40 border border-white/10 rounded text-white text-center py-1.5 text-xs focus:border-luxe outline-none" placeholder="Actual ${mat.unit}" value="${actQty.toFixed(1)}">
+                        <input type="number" step="0.01" class="act-cost flex-1 w-0 bg-black/40 border border-white/10 rounded text-white text-center py-1.5 text-xs focus:border-luxe outline-none" placeholder="Total RM" value="${actCost.toFixed(2)}">
+                        <input type="text" class="act-remarks flex-1 w-0 bg-black/40 border border-white/10 rounded text-white/80 px-2 py-1.5 text-xs focus:border-luxe outline-none" placeholder="Remarks..." value="${hist ? (hist.Remarks || '') : ''}">
                     </div>
                 </div>`;
         });
 
-        // Inject Direct Labor Override
         const laborContainer = document.getElementById('actual-labor-container');
         if (laborContainer) {
             let totalPlanLabor = 0;
@@ -1198,24 +1196,24 @@
 
             laborContainer.innerHTML = `
                 <div class="glass-panel p-3 rounded-xl flex flex-col gap-2 actual-cost-row border-l-2 border-luxe transition-colors ${highlightClasses}" data-id="DIRECT-LABOR" data-category="Operational">
-                    <div class="flex justify-between items-center">
-                        <div class="flex items-center gap-2">
+                    <div class="flex justify-between items-center gap-2">
+                        <div class="flex-1 flex items-center gap-2 min-w-0">
                             <button class="btn-toggle-lock text-xs tap-none shrink-0 ${isLockedLabor ? 'text-luxe' : 'text-white/40 hover:text-white'}" title="Toggle Lock">
                                 <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C9.243 2 7 4.243 7 7v3H6c-1.103 0-2 .897-2 2v8c0 1.103.897 2 2 2h12c1.103 0 2-.897 2-2v-8c0-1.103-.897-2-2-2h-1V7c0-2.757-2.243-5-5-5zm-3 5c0-1.654 1.346-3 3-3s3 1.346 3 3v3H9V7zm8 7v6H5v-6h14z"></path></svg>
                             </button>
                             <input type="hidden" class="act-lock-state" value="${isLockedLabor}">
-                            <span class="text-luxe text-sm font-bold">Direct Labor / Tailoring</span>
+                            <span class="text-luxe text-sm font-bold truncate flex-1">Direct Labor / Tailoring</span>
                             <button class="btn-sync-row text-white/30 hover:text-luxe transition-colors tap-none shrink-0" data-theo-qty="1" data-theo-cost="${totalPlanLabor}" title="Sync to Plan">
                                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
                             </button>
                             ${dismissBtn}
                         </div>
-                        <span class="text-white/40 text-[9px] uppercase tracking-widest shrink-0 ml-2">Operational</span>
+                        <span class="text-white/40 text-[9px] uppercase tracking-widest shrink-0">Operational</span>
                     </div>
                     <div class="flex gap-2">
                         <input type="hidden" class="act-qty" value="1">
-                        <input type="number" step="0.01" class="act-cost w-1/2 bg-black/40 border border-white/10 rounded text-white text-center py-1.5 text-xs focus:border-luxe outline-none" placeholder="Total RM" value="${actLaborCost.toFixed(2)}">
-                        <input type="text" class="act-remarks w-1/2 bg-black/40 border border-white/10 rounded text-white/80 px-2 py-1.5 text-xs focus:border-luxe outline-none" placeholder="Remarks..." value="${histLabor ? (histLabor.Remarks || '') : ''}">
+                        <input type="number" step="0.01" class="act-cost flex-1 w-0 bg-black/40 border border-white/10 rounded text-white text-center py-1.5 text-xs focus:border-luxe outline-none" placeholder="Total RM" value="${actLaborCost.toFixed(2)}">
+                        <input type="text" class="act-remarks flex-1 w-0 bg-black/40 border border-white/10 rounded text-white/80 px-2 py-1.5 text-xs focus:border-luxe outline-none" placeholder="Remarks..." value="${histLabor ? (histLabor.Remarks || '') : ''}">
                     </div>
                 </div>`;
         }
@@ -1243,7 +1241,7 @@
                 opexList.innerHTML += `
                     <div class="flex items-center justify-between bg-black/40 border border-white/10 rounded-lg p-2 actual-opex-row" data-name="${c.Variable_Name}">
                         <span class="text-white/70 text-xs px-2 truncate flex-1">${c.Variable_Name.replace(/_/g, ' ')}</span>
-                        <input type="number" step="0.01" class="act-opex-val bg-transparent text-white text-right text-sm outline-none focus:text-luxe w-1/3" value="${actOpCost.toFixed(2)}">
+                        <input type="number" step="0.01" class="act-opex-val bg-transparent text-white text-right text-sm outline-none focus:text-luxe w-24 sm:w-1/3 shrink-0" value="${actOpCost.toFixed(2)}">
                     </div>`;
             });
         }
@@ -1950,19 +1948,19 @@
             const displayCostRM = mat.currency === 'CNY' ? `(≈ RM ${mat.costRM.toFixed(2)})` : '';
             matEditorList.innerHTML += `
                 <div class="glass-panel p-3 rounded-xl flex items-center justify-between gap-3">
-                    <div class="flex-1 truncate flex items-center gap-2">
+                    <div class="flex-1 min-w-0 flex items-center gap-2 pr-2">
                         <button class="btn-delete-mat text-white/20 hover:text-red-400 transition-colors tap-none shrink-0" data-mat-id="${id}" title="Delete Material">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
                         </button>
-                        <div class="truncate">
+                        <div class="flex-1 min-w-0">
                             <p class="text-white text-sm truncate">${mat.desc}</p>
-                            <p class="text-white/40 text-[10px] uppercase tracking-widest">${id} • ${mat.unit}</p>
+                            <p class="text-white/40 text-[10px] uppercase tracking-widest truncate">${id} • ${mat.unit}</p>
                         </div>
                     </div>
-                    <div class="w-32 flex flex-col items-end shrink-0">
+                    <div class="w-24 sm:w-32 flex flex-col items-end shrink-0">
                         <div class="flex items-center gap-1 w-full bg-black/40 border border-white/10 rounded-lg overflow-hidden">
                             <span class="text-white/50 text-[10px] pl-2 font-medium">${mat.currency}</span>
-                            <input type="number" step="0.01" data-mat-id="${id}" value="${mat.origCost}" class="mat-price-input flex-1 bg-transparent text-white text-right py-2 pr-2 text-sm focus:outline-none">
+                            <input type="number" step="0.01" data-mat-id="${id}" value="${mat.origCost}" class="mat-price-input flex-1 w-0 bg-transparent text-white text-right py-2 pr-2 text-sm focus:outline-none">
                         </div>
                         <span class="text-[9px] text-white/30 mt-1 mr-1">${displayCostRM}</span>
                     </div>
