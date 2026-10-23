@@ -2763,8 +2763,8 @@
             <div class="product-preview-notice">
               Prices and availability are loaded from the staging
               catalog. The staging basket is saved in this browser.
-              Checkout can request a staging delivery estimate and
-              still does not create an order.
+              Checkout can start a staging order. Payment is completed
+              on SenangPay, and the server confirms it.
             </div>
 
           </div>
@@ -2883,13 +2883,14 @@
             <h3>Delivery and shopping</h3>
 
             <p>
-              The checkout preview can request a staging delivery
-              estimate. It does not create a shipment.
+              Checkout can request a staging delivery estimate.
+              A courier shipment is created only after the server
+              confirms payment.
             </p>
 
             <p>
               Size selection and the staging basket are active in
-              this browser. Checkout and payment remain demonstrations.
+              this browser. Checkout sends the order to staging.
             </p>
           </section>
 
@@ -3114,7 +3115,7 @@
 
             <p class="commerce-preview-note">
               Staging cart — saved in this browser.
-              Checkout and payment are still demonstrations.
+              Checkout sends a staging order to SenangPay.
             </p>
 
             <p id="commerce-basket-status"
@@ -3136,8 +3137,8 @@
             </div>
 
             <p class="commerce-preview-note">
-              The checkout preview can request a staging delivery estimate.
-              It does not create an order.
+              Checkout uses this basket for a staging order.
+              Payment is completed on SenangPay.
             </p>
 
             <button id="commerce-continue-shopping"
@@ -3278,7 +3279,7 @@
             ←
           </button>
 
-          <h2 id="checkout-title">Checkout · Preview</h2>
+          <h2 id="checkout-title">Checkout · Staging</h2>
 
           <button id="checkout-exit"
                   class="checkout-icon-button"
@@ -3296,9 +3297,10 @@
                    class="checkout-view">
 
             <p class="checkout-disclaimer">
-              Product prices and the delivery estimate come from
-              staging. Basket quantities are saved in this browser.
-              No order or payment will be created.
+              This is an Arabista staging transaction. The amount
+              comes from the staging catalog and delivery estimate.
+              SenangPay hosts the payment. The server confirms a
+              successful payment.
             </p>
 
             <button id="checkout-address-entry"
@@ -3357,8 +3359,9 @@
               </button>
 
               <p class="checkout-muted">
-                This is a staging delivery estimate. No shipment
-                is created.
+                This is a staging delivery estimate. A courier
+                shipment is created only after the server confirms
+                payment.
               </p>
             </section>
 
@@ -3390,55 +3393,28 @@
 
             <div class="checkout-divider"></div>
 
-            <section class="checkout-section">
-              <h3>Payment method</h3>
+            <section class="checkout-section" id="checkout-payment">
+              <h3>Secure Payment via SenangPay</h3>
 
               <p class="checkout-muted">
-                Illustrative options only. The payment methods
-                actually offered later will depend on SenangPay's
-                configured hosted checkout.
+                Available payment options will be shown securely
+                on SenangPay.
               </p>
-
-              <fieldset id="checkout-payment-options"
-                        class="checkout-payment-options">
-
-                <legend class="sr-only">Select preview payment method</legend>
-
-                <label class="checkout-payment-option">
-                  <span>
-                    <strong>Online banking</strong>
-                    <small>FPX · Demonstration</small>
-                  </span>
-                  <input type="radio"
-                         name="checkout-preview-payment"
-                         value="online-banking">
-                </label>
-
-                <label class="checkout-payment-option">
-                  <span>
-                    <strong>E-wallet</strong>
-                    <small>Illustrative only</small>
-                  </span>
-                  <input type="radio"
-                         name="checkout-preview-payment"
-                         value="ewallet">
-                </label>
-
-                <label class="checkout-payment-option">
-                  <span>
-                    <strong>Debit / Credit card</strong>
-                    <small>Hosted gateway demonstration</small>
-                  </span>
-                  <input type="radio"
-                         name="checkout-preview-payment"
-                         value="card">
-                </label>
-
-              </fieldset>
 
               <p class="checkout-muted">
-                No payment credentials will be requested or transmitted.
+                Card numbers are not collected on this page.
               </p>
+
+              <p id="checkout-submission-note"
+                 class="commerce-line-warning"
+                 hidden></p>
+
+              <button id="checkout-payment-confirm"
+                      class="checkout-secondary"
+                      type="button"
+                      hidden>
+                Continue with the confirmed staging amount
+              </button>
             </section>
 
           </section>
@@ -3564,8 +3540,8 @@
             </form>
 
             <p class="checkout-muted">
-              Use fictional information for testing. This data is
-              not submitted to Arabista or saved after refresh.
+              Use test details. This address stays in this checkout
+              until you continue, and it is not saved in this browser.
             </p>
 
           </section>
@@ -3575,23 +3551,21 @@
                    class="checkout-view checkout-complete"
                    hidden>
 
-            <div class="checkout-complete-icon">✓</div>
+            <div class="checkout-complete-icon">!</div>
 
-            <h3>Checkout journey completed</h3>
+            <h3 id="checkout-recovery-title">Staging order reserved</h3>
 
-            <p>
-              This was an interface demonstration only.
-            </p>
+            <p id="checkout-recovery-order"></p>
 
-            <p>
-              No order was created, no inventory was reserved,
-              and no payment was initiated.
+            <p id="checkout-recovery-message">
+              Payment was not opened. This screen does not mean
+              the order was paid.
             </p>
 
             <button id="checkout-complete-return"
                     type="button"
                     class="checkout-secondary">
-              Return to checkout preview
+              Return to checkout
             </button>
 
           </section>
@@ -3611,7 +3585,7 @@
                   class="checkout-primary"
                   type="button"
                   disabled>
-            Place order · Preview
+            Proceed to Secure Payment
           </button>
 
         </footer>
@@ -7178,6 +7152,13 @@
       let checkoutItems = [];
       let checkoutPayment = null;
 
+      const stagingSubmission = {
+        status:'idle',
+        error:null,
+        result:null
+      };
+      let stagingCheckoutBusy = false;
+
       const stagingShipping = {
         status:'idle',
         postcode:'',
@@ -7488,10 +7469,8 @@
           if (!json || json.status !== 'success') {
             throw new Error('Shipping status');
           }
-          const rate = Number(json.rate);
-          if (!Number.isFinite(rate) || rate < 0) {
-            throw new Error('Shipping rate');
-          }
+          const rate = stagingQuotedRate(json.rate);
+          if (rate === null) throw new Error('Shipping rate');
           return rate;
         })();
         shippingRequest = pending;
@@ -7563,6 +7542,333 @@
         }, 200);
       }
 
+      function stagingQuotedRate(value) {
+        if (typeof value === 'number') {
+          if (!Number.isFinite(value) || value < 0) return null;
+          return value;
+        }
+        if (typeof value !== 'string') return null;
+        const trimmed = value.trim();
+        if (!/^\d+(?:\.\d+)?$/.test(trimmed)) return null;
+        const rate = Number(trimmed);
+        if (!Number.isFinite(rate) || rate < 0) return null;
+        return rate;
+      }
+
+      function fypNormalizePhone(raw) {
+        let digits = String(raw || '').trim().replace(/\D/g, '');
+        if (digits.startsWith('1')) digits = '60' + digits;
+        else if (digits.startsWith('0')) digits = '6' + digits;
+        return digits;
+      }
+
+      function fypRoundMoney(amount) {
+        return Math.round(Number(amount) * 100) / 100;
+      }
+
+      function fypStagingEndpointAllowed() {
+        const url = String(FYP_STAGING_API_URL);
+        return url.includes('AKfycbw4qGOeC2Sebod06') &&
+          !url.includes('AKfycbwYt7O3E');
+      }
+
+      function isStagingOrderId(value) {
+        return /^STGORD-[A-Z0-9]+(?:-[A-Z0-9]+)*$/.test(String(value || ''));
+      }
+
+      function inspectStagingPaymentUrl(paymentUrl, orderId, amount) {
+        let url;
+        try {
+          url = new URL(paymentUrl);
+        } catch (error) {
+          return { ok:false, reason:'invalid', host:'' };
+        }
+        const host = url.hostname.toLowerCase();
+        if (url.protocol !== 'https:') {
+          return { ok:false, reason:'invalid', host };
+        }
+        if (host === 'app.senangpay.my') {
+          return { ok:false, reason:'live', host };
+        }
+        if (host !== 'sandbox.senangpay.my') {
+          return { ok:false, reason:'unverified', host };
+        }
+        if (!isStagingOrderId(orderId) ||
+            url.searchParams.get('order_id') !== orderId) {
+          return { ok:false, reason:'order', host };
+        }
+        const expected = Number(amount).toFixed(2);
+        if (url.searchParams.get('amount') !== expected) {
+          return { ok:false, reason:'amount', host };
+        }
+        return { ok:true, reason:'', host };
+      }
+
+      function buildFypStagingReservationPayload() {
+        const context = buildCheckoutShippingContext();
+        const address = checkoutSelectedAddress();
+        if (!context || !address || !checkoutHasValidShippingQuote()) {
+          return null;
+        }
+        const phone = fypNormalizePhone(address.phone);
+        if (!phone) return null;
+
+        const items = [];
+        let basePrice = 0;
+        let discount = 0;
+        let totalQty = 0;
+
+        for (let index = 0; index < checkoutItems.length; index += 1) {
+          const item = checkoutItems[index];
+          if (!item || item.sku !== 'D06') return null;
+          const info = getD06SizeInfo(item.size);
+          const quantity = normalizeQuantity(item.quantity);
+          if (!info || quantity === null ||
+              info.effectivePrice === null ||
+              !Number.isFinite(info.retailPrice) ||
+              !Number.isFinite(info.weightKg) ||
+              info.weightKg <= 0) {
+            return null;
+          }
+          const unitDiscount = Math.max(
+            0,
+            fypRoundMoney(info.retailPrice - info.effectivePrice)
+          );
+          basePrice += info.effectivePrice * quantity;
+          discount += unitDiscount * quantity;
+          totalQty += quantity;
+          items.push({
+            signature:`D06-${item.size}|{}`,
+            sku:`D06-${item.size}`,
+            size:item.size,
+            qty:quantity,
+            unitRetailPrice:info.retailPrice,
+            unitEffectivePrice:info.effectivePrice,
+            unitAltCost:0,
+            unitDiscount,
+            unitWeight:info.weightKg,
+            alterations:{}
+          });
+        }
+
+        if (!items.length) return null;
+        const shippingFee = stagingShipping.effectiveRate;
+        const productAmount = fypRoundMoney(basePrice);
+        return {
+          items,
+          basePrice:productAmount,
+          altCost:0,
+          weightKg:context.weightKg,
+          totalWeight:context.weightKg,
+          totalQty,
+          shippingFee,
+          discount:fypRoundMoney(discount),
+          totalPaid:fypRoundMoney(productAmount + shippingFee),
+          name:address.recipient,
+          phone,
+          email:'',
+          address:[address.line1, address.line2, address.city]
+            .filter(Boolean)
+            .join(', '),
+          state:address.state,
+          postcode:String(address.postcode),
+          ttclid:'',
+          userAgent:'',
+          url:''
+        };
+      }
+
+      function showCheckoutSubmission(text) {
+        const note = document.getElementById('checkout-submission-note');
+        if (!note) return;
+        note.hidden = !text;
+        note.textContent = text || '';
+      }
+
+      function showReservationRecovery(orderId, message) {
+        const title = document.getElementById('checkout-recovery-title');
+        const order = document.getElementById('checkout-recovery-order');
+        const body = document.getElementById('checkout-recovery-message');
+        if (title) title.textContent = 'Staging order reserved';
+        if (order) {
+          order.textContent = orderId
+            ? `Order ${orderId}`
+            : 'The staging order id was not returned.';
+        }
+        if (body) body.textContent = message;
+        checkoutShowView('complete');
+      }
+
+      async function submitFypStagingReservation(payload) {
+        if (!fypStagingEndpointAllowed()) {
+          throw new Error('Staging endpoint rejected');
+        }
+        const response = await fetch(
+          `${FYP_STAGING_API_URL}?action=reserve_stock`,
+          {
+            method:'POST',
+            headers:{
+              'Content-Type':'application/x-www-form-urlencoded'
+            },
+            body:'payload=' + encodeURIComponent(JSON.stringify(payload)),
+            credentials:'omit'
+          }
+        );
+        return response.json();
+      }
+
+      function redirectToSandboxPayment(paymentUrl) {
+        stagingSubmission.status = 'redirecting';
+        checkoutSyncPrimary();
+        window.location.assign(paymentUrl);
+      }
+
+      function acceptReservedPayment(json, displayedTotal) {
+        const orderId = json && json.orderId;
+        const paymentUrl = json && json.paymentUrl;
+        const backendTotal = Number(json && json.totalPaid);
+        stagingSubmission.result = {
+          orderId: orderId || '',
+          paymentUrl: paymentUrl || '',
+          totalPaid: backendTotal
+        };
+        stagingSubmission.status = 'reserved';
+
+        if (!isStagingOrderId(orderId) || !paymentUrl) {
+          showReservationRecovery(
+            isStagingOrderId(orderId) ? orderId : '',
+            'The staging reservation did not return a usable payment address. No second reservation was created. Payment was not opened.'
+          );
+          return;
+        }
+
+        const inspection = inspectStagingPaymentUrl(
+          paymentUrl,
+          orderId,
+          backendTotal
+        );
+        if (!inspection.ok) {
+          const reason = inspection.reason === 'live'
+            ? 'The payment address is not the SenangPay sandbox, so it was not opened. The staging reservation can expire through the existing reservation process. No second reservation was created.'
+            : 'The payment address could not be verified as the SenangPay sandbox, so it was not opened. No second reservation was created.';
+          showReservationRecovery(orderId, reason);
+          return;
+        }
+
+        if (!Number.isFinite(backendTotal) ||
+            Math.abs(backendTotal - displayedTotal) > 0.5) {
+          const confirm = document.getElementById('checkout-payment-confirm');
+          if (confirm) confirm.hidden = false;
+          showCheckoutSubmission(
+            `The staging server confirmed ${checkoutMoney(backendTotal)}. ` +
+            `The estimate was ${checkoutMoney(displayedTotal)}. ` +
+            'Continue uses this reservation and does not create another order.'
+          );
+          checkoutSyncPrimary();
+          return;
+        }
+
+        redirectToSandboxPayment(paymentUrl);
+      }
+
+      async function beginFypStagingCheckout() {
+        if (stagingCheckoutBusy) return;
+        if (stagingSubmission.status === 'reserved' ||
+            stagingSubmission.status === 'redirecting') {
+          return;
+        }
+        if (!checkoutCanComplete()) return;
+
+        stagingCheckoutBusy = true;
+        stagingSubmission.status = 'validating';
+        stagingSubmission.error = null;
+        showCheckoutSubmission('');
+        const confirm = document.getElementById('checkout-payment-confirm');
+        if (confirm) confirm.hidden = true;
+        checkoutSyncPrimary();
+
+        try {
+          await refreshD06CatalogIfStale();
+          scheduleCheckoutShipping();
+          const started = Date.now();
+          while (!checkoutHasValidShippingQuote() &&
+                 Date.now() - started < 8000) {
+            if (stagingShipping.status === 'error') break;
+            await new Promise(resolve => setTimeout(resolve, 50));
+          }
+          if (!checkoutCanComplete()) {
+            stagingSubmission.status = 'error';
+            stagingSubmission.error = 'stale';
+            showCheckoutSubmission(
+              'The staging total is not current. Check the delivery estimate before continuing.'
+            );
+            return;
+          }
+
+          const payload = buildFypStagingReservationPayload();
+          if (!payload) {
+            stagingSubmission.status = 'error';
+            showCheckoutSubmission(
+              'The staging order could not be prepared from this checkout.'
+            );
+            return;
+          }
+
+          stagingSubmission.status = 'submitting';
+          checkoutSyncPrimary();
+          const json = await submitFypStagingReservation(payload);
+
+          if (!json || typeof json !== 'object') {
+            stagingSubmission.status = 'error';
+            stagingSubmission.error = 'malformed';
+            showCheckoutSubmission(
+              'The staging server returned an unreadable result. The order was not submitted again, because a reservation may already exist.'
+            );
+            return;
+          }
+
+          if (json.status === 'success') {
+            acceptReservedPayment(json, payload.totalPaid);
+            return;
+          }
+
+          stagingSubmission.status = 'error';
+          stagingSubmission.error = json.reason || json.message || 'error';
+          if (json.reason === 'out_of_stock') {
+            const size = String(json.failedSignature || '').split('|')[0];
+            showCheckoutSubmission(
+              size
+                ? `${size} is no longer available in staging. The basket was kept.`
+                : 'An item is no longer available in staging. The basket was kept.'
+            );
+            loadD06StagingCatalog(true);
+            return;
+          }
+          if (json.reason === 'unknown_sku') {
+            showCheckoutSubmission(
+              'Staging did not recognise one of the selected items. Nothing was removed.'
+            );
+            loadD06StagingCatalog(true);
+            return;
+          }
+          showCheckoutSubmission(
+            json.message || 'The staging order was not created.'
+          );
+        } catch (error) {
+          stagingSubmission.status = 'error';
+          stagingSubmission.error = 'network';
+          showCheckoutSubmission(
+            'The staging server did not return a result. The order was not submitted again, because a reservation may already exist. The basket and address are unchanged.'
+          );
+        } finally {
+          if (stagingSubmission.status !== 'reserved' &&
+              stagingSubmission.status !== 'redirecting') {
+            stagingCheckoutBusy = false;
+          }
+          checkoutSyncPrimary();
+        }
+      }
+
       function checkoutCanComplete() {
         const priced = getD06PreviewSubtotal(checkoutItems);
         return (
@@ -7570,13 +7876,27 @@
           priced.complete &&
           !priced.blocked &&
           checkoutSelectedAddress() !== null &&
-          checkoutHasValidShippingQuote() &&
-          checkoutPayment !== null
+          checkoutHasValidShippingQuote()
         );
       }
 
       function checkoutSyncPrimary() {
-        checkoutPrimary.disabled = !checkoutCanComplete();
+        const busy = stagingCheckoutBusy ||
+          stagingSubmission.status === 'submitting' ||
+          stagingSubmission.status === 'validating' ||
+          stagingSubmission.status === 'reserved' ||
+          stagingSubmission.status === 'redirecting' ||
+          stagingSubmission.error === 'network' ||
+          stagingSubmission.error === 'malformed';
+        checkoutPrimary.disabled = busy || !checkoutCanComplete();
+        if (stagingSubmission.status === 'validating' ||
+            stagingSubmission.status === 'submitting') {
+          checkoutPrimary.textContent = 'Securing staging order…';
+        } else if (stagingSubmission.status === 'redirecting') {
+          checkoutPrimary.textContent = 'Opening secure payment…';
+        } else {
+          checkoutPrimary.textContent = 'Proceed to Secure Payment';
+        }
       }
 
       function checkoutPhoneValid(value) {
@@ -7836,6 +8156,13 @@
         checkoutOrigin = origin;
         checkoutTrigger = trigger || null;
         checkoutPayment = null;
+        stagingSubmission.status = 'idle';
+        stagingSubmission.error = null;
+        stagingSubmission.result = null;
+        stagingCheckoutBusy = false;
+        showCheckoutSubmission('');
+        const paymentConfirm = document.getElementById('checkout-payment-confirm');
+        if (paymentConfirm) paymentConfirm.hidden = true;
         checkoutActive = true;
         checkoutClosing = false;
         checkoutOriginInert = commerceLayer.inert;
@@ -8112,23 +8439,21 @@
         checkoutShowView('addresses');
       });
 
-      document.getElementById('checkout-payment-options')
-        .addEventListener('change', event => {
-          const input = event.target;
-          if (!input || input.name !== 'checkout-preview-payment') return;
-
-          if (!['online-banking','ewallet','card'].includes(input.value)) {
-            input.checked = false;
-            return;
-          }
-
-          checkoutPayment = input.value;
-          checkoutRenderPayment();
+      document.getElementById('checkout-payment-confirm')
+        .addEventListener('click', () => {
+          const result = stagingSubmission.result;
+          if (!result || stagingSubmission.status !== 'reserved') return;
+          const inspection = inspectStagingPaymentUrl(
+            result.paymentUrl,
+            result.orderId,
+            result.totalPaid
+          );
+          if (!inspection.ok) return;
+          redirectToSandboxPayment(result.paymentUrl);
         });
 
       checkoutPrimary.addEventListener('click', () => {
-        if (!checkoutCanComplete()) return;
-        checkoutShowView('complete');
+        beginFypStagingCheckout();
       });
 
       checkoutAddressForm.addEventListener('focusin', () => {
