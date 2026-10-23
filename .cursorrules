@@ -1,92 +1,169 @@
-# ARABISTA PROJECT - AI BEHAVIOR RULES
+# ARABISTA PROJECT — CURSOR AI BEHAVIOR RULES
 
-## Context
-This workspace contains a unified omnichannel architecture divided into distinct decoupled systems, managed by a central Master Router:
-1. Master Webhook Router (Central point of entry, routing triage, & Command Center)
-2. Retail Engine (Direct E-Commerce / Pos Laju / SenangPay)
-3. Alteration Service (Gig-Tailor Network / Lalamove / Hub Portal)
-4. Support CRM (Telegram 1-on-1 Auto-Topic Triage)
-5. Production ERP (BOM / Planning / Procurement / AI Ops Lounge)
+## 1. PROJECT CONTEXT AND SOURCE OF TRUTH
 
-## ⚠️ MANDATORY DEVOPS & ARCHITECTURE RULES
-- **Single-File Architecture (Google Apps Script):** To bypass Google Apps Script's aggressive caching and ghost-file merging bugs, frontend HTML/UI must be embedded directly as string-returning functions (e.g., `getDashboardUI()`) inside the main `.gs` file. Do NOT create separate `.html` files or use global `const` variables for HTML templates to avoid redeclaration errors.
-- **Telegram CRM Standard:** All outbound bot messages to customers from a Telegram CRM environment MUST require the `/c` command prefix to enforce muscle-memory consistency across the team.
+Arabista is a Malaysian direct-to-consumer abaya business with separate systems:
+1. Retail storefront and commerce engine — static HTML/JS/Tailwind, GitHub Pages, Google Apps Script, Google Sheets, SenangPay and J&T Express.
+2. Master Webhook Router — routes incoming Meta/WhatsApp and SenangPay events to the appropriate service.
+3. Support CRM — WhatsApp and Telegram workflows.
+4. Alteration Service — independent alteration/hub workflows.
+5. Production ERP — factory planning, costing and procurement.
+6. Experimental FYP/Live Commerce — a NEW frontend archetype, initially staging-only; live broadcasting is deferred.
 
-## ⚠️ MANDATORY DOCUMENTATION RULE
-We maintain three single-source-of-truth architecture documents in the root folder:
-- `Arabista_Retail_Master_Doc.md` — storefront, checkout, Retail GAS, Master Router
-- `Arabista_Alteration_Master_Doc.md` — alteration / hub / gig network
-- `Arabista_Production_Master_Doc.md` — Production ERP (`production-dashboard.html`, `production-app.js`, `Production_Engine.gs`)
+Before editing, read the actual affected source files and the relevant local master documentation. Do not assume old documentation, comments, or examples describe the current implementation exactly. If a standing rule is contradicted by current source code, STOP making the conflicting assumption, preserve existing behavior, and report the discrepancy; do not rewrite working code merely to make it match an obsolete rule. Follow the user's explicit task scope and acceptance criteria.
 
-Whenever you (the AI) are asked to write new code, modify logic, alter an API payload, change a URL, or adjust the database schema, you MUST adhere to the following rule:
-You must proactively update the corresponding Master Document (.md file) to reflect the new changes so the documentation never drifts from the live codebase. Maintain the existing Markdown hierarchy, structure, and tone when making your updates. Do not ask for permission to update the doc; just include the document updates in your proposed code changes. (Retail: `Arabista_Retail_Master_Doc.md` **v3.4**+; Production: `Arabista_Production_Master_Doc.md` **v5.1**+.)
+Authoritative technical references:
+- `Arabista_Retail_Master_Doc.md` — Retail API, cart/checkout, payments, inventory, shipping, and Router.
+- `Arabista_Alteration_Master_Doc.md` — Alteration Service.
+- `Arabista_Production_Master_Doc.md` — Production ERP.
+- `Arabista_Live_Commerce_Master_Doc.md` — new FYP/Live Commerce research, decisions and implementation history (create locally when implementing this project).
+- Actual currently deployed/source `.html`, `.js`, and local `.gs` files — verify implementation details directly.
 
-## ⚠️ FRONTEND MASTER TEMPLATE PROTOCOL
-To prevent code drift and maintain a unified architecture, we strictly enforce a Master Template system for all product pages.
+## 2. NON-NEGOTIABLE DEVELOPMENT RULES
 
-**1. The Master Template**  
-`product-z01-staging.html` is the absolute **Master Reference Template**. Whenever you are asked to create or update a product page (e.g., `product-m01-staging.html`, `product-d02-staging.html`), you MUST strictly clone the HTML layout, CSS classes, and JavaScript logic of the Master Template.
+- Work ONLY on the requested phase and files. Read-only inspection of other files is allowed; modification is not, unless explicitly authorized.
+- Do not refactor unrelated components, rename files, reorganize asset folders, install dependencies, change frameworks, migrate hosting, alter deployments, or update production as a side effect.
+- Preserve existing page behavior, public links, payment flow, API contracts, stock logic, SEO, analytics, and environment separation unless a specific change is requested.
+- Do not invent selectors, functions, element IDs, API properties, deployment URLs, file paths, or tests. Locate and verify them in the current workspace before editing.
+- Prefer small, reversible edits. Reuse proven modules when explicitly integrating with them; never paste multiple independent copies of the retail engine across pages.
+- Existing frontend architecture is static HTML + JavaScript + Tailwind; do not introduce React, Next.js, a build pipeline, npm dependencies, or an additional backend without approval.
+- Keep credentials and tokens in Google Apps Script `PropertiesService` or other approved server-side configuration. Never add secrets to HTML, frontend JS, tracked docs, commits, screenshots, or console output.
+- Do NOT run `git commit`, `git push`, publish/deploy, create production orders, or execute payment/fulfilment tests unless the task explicitly authorizes the action. Inspect `git diff` and report all changed files after implementation.
+- If the prompt supplies exact code and insertion points, follow them precisely. If the anchor or function is absent or changed, do not guess; explain the mismatch and choose the smallest safe correction within the authorized scope.
 
-**2. Allowed Modifications for New Products**  
-When cloning the Master Template for a new product, you are ONLY permitted to change the following data points:
-* Model codes (e.g., `Z01` to `M01`) and Series Names (e.g., `Zahra` to `Maraya`).
-* Image file paths and the CSV Review data payload.
-* Alteration ID keys (e.g., `Z01_ALT_LENGTH` to `M01_ALT_LENGTH`).
-* **THE DAHLIA EXCEPTION:** If the product belongs to the "Dahlia" series (e.g., D01, D02), you MUST change the feature bullet wording from `"Cutting Ala Cardigan"` to `"Cutting 1-Lapis"`. For all other series (Zahra, Maraya, etc.), it must remain `"Cutting Ala Cardigan"`. Do not alter any other structural HTML.
+## 3. STAGING / PRODUCTION ISOLATION (CRITICAL)
 
-**3. Staging vs. Production Synchronization**  
-Staging files (e.g., `product-z01-staging.html`) and Production files (e.g., `product-z01.html`) MUST remain structurally, logically, and aesthetically 100% identical at all times.  
-The ONLY permitted differences between a staging file and its production counterpart are environment variables:
-1. **Title Tag:** Staging includes `(STAGING)`.
-2. **Internal Routing:** Staging uses relative paths (e.g., `href="index-staging.html"`). Production uses live root paths (e.g., `href="/"`).
-3. **API URL:** Staging connects to the Staging Google Apps Script URL. Production connects to the Live Apps Script URL.  
-Never introduce a layout or logic change to Production without also mirroring it in Staging (and vice versa).
+Production and staging are independent transactional environments. NEVER mix their URLs, data, carts, webhooks, analytics or return pages.
 
-## 🛒 OMNICHANNEL CART PORTING PROTOCOL (V2)
-All product pages MUST use the unified `localStorage` Cart Engine. `product-z01-staging.html` is the Master Template. When creating or updating a product page, you MUST adhere to the following strict porting rules:
+| Concern | Production | Staging |
+|---|---|---|
+| Retail backend | `Retail.gs` | `Retail_STAGING.gs` |
+| Google Sheets | Production retail DB | Separate staging retail DB |
+| Order IDs | `ORD-*` | `STGORD-*` |
+| SenangPay | Live merchant | Existing sandbox merchant |
+| Cart key | `arabista_cart` | `arabista_cart_stg` |
+| Checkout draft key | `arabista_checkout_draft` | `arabista_checkout_draft_stg` |
+| Payment return | `checkout/success-router.html` | `checkout/success-router-staging.html` |
+| Success portal | `checkout/retail-success.html` | `checkout/retail-success-staging.html` |
 
-**1. No In-Memory State:** NEVER use `let cartState = null;`. The cart MUST be globally driven by the `CartManager` object interacting with `localStorage.getItem('arabista_cart')`.
+- Use existing, VERIFIED staging URLs and existing `ARABISTA_CONTEXT` conventions from a current staging page. Do not construct a new Apps Script URL or switch environments by inference.
+- Staging pages must have `<meta name="robots" content="noindex">` and mock/no-op marketing analytics; never emit real production conversion events from prototypes.
+- Existing staging/production PAGE PAIRS must retain their defined structural and behavioral parity, subject to the documented environment-specific differences (URLs, keys, links, title, SEO and tracking configuration).
+- NEW experimental staging-only pages, including `fyp-staging.html`, are EXEMPT from the page-pair rule until explicitly promoted to a production counterpart.
+- The existing staging `.gs` payment/Telegram/fulfilment environment was deliberately isolated from production. Respect that configuration; do not rewrite it automatically. Review payment callback hardening separately when requested.
 
-**2. Universal Engine Parity:**
-The following JavaScript functions MUST be exact 1:1 copies from the Z01 Master Template. Do NOT alter their internal logic per page:
-- `CartManager` object (including the `nav-cart-badge` UI animation)
-- `renderCart()`
-- `updateGrandTotal()`
-- The `#btn-calc-ship` and `#btn-checkout` listeners (which execute "Hard Reject" reloads and dynamic array building for Google Apps Script).
+## 4. EXISTING RETAIL FRONTEND ARCHITECTURE
 
-**3. Product Identity Mapping:**
-When building the `add[MODEL]ToLocalCartAndOpenDrawer()` payload, you MUST map the following properties to match the specific HTML page:
-- `id`: Must prefix with the model (e.g., `D01-${Date.now()}`).
-- `series`: The correct product family (e.g., 'Dian Series').
-- `image`: The correct hero thumbnail path for the cart drawer.
-- `alterations`: Ensure the `appConfig` keys match the exact model (e.g., `D01_ALT_LENGTH`).
-- Ensure `unitWeight: activeWeightKg` is included in the payload.
+Current storefront archetypes:
+- Homepage: `index.html` / `index-staging.html` — presentation-only; no retail cart bootstrap.
+- Portal: `products.html` / `products-staging.html` — `pageType: 'portal'`.
+- Grid: `abaya.html` / `abaya-staging.html` — `pageType: 'catalog'`.
+- Product detail pages (PDPs): `product-{sku}.html` / `product-{sku}-staging.html` — `baseItem` in `window.ARABISTA_CONTEXT`.
+- New FYP: `fyp-staging.html` — separate archetype; no automatic PDP template cloning or core-engine initialization.
 
-**4. UI Strictness:**
-- Do NOT use the legacy `#cart-notification` red banner for sold-out states. Rely on the Hard Reject `alert()` + `window.location.reload()` built into the Master checkout logic.
+`arabista-core.js` is the centralized retail cart, checkout, gallery and PDP engine. It is wrapped in an IIFE and contains closure-private cart logic; do NOT assume a public global `CartManager`, `renderCart()` or direct cart API exists. The engine's boot guard currently recognizes catalog, portal or a supplied `baseItem`; a new FYP `pageType` does not automatically initialize it. Inspect the current guard and available integration points before planning commerce connectivity.
 
-## ⚠️ REVIEW INGESTION PROTOCOL
-Whenever you are instructed to inject customer reviews from a CSV file into a product staging page, you MUST strictly follow this exact 5-step process to prevent syntax errors and maintain data integrity:
+`arabista-catalog.js` handles catalog/grid-specific interactions and must not be forced into an unrelated FYP page.
 
-**1. Column Mapping:**  
-Read the provided CSV and map the data to an array of JSON objects using EXACTLY these 4 keys: `username`, `size`, `rating`, `original`.
-* `username` <- Mapped from the `Reviewer` column.
-* `rating` <- Mapped from the `Rating` column (parsed as an integer).
-* `original` <- Mapped from the `Text` column.
-* `size` <- Mapped from the `Variant` column.
+- All shared commerce calls must respect the current staging Retail API contract: `get_config`, `calc_shipping`, and `reserve_stock`.
+- The backend is authoritative for prices, SKU/size availability, shipping, inventory reservations and final payment amount.
+- For out-of-stock responses, prefer the current core engine's inline handling; do NOT restore legacy hard-reject `alert()` + full-page reload behavior.
+- The live retail engine uses localStorage for persistent cart/checkout draft state. Short-lived FYP UI state (current video, likes, sheet position, mock chat, animation flags) MAY be held in memory.
+- Only after explicit authorization for commerce integration should an adapter to the existing staging cart or narrowly scoped shared-engine extension be introduced. Avoid a second competing production cart implementation.
 
-**2. Strict Data Sanitization (Syntax Error Prevention):**
-* **The Newline Rule:** You MUST replace ANY literal newlines (`\n` or `\r`) inside the `Text` column with a single space. The entire review string must sit on a single line to prevent JavaScript `Uncaught SyntaxError` crashes.
-* **The Size Extraction Rule:** You MUST extract ONLY the size string from the `Variant` column. Strip out any extra product details. (e.g., `"No Shawl, S"` becomes `"S"`; `"Shawl, XXL"` becomes `"XXL"`; `"XS"` remains `"XS"`).
+## 5. CONVENTIONAL PRODUCT PAGE MASTER TEMPLATE
 
-**3. JSON Injection Formatting:**  
-Locate `const FULL = [...];` inside the `// --- Review Grid Logic ---` section of the HTML file. Replace it entirely with the newly mapped array.
-* **Format:** The injected JSON MUST be formatted as a minified, single-line string or tightly packed array to guarantee zero line-break syntax errors.
+`product-z01-staging.html` remains the reference for NEW conventional product detail pages, NOT for FYP/Live Commerce pages.
 
-**4. Sync HTML Review Counts:**  
-Calculate the exact total number of reviews injected (the length of the `FULL` array) and update the hardcoded numbers in the HTML to match:
-* Update the Header count: `<span class="text-white/50 text-[10px] uppercase tracking-widest">{TOTAL} Reviews</span>`
-* Update the Grid count: `<div class="text-gray-400 text-sm">{TOTAL} reviews</div>`
+When adding a standard PDP, follow the current Retail Master Document's new-product SOP and verified current template. Preserve layout and common behavior; update only product-specific content such as model/series, SEO, media paths, review data, `ARABISTA_CONTEXT` metadata and required product configuration, plus staging/production environment differences.
 
-**5. Verification:**  
-Do NOT alter the `reviewCard(r)` function or any surrounding layout/logic during this process.
+- Dahlia (`D*`) feature copy: `Cutting 1-Lapis`.
+- Zahra/Warda/Maraya and other non-Dahlia series: `Cutting Ala Cardigan`.
+- Never duplicate shared checkout/cart functions into individual PDPs.
+- Maintain any production/staging pair in sync when that PAIR is explicitly changed.
+
+## 6. NEW ARABISTA FYP / LIVE COMMERCE PROJECT (STAGING ONLY)
+
+Project objective: an exceptionally familiar TikTok-style mobile For You Page and shoppable-video journey, subtly refined to match Arabista's existing premium aesthetic. Both visual similarity and interaction similarity matter; preserve familiar proportions, controls, gesture behaviors and transitions without copying TikTok source code, proprietary fonts, marks or platform-only features.
+
+Initial reference assets and files:
+- Experimental page: `fyp-staging.html` (create only when specifically instructed).
+- Initial D06 video: `images/fyp-d06-shoppable.mp4` (EXACT lowercase directory; do not relocate the asset).
+- Initial product: Dahlia D06, reference `product-d06-staging.html`.
+- Initial commerce environment: staging only, connected to `Retail_STAGING.gs` ONLY in an explicitly authorized integration phase.
+- Do not alter `index.html`, `index-staging.html`, conventional PDPs, `arabista-core.js`, `Retail.gs`, `Retail_STAGING.gs`, or the Master Router merely to construct an interface-only FYP prototype.
+
+Design direction:
+- Mobile-first full-height 9:16-oriented FYP with a TikTok-familiar right-side action rail, caption region, product tag, and bottom navigation. At desktop widths, use a practical centered portrait preview initially.
+- Use D06 video as the primary reference video; any additional demo items may use clearly fictional/sample data or independently created assets, not automatically copied from unrelated existing Arabista content.
+- Simplify platform-only navigation and controls (e.g., Following/Friends/STEM) where inappropriate to a single-brand storefront; do not add irrelevant social-network features.
+- Preserve Arabista's restrained obsidian/ink, muted-gold, Inter and Cormorant Garamond design language. Favor usability and legibility over decoration; do not make a gratuitously different layout.
+- Use `playsinline`, muted autoplay with a clear unmute action, and robust mobile-browser fallback. Respect `prefers-reduced-motion` and iOS safe areas.
+- FYP up/down gesture changes at most one video per gesture. Touch handling must not fight browser scrolling or scrolling inside open drawers; overlays take precedence over feed swipes.
+- Bottom sheets should animate smoothly from below, support predictable dismissal, and restore the same video/feed position after closing.
+- Native TikTok-inspired commerce references documented in the private blueprint include: partial-to-expanded product detail sheet; floating origin-video mini-player; share/comments sheets; common size/quantity selector with Add to Cart and Buy Now modes; product-context Chat; address list and add/edit form; sticky checkout total/action bar.
+- No alteration-selection functionality in the FYP project unless the user expressly reintroduces it.
+- Livestream delivery/hosting, real chat/WhatsApp integration, personal accounts, recommendations and native payment-method integrations are out of scope until separately authorized.
+
+PHASE GATING — NEVER implement later phases merely because they appear in this roadmap:
+1. FYP shell + D06 video + swipe/pause/navigation layout.
+2. Comments, share and other agreed mock interactions.
+3. Shoppable label and partial/expanded product sheet with animations.
+4. Mock size selection, Add to Cart, Buy Now and Chat.
+5. Mock checkout, saved-address and add/edit-address screens.
+6. Explicit staging-only Retail API / SenangPay sandbox integration and end-to-end tests.
+7. Visual refinement, regression verification, and only later a deliberate production-promotion plan.
+
+## 7. CHECKOUT, PAYMENT AND FULFILMENT SAFETY
+
+- The new video-first checkout is a frontend UX layer, NOT a replacement for the Retail backend's stock reservation, server-side price computation, HMAC signing, payment callback and fulfilment pipeline.
+- In the mock-interface phases, DO NOT call real `reserve_stock`, create orders or initiate payments. Clearly distinguish demonstration values from real stock/price data.
+- In the authorized staging integration phase, use the staging product/SKU matrix, staging cart/draft keys, staging Retail API, and the payment URL returned by `reserve_stock`; do not hardcode payment amounts or invent gateways.
+- The staging `.gs` uses `SENANGPAY_BASE_URL` from Script Properties; do not assume the actual deployed value from a local source file alone. The user's established staging configuration uses the SenangPay sandbox.
+- Real backend checkout expects customer name, phone, address and postcode; retain correct Malaysian 5-digit postcode handling and J&T shipping calculation. Do not offer delivery services that the backend does not support.
+- Do not log sensitive personal data or use real customer addresses as prototype defaults. Use fictional test records.
+- The SenangPay hosted checkout remains an external secure payment handoff. The frontend must not collect raw card data.
+- Production deployments, production payments and actual shipping actions require explicit separate approval.
+
+## 8. GOOGLE APPS SCRIPT AND CRM CONVENTIONS
+
+- Respect the existing 4-tab retail schema: `Orders`, `Inventory_Master`, `System_Logs`, `App_Config`. `Available_To_Sell` is a read-only ArrayFormula; never write to it.
+- Keep business logic/credentials server-side; preserve lock/flush, callback verification, status transitions, idempotency, and separate production/staging Script Properties.
+- For existing Master Router / embedded GAS dashboard HTML, retain the verified single-file string-template architecture. This restriction applies to such GAS templates, NOT to ordinary GitHub Pages static `.html` files.
+- Preserve the single Router ingress architecture. Do not create a duplicate staging router or invent new webhook paths without an explicit architecture change.
+- The Telegram `/c` prefix is required when OPERATORS reply to customers via the Telegram-to-WhatsApp CRM bridge. Do not incorrectly impose `/c` on all automatic outbound system notifications.
+
+## 9. CUSTOMER REVIEWS / CSV INGESTION (CONVENTIONAL PDPs ONLY)
+
+If specifically tasked with injecting reviews into a standard PDP:
+1. Map CSV review fields to EXACT keys `{ username, size, rating, original }`: `Reviewer` → username, `Rating` → rating, `Text` → original, `Variant` → size.
+2. Sanitize embedded line breaks in review text; derive size alone from the variant (e.g., `No Shawl, S` → `S`). Safely JSON-encode content; do not introduce JS syntax errors.
+3. Inspect the CURRENT review-array anchor and renderer before replacing data. Do not assume a historical `const FULL` block exists in every file.
+4. Update corresponding UI counts and JSON-LD review counts to the new actual number; keep markup and review rendering behavior intact.
+5. Do not change shared review-rendering code unless the task explicitly requires it.
+
+## 10. PRIVATE DOCUMENTATION AND GIT HYGIENE (MANDATORY)
+
+The `.gitignore` deliberately contains `*.gs` and `*_Master_Doc.md`. These source files and documentation are LOCAL-ONLY and must not become public. Never remove those exclusions, force-add the files, or paste their secrets/content into tracked artifacts.
+
+When modifying an affected system, update the appropriate local master document in the SAME implementation phase. For FYP work, create/update `Arabista_Live_Commerce_Master_Doc.md` locally, recording architecture, screenshots/reference findings, agreed UX states, implementation changes, testing, known issues and a concise changelog. When shared retail behavior changes, update `Arabista_Retail_Master_Doc.md` as well. Maintain existing hierarchy and conventions where applicable.
+
+If ignored files are unavailable to the Cursor context index, access/edit them through authorized local workspace filesystem or terminal operations when supported; do NOT unignore or publish them. If inaccessible, explicitly report the documentation change that could not be completed. Verify ignored documents remain untracked (`git status --ignored` or equivalent) before suggesting a commit.
+
+## 11. VERIFICATION AND FINAL RESPONSE REQUIREMENTS
+
+Before reporting completion:
+- Verify the exact files modified and inspect the diff for unintended changes.
+- Run available syntax/build checks and browser/manual interaction checks appropriate to the requested phase; do not claim tests were run if they were not.
+- For FYP visual work, compare against supplied TikTok reference screenshots and the intended mobile viewport. Test (where possible) desktop emulation and an actual mobile browser; never claim iPhone testing without device evidence.
+- Verify keyboard/touch access, focus/close behavior, sheet scroll-lock, video controls, safe areas, and no console errors for the features in scope.
+- For mock phases, confirm no payment, production API or inventory call is triggered. For authorized staging-commerce phases, verify only staging services are called.
+- Confirm all relevant private master documentation was locally updated and remains excluded from Git.
+- Provide a concise final report: changed files, implementation summary, verification performed and results, unresolved issues, and explicit confirmation of untouched restricted files.
+
+## 12. CURSOR TASK PROMPT COMPLIANCE
+
+The user receives detailed implementation instructions in this standard form:
+`@filename1 @filename2` → `Context:` → `Instructions: Apply the following [X] modifications...` → numbered **[Language] - [Action Description]** entries with exact `File`, `Locate`, and `Replace/Inject/Modify` directives and code blocks.
+
+Treat the user's latest prompt as the phase-specific execution specification. Do not substitute an unrelated implementation plan, change requested code gratuitously, or expand scope. When asked to plan or discuss only, DO NOT edit files or generate an implementation as if approval had already been given.
