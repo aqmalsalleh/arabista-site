@@ -845,7 +845,21 @@
       background:#000;
     }
 
-    /* Hide FYP-specific overlays only while viewing Product. */
+    /* PHASE 3A.3 — SMOOTH FYP OVERLAY TRANSITIONS */
+
+    .app .topbar,
+    .app .rail,
+    .app .caption,
+    .app .player-buttons,
+    .app .shade {
+      transition:opacity 200ms ease;
+    }
+
+    /*
+      During Product viewing, keep the underlying elements
+      rendered but transparent, instead of visibility:hidden.
+      This permits smooth opacity restoration.
+    */
 
     .app.is-product-peek .topbar,
     .app.is-product-peek .rail,
@@ -853,8 +867,39 @@
     .app.is-product-peek .player-buttons,
     .app.is-product-peek .shade {
       opacity:0;
-      visibility:hidden;
+      visibility:visible;
       pointer-events:none;
+    }
+
+    /*
+      During dismissal, header controls reappear earlier.
+      Lower FYP content returns later as the sheet exposes it.
+      Opacity is driven by existing sheet animation progress.
+    */
+
+    .app.is-product-peek.is-product-exiting .topbar,
+    .app.is-product-peek.is-product-exiting .player-buttons {
+      opacity:var(--fyp-header-return,0);
+      transition:none;
+      pointer-events:none;
+    }
+
+    .app.is-product-peek.is-product-exiting .rail,
+    .app.is-product-peek.is-product-exiting .caption,
+    .app.is-product-peek.is-product-exiting .shade {
+      opacity:var(--fyp-lower-return,0);
+      transition:none;
+      pointer-events:none;
+    }
+
+    @media (prefers-reduced-motion:reduce) {
+      .app .topbar,
+      .app .rail,
+      .app .caption,
+      .app .player-buttons,
+      .app .shade {
+        transition:none !important;
+      }
     }
 
     /*
@@ -1298,6 +1343,61 @@
       color:#fff;
       font-size:15px;
       line-height:1;
+    }
+
+    /* PHASE 3A.3 — STABLE FLOATING VIDEO CONTROLS */
+
+    .product-mini {
+      isolation:isolate;
+      z-index:8;
+      backface-visibility:hidden;
+    }
+
+    .product-mini-return {
+      z-index:1;
+    }
+
+    .product-mini img,
+    .product-mini canvas {
+      pointer-events:none;
+      backface-visibility:hidden;
+    }
+
+    .product-mini-label {
+      pointer-events:none;
+    }
+
+    .product-mini-close {
+      position:absolute;
+      top:6px;
+      right:6px;
+      z-index:10;
+
+      display:grid;
+      place-items:center;
+
+      width:30px;
+      height:30px;
+
+      padding:0;
+      border:1px solid rgba(255,255,255,.65);
+      border-radius:50%;
+
+      background:rgba(10,10,10,.85);
+      color:#fff;
+
+      font-size:18px;
+      font-weight:500;
+      line-height:1;
+
+      box-shadow:0 2px 8px rgba(0,0,0,.45);
+
+      opacity:1;
+      visibility:visible;
+      pointer-events:auto;
+      touch-action:manipulation;
+
+      backface-visibility:hidden;
     }
 
     .product-mini-return:focus-visible,
@@ -2909,6 +3009,19 @@
       let productFrame = null;
       let productSettleFrame = null;
       let productGeometry = null;
+
+      // Phase 3A.3: FYP overlay exit choreography.
+      let productExitStartTop = 0;
+
+      function clampUnit(value) {
+        return Math.max(0, Math.min(1, value));
+      }
+
+      function smoothOverlayProgress(value) {
+        const t = clampUnit(value);
+        return t * t * (3 - 2 * t);
+      }
+
       let miniDismissed = false;
       let miniOffset = { x:0, y:0 };
       let miniDrag = null;
@@ -2996,6 +3109,39 @@
           '--product-peek-height',
           `${visible}px`
         );
+
+        if (fypApp.classList.contains('is-product-exiting')) {
+          const appHeight = fypApp.clientHeight;
+
+          const exitDistance = Math.max(
+            1,
+            appHeight - productExitStartTop
+          );
+
+          const progress = clampUnit(
+            (visible - productExitStartTop) / exitDistance
+          );
+
+          // Upper controls begin returning earlier.
+          const headerProgress = smoothOverlayProgress(
+            (progress - 0.04) / 0.46
+          );
+
+          // Lower controls fade in toward the end of dismissal.
+          const lowerProgress = smoothOverlayProgress(
+            (progress - 0.52) / 0.43
+          );
+
+          fypApp.style.setProperty(
+            '--fyp-header-return',
+            String(headerProgress)
+          );
+
+          fypApp.style.setProperty(
+            '--fyp-lower-return',
+            String(lowerProgress)
+          );
+        }
       }
 
       function followVisibleSheet(duration, whileOpen) {
@@ -3440,6 +3586,10 @@
       }
 
       function beginProductEntrance() {
+        fypApp.classList.remove('is-product-exiting');
+        fypApp.style.removeProperty('--fyp-header-return');
+        fypApp.style.removeProperty('--fyp-lower-return');
+        productExitStartTop = 0;
         cancelProductMotion();
         closeProductLightbox(true);
         productSheet.inert = false;
@@ -3469,6 +3619,19 @@
       }
 
       function beginProductExit() {
+        // Capture the starting sheet position before the exit transition.
+        const appRect = fypApp.getBoundingClientRect();
+        const sheetRect = productSheet.getBoundingClientRect();
+
+        productExitStartTop = Math.max(
+          0,
+          sheetRect.top - appRect.top
+        );
+
+        fypApp.style.setProperty('--fyp-header-return', '0');
+        fypApp.style.setProperty('--fyp-lower-return', '0');
+
+        fypApp.classList.add('is-product-exiting');
         cancelProductMotion();
         closeProductLightbox(true);
         productSheet.inert = false;
@@ -3491,6 +3654,12 @@
         stopProductPreview();
         fypApp.classList.remove('is-product-peek');
         fypApp.style.removeProperty('--product-peek-height');
+        fypApp.classList.remove('is-product-exiting');
+
+        fypApp.style.removeProperty('--fyp-header-return');
+        fypApp.style.removeProperty('--fyp-lower-return');
+
+        productExitStartTop = 0;
       }
 
       function setProductExpanded(expanded) {
@@ -3689,6 +3858,11 @@
         }
 
         if (activeSheet === 'product') closeSheet();
+      });
+
+      // Closing the preview must not initiate a mini-video drag.
+      productMiniClose.addEventListener('pointerdown', event => {
+        event.stopPropagation();
       });
 
       productMiniClose.addEventListener('click', event => {
