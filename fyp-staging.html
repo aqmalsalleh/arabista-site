@@ -1652,6 +1652,12 @@
       margin:4px 0 8px;
     }
 
+    .commerce-price.is-status {
+      color:#6b6b6b;
+      font-size:15px;
+      font-weight:600;
+    }
+
     .commerce-product-name {
       font-size:13px;
       font-weight:600;
@@ -1690,6 +1696,45 @@
       border:2px solid #b39257;
       background:#f7f2e9;
       color:#8c6836;
+    }
+
+    .commerce-size-button:disabled {
+      background:#f3f3f3;
+      color:#a3a3a3;
+      border-color:#ececec;
+    }
+
+    .product-price del,
+    .commerce-price-compare {
+      color:#9a9a9a;
+      font-size:14px;
+      font-weight:500;
+    }
+
+    .product-price strong.is-status {
+      color:#6b6b6b;
+      font-size:16px;
+      letter-spacing:0;
+      font-weight:600;
+    }
+
+    .catalog-retry {
+      margin-top:10px;
+      min-height:36px;
+      padding:8px 14px;
+      border:1px solid #b39257;
+      border-radius:18px;
+      background:#fff;
+      color:#8b6e38;
+      font-size:12px;
+      font-weight:700;
+    }
+
+    .commerce-line-warning {
+      margin:4px 0 0;
+      color:#ad3450;
+      font-size:11px;
+      line-height:1.4;
     }
 
     .commerce-quantity-row {
@@ -2656,12 +2701,24 @@
 
           <div class="product-overview" id="product-overview">
 
-            <div class="product-price">
-              <strong>RM139.00</strong>
-              <span class="product-preview-label">
-                Reference price · Preview only
+            <div class="product-price" id="product-price">
+              <del id="product-price-compare" hidden></del>
+              <strong id="product-price-value" class="is-status">
+                Loading staging price…
+              </strong>
+              <span id="product-price-label"
+                    class="product-preview-label"
+                    hidden>
+                Staging catalog price
               </span>
             </div>
+
+            <button id="product-catalog-retry"
+                    class="catalog-retry"
+                    type="button"
+                    hidden>
+              Retry
+            </button>
 
             <h2 id="product-sheet-heading" class="product-name">
               ARABISTA | Abaya Arab — Dahlia Series
@@ -2680,9 +2737,9 @@
             </p>
 
             <div class="product-preview-notice">
-              Product interface preview. Actual pricing,
-              availability, shipping and checkout will be connected
-              to the staging retail system in a later phase.
+              Prices and availability are loaded from the staging
+              catalog. The basket, shipping and checkout still
+              operate as demonstrations.
             </div>
 
           </div>
@@ -2721,8 +2778,9 @@
             </p>
 
             <p class="product-reference-note">
-              No live size availability or stock information is
-              connected in this preview.
+              Size availability is loaded from the staging catalog.
+              The measurement table below remains historical
+              reference and is not a stock list.
             </p>
 
             <details>
@@ -2950,14 +3008,21 @@
                    alt="D06 Dahlia Abaya">
 
               <div class="commerce-product-info">
-                <strong class="commerce-price">RM139.00</strong>
+                <del id="commerce-price-compare"
+                     class="commerce-price-compare"
+                     hidden></del>
+                <strong id="commerce-price-value"
+                        class="commerce-price is-status">
+                  Loading staging price…
+                </strong>
 
                 <div class="commerce-product-name">
                   ARABISTA | Dahlia Series D06
                 </div>
 
-                <p class="commerce-preview-note">
-                  Reference price · Preview only
+                <p id="commerce-price-note"
+                   class="commerce-preview-note">
+                  Staging catalog price
                 </p>
               </div>
             </div>
@@ -2970,19 +3035,19 @@
                  aria-label="Select demonstration size">
 
               <button type="button" class="commerce-size-button"
-                      data-demo-size="XS" aria-pressed="false">XS</button>
+                      data-demo-size="XS" aria-pressed="false" disabled>XS</button>
               <button type="button" class="commerce-size-button"
-                      data-demo-size="S" aria-pressed="false">S</button>
+                      data-demo-size="S" aria-pressed="false" disabled>S</button>
               <button type="button" class="commerce-size-button"
-                      data-demo-size="M" aria-pressed="false">M</button>
+                      data-demo-size="M" aria-pressed="false" disabled>M</button>
               <button type="button" class="commerce-size-button"
-                      data-demo-size="L" aria-pressed="false">L</button>
+                      data-demo-size="L" aria-pressed="false" disabled>L</button>
               <button type="button" class="commerce-size-button"
-                      data-demo-size="XL" aria-pressed="false">XL</button>
+                      data-demo-size="XL" aria-pressed="false" disabled>XL</button>
               <button type="button" class="commerce-size-button"
-                      data-demo-size="XXL" aria-pressed="false">XXL</button>
+                      data-demo-size="XXL" aria-pressed="false" disabled>XXL</button>
               <button type="button" class="commerce-size-button"
-                      data-demo-size="XXXL" aria-pressed="false">XXXL</button>
+                      data-demo-size="XXXL" aria-pressed="false" disabled>XXXL</button>
 
             </div>
 
@@ -3005,8 +3070,15 @@
             <p id="commerce-selection-note"
                class="commerce-preview-note"
                aria-live="polite">
-              Select a size to continue. Availability is not verified.
+              Loading staging availability…
             </p>
+
+            <button id="commerce-catalog-retry"
+                    class="catalog-retry"
+                    type="button"
+                    hidden>
+              Retry
+            </button>
 
           </div>
 
@@ -3016,19 +3088,21 @@
                hidden>
 
             <p class="commerce-preview-note">
-              Demonstration basket — not connected to Arabista checkout.
+              Demonstration basket. Prices and stock come from the
+              staging catalog. This basket is not saved and is not
+              Arabista checkout.
             </p>
 
             <div id="commerce-basket-items"></div>
 
             <div class="commerce-basket-total">
-              <span>Reference subtotal</span>
-              <span id="commerce-basket-total">RM0.00</span>
+              <span>Staging subtotal</span>
+              <span id="commerce-basket-total">Price unavailable</span>
             </div>
 
             <p class="commerce-preview-note">
-              Shipping, discounts, live prices and stock have not
-              been calculated.
+              Shipping is not calculated. Checkout remains a
+              demonstration.
             </p>
 
             <button id="commerce-continue-shopping"
@@ -3092,8 +3166,9 @@
                   Dahlia Series D06
                 </div>
 
-                <p class="commerce-preview-note">
-                  RM139.00 reference · Product attached
+                <p id="commerce-chat-price"
+                   class="commerce-preview-note">
+                  Loading staging price…
                 </p>
               </div>
             </div>
@@ -3563,6 +3638,7 @@
 
         if (type === 'product') {
           beginProductEntrance();
+          loadD06StagingCatalog(false);
         }
 
         trigger.setAttribute('aria-expanded', 'true');
@@ -5350,10 +5426,27 @@
       // PHASE 3B — MEMORY-ONLY SHOPPING STATE
       // =====================================================
 
-      const COMMERCE_PREVIEW_PRICE = 139;
       const COMMERCE_SIZES = [
         'XS','S','M','L','XL','XXL','XXXL'
       ];
+
+      // Staging Retail web app copied from product-d06-staging.html
+      // (window.ARABISTA_CONTEXT.apiUrl). This is the only FYP API URL.
+      // Production Retail is not used. Phase 4B.1 calls get_config only.
+      const FYP_STAGING_API_URL = 'https://script.google.com/macros/s/AKfycbw4qGOeC2Sebod06uFnW2u-ZAkj7l8zRdzyWrFEyL1_7eDCn-ks9lVKrd1I226qHxRmQg/exec';
+      const FYP_CATALOG_MAX_AGE_MS = 30000;
+
+      const stagingCatalog = {
+        status:'idle',
+        matrix:{},
+        config:{},
+        loadedAt:0,
+        error:null
+      };
+
+      let stagingCatalogRequest = null;
+      let stagingCatalogGeneration = 0;
+      let demoSelectionNotice = '';
 
       const commerceLayer =
         document.getElementById('commerce-layer');
@@ -5425,34 +5518,520 @@
       const demoBasket = [];
 
       function moneyPreview(amount) {
-        return `RM${amount.toFixed(2)}`;
+        return `RM${Number(amount).toFixed(2)}`;
+      }
+
+      function emptyD06Size(sku, size, reason) {
+        return {
+          sku,
+          size,
+          retailPrice:null,
+          promoPrice:null,
+          effectivePrice:null,
+          weightKg:null,
+          available:null,
+          requiresAlteration:false,
+          purchasable:false,
+          reason
+        };
+      }
+
+      function normalizeD06Row(sku, size, row) {
+        const info = emptyD06Size(sku, size, 'missing');
+        if (!row || typeof row !== 'object') return info;
+        if (row.baseItem !== 'D06' || row.size !== size) {
+          info.reason = 'mismatch';
+          return info;
+        }
+
+        info.requiresAlteration = row.requiresAlteration === true;
+
+        const retail = Number(row.retailPrice);
+        const weight = Number(row.weightKg);
+        const stock = Number(row.Available_To_Sell);
+        if (!Number.isFinite(retail) || retail <= 0) {
+          info.reason = 'unpriced';
+          return info;
+        }
+        info.retailPrice = retail;
+
+        if (!Number.isFinite(weight) || weight <= 0) {
+          info.reason = 'invalid_weight';
+          return info;
+        }
+        info.weightKg = weight;
+
+        if (!Number.isFinite(stock) || stock < 0) {
+          info.reason = 'invalid_stock';
+          return info;
+        }
+        info.available = Math.floor(stock);
+
+        const promoRaw = row.promoPrice;
+        if (promoRaw === null || promoRaw === undefined || promoRaw === '') {
+          info.promoPrice = null;
+          info.effectivePrice = retail;
+        } else {
+          const promo = Number(promoRaw);
+          if (!Number.isFinite(promo) || promo <= 0) {
+            info.reason = 'promo_invalid';
+            return info;
+          }
+          if (promo >= retail) {
+            info.promoPrice = promo;
+            info.reason = 'promo_discrepancy';
+            return info;
+          }
+          info.promoPrice = promo;
+          info.effectivePrice = promo;
+        }
+
+        if (info.available < 1) {
+          info.reason = 'sold_out';
+          return info;
+        }
+
+        info.purchasable = true;
+        info.reason = 'ok';
+        return info;
+      }
+
+      function normalizeD06Catalog(data) {
+        const source = data && data.matrix && typeof data.matrix === 'object'
+          ? data.matrix
+          : {};
+        const matrix = {};
+
+        COMMERCE_SIZES.forEach(size => {
+          const sku = `D06-${size}`;
+          matrix[sku] = normalizeD06Row(sku, size, source[sku]);
+        });
+
+        return matrix;
+      }
+
+      function getD06SizeInfo(size) {
+        if (!COMMERCE_SIZES.includes(size)) return null;
+        return stagingCatalog.matrix[`D06-${size}`] || null;
+      }
+
+      function getD06EffectivePrice(size) {
+        if (stagingCatalog.status !== 'ready') return null;
+        const info = getD06SizeInfo(size);
+        return info && info.effectivePrice !== null
+          ? info.effectivePrice
+          : null;
+      }
+
+      function isD06SizePurchasable(size, quantity = 1) {
+        if (stagingCatalog.status !== 'ready') return false;
+        const info = getD06SizeInfo(size);
+        const qty = Number(quantity);
+        if (!info || !info.purchasable) return false;
+        if (!Number.isFinite(qty) || qty < 1) return false;
+        return qty <= Math.min(10, info.available);
+      }
+
+      function maxPreviewQuantity(size) {
+        const info = getD06SizeInfo(size);
+        if (!info || !info.purchasable) return 1;
+        return Math.max(1, Math.min(10, info.available));
+      }
+
+      function previewLineState(item) {
+        if (stagingCatalog.status !== 'ready') {
+          return {
+            price:null,
+            lineTotal:null,
+            blocked:true,
+            warning:stagingCatalog.status === 'error'
+              ? 'Refresh required'
+              : 'Price unavailable'
+          };
+        }
+
+        const info = getD06SizeInfo(item.size);
+        if (!info || info.effectivePrice === null) {
+          return {
+            price:null,
+            lineTotal:null,
+            blocked:true,
+            warning:'Price unavailable'
+          };
+        }
+
+        const overStock = !info.purchasable ||
+          item.quantity > info.available;
+        let warning = '';
+        if (overStock) {
+          warning = info.available > 0
+            ? `Only ${info.available} available in staging`
+            : 'Unavailable in staging';
+        }
+
+        return {
+          price:info.effectivePrice,
+          lineTotal:info.effectivePrice * item.quantity,
+          blocked:overStock,
+          warning
+        };
+      }
+
+      function getD06PreviewSubtotal(items) {
+        if (!items.length) {
+          return { complete:true, blocked:true, amount:0, lines:[] };
+        }
+
+        let amount = 0;
+        let complete = true;
+        let blocked = false;
+        const lines = items.map(item => {
+          const state = previewLineState(item);
+          if (state.price === null) complete = false;
+          else amount += state.lineTotal;
+          if (state.blocked) blocked = true;
+          return state;
+        });
+
+        if (!complete) blocked = true;
+
+        return {
+          complete,
+          blocked,
+          amount:complete ? amount : null,
+          lines
+        };
+      }
+
+      function catalogPriceSummary() {
+        if (stagingCatalog.status === 'idle' ||
+            stagingCatalog.status === 'loading') {
+          return { kind:'loading' };
+        }
+        if (stagingCatalog.status !== 'ready') {
+          return { kind:'error' };
+        }
+
+        const purchasable = COMMERCE_SIZES
+          .map(getD06SizeInfo)
+          .filter(info => info && info.purchasable);
+
+        if (!purchasable.length) return { kind:'unavailable' };
+
+        const amounts = purchasable.map(info => info.effectivePrice);
+        const lowest = Math.min.apply(null, amounts);
+        const highest = Math.max.apply(null, amounts);
+        const sample = purchasable.find(
+          info => info.effectivePrice === lowest
+        );
+
+        if (lowest === highest && sample.promoPrice !== null) {
+          return {
+            kind:'promo',
+            amount:lowest,
+            retail:sample.retailPrice
+          };
+        }
+
+        if (lowest === highest) {
+          return { kind:'exact', amount:lowest };
+        }
+
+        return { kind:'from', amount:lowest };
+      }
+
+      function paintPriceTarget(valueEl, compareEl, labelEl, summary) {
+        if (!valueEl) return;
+        compareEl && (compareEl.hidden = true);
+        valueEl.classList.toggle(
+          'is-status',
+          summary.kind === 'loading' ||
+          summary.kind === 'error' ||
+          summary.kind === 'unavailable'
+        );
+
+        if (summary.kind === 'loading') {
+          valueEl.textContent = 'Loading staging price…';
+          if (labelEl) labelEl.hidden = true;
+          return;
+        }
+        if (summary.kind === 'error') {
+          valueEl.textContent = 'Staging catalog unavailable';
+          if (labelEl) labelEl.hidden = true;
+          return;
+        }
+        if (summary.kind === 'unavailable') {
+          valueEl.textContent = 'Currently unavailable in staging';
+          if (labelEl) labelEl.hidden = true;
+          return;
+        }
+        if (summary.kind === 'from') {
+          valueEl.textContent = `From ${moneyPreview(summary.amount)}`;
+        } else {
+          valueEl.textContent = moneyPreview(summary.amount);
+        }
+        if (summary.kind === 'promo' && compareEl) {
+          compareEl.hidden = false;
+          compareEl.textContent = moneyPreview(summary.retail);
+        }
+        if (labelEl) labelEl.hidden = false;
+      }
+
+      function renderD06CatalogState() {
+        const summary = catalogPriceSummary();
+        paintPriceTarget(
+          document.getElementById('product-price-value'),
+          document.getElementById('product-price-compare'),
+          document.getElementById('product-price-label'),
+          summary
+        );
+
+        const productRetry =
+          document.getElementById('product-catalog-retry');
+        if (productRetry) {
+          productRetry.hidden = summary.kind !== 'error';
+        }
+
+        const commerceRetry =
+          document.getElementById('commerce-catalog-retry');
+        if (commerceRetry) {
+          commerceRetry.hidden = summary.kind !== 'error';
+        }
+
+        const chatPrice =
+          document.getElementById('commerce-chat-price');
+        if (chatPrice) {
+          if (summary.kind === 'loading') {
+            chatPrice.textContent = 'Loading staging price…';
+          } else if (summary.kind === 'exact' || summary.kind === 'promo') {
+            chatPrice.textContent =
+              `Staging catalog price · ${moneyPreview(summary.amount)}`;
+          } else if (summary.kind === 'from') {
+            chatPrice.textContent =
+              `Staging catalog price · From ${moneyPreview(summary.amount)}`;
+          } else {
+            chatPrice.textContent = 'Price unavailable';
+          }
+        }
+
+        if (typeof renderVariantSelection === 'function' &&
+            commerceCurrentView === 'variant') {
+          renderVariantSelection();
+        }
+        if (typeof renderPreviewBasket === 'function' &&
+            commerceCurrentView === 'basket') {
+          renderPreviewBasket();
+        }
+        if (typeof renderOrderPreview === 'function' &&
+            commerceCurrentView === 'order') {
+          renderOrderPreview();
+        }
+        if (typeof checkoutRenderItems === 'function' &&
+            checkoutActive) {
+          checkoutRenderItems();
+          checkoutSyncPrimary();
+        }
+      }
+
+      function reconcileCatalogSelection() {
+        if (!demoSelectedSize) return;
+        const info = getD06SizeInfo(demoSelectedSize);
+        if (!info || !info.purchasable) {
+          demoSelectionNotice =
+            `Size ${demoSelectedSize} is no longer available in the staging catalog.`;
+          demoSelectedSize = null;
+          demoQuantity = 1;
+          return;
+        }
+        const cap = maxPreviewQuantity(demoSelectedSize);
+        if (demoQuantity > cap) {
+          demoQuantity = cap;
+          demoSelectionNotice =
+            `Quantity was reduced to ${cap}, the current staging stock.`;
+        }
+      }
+
+      async function loadD06StagingCatalog(forceRefresh = false) {
+        const fresh = stagingCatalog.status === 'ready' &&
+          (Date.now() - stagingCatalog.loadedAt) <= FYP_CATALOG_MAX_AGE_MS;
+
+        if (!forceRefresh && fresh) return stagingCatalog;
+        if (!forceRefresh && stagingCatalogRequest) {
+          return stagingCatalogRequest;
+        }
+
+        const generation = ++stagingCatalogGeneration;
+        stagingCatalog.status = 'loading';
+        stagingCatalog.error = null;
+        renderD06CatalogState();
+
+        const pending = (async () => {
+          const url = new URL(FYP_STAGING_API_URL);
+          url.searchParams.set('action', 'get_config');
+          url.searchParams.set('model', 'D06');
+          url.searchParams.set('nocache', 'true');
+
+          const response = await fetch(url.toString(), {
+            credentials:'omit'
+          });
+          if (!response.ok) {
+            throw new Error(`Catalog HTTP ${response.status}`);
+          }
+
+          const json = await response.json();
+          if (!json || json.status !== 'success' ||
+              !json.data ||
+              !json.data.matrix ||
+              typeof json.data.matrix !== 'object') {
+            throw new Error('Invalid catalog response');
+          }
+
+          return json.data;
+        })();
+
+        stagingCatalogRequest = pending;
+
+        try {
+          const data = await pending;
+          if (generation !== stagingCatalogGeneration) {
+            return stagingCatalog;
+          }
+
+          stagingCatalog.matrix = normalizeD06Catalog(data);
+          stagingCatalog.config = data.config &&
+            typeof data.config === 'object'
+            ? data.config
+            : {};
+          stagingCatalog.loadedAt = Date.now();
+          stagingCatalog.status = 'ready';
+          stagingCatalog.error = null;
+          reconcileCatalogSelection();
+          renderD06CatalogState();
+          return stagingCatalog;
+        } catch (error) {
+          if (generation !== stagingCatalogGeneration) {
+            return stagingCatalog;
+          }
+          stagingCatalog.status = 'error';
+          stagingCatalog.error = 'Staging catalog unavailable';
+          renderD06CatalogState();
+          return stagingCatalog;
+        } finally {
+          if (stagingCatalogRequest === pending) {
+            stagingCatalogRequest = null;
+          }
+        }
+      }
+
+      function refreshD06CatalogIfStale() {
+        const fresh = stagingCatalog.status === 'ready' &&
+          (Date.now() - stagingCatalog.loadedAt) <= FYP_CATALOG_MAX_AGE_MS;
+        if (fresh) return Promise.resolve(stagingCatalog);
+        if (stagingCatalog.status === 'loading') {
+          return loadD06StagingCatalog(false);
+        }
+        return loadD06StagingCatalog(true);
+      }
+
+      function renderCommercePrice(summary) {
+        paintPriceTarget(
+          document.getElementById('commerce-price-value'),
+          document.getElementById('commerce-price-compare'),
+          null,
+          summary
+        );
+        const note = document.getElementById('commerce-price-note');
+        if (!note) return;
+        note.textContent = summary.kind === 'loading'
+          ? 'Loading staging catalog'
+          : summary.kind === 'error' || summary.kind === 'unavailable'
+            ? 'Price unavailable'
+            : 'Staging catalog price';
       }
 
       function renderVariantSelection() {
+        const catalogReady = stagingCatalog.status === 'ready';
+
         commerceSizeButtons.forEach(button => {
+          const size = button.dataset.demoSize;
+          const info = getD06SizeInfo(size);
+          const enabled = catalogReady &&
+            !!(info && info.purchasable);
+          button.disabled = !enabled;
           button.setAttribute(
             'aria-pressed',
-            String(button.dataset.demoSize === demoSelectedSize)
+            String(enabled && size === demoSelectedSize)
           );
+          if (!info || info.reason === 'missing' || info.reason === 'mismatch') {
+            button.setAttribute('aria-label', `${size}, unavailable`);
+          } else if (!info.purchasable) {
+            button.setAttribute(
+              'aria-label',
+              info.reason === 'sold_out'
+                ? `${size}, sold out`
+                : `${size}, unavailable`
+            );
+          } else {
+            button.setAttribute('aria-label', `Size ${size}`);
+          }
         });
 
+        const selected = getD06SizeInfo(demoSelectedSize);
+        if (selected && selected.purchasable) {
+          const cap = maxPreviewQuantity(demoSelectedSize);
+          if (demoQuantity > cap) demoQuantity = cap;
+        }
+
         commerceQuantity.textContent = String(demoQuantity);
-
         commerceMinus.disabled = demoQuantity <= 1;
-        commercePlus.disabled = demoQuantity >= 10;
+        commercePlus.disabled = !selected ||
+          !selected.purchasable ||
+          demoQuantity >= maxPreviewQuantity(demoSelectedSize);
 
-        commercePrimary.disabled = !demoSelectedSize;
-
+        const canPreview = isD06SizePurchasable(
+          demoSelectedSize,
+          demoQuantity
+        );
+        commercePrimary.disabled = !canPreview;
         commercePrimary.textContent =
           commerceIntent === 'buy'
             ? 'Buy now · Preview'
             : 'Add to basket';
 
-        document.getElementById(
-          'commerce-selection-note'
-        ).textContent = demoSelectedSize
-          ? `Size ${demoSelectedSize} · Quantity ${demoQuantity} · Demonstration only`
-          : 'Select a size to continue. Availability is not verified.';
+        const note = document.getElementById('commerce-selection-note');
+        if (stagingCatalog.status === 'loading' ||
+            stagingCatalog.status === 'idle') {
+          note.textContent = 'Loading staging availability…';
+        } else if (stagingCatalog.status === 'error') {
+          note.textContent =
+            'Staging catalog unavailable. Retry to load sizes.';
+        } else if (demoSelectionNotice && !demoSelectedSize) {
+          note.textContent = demoSelectionNotice;
+        } else if (canPreview) {
+          const unit = getD06EffectivePrice(demoSelectedSize);
+          note.textContent =
+            `Size ${demoSelectedSize} · Quantity ${demoQuantity} · ` +
+            `${moneyPreview(unit * demoQuantity)} · Staging catalog`;
+        } else if (demoSelectedSize && selected && selected.reason === 'sold_out') {
+          note.textContent = `Size ${demoSelectedSize} is sold out in staging.`;
+        } else {
+          note.textContent =
+            'Select a size to continue. Sold-out sizes stay visible and cannot be selected.';
+        }
+
+        if (selected && selected.purchasable) {
+          renderCommercePrice(
+            selected.promoPrice !== null
+              ? {
+                  kind:'promo',
+                  amount:selected.effectivePrice,
+                  retail:selected.retailPrice
+                }
+              : { kind:'exact', amount:selected.effectivePrice }
+          );
+        } else {
+          renderCommercePrice(catalogPriceSummary());
+        }
       }
 
       function updatePreviewCartBadge() {
@@ -5481,6 +6060,8 @@
         demoBasket.forEach((item,index) => {
           const row = document.createElement('div');
           row.className = 'commerce-basket-item';
+          const line = previewLineState(item);
+          const info = getD06SizeInfo(item.size);
 
           const image = document.createElement('img');
           image.src = 'images/d06-1-hero.webp';
@@ -5492,8 +6073,9 @@
           title.textContent = `Dahlia D06 · ${item.size}`;
 
           const summary = document.createElement('p');
-          summary.textContent =
-            `${moneyPreview(COMMERCE_PREVIEW_PRICE)} reference · Qty ${item.quantity}`;
+          summary.textContent = line.price === null
+            ? `${line.warning} · Qty ${item.quantity}`
+            : `${moneyPreview(line.price)} staging · Qty ${item.quantity}`;
 
           const controls = document.createElement('div');
           controls.className = 'commerce-basket-controls';
@@ -5509,13 +6091,20 @@
             renderPreviewBasket();
           });
 
+          const stockCap = info && info.available > 0
+            ? Math.min(10, info.available)
+            : item.quantity;
           const plus = document.createElement('button');
           plus.type = 'button';
           plus.textContent = '+';
           plus.setAttribute('aria-label','Increase basket item');
-          plus.disabled = item.quantity >= 10;
+          plus.disabled = item.quantity >= stockCap;
 
           plus.addEventListener('click', () => {
+            const cap = info && info.available > 0
+              ? Math.min(10, info.available)
+              : item.quantity;
+            if (item.quantity >= cap) return;
             item.quantity++;
             renderPreviewBasket();
           });
@@ -5530,40 +6119,54 @@
           });
 
           controls.append(minus,plus,remove);
-          information.append(title,summary,controls);
+          information.append(title,summary);
+          if (line.warning && line.price !== null) {
+            const warning = document.createElement('p');
+            warning.className = 'commerce-line-warning';
+            warning.textContent = line.warning;
+            information.appendChild(warning);
+          }
+          information.appendChild(controls);
           row.append(image,information);
           container.appendChild(row);
         });
 
-        const total = demoBasket.reduce(
-          (sum,item) =>
-            sum + COMMERCE_PREVIEW_PRICE * item.quantity,
-          0
-        );
-
+        const priced = getD06PreviewSubtotal(demoBasket);
         document.getElementById(
           'commerce-basket-total'
-        ).textContent = moneyPreview(total);
+        ).textContent = priced.complete
+          ? moneyPreview(priced.amount)
+          : 'Price unavailable';
 
         updatePreviewCartBadge();
 
         document.getElementById('commerce-checkout-basket').disabled =
-          demoBasket.length === 0;
+          demoBasket.length === 0 || priced.blocked || !priced.complete;
       }
 
       function renderOrderPreview() {
         const summary =
           document.getElementById('commerce-order-summary');
+        const valid = isD06SizePurchasable(
+          demoSelectedSize,
+          demoQuantity
+        );
+        const unit = getD06EffectivePrice(demoSelectedSize);
+        const subtotal = valid && unit !== null
+          ? moneyPreview(unit * demoQuantity)
+          : 'Price unavailable';
 
         summary.textContent =
           `Dahlia Series D06\n` +
-          `Size: ${demoSelectedSize}\n` +
+          `Size: ${demoSelectedSize || '—'}\n` +
           `Quantity: ${demoQuantity}\n` +
-          `Reference subtotal: ${
-            moneyPreview(COMMERCE_PREVIEW_PRICE * demoQuantity)
-          }\n` +
+          `Staging subtotal: ${subtotal}\n` +
           `Shipping: Not calculated\n` +
           `Status: Preview only`;
+
+        const checkoutButton =
+          document.getElementById('commerce-checkout-buy');
+        if (checkoutButton) checkoutButton.disabled = !valid;
       }
 
       function showCommerceView(view) {
@@ -5588,6 +6191,7 @@
       function resetCommerceDraft() {
         demoSelectedSize = null;
         demoQuantity = 1;
+        demoSelectionNotice = '';
         renderVariantSelection();
       }
 
@@ -5618,6 +6222,7 @@
         if (view === 'variant') resetCommerceDraft();
 
         showCommerceView(view);
+        refreshD06CatalogIfStale();
 
         commerceLayer.hidden = false;
 
@@ -5697,13 +6302,29 @@
           openCommerce('basket',event.currentTarget);
         });
 
+      document.getElementById('product-catalog-retry')
+        .addEventListener('click', () => {
+          loadD06StagingCatalog(true);
+        });
+
+      document.getElementById('commerce-catalog-retry')
+        .addEventListener('click', () => {
+          loadD06StagingCatalog(true);
+        });
+
       commerceSizeButtons.forEach(button => {
         button.addEventListener('click', () => {
           if (!COMMERCE_SIZES.includes(button.dataset.demoSize)) {
             return;
           }
 
+          if (!isD06SizePurchasable(button.dataset.demoSize, 1)) return;
           demoSelectedSize = button.dataset.demoSize;
+          demoQuantity = Math.min(
+            demoQuantity,
+            maxPreviewQuantity(demoSelectedSize)
+          );
+          demoSelectionNotice = '';
           renderVariantSelection();
         });
       });
@@ -5714,12 +6335,18 @@
       });
 
       commercePlus.addEventListener('click', () => {
-        demoQuantity = Math.min(10,demoQuantity + 1);
+        demoQuantity = Math.min(
+          maxPreviewQuantity(demoSelectedSize),
+          demoQuantity + 1
+        );
         renderVariantSelection();
       });
 
       commercePrimary.addEventListener('click', () => {
         if (!demoSelectedSize || commerceCurrentView !== 'variant') {
+          return;
+        }
+        if (!isD06SizePurchasable(demoSelectedSize, demoQuantity)) {
           return;
         }
 
@@ -5731,10 +6358,12 @@
         const existing = demoBasket.find(
           item => item.size === demoSelectedSize
         );
+        const cap = maxPreviewQuantity(demoSelectedSize);
 
         if (existing) {
           existing.quantity = Math.min(
-            10,existing.quantity + demoQuantity
+            cap,
+            existing.quantity + demoQuantity
           );
         } else {
           demoBasket.push({
@@ -5969,8 +6598,11 @@
       }
 
       function checkoutCanComplete() {
+        const priced = getD06PreviewSubtotal(checkoutItems);
         return (
           checkoutItems.length > 0 &&
+          priced.complete &&
+          !priced.blocked &&
           checkoutSelectedAddress() !== null &&
           checkoutPayment !== null
         );
@@ -6013,6 +6645,7 @@
         list.replaceChildren();
 
         checkoutItems.forEach(item => {
+          const line = previewLineState(item);
           const row = document.createElement('div');
           row.className = 'checkout-item';
 
@@ -6031,23 +6664,31 @@
             `Size ${item.size} · Quantity ${item.quantity}`;
 
           const price = document.createElement('small');
-          price.textContent =
-            `${checkoutMoney(COMMERCE_PREVIEW_PRICE * item.quantity)} reference`;
+          price.textContent = line.price === null
+            ? 'Price unavailable'
+            : `${checkoutMoney(line.lineTotal)} staging`;
 
           info.append(name, detail, price);
+          if (line.warning && line.price !== null) {
+            const warning = document.createElement('small');
+            warning.className = 'commerce-line-warning';
+            warning.textContent = line.warning;
+            info.appendChild(warning);
+          }
           row.append(image, info);
           list.appendChild(row);
         });
 
-        const subtotal = checkoutItems.reduce(
-          (sum, item) => sum + COMMERCE_PREVIEW_PRICE * item.quantity,
-          0
-        );
+        const priced = getD06PreviewSubtotal(checkoutItems);
+        const subtotalText = priced.complete
+          ? checkoutMoney(priced.amount)
+          : 'Price unavailable';
 
         document.getElementById('checkout-subtotal').textContent =
-          checkoutMoney(subtotal);
+          subtotalText;
         document.getElementById('checkout-footer-subtotal').textContent =
-          checkoutMoney(subtotal);
+          subtotalText;
+        checkoutSyncPrimary();
       }
 
       function checkoutRenderAddressSummary() {
@@ -6204,6 +6845,8 @@
           : checkoutSnapshotFromBasket();
 
         if (!items.length) return;
+        const priced = getD06PreviewSubtotal(items);
+        if (!priced.complete || priced.blocked) return;
 
         checkoutItems = items;
         checkoutOrigin = origin;
