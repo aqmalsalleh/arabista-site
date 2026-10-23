@@ -272,7 +272,327 @@
       height:19px;
       stroke-width:2;
     }
-    .toast { position:absolute; left:50%; bottom:calc(77px + env(safe-area-inset-bottom,0px)); z-index:20; width:max-content; max-width:85%; padding:10px 14px; border-radius:30px; background:#242426ed; box-shadow:0 4px 25px #0008; color:#fff; text-align:center; font-size:12px; transform:translate(-50%,12px); opacity:0; pointer-events:none; transition:opacity .18s,transform .18s; }
+    /* =====================================================
+       PHASE 2 — SHARED BOTTOM SHEET FRAMEWORK
+       ===================================================== */
+
+    .sheet-layer {
+      position:absolute;
+      inset:0;
+      z-index:30;
+      isolation:isolate;
+    }
+
+    .sheet-backdrop {
+      position:absolute;
+      inset:0;
+      width:100%;
+      height:100%;
+      border:0;
+      border-radius:0;
+      padding:0;
+      background:rgba(0,0,0,.50);
+      opacity:0;
+      transition:opacity 320ms ease;
+    }
+
+    .sheet-layer.is-open .sheet-backdrop {
+      opacity:1;
+    }
+
+    .sheet {
+      position:absolute;
+      left:0;
+      right:0;
+      bottom:0;
+      z-index:1;
+      display:flex;
+      flex-direction:column;
+      min-width:0;
+      max-height:calc(100% - 24px - env(safe-area-inset-top,0px));
+      color:#161823;
+      color-scheme:light;
+      background:#fff;
+      border-radius:16px 16px 0 0;
+      overflow:hidden;
+      overscroll-behavior:contain;
+      box-shadow:0 -8px 36px rgba(0,0,0,.15);
+      transform:translateY(105%);
+      transition:transform 320ms cubic-bezier(.22,1,.36,1);
+    }
+
+    .sheet-layer.is-open .sheet:not([hidden]) {
+      transform:translateY(0);
+    }
+
+    .sheet--comments {
+      height:min(74%,720px);
+    }
+
+    .sheet--share {
+      height:calc(235px + env(safe-area-inset-bottom,0px));
+      max-height:75%;
+    }
+
+    .sheet-header {
+      position:relative;
+      flex:0 0 auto;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      height:54px;
+      padding:10px 48px;
+      touch-action:none;
+      user-select:none;
+      -webkit-user-select:none;
+    }
+
+    .sheet-handle {
+      position:absolute;
+      top:7px;
+      left:50%;
+      transform:translateX(-50%);
+      width:35px;
+      height:4px;
+      border-radius:999px;
+      background:#dedede;
+    }
+
+    .sheet-title {
+      margin:0;
+      font-family:Inter,system-ui,sans-serif;
+      font-size:13px;
+      font-weight:600;
+      line-height:1.3;
+      color:#161823;
+      text-align:center;
+    }
+
+    .sheet-close {
+      position:absolute;
+      top:13px;
+      right:12px;
+      display:grid;
+      place-items:center;
+      width:30px;
+      height:30px;
+      padding:0;
+      border:0;
+      border-radius:50%;
+      background:transparent;
+      color:#444;
+    }
+
+    .sheet-close svg {
+      width:19px;
+      height:19px;
+    }
+
+    /* COMMENTS */
+
+    .sheet-comments-list {
+      flex:1 1 auto;
+      min-height:0;
+      overflow-y:auto;
+      overscroll-behavior:contain;
+      -webkit-overflow-scrolling:touch;
+      touch-action:pan-y;
+      padding:4px 15px 18px;
+    }
+
+    .sheet-demo-notice {
+      color:#888;
+      font-size:11px;
+      text-align:center;
+      padding:3px 0 15px;
+    }
+
+    .sheet-comment-row {
+      display:grid;
+      grid-template-columns:32px minmax(0,1fr) 28px;
+      align-items:start;
+      column-gap:10px;
+      margin-bottom:19px;
+    }
+
+    .sheet-comment-avatar {
+      width:32px;
+      height:32px;
+      border-radius:50%;
+      display:grid;
+      place-items:center;
+      background:#eee8dd;
+      color:#74634c;
+      font-size:12px;
+      font-weight:700;
+    }
+
+    .sheet-comment-body {
+      min-width:0;
+    }
+
+    .sheet-comment-body strong {
+      display:block;
+      color:#686868;
+      font-size:12px;
+      font-weight:600;
+      margin-bottom:4px;
+    }
+
+    .sheet-comment-body p {
+      margin:0 0 5px;
+      color:#161823;
+      font-size:13px;
+      line-height:1.45;
+      overflow-wrap:anywhere;
+    }
+
+    .sheet-comment-body small {
+      display:block;
+      color:#999;
+      font-size:10px;
+    }
+
+    .sheet-comment-heart {
+      color:#b5b5b5;
+      text-align:center;
+      font-size:19px;
+      line-height:30px;
+    }
+
+    .sheet-comment-form {
+      flex:0 0 auto;
+      display:flex;
+      align-items:center;
+      gap:9px;
+      padding:10px 12px calc(11px + env(safe-area-inset-bottom,0px));
+      border-top:1px solid #eee;
+      background:#fff;
+    }
+
+    .sheet-comment-input {
+      flex:1;
+      min-width:0;
+      height:38px;
+      border:0;
+      border-radius:22px;
+      outline:none;
+      padding:0 14px;
+      background:#f2f2f2;
+      color:#161823;
+      font-family:Inter,system-ui,sans-serif;
+      font-size:13px;
+    }
+
+    .sheet-comment-input:focus {
+      box-shadow:inset 0 0 0 1.5px var(--gold);
+    }
+
+    .sheet-comment-send {
+      display:grid;
+      place-items:center;
+      flex:0 0 36px;
+      width:36px;
+      height:36px;
+      border:0;
+      border-radius:50%;
+      background:var(--gold);
+      color:#181818;
+    }
+
+    .sheet-comment-send svg {
+      width:18px;
+      height:18px;
+    }
+
+    /* SHARE */
+
+    .sheet-share-strip {
+      display:flex;
+      align-items:flex-start;
+      gap:15px;
+      overflow-x:auto;
+      overflow-y:hidden;
+      overscroll-behavior-x:contain;
+      -webkit-overflow-scrolling:touch;
+      scroll-snap-type:x proximity;
+      padding:8px 15px 15px;
+      scrollbar-width:none;
+    }
+
+    .sheet-share-strip::-webkit-scrollbar {
+      display:none;
+    }
+
+    .sheet-share-option {
+      flex:0 0 58px;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      gap:7px;
+      padding:0;
+      border:0;
+      background:transparent;
+      color:#404040;
+      scroll-snap-align:start;
+      text-align:center;
+    }
+
+    .sheet-share-circle {
+      display:grid;
+      place-items:center;
+      width:46px;
+      height:46px;
+      border-radius:50%;
+      background:#efefef;
+      color:#333;
+      font-size:17px;
+      font-weight:700;
+    }
+
+    .sheet-share-circle.blue {
+      background:#3974df;
+      color:#fff;
+    }
+
+    .sheet-share-circle.green {
+      background:#27b66c;
+      color:#fff;
+    }
+
+    .sheet-share-circle.gray {
+      background:#dedede;
+      color:#383838;
+    }
+
+    .sheet-share-option span:last-child {
+      font-size:10px;
+      line-height:1.25;
+      white-space:normal;
+    }
+
+    .sheet-share-divider {
+      height:1px;
+      flex:0 0 auto;
+      margin:0 15px;
+      background:#ececec;
+    }
+
+    .sheet-share-description {
+      padding:15px;
+      color:#888;
+      font-size:11px;
+      line-height:1.4;
+      text-align:center;
+    }
+
+    @media (prefers-reduced-motion:reduce) {
+      .sheet,
+      .sheet-backdrop {
+        transition:none !important;
+      }
+    }
+    .toast { position:absolute; left:50%; bottom:calc(77px + env(safe-area-inset-bottom,0px)); z-index:50; width:max-content; max-width:85%; padding:10px 14px; border-radius:30px; background:#242426ed; box-shadow:0 4px 25px #0008; color:#fff; text-align:center; font-size:12px; transform:translate(-50%,12px); opacity:0; pointer-events:none; transition:opacity .18s,transform .18s; }
     .toast.visible { opacity:1; transform:translate(-50%,0); }
     .sr-only { position:absolute; clip:rect(0,0,0,0); width:1px; height:1px; overflow:hidden; white-space:nowrap; }
     @media (min-width:700px) { body { display:grid; place-items:center; } .app { border-radius:14px; } }
@@ -327,9 +647,9 @@
       <aside class="rail" aria-label="Video actions">
         <button class="profile-action" data-soon="Creator profile" aria-label="Creator profile (future phase)"><span class="avatar" aria-hidden="true">A</span></button>
         <button data-soon="Likes" aria-label="Like video (future phase)"><svg><use href="#i-heart"/></svg><span class="count">Like</span></button>
-        <button data-soon="Comments" aria-label="Comments (future phase)"><svg><use href="#i-chat"/></svg><span class="count">Comment</span></button>
+        <button id="open-comments" type="button" aria-haspopup="dialog" aria-expanded="false" aria-controls="comments-sheet" aria-label="Open comments"><svg><use href="#i-chat"/></svg><span class="count">Comment</span></button>
         <button data-soon="Save" aria-label="Save video (future phase)"><svg><use href="#i-bookmark"/></svg><span class="count">Save</span></button>
-        <button data-soon="Share" aria-label="Share video (future phase)"><svg><use href="#i-share"/></svg><span class="count">Share</span></button>
+        <button id="open-share" type="button" aria-haspopup="dialog" aria-expanded="false" aria-controls="share-sheet" aria-label="Open sharing options"><svg><use href="#i-share"/></svg><span class="count">Share</span></button>
       </aside>
       <section class="caption" aria-label="Video information">
         <button class="tag" id="product-tag" data-soon="D06 shopping" aria-label="Shop D06 (future phase)"><svg><use href="#i-bag"/></svg><span>Shop | D06 Dahlia Abaya</span></button>
@@ -366,6 +686,145 @@
         <span>Profile</span>
       </button>
     </nav>
+    <!-- PHASE 2: SHARED COMMENTS / SHARE OVERLAY -->
+    <div id="sheet-layer" class="sheet-layer" hidden>
+
+      <button
+        id="sheet-backdrop"
+        class="sheet-backdrop"
+        type="button"
+        tabindex="-1"
+        aria-label="Close active panel">
+      </button>
+
+      <!-- COMMENTS -->
+      <section
+        id="comments-sheet"
+        class="sheet sheet--comments"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="comments-heading"
+        hidden>
+
+        <header class="sheet-header">
+          <span class="sheet-handle" aria-hidden="true"></span>
+          <h2 id="comments-heading" class="sheet-title">Comments · Preview</h2>
+
+          <button class="sheet-close" type="button" data-close-sheet aria-label="Close comments">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M5 5L19 19M19 5L5 19"/>
+            </svg>
+          </button>
+        </header>
+
+        <div id="sheet-comments-list" class="sheet-comments-list">
+          <div class="sheet-demo-notice">Demonstration comments — not real customer feedback</div>
+
+          <div class="sheet-comment-row">
+            <div class="sheet-comment-avatar">D</div>
+            <div class="sheet-comment-body">
+              <strong>Demo Viewer 01</strong>
+              <p>This is an example comment for testing the interface.</p>
+              <small>Preview · sample content</small>
+            </div>
+            <span class="sheet-comment-heart" aria-hidden="true">♡</span>
+          </div>
+
+          <div class="sheet-comment-row">
+            <div class="sheet-comment-avatar">D</div>
+            <div class="sheet-comment-body">
+              <strong>Demo Viewer 02</strong>
+              <p>Try scrolling the comments without changing the video.</p>
+              <small>Preview · sample content</small>
+            </div>
+            <span class="sheet-comment-heart" aria-hidden="true">♡</span>
+          </div>
+
+          <div class="sheet-comment-row">
+            <div class="sheet-comment-avatar">D</div>
+            <div class="sheet-comment-body">
+              <strong>Demo Viewer 03</strong>
+              <p>The shopping experience will be introduced in a later phase.</p>
+              <small>Preview · sample content</small>
+            </div>
+            <span class="sheet-comment-heart" aria-hidden="true">♡</span>
+          </div>
+        </div>
+
+        <form id="sheet-comment-form" class="sheet-comment-form">
+          <input
+            id="sheet-comment-input"
+            class="sheet-comment-input"
+            type="text"
+            maxlength="220"
+            autocomplete="off"
+            aria-label="Write demonstration comment"
+            placeholder="Add comment...">
+
+          <button class="sheet-comment-send" type="submit" aria-label="Add preview comment">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M12 19V5M6 11l6-6 6 6"/>
+            </svg>
+          </button>
+        </form>
+      </section>
+
+      <!-- SHARE -->
+      <section
+        id="share-sheet"
+        class="sheet sheet--share"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="share-heading"
+        hidden>
+
+        <header class="sheet-header">
+          <span class="sheet-handle" aria-hidden="true"></span>
+          <h2 id="share-heading" class="sheet-title">Share</h2>
+
+          <button class="sheet-close" type="button" data-close-sheet aria-label="Close sharing options">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M5 5L19 19M19 5L5 19"/>
+            </svg>
+          </button>
+        </header>
+
+        <div class="sheet-share-strip" role="group" aria-label="Sharing options">
+
+          <button id="share-copy" class="sheet-share-option" type="button">
+            <span class="sheet-share-circle blue" aria-hidden="true">↗</span>
+            <span>Copy link</span>
+          </button>
+
+          <button class="sheet-share-option" type="button" data-demo-share="WhatsApp">
+            <span class="sheet-share-circle green" aria-hidden="true">W</span>
+            <span>WhatsApp</span>
+          </button>
+
+          <button class="sheet-share-option" type="button" data-demo-share="Facebook">
+            <span class="sheet-share-circle blue" aria-hidden="true">f</span>
+            <span>Facebook</span>
+          </button>
+
+          <button class="sheet-share-option" type="button" data-demo-share="Telegram">
+            <span class="sheet-share-circle blue" aria-hidden="true">↗</span>
+            <span>Telegram</span>
+          </button>
+
+          <button id="share-native" class="sheet-share-option" type="button">
+            <span class="sheet-share-circle gray" aria-hidden="true">•••</span>
+            <span>More</span>
+          </button>
+
+        </div>
+
+        <div class="sheet-share-divider"></div>
+
+        <p class="sheet-share-description">
+          Share this Arabista FYP preview. Social integrations are not active yet.
+        </p>
+      </section>
+    </div>
     <div id="toast" class="toast" role="status" aria-live="polite"></div>
     <div id="screen-reader-status" class="sr-only" aria-live="polite">Video 1 of 3</div>
   </main>
@@ -392,6 +851,88 @@
       let toastTimer = null;
       let userPaused = false;
 
+      // =====================================================
+      // PHASE 2: BOTTOM SHEET CONTROLLER
+      // =====================================================
+
+      const sheetLayer = document.getElementById('sheet-layer');
+      const sheetBackdrop = document.getElementById('sheet-backdrop');
+      const commentsSheet = document.getElementById('comments-sheet');
+      const shareSheet = document.getElementById('share-sheet');
+      const bottomNavigation = document.querySelector('.bottom');
+
+      const sheetMap = {
+        comments: commentsSheet,
+        share: shareSheet
+      };
+
+      let activeSheet = null;
+      let sheetClosing = false;
+      let previousSheetFocus = null;
+      let sheetCloseTimer = null;
+
+      const prefersReducedMotion = () =>
+        window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      function openSheet(type, trigger) {
+        if (activeSheet || !sheetMap[type]) return;
+
+        activeSheet = type;
+        sheetClosing = false;
+        previousSheetFocus = trigger;
+
+        sheetLayer.hidden = false;
+        sheetMap[type].hidden = false;
+
+        feed.inert = true;
+        bottomNavigation.inert = true;
+
+        // Establish the initial closed position before animation.
+        sheetMap[type].getBoundingClientRect();
+
+        sheetLayer.classList.add('is-open');
+
+        trigger.setAttribute('aria-expanded', 'true');
+
+        const closeButton =
+          sheetMap[type].querySelector('[data-close-sheet]');
+
+        if (closeButton) {
+          closeButton.focus({ preventScroll: true });
+        }
+      }
+
+      function closeSheet() {
+        if (!activeSheet || sheetClosing) return;
+
+        sheetClosing = true;
+
+        const closingType = activeSheet;
+        const restoreFocus = previousSheetFocus;
+
+        sheetLayer.classList.remove('is-open');
+
+        clearTimeout(sheetCloseTimer);
+
+        sheetCloseTimer = window.setTimeout(() => {
+          sheetMap[closingType].hidden = true;
+          sheetLayer.hidden = true;
+
+          feed.inert = false;
+          bottomNavigation.inert = false;
+
+          if (restoreFocus && restoreFocus.isConnected) {
+            restoreFocus.setAttribute('aria-expanded', 'false');
+            restoreFocus.focus({ preventScroll: true });
+          }
+
+          activeSheet = null;
+          sheetClosing = false;
+          previousSheetFocus = null;
+
+        }, prefersReducedMotion() ? 0 : 340);
+      }
+
       function message(text) {
         toast.textContent = text;
         toast.classList.add('visible');
@@ -407,7 +948,7 @@
         updatePauseCue();
       }
       function move(direction) {
-        if (transitioning) return;
+        if (activeSheet || transitioning) return;
         const next = Math.max(0, Math.min(count - 1, active + direction));
         if (next === active) return;
         transitioning = true;
@@ -432,7 +973,7 @@
       feed.addEventListener('touchcancel', () => { startY = null; }, { passive:true });
       feed.addEventListener('wheel', e => { if (Math.abs(e.deltaY) > 25) { e.preventDefault(); move(e.deltaY > 0 ? 1 : -1); } }, { passive:false });
       window.addEventListener('keydown', e => {
-        if (['INPUT','TEXTAREA','SELECT'].includes(document.activeElement?.tagName)) return;
+        if (activeSheet || ['INPUT','TEXTAREA','SELECT'].includes(document.activeElement?.tagName)) return;
         if (e.key === 'ArrowDown') { e.preventDefault(); move(1); }
         if (e.key === 'ArrowUp') { e.preventDefault(); move(-1); }
         if (e.code === 'Space' && active === 0) { e.preventDefault(); togglePause(); }
@@ -455,6 +996,194 @@
         const name = button.dataset.soon;
         message(name === 'Home' ? 'You are already in the For You preview' : `${name} is planned for a later phase`);
       }));
+
+      // =====================================================
+      // PHASE 2: COMMENTS AND SHARE INTERACTIONS
+      // =====================================================
+
+      const commentsTrigger = document.getElementById('open-comments');
+      const shareTrigger = document.getElementById('open-share');
+
+      commentsTrigger.addEventListener('click', () => {
+        openSheet('comments', commentsTrigger);
+      });
+
+      shareTrigger.addEventListener('click', () => {
+        openSheet('share', shareTrigger);
+      });
+
+      sheetBackdrop.addEventListener('click', closeSheet);
+
+      document.querySelectorAll('[data-close-sheet]').forEach(button => {
+        button.addEventListener('click', closeSheet);
+      });
+
+      // Accessible dialog dismissal and focus containment.
+      document.addEventListener('keydown', event => {
+        if (!activeSheet) return;
+
+        if (event.key === 'Escape') {
+          event.preventDefault();
+          closeSheet();
+          return;
+        }
+
+        if (event.key !== 'Tab') return;
+
+        const controls = Array.from(
+          sheetMap[activeSheet].querySelectorAll(
+            'button:not([disabled]), input:not([disabled])'
+          )
+        ).filter(element => !element.hidden);
+
+        if (!controls.length) return;
+
+        const first = controls[0];
+        const last = controls[controls.length - 1];
+
+        if (event.shiftKey && document.activeElement === first) {
+          event.preventDefault();
+          last.focus();
+        } else if (!event.shiftKey && document.activeElement === last) {
+          event.preventDefault();
+          first.focus();
+        } else if (!controls.includes(document.activeElement)) {
+          event.preventDefault();
+          first.focus();
+        }
+      }, true);
+
+      // Dragging the header downward dismisses the panel.
+      // Scrolling inside the comments list does NOT dismiss it.
+      document.querySelectorAll('.sheet-header').forEach(header => {
+        let pointerStartY = null;
+        let draggedSheet = null;
+
+        header.addEventListener('pointerdown', event => {
+          if (event.button !== 0 || event.target.closest('button')) return;
+          if (!activeSheet || sheetClosing) return;
+
+          pointerStartY = event.clientY;
+          draggedSheet = header.closest('.sheet');
+
+          draggedSheet.style.transition = 'none';
+          header.setPointerCapture(event.pointerId);
+        });
+
+        header.addEventListener('pointermove', event => {
+          if (pointerStartY === null || !draggedSheet) return;
+
+          const distance = Math.max(0, event.clientY - pointerStartY);
+          draggedSheet.style.transform = `translateY(${distance}px)`;
+        });
+
+        function finishDrag(event) {
+          if (pointerStartY === null || !draggedSheet) return;
+
+          const distance = Math.max(0, event.clientY - pointerStartY);
+
+          draggedSheet.style.transition = '';
+          draggedSheet.style.transform = '';
+
+          pointerStartY = null;
+          draggedSheet = null;
+
+          if (distance > 90) {
+            closeSheet();
+          }
+        }
+
+        header.addEventListener('pointerup', finishDrag);
+        header.addEventListener('pointercancel', finishDrag);
+      });
+
+      // Demonstration comments exist only in memory.
+      const commentForm = document.getElementById('sheet-comment-form');
+      const commentInput = document.getElementById('sheet-comment-input');
+      const commentsList = document.getElementById('sheet-comments-list');
+
+      commentForm.addEventListener('submit', event => {
+        event.preventDefault();
+
+        const value = commentInput.value.trim();
+        if (!value) return;
+
+        const row = document.createElement('div');
+        row.className = 'sheet-comment-row';
+
+        const avatar = document.createElement('div');
+        avatar.className = 'sheet-comment-avatar';
+        avatar.textContent = 'Y';
+
+        const body = document.createElement('div');
+        body.className = 'sheet-comment-body';
+
+        const name = document.createElement('strong');
+        name.textContent = 'You · Preview';
+
+        const content = document.createElement('p');
+        content.textContent = value;
+
+        const timestamp = document.createElement('small');
+        timestamp.textContent = 'Just now · Not publicly posted';
+
+        const heart = document.createElement('span');
+        heart.className = 'sheet-comment-heart';
+        heart.setAttribute('aria-hidden', 'true');
+        heart.textContent = '♡';
+
+        body.append(name, content, timestamp);
+        row.append(avatar, body, heart);
+        commentsList.appendChild(row);
+
+        commentInput.value = '';
+        commentsList.scrollTop = commentsList.scrollHeight;
+
+        message('Comment added to this preview only');
+      });
+
+      // Copy the current staging preview URL.
+      document.getElementById('share-copy').addEventListener('click', async () => {
+        try {
+          if (!navigator.clipboard || !navigator.clipboard.writeText) {
+            throw new Error('Clipboard unavailable');
+          }
+
+          await navigator.clipboard.writeText(window.location.href);
+          message('Preview link copied');
+
+        } catch (error) {
+          message('Copy unavailable — use your browser share menu');
+        }
+      });
+
+      // Use the browser's native sharing interface when available.
+      document.getElementById('share-native').addEventListener('click', async () => {
+        if (typeof navigator.share !== 'function') {
+          message('Device sharing is unavailable in this browser');
+          return;
+        }
+
+        try {
+          await navigator.share({
+            title: 'Arabista FYP Preview',
+            url: window.location.href
+          });
+
+        } catch (error) {
+          if (error && error.name !== 'AbortError') {
+            message('Device sharing could not be completed');
+          }
+        }
+      });
+
+      // Social services are visual demonstrations at this stage.
+      document.querySelectorAll('[data-demo-share]').forEach(button => {
+        button.addEventListener('click', () => {
+          message(`${button.dataset.demoShare} sharing is planned for later`);
+        });
+      });
+
       document.addEventListener('visibilitychange', () => { if (document.hidden) video.pause(); else syncPlayback(); });
       syncPlayback();
     })();
