@@ -2101,9 +2101,22 @@
       font-size:13px;
     }
 
-    .checkout-row strong {
-      color:#222;
+    .checkout-shipping-rate {
+      display:flex;
+      align-items:baseline;
+      justify-content:flex-end;
+      flex-wrap:wrap;
+      gap:8px;
       text-align:right;
+    }
+
+    .checkout-shipping-rate del {
+      color:#9a9a9a;
+      font-weight:500;
+    }
+
+    .checkout-shipping-rate strong {
+      color:#8b6e38;
     }
 
     .checkout-total-row {
@@ -2750,7 +2763,8 @@
             <div class="product-preview-notice">
               Prices and availability are loaded from the staging
               catalog. The staging basket is saved in this browser.
-              Shipping and checkout remain demonstrations.
+              Checkout can request a staging delivery estimate and
+              still does not create an order.
             </div>
 
           </div>
@@ -2869,8 +2883,8 @@
             <h3>Delivery and shopping</h3>
 
             <p>
-              Shipping options and fees will be calculated through
-              the staging retail backend in a later phase.
+              The checkout preview can request a staging delivery
+              estimate. It does not create a shipment.
             </p>
 
             <p>
@@ -3122,8 +3136,8 @@
             </div>
 
             <p class="commerce-preview-note">
-              Shipping is not calculated. Checkout remains a
-              demonstration.
+              The checkout preview can request a staging delivery estimate.
+              It does not create an order.
             </p>
 
             <button id="commerce-continue-shopping"
@@ -3282,9 +3296,9 @@
                    class="checkout-view">
 
             <p class="checkout-disclaimer">
-              Product prices are staging catalog prices. Basket
-              quantities are saved in this browser. Shipping is not
-              calculated. No order or payment will be created.
+              Product prices and the delivery estimate come from
+              staging. Basket quantities are saved in this browser.
+              No order or payment will be created.
             </p>
 
             <button id="checkout-address-entry"
@@ -3311,17 +3325,40 @@
 
             <div class="checkout-divider"></div>
 
-            <section class="checkout-section">
+            <section class="checkout-section" id="checkout-delivery">
               <h3>Delivery</h3>
 
               <div class="checkout-row">
                 <span>Standard delivery</span>
-                <strong>Pending</strong>
+                <strong id="checkout-delivery-status">Pending shipping</strong>
               </div>
 
+              <div class="checkout-row" id="checkout-shipping-rate-row" hidden>
+                <span>Shipping</span>
+                <span id="checkout-shipping-rate" class="checkout-shipping-rate">
+                  <del id="checkout-shipping-gross" hidden></del>
+                  <strong id="checkout-shipping-effective"></strong>
+                </span>
+              </div>
+
+              <p id="checkout-shipping-promo"
+                 class="checkout-muted"
+                 hidden></p>
+
+              <p id="checkout-shipping-error"
+                 class="commerce-line-warning"
+                 hidden></p>
+
+              <button id="checkout-shipping-retry"
+                      class="catalog-retry"
+                      type="button"
+                      hidden>
+                Retry
+              </button>
+
               <p class="checkout-muted">
-                Shipping charges and delivery estimates will be
-                calculated by the staging retail backend in a later phase.
+                This is a staging delivery estimate. No shipment
+                is created.
               </p>
             </section>
 
@@ -3337,7 +3374,7 @@
 
               <div class="checkout-row">
                 <span>Shipping subtotal</span>
-                <strong>Not calculated</strong>
+                <strong id="checkout-shipping-subtotal">Pending shipping</strong>
               </div>
 
               <div class="checkout-row">
@@ -3346,8 +3383,8 @@
               </div>
 
               <div class="checkout-row checkout-total-row">
-                <span>Final total</span>
-                <strong>Pending shipping</strong>
+                <span>Estimated total · Staging</span>
+                <strong id="checkout-estimated-total">Pending shipping</strong>
               </div>
             </section>
 
@@ -3565,9 +3602,9 @@
                 class="checkout-footer">
 
           <div class="checkout-footer-total">
-            <span>Product subtotal</span>
-            <strong id="checkout-footer-subtotal">RM0.00</strong>
-            <small>Final total pending shipping</small>
+            <span id="checkout-footer-label">Estimated total · Staging</span>
+            <strong id="checkout-footer-subtotal">Pending shipping</strong>
+            <small id="checkout-footer-note">Final total pending shipping</small>
           </div>
 
           <button id="checkout-place-order"
@@ -7141,6 +7178,23 @@
       let checkoutItems = [];
       let checkoutPayment = null;
 
+      const stagingShipping = {
+        status:'idle',
+        postcode:'',
+        weightKg:null,
+        grossRate:null,
+        effectiveRate:null,
+        freeShipping:false,
+        quoteKey:'',
+        quotedAt:0,
+        error:null
+      };
+
+      let shippingRequest = null;
+      let shippingAbort = null;
+      let shippingGeneration = 0;
+      let shippingDebounceTimer = null;
+
       // All addresses are memory-only.
       const checkoutAddresses = [];
       let checkoutAddressId = 0;
@@ -7177,6 +7231,338 @@
         ) || null;
       }
 
+      function isValidStagingPostcode(value) {
+        const pc = String(value);
+        if (!/^\d{5}$/.test(pc)) return false;
+        const number = Number(pc);
+        return number >= 1000 && number <= 98859;
+      }
+
+      function stagingFreeShippingActive() {
+        const promo = stagingCatalog.config &&
+          stagingCatalog.config.PROMO_FREE_SHIPPING;
+        return !!(promo && promo.isActive === true);
+      }
+
+      function buildCheckoutShippingContext() {
+        if (!checkoutActive || checkoutBasketHold) return null;
+        if (stagingCatalog.status !== 'ready') return null;
+        if (!checkoutItems.length) return null;
+
+        const address = checkoutSelectedAddress();
+        if (!address || !isValidStagingPostcode(address.postcode)) return null;
+
+        const priced = getD06PreviewSubtotal(checkoutItems);
+        if (!priced.complete || priced.blocked) return null;
+
+        const lines = [];
+        let weightKg = 0;
+        for (let index = 0; index < checkoutItems.length; index += 1) {
+          const item = checkoutItems[index];
+          const quantity = normalizeQuantity(item && item.quantity);
+          if (!item || item.sku !== 'D06' ||
+              !COMMERCE_SIZES.includes(item.size) ||
+              !quantity) {
+            return null;
+          }
+          const info = getD06SizeInfo(item.size);
+          if (!info ||
+              info.effectivePrice === null ||
+              !Number.isFinite(info.weightKg) ||
+              info.weightKg <= 0) {
+            return null;
+          }
+          weightKg += info.weightKg * quantity;
+          lines.push({
+            sku:`D06-${item.size}`,
+            quantity,
+            weightKg:info.weightKg
+          });
+        }
+
+        if (!Number.isFinite(weightKg) || weightKg <= 0) return null;
+
+        return {
+          postcode:String(address.postcode),
+          weightKg,
+          lines,
+          freeShipping:stagingFreeShippingActive(),
+          origin:checkoutOrigin,
+          productAmount:priced.amount
+        };
+      }
+
+      function checkoutQuoteKey(context) {
+        if (!context) return '';
+        const items = context.lines
+          .map(line => `${line.sku}:${line.quantity}:${line.weightKg}`)
+          .join(',');
+        return [
+          context.origin,
+          context.postcode,
+          context.weightKg.toFixed(3),
+          items,
+          context.freeShipping ? '1' : '0'
+        ].join('|');
+      }
+
+      function checkoutHasValidShippingQuote() {
+        const context = buildCheckoutShippingContext();
+        const key = checkoutQuoteKey(context);
+        return !!(
+          context &&
+          key &&
+          stagingShipping.status === 'ready' &&
+          stagingShipping.quoteKey === key &&
+          Number.isFinite(stagingShipping.grossRate) &&
+          stagingShipping.grossRate >= 0 &&
+          Number.isFinite(stagingShipping.effectiveRate) &&
+          stagingShipping.effectiveRate >= 0
+        );
+      }
+
+      function paintCheckoutMoney(id, text) {
+        const element = document.getElementById(id);
+        if (element) element.textContent = text;
+      }
+
+      function renderCheckoutShipping() {
+        const statusEl = document.getElementById('checkout-delivery-status');
+        const rateRow = document.getElementById('checkout-shipping-rate-row');
+        const grossEl = document.getElementById('checkout-shipping-gross');
+        const effectiveEl = document.getElementById('checkout-shipping-effective');
+        const promoEl = document.getElementById('checkout-shipping-promo');
+        const errorEl = document.getElementById('checkout-shipping-error');
+        const retryEl = document.getElementById('checkout-shipping-retry');
+        const noteEl = document.getElementById('checkout-footer-note');
+        if (!statusEl || !rateRow) return;
+
+        const valid = checkoutHasValidShippingQuote();
+        const priced = getD06PreviewSubtotal(checkoutItems);
+        rateRow.hidden = true;
+        grossEl.hidden = true;
+        promoEl.hidden = true;
+        errorEl.hidden = true;
+        retryEl.hidden = true;
+
+        if (valid && priced.complete) {
+          statusEl.textContent = 'Staging delivery estimate';
+          rateRow.hidden = false;
+          if (stagingShipping.freeShipping) {
+            grossEl.hidden = false;
+            grossEl.textContent = checkoutMoney(stagingShipping.grossRate);
+            effectiveEl.textContent = 'FREE';
+            promoEl.hidden = false;
+            promoEl.textContent =
+              'Free shipping is active in the staging catalog.';
+            paintCheckoutMoney('checkout-shipping-subtotal', 'FREE');
+            paintCheckoutMoney(
+              'checkout-estimated-total',
+              checkoutMoney(priced.amount)
+            );
+            paintCheckoutMoney(
+              'checkout-footer-subtotal',
+              checkoutMoney(priced.amount)
+            );
+          } else {
+            effectiveEl.textContent = checkoutMoney(stagingShipping.effectiveRate);
+            paintCheckoutMoney(
+              'checkout-shipping-subtotal',
+              checkoutMoney(stagingShipping.effectiveRate)
+            );
+            paintCheckoutMoney(
+              'checkout-estimated-total',
+              checkoutMoney(priced.amount + stagingShipping.effectiveRate)
+            );
+            paintCheckoutMoney(
+              'checkout-footer-subtotal',
+              checkoutMoney(priced.amount + stagingShipping.effectiveRate)
+            );
+          }
+          if (noteEl) {
+            noteEl.textContent =
+              'Staging estimate. No order or shipment will be created.';
+          }
+          return;
+        }
+
+        const pending = checkoutBasketHold
+          ? 'Pending shipping'
+          : 'Pending shipping';
+        paintCheckoutMoney('checkout-shipping-subtotal', pending);
+        paintCheckoutMoney('checkout-estimated-total', pending);
+        paintCheckoutMoney('checkout-footer-subtotal', pending);
+        if (noteEl) noteEl.textContent = 'Final total pending shipping';
+
+        if (checkoutBasketHold) {
+          statusEl.textContent = 'Pending shipping';
+          return;
+        }
+        if (stagingShipping.status === 'loading') {
+          statusEl.textContent = 'Calculating staging delivery…';
+          return;
+        }
+        if (stagingShipping.status === 'error') {
+          statusEl.textContent = 'Shipping unavailable';
+          errorEl.hidden = false;
+          errorEl.textContent = 'Shipping unavailable';
+          retryEl.hidden = false;
+          return;
+        }
+        if (!checkoutSelectedAddress()) {
+          statusEl.textContent = 'Add a delivery address';
+          return;
+        }
+        if (checkoutSelectedAddress() &&
+            !isValidStagingPostcode(checkoutSelectedAddress().postcode)) {
+          statusEl.textContent = 'Enter a valid postcode';
+          return;
+        }
+        statusEl.textContent = stagingCatalog.status === 'ready'
+          ? 'Pending shipping'
+          : 'Shipping unavailable';
+      }
+
+      function invalidateCheckoutShipping() {
+        clearTimeout(shippingDebounceTimer);
+        shippingGeneration += 1;
+        if (shippingAbort) {
+          shippingAbort.abort();
+          shippingAbort = null;
+        }
+        shippingRequest = null;
+        stagingShipping.status = 'idle';
+        stagingShipping.postcode = '';
+        stagingShipping.weightKg = null;
+        stagingShipping.grossRate = null;
+        stagingShipping.effectiveRate = null;
+        stagingShipping.freeShipping = false;
+        stagingShipping.quoteKey = '';
+        stagingShipping.quotedAt = 0;
+        stagingShipping.error = null;
+        renderCheckoutShipping();
+        checkoutSyncPrimary();
+      }
+
+      async function loadCheckoutShipping() {
+        const context = buildCheckoutShippingContext();
+        const key = checkoutQuoteKey(context);
+        if (!context) {
+          invalidateCheckoutShipping();
+          return stagingShipping;
+        }
+        if (stagingShipping.status === 'ready' &&
+            stagingShipping.quoteKey === key) {
+          renderCheckoutShipping();
+          checkoutSyncPrimary();
+          return stagingShipping;
+        }
+
+        const generation = ++shippingGeneration;
+        if (shippingAbort) shippingAbort.abort();
+        const controller = new AbortController();
+        shippingAbort = controller;
+        stagingShipping.status = 'loading';
+        stagingShipping.postcode = context.postcode;
+        stagingShipping.weightKg = context.weightKg;
+        stagingShipping.freeShipping = context.freeShipping;
+        stagingShipping.quoteKey = key;
+        stagingShipping.grossRate = null;
+        stagingShipping.effectiveRate = null;
+        stagingShipping.error = null;
+        stagingShipping.quotedAt = 0;
+        renderCheckoutShipping();
+        checkoutSyncPrimary();
+
+        const pending = (async () => {
+          const url = new URL(FYP_STAGING_API_URL);
+          url.searchParams.set('action', 'calc_shipping');
+          url.searchParams.set('postcode', context.postcode);
+          url.searchParams.set('weight', context.weightKg.toFixed(3));
+          const response = await fetch(url.toString(), {
+            credentials:'omit',
+            signal:controller.signal
+          });
+          if (!response.ok) throw new Error('Shipping HTTP');
+          const json = await response.json();
+          if (!json || json.status !== 'success') {
+            throw new Error('Shipping status');
+          }
+          const rate = Number(json.rate);
+          if (!Number.isFinite(rate) || rate < 0) {
+            throw new Error('Shipping rate');
+          }
+          return rate;
+        })();
+        shippingRequest = pending;
+
+        try {
+          const rate = await pending;
+          if (generation !== shippingGeneration) return stagingShipping;
+          const latest = checkoutQuoteKey(buildCheckoutShippingContext());
+          if (latest !== key) return stagingShipping;
+          stagingShipping.status = 'ready';
+          stagingShipping.grossRate = rate;
+          stagingShipping.effectiveRate = context.freeShipping ? 0 : rate;
+          stagingShipping.freeShipping = context.freeShipping;
+          stagingShipping.quoteKey = key;
+          stagingShipping.quotedAt = Date.now();
+          stagingShipping.error = null;
+          return stagingShipping;
+        } catch (error) {
+          if (generation !== shippingGeneration) return stagingShipping;
+          if (error && error.name === 'AbortError') return stagingShipping;
+          stagingShipping.status = 'error';
+          stagingShipping.grossRate = null;
+          stagingShipping.effectiveRate = null;
+          stagingShipping.error = 'Shipping unavailable';
+          return stagingShipping;
+        } finally {
+          if (shippingRequest === pending) shippingRequest = null;
+          if (shippingAbort === controller) shippingAbort = null;
+          if (generation === shippingGeneration) {
+            renderCheckoutShipping();
+            checkoutSyncPrimary();
+          }
+        }
+      }
+
+      function scheduleCheckoutShipping() {
+        if (!checkoutActive) return;
+        const context = buildCheckoutShippingContext();
+        const key = checkoutQuoteKey(context);
+        if (key &&
+            stagingShipping.quoteKey === key &&
+            (stagingShipping.status === 'ready' ||
+              stagingShipping.status === 'loading')) {
+          renderCheckoutShipping();
+          checkoutSyncPrimary();
+          return;
+        }
+
+        clearTimeout(shippingDebounceTimer);
+        if (shippingAbort) {
+          shippingAbort.abort();
+          shippingAbort = null;
+        }
+        shippingGeneration += 1;
+        stagingShipping.quoteKey = key;
+        stagingShipping.status = context ? 'loading' : 'idle';
+        stagingShipping.grossRate = null;
+        stagingShipping.effectiveRate = null;
+        stagingShipping.error = null;
+        stagingShipping.postcode = context ? context.postcode : '';
+        stagingShipping.weightKg = context ? context.weightKg : null;
+        stagingShipping.freeShipping = !!(context && context.freeShipping);
+        stagingShipping.quotedAt = 0;
+        renderCheckoutShipping();
+        checkoutSyncPrimary();
+        if (!context) return;
+        shippingDebounceTimer = setTimeout(() => {
+          loadCheckoutShipping();
+        }, 200);
+      }
+
       function checkoutCanComplete() {
         const priced = getD06PreviewSubtotal(checkoutItems);
         return (
@@ -7184,6 +7570,7 @@
           priced.complete &&
           !priced.blocked &&
           checkoutSelectedAddress() !== null &&
+          checkoutHasValidShippingQuote() &&
           checkoutPayment !== null
         );
       }
@@ -7237,9 +7624,7 @@
           list.appendChild(hold);
           document.getElementById('checkout-subtotal').textContent =
             'Full cart total unavailable';
-          document.getElementById('checkout-footer-subtotal').textContent =
-            'Full cart total unavailable';
-          checkoutSyncPrimary();
+          scheduleCheckoutShipping();
           return;
         }
 
@@ -7286,9 +7671,7 @@
 
         document.getElementById('checkout-subtotal').textContent =
           subtotalText;
-        document.getElementById('checkout-footer-subtotal').textContent =
-          subtotalText;
-        checkoutSyncPrimary();
+        scheduleCheckoutShipping();
       }
 
       function checkoutRenderAddressSummary() {
@@ -7375,7 +7758,7 @@
           select.addEventListener('click', () => {
             checkoutSelectedAddressId = address.id;
             checkoutRenderAddressSummary();
-            checkoutSyncPrimary();
+            scheduleCheckoutShipping();
             checkoutShowView('main');
           });
 
@@ -7597,6 +7980,13 @@
 
       updatePreviewCartBadge();
 
+      document.getElementById('checkout-shipping-retry')
+        .addEventListener('click', () => {
+          stagingShipping.status = 'idle';
+          stagingShipping.quoteKey = '';
+          scheduleCheckoutShipping();
+        });
+
       document.getElementById('checkout-address-entry')
         .addEventListener('click', () => {
           checkoutRenderAddressList();
@@ -7667,8 +8057,8 @@
           return;
         }
 
-        if (!/^\d{5}$/.test(postcode)) {
-          fail(form.elements.postcode, 'Enter a 5-digit postcode.');
+        if (!isValidStagingPostcode(postcode)) {
+          fail(form.elements.postcode, 'Enter a valid 5-digit Malaysian postcode.');
           return;
         }
 
@@ -7718,7 +8108,7 @@
         checkoutEditingAddressId = null;
         checkoutRenderAddressList();
         checkoutRenderAddressSummary();
-        checkoutSyncPrimary();
+        scheduleCheckoutShipping();
         checkoutShowView('addresses');
       });
 
