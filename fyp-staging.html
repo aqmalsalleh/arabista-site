@@ -388,7 +388,9 @@
       height:19px;
     }
 
-    /* COMMENTS */
+    /* =====================================================
+       PHASE 2.1 — COMMENTS AND COMPOSER
+       ===================================================== */
 
     .sheet-comments-list {
       flex:1 1 auto;
@@ -397,30 +399,34 @@
       overscroll-behavior:contain;
       -webkit-overflow-scrolling:touch;
       touch-action:pan-y;
-      padding:4px 15px 18px;
+      padding:4px 12px 20px;
     }
 
     .sheet-demo-notice {
-      color:#888;
       font-size:11px;
+      line-height:1.4;
+      color:#888;
       text-align:center;
-      padding:3px 0 15px;
+      padding:4px 0 16px;
+    }
+
+    .sheet-comment-item {
+      margin-bottom:18px;
     }
 
     .sheet-comment-row {
       display:grid;
-      grid-template-columns:32px minmax(0,1fr) 28px;
-      align-items:start;
+      grid-template-columns:34px minmax(0,1fr) 64px;
       column-gap:10px;
-      margin-bottom:19px;
+      align-items:start;
     }
 
     .sheet-comment-avatar {
-      width:32px;
-      height:32px;
-      border-radius:50%;
+      width:34px;
+      height:34px;
       display:grid;
       place-items:center;
+      border-radius:50%;
       background:#eee8dd;
       color:#74634c;
       font-size:12px;
@@ -433,76 +439,266 @@
 
     .sheet-comment-body strong {
       display:block;
-      color:#686868;
+      color:#898989;
       font-size:12px;
       font-weight:600;
-      margin-bottom:4px;
+      margin-bottom:5px;
     }
 
     .sheet-comment-body p {
-      margin:0 0 5px;
+      margin:0 0 8px;
       color:#161823;
-      font-size:13px;
+      font-size:14px;
       line-height:1.45;
       overflow-wrap:anywhere;
     }
 
-    .sheet-comment-body small {
-      display:block;
+    .sheet-comment-meta {
+      display:flex;
+      align-items:center;
+      flex-wrap:wrap;
+      gap:12px;
       color:#999;
-      font-size:10px;
+      font-size:11px;
+      line-height:1.5;
     }
 
-    .sheet-comment-heart {
-      color:#b5b5b5;
-      text-align:center;
-      font-size:19px;
-      line-height:30px;
+    .sheet-comment-meta button,
+    .sheet-replies-toggle {
+      border:0;
+      background:transparent;
+      padding:0;
+      color:#858585;
+      font-size:11px;
+      font-weight:600;
     }
+
+    .sheet-comment-actions {
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      padding-top:34px;
+      gap:4px;
+    }
+
+    .sheet-comment-reaction {
+      width:28px;
+      height:28px;
+      border:0;
+      padding:3px;
+      background:transparent;
+      color:#969696;
+      display:grid;
+      place-items:center;
+    }
+
+    .sheet-comment-reaction svg {
+      width:21px;
+      height:21px;
+      stroke-width:1.8;
+    }
+
+    .sheet-comment-reaction[aria-pressed="true"] {
+      color:#fe2c55;
+    }
+
+    .sheet-replies-toggle {
+      display:inline-flex;
+      align-items:center;
+      margin:10px 0 0 44px;
+      gap:6px;
+    }
+
+    .sheet-replies {
+      margin:13px 0 0 44px;
+      padding-left:11px;
+      border-left:1px solid #e8e8e8;
+    }
+
+    .sheet-replies .sheet-comment-row {
+      grid-template-columns:28px minmax(0,1fr) 58px;
+      column-gap:8px;
+    }
+
+    .sheet-replies .sheet-comment-avatar {
+      width:28px;
+      height:28px;
+    }
+
+    .sheet-replies .sheet-comment-actions {
+      padding-top:24px;
+    }
+
+    /* COMPOSER */
 
     .sheet-comment-form {
       flex:0 0 auto;
       display:flex;
-      align-items:center;
+      flex-direction:column;
       gap:9px;
+      min-width:0;
       padding:10px 12px calc(11px + env(safe-area-inset-bottom,0px));
-      border-top:1px solid #eee;
+      border-top:1px solid #ececec;
       background:#fff;
     }
 
-    .sheet-comment-input {
-      flex:1;
+    .sheet-composer-line {
+      display:flex;
+      align-items:center;
+      gap:9px;
       min-width:0;
-      height:38px;
+      width:100%;
+    }
+
+    .sheet-composer-avatar {
+      flex:0 0 34px;
+      width:34px;
+      height:34px;
+      border-radius:50%;
+      background:#251d1c;
+      color:#d8b77c;
+      display:grid;
+      place-items:center;
+      font:600 23px 'Cormorant Garamond',serif;
+    }
+
+    .sheet-composer-field {
+      flex:1 1 auto;
+      min-width:0;
+      position:relative;
+      display:flex;
+      align-items:center;
+    }
+
+    .sheet-comment-input {
+      display:block;
+      width:100%;
+      min-width:0;
+      height:44px;
+      padding:0 92px 0 15px;
       border:0;
-      border-radius:22px;
+      border-radius:23px;
       outline:none;
-      padding:0 14px;
       background:#f2f2f2;
       color:#161823;
       font-family:Inter,system-ui,sans-serif;
-      font-size:13px;
+      font-size:16px;
+      line-height:normal;
+      -webkit-appearance:none;
+      appearance:none;
     }
 
     .sheet-comment-input:focus {
-      box-shadow:inset 0 0 0 1.5px var(--gold);
+      box-shadow:inset 0 0 0 1.5px #c0a062;
+    }
+
+    .sheet-composer-inline-tools {
+      position:absolute;
+      right:7px;
+      top:50%;
+      transform:translateY(-50%);
+      display:flex;
+      align-items:center;
+      gap:1px;
+    }
+
+    .sheet-composer-tool {
+      display:grid;
+      place-items:center;
+      flex:0 0 28px;
+      width:28px;
+      height:32px;
+      padding:0;
+      border:0;
+      background:transparent;
+      color:#161823;
+      font-size:21px;
+      font-weight:600;
+    }
+
+    .sheet-composer-tool svg {
+      width:20px;
+      height:20px;
     }
 
     .sheet-comment-send {
+      flex:0 0 38px;
       display:grid;
       place-items:center;
-      flex:0 0 36px;
-      width:36px;
-      height:36px;
+      width:38px;
+      height:38px;
+      padding:0;
       border:0;
       border-radius:50%;
       background:var(--gold);
-      color:#181818;
+      color:#161823;
+      align-self:center;
+    }
+
+    .sheet-comment-send:disabled {
+      opacity:.38;
+      cursor:default;
     }
 
     .sheet-comment-send svg {
-      width:18px;
-      height:18px;
+      width:19px;
+      height:19px;
+    }
+
+    .sheet-quick-emoji {
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:5px;
+      overflow-x:auto;
+      padding:2px 0;
+      scrollbar-width:none;
+    }
+
+    .sheet-quick-emoji button {
+      flex:0 0 auto;
+      padding:4px;
+      border:0;
+      background:transparent;
+      font-size:23px;
+    }
+
+    .sheet-composer-toolbar {
+      display:flex;
+      align-items:center;
+      justify-content:flex-start;
+      gap:15px;
+      padding:0 5px;
+    }
+
+    .sheet-composer-toolbar .sheet-composer-tool {
+      width:30px;
+      height:34px;
+      flex-basis:30px;
+    }
+
+    .sheet--comments.is-composing .sheet-comment-input {
+      padding-right:15px;
+    }
+
+    @media (max-width:380px) {
+      .sheet-comment-row {
+        grid-template-columns:30px minmax(0,1fr) 58px;
+        column-gap:7px;
+      }
+
+      .sheet-comment-avatar {
+        width:30px;
+        height:30px;
+      }
+
+      .sheet-composer-line {
+        gap:6px;
+      }
+
+      .sheet-composer-toolbar {
+        gap:12px;
+      }
     }
 
     /* SHARE */
@@ -708,9 +904,12 @@
 
         <header class="sheet-header">
           <span class="sheet-handle" aria-hidden="true"></span>
-          <h2 id="comments-heading" class="sheet-title">Comments · Preview</h2>
+          <h2 id="comments-heading" class="sheet-title">
+            Comments · Preview
+          </h2>
 
-          <button class="sheet-close" type="button" data-close-sheet aria-label="Close comments">
+          <button class="sheet-close" type="button"
+                  data-close-sheet aria-label="Close comments">
             <svg viewBox="0 0 24 24" aria-hidden="true">
               <path d="M5 5L19 19M19 5L5 19"/>
             </svg>
@@ -718,54 +917,94 @@
         </header>
 
         <div id="sheet-comments-list" class="sheet-comments-list">
-          <div class="sheet-demo-notice">Demonstration comments — not real customer feedback</div>
-
-          <div class="sheet-comment-row">
-            <div class="sheet-comment-avatar">D</div>
-            <div class="sheet-comment-body">
-              <strong>Demo Viewer 01</strong>
-              <p>This is an example comment for testing the interface.</p>
-              <small>Preview · sample content</small>
-            </div>
-            <span class="sheet-comment-heart" aria-hidden="true">♡</span>
-          </div>
-
-          <div class="sheet-comment-row">
-            <div class="sheet-comment-avatar">D</div>
-            <div class="sheet-comment-body">
-              <strong>Demo Viewer 02</strong>
-              <p>Try scrolling the comments without changing the video.</p>
-              <small>Preview · sample content</small>
-            </div>
-            <span class="sheet-comment-heart" aria-hidden="true">♡</span>
-          </div>
-
-          <div class="sheet-comment-row">
-            <div class="sheet-comment-avatar">D</div>
-            <div class="sheet-comment-body">
-              <strong>Demo Viewer 03</strong>
-              <p>The shopping experience will be introduced in a later phase.</p>
-              <small>Preview · sample content</small>
-            </div>
-            <span class="sheet-comment-heart" aria-hidden="true">♡</span>
+          <div class="sheet-demo-notice">
+            Demonstration comments — not real customer feedback
           </div>
         </div>
 
         <form id="sheet-comment-form" class="sheet-comment-form">
-          <input
-            id="sheet-comment-input"
-            class="sheet-comment-input"
-            type="text"
-            maxlength="220"
-            autocomplete="off"
-            aria-label="Write demonstration comment"
-            placeholder="Add comment...">
 
-          <button class="sheet-comment-send" type="submit" aria-label="Add preview comment">
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-              <path d="M12 19V5M6 11l6-6 6 6"/>
-            </svg>
-          </button>
+          <div id="sheet-quick-emoji"
+               class="sheet-quick-emoji"
+               aria-label="Quick emoji"
+               hidden></div>
+
+          <div class="sheet-composer-line">
+
+            <span class="sheet-composer-avatar"
+                  aria-hidden="true">A</span>
+
+            <div class="sheet-composer-field">
+
+              <input
+                id="sheet-comment-input"
+                class="sheet-comment-input"
+                type="text"
+                maxlength="220"
+                autocomplete="off"
+                enterkeyhint="send"
+                aria-label="Write demonstration comment"
+                placeholder="Add comment...">
+
+              <div id="sheet-inline-tools"
+                   class="sheet-composer-inline-tools">
+
+                <button class="sheet-composer-tool"
+                        type="button"
+                        data-comment-tool="Image"
+                        aria-label="Image attachment preview">▧</button>
+
+                <button class="sheet-composer-tool"
+                        type="button"
+                        data-comment-tool="Emoji"
+                        aria-label="Emoji shortcuts">☺</button>
+
+                <button class="sheet-composer-tool"
+                        type="button"
+                        data-comment-tool="Mention"
+                        aria-label="Insert mention">@</button>
+
+              </div>
+            </div>
+
+            <button id="sheet-comment-send"
+                    class="sheet-comment-send"
+                    type="submit"
+                    disabled
+                    aria-label="Add preview comment">
+
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M12 19V5M6 11l6-6 6 6"/>
+              </svg>
+            </button>
+          </div>
+
+          <div id="sheet-composer-toolbar"
+               class="sheet-composer-toolbar"
+               hidden>
+
+            <button class="sheet-composer-tool" type="button"
+                    data-comment-tool="Image"
+                    aria-label="Image attachment preview">▧</button>
+
+            <button class="sheet-composer-tool" type="button"
+                    data-comment-tool="Emoji"
+                    aria-label="Emoji shortcuts">☺</button>
+
+            <button class="sheet-composer-tool" type="button"
+                    data-comment-tool="Mention"
+                    aria-label="Insert mention">@</button>
+
+            <button class="sheet-composer-tool" type="button"
+                    data-comment-tool="Microphone"
+                    aria-label="Voice comment preview">♩</button>
+
+            <button class="sheet-composer-tool" type="button"
+                    data-comment-tool="More"
+                    aria-label="More comment options">⊕</button>
+
+          </div>
+
         </form>
       </section>
 
@@ -905,6 +1144,12 @@
       function closeSheet() {
         if (!activeSheet || sheetClosing) return;
 
+        if (activeSheet === 'comments') {
+          commentInput.blur();
+          sheetLayer.style.bottom = '';
+          setComposerExpanded(false);
+        }
+
         sheetClosing = true;
 
         const closingType = activeSheet;
@@ -1034,7 +1279,11 @@
           sheetMap[activeSheet].querySelectorAll(
             'button:not([disabled]), input:not([disabled])'
           )
-        ).filter(element => !element.hidden);
+        ).filter(element =>
+          !element.hidden &&
+          !element.closest('[hidden]') &&
+          element.getClientRects().length > 0
+        );
 
         if (!controls.length) return;
 
@@ -1097,10 +1346,263 @@
         header.addEventListener('pointercancel', finishDrag);
       });
 
-      // Demonstration comments exist only in memory.
+      // =====================================================
+      // PHASE 2.1: DEMONSTRATION COMMENT HIERARCHY
+      // =====================================================
+
       const commentForm = document.getElementById('sheet-comment-form');
       const commentInput = document.getElementById('sheet-comment-input');
       const commentsList = document.getElementById('sheet-comments-list');
+      const commentSend = document.getElementById('sheet-comment-send');
+      const quickEmoji = document.getElementById('sheet-quick-emoji');
+      const inlineTools = document.getElementById('sheet-inline-tools');
+      const composerToolbar = document.getElementById('sheet-composer-toolbar');
+
+      let demoReplyId = 0;
+
+      const demoComments = [
+        {
+          author: 'Demo Viewer 01',
+          initial: 'D',
+          date: '2026-10-21 · Demo',
+          message: 'Which abaya series is being shown?',
+          replies: [{
+            author: 'Demo Reply',
+            initial: 'R',
+            date: '2026-10-21 · Demo',
+            message: 'This example features the Dahlia D06.'
+          }]
+        },
+        {
+          author: 'Demo Viewer 02',
+          initial: 'D',
+          date: '2026-10-22 · Demo',
+          message: 'This comment demonstrates the reply interface.',
+          replies: [{
+            author: 'Demo Reply',
+            initial: 'R',
+            date: '2026-10-22 · Demo',
+            message: 'Replies can expand and collapse independently.'
+          }]
+        },
+        {
+          author: 'Demo Viewer 03',
+          initial: 'D',
+          date: '2026-10-23 · Demo',
+          message: 'Shopping will be added in a later phase.',
+          replies: []
+        }
+      ];
+
+      function makeElement(tag, className, value) {
+        const element = document.createElement(tag);
+        if (className) element.className = className;
+        if (value !== undefined) element.textContent = value;
+        return element;
+      }
+
+      function commentReaction(type) {
+        const button = makeElement(
+          'button', 'sheet-comment-reaction'
+        );
+
+        button.type = 'button';
+        button.setAttribute('aria-label', `${type} preview comment`);
+        button.setAttribute('aria-pressed', 'false');
+
+        const svg = document.createElementNS(
+          'http://www.w3.org/2000/svg', 'svg'
+        );
+        svg.setAttribute('viewBox', '0 0 24 24');
+        svg.setAttribute('aria-hidden', 'true');
+        svg.setAttribute('fill', 'none');
+        svg.setAttribute('stroke', 'currentColor');
+        svg.setAttribute('stroke-linecap', 'round');
+        svg.setAttribute('stroke-linejoin', 'round');
+
+        const path = document.createElementNS(
+          'http://www.w3.org/2000/svg', 'path'
+        );
+
+        path.setAttribute(
+          'd',
+          type === 'Like'
+            ? 'M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 1 0-7.8 7.8L12 21l8.8-8.6a5.5 5.5 0 0 0 0-7.8z'
+            : 'M7 14V4h10l3 8-1 3h-6l-2 5-2-1v-5H7zM3 4h4v11H3z'
+        );
+
+        svg.appendChild(path);
+        button.appendChild(svg);
+
+        button.addEventListener('click', () => {
+          const next = button.getAttribute('aria-pressed') !== 'true';
+          button.setAttribute('aria-pressed', String(next));
+        });
+
+        return button;
+      }
+
+      function updateCommentSend() {
+        commentSend.disabled = !commentInput.value.trim();
+      }
+
+      function buildComment(data, nested = false) {
+        const item = makeElement('article', 'sheet-comment-item');
+        const row = makeElement('div', 'sheet-comment-row');
+
+        const avatar = makeElement(
+          'div', 'sheet-comment-avatar', data.initial || 'D'
+        );
+
+        const body = makeElement('div', 'sheet-comment-body');
+
+        const author = makeElement('strong', '', data.author);
+        const text = makeElement('p', '', data.message);
+
+        const meta = makeElement('div', 'sheet-comment-meta');
+        const date = makeElement('span', '', data.date);
+
+        const reply = makeElement(
+          'button', '', 'Reply'
+        );
+
+        reply.type = 'button';
+
+        reply.addEventListener('click', () => {
+          commentInput.value = `@${data.author} `;
+          updateCommentSend();
+          window.setTimeout(() => {
+            commentInput.focus();
+            commentInput.setSelectionRange(
+              commentInput.value.length,
+              commentInput.value.length
+            );
+          }, 0);
+        });
+
+        meta.append(date, reply);
+        body.append(author, text, meta);
+
+        const actions = makeElement(
+          'div', 'sheet-comment-actions'
+        );
+        actions.append(
+          commentReaction('Like'),
+          commentReaction('Dislike')
+        );
+
+        row.append(avatar, body, actions);
+        item.appendChild(row);
+
+        if (!nested && data.replies && data.replies.length) {
+          const id = `preview-replies-${++demoReplyId}`;
+
+          const toggle = makeElement(
+            'button',
+            'sheet-replies-toggle',
+            `— View ${data.replies.length} ${
+              data.replies.length === 1 ? 'reply' : 'replies'
+            } ▾`
+          );
+
+          toggle.type = 'button';
+          toggle.setAttribute('aria-expanded', 'false');
+          toggle.setAttribute('aria-controls', id);
+
+          const replies = makeElement('div', 'sheet-replies');
+          replies.id = id;
+          replies.hidden = true;
+
+          data.replies.forEach(entry => {
+            replies.appendChild(buildComment(entry, true));
+          });
+
+          toggle.addEventListener('click', () => {
+            const expanded =
+              toggle.getAttribute('aria-expanded') === 'true';
+
+            replies.hidden = expanded;
+            toggle.setAttribute(
+              'aria-expanded', String(!expanded)
+            );
+            toggle.textContent = expanded
+              ? `— View ${data.replies.length} ${
+                  data.replies.length === 1 ? 'reply' : 'replies'
+                } ▾`
+              : '— Hide replies ▴';
+          });
+
+          item.append(toggle, replies);
+        }
+
+        return item;
+      }
+
+      // Demonstration data only, never external comments.
+      demoComments.forEach(entry => {
+        commentsList.appendChild(buildComment(entry));
+      });
+
+      function setComposerExpanded(expanded) {
+        commentsSheet.classList.toggle('is-composing', expanded);
+
+        quickEmoji.hidden = !expanded;
+        composerToolbar.hidden = !expanded;
+        inlineTools.hidden = expanded;
+      }
+
+      const quickEmojiItems = [
+        '🥰', '😊', '😂', '😮', '😉', '🥹', '❤️', '✨'
+      ];
+
+      quickEmojiItems.forEach(emoji => {
+        const button = makeElement('button', '', emoji);
+        button.type = 'button';
+        button.setAttribute('aria-label', `Insert ${emoji}`);
+
+        button.addEventListener('click', () => {
+          commentInput.value += emoji;
+          updateCommentSend();
+          commentInput.focus();
+        });
+
+        quickEmoji.appendChild(button);
+      });
+
+      commentInput.addEventListener('input', updateCommentSend);
+
+      commentInput.addEventListener('focus', () => {
+        setComposerExpanded(true);
+      });
+
+      commentForm.addEventListener('focusout', () => {
+        window.setTimeout(() => {
+          if (!commentForm.contains(document.activeElement)) {
+            setComposerExpanded(false);
+          }
+        }, 50);
+      });
+
+      document.querySelectorAll('[data-comment-tool]').forEach(button => {
+        button.addEventListener('click', () => {
+          const tool = button.dataset.commentTool;
+
+          if (tool === 'Mention') {
+            commentInput.value += '@';
+            updateCommentSend();
+            commentInput.focus();
+            return;
+          }
+
+          if (tool === 'Emoji') {
+            commentInput.focus();
+            message('Choose an emoji from the preview shortcuts');
+            return;
+          }
+
+          message(`${tool} is not available in this preview`);
+        });
+      });
 
       commentForm.addEventListener('submit', event => {
         event.preventDefault();
@@ -1108,39 +1610,90 @@
         const value = commentInput.value.trim();
         if (!value) return;
 
-        const row = document.createElement('div');
-        row.className = 'sheet-comment-row';
+        const entry = {
+          author: 'You · Preview',
+          initial: 'Y',
+          date: 'Just now · Not publicly posted',
+          message: value,
+          replies: []
+        };
 
-        const avatar = document.createElement('div');
-        avatar.className = 'sheet-comment-avatar';
-        avatar.textContent = 'Y';
-
-        const body = document.createElement('div');
-        body.className = 'sheet-comment-body';
-
-        const name = document.createElement('strong');
-        name.textContent = 'You · Preview';
-
-        const content = document.createElement('p');
-        content.textContent = value;
-
-        const timestamp = document.createElement('small');
-        timestamp.textContent = 'Just now · Not publicly posted';
-
-        const heart = document.createElement('span');
-        heart.className = 'sheet-comment-heart';
-        heart.setAttribute('aria-hidden', 'true');
-        heart.textContent = '♡';
-
-        body.append(name, content, timestamp);
-        row.append(avatar, body, heart);
-        commentsList.appendChild(row);
+        commentsList.appendChild(buildComment(entry));
 
         commentInput.value = '';
+        updateCommentSend();
+
         commentsList.scrollTop = commentsList.scrollHeight;
 
         message('Comment added to this preview only');
       });
+
+      updateCommentSend();
+
+      // =====================================================
+      // PHASE 2.1: MOBILE VISUAL VIEWPORT SUPPORT
+      // =====================================================
+
+      const fypApp = document.querySelector('.app');
+
+      function updateCommentKeyboardPosition() {
+        if (activeSheet !== 'comments' ||
+            document.activeElement !== commentInput) {
+          sheetLayer.style.bottom = '';
+          return;
+        }
+
+        const viewport = window.visualViewport;
+
+        if (!viewport) {
+          sheetLayer.style.bottom = '';
+          return;
+        }
+
+        const appBottom =
+          fypApp.getBoundingClientRect().bottom;
+
+        const visualBottom =
+          viewport.offsetTop + viewport.height;
+
+        const overlap = Math.max(
+          0,
+          Math.min(
+            fypApp.clientHeight * 0.65,
+            appBottom - visualBottom
+          )
+        );
+
+        sheetLayer.style.bottom =
+          `${Math.round(overlap)}px`;
+      }
+
+      commentInput.addEventListener('focus', () => {
+        requestAnimationFrame(updateCommentKeyboardPosition);
+
+        window.setTimeout(
+          updateCommentKeyboardPosition,
+          300
+        );
+      });
+
+      commentInput.addEventListener('blur', () => {
+        sheetLayer.style.bottom = '';
+      });
+
+      if (window.visualViewport) {
+        window.visualViewport.addEventListener(
+          'resize', updateCommentKeyboardPosition
+        );
+
+        window.visualViewport.addEventListener(
+          'scroll', updateCommentKeyboardPosition
+        );
+      }
+
+      window.addEventListener(
+        'resize', updateCommentKeyboardPosition
+      );
 
       // Copy the current staging preview URL.
       document.getElementById('share-copy').addEventListener('click', async () => {
