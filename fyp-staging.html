@@ -1502,7 +1502,410 @@
       }
     }
 
-    .toast { position:absolute; left:50%; bottom:calc(77px + env(safe-area-inset-bottom,0px)); z-index:50; width:max-content; max-width:85%; padding:10px 14px; border-radius:30px; background:#242426ed; box-shadow:0 4px 25px #0008; color:#fff; text-align:center; font-size:12px; transform:translate(-50%,12px); opacity:0; pointer-events:none; transition:opacity .18s,transform .18s; }
+    /* =====================================================
+       PHASE 3B — MOCK COMMERCE SHEETS
+       ===================================================== */
+
+    .commerce-layer {
+      position:absolute;
+      inset:0;
+      z-index:60;
+      isolation:isolate;
+    }
+
+    .commerce-backdrop {
+      position:absolute;
+      inset:0;
+      width:100%;
+      height:100%;
+      border:0;
+      background:rgba(0,0,0,.48);
+      opacity:0;
+      transition:opacity 320ms ease;
+    }
+
+    .commerce-layer.is-open .commerce-backdrop {
+      opacity:1;
+    }
+
+    .commerce-panel {
+      position:absolute;
+      left:0;
+      right:0;
+      bottom:0;
+      display:flex;
+      flex-direction:column;
+      width:100%;
+      height:min(69%,650px);
+      max-height:calc(100% - 16px);
+      overflow:hidden;
+      border-radius:17px 17px 0 0;
+      background:#fff;
+      color:#161823;
+      color-scheme:light;
+      box-shadow:0 -8px 28px #0002;
+      transform:translate3d(0,105%,0);
+      transition:transform 340ms cubic-bezier(.22,1,.36,1);
+    }
+
+    .commerce-layer.is-open .commerce-panel {
+      transform:translate3d(0,0,0);
+    }
+
+    .commerce-panel[data-view="chat"] {
+      height:min(79%,750px);
+    }
+
+    .commerce-panel[data-view="basket"] {
+      height:min(72%,680px);
+    }
+
+    .commerce-panel[data-view="order"] {
+      height:min(64%,580px);
+    }
+
+    .commerce-header {
+      position:relative;
+      flex:0 0 54px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:12px 48px 5px;
+      border-bottom:1px solid #f0f0f0;
+      touch-action:none;
+    }
+
+    .commerce-handle {
+      position:absolute;
+      top:7px;
+      left:50%;
+      width:38px;
+      height:4px;
+      border-radius:99px;
+      background:#dedede;
+      transform:translateX(-50%);
+    }
+
+    .commerce-heading {
+      margin:0;
+      font-size:14px;
+      font-weight:700;
+      text-align:center;
+    }
+
+    .commerce-close {
+      position:absolute;
+      top:15px;
+      right:14px;
+      width:30px;
+      height:30px;
+      display:grid;
+      place-items:center;
+      padding:0;
+      border:0;
+      border-radius:50%;
+      background:#f2f2f2;
+      color:#333;
+      font-size:21px;
+    }
+
+    .commerce-body {
+      flex:1 1 auto;
+      min-height:0;
+      overflow-y:auto;
+      overscroll-behavior:contain;
+      -webkit-overflow-scrolling:touch;
+      padding:16px;
+      background:#fff;
+    }
+
+    .commerce-view {
+      min-width:0;
+    }
+
+    .commerce-product-card {
+      display:flex;
+      align-items:flex-start;
+      gap:13px;
+      margin-bottom:24px;
+    }
+
+    .commerce-product-card img {
+      width:88px;
+      height:118px;
+      flex:0 0 88px;
+      object-fit:cover;
+      border-radius:9px;
+      background:#eee;
+    }
+
+    .commerce-product-info {
+      flex:1;
+      min-width:0;
+    }
+
+    .commerce-price {
+      display:block;
+      font-size:25px;
+      font-weight:700;
+      color:#a78548;
+      margin:4px 0 8px;
+    }
+
+    .commerce-product-name {
+      font-size:13px;
+      font-weight:600;
+      line-height:1.5;
+    }
+
+    .commerce-preview-note {
+      font-size:11px;
+      line-height:1.5;
+      color:#898989;
+    }
+
+    .commerce-section-title {
+      font-size:14px;
+      font-weight:700;
+      margin:20px 0 12px;
+    }
+
+    .commerce-size-grid {
+      display:grid;
+      grid-template-columns:repeat(4,minmax(0,1fr));
+      gap:9px;
+    }
+
+    .commerce-size-button {
+      height:43px;
+      border:1px solid #d9d9d9;
+      border-radius:8px;
+      background:#fff;
+      color:#333;
+      font-size:13px;
+      font-weight:600;
+    }
+
+    .commerce-size-button[aria-pressed="true"] {
+      border:2px solid #b39257;
+      background:#f7f2e9;
+      color:#8c6836;
+    }
+
+    .commerce-quantity-row {
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      margin-top:23px;
+      gap:12px;
+    }
+
+    .commerce-stepper {
+      display:flex;
+      align-items:center;
+      border-radius:8px;
+      overflow:hidden;
+      background:#f3f3f3;
+    }
+
+    .commerce-stepper button {
+      width:41px;
+      height:43px;
+      border:0;
+      background:transparent;
+      color:#222;
+      font-size:23px;
+    }
+
+    .commerce-stepper span {
+      min-width:33px;
+      text-align:center;
+      font-size:15px;
+    }
+
+    .commerce-stepper button:disabled {
+      color:#bababa;
+    }
+
+    .commerce-action-footer {
+      flex:0 0 auto;
+      padding:12px 15px calc(12px + env(safe-area-inset-bottom,0px));
+      border-top:1px solid #eee;
+      background:#fff;
+    }
+
+    .commerce-primary {
+      width:100%;
+      min-height:49px;
+      border:0;
+      border-radius:26px;
+      background:#b39257;
+      color:#fff;
+      font-weight:700;
+      font-size:15px;
+    }
+
+    .commerce-primary:disabled {
+      opacity:.45;
+      cursor:default;
+    }
+
+    .commerce-basket-item {
+      display:grid;
+      grid-template-columns:67px minmax(0,1fr);
+      gap:12px;
+      padding:15px 0;
+      border-bottom:1px solid #eee;
+    }
+
+    .commerce-basket-item img {
+      width:67px;
+      height:91px;
+      object-fit:cover;
+      border-radius:7px;
+    }
+
+    .commerce-basket-item p {
+      margin:4px 0;
+      font-size:12px;
+      line-height:1.5;
+    }
+
+    .commerce-basket-controls {
+      display:flex;
+      align-items:center;
+      flex-wrap:wrap;
+      gap:10px;
+      margin-top:9px;
+    }
+
+    .commerce-basket-controls button {
+      min-width:32px;
+      min-height:32px;
+      border:1px solid #ddd;
+      border-radius:7px;
+      background:#fff;
+      color:#333;
+    }
+
+    .commerce-basket-total {
+      display:flex;
+      justify-content:space-between;
+      margin:20px 0;
+      font-size:14px;
+      font-weight:700;
+    }
+
+    .commerce-secondary {
+      padding:10px 12px;
+      border:1px solid #d5c4a5;
+      border-radius:9px;
+      background:#fff;
+      color:#876a3c;
+      font-weight:600;
+    }
+
+    .commerce-chat-log {
+      display:flex;
+      flex-direction:column;
+      gap:11px;
+      min-height:160px;
+      max-height:36vh;
+      overflow-y:auto;
+      overscroll-behavior:contain;
+      padding:12px 0;
+    }
+
+    .commerce-chat-bubble {
+      max-width:83%;
+      align-self:flex-end;
+      padding:10px 13px;
+      border-radius:14px 14px 3px 14px;
+      background:#eae3d5;
+      color:#282828;
+      font-size:13px;
+      line-height:1.5;
+      overflow-wrap:anywhere;
+    }
+
+    .commerce-chat-composer {
+      display:flex;
+      gap:9px;
+      align-items:center;
+      margin-top:12px;
+    }
+
+    .commerce-chat-input {
+      flex:1;
+      min-width:0;
+      min-height:44px;
+      padding:10px 14px;
+      border:0;
+      border-radius:24px;
+      background:#f1f1f1;
+      color:#222;
+      font-size:16px;
+    }
+
+    .commerce-chat-send {
+      min-width:62px;
+      height:42px;
+      padding:0 12px;
+      border:0;
+      border-radius:21px;
+      background:#b39257;
+      color:#fff;
+      font-weight:600;
+    }
+
+    .commerce-chat-send:disabled {
+      opacity:.4;
+    }
+
+    .preview-cart-count {
+      position:absolute;
+      top:0;
+      right:14%;
+      padding:2px 5px;
+      border-radius:20px;
+      background:#b39257;
+      color:#111;
+      font-size:9px;
+      font-weight:700;
+      line-height:1.1;
+    }
+
+    .bottom #open-preview-basket {
+      position:relative;
+    }
+
+    .commerce-order-summary {
+      white-space:pre-line;
+      padding:16px;
+      border-radius:10px;
+      background:#f7f5f1;
+      font-size:14px;
+      line-height:1.9;
+    }
+
+    @media(max-width:380px) {
+      .commerce-size-grid {
+        gap:7px;
+      }
+
+      .commerce-body {
+        padding:12px;
+      }
+    }
+
+    @media(prefers-reduced-motion:reduce) {
+      .commerce-panel,
+      .commerce-backdrop {
+        transition:none !important;
+      }
+    }
+
+    .toast { position:absolute; left:50%; bottom:calc(77px + env(safe-area-inset-bottom,0px)); z-index:80; width:max-content; max-width:85%; padding:10px 14px; border-radius:30px; background:#242426ed; box-shadow:0 4px 25px #0008; color:#fff; text-align:center; font-size:12px; transform:translate(-50%,12px); opacity:0; pointer-events:none; transition:opacity .18s,transform .18s; }
     .toast.visible { opacity:1; transform:translate(-50%,0); }
     .sr-only { position:absolute; clip:rect(0,0,0,0); width:1px; height:1px; overflow:hidden; white-space:nowrap; }
     @media (min-width:700px) { body { display:grid; place-items:center; } .app { border-radius:14px; } }
@@ -1596,8 +1999,15 @@
         <span>Shop</span>
       </button>
 
-      <button data-soon="Cart" aria-label="Cart (future phase)">
+      <button id="open-preview-basket"
+              type="button"
+              aria-haspopup="dialog"
+              aria-controls="commerce-panel"
+              aria-label="Open preview basket">
         <svg aria-hidden="true"><use href="#i-cart"/></svg>
+        <span id="preview-cart-count"
+              class="preview-cart-count"
+              hidden>0</span>
         <span>Cart</span>
       </button>
 
@@ -2048,21 +2458,27 @@
 
           <button type="button"
                   class="product-footer-small"
-                  data-product-demo="Chat">
+                  id="open-product-chat"
+                  aria-haspopup="dialog"
+                  aria-controls="commerce-panel">
             <svg aria-hidden="true"><use href="#i-chat"/></svg>
             <span>Chat</span>
           </button>
 
           <button type="button"
                   class="product-cart-button"
-                  data-product-demo="Add to cart"
-                  aria-label="Add to cart — future phase">
+                  id="open-product-cart"
+                  aria-haspopup="dialog"
+                  aria-controls="commerce-panel"
+                  aria-label="Choose D06 options to add to preview basket">
             <svg aria-hidden="true"><use href="#i-cart"/></svg>
           </button>
 
           <button type="button"
                   class="product-buy-button"
-                  data-product-demo="Buy now">
+                  id="open-product-buy"
+                  aria-haspopup="dialog"
+                  aria-controls="commerce-panel">
             Buy now · Preview
           </button>
         </footer>
@@ -2095,6 +2511,230 @@
              aria-label="Full-screen image carousel">
         </div>
       </div>
+    </div>
+
+    <!-- PHASE 3B: FRONTEND-ONLY COMMERCE PREVIEW -->
+    <div id="commerce-layer" class="commerce-layer" hidden>
+
+      <button id="commerce-backdrop"
+              class="commerce-backdrop"
+              type="button"
+              tabindex="-1"
+              aria-label="Close shopping preview">
+      </button>
+
+      <section id="commerce-panel"
+               class="commerce-panel"
+               data-view="variant"
+               role="dialog"
+               aria-modal="true"
+               aria-labelledby="commerce-heading">
+
+        <header id="commerce-header" class="commerce-header">
+          <span class="commerce-handle" aria-hidden="true"></span>
+
+          <h2 id="commerce-heading" class="commerce-heading">
+            Choose options
+          </h2>
+
+          <button id="commerce-close"
+                  class="commerce-close"
+                  type="button"
+                  aria-label="Close shopping preview">×</button>
+        </header>
+
+        <div class="commerce-body">
+
+          <!-- PRODUCT VARIANTS -->
+          <div id="commerce-variant" class="commerce-view">
+
+            <div class="commerce-product-card">
+              <img src="images/d06-1-hero.webp"
+                   alt="D06 Dahlia Abaya">
+
+              <div class="commerce-product-info">
+                <strong class="commerce-price">RM139.00</strong>
+
+                <div class="commerce-product-name">
+                  ARABISTA | Dahlia Series D06
+                </div>
+
+                <p class="commerce-preview-note">
+                  Reference price · Preview only
+                </p>
+              </div>
+            </div>
+
+            <div class="commerce-section-title">Saiz</div>
+
+            <div id="commerce-size-grid"
+                 class="commerce-size-grid"
+                 role="group"
+                 aria-label="Select demonstration size">
+
+              <button type="button" class="commerce-size-button"
+                      data-demo-size="XS" aria-pressed="false">XS</button>
+              <button type="button" class="commerce-size-button"
+                      data-demo-size="S" aria-pressed="false">S</button>
+              <button type="button" class="commerce-size-button"
+                      data-demo-size="M" aria-pressed="false">M</button>
+              <button type="button" class="commerce-size-button"
+                      data-demo-size="L" aria-pressed="false">L</button>
+              <button type="button" class="commerce-size-button"
+                      data-demo-size="XL" aria-pressed="false">XL</button>
+              <button type="button" class="commerce-size-button"
+                      data-demo-size="XXL" aria-pressed="false">XXL</button>
+              <button type="button" class="commerce-size-button"
+                      data-demo-size="XXXL" aria-pressed="false">XXXL</button>
+
+            </div>
+
+            <div class="commerce-quantity-row">
+              <strong>Quantity</strong>
+
+              <div class="commerce-stepper">
+                <button id="commerce-minus"
+                        type="button"
+                        aria-label="Decrease quantity">−</button>
+
+                <span id="commerce-quantity">1</span>
+
+                <button id="commerce-plus"
+                        type="button"
+                        aria-label="Increase quantity">+</button>
+              </div>
+            </div>
+
+            <p id="commerce-selection-note"
+               class="commerce-preview-note"
+               aria-live="polite">
+              Select a size to continue. Availability is not verified.
+            </p>
+
+          </div>
+
+          <!-- MEMORY-ONLY BASKET -->
+          <div id="commerce-basket"
+               class="commerce-view"
+               hidden>
+
+            <p class="commerce-preview-note">
+              Demonstration basket — not connected to Arabista checkout.
+            </p>
+
+            <div id="commerce-basket-items"></div>
+
+            <div class="commerce-basket-total">
+              <span>Reference subtotal</span>
+              <span id="commerce-basket-total">RM0.00</span>
+            </div>
+
+            <p class="commerce-preview-note">
+              Shipping, discounts, live prices and stock have not
+              been calculated.
+            </p>
+
+            <button id="commerce-continue-shopping"
+                    class="commerce-secondary"
+                    type="button">
+              Continue shopping
+            </button>
+
+          </div>
+
+          <!-- NON-TRANSACTIONAL BUY NOW SUMMARY -->
+          <div id="commerce-order"
+               class="commerce-view"
+               hidden>
+
+            <p class="commerce-preview-note">
+              This is an order summary demonstration, not checkout.
+            </p>
+
+            <div id="commerce-order-summary"
+                 class="commerce-order-summary"></div>
+
+            <p class="commerce-preview-note">
+              No order, reservation or payment has been created.
+            </p>
+
+            <button id="commerce-back-to-options"
+                    class="commerce-secondary"
+                    type="button">
+              Back to options
+            </button>
+
+          </div>
+
+          <!-- LOCAL-ONLY CHAT -->
+          <div id="commerce-chat"
+               class="commerce-view"
+               hidden>
+
+            <div class="commerce-product-card">
+              <img src="images/d06-1-hero.webp"
+                   alt="D06 Dahlia Abaya">
+
+              <div class="commerce-product-info">
+                <strong>Arabista</strong>
+
+                <div class="commerce-product-name">
+                  Dahlia Series D06
+                </div>
+
+                <p class="commerce-preview-note">
+                  RM139.00 reference · Product attached
+                </p>
+              </div>
+            </div>
+
+            <p class="commerce-preview-note">
+              Preview conversation. Messages are not sent to Arabista.
+            </p>
+
+            <div id="commerce-chat-log"
+                 class="commerce-chat-log"
+                 aria-live="polite"></div>
+
+            <form id="commerce-chat-form"
+                  class="commerce-chat-composer">
+
+              <input id="commerce-chat-input"
+                     class="commerce-chat-input"
+                     type="text"
+                     maxlength="500"
+                     autocomplete="off"
+                     enterkeyhint="send"
+                     placeholder="Send message..."
+                     aria-label="Write preview chat message">
+
+              <button id="commerce-chat-send"
+                      class="commerce-chat-send"
+                      type="submit"
+                      disabled>
+                Send
+              </button>
+
+            </form>
+
+          </div>
+
+        </div>
+
+        <footer id="commerce-action-footer"
+                class="commerce-action-footer">
+
+          <button id="commerce-primary"
+                  class="commerce-primary"
+                  type="button"
+                  disabled>
+            Add to basket
+          </button>
+
+        </footer>
+
+      </section>
+
     </div>
     <div id="toast" class="toast" role="status" aria-live="polite"></div>
     <div id="screen-reader-status" class="sr-only" aria-live="polite">Video 1 of 3</div>
@@ -2152,7 +2792,7 @@
         window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
       function openSheet(type, trigger) {
-        if (activeSheet || !sheetMap[type]) return;
+        if (commerceActive || activeSheet || !sheetMap[type]) return;
 
         if (type === 'product') {
           productSheet.classList.remove('is-expanded');
@@ -2189,7 +2829,7 @@
       }
 
       function closeSheet() {
-        if (!activeSheet || sheetClosing) return;
+        if (!activeSheet || sheetClosing || commerceActive) return;
 
         if (activeSheet === 'comments') {
           commentInput.blur();
@@ -2249,7 +2889,7 @@
         updatePauseCue();
       }
       function move(direction) {
-        if (activeSheet || transitioning) return;
+        if (activeSheet || commerceActive || transitioning) return;
         const next = Math.max(0, Math.min(count - 1, active + direction));
         if (next === active) return;
         transitioning = true;
@@ -2274,7 +2914,7 @@
       feed.addEventListener('touchcancel', () => { startY = null; }, { passive:true });
       feed.addEventListener('wheel', e => { if (Math.abs(e.deltaY) > 25) { e.preventDefault(); move(e.deltaY > 0 ? 1 : -1); } }, { passive:false });
       window.addEventListener('keydown', e => {
-        if (activeSheet || ['INPUT','TEXTAREA','SELECT'].includes(document.activeElement?.tagName)) return;
+        if (activeSheet || commerceActive || ['INPUT','TEXTAREA','SELECT'].includes(document.activeElement?.tagName)) return;
         if (e.key === 'ArrowDown') { e.preventDefault(); move(1); }
         if (e.key === 'ArrowUp') { e.preventDefault(); move(-1); }
         if (e.code === 'Space' && active === 0) { e.preventDefault(); togglePause(); }
@@ -2321,6 +2961,49 @@
 
       // Accessible dialog dismissal and focus containment.
       document.addEventListener('keydown', event => {
+        if (commerceActive) {
+          if (event.key === 'Escape') {
+            event.preventDefault();
+            event.stopPropagation();
+            closeCommerce();
+            return;
+          }
+
+          if (event.key === 'Tab') {
+            const focusable = Array.from(
+              commercePanel.querySelectorAll(
+                'button:not([disabled]), input:not([disabled]), [tabindex="0"]'
+              )
+            ).filter(element =>
+              !element.hidden &&
+              !element.closest('[hidden]') &&
+              element.getClientRects().length > 0
+            );
+
+            if (focusable.length) {
+              const first = focusable[0];
+              const last = focusable[focusable.length - 1];
+
+              if (event.shiftKey &&
+                  document.activeElement === first) {
+                event.preventDefault();
+                last.focus();
+              } else if (!event.shiftKey &&
+                         document.activeElement === last) {
+                event.preventDefault();
+                first.focus();
+              } else if (!focusable.includes(
+                document.activeElement
+              )) {
+                event.preventDefault();
+                first.focus();
+              }
+            }
+          }
+
+          return;
+        }
+
         const lightbox = document.getElementById('product-lightbox');
         const lightboxOpen = lightbox && !lightbox.hidden;
 
@@ -3418,7 +4101,7 @@
       });
 
       function openProductLightbox(index, opener) {
-        if (activeSheet !== 'product' || sheetClosing) return;
+        if (commerceActive || activeSheet !== 'product' || sheetClosing) return;
 
         lightboxOpener = opener || document.activeElement;
         productLightbox.hidden = false;
@@ -3872,11 +4555,535 @@
         stopProductPreview();
       });
 
+      // =====================================================
+      // PHASE 3B — MEMORY-ONLY SHOPPING STATE
+      // =====================================================
+
+      const COMMERCE_PREVIEW_PRICE = 139;
+      const COMMERCE_SIZES = [
+        'XS','S','M','L','XL','XXL','XXXL'
+      ];
+
+      const commerceLayer =
+        document.getElementById('commerce-layer');
+
+      const commercePanel =
+        document.getElementById('commerce-panel');
+
+      const commerceHeading =
+        document.getElementById('commerce-heading');
+
+      const commercePrimary =
+        document.getElementById('commerce-primary');
+
+      const commerceFooter =
+        document.getElementById('commerce-action-footer');
+
+      const commerceSizeButtons = Array.from(
+        document.querySelectorAll('[data-demo-size]')
+      );
+
+      const commerceQuantity =
+        document.getElementById('commerce-quantity');
+
+      const commerceMinus =
+        document.getElementById('commerce-minus');
+
+      const commercePlus =
+        document.getElementById('commerce-plus');
+
+      const commerceCartCount =
+        document.getElementById('preview-cart-count');
+
+      const commerceChatInput =
+        document.getElementById('commerce-chat-input');
+
+      const commerceChatLog =
+        document.getElementById('commerce-chat-log');
+
+      const commerceChatSend =
+        document.getElementById('commerce-chat-send');
+
+      const commerceViews = {
+        variant:document.getElementById('commerce-variant'),
+        basket:document.getElementById('commerce-basket'),
+        order:document.getElementById('commerce-order'),
+        chat:document.getElementById('commerce-chat')
+      };
+
+      const commerceTitles = {
+        variant:'Choose options',
+        basket:'Your basket · Preview',
+        order:'Order preview',
+        chat:'Arabista · Chat preview'
+      };
+
+      let commerceActive = false;
+      let commerceClosing = false;
+      let commerceCurrentView = null;
+      let commerceIntent = 'cart';
+      let commerceTrigger = null;
+      let commerceCloseTimer = null;
+
+      let commercePreviousInert = null;
+
+      let demoSelectedSize = null;
+      let demoQuantity = 1;
+
+      // This basket exists in memory only.
+      const demoBasket = [];
+
+      function moneyPreview(amount) {
+        return `RM${amount.toFixed(2)}`;
+      }
+
+      function renderVariantSelection() {
+        commerceSizeButtons.forEach(button => {
+          button.setAttribute(
+            'aria-pressed',
+            String(button.dataset.demoSize === demoSelectedSize)
+          );
+        });
+
+        commerceQuantity.textContent = String(demoQuantity);
+
+        commerceMinus.disabled = demoQuantity <= 1;
+        commercePlus.disabled = demoQuantity >= 10;
+
+        commercePrimary.disabled = !demoSelectedSize;
+
+        commercePrimary.textContent =
+          commerceIntent === 'buy'
+            ? 'Buy now · Preview'
+            : 'Add to basket';
+
+        document.getElementById(
+          'commerce-selection-note'
+        ).textContent = demoSelectedSize
+          ? `Size ${demoSelectedSize} · Quantity ${demoQuantity} · Demonstration only`
+          : 'Select a size to continue. Availability is not verified.';
+      }
+
+      function updatePreviewCartBadge() {
+        const count = demoBasket.reduce(
+          (sum,item) => sum + item.quantity, 0
+        );
+
+        commerceCartCount.hidden = count === 0;
+        commerceCartCount.textContent =
+          count > 99 ? '99+' : String(count);
+      }
+
+      function renderPreviewBasket() {
+        const container =
+          document.getElementById('commerce-basket-items');
+
+        container.replaceChildren();
+
+        if (!demoBasket.length) {
+          const empty = document.createElement('p');
+          empty.textContent = 'Your preview basket is empty.';
+          empty.className = 'commerce-preview-note';
+          container.appendChild(empty);
+        }
+
+        demoBasket.forEach((item,index) => {
+          const row = document.createElement('div');
+          row.className = 'commerce-basket-item';
+
+          const image = document.createElement('img');
+          image.src = 'images/d06-1-hero.webp';
+          image.alt = 'D06 Dahlia Series';
+
+          const information = document.createElement('div');
+
+          const title = document.createElement('strong');
+          title.textContent = `Dahlia D06 · ${item.size}`;
+
+          const summary = document.createElement('p');
+          summary.textContent =
+            `${moneyPreview(COMMERCE_PREVIEW_PRICE)} reference · Qty ${item.quantity}`;
+
+          const controls = document.createElement('div');
+          controls.className = 'commerce-basket-controls';
+
+          const minus = document.createElement('button');
+          minus.type = 'button';
+          minus.textContent = '−';
+          minus.setAttribute('aria-label','Decrease basket item');
+          minus.disabled = item.quantity <= 1;
+
+          minus.addEventListener('click', () => {
+            item.quantity--;
+            renderPreviewBasket();
+          });
+
+          const plus = document.createElement('button');
+          plus.type = 'button';
+          plus.textContent = '+';
+          plus.setAttribute('aria-label','Increase basket item');
+          plus.disabled = item.quantity >= 10;
+
+          plus.addEventListener('click', () => {
+            item.quantity++;
+            renderPreviewBasket();
+          });
+
+          const remove = document.createElement('button');
+          remove.type = 'button';
+          remove.textContent = 'Remove';
+
+          remove.addEventListener('click', () => {
+            demoBasket.splice(index,1);
+            renderPreviewBasket();
+          });
+
+          controls.append(minus,plus,remove);
+          information.append(title,summary,controls);
+          row.append(image,information);
+          container.appendChild(row);
+        });
+
+        const total = demoBasket.reduce(
+          (sum,item) =>
+            sum + COMMERCE_PREVIEW_PRICE * item.quantity,
+          0
+        );
+
+        document.getElementById(
+          'commerce-basket-total'
+        ).textContent = moneyPreview(total);
+
+        updatePreviewCartBadge();
+      }
+
+      function renderOrderPreview() {
+        const summary =
+          document.getElementById('commerce-order-summary');
+
+        summary.textContent =
+          `Dahlia Series D06\n` +
+          `Size: ${demoSelectedSize}\n` +
+          `Quantity: ${demoQuantity}\n` +
+          `Reference subtotal: ${
+            moneyPreview(COMMERCE_PREVIEW_PRICE * demoQuantity)
+          }\n` +
+          `Shipping: Not calculated\n` +
+          `Status: Preview only`;
+      }
+
+      function showCommerceView(view) {
+        if (!commerceViews[view]) return;
+
+        commerceCurrentView = view;
+        commercePanel.dataset.view = view;
+
+        Object.entries(commerceViews).forEach(([name,element]) => {
+          element.hidden = name !== view;
+        });
+
+        commerceHeading.textContent = commerceTitles[view];
+
+        commerceFooter.hidden = view !== 'variant';
+
+        if (view === 'variant') renderVariantSelection();
+        if (view === 'basket') renderPreviewBasket();
+        if (view === 'order') renderOrderPreview();
+      }
+
+      function resetCommerceDraft() {
+        demoSelectedSize = null;
+        demoQuantity = 1;
+        renderVariantSelection();
+      }
+
+      function openCommerce(view, trigger, intent = 'cart') {
+        if (commerceActive ||
+            sheetClosing ||
+            (activeSheet && activeSheet !== 'product') ||
+            !productLightbox.hidden) return;
+
+        commerceActive = true;
+        commerceClosing = false;
+        commerceIntent = intent;
+        commerceTrigger = trigger;
+
+        commercePreviousInert = {
+          feed:feed.inert,
+          navigation:bottomNavigation.inert,
+          sheet:sheetLayer.inert
+        };
+
+        feed.inert = true;
+        bottomNavigation.inert = true;
+
+        if (!sheetLayer.hidden) {
+          sheetLayer.inert = true;
+        }
+
+        if (view === 'variant') resetCommerceDraft();
+
+        showCommerceView(view);
+
+        commerceLayer.hidden = false;
+
+        // Establish the hidden initial position before entering.
+        commercePanel.getBoundingClientRect();
+
+        commerceLayer.classList.add('is-open');
+
+        if (activeSheet === 'product') {
+          stopProductPreview();
+        }
+
+        document.getElementById('commerce-close')
+          .focus({preventScroll:true});
+      }
+
+      function closeCommerce() {
+        if (!commerceActive || commerceClosing) return;
+
+        commerceClosing = true;
+        commerceChatInput.blur();
+        commerceLayer.style.bottom = '';
+        commerceLayer.classList.remove('is-open');
+
+        clearTimeout(commerceCloseTimer);
+
+        commerceCloseTimer = window.setTimeout(() => {
+          commerceLayer.hidden = true;
+
+          if (commercePreviousInert) {
+            feed.inert = commercePreviousInert.feed;
+            bottomNavigation.inert =
+              commercePreviousInert.navigation;
+            sheetLayer.inert = commercePreviousInert.sheet;
+          }
+
+          if (commerceTrigger && commerceTrigger.isConnected) {
+            commerceTrigger.focus({preventScroll:true});
+          }
+
+          commerceActive = false;
+          commerceClosing = false;
+          commerceCurrentView = null;
+          commerceTrigger = null;
+          commercePreviousInert = null;
+
+          if (activeSheet === 'product' &&
+              productSheet.classList.contains('is-expanded') &&
+              !productMini.hidden) {
+            startProductPreview();
+          }
+
+        }, prefersReducedMotion() ? 0 : 340);
+      }
+
+      // =====================================================
+      // PHASE 3B — SHOPPING INTERACTIONS
+      // =====================================================
+
+      document.getElementById('open-product-cart')
+        .addEventListener('click', event => {
+          openCommerce('variant',event.currentTarget,'cart');
+        });
+
+      document.getElementById('open-product-buy')
+        .addEventListener('click', event => {
+          openCommerce('variant',event.currentTarget,'buy');
+        });
+
+      document.getElementById('open-product-chat')
+        .addEventListener('click', event => {
+          openCommerce('chat',event.currentTarget);
+        });
+
+      document.getElementById('open-preview-basket')
+        .addEventListener('click', event => {
+          openCommerce('basket',event.currentTarget);
+        });
+
+      commerceSizeButtons.forEach(button => {
+        button.addEventListener('click', () => {
+          if (!COMMERCE_SIZES.includes(button.dataset.demoSize)) {
+            return;
+          }
+
+          demoSelectedSize = button.dataset.demoSize;
+          renderVariantSelection();
+        });
+      });
+
+      commerceMinus.addEventListener('click', () => {
+        demoQuantity = Math.max(1,demoQuantity - 1);
+        renderVariantSelection();
+      });
+
+      commercePlus.addEventListener('click', () => {
+        demoQuantity = Math.min(10,demoQuantity + 1);
+        renderVariantSelection();
+      });
+
+      commercePrimary.addEventListener('click', () => {
+        if (!demoSelectedSize || commerceCurrentView !== 'variant') {
+          return;
+        }
+
+        if (commerceIntent === 'buy') {
+          showCommerceView('order');
+          return;
+        }
+
+        const existing = demoBasket.find(
+          item => item.size === demoSelectedSize
+        );
+
+        if (existing) {
+          existing.quantity = Math.min(
+            10,existing.quantity + demoQuantity
+          );
+        } else {
+          demoBasket.push({
+            sku:'D06',
+            size:demoSelectedSize,
+            quantity:demoQuantity
+          });
+        }
+
+        updatePreviewCartBadge();
+        showCommerceView('basket');
+
+        message('Added to demonstration basket only');
+      });
+
+      document.getElementById('commerce-back-to-options')
+        .addEventListener('click', () => {
+          showCommerceView('variant');
+        });
+
+      document.getElementById('commerce-continue-shopping')
+        .addEventListener('click', closeCommerce);
+
+      document.getElementById('commerce-close')
+        .addEventListener('click', closeCommerce);
+
+      document.getElementById('commerce-backdrop')
+        .addEventListener('click', closeCommerce);
+
+      // Simple downward header gesture closes the commerce panel.
+      const commerceHeader =
+        document.getElementById('commerce-header');
+
+      let commerceDragStart = null;
+
+      commerceHeader.addEventListener('pointerdown', event => {
+        if (event.button !== 0 || event.target.closest('button')) {
+          return;
+        }
+
+        commerceDragStart = {
+          id:event.pointerId,
+          y:event.clientY
+        };
+
+        try {
+          commerceHeader.setPointerCapture(event.pointerId);
+        } catch (error) {}
+      });
+
+      commerceHeader.addEventListener('pointerup', event => {
+        if (!commerceDragStart ||
+            commerceDragStart.id !== event.pointerId) return;
+
+        const distance = event.clientY - commerceDragStart.y;
+        commerceDragStart = null;
+
+        if (distance > 90) closeCommerce();
+      });
+
+      commerceHeader.addEventListener('pointercancel', () => {
+        commerceDragStart = null;
+      });
+
+      commerceChatInput.addEventListener('input', () => {
+        commerceChatSend.disabled =
+          !commerceChatInput.value.trim();
+      });
+
+      document.getElementById('commerce-chat-form')
+        .addEventListener('submit', event => {
+          event.preventDefault();
+
+          const text = commerceChatInput.value.trim();
+          if (!text) return;
+
+          const bubble = document.createElement('div');
+          bubble.className = 'commerce-chat-bubble';
+          bubble.textContent = text;
+
+          commerceChatLog.appendChild(bubble);
+
+          commerceChatInput.value = '';
+          commerceChatSend.disabled = true;
+          commerceChatLog.scrollTop =
+            commerceChatLog.scrollHeight;
+
+          message('Message added to preview only');
+        });
+
+      // Keep the composer accessible when a mobile keyboard opens.
+      function updateCommerceKeyboardInset() {
+        if (!commerceActive ||
+            commerceCurrentView !== 'chat' ||
+            document.activeElement !== commerceChatInput ||
+            !window.visualViewport) {
+          commerceLayer.style.bottom = '';
+          return;
+        }
+
+        const appBottom =
+          fypApp.getBoundingClientRect().bottom;
+
+        const viewportBottom =
+          window.visualViewport.offsetTop +
+          window.visualViewport.height;
+
+        const overlap = Math.max(
+          0,
+          Math.min(
+            fypApp.clientHeight * 0.65,
+            appBottom - viewportBottom
+          )
+        );
+
+        commerceLayer.style.bottom =
+          `${Math.round(overlap)}px`;
+      }
+
+      commerceChatInput.addEventListener('focus', () => {
+        requestAnimationFrame(updateCommerceKeyboardInset);
+        window.setTimeout(updateCommerceKeyboardInset,300);
+      });
+
+      commerceChatInput.addEventListener('blur', () => {
+        commerceLayer.style.bottom = '';
+      });
+
+      if (window.visualViewport) {
+        window.visualViewport.addEventListener(
+          'resize',updateCommerceKeyboardInset
+        );
+
+        window.visualViewport.addEventListener(
+          'scroll',updateCommerceKeyboardInset
+        );
+      }
+
       document.querySelectorAll('[data-product-demo]')
         .forEach(button => {
           button.addEventListener('click', () => {
             message(
-              `${button.dataset.productDemo} will be implemented in Phase 3B`
+              `${button.dataset.productDemo} will be implemented in a later phase`
             );
           });
         });
