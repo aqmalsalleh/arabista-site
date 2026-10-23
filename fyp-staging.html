@@ -820,6 +820,339 @@
         transition:none !important;
       }
     }
+    /* =====================================================
+       PHASE 3A — D06 PRODUCT SHOPPING SHEET
+       ===================================================== */
+
+    .sheet--product {
+      height:72%;
+      max-height:calc(100% - 8px - env(safe-area-inset-top,0px));
+      transition:
+        transform 320ms cubic-bezier(.22,1,.36,1),
+        height 380ms cubic-bezier(.22,1,.36,1);
+    }
+
+    .sheet--product.is-expanded {
+      height:calc(100% - env(safe-area-inset-top,0px));
+    }
+
+    .product-grab {
+      position:relative;
+      flex:0 0 36px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      width:100%;
+      padding:0 14px;
+      touch-action:pan-y;
+      user-select:none;
+      -webkit-user-select:none;
+      background:#fff;
+      cursor:grab;
+    }
+
+    .product-grab:active {
+      cursor:grabbing;
+    }
+
+    .product-grab .product-handle {
+      position:absolute;
+      top:8px;
+      left:50%;
+      transform:translateX(-50%);
+      width:38px;
+      height:4px;
+      border-radius:99px;
+      background:#d6d6d6;
+    }
+
+    .product-grab-label {
+      font-size:11px;
+      font-weight:600;
+      color:#8b7855;
+      padding-top:12px;
+    }
+
+    .product-close {
+      position:relative;
+      z-index:2;
+      width:30px;
+      height:30px;
+      display:grid;
+      place-items:center;
+      border:0;
+      background:transparent;
+      color:#333;
+      padding:0;
+    }
+
+    .product-close svg {
+      width:19px;
+      height:19px;
+    }
+
+    .product-scroll {
+      flex:1 1 auto;
+      min-height:0;
+      overflow-y:hidden;
+      overscroll-behavior:contain;
+      -webkit-overflow-scrolling:touch;
+      background:#fff;
+    }
+
+    .sheet--product.is-expanded .product-scroll {
+      overflow-y:auto;
+      touch-action:pan-y;
+    }
+
+    .product-gallery {
+      position:relative;
+      height:clamp(250px,42dvh,440px);
+      width:100%;
+      display:grid;
+      place-items:center;
+      overflow:hidden;
+      background:#eee9df;
+    }
+
+    .product-gallery img {
+      width:100%;
+      height:100%;
+      object-fit:contain;
+      display:block;
+    }
+
+    .product-gallery-tools {
+      position:absolute;
+      right:12px;
+      top:12px;
+      display:flex;
+      gap:8px;
+    }
+
+    .product-gallery-tools button {
+      border:0;
+      border-radius:50%;
+      background:#1b1b1bcc;
+      color:#fff;
+      width:35px;
+      height:35px;
+      display:grid;
+      place-items:center;
+      padding:0;
+    }
+
+    .product-gallery-tools svg {
+      width:18px;
+      height:18px;
+    }
+
+    .product-gallery-count {
+      position:absolute;
+      right:12px;
+      bottom:12px;
+      padding:5px 9px;
+      border-radius:15px;
+      background:#222a;
+      color:#fff;
+      font-size:11px;
+    }
+
+    .product-overview {
+      padding:15px 16px 18px;
+      background:#fff;
+    }
+
+    .product-price {
+      display:flex;
+      align-items:baseline;
+      flex-wrap:wrap;
+      gap:9px;
+    }
+
+    .product-price strong {
+      color:#a88648;
+      font-size:25px;
+      font-weight:700;
+      letter-spacing:-.04em;
+    }
+
+    .product-preview-label {
+      color:#858585;
+      background:#f4f2ee;
+      border-radius:5px;
+      font-size:10px;
+      padding:4px 7px;
+    }
+
+    .product-name {
+      margin:12px 0 8px;
+      color:#171717;
+      font-size:15px;
+      font-weight:600;
+      line-height:1.45;
+    }
+
+    .product-subtext {
+      color:#797979;
+      font-size:12px;
+      line-height:1.55;
+    }
+
+    .product-section {
+      padding:16px;
+      border-top:7px solid #f5f5f5;
+      background:#fff;
+    }
+
+    .product-section h3 {
+      margin:0 0 12px;
+      color:#222;
+      font-size:15px;
+      font-weight:700;
+    }
+
+    .product-section p {
+      margin:0 0 10px;
+      color:#595959;
+      font-size:13px;
+      line-height:1.6;
+    }
+
+    .product-feature-list {
+      margin:0;
+      padding-left:18px;
+      color:#555;
+      font-size:13px;
+      line-height:1.9;
+    }
+
+    .product-footer {
+      flex:0 0 auto;
+      display:grid;
+      grid-template-columns:46px 46px 53px minmax(0,1fr);
+      align-items:center;
+      gap:5px;
+      width:100%;
+      padding:9px 12px calc(10px + env(safe-area-inset-bottom,0px));
+      border-top:1px solid #eaeaea;
+      background:#fff;
+    }
+
+    .product-footer button {
+      min-width:0;
+      border:0;
+      padding:0;
+    }
+
+    .product-footer-small {
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      gap:3px;
+      height:48px;
+      background:transparent;
+      color:#333;
+      font-size:10px;
+    }
+
+    .product-footer-small svg {
+      width:22px;
+      height:22px;
+    }
+
+    .product-cart-button {
+      height:43px;
+      border-radius:22px;
+      display:grid;
+      place-items:center;
+      background:#eee9df;
+      color:#8b6e38;
+    }
+
+    .product-cart-button svg {
+      width:23px;
+      height:23px;
+    }
+
+    .product-buy-button {
+      min-height:47px;
+      border-radius:25px;
+      background:#b39257;
+      color:#fff;
+      font-size:14px;
+      font-weight:700;
+    }
+
+    .product-mini {
+      position:absolute;
+      right:13px;
+      bottom:calc(90px + env(safe-area-inset-bottom,0px));
+      z-index:6;
+      width:99px;
+      height:176px;
+      border:2px solid #fff;
+      border-radius:11px;
+      padding:0;
+      overflow:hidden;
+      background:#171717;
+      box-shadow:0 5px 24px #0006;
+      display:none;
+    }
+
+    .sheet--product.is-expanded .product-mini {
+      display:block;
+    }
+
+    .product-mini img,
+    .product-mini canvas {
+      position:absolute;
+      inset:0;
+      width:100%;
+      height:100%;
+      object-fit:cover;
+    }
+
+    .product-mini-label {
+      position:absolute;
+      left:0;
+      right:0;
+      bottom:0;
+      padding:5px 3px;
+      background:linear-gradient(transparent,#000b);
+      color:#fff;
+      font-size:10px;
+      text-align:center;
+    }
+
+    .product-mini:focus-visible {
+      outline:3px solid var(--gold);
+    }
+
+    @media(max-width:380px) {
+      .product-gallery {
+        height:38dvh;
+      }
+
+      .product-footer {
+        grid-template-columns:42px 42px 47px minmax(0,1fr);
+        gap:4px;
+        padding-left:9px;
+        padding-right:9px;
+      }
+
+      .product-buy-button {
+        font-size:13px;
+      }
+    }
+
+    @media(prefers-reduced-motion:reduce) {
+      .sheet--product {
+        transition:none !important;
+      }
+    }
+
     .toast { position:absolute; left:50%; bottom:calc(77px + env(safe-area-inset-bottom,0px)); z-index:50; width:max-content; max-width:85%; padding:10px 14px; border-radius:30px; background:#242426ed; box-shadow:0 4px 25px #0008; color:#fff; text-align:center; font-size:12px; transform:translate(-50%,12px); opacity:0; pointer-events:none; transition:opacity .18s,transform .18s; }
     .toast.visible { opacity:1; transform:translate(-50%,0); }
     .sr-only { position:absolute; clip:rect(0,0,0,0); width:1px; height:1px; overflow:hidden; white-space:nowrap; }
@@ -880,7 +1213,17 @@
         <button id="open-share" type="button" aria-haspopup="dialog" aria-expanded="false" aria-controls="share-sheet" aria-label="Open sharing options"><svg><use href="#i-share"/></svg><span class="count">Share</span></button>
       </aside>
       <section class="caption" aria-label="Video information">
-        <button class="tag" id="product-tag" data-soon="D06 shopping" aria-label="Shop D06 (future phase)"><svg><use href="#i-bag"/></svg><span>Shop | D06 Dahlia Abaya</span></button>
+        <button
+          class="tag"
+          id="product-tag"
+          type="button"
+          aria-haspopup="dialog"
+          aria-expanded="false"
+          aria-controls="product-sheet"
+          aria-label="View D06 Dahlia Abaya">
+          <svg aria-hidden="true"><use href="#i-bag"/></svg>
+          <span>Shop | D06 Dahlia Abaya</span>
+        </button>
         <div class="creator" id="creator-name">@arabistaofficial</div>
         <p class="description" id="video-caption">Dahlia Series D06 · Premium Nidha Dubai abaya</p>
         <div class="sound"><svg><use href="#i-music"/></svg><span id="sound-title">Original sound · Arabista</span></div>
@@ -1110,6 +1453,168 @@
           Share this Arabista FYP preview. Social integrations are not active yet.
         </p>
       </section>
+
+      <!-- PHASE 3A: D06 SHOPPING PRODUCT SHEET -->
+      <section
+        id="product-sheet"
+        class="sheet sheet--product"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="product-sheet-heading"
+        hidden>
+
+        <header class="product-grab" id="product-grab" tabindex="0">
+          <span class="product-handle" aria-hidden="true"></span>
+
+          <span class="product-grab-label">ARABISTA · D06</span>
+
+          <button
+            type="button"
+            class="product-close"
+            data-close-sheet
+            aria-label="Close product information">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M5 5L19 19M19 5L5 19"/>
+            </svg>
+          </button>
+        </header>
+
+        <div id="product-scroll" class="product-scroll">
+
+          <div class="product-gallery">
+            <img
+              id="product-main-image"
+              src="images/d06-1-hero.webp"
+              alt="D06 Dahlia Series abaya"
+              loading="eager">
+
+            <div class="product-gallery-tools">
+              <button id="product-next-image"
+                      type="button"
+                      aria-label="View next product image">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M8 5l7 7-7 7"/>
+                </svg>
+              </button>
+            </div>
+
+            <span id="product-gallery-count"
+                  class="product-gallery-count">1/2</span>
+          </div>
+
+          <div class="product-overview">
+            <div class="product-price">
+              <strong>RM139.00</strong>
+              <span class="product-preview-label">
+                Reference price · Preview only
+              </span>
+            </div>
+
+            <h2 id="product-sheet-heading" class="product-name">
+              ARABISTA | Dahlia Series D06
+              — Premium Nidha Dubai Abaya
+            </h2>
+
+            <div class="product-subtext">
+              Product interface demonstration.
+              Availability and pricing are not connected
+              to the staging retail backend yet.
+            </div>
+          </div>
+
+          <section class="product-section">
+            <h3>Product details</h3>
+
+            <p>
+              An Arabista Dahlia Series abaya made with
+              premium Nidha Dubai fabric.
+            </p>
+
+            <ul class="product-feature-list">
+              <li>Comfortable premium Nidha Dubai material</li>
+              <li>Nursing-friendly front zip</li>
+              <li>Inner sleeve lining for wudhu</li>
+              <li>Left and right pockets</li>
+              <li>Complimentary chiffon shawl</li>
+            </ul>
+          </section>
+
+          <section class="product-section">
+            <h3>Sizes and availability</h3>
+
+            <p>
+              Size selection and live availability will
+              be implemented in Phase 3B.
+            </p>
+
+            <p>
+              XS · S · M · L · XL · XXL · XXXL
+            </p>
+          </section>
+
+          <section class="product-section">
+            <h3>Shopping information</h3>
+
+            <p>
+              Checkout, delivery fees and payment are not
+              active in this preview.
+            </p>
+          </section>
+
+        </div>
+
+        <button
+          id="product-mini"
+          class="product-mini"
+          type="button"
+          aria-label="Return to D06 video">
+
+          <img
+            src="images/d06-1-hero.webp"
+            alt=""
+            aria-hidden="true">
+
+          <canvas
+            id="product-mini-canvas"
+            width="180"
+            height="320"
+            aria-hidden="true"
+            hidden></canvas>
+
+          <span class="product-mini-label">
+            Return to video
+          </span>
+        </button>
+
+        <footer class="product-footer">
+          <button type="button"
+                  class="product-footer-small"
+                  data-product-demo="Shop">
+            <svg aria-hidden="true"><use href="#i-bag"/></svg>
+            <span>Shop</span>
+          </button>
+
+          <button type="button"
+                  class="product-footer-small"
+                  data-product-demo="Chat">
+            <svg aria-hidden="true"><use href="#i-chat"/></svg>
+            <span>Chat</span>
+          </button>
+
+          <button type="button"
+                  class="product-cart-button"
+                  data-product-demo="Add to cart"
+                  aria-label="Add to cart — future phase">
+            <svg aria-hidden="true"><use href="#i-cart"/></svg>
+          </button>
+
+          <button type="button"
+                  class="product-buy-button"
+                  data-product-demo="Buy now">
+            Buy now · Preview
+          </button>
+        </footer>
+      </section>
     </div>
     <div id="toast" class="toast" role="status" aria-live="polite"></div>
     <div id="screen-reader-status" class="sr-only" aria-live="polite">Video 1 of 3</div>
@@ -1145,11 +1650,17 @@
       const sheetBackdrop = document.getElementById('sheet-backdrop');
       const commentsSheet = document.getElementById('comments-sheet');
       const shareSheet = document.getElementById('share-sheet');
+      const productSheet =
+        document.getElementById('product-sheet');
+
+      const productScroll =
+        document.getElementById('product-scroll');
       const bottomNavigation = document.querySelector('.bottom');
 
       const sheetMap = {
         comments: commentsSheet,
-        share: shareSheet
+        share: shareSheet,
+        product: productSheet
       };
 
       let activeSheet = null;
@@ -1162,6 +1673,11 @@
 
       function openSheet(type, trigger) {
         if (activeSheet || !sheetMap[type]) return;
+
+        if (type === 'product') {
+          productSheet.classList.remove('is-expanded');
+          productScroll.scrollTop = 0;
+        }
 
         activeSheet = type;
         sheetClosing = false;
@@ -1210,6 +1726,11 @@
         sheetCloseTimer = window.setTimeout(() => {
           sheetMap[closingType].hidden = true;
           sheetLayer.hidden = true;
+
+          if (closingType === 'product') {
+            productSheet.classList.remove('is-expanded');
+            stopProductPreview();
+          }
 
           feed.inert = false;
           bottomNavigation.inert = false;
@@ -1325,7 +1846,7 @@
 
         const controls = Array.from(
           sheetMap[activeSheet].querySelectorAll(
-            'button:not([disabled]), input:not([disabled])'
+            'button:not([disabled]), input:not([disabled]), [tabindex="0"]'
           )
         ).filter(element =>
           !element.hidden &&
@@ -1917,6 +2438,299 @@
         button.addEventListener('click', () => {
           message(`${button.dataset.demoShare} sharing is planned for later`);
         });
+      });
+
+      // =====================================================
+      // PHASE 3A — D06 SHOPPING EXPERIENCE
+      // =====================================================
+
+      const productTag =
+        document.getElementById('product-tag');
+
+      const productGrab =
+        document.getElementById('product-grab');
+
+      const productMini =
+        document.getElementById('product-mini');
+
+      const productCanvas =
+        document.getElementById('product-mini-canvas');
+
+      const productImage =
+        document.getElementById('product-main-image');
+
+      const productImageCount =
+        document.getElementById('product-gallery-count');
+
+      const productImages = [
+        'images/d06-1-hero.webp',
+        'images/d06-2-angle.webp'
+      ];
+
+      let productImageIndex = 0;
+      let productPreviewFrame = null;
+      let lastProductFrameTime = 0;
+
+      function stopProductPreview() {
+        if (productPreviewFrame !== null) {
+          cancelAnimationFrame(productPreviewFrame);
+          productPreviewFrame = null;
+        }
+
+        productCanvas.hidden = true;
+      }
+
+      function drawProductPreview(timestamp) {
+        if (activeSheet !== 'product' ||
+            !productSheet.classList.contains('is-expanded') ||
+            sheetClosing ||
+            document.hidden) {
+          stopProductPreview();
+          return;
+        }
+
+        if (timestamp - lastProductFrameTime >= 90) {
+          lastProductFrameTime = timestamp;
+
+          if (video.readyState >= 2 &&
+              video.videoWidth > 0 &&
+              video.videoHeight > 0) {
+
+            try {
+              const context = productCanvas.getContext('2d');
+
+              if (context) {
+                const sourceWidth = video.videoWidth;
+                const sourceHeight = video.videoHeight;
+
+                const targetRatio =
+                  productCanvas.width / productCanvas.height;
+
+                const sourceRatio =
+                  sourceWidth / sourceHeight;
+
+                let cropWidth = sourceWidth;
+                let cropHeight = sourceHeight;
+                let cropX = 0;
+                let cropY = 0;
+
+                if (sourceRatio > targetRatio) {
+                  cropWidth = sourceHeight * targetRatio;
+                  cropX = (sourceWidth - cropWidth) / 2;
+                } else {
+                  cropHeight = sourceWidth / targetRatio;
+                  cropY = (sourceHeight - cropHeight) / 2;
+                }
+
+                context.drawImage(
+                  video,
+                  cropX, cropY,
+                  cropWidth, cropHeight,
+                  0, 0,
+                  productCanvas.width,
+                  productCanvas.height
+                );
+
+                productCanvas.hidden = false;
+              }
+            } catch (error) {
+              // Keep the static D06 image as the fallback.
+              productCanvas.hidden = true;
+            }
+          }
+        }
+
+        productPreviewFrame =
+          requestAnimationFrame(drawProductPreview);
+      }
+
+      function startProductPreview() {
+        stopProductPreview();
+        lastProductFrameTime = 0;
+
+        if (activeSheet !== 'product' ||
+            document.hidden) return;
+
+        productPreviewFrame =
+          requestAnimationFrame(drawProductPreview);
+      }
+
+      function setProductExpanded(expanded) {
+        if (activeSheet !== 'product' || sheetClosing) return;
+
+        const next = Boolean(expanded);
+
+        productSheet.classList.toggle(
+          'is-expanded', next
+        );
+
+        if (!next) {
+          productScroll.scrollTop = 0;
+          stopProductPreview();
+        } else {
+          startProductPreview();
+        }
+      }
+
+      productTag.addEventListener('click', () => {
+        if (active !== 0) return;
+
+        productImageIndex = 0;
+        productImage.src = productImages[0];
+        productImageCount.textContent = '1/2';
+
+        openSheet('product', productTag);
+      });
+
+      document.getElementById('product-next-image')
+        .addEventListener('click', () => {
+          productImageIndex =
+            (productImageIndex + 1) % productImages.length;
+
+          productImage.src =
+            productImages[productImageIndex];
+
+          productImageCount.textContent =
+            `${productImageIndex + 1}/${productImages.length}`;
+        });
+
+      productMini.addEventListener('click', () => {
+        if (activeSheet === 'product') {
+          closeSheet();
+        }
+      });
+
+      document.querySelectorAll('[data-product-demo]')
+        .forEach(button => {
+          button.addEventListener('click', () => {
+            message(
+              `${button.dataset.productDemo} will be implemented in Phase 3B`
+            );
+          });
+        });
+
+      // Touch gestures support the natural mobile sheet flow.
+      // Partial: upward swipe -> expanded.
+      // Expanded: downward swipe from the top -> partial.
+      // Partial: downward swipe -> close.
+
+      let productTouchStartY = null;
+      let productTouchInitialScroll = 0;
+
+      productSheet.addEventListener('touchstart', event => {
+        if (activeSheet !== 'product' ||
+            event.touches.length !== 1 ||
+            event.target.closest('button')) {
+          productTouchStartY = null;
+          return;
+        }
+
+        productTouchStartY =
+          event.touches[0].clientY;
+
+        productTouchInitialScroll =
+          productScroll.scrollTop;
+      }, { passive:true });
+
+      productSheet.addEventListener('touchend', event => {
+        if (productTouchStartY === null ||
+            event.changedTouches.length !== 1 ||
+            activeSheet !== 'product' ||
+            sheetClosing) {
+          productTouchStartY = null;
+          return;
+        }
+
+        const distance =
+          event.changedTouches[0].clientY -
+          productTouchStartY;
+
+        productTouchStartY = null;
+
+        const expanded =
+          productSheet.classList.contains('is-expanded');
+
+        if (!expanded && distance < -60) {
+          setProductExpanded(true);
+        } else if (!expanded && distance > 100) {
+          closeSheet();
+        } else if (
+          expanded &&
+          distance > 100 &&
+          productTouchInitialScroll <= 2 &&
+          productScroll.scrollTop <= 2
+        ) {
+          setProductExpanded(false);
+        }
+      }, { passive:true });
+
+      productSheet.addEventListener('touchcancel', () => {
+        productTouchStartY = null;
+      }, { passive:true });
+
+      // Desktop mouse drag on the product header.
+      // Touch devices use the handler above.
+      let productPointerStart = null;
+
+      productGrab.addEventListener('pointerdown', event => {
+        if (event.pointerType !== 'mouse' ||
+            event.button !== 0 ||
+            event.target.closest('button') ||
+            activeSheet !== 'product') return;
+
+        productPointerStart = event.clientY;
+        productGrab.setPointerCapture(event.pointerId);
+      });
+
+      productGrab.addEventListener('pointerup', event => {
+        if (productPointerStart === null) return;
+
+        const distance =
+          event.clientY - productPointerStart;
+
+        productPointerStart = null;
+
+        const expanded =
+          productSheet.classList.contains('is-expanded');
+
+        if (!expanded && distance < -50) {
+          setProductExpanded(true);
+        } else if (!expanded && distance > 90) {
+          closeSheet();
+        } else if (expanded && distance > 90) {
+          setProductExpanded(false);
+        }
+      });
+
+      productGrab.addEventListener('pointercancel', () => {
+        productPointerStart = null;
+      });
+
+      // Keep keyboard users able to operate the partial sheet.
+      // The existing Escape handler still closes the dialog.
+      productGrab.addEventListener('keydown', event => {
+        if (activeSheet !== 'product') return;
+
+        if (event.key === 'ArrowUp') {
+          event.preventDefault();
+          setProductExpanded(true);
+        }
+
+        if (event.key === 'ArrowDown') {
+          event.preventDefault();
+          setProductExpanded(false);
+        }
+      });
+
+      document.addEventListener('visibilitychange', () => {
+        if (document.hidden) {
+          stopProductPreview();
+        } else if (
+          activeSheet === 'product' &&
+          productSheet.classList.contains('is-expanded')
+        ) {
+          startProductPreview();
+        }
       });
 
       document.addEventListener('visibilitychange', () => { if (document.hidden) video.pause(); else syncPlayback(); });
