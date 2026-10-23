@@ -701,6 +701,38 @@
       }
     }
 
+    /* PHASE 2.2 — ACTIVE REPLY CONTEXT */
+
+    .sheet-reply-context {
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      padding:5px 8px;
+      border-radius:7px;
+      background:#f7f5f1;
+      color:#777;
+      font-size:12px;
+      line-height:1.4;
+    }
+
+    .sheet-reply-context span {
+      min-width:0;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      white-space:nowrap;
+    }
+
+    .sheet-reply-context button {
+      flex:0 0 auto;
+      padding:4px 7px;
+      border:0;
+      background:transparent;
+      color:#8d7144;
+      font-size:12px;
+      font-weight:600;
+    }
+
     /* SHARE */
 
     .sheet-share-strip {
@@ -923,6 +955,21 @@
         </div>
 
         <form id="sheet-comment-form" class="sheet-comment-form">
+
+          <div id="sheet-reply-context"
+               class="sheet-reply-context"
+               hidden>
+
+            <span id="sheet-reply-context-label"
+                  aria-live="polite"></span>
+
+            <button id="sheet-reply-cancel"
+                    type="button"
+                    aria-label="Cancel reply">
+              Cancel
+            </button>
+
+          </div>
 
           <div id="sheet-quick-emoji"
                class="sheet-quick-emoji"
@@ -1148,6 +1195,7 @@
           commentInput.blur();
           sheetLayer.style.bottom = '';
           setComposerExpanded(false);
+          cancelReply();
         }
 
         sheetClosing = true;
@@ -1360,6 +1408,32 @@
 
       let demoReplyId = 0;
 
+      // Phase 2.2: Explicit threaded reply state.
+      const replyThreads = new WeakMap();
+
+      let activeReplyTarget = null;
+
+      const replyContext =
+        document.getElementById('sheet-reply-context');
+
+      const replyContextLabel =
+        document.getElementById('sheet-reply-context-label');
+
+      const replyCancelButton =
+        document.getElementById('sheet-reply-cancel');
+
+      function cancelReply() {
+        activeReplyTarget = null;
+
+        replyContext.hidden = true;
+        replyContextLabel.textContent = '';
+
+        commentInput.value = '';
+        updateCommentSend();
+      }
+
+      replyCancelButton.addEventListener('click', cancelReply);
+
       const demoComments = [
         {
           author: 'Demo Viewer 01',
@@ -1443,12 +1517,21 @@
       }
 
       function updateCommentSend() {
-        commentSend.disabled = !commentInput.value.trim();
+        const text = commentInput.value.trim();
+
+        const mentionOnly =
+          activeReplyTarget &&
+          text === `@${activeReplyTarget.author}`;
+
+        commentSend.disabled = !text || Boolean(mentionOnly);
       }
 
-      function buildComment(data, nested = false) {
+      function buildComment(data, nested = false, parentRoot = null) {
         const item = makeElement('article', 'sheet-comment-item');
         const row = makeElement('div', 'sheet-comment-row');
+
+        // Nested replies belong to their top-level comment.
+        const rootItem = nested ? parentRoot : item;
 
         const avatar = makeElement(
           'div', 'sheet-comment-avatar', data.initial || 'D'
@@ -1462,15 +1545,23 @@
         const meta = makeElement('div', 'sheet-comment-meta');
         const date = makeElement('span', '', data.date);
 
-        const reply = makeElement(
-          'button', '', 'Reply'
-        );
-
+        const reply = makeElement('button', '', 'Reply');
         reply.type = 'button';
 
         reply.addEventListener('click', () => {
+          activeReplyTarget = {
+            root: rootItem,
+            author: data.author
+          };
+
+          replyContextLabel.textContent =
+            `Replying to ${data.author}`;
+
+          replyContext.hidden = false;
+
           commentInput.value = `@${data.author} `;
           updateCommentSend();
+
           window.setTimeout(() => {
             commentInput.focus();
             commentInput.setSelectionRange(
@@ -1486,6 +1577,7 @@
         const actions = makeElement(
           'div', 'sheet-comment-actions'
         );
+
         actions.append(
           commentReaction('Like'),
           commentReaction('Dislike')
@@ -1494,43 +1586,68 @@
         row.append(avatar, body, actions);
         item.appendChild(row);
 
-        if (!nested && data.replies && data.replies.length) {
+        if (!nested) {
+          const initialReplies = Array.isArray(data.replies)
+            ? data.replies
+            : [];
+
           const id = `preview-replies-${++demoReplyId}`;
 
           const toggle = makeElement(
             'button',
-            'sheet-replies-toggle',
-            `— View ${data.replies.length} ${
-              data.replies.length === 1 ? 'reply' : 'replies'
-            } ▾`
+            'sheet-replies-toggle'
           );
 
           toggle.type = 'button';
-          toggle.setAttribute('aria-expanded', 'false');
           toggle.setAttribute('aria-controls', id);
+          toggle.setAttribute('aria-expanded', 'false');
 
           const replies = makeElement('div', 'sheet-replies');
           replies.id = id;
           replies.hidden = true;
 
-          data.replies.forEach(entry => {
-            replies.appendChild(buildComment(entry, true));
-          });
+          const thread = {
+            toggle,
+            replies,
+            count: initialReplies.length,
+            updateLabel: null
+          };
 
-          toggle.addEventListener('click', () => {
+          thread.updateLabel = () => {
             const expanded =
               toggle.getAttribute('aria-expanded') === 'true';
 
-            replies.hidden = expanded;
-            toggle.setAttribute(
-              'aria-expanded', String(!expanded)
-            );
+            toggle.hidden = thread.count === 0;
+
             toggle.textContent = expanded
-              ? `— View ${data.replies.length} ${
-                  data.replies.length === 1 ? 'reply' : 'replies'
-                } ▾`
-              : '— Hide replies ▴';
+              ? '— Hide replies ▴'
+              : `— View ${thread.count} ${
+                  thread.count === 1 ? 'reply' : 'replies'
+                } ▾`;
+          };
+
+          // Register the thread even when it has zero replies.
+          replyThreads.set(item, thread);
+
+          initialReplies.forEach(entry => {
+            replies.appendChild(
+              buildComment(entry, true, item)
+            );
           });
+
+          toggle.addEventListener('click', () => {
+            const expand =
+              toggle.getAttribute('aria-expanded') !== 'true';
+
+            toggle.setAttribute(
+              'aria-expanded', String(expand)
+            );
+
+            replies.hidden = !expand;
+            thread.updateLabel();
+          });
+
+          thread.updateLabel();
 
           item.append(toggle, replies);
         }
@@ -1608,7 +1725,16 @@
         event.preventDefault();
 
         const value = commentInput.value.trim();
+
         if (!value) return;
+
+        if (
+          activeReplyTarget &&
+          value === `@${activeReplyTarget.author}`
+        ) {
+          message('Write a reply before sending');
+          return;
+        }
 
         const entry = {
           author: 'You · Preview',
@@ -1618,14 +1744,70 @@
           replies: []
         };
 
-        commentsList.appendChild(buildComment(entry));
+        if (activeReplyTarget) {
+          const thread = replyThreads.get(
+            activeReplyTarget.root
+          );
+
+          if (!thread) {
+            message('Reply thread unavailable');
+            return;
+          }
+
+          // Insert into the actual parent thread.
+          const replyItem = buildComment(
+            entry,
+            true,
+            activeReplyTarget.root
+          );
+
+          thread.replies.appendChild(replyItem);
+          thread.count += 1;
+
+          // Reveal the newly submitted reply.
+          thread.replies.hidden = false;
+
+          thread.toggle.setAttribute(
+            'aria-expanded', 'true'
+          );
+
+          thread.updateLabel();
+
+          // Scroll only the comments list, never the FYP.
+          requestAnimationFrame(() => {
+            const replyBottom =
+              replyItem.getBoundingClientRect().bottom;
+
+            const listBottom =
+              commentsList.getBoundingClientRect().bottom;
+
+            const difference = replyBottom - listBottom + 8;
+
+            if (difference > 0) {
+              commentsList.scrollTop += difference;
+            }
+          });
+
+          message('Reply added to this preview thread');
+
+        } else {
+          // Ordinary comments remain top-level.
+          commentsList.appendChild(buildComment(entry));
+
+          commentsList.scrollTop =
+            commentsList.scrollHeight;
+
+          message('Comment added to this preview only');
+        }
+
+        // Reset to ordinary comment mode after submission.
+        activeReplyTarget = null;
+
+        replyContext.hidden = true;
+        replyContextLabel.textContent = '';
 
         commentInput.value = '';
         updateCommentSend();
-
-        commentsList.scrollTop = commentsList.scrollHeight;
-
-        message('Comment added to this preview only');
       });
 
       updateCommentSend();
