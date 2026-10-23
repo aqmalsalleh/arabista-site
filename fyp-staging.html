@@ -882,13 +882,11 @@
     .sheet--product {
       height:72%;
       max-height:calc(100% - 8px - env(safe-area-inset-top,0px));
-      transition:
-        transform 320ms cubic-bezier(.22,1,.36,1),
-        height 380ms cubic-bezier(.22,1,.36,1);
+      transition:transform 320ms cubic-bezier(.22,1,.36,1);
     }
 
-    .sheet--product.is-expanded {
-      height:calc(100% - env(safe-area-inset-top,0px));
+    .sheet--product.is-dragging {
+      transition:none !important;
     }
 
     .product-grab {
@@ -899,7 +897,7 @@
       justify-content:space-between;
       width:100%;
       padding:0 14px;
-      touch-action:pan-y;
+      touch-action:none;
       user-select:none;
       -webkit-user-select:none;
       background:#fff;
@@ -964,51 +962,48 @@
     .product-gallery {
       position:relative;
       width:100%;
-      height:auto;
-      min-height:0;
+      overflow:hidden;
+      background:#fff;
+    }
+
+    .product-gallery-track {
+      display:flex;
+      width:100%;
+      overflow-x:auto;
+      overflow-y:hidden;
+      scroll-snap-type:x mandatory;
+      scroll-behavior:smooth;
+      overscroll-behavior-x:contain;
+      -webkit-overflow-scrolling:touch;
+      scrollbar-width:none;
+      touch-action:pan-x pan-y;
+    }
+
+    .product-gallery-track::-webkit-scrollbar {
+      display:none;
+    }
+
+    .product-gallery-slide {
+      flex:0 0 100%;
+      min-width:100%;
+      scroll-snap-align:start;
+      scroll-snap-stop:normal;
       display:flex;
       justify-content:center;
       align-items:flex-start;
-      overflow:hidden;
+      border:0;
+      padding:0;
       background:#fff;
-      touch-action:pan-y;
     }
 
-    .product-gallery img {
+    .product-gallery-slide img {
       display:block;
-      flex:0 0 auto;
       width:75%;
       max-width:100%;
       height:auto;
-      max-height:none;
       object-fit:contain;
-      object-position:center;
-      aspect-ratio:auto;
-    }
-
-    .product-gallery-tools {
-      position:absolute;
-      right:12px;
-      top:12px;
-      display:flex;
-      gap:8px;
-    }
-
-    .product-gallery-tools button {
-      border:0;
-      border-radius:50%;
-      background:#1b1b1bcc;
-      color:#fff;
-      width:35px;
-      height:35px;
-      display:grid;
-      place-items:center;
-      padding:0;
-    }
-
-    .product-gallery-tools svg {
-      width:18px;
-      height:18px;
+      user-select:none;
+      -webkit-user-drag:none;
     }
 
     .product-gallery-count {
@@ -1250,17 +1245,22 @@
       z-index:6;
       width:99px;
       height:176px;
+      border-radius:11px;
+      touch-action:none;
+    }
+
+    .product-mini-return {
+      position:relative;
+      display:block;
+      width:100%;
+      height:100%;
       border:2px solid #fff;
       border-radius:11px;
       padding:0;
       overflow:hidden;
       background:#171717;
       box-shadow:0 5px 24px #0006;
-      display:none;
-    }
-
-    .sheet--product.is-expanded .product-mini {
-      display:block;
+      color:#fff;
     }
 
     .product-mini img,
@@ -1284,8 +1284,103 @@
       text-align:center;
     }
 
-    .product-mini:focus-visible {
+    .product-mini-close {
+      position:absolute;
+      top:4px;
+      right:4px;
+      z-index:2;
+      width:22px;
+      height:22px;
+      border:0;
+      border-radius:50%;
+      padding:0;
+      background:#111c;
+      color:#fff;
+      font-size:15px;
+      line-height:1;
+    }
+
+    .product-mini-return:focus-visible,
+    .product-mini-close:focus-visible {
       outline:3px solid var(--gold);
+    }
+
+    .product-lightbox {
+      position:absolute;
+      inset:0;
+      z-index:4;
+      display:flex;
+      flex-direction:column;
+      background:#050505;
+      color:#fff;
+    }
+
+    .product-lightbox-header {
+      flex:0 0 auto;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      padding:calc(10px + env(safe-area-inset-top,0px)) 12px 8px;
+    }
+
+    .product-lightbox-header span {
+      font-size:13px;
+      letter-spacing:.04em;
+    }
+
+    .product-lightbox-header button {
+      width:36px;
+      height:36px;
+      display:grid;
+      place-items:center;
+      border:0;
+      background:transparent;
+      color:#fff;
+      padding:0;
+    }
+
+    .product-lightbox-header svg {
+      width:20px;
+      height:20px;
+    }
+
+    .product-lightbox-track {
+      flex:1 1 auto;
+      min-height:0;
+      display:flex;
+      overflow-x:auto;
+      overflow-y:hidden;
+      scroll-snap-type:x mandatory;
+      scroll-behavior:smooth;
+      scrollbar-width:none;
+      touch-action:pan-x;
+    }
+
+    .product-lightbox-track::-webkit-scrollbar {
+      display:none;
+    }
+
+    .product-lightbox-slide {
+      flex:0 0 100%;
+      min-width:100%;
+      height:100%;
+      scroll-snap-align:center;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:8px 12px calc(16px + env(safe-area-inset-bottom,0px));
+    }
+
+    .product-lightbox-slide img {
+      display:block;
+      max-width:92%;
+      max-height:100%;
+      width:auto;
+      height:auto;
+      object-fit:contain;
+      user-select:none;
+      -webkit-user-drag:none;
     }
 
     @media(max-width:380px) {
@@ -1635,25 +1730,21 @@
 
         <div id="product-scroll" class="product-scroll">
 
-          <div class="product-gallery">
-            <img
-              id="product-main-image"
-              src="images/d06-1-hero.webp"
-              alt="D06 Dahlia Series abaya"
-              loading="eager">
+          <div class="product-gallery"
+               id="product-gallery"
+               aria-label="D06 product image gallery">
 
-            <div class="product-gallery-tools">
-              <button id="product-next-image"
-                      type="button"
-                      aria-label="View next product image">
-                <svg viewBox="0 0 24 24" aria-hidden="true">
-                  <path d="M8 5l7 7-7 7"/>
-                </svg>
-              </button>
+            <div id="product-gallery-track"
+                 class="product-gallery-track"
+                 tabindex="0"
+                 role="region"
+                 aria-label="Swipe through D06 product images">
             </div>
 
             <span id="product-gallery-count"
-                  class="product-gallery-count">1/8</span>
+                  class="product-gallery-count"
+                  aria-live="polite">1/8</span>
+
           </div>
 
           <div class="product-overview" id="product-overview">
@@ -1814,28 +1905,38 @@
 
         </div>
 
-        <button
-          id="product-mini"
-          class="product-mini"
-          type="button"
-          aria-label="Return to D06 video">
+        <div id="product-mini"
+             class="product-mini"
+             hidden>
 
-          <img
-            src="images/d06-1-hero.webp"
-            alt=""
-            aria-hidden="true">
+          <button id="product-mini-return"
+                  class="product-mini-return"
+                  type="button"
+                  aria-label="Return to D06 video">
 
-          <canvas
-            id="product-mini-canvas"
-            width="180"
-            height="320"
-            aria-hidden="true"
-            hidden></canvas>
+            <img src="images/d06-1-hero.webp"
+                 alt=""
+                 aria-hidden="true">
 
-          <span class="product-mini-label">
-            Return to video
-          </span>
-        </button>
+            <canvas id="product-mini-canvas"
+                    width="180"
+                    height="320"
+                    aria-hidden="true"
+                    hidden></canvas>
+
+            <span class="product-mini-label">
+              Return to video
+            </span>
+          </button>
+
+          <button id="product-mini-close"
+                  class="product-mini-close"
+                  type="button"
+                  aria-label="Hide floating video">
+            ×
+          </button>
+
+        </div>
 
         <footer class="product-footer">
           <button type="button"
@@ -1866,6 +1967,34 @@
           </button>
         </footer>
       </section>
+
+      <!-- PHASE 3A.2: FULLSCREEN PRODUCT IMAGE VIEWER -->
+      <div id="product-lightbox"
+           class="product-lightbox"
+           role="dialog"
+           aria-modal="true"
+           aria-label="D06 full-screen product images"
+           hidden>
+
+        <header class="product-lightbox-header">
+          <span id="product-lightbox-counter">1 / 8</span>
+
+          <button id="product-lightbox-close"
+                  type="button"
+                  aria-label="Close full-screen gallery">
+            <svg viewBox="0 0 24 24"
+                 aria-hidden="true">
+              <path d="M5 5L19 19M19 5L5 19"/>
+            </svg>
+          </button>
+        </header>
+
+        <div id="product-lightbox-track"
+             class="product-lightbox-track"
+             tabindex="0"
+             aria-label="Full-screen image carousel">
+        </div>
+      </div>
     </div>
     <div id="toast" class="toast" role="status" aria-live="polite"></div>
     <div id="screen-reader-status" class="sr-only" aria-live="polite">Video 1 of 3</div>
@@ -1937,11 +2066,6 @@
         sheetLayer.hidden = false;
         sheetMap[type].hidden = false;
 
-        if (type === 'product') {
-          fypApp.classList.add('is-product-peek');
-          updateProductPeekGeometry();
-        }
-
         feed.inert = true;
         bottomNavigation.inert = true;
 
@@ -1949,6 +2073,10 @@
         sheetMap[type].getBoundingClientRect();
 
         sheetLayer.classList.add('is-open');
+
+        if (type === 'product') {
+          beginProductEntrance();
+        }
 
         trigger.setAttribute('aria-expanded', 'true');
 
@@ -1975,6 +2103,10 @@
         const closingType = activeSheet;
         const restoreFocus = previousSheetFocus;
 
+        if (closingType === 'product') {
+          beginProductExit();
+        }
+
         sheetLayer.classList.remove('is-open');
 
         clearTimeout(sheetCloseTimer);
@@ -1984,11 +2116,7 @@
           sheetLayer.hidden = true;
 
           if (closingType === 'product') {
-            productSheet.classList.remove('is-expanded');
-            stopProductPreview();
-
-            fypApp.classList.remove('is-product-peek');
-            fypApp.style.removeProperty('--product-peek-height');
+            finishProductExit();
           }
 
           feed.inert = false;
@@ -2093,18 +2221,28 @@
 
       // Accessible dialog dismissal and focus containment.
       document.addEventListener('keydown', event => {
-        if (!activeSheet) return;
+        const lightbox = document.getElementById('product-lightbox');
+        const lightboxOpen = lightbox && !lightbox.hidden;
+
+        if (!activeSheet && !lightboxOpen) return;
 
         if (event.key === 'Escape') {
           event.preventDefault();
+          if (lightboxOpen) {
+            closeProductLightbox();
+            return;
+          }
           closeSheet();
           return;
         }
 
         if (event.key !== 'Tab') return;
 
+        const scope = lightboxOpen ? lightbox : sheetMap[activeSheet];
+        if (!scope) return;
+
         const controls = Array.from(
-          sheetMap[activeSheet].querySelectorAll(
+          scope.querySelectorAll(
             'button:not([disabled]), input:not([disabled]), [tabindex="0"]'
           )
         ).filter(element =>
@@ -2703,6 +2841,9 @@
       // PHASE 3A — D06 SHOPPING EXPERIENCE
       // =====================================================
 
+      const PRODUCT_PARTIAL_RATIO = 0.72;
+      const PRODUCT_SETTLE_MS = 340;
+
       const productTag =
         document.getElementById('product-tag');
 
@@ -2712,14 +2853,32 @@
       const productMini =
         document.getElementById('product-mini');
 
+      const productMiniReturn =
+        document.getElementById('product-mini-return');
+
+      const productMiniClose =
+        document.getElementById('product-mini-close');
+
       const productCanvas =
         document.getElementById('product-mini-canvas');
 
-      const productImage =
-        document.getElementById('product-main-image');
+      const productGalleryTrack =
+        document.getElementById('product-gallery-track');
 
       const productImageCount =
         document.getElementById('product-gallery-count');
+
+      const productLightbox =
+        document.getElementById('product-lightbox');
+
+      const productLightboxTrack =
+        document.getElementById('product-lightbox-track');
+
+      const productLightboxCounter =
+        document.getElementById('product-lightbox-counter');
+
+      const productLightboxClose =
+        document.getElementById('product-lightbox-close');
 
       const productImages = [
         'images/d06-1-hero.webp',
@@ -2743,20 +2902,418 @@
         'D06 pocket feature'
       ];
 
-      function showProductImage(index) {
-        productImageIndex =
-          (index + productImages.length) % productImages.length;
+      let productImageIndex = 0;
+      let productPreviewFrame = null;
+      let lastProductFrameTime = 0;
+      let productDrag = null;
+      let productFrame = null;
+      let productSettleFrame = null;
+      let productGeometry = null;
+      let miniDismissed = false;
+      let miniOffset = { x:0, y:0 };
+      let miniDrag = null;
+      let miniSuppressClick = false;
+      let lightboxOpener = null;
+      let galleryMoved = false;
+      let galleryPointer = null;
 
-        productImage.src = productImages[productImageIndex];
-        productImage.alt = productImageAlts[productImageIndex];
+      function clampProductHeight(value, min, max) {
+        return Math.max(min, Math.min(max, value));
+      }
+
+      function readSafeTop() {
+        const probe = document.createElement('div');
+        probe.style.cssText = 'position:absolute;visibility:hidden;pointer-events:none;padding-top:env(safe-area-inset-top,0px)';
+        fypApp.appendChild(probe);
+        const value = parseFloat(getComputedStyle(probe).paddingTop) || 0;
+        probe.remove();
+        return Math.max(8, value);
+      }
+
+      function getProductGeometry() {
+        const appHeight = fypApp.clientHeight;
+        const safeTop = readSafeTop();
+
+        return {
+          appHeight,
+          partial: Math.round(appHeight * PRODUCT_PARTIAL_RATIO),
+          minimum: Math.round(appHeight * 0.42),
+          maximum: Math.max(1, Math.round(appHeight - safeTop))
+        };
+      }
+
+      function applyProductGeometry(sheetHeight, geometry) {
+        const metrics = geometry || getProductGeometry();
+        const height = clampProductHeight(
+          sheetHeight,
+          metrics.minimum,
+          metrics.maximum
+        );
+        const visibleVideoHeight = Math.max(
+          0,
+          metrics.appHeight - height
+        );
+
+        productSheet.style.height = `${height}px`;
+        fypApp.style.setProperty(
+          '--product-peek-height',
+          `${visibleVideoHeight}px`
+        );
+
+        return height;
+      }
+
+      function easeOutCubic(t) {
+        return 1 - Math.pow(1 - t, 3);
+      }
+
+      function cancelProductMotion() {
+        if (productFrame !== null) {
+          cancelAnimationFrame(productFrame);
+          productFrame = null;
+        }
+
+        if (productSettleFrame !== null) {
+          cancelAnimationFrame(productSettleFrame);
+          productSettleFrame = null;
+        }
+
+        productDrag = null;
+        productSheet.classList.remove('is-dragging');
+      }
+
+      function syncPeekToVisibleSheet() {
+        const appBox = fypApp.getBoundingClientRect();
+        const sheetTop =
+          productSheet.getBoundingClientRect().top - appBox.top;
+
+        const visible = Math.max(
+          0,
+          Math.min(fypApp.clientHeight, Math.round(sheetTop))
+        );
+
+        fypApp.style.setProperty(
+          '--product-peek-height',
+          `${visible}px`
+        );
+      }
+
+      function followVisibleSheet(duration, whileOpen) {
+        if (prefersReducedMotion()) {
+          syncPeekToVisibleSheet();
+          return;
+        }
+
+        const started = performance.now();
+
+        function step(now) {
+          if (productDrag) return;
+          if (whileOpen && (sheetClosing || activeSheet !== 'product')) return;
+
+          syncPeekToVisibleSheet();
+
+          if (now - started < duration) {
+            productSettleFrame = requestAnimationFrame(step);
+          } else {
+            productSettleFrame = null;
+          }
+        }
+
+        productSettleFrame = requestAnimationFrame(step);
+      }
+
+      function animateProductHeight(targetHeight) {
+        if (productFrame !== null) {
+          cancelAnimationFrame(productFrame);
+          productFrame = null;
+        }
+
+        if (productSettleFrame !== null) {
+          cancelAnimationFrame(productSettleFrame);
+          productSettleFrame = null;
+        }
+
+        const geometry = getProductGeometry();
+        const start = productSheet.offsetHeight || geometry.partial;
+        const target = clampProductHeight(
+          targetHeight,
+          geometry.minimum,
+          geometry.maximum
+        );
+
+        if (prefersReducedMotion() || Math.abs(target - start) < 1) {
+          applyProductGeometry(target, geometry);
+          return;
+        }
+
+        const started = performance.now();
+
+        function step(now) {
+          if (sheetClosing || productDrag) {
+            productSettleFrame = null;
+            return;
+          }
+
+          const progress = Math.min(1, (now - started) / PRODUCT_SETTLE_MS);
+          applyProductGeometry(
+            start + (target - start) * easeOutCubic(progress),
+            geometry
+          );
+
+          if (progress < 1) {
+            productSettleFrame = requestAnimationFrame(step);
+          } else {
+            productSettleFrame = null;
+            applyProductGeometry(target, geometry);
+          }
+        }
+
+        productSettleFrame = requestAnimationFrame(step);
+      }
+
+      function updateProductPeekGeometry() {
+        if (activeSheet !== 'product' ||
+            productSheet.hidden ||
+            productDrag ||
+            sheetClosing) return;
+
+        cancelProductMotion();
+
+        const geometry = getProductGeometry();
+        const expanded =
+          productSheet.classList.contains('is-expanded');
+
+        applyProductGeometry(
+          expanded ? geometry.maximum : geometry.partial,
+          geometry
+        );
+
+        clampMiniPosition();
+      }
+
+      function makeProductSlide(src, alt, className, lazy) {
+        const slide = document.createElement(
+          className === 'product-gallery-slide' ? 'button' : 'div'
+        );
+
+        if (slide.tagName === 'BUTTON') slide.type = 'button';
+        slide.className = className;
+
+        const image = document.createElement('img');
+        image.src = src;
+        image.alt = alt;
+        image.draggable = false;
+        if (lazy) image.loading = 'lazy';
+
+        slide.append(image);
+        return slide;
+      }
+
+      productImages.forEach((src, index) => {
+        productGalleryTrack.append(
+          makeProductSlide(
+            src,
+            productImageAlts[index],
+            'product-gallery-slide',
+            index > 0
+          )
+        );
+
+        productLightboxTrack.append(
+          makeProductSlide(
+            src,
+            productImageAlts[index],
+            'product-lightbox-slide',
+            true
+          )
+        );
+      });
+
+      function scrollTrackTo(track, index, smooth) {
+        const width = track.clientWidth || 1;
+        const next = Math.max(
+          0,
+          Math.min(productImages.length - 1, index)
+        );
+
+        track.scrollTo({
+          left: next * width,
+          behavior: smooth && !prefersReducedMotion() ? 'smooth' : 'auto'
+        });
+
+        return next;
+      }
+
+      function readTrackIndex(track) {
+        const width = track.clientWidth || 1;
+
+        return Math.max(
+          0,
+          Math.min(
+            productImages.length - 1,
+            Math.round(track.scrollLeft / width)
+          )
+        );
+      }
+
+      function resetGallery(index, smooth) {
+        productImageIndex = scrollTrackTo(
+          productGalleryTrack,
+          index,
+          smooth
+        );
 
         productImageCount.textContent =
           `${productImageIndex + 1}/${productImages.length}`;
       }
 
-      let productImageIndex = 0;
-      let productPreviewFrame = null;
-      let lastProductFrameTime = 0;
+      function syncGalleryFromScroll() {
+        productImageIndex = readTrackIndex(productGalleryTrack);
+        productImageCount.textContent =
+          `${productImageIndex + 1}/${productImages.length}`;
+      }
+
+      let galleryScrollFrame = null;
+
+      productGalleryTrack.addEventListener('scroll', () => {
+        if (galleryScrollFrame !== null) return;
+
+        galleryScrollFrame = requestAnimationFrame(() => {
+          galleryScrollFrame = null;
+          syncGalleryFromScroll();
+        });
+      }, { passive:true });
+
+      productGalleryTrack.addEventListener('pointerdown', event => {
+        galleryMoved = false;
+        galleryPointer = {
+          x: event.clientX,
+          y: event.clientY
+        };
+      });
+
+      productGalleryTrack.addEventListener('pointermove', event => {
+        if (!galleryPointer) return;
+
+        if (Math.abs(event.clientX - galleryPointer.x) > 8 ||
+            Math.abs(event.clientY - galleryPointer.y) > 8) {
+          galleryMoved = true;
+        }
+      });
+
+      productGalleryTrack.addEventListener('pointerup', () => {
+        galleryPointer = null;
+      });
+
+      productGalleryTrack.addEventListener('pointercancel', () => {
+        galleryPointer = null;
+      });
+
+      productGalleryTrack.addEventListener('click', event => {
+        const slide = event.target.closest('.product-gallery-slide');
+        if (!slide) return;
+
+        if (galleryMoved) {
+          event.preventDefault();
+          return;
+        }
+
+        const index = [...productGalleryTrack.children].indexOf(slide);
+        if (index >= 0) openProductLightbox(index, slide);
+      });
+
+      productGalleryTrack.addEventListener('keydown', event => {
+        if (event.key === 'ArrowRight') {
+          event.preventDefault();
+          resetGallery(productImageIndex + 1, true);
+        }
+
+        if (event.key === 'ArrowLeft') {
+          event.preventDefault();
+          resetGallery(productImageIndex - 1, true);
+        }
+      });
+
+      function syncLightboxCounter() {
+        const index = readTrackIndex(productLightboxTrack);
+        productImageIndex = index;
+        productLightboxCounter.textContent =
+          `${index + 1} / ${productImages.length}`;
+        productImageCount.textContent =
+          `${index + 1}/${productImages.length}`;
+      }
+
+      let lightboxScrollFrame = null;
+
+      productLightboxTrack.addEventListener('scroll', () => {
+        if (lightboxScrollFrame !== null) return;
+
+        lightboxScrollFrame = requestAnimationFrame(() => {
+          lightboxScrollFrame = null;
+          syncLightboxCounter();
+        });
+      }, { passive:true });
+
+      productLightboxTrack.addEventListener('keydown', event => {
+        if (event.key !== 'ArrowRight' && event.key !== 'ArrowLeft') return;
+
+        event.preventDefault();
+
+        const delta = event.key === 'ArrowRight' ? 1 : -1;
+        const index = scrollTrackTo(
+          productLightboxTrack,
+          readTrackIndex(productLightboxTrack) + delta,
+          true
+        );
+
+        productImageIndex = index;
+        productLightboxCounter.textContent =
+          `${index + 1} / ${productImages.length}`;
+      });
+
+      function openProductLightbox(index, opener) {
+        if (activeSheet !== 'product' || sheetClosing) return;
+
+        lightboxOpener = opener || document.activeElement;
+        productLightbox.hidden = false;
+        productSheet.inert = true;
+
+        const previous = productLightboxTrack.style.scrollBehavior;
+        productLightboxTrack.style.scrollBehavior = 'auto';
+        scrollTrackTo(productLightboxTrack, index, false);
+        productLightboxTrack.style.scrollBehavior = previous;
+
+        productImageIndex = index;
+        productLightboxCounter.textContent =
+          `${index + 1} / ${productImages.length}`;
+
+        productLightboxClose.focus({ preventScroll:true });
+      }
+
+      function closeProductLightbox(silent) {
+        if (!productLightbox || productLightbox.hidden) return;
+
+        const index = readTrackIndex(productLightboxTrack);
+        productLightbox.hidden = true;
+
+        if (activeSheet === 'product') {
+          productSheet.inert = false;
+          resetGallery(index, false);
+        }
+
+        if (!silent &&
+            lightboxOpener &&
+            lightboxOpener.isConnected &&
+            !lightboxOpener.closest('[inert]')) {
+          lightboxOpener.focus({ preventScroll:true });
+        }
+
+        lightboxOpener = null;
+      }
+
+      productLightboxClose.addEventListener('click', () => {
+        closeProductLightbox(false);
+      });
 
       function stopProductPreview() {
         if (productPreviewFrame !== null) {
@@ -2770,6 +3327,7 @@
       function drawProductPreview(timestamp) {
         if (activeSheet !== 'product' ||
             !productSheet.classList.contains('is-expanded') ||
+            productMini.hidden ||
             sheetClosing ||
             document.hidden) {
           stopProductPreview();
@@ -2789,12 +3347,9 @@
               if (context) {
                 const sourceWidth = video.videoWidth;
                 const sourceHeight = video.videoHeight;
-
                 const targetRatio =
                   productCanvas.width / productCanvas.height;
-
-                const sourceRatio =
-                  sourceWidth / sourceHeight;
+                const sourceRatio = sourceWidth / sourceHeight;
 
                 let cropWidth = sourceWidth;
                 let cropHeight = sourceHeight;
@@ -2821,14 +3376,12 @@
                 productCanvas.hidden = false;
               }
             } catch (error) {
-              // Keep the static D06 image as the fallback.
               productCanvas.hidden = true;
             }
           }
         }
 
-        productPreviewFrame =
-          requestAnimationFrame(drawProductPreview);
+        productPreviewFrame = requestAnimationFrame(drawProductPreview);
       }
 
       function startProductPreview() {
@@ -2836,268 +3389,224 @@
         lastProductFrameTime = 0;
 
         if (activeSheet !== 'product' ||
-            document.hidden) return;
+            document.hidden ||
+            productMini.hidden ||
+            !productSheet.classList.contains('is-expanded')) return;
 
-        productPreviewFrame =
-          requestAnimationFrame(drawProductPreview);
+        productPreviewFrame = requestAnimationFrame(drawProductPreview);
       }
 
-      // =====================================================
-      // PHASE 3A.1 — PRODUCT VIDEO PEEK GEOMETRY
-      // =====================================================
+      function syncMiniVisibility() {
+        const show = activeSheet === 'product' &&
+          !sheetClosing &&
+          !miniDismissed &&
+          productSheet.classList.contains('is-expanded');
 
-      function updateProductPeekGeometry() {
-        if (activeSheet !== 'product' || productSheet.hidden) {
+        productMini.hidden = !show;
+
+        if (show) startProductPreview();
+        else stopProductPreview();
+      }
+
+      function miniTravelBounds() {
+        const previous = productMini.style.transform;
+        productMini.style.transform = 'translate3d(0px, 0px, 0)';
+
+        const mini = productMini.getBoundingClientRect();
+        const sheet = productSheet.getBoundingClientRect();
+        const footer = productSheet.querySelector('.product-footer').getBoundingClientRect();
+        const grab = productGrab.getBoundingClientRect();
+
+        productMini.style.transform = previous;
+
+        const pad = 8;
+
+        return {
+          minX: sheet.left + pad - mini.left,
+          maxX: sheet.right - pad - mini.right,
+          minY: grab.bottom + pad - mini.top,
+          maxY: footer.top - pad - mini.bottom
+        };
+      }
+
+      function clampMiniPosition() {
+        if (productMini.hidden) return;
+
+        const bounds = miniTravelBounds();
+        miniOffset.x = Math.max(bounds.minX, Math.min(bounds.maxX, miniOffset.x));
+        miniOffset.y = Math.max(bounds.minY, Math.min(bounds.maxY, miniOffset.y));
+        productMini.style.transform =
+          `translate3d(${miniOffset.x}px, ${miniOffset.y}px, 0)`;
+      }
+
+      function beginProductEntrance() {
+        cancelProductMotion();
+        closeProductLightbox(true);
+        productSheet.inert = false;
+        productSheet.classList.remove('is-expanded', 'is-dragging');
+        miniDismissed = false;
+        miniOffset = { x:0, y:0 };
+        miniDrag = null;
+        productMini.style.transform = '';
+        productMini.hidden = true;
+        stopProductPreview();
+        resetGallery(0, false);
+
+        const geometry = getProductGeometry();
+        productSheet.style.height = `${geometry.partial}px`;
+        fypApp.classList.add('is-product-peek');
+        fypApp.style.setProperty(
+          '--product-peek-height',
+          `${geometry.appHeight}px`
+        );
+
+        if (prefersReducedMotion()) {
+          applyProductGeometry(geometry.partial, geometry);
           return;
         }
 
-        const appHeight =
-          fypApp.getBoundingClientRect().height;
-
-        /*
-          offsetHeight is the sheet's actual layout height.
-          The sheet's entrance transform does not change it.
-        */
-        const partialSheetHeight =
-          productSheet.classList.contains('is-expanded')
-            ? appHeight * 0.72
-            : productSheet.offsetHeight;
-
-        const availableHeight = Math.max(
-          80,
-          Math.round(appHeight - partialSheetHeight)
-        );
-
-        fypApp.style.setProperty(
-          '--product-peek-height',
-          `${availableHeight}px`
-        );
+        followVisibleSheet(360, true);
       }
 
-      window.addEventListener('resize', () => {
-        if (activeSheet === 'product') {
-          updateProductPeekGeometry();
-        }
-      });
+      function beginProductExit() {
+        cancelProductMotion();
+        closeProductLightbox(true);
+        productSheet.inert = false;
+        stopProductPreview();
+        productMini.hidden = true;
+        followVisibleSheet(340, false);
+      }
+
+      function finishProductExit() {
+        cancelProductMotion();
+        closeProductLightbox(true);
+        productSheet.inert = false;
+        productSheet.classList.remove('is-expanded', 'is-dragging');
+        productSheet.style.height = '';
+        productMini.hidden = true;
+        productMini.style.transform = '';
+        miniOffset = { x:0, y:0 };
+        miniDismissed = false;
+        miniDrag = null;
+        stopProductPreview();
+        fypApp.classList.remove('is-product-peek');
+        fypApp.style.removeProperty('--product-peek-height');
+      }
 
       function setProductExpanded(expanded) {
         if (activeSheet !== 'product' || sheetClosing) return;
 
         const next = Boolean(expanded);
+        productSheet.classList.toggle('is-expanded', next);
 
-        productSheet.classList.toggle(
-          'is-expanded', next
-        );
+        if (!next) productScroll.scrollTop = 0;
 
-        if (!next) {
-          productScroll.scrollTop = 0;
-          stopProductPreview();
-        } else {
-          startProductPreview();
-        }
+        syncMiniVisibility();
+
+        const geometry = getProductGeometry();
+        animateProductHeight(next ? geometry.maximum : geometry.partial);
       }
 
-      productTag.addEventListener('click', () => {
-        if (active !== 0) return;
+      function settleProductDrag(velocity) {
+        const geometry = productGeometry || getProductGeometry();
+        const height = productSheet.offsetHeight;
+        const closeLine =
+          geometry.partial - Math.round(geometry.appHeight * 0.1);
 
-        showProductImage(0);
-
-        openSheet('product', productTag);
-      });
-
-      document.getElementById('product-next-image')
-        .addEventListener('click', () => {
-          showProductImage(productImageIndex + 1);
-        });
-
-      // Gallery horizontal swipe: previous / next image.
-      // Vertical gestures are handled by the product sheet.
-
-      const productGallery =
-        productImage.closest('.product-gallery');
-
-      let galleryTouchStart = null;
-
-      productGallery.addEventListener('touchstart', event => {
-        if (event.touches.length !== 1) {
-          galleryTouchStart = null;
-          return;
-        }
-
-        galleryTouchStart = {
-          x:event.touches[0].clientX,
-          y:event.touches[0].clientY
-        };
-      }, { passive:true });
-
-      productGallery.addEventListener('touchend', event => {
-        if (!galleryTouchStart ||
-            event.changedTouches.length !== 1) {
-          galleryTouchStart = null;
-          return;
-        }
-
-        const dx =
-          event.changedTouches[0].clientX -
-          galleryTouchStart.x;
-
-        const dy =
-          event.changedTouches[0].clientY -
-          galleryTouchStart.y;
-
-        galleryTouchStart = null;
-
-        if (Math.abs(dx) > 45 &&
-            Math.abs(dx) > Math.abs(dy) * 1.2) {
-
-          showProductImage(
-            productImageIndex + (dx < 0 ? 1 : -1)
-          );
-
-          // Do not pass a horizontal image gesture
-          // to the product-sheet vertical gesture handler.
-          productTouchStartY = null;
-          productTouchStartX = null;
-          event.stopPropagation();
-        }
-      }, { passive:true });
-
-      productGallery.addEventListener('touchcancel', () => {
-        galleryTouchStart = null;
-      }, { passive:true });
-
-      productMini.addEventListener('click', () => {
-        if (activeSheet === 'product') {
+        if (height <= closeLine ||
+            (height < geometry.partial - 36 && velocity > 0.85)) {
           closeSheet();
-        }
-      });
-
-      document.querySelectorAll('[data-product-demo]')
-        .forEach(button => {
-          button.addEventListener('click', () => {
-            message(
-              `${button.dataset.productDemo} will be implemented in Phase 3B`
-            );
-          });
-        });
-
-      // Touch gestures support the natural mobile sheet flow.
-      // Partial: upward swipe -> expanded.
-      // Expanded: downward swipe from the top -> partial.
-      // Partial: downward swipe -> close.
-
-      let productTouchStartY = null;
-      let productTouchStartX = null;
-      let productTouchInitialScroll = 0;
-
-      productSheet.addEventListener('touchstart', event => {
-        if (activeSheet !== 'product' ||
-            event.touches.length !== 1 ||
-            event.target.closest('button')) {
-          productTouchStartY = null;
-          productTouchStartX = null;
           return;
         }
 
-        productTouchStartY =
-          event.touches[0].clientY;
+        const span = geometry.maximum - geometry.partial;
+        let expanded = height > geometry.partial + span * 0.42;
 
-        productTouchStartX =
-          event.touches[0].clientX;
-
-        productTouchInitialScroll =
-          productScroll.scrollTop;
-      }, { passive:true });
-
-      productSheet.addEventListener('touchend', event => {
-        if (productTouchStartY === null ||
-            event.changedTouches.length !== 1 ||
-            activeSheet !== 'product' ||
-            sheetClosing) {
-          productTouchStartY = null;
-          productTouchStartX = null;
-          return;
+        if (velocity < -0.75) expanded = true;
+        if (velocity > 0.75 && height < geometry.maximum - 30) {
+          expanded = false;
         }
 
-        const distance =
-          event.changedTouches[0].clientY -
-          productTouchStartY;
+        productSheet.classList.toggle('is-expanded', expanded);
+        syncMiniVisibility();
+        animateProductHeight(
+          expanded ? geometry.maximum : geometry.partial
+        );
+      }
 
-        const dx =
-          event.changedTouches[0].clientX -
-          productTouchStartX;
+      function endProductPointer(event) {
+        if (!productDrag || event.pointerId !== productDrag.id) return;
 
-        productTouchStartY = null;
-        productTouchStartX = null;
+        const velocity = productDrag.velocity || 0;
+        productDrag = null;
+        productSheet.classList.remove('is-dragging');
 
-        if (Math.abs(dx) > 45 &&
-            Math.abs(dx) > Math.abs(distance) * 1.2) {
-          return;
+        if (productFrame !== null) {
+          cancelAnimationFrame(productFrame);
+          productFrame = null;
         }
 
-        const atTop =
-          productTouchInitialScroll <= 2 &&
-          productScroll.scrollTop <= 2;
+        if (sheetClosing || activeSheet !== 'product') return;
 
-        if (!atTop) return;
-
-        const expanded =
-          productSheet.classList.contains('is-expanded');
-
-        if (!expanded && distance < -60) {
-          setProductExpanded(true);
-        } else if (!expanded && distance > 100) {
-          closeSheet();
-        } else if (expanded && distance > 100) {
-          setProductExpanded(false);
-        }
-      }, { passive:true });
-
-      productSheet.addEventListener('touchcancel', () => {
-        productTouchStartY = null;
-        productTouchStartX = null;
-      }, { passive:true });
-
-      // Desktop mouse drag on the product header.
-      // Touch devices use the handler above.
-      let productPointerStart = null;
+        settleProductDrag(velocity);
+      }
 
       productGrab.addEventListener('pointerdown', event => {
-        if (event.pointerType !== 'mouse' ||
-            event.button !== 0 ||
-            event.target.closest('button') ||
-            activeSheet !== 'product') return;
+        if (event.button !== 0) return;
+        if (event.target.closest('button')) return;
+        if (activeSheet !== 'product' || sheetClosing) return;
 
-        productPointerStart = event.clientY;
-        productGrab.setPointerCapture(event.pointerId);
+        cancelProductMotion();
+        productGeometry = getProductGeometry();
+        productDrag = {
+          id: event.pointerId,
+          startY: event.clientY,
+          startHeight: productSheet.offsetHeight,
+          lastY: event.clientY,
+          lastTime: performance.now(),
+          velocity: 0,
+          pendingY: event.clientY
+        };
+
+        productSheet.classList.add('is-dragging');
+
+        try {
+          productGrab.setPointerCapture(event.pointerId);
+        } catch (error) {}
       });
 
-      productGrab.addEventListener('pointerup', event => {
-        if (productPointerStart === null) return;
+      productGrab.addEventListener('pointermove', event => {
+        if (!productDrag || event.pointerId !== productDrag.id) return;
 
-        const distance =
-          event.clientY - productPointerStart;
+        productDrag.pendingY = event.clientY;
 
-        productPointerStart = null;
+        const now = performance.now();
+        const elapsed = now - productDrag.lastTime;
 
-        const expanded =
-          productSheet.classList.contains('is-expanded');
-
-        if (!expanded && distance < -50) {
-          setProductExpanded(true);
-        } else if (!expanded && distance > 90) {
-          closeSheet();
-        } else if (expanded && distance > 90) {
-          setProductExpanded(false);
+        if (elapsed >= 16) {
+          const raw = (event.clientY - productDrag.lastY) / elapsed;
+          productDrag.velocity = Math.max(-3, Math.min(3, raw));
+          productDrag.lastY = event.clientY;
+          productDrag.lastTime = now;
         }
+
+        if (productFrame !== null) return;
+
+        productFrame = requestAnimationFrame(() => {
+          productFrame = null;
+          if (!productDrag) return;
+
+          const next = productDrag.startHeight -
+            (productDrag.pendingY - productDrag.startY);
+
+          applyProductGeometry(next, productGeometry);
+        });
       });
 
-      productGrab.addEventListener('pointercancel', () => {
-        productPointerStart = null;
-      });
+      productGrab.addEventListener('pointerup', endProductPointer);
+      productGrab.addEventListener('pointercancel', endProductPointer);
+      productGrab.addEventListener('lostpointercapture', endProductPointer);
 
-      // Keep keyboard users able to operate the partial sheet.
-      // The existing Escape handler still closes the dialog.
       productGrab.addEventListener('keydown', event => {
         if (activeSheet !== 'product') return;
 
@@ -3112,12 +3621,105 @@
         }
       });
 
+      productTag.addEventListener('click', () => {
+        if (active !== 0) return;
+        openSheet('product', productTag);
+      });
+
+      productMini.addEventListener('pointerdown', event => {
+        if (event.button !== 0) return;
+        if (event.target.closest('#product-mini-close')) return;
+
+        miniDrag = {
+          id: event.pointerId,
+          x: event.clientX,
+          y: event.clientY,
+          ox: miniOffset.x,
+          oy: miniOffset.y,
+          bounds: miniTravelBounds(),
+          moved: false
+        };
+
+        try {
+          productMini.setPointerCapture(event.pointerId);
+        } catch (error) {}
+      });
+
+      productMini.addEventListener('pointermove', event => {
+        if (!miniDrag || event.pointerId !== miniDrag.id) return;
+
+        const dx = event.clientX - miniDrag.x;
+        const dy = event.clientY - miniDrag.y;
+
+        if (Math.abs(dx) + Math.abs(dy) > 6) miniDrag.moved = true;
+
+        const bounds = miniDrag.bounds;
+        miniOffset.x = Math.max(
+          bounds.minX,
+          Math.min(bounds.maxX, miniDrag.ox + dx)
+        );
+        miniOffset.y = Math.max(
+          bounds.minY,
+          Math.min(bounds.maxY, miniDrag.oy + dy)
+        );
+
+        productMini.style.transform =
+          `translate3d(${miniOffset.x}px, ${miniOffset.y}px, 0)`;
+      });
+
+      function endMiniPointer(event) {
+        if (!miniDrag || event.pointerId !== miniDrag.id) return;
+
+        miniSuppressClick = miniDrag.moved;
+        miniDrag = null;
+      }
+
+      productMini.addEventListener('pointerup', endMiniPointer);
+      productMini.addEventListener('pointercancel', endMiniPointer);
+      productMini.addEventListener('lostpointercapture', event => {
+        if (!miniDrag || event.pointerId !== miniDrag.id) return;
+        miniSuppressClick = miniDrag.moved;
+        miniDrag = null;
+      });
+
+      productMiniReturn.addEventListener('click', () => {
+        if (miniSuppressClick) {
+          miniSuppressClick = false;
+          return;
+        }
+
+        if (activeSheet === 'product') closeSheet();
+      });
+
+      productMiniClose.addEventListener('click', event => {
+        event.stopPropagation();
+        miniDismissed = true;
+        productMini.hidden = true;
+        stopProductPreview();
+      });
+
+      document.querySelectorAll('[data-product-demo]')
+        .forEach(button => {
+          button.addEventListener('click', () => {
+            message(
+              `${button.dataset.productDemo} will be implemented in Phase 3B`
+            );
+          });
+        });
+
+      window.addEventListener('resize', () => {
+        if (activeSheet === 'product') {
+          updateProductPeekGeometry();
+        }
+      });
+
       document.addEventListener('visibilitychange', () => {
         if (document.hidden) {
           stopProductPreview();
         } else if (
           activeSheet === 'product' &&
-          productSheet.classList.contains('is-expanded')
+          productSheet.classList.contains('is-expanded') &&
+          !productMini.hidden
         ) {
           startProductPreview();
         }
