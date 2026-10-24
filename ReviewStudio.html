@@ -452,7 +452,9 @@
   let sessionToken = '';
   let authClientKey = '';
   let bridgeFrame = null;
+  let bridgeSource = null;
   let bridgeOrigin = '';
+  let bridgeHandshake = '';
   let bridgeReady = null;
   const bridgePending = new Map();
 
@@ -483,10 +485,19 @@
     });
   }
 
+  function randomHex(bytes) {
+    const list = new Uint8Array(bytes);
+    crypto.getRandomValues(list);
+    let hex = '';
+    for (let i = 0; i < list.length; i++) hex += list[i].toString(16).padStart(2, '0');
+    return hex;
+  }
+
   function ensureBridge() {
     if (bridgeReady) return bridgeReady;
     let frame = null;
     let onReady = null;
+    const handshake = randomHex(16);
     bridgeReady = new Promise((resolve, reject) => {
       frame = document.createElement('iframe');
       frame.hidden = true;
@@ -495,22 +506,29 @@
       frame.style.cssText = 'position:absolute;width:0;height:0;border:0';
       const timer = setTimeout(() => reject(new Error('The Review Studio connection did not start.')), 20000);
       onReady = event => {
-        const data = event.data || {};
-        if (!googleUserContent(event.origin) || data.source !== 'arabista-review-bridge' || data.type !== 'ready') return;
+        const data = event.data;
+        if (!data || typeof data !== 'object') return;
+        if (!googleUserContent(event.origin) || !event.source) return;
+        if (data.source !== 'arabista-review-bridge' || data.type !== 'ready') return;
+        if (data.handshake !== handshake) return;
         clearTimeout(timer);
         window.removeEventListener('message', onReady);
         bridgeOrigin = event.origin;
+        bridgeSource = event.source;
+        bridgeHandshake = handshake;
         bridgeFrame = frame;
         resolve(frame);
       };
       window.addEventListener('message', onReady);
-      frame.src = BRIDGE_URL;
+      frame.src = BRIDGE_URL + '&handshake=' + handshake;
       document.body.appendChild(frame);
     }).catch(err => {
       if (onReady) window.removeEventListener('message', onReady);
       if (frame) frame.remove();
       bridgeFrame = null;
+      bridgeSource = null;
       bridgeOrigin = '';
+      bridgeHandshake = '';
       bridgeReady = null;
       throw err;
     });
@@ -518,9 +536,12 @@
   }
 
   window.addEventListener('message', event => {
+    if (!bridgeSource || event.source !== bridgeSource) return;
     if (!bridgeOrigin || event.origin !== bridgeOrigin) return;
-    const data = event.data || {};
+    const data = event.data;
+    if (!data || typeof data !== 'object') return;
     if (data.source !== 'arabista-review-bridge' || data.type !== 'response') return;
+    if (data.handshake !== bridgeHandshake || typeof data.id !== 'string') return;
     const pending = bridgePending.get(data.id);
     if (!pending) return;
     clearTimeout(pending.timer);
@@ -530,14 +551,25 @@
   });
 
   function bridgeCall(fn, args) {
-    return ensureBridge().then(frame => new Promise((resolve, reject) => {
-      const id = window.crypto && crypto.randomUUID ? crypto.randomUUID() : String(Date.now()) + Math.random();
+    return ensureBridge().then(() => new Promise((resolve, reject) => {
+      const id = randomHex(16);
       const timer = setTimeout(() => {
         bridgePending.delete(id);
         reject(new Error('The Review Studio request timed out.'));
       }, BRIDGE_TIMEOUT);
       bridgePending.set(id, {resolve, reject, timer});
-      frame.contentWindow.postMessage({source:'arabista-review-studio', id, fn, args}, bridgeOrigin);
+      try {
+        bridgeSource.postMessage({
+          source: 'arabista-review-studio',
+          type: 'request',
+          handshake: bridgeHandshake,
+          id, fn, args
+        }, bridgeOrigin);
+      } catch (e) {
+        clearTimeout(timer);
+        bridgePending.delete(id);
+        reject(new Error('The Review Studio connection is unavailable.'));
+      }
     }));
   }
 

@@ -12,21 +12,28 @@
   // Injected by Apps Script. This page has no dashboard and never displays a password.
   // ALLOWALL framing applies only here. Messages are accepted from the configured website origins.
   const ALLOWED = <?!= originsJson ?>;
+  const HANDSHAKE = <?!= handshakeJson ?>;
   const SOURCE = 'arabista-review-bridge';
 
   function allowed(origin) {
     return Array.isArray(ALLOWED) && ALLOWED.indexOf(origin) !== -1;
   }
 
+  function handshakeOk(value) {
+    return typeof HANDSHAKE === 'string' && HANDSHAKE.length === 32 && value === HANDSHAKE;
+  }
+
   function reply(target, origin, payload) {
-    if (!target || !allowed(origin)) return;
+    if (!target || !allowed(origin) || !handshakeOk(HANDSHAKE)) return;
     target.postMessage(payload, origin);
   }
 
   function announce() {
-    if (!Array.isArray(ALLOWED)) return;
+    if (!handshakeOk(HANDSHAKE) || !Array.isArray(ALLOWED)) return;
     ALLOWED.forEach(origin => {
-      try { window.top.postMessage({source: SOURCE, type: 'ready'}, origin); } catch (e) {}
+      try {
+        window.top.postMessage({source: SOURCE, type: 'ready', handshake: HANDSHAKE}, origin);
+      } catch (e) {}
     });
   }
 
@@ -39,18 +46,21 @@
   }
 
   window.addEventListener('message', event => {
-    if (!allowed(event.origin)) return;
-    const data = event.data || {};
-    if (data.source !== 'arabista-review-studio' || typeof data.id !== 'string') return;
-    const args = Array.isArray(data.args) ? data.args : [];
+    if (!handshakeOk(HANDSHAKE) || !allowed(event.origin) || !event.source) return;
+    const data = event.data;
+    if (!data || typeof data !== 'object' || Array.isArray(data)) return;
+    if (data.source !== 'arabista-review-studio' || data.type !== 'request') return;
+    if (!handshakeOk(data.handshake)) return;
+    if (typeof data.id !== 'string' || data.id.length < 8 || data.id.length > 80) return;
+    if (!Array.isArray(data.args)) return;
     const respond = (ok, result, error) => reply(event.source, event.origin, {
-      source: SOURCE, type: 'response', id: data.id, ok, result, error
+      source: SOURCE, type: 'response', handshake: HANDSHAKE, id: data.id, ok, result, error
     });
     if (!window.google || !google.script || !google.script.run) {
       respond(false, null, 'Apps Script bridge is unavailable.');
       return;
     }
-    run(data.fn, args,
+    run(data.fn, data.args,
       result => respond(true, result, ''),
       err => respond(false, null, err && err.message ? err.message : 'Request failed.'));
   });
