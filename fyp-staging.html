@@ -855,22 +855,55 @@
       left:0;
       width:100%;
       height:var(--d06-window-height, 100%);
-      z-index:1;
       overflow:hidden;
+      z-index:1;
       pointer-events:none;
     }
 
     #d06-video {
       position:absolute;
-      left:var(--d06-frame-left, 0px);
-      top:var(--d06-frame-top, 0px);
-      width:var(--d06-frame-width, 100%);
-      height:var(--d06-frame-height, 100%);
+      top:0;
+      left:0;
+      width:var(--d06-base-width, 100%);
+      height:var(--d06-base-height, 100%);
       max-width:none;
       display:block;
       object-fit:cover;
-      object-position:center center;
+      object-position:center;
+      transform-origin:0 0;
+      transform:translate3d(var(--d06-offset-x, 0px), var(--d06-offset-y, 0px), 0) scale(var(--d06-scale, 1));
+      -webkit-backface-visibility:hidden;
+      backface-visibility:hidden;
       background:transparent;
+      pointer-events:none;
+    }
+
+    .app.is-video-debug #video-hit-area {
+      outline:2px solid #3dff7a;
+      outline-offset:-2px;
+    }
+
+    .app.is-video-debug #d06-video-window {
+      outline:2px solid #4aa3ff;
+      outline-offset:-4px;
+    }
+
+    .app.is-video-debug #d06-video {
+      outline:2px solid #ff5a5a;
+    }
+
+    #d06-video-debug {
+      position:absolute;
+      z-index:40;
+      left:8px;
+      top:max(8px, env(safe-area-inset-top, 0px));
+      max-width:calc(100% - 16px);
+      margin:0;
+      padding:8px;
+      background:rgba(0,0,0,.78);
+      color:#fff;
+      font:11px/1.35 ui-monospace, SFMono-Regular, Consolas, monospace;
+      white-space:pre-wrap;
       pointer-events:none;
     }
 
@@ -4260,7 +4293,16 @@
 
         clearTimeout(sheetCloseTimer);
 
-        sheetCloseTimer = window.setTimeout(() => {
+        const finishClosing = () => {
+          if (closingType === 'product') {
+            if (videoGeometryFrame !== null) {
+              cancelAnimationFrame(videoGeometryFrame);
+              videoGeometryFrame = null;
+            }
+            cancelProductMotion();
+            syncProductVideoFrame(feed.clientHeight);
+          }
+
           sheetMap[closingType].hidden = true;
           sheetLayer.hidden = true;
 
@@ -4279,8 +4321,39 @@
           activeSheet = null;
           sheetClosing = false;
           previousSheetFocus = null;
+        };
 
-        }, prefersReducedMotion() ? 0 : 340);
+        if (closingType !== 'product') {
+          sheetCloseTimer = window.setTimeout(
+            finishClosing,
+            prefersReducedMotion() ? 0 : 340
+          );
+          return;
+        }
+
+        if (prefersReducedMotion()) {
+          requestAnimationFrame(finishClosing);
+          return;
+        }
+
+        let productCloseDone = false;
+        const onProductTransitionEnd = (event) => {
+          if (event.target !== productSheet) return;
+          if (event.propertyName !== 'transform') return;
+          if (productCloseDone) return;
+          productCloseDone = true;
+          productSheet.removeEventListener('transitionend', onProductTransitionEnd);
+          clearTimeout(sheetCloseTimer);
+          finishClosing();
+        };
+
+        productSheet.addEventListener('transitionend', onProductTransitionEnd);
+        sheetCloseTimer = window.setTimeout(() => {
+          if (productCloseDone) return;
+          productCloseDone = true;
+          productSheet.removeEventListener('transitionend', onProductTransitionEnd);
+          finishClosing();
+        }, 700);
       }
 
       function message(text) {
@@ -5330,39 +5403,82 @@
 
       let videoGeometryFrame = null;
       let d06AmbientCaptured = false;
+      let d06BaseWidth = 0;
+      let d06BaseHeight = 0;
+      let d06DebugPaintedAt = 0;
+      const videoDebug = new URLSearchParams(window.location.search).get('videoDebug') === '1';
+
+      function ensureD06BaseGeometry() {
+        const width = Math.max(1, feed.clientWidth);
+        const height = Math.max(1, feed.clientHeight);
+
+        if (width !== d06BaseWidth || height !== d06BaseHeight) {
+          d06BaseWidth = width;
+          d06BaseHeight = height;
+          fypApp.style.setProperty('--d06-base-width', `${width}px`);
+          fypApp.style.setProperty('--d06-base-height', `${height}px`);
+        }
+
+        return { width, height };
+      }
+
+      function paintD06VideoDebug() {
+        if (!videoDebug) return;
+        const now = performance.now();
+        if (now - d06DebugPaintedAt < 160) return;
+        d06DebugPaintedAt = now;
+
+        const panel = document.getElementById('d06-video-debug');
+        if (!panel) return;
+
+        const box = (element) => {
+          if (!element) return 'missing';
+          const rect = element.getBoundingClientRect();
+          return `${rect.width.toFixed(1)}x${rect.height.toFixed(1)} top ${rect.top.toFixed(1)}`;
+        };
+        const styles = getComputedStyle(fypApp);
+        const viewport = window.visualViewport;
+
+        panel.textContent = [
+          `app ${box(fypApp)}`,
+          `feed ${box(feed)}`,
+          `stage ${box(document.getElementById('video-hit-area'))}`,
+          `window ${box(document.getElementById('d06-video-window'))}`,
+          `video ${box(video)}`,
+          `media ${video.videoWidth}x${video.videoHeight}`,
+          `scale ${styles.getPropertyValue('--d06-scale').trim() || '1'}`,
+          `offset ${styles.getPropertyValue('--d06-offset-x').trim() || '0px'}, ${styles.getPropertyValue('--d06-offset-y').trim() || '0px'}`,
+          `innerHeight ${window.innerHeight}`,
+          viewport
+            ? `visualViewport ${viewport.height.toFixed(1)} offsetTop ${viewport.offsetTop.toFixed(1)}`
+            : 'visualViewport unavailable',
+          `product ${activeSheet === 'product'} closing ${sheetClosing}`
+        ].join('\n');
+      }
 
       function syncProductVideoFrame(visibleHeight) {
-        const width = Math.max(1, feed.clientWidth);
-        const fullHeight = Math.max(1, feed.clientHeight);
-        const height = Math.max(
+        const stage = ensureD06BaseGeometry();
+        const width = stage.width;
+        const fullHeight = stage.height;
+        const visible = Math.max(
           0,
           Math.min(
             fullHeight,
             Number.isFinite(visibleHeight) ? visibleHeight : fullHeight
           )
         );
-        const ratio = video.videoWidth > 0 && video.videoHeight > 0
-          ? video.videoWidth / video.videoHeight
-          : 9 / 16;
-        const partialVisible = fullHeight * (1 - PRODUCT_PARTIAL_RATIO);
-        const span = Math.max(1, fullHeight - partialVisible);
-        const progress = Math.max(
-          0,
-          Math.min(1, (height - partialVisible) / span)
-        );
-        const containWidth = Math.min(width, height * ratio);
-        const coverWidth = Math.max(width, height * ratio);
-        const drawWidth = containWidth + (coverWidth - containWidth) * progress;
-        const drawHeight = drawWidth / ratio;
-        const left = (width - drawWidth) / 2;
-        const top = (height - drawHeight) / 2;
+        const scale = visible / fullHeight;
+        const scaledWidth = width * scale;
+        const scaledHeight = fullHeight * scale;
+        const offsetX = (width - scaledWidth) / 2;
+        const offsetY = (visible - scaledHeight) / 2;
         const px = value => `${Math.round(value * 100) / 100}px`;
 
-        fypApp.style.setProperty('--d06-window-height', px(height));
-        fypApp.style.setProperty('--d06-frame-left', px(left));
-        fypApp.style.setProperty('--d06-frame-top', px(top));
-        fypApp.style.setProperty('--d06-frame-width', px(drawWidth));
-        fypApp.style.setProperty('--d06-frame-height', px(drawHeight));
+        fypApp.style.setProperty('--d06-window-height', px(visible));
+        fypApp.style.setProperty('--d06-offset-x', px(offsetX));
+        fypApp.style.setProperty('--d06-offset-y', px(offsetY));
+        fypApp.style.setProperty('--d06-scale', String(Math.max(0.001, scale)));
+        paintD06VideoDebug();
       }
 
       function scheduleD06GeometrySync() {
@@ -5422,31 +5538,28 @@
       }
 
       function syncPeekToVisibleSheet() {
-        const appBox = fypApp.getBoundingClientRect();
-        const sheetTop =
-          productSheet.getBoundingClientRect().top - appBox.top;
-
+        const feedRect = feed.getBoundingClientRect();
+        const sheetRect = productSheet.getBoundingClientRect();
         const visible = Math.max(
           0,
-          Math.min(fypApp.clientHeight, Math.round(sheetTop))
+          Math.min(feedRect.height, sheetRect.top - feedRect.top)
         );
 
-        fypApp.style.setProperty(
-          '--product-peek-height',
-          `${visible}px`
-        );
+        fypApp.style.setProperty('--product-peek-height', `${visible}px`);
         syncProductVideoFrame(visible);
 
         if (fypApp.classList.contains('is-product-exiting')) {
-          const appHeight = fypApp.clientHeight;
-
+          const appRect = fypApp.getBoundingClientRect();
+          const appVisible = Math.max(
+            0,
+            Math.min(appRect.height, sheetRect.top - appRect.top)
+          );
           const exitDistance = Math.max(
             1,
-            appHeight - productExitStartTop
+            appRect.height - productExitStartTop
           );
-
           const progress = clampUnit(
-            (visible - productExitStartTop) / exitDistance
+            (appVisible - productExitStartTop) / exitDistance
           );
 
           // Upper controls begin returning earlier.
@@ -5480,8 +5593,9 @@
         const started = performance.now();
 
         function step(now) {
-          if (productDrag) return;
+          if (productDrag || productSheet.hidden) return;
           if (whileOpen && (sheetClosing || activeSheet !== 'product')) return;
+          if (!whileOpen && !sheetClosing) return;
 
           syncPeekToVisibleSheet();
 
@@ -10024,6 +10138,13 @@
         new ResizeObserver(scheduleD06GeometrySync).observe(feed);
       }
       armD06AmbientCapture();
+      if (videoDebug) {
+        fypApp.classList.add('is-video-debug');
+        const panel = document.createElement('p');
+        panel.id = 'd06-video-debug';
+        panel.setAttribute('aria-hidden', 'true');
+        fypApp.appendChild(panel);
+      }
       scheduleD06GeometrySync();
 
       document.addEventListener('visibilitychange', () => {
