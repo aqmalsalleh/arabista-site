@@ -854,7 +854,7 @@
       top:0;
       left:0;
       width:100%;
-      height:var(--d06-window-height, 100%);
+      height:100%;
       overflow:hidden;
       z-index:1;
       pointer-events:none;
@@ -871,11 +871,16 @@
       object-fit:cover;
       object-position:center;
       transform-origin:0 0;
-      transform:translate3d(var(--d06-offset-x, 0px), var(--d06-offset-y, 0px), 0) scale(var(--d06-scale, 1));
-      -webkit-backface-visibility:hidden;
+      transform:translate3d(0,0,0) scale(1);
+      will-change:transform;
       backface-visibility:hidden;
+      -webkit-backface-visibility:hidden;
       background:transparent;
       pointer-events:none;
+    }
+
+    .app.is-product-exiting #d06-video {
+      transition:transform 320ms cubic-bezier(.22,1,.36,1);
     }
 
     .app.is-video-debug #video-hit-area {
@@ -960,16 +965,16 @@
 
     .app.is-product-peek.is-product-exiting .topbar,
     .app.is-product-peek.is-product-exiting .player-buttons {
-      opacity:var(--fyp-header-return,0);
-      transition:none;
+      opacity:1;
+      transition:opacity 160ms ease 35ms;
       pointer-events:none;
     }
 
     .app.is-product-peek.is-product-exiting .rail,
     .app.is-product-peek.is-product-exiting .caption,
     .app.is-product-peek.is-product-exiting .shade {
-      opacity:var(--fyp-lower-return,0);
-      transition:none;
+      opacity:1;
+      transition:opacity 165ms ease 145ms;
       pointer-events:none;
     }
 
@@ -4300,7 +4305,7 @@
               videoGeometryFrame = null;
             }
             cancelProductMotion();
-            syncProductVideoFrame(feed.clientHeight);
+            pinD06RestingFrame();
           }
 
           sheetMap[closingType].hidden = true;
@@ -5354,6 +5359,8 @@
 
         return {
           appHeight,
+          feedWidth: Math.max(1, feed.clientWidth),
+          feedHeight: Math.max(1, feed.clientHeight),
           partial: Math.round(appHeight * PRODUCT_PARTIAL_RATIO),
           minimum: Math.round(appHeight * 0.42),
           maximum: Math.max(1, Math.round(appHeight - safeTop))
@@ -5367,17 +5374,13 @@
           metrics.minimum,
           metrics.maximum
         );
-        const visibleVideoHeight = Math.max(
-          0,
-          metrics.appHeight - height
-        );
+        const visible = Math.max(0, metrics.appHeight - height);
 
         productSheet.style.height = `${height}px`;
-        fypApp.style.setProperty(
-          '--product-peek-height',
-          `${visibleVideoHeight}px`
-        );
-        syncProductVideoFrame(visibleVideoHeight);
+        syncProductVideoFrame(visible, {
+          width: metrics.feedWidth,
+          height: metrics.feedHeight
+        });
 
         return height;
       }
@@ -5399,9 +5402,18 @@
 
         productDrag = null;
         productSheet.classList.remove('is-dragging');
+
+        if (productMotionActive) {
+          productMotionActive = false;
+          if (activeSheet === 'product' && !sheetClosing) {
+            syncMiniVisibility();
+          }
+        }
       }
 
       let videoGeometryFrame = null;
+      let productExitFrame = null;
+      let productMotionActive = false;
       let d06AmbientCaptured = false;
       let d06BaseWidth = 0;
       let d06BaseHeight = 0;
@@ -5436,7 +5448,7 @@
           const rect = element.getBoundingClientRect();
           return `${rect.width.toFixed(1)}x${rect.height.toFixed(1)} top ${rect.top.toFixed(1)}`;
         };
-        const styles = getComputedStyle(fypApp);
+        const styles = getComputedStyle(video);
         const viewport = window.visualViewport;
 
         panel.textContent = [
@@ -5446,8 +5458,7 @@
           `window ${box(document.getElementById('d06-video-window'))}`,
           `video ${box(video)}`,
           `media ${video.videoWidth}x${video.videoHeight}`,
-          `scale ${styles.getPropertyValue('--d06-scale').trim() || '1'}`,
-          `offset ${styles.getPropertyValue('--d06-offset-x').trim() || '0px'}, ${styles.getPropertyValue('--d06-offset-y').trim() || '0px'}`,
+          `transform ${video.style.transform || styles.transform}`,
           `innerHeight ${window.innerHeight}`,
           viewport
             ? `visualViewport ${viewport.height.toFixed(1)} offsetTop ${viewport.offsetTop.toFixed(1)}`
@@ -5456,8 +5467,8 @@
         ].join('\n');
       }
 
-      function syncProductVideoFrame(visibleHeight) {
-        const stage = ensureD06BaseGeometry();
+      function syncProductVideoFrame(visibleHeight, cachedStage) {
+        const stage = cachedStage || ensureD06BaseGeometry();
         const width = stage.width;
         const fullHeight = stage.height;
         const visible = Math.max(
@@ -5467,18 +5478,55 @@
             Number.isFinite(visibleHeight) ? visibleHeight : fullHeight
           )
         );
-        const scale = visible / fullHeight;
-        const scaledWidth = width * scale;
-        const scaledHeight = fullHeight * scale;
-        const offsetX = (width - scaledWidth) / 2;
-        const offsetY = (visible - scaledHeight) / 2;
-        const px = value => `${Math.round(value * 100) / 100}px`;
+        const scale = Math.max(0.001, visible / fullHeight);
+        const offsetX = (width * (1 - scale)) / 2;
 
-        fypApp.style.setProperty('--d06-window-height', px(visible));
-        fypApp.style.setProperty('--d06-offset-x', px(offsetX));
-        fypApp.style.setProperty('--d06-offset-y', px(offsetY));
-        fypApp.style.setProperty('--d06-scale', String(Math.max(0.001, scale)));
-        paintD06VideoDebug();
+        video.style.transform =
+          `translate3d(${offsetX.toFixed(2)}px, 0px, 0px) scale(${scale.toFixed(6)})`;
+
+        if (videoDebug) paintD06VideoDebug();
+      }
+
+      function pinD06RestingFrame() {
+        if (productExitFrame !== null) {
+          cancelAnimationFrame(productExitFrame);
+          productExitFrame = null;
+        }
+        video.style.transition = 'none';
+        syncProductVideoFrame(feed.clientHeight);
+        void video.offsetWidth;
+        video.style.transition = '';
+      }
+
+      function animateVideoToRest() {
+        if (productExitFrame !== null) {
+          cancelAnimationFrame(productExitFrame);
+        }
+
+        productExitFrame = requestAnimationFrame(() => {
+          productExitFrame = null;
+          if (activeSheet !== 'product' || !sheetClosing) return;
+          syncProductVideoFrame(feed.clientHeight);
+        });
+      }
+
+      function suspendMiniPreviewFrames() {
+        if (productPreviewFrame !== null) {
+          cancelAnimationFrame(productPreviewFrame);
+          productPreviewFrame = null;
+        }
+      }
+
+      function beginProductMotion() {
+        productMotionActive = true;
+        suspendMiniPreviewFrames();
+      }
+
+      function finishProductMotion() {
+        productMotionActive = false;
+        if (activeSheet === 'product' && !sheetClosing) {
+          syncMiniVisibility();
+        }
       }
 
       function scheduleD06GeometrySync() {
@@ -5489,10 +5537,22 @@
 
           if (activeSheet === 'product' && !productSheet.hidden) {
             if (sheetClosing) {
-              syncPeekToVisibleSheet();
-            } else if (!productDrag) {
-              updateProductPeekGeometry();
+              const previousWidth = d06BaseWidth;
+              const previousHeight = d06BaseHeight;
+              const stage = ensureD06BaseGeometry();
+              if (stage.width !== previousWidth || stage.height !== previousHeight) {
+                if (productExitFrame !== null) {
+                  cancelAnimationFrame(productExitFrame);
+                  productExitFrame = null;
+                }
+                video.style.transition = 'none';
+                syncProductVideoFrame(stage.height, stage);
+                void video.offsetWidth;
+                video.style.transition = '';
+              }
+              return;
             }
+            if (!productDrag) updateProductPeekGeometry();
             return;
           }
 
@@ -5538,6 +5598,8 @@
       }
 
       function syncPeekToVisibleSheet() {
+        if (sheetClosing) return;
+
         const feedRect = feed.getBoundingClientRect();
         const sheetRect = productSheet.getBoundingClientRect();
         const visible = Math.max(
@@ -5545,43 +5607,7 @@
           Math.min(feedRect.height, sheetRect.top - feedRect.top)
         );
 
-        fypApp.style.setProperty('--product-peek-height', `${visible}px`);
         syncProductVideoFrame(visible);
-
-        if (fypApp.classList.contains('is-product-exiting')) {
-          const appRect = fypApp.getBoundingClientRect();
-          const appVisible = Math.max(
-            0,
-            Math.min(appRect.height, sheetRect.top - appRect.top)
-          );
-          const exitDistance = Math.max(
-            1,
-            appRect.height - productExitStartTop
-          );
-          const progress = clampUnit(
-            (appVisible - productExitStartTop) / exitDistance
-          );
-
-          // Upper controls begin returning earlier.
-          const headerProgress = smoothOverlayProgress(
-            (progress - 0.04) / 0.46
-          );
-
-          // Lower controls fade in toward the end of dismissal.
-          const lowerProgress = smoothOverlayProgress(
-            (progress - 0.52) / 0.43
-          );
-
-          fypApp.style.setProperty(
-            '--fyp-header-return',
-            String(headerProgress)
-          );
-
-          fypApp.style.setProperty(
-            '--fyp-lower-return',
-            String(lowerProgress)
-          );
-        }
       }
 
       function followVisibleSheet(duration, whileOpen) {
@@ -5630,9 +5656,11 @@
 
         if (prefersReducedMotion() || Math.abs(target - start) < 1) {
           applyProductGeometry(target, geometry);
+          finishProductMotion();
           return;
         }
 
+        beginProductMotion();
         const started = performance.now();
 
         function step(now) {
@@ -5652,6 +5680,7 @@
           } else {
             productSettleFrame = null;
             applyProductGeometry(target, geometry);
+            finishProductMotion();
           }
         }
 
@@ -5912,6 +5941,11 @@
       }
 
       function drawProductPreview(timestamp) {
+        if (productMotionActive) {
+          productPreviewFrame = null;
+          return;
+        }
+
         if (activeSheet !== 'product' ||
             !productSheet.classList.contains('is-expanded') ||
             productMini.hidden ||
@@ -5991,8 +6025,8 @@
 
         productMini.hidden = !show;
 
-        if (show) startProductPreview();
-        else stopProductPreview();
+        if (show && !productMotionActive) startProductPreview();
+        else if (!show) stopProductPreview();
       }
 
       function miniTravelBounds() {
@@ -6028,9 +6062,13 @@
 
       function beginProductEntrance() {
         fypApp.classList.remove('is-product-exiting');
-        fypApp.style.removeProperty('--fyp-header-return');
-        fypApp.style.removeProperty('--fyp-lower-return');
+        productMotionActive = false;
         productExitStartTop = 0;
+        if (productExitFrame !== null) {
+          cancelAnimationFrame(productExitFrame);
+          productExitFrame = null;
+        }
+        video.style.transition = '';
         cancelProductMotion();
         closeProductLightbox(true);
         productSheet.inert = false;
@@ -6046,10 +6084,6 @@
         const geometry = getProductGeometry();
         productSheet.style.height = `${geometry.partial}px`;
         fypApp.classList.add('is-product-peek');
-        fypApp.style.setProperty(
-          '--product-peek-height',
-          `${geometry.appHeight}px`
-        );
         syncProductVideoFrame(geometry.appHeight);
 
         if (prefersReducedMotion()) {
@@ -6061,28 +6095,19 @@
       }
 
       function beginProductExit() {
-        // Capture the starting sheet position before the exit transition.
-        const appRect = fypApp.getBoundingClientRect();
-        const sheetRect = productSheet.getBoundingClientRect();
-
-        productExitStartTop = Math.max(
-          0,
-          sheetRect.top - appRect.top
-        );
-
-        fypApp.style.setProperty('--fyp-header-return', '0');
-        fypApp.style.setProperty('--fyp-lower-return', '0');
-
-        fypApp.classList.add('is-product-exiting');
         cancelProductMotion();
+        beginProductMotion();
         closeProductLightbox(true);
         productSheet.inert = false;
         stopProductPreview();
         productMini.hidden = true;
-        followVisibleSheet(340, false);
+        void video.getBoundingClientRect();
+        fypApp.classList.add('is-product-exiting');
+        animateVideoToRest();
       }
 
       function finishProductExit() {
+        pinD06RestingFrame();
         cancelProductMotion();
         closeProductLightbox(true);
         productSheet.inert = false;
@@ -6094,14 +6119,9 @@
         miniDismissed = false;
         miniDrag = null;
         stopProductPreview();
-        syncProductVideoFrame(feed.clientHeight);
+        productMotionActive = false;
         fypApp.classList.remove('is-product-peek');
-        fypApp.style.removeProperty('--product-peek-height');
         fypApp.classList.remove('is-product-exiting');
-
-        fypApp.style.removeProperty('--fyp-header-return');
-        fypApp.style.removeProperty('--fyp-lower-return');
-
         productExitStartTop = 0;
       }
 
@@ -6170,6 +6190,7 @@
 
         cancelProductMotion();
         productGeometry = getProductGeometry();
+        beginProductMotion();
         productDrag = {
           id: event.pointerId,
           startY: event.clientY,
