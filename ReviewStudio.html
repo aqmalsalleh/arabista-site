@@ -22,7 +22,7 @@
     .eyebrow{font-size:10px;letter-spacing:.17em;font-weight:700;color:var(--gold);text-transform:uppercase}
     .side-sub{margin:7px 0 27px;color:var(--muted);font-size:11px}
     .side-label{display:block;font-size:10px;text-transform:uppercase;letter-spacing:.1em;font-weight:700;color:#8b806f;margin:0 0 7px}
-    .field,select,input[type=text],input[type=date],input[type=number],input[type=url],textarea{width:100%;border:1px solid #e0d9cc;background:#fff;padding:11px 12px;border-radius:10px;color:var(--ink);min-width:0}
+    .field,select,input[type=text],input[type=password],input[type=date],input[type=number],input[type=url],textarea{width:100%;border:1px solid #e0d9cc;background:#fff;padding:11px 12px;border-radius:10px;color:var(--ink);min-width:0}
     textarea{resize:vertical;min-height:100px}
     input::placeholder,textarea::placeholder{color:#aea69a}
     .toolrow{display:flex;align-items:center;gap:8px}
@@ -124,10 +124,32 @@
     .ref-library-image img{height:100%;width:100%;object-fit:cover}
     .ref-library-name{font-size:11px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-top:7px}
     .ref-library-source{font-size:10px;color:#c4b9a7;margin-top:2px}
+    .app[hidden]{display:none}
+    .gate{min-height:100vh;display:grid;place-items:center;padding:24px;background:linear-gradient(180deg,#f8f6f2 0%,#f3ede2 100%)}
+    .gate-card{width:min(420px,100%);background:var(--paper);border:1px solid var(--line);border-radius:18px;padding:34px 28px 28px;box-shadow:0 18px 50px rgba(65,46,22,.08)}
+    .gate-card h1{margin:8px 0 4px}
+    .gate-card .muted{margin:0 0 22px}
+    .gate-error{color:var(--red);font-size:12px;margin:10px 0 0}
+    .gate-card .btn.full{margin-top:16px}
+    @media(max-width:700px){.gate{padding:16px}.gate-card{padding:26px 18px 22px}}
   </style>
 </head>
 <body>
-<div class="app">
+<div id="gate" class="gate">
+  <form id="gateForm" class="gate-card" method="post" action="">
+    <div class="brand">Arabista</div>
+    <h1>Review Studio</h1>
+    <p class="muted">Private Management Dashboard</p>
+    <label for="gatePassword">Password</label>
+    <div class="toolrow">
+      <input id="gatePassword" type="password" autocomplete="off" spellcheck="false" required>
+      <button type="button" class="btn secondary" id="gateToggle" aria-pressed="false" aria-controls="gatePassword">Show</button>
+    </div>
+    <p id="gateError" class="gate-error" role="alert" hidden></p>
+    <button id="gateSubmit" class="btn primary full" type="submit">Unlock Studio</button>
+  </form>
+</div>
+<div class="app" id="app" hidden>
   <aside class="sidebar">
     <div class="eyebrow">Private management · staging</div>
     <div class="brand">Arabista</div>
@@ -152,6 +174,7 @@
         <p class="muted micro" id="productInfo">Loading D06 profile…</p>
       </div>
       <div class="top-actions">
+        <button id="lockStudio" class="btn ghost small" type="button">Lock Studio</button>
         <button id="health" class="btn ghost small" type="button">Check connection</button>
         <button id="aiHealth" class="btn ghost small" type="button">Test AI connection</button>
         <button id="refresh" class="btn ghost small" type="button">↻ Refresh</button>
@@ -424,14 +447,118 @@
     'Batrisyia','Aqilah','Aminah','Nasuha','Najwa','Sabrina'
   ];
 
-  function call(name, ...args) {
+  const BRIDGE_URL = 'https://script.google.com/macros/s/AKfycbx78O1BiGdK7_IdCpbKEK5hzlf5AXYvrrvLcZLOa5a9KnLDaNhyGenA5ptyqcn24sBL/exec?bridge=1';
+  const BRIDGE_TIMEOUT = 180000;
+  let sessionToken = '';
+  let authClientKey = '';
+  let bridgeFrame = null;
+  let bridgeOrigin = '';
+  let bridgeReady = null;
+  const bridgePending = new Map();
+
+  function clientKey() {
+    if (!authClientKey) {
+      authClientKey = (window.crypto && crypto.randomUUID ? crypto.randomUUID() : String(Date.now())) + String(Math.random()).slice(2);
+    }
+    return authClientKey;
+  }
+
+  function googleUserContent(origin) {
+    try {
+      const host = new URL(origin).hostname;
+      return host === 'script.googleusercontent.com' || host.endsWith('.script.googleusercontent.com');
+    } catch (e) {
+      return false;
+    }
+  }
+
+  function gasAvailable() {
+    return !!(window.google && google.script && google.script.run);
+  }
+
+  function gasCall(fn, args) {
     return new Promise((resolve, reject) => {
-      if (!window.google || !google.script || !google.script.run) {
-        reject(new Error('Open the deployed Google Apps Script URL to use this studio.'));
-        return;
-      }
       google.script.run.withSuccessHandler(resolve)
-        .withFailureHandler(err => reject(new Error(err && err.message ? err.message : String(err))))[name](...args);
+        .withFailureHandler(err => reject(new Error(err && err.message ? err.message : String(err))))[fn](...args);
+    });
+  }
+
+  function ensureBridge() {
+    if (bridgeReady) return bridgeReady;
+    let frame = null;
+    let onReady = null;
+    bridgeReady = new Promise((resolve, reject) => {
+      frame = document.createElement('iframe');
+      frame.hidden = true;
+      frame.title = 'Review Studio connection';
+      frame.setAttribute('aria-hidden', 'true');
+      frame.style.cssText = 'position:absolute;width:0;height:0;border:0';
+      const timer = setTimeout(() => reject(new Error('The Review Studio connection did not start.')), 20000);
+      onReady = event => {
+        const data = event.data || {};
+        if (!googleUserContent(event.origin) || data.source !== 'arabista-review-bridge' || data.type !== 'ready') return;
+        clearTimeout(timer);
+        window.removeEventListener('message', onReady);
+        bridgeOrigin = event.origin;
+        bridgeFrame = frame;
+        resolve(frame);
+      };
+      window.addEventListener('message', onReady);
+      frame.src = BRIDGE_URL;
+      document.body.appendChild(frame);
+    }).catch(err => {
+      if (onReady) window.removeEventListener('message', onReady);
+      if (frame) frame.remove();
+      bridgeFrame = null;
+      bridgeOrigin = '';
+      bridgeReady = null;
+      throw err;
+    });
+    return bridgeReady;
+  }
+
+  window.addEventListener('message', event => {
+    if (!bridgeOrigin || event.origin !== bridgeOrigin) return;
+    const data = event.data || {};
+    if (data.source !== 'arabista-review-bridge' || data.type !== 'response') return;
+    const pending = bridgePending.get(data.id);
+    if (!pending) return;
+    clearTimeout(pending.timer);
+    bridgePending.delete(data.id);
+    if (data.ok) pending.resolve(data.result);
+    else pending.reject(new Error(data.error || 'Request failed.'));
+  });
+
+  function bridgeCall(fn, args) {
+    return ensureBridge().then(frame => new Promise((resolve, reject) => {
+      const id = window.crypto && crypto.randomUUID ? crypto.randomUUID() : String(Date.now()) + Math.random();
+      const timer = setTimeout(() => {
+        bridgePending.delete(id);
+        reject(new Error('The Review Studio request timed out.'));
+      }, BRIDGE_TIMEOUT);
+      bridgePending.set(id, {resolve, reject, timer});
+      frame.contentWindow.postMessage({source:'arabista-review-studio', id, fn, args}, bridgeOrigin);
+    }));
+  }
+
+  function transport(fn, args) {
+    return gasAvailable() ? gasCall(fn, args) : bridgeCall(fn, args);
+  }
+
+  function sessionError(error) {
+    return /sign in required/i.test(String(error && error.message || error));
+  }
+
+  function showGate() {
+    sessionToken = '';
+    $('gate').hidden = false;
+    $('app').hidden = true;
+  }
+
+  function call(name, ...args) {
+    return transport('studioDispatch', [sessionToken, name, args]).catch(err => {
+      if (sessionError(err)) showGate();
+      throw err;
     });
   }
 
@@ -1252,16 +1379,54 @@
     });
     $('url').addEventListener('change',importReferenceUrl);
     $('url').addEventListener('input',()=>{if($('url').value!==lastImport)lastImport='';});
+    $('gateForm').addEventListener('submit', unlockStudio);
+    $('gateToggle').addEventListener('click', () => {
+      const input = $('gatePassword');
+      const shown = input.type === 'text';
+      input.type = shown ? 'password' : 'text';
+      $('gateToggle').textContent = shown ? 'Show' : 'Hide';
+      $('gateToggle').setAttribute('aria-pressed', shown ? 'false' : 'true');
+    });
+    $('lockStudio').addEventListener('click', lockStudio);
     $('closeLightbox').addEventListener('click',()=> $('lightbox').close());
     $('lightbox').addEventListener('click',e=>{
       if (e.target===$('lightbox'))$('lightbox').close();
     });
   }
 
+  async function unlockStudio(event) {
+    event.preventDefault();
+    const password = $('gatePassword').value;
+    $('gateError').hidden = true;
+    $('gateSubmit').disabled = true;
+    try {
+      const result = await transport('studioAuthenticate', [password, clientKey()]);
+      if (!result || !result.token) throw new Error('Sign in failed.');
+      sessionToken = result.token;
+      $('gatePassword').value = '';
+      $('gate').hidden = true;
+      $('app').hidden = false;
+      await loadWorkspace();
+      loadAiSettings();
+      loadImageQualitySettings();
+    } catch (e) {
+      $('gateError').textContent = e.message || 'Sign in failed.';
+      $('gateError').hidden = false;
+      $('gatePassword').focus();
+    } finally {
+      $('gateSubmit').disabled = false;
+    }
+  }
+
+  async function lockStudio() {
+    if (!isSafeToLeave()) return;
+    const token = sessionToken;
+    showGate();
+    if (!token) return;
+    try { await transport('studioLogout', [token]); } catch (e) {}
+  }
+
   wire();
-  loadWorkspace();
-  loadAiSettings();
-  loadImageQualitySettings();
 })();
 </script>
 </body>
