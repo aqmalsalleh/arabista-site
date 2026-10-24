@@ -1075,6 +1075,94 @@
       height:19px;
     }
 
+    .product-grab-actions {
+      display:flex;
+      align-items:center;
+      gap:5px;
+      margin-left:auto;
+      padding-top:4px;
+    }
+
+    .product-header-basket,
+    .commerce-header-basket {
+      position:relative;
+      display:grid;
+      place-items:center;
+      width:34px;
+      height:34px;
+      flex:0 0 34px;
+      padding:0;
+      border:0;
+      border-radius:50%;
+      background:transparent;
+      color:#5C4630;
+    }
+
+    .product-header-basket svg,
+    .commerce-header-basket svg {
+      width:21px;
+      height:21px;
+    }
+
+    .commerce-header-basket {
+      position:absolute;
+      left:14px;
+      top:14px;
+    }
+
+    .cart-shortcut-badge {
+      position:absolute;
+      top:-2px;
+      right:-5px;
+      display:grid;
+      place-items:center;
+      min-width:16px;
+      height:16px;
+      padding:0 3px;
+      border-radius:999px;
+      background:#B39257;
+      color:#fff;
+      font-size:9px;
+      font-weight:700;
+      line-height:1;
+      box-shadow:0 1px 4px rgba(60,40,16,.22);
+      pointer-events:none;
+    }
+
+    .product-header-basket:focus-visible,
+    .commerce-header-basket:focus-visible {
+      outline:2px solid #B39257;
+      outline-offset:2px;
+    }
+
+    .cart-fly-thumbnail {
+      position:fixed;
+      width:46px;
+      height:62px;
+      object-fit:cover;
+      border-radius:9px;
+      box-shadow:0 8px 22px rgba(28,19,10,.30);
+      pointer-events:none;
+      transform-origin:center;
+      z-index:9999;
+    }
+
+    @keyframes cart-arrival-pulse {
+      0% { transform:scale(1); background:transparent; }
+      45% { transform:scale(1.14); background:rgba(179,146,87,.18); }
+      100% { transform:scale(1); background:transparent; }
+    }
+
+    .commerce-header-basket.cart-arrival {
+      animation:cart-arrival-pulse 360ms ease-out;
+    }
+
+    @media (prefers-reduced-motion:reduce) {
+      .commerce-header-basket.cart-arrival {
+        animation:none;
+      }
+    }
+
     .product-scroll {
       flex:1 1 auto;
       min-height:0;
@@ -3281,15 +3369,33 @@
 
           <span class="product-grab-label">ARABISTA · D06</span>
 
-          <button
-            type="button"
-            class="product-close"
-            data-close-sheet
-            aria-label="Close product information">
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-              <path d="M5 5L19 19M19 5L5 19"/>
-            </svg>
-          </button>
+          <div class="product-grab-actions">
+            <button
+              id="product-header-basket"
+              class="product-header-basket"
+              type="button"
+              aria-haspopup="dialog"
+              aria-controls="commerce-panel"
+              aria-label="View basket">
+              <svg aria-hidden="true">
+                <use href="#i-cart"></use>
+              </svg>
+              <span
+                id="product-header-cart-count"
+                class="cart-shortcut-badge"
+                hidden>0</span>
+            </button>
+
+            <button
+              type="button"
+              class="product-close"
+              data-close-sheet
+              aria-label="Close product information">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M5 5L19 19M19 5L5 19"/>
+              </svg>
+            </button>
+          </div>
         </header>
 
         <div id="product-scroll" class="product-scroll">
@@ -3601,6 +3707,21 @@
 
         <header id="commerce-header" class="commerce-header">
           <span class="commerce-handle" aria-hidden="true"></span>
+
+          <button
+            id="commerce-header-basket"
+            class="commerce-header-basket"
+            type="button"
+            aria-label="View basket"
+            aria-controls="commerce-panel">
+            <svg aria-hidden="true">
+              <use href="#i-cart"></use>
+            </svg>
+            <span
+              id="commerce-header-cart-count"
+              class="cart-shortcut-badge"
+              hidden>0</span>
+          </button>
 
           <h2 id="commerce-heading" class="commerce-heading">
             Choose options
@@ -6427,6 +6548,9 @@
       let demoQuantity = 1;
       let stagingCartBusy = false;
       let stagingCartNotice = '';
+      let cartFlyAnimation = null;
+      let cartFlyElement = null;
+      let cartAddGeneration = 0;
       let checkoutBasketHold = '';
 
       // Shared with conventional staging PDPs. Production cart is not used.
@@ -7428,21 +7552,132 @@
         }
       }
 
-      function updatePreviewCartBadge() {
-        const cart = readStagingCart();
-        if (!cart.ok) {
-          commerceCartCount.hidden = true;
-          return;
+      function cancelCartFlyAnimation() {
+        if (cartFlyAnimation) {
+          cartFlyAnimation.cancel();
+          cartFlyAnimation = null;
+        }
+        if (cartFlyElement) {
+          cartFlyElement.remove();
+          cartFlyElement = null;
+        }
+      }
+
+      function pulseCartShortcut() {
+        const target = document.getElementById('commerce-header-basket');
+        if (!target || target.hidden || prefersReducedMotion()) return;
+        target.classList.remove('cart-arrival');
+        void target.offsetWidth;
+        target.classList.add('cart-arrival');
+      }
+
+      async function animateProductIntoCart() {
+        const source = document.querySelector(
+          '#commerce-variant .commerce-product-card img'
+        );
+        const target = document.getElementById('commerce-header-basket');
+        if (!source || !target || target.hidden || prefersReducedMotion()) return;
+        if (typeof Element.prototype.animate !== 'function') return;
+
+        cancelCartFlyAnimation();
+
+        const sourceRect = source.getBoundingClientRect();
+        const targetRect = target.getBoundingClientRect();
+        const tileWidth = 46;
+        const tileHeight = 62;
+        const startX = sourceRect.left + sourceRect.width / 2 - tileWidth / 2;
+        const startY = sourceRect.top + sourceRect.height / 2 - tileHeight / 2;
+        const dx = targetRect.left + targetRect.width / 2 - (startX + tileWidth / 2);
+        const dy = targetRect.top + targetRect.height / 2 - (startY + tileHeight / 2);
+        const tile = document.createElement('img');
+        tile.src = FYP_CART_IMAGE;
+        tile.alt = '';
+        tile.setAttribute('aria-hidden', 'true');
+        tile.className = 'cart-fly-thumbnail';
+        tile.style.left = `${startX}px`;
+        tile.style.top = `${startY}px`;
+        document.body.appendChild(tile);
+        cartFlyElement = tile;
+
+        const animation = tile.animate(
+          [
+            {
+              offset:0,
+              transform:'translate3d(0,0,0) scale(1) rotate(-4deg)',
+              opacity:1
+            },
+            {
+              offset:0.45,
+              transform:
+                `translate3d(${dx * .35}px, ${dy * .55 - 25}px, 0) scale(.85) rotate(7deg)`,
+              opacity:1
+            },
+            {
+              offset:1,
+              transform:
+                `translate3d(${dx}px, ${dy}px, 0) scale(.12) rotate(12deg)`,
+              opacity:.35
+            }
+          ],
+          {
+            duration:500,
+            easing:'cubic-bezier(.22,.75,.30,1)',
+            fill:'forwards'
+          }
+        );
+        cartFlyAnimation = animation;
+
+        let completed = false;
+        try {
+          await animation.finished;
+          completed = true;
+        } catch (error) {
+          // A cancelled flight is not a cart failure.
+        } finally {
+          if (cartFlyAnimation === animation) cartFlyAnimation = null;
+          tile.remove();
+          if (cartFlyElement === tile) cartFlyElement = null;
         }
 
-        const count = cart.items.reduce(
-          (sum, item) => sum + storedLineQuantity(item),
-          0
-        );
+        if (completed && commerceActive && !commerceClosing) {
+          pulseCartShortcut();
+        }
+      }
 
-        commerceCartCount.hidden = count === 0;
-        commerceCartCount.textContent =
-          count > 99 ? '99+' : String(count);
+      function updatePreviewCartBadge() {
+        const cart = readStagingCart();
+        const count = cart.ok
+          ? cart.items.reduce(
+              (sum, item) => sum + storedLineQuantity(item),
+              0
+            )
+          : 0;
+        const text = count > 99 ? '99+' : String(count);
+
+        [
+          'preview-cart-count',
+          'product-header-cart-count',
+          'commerce-header-cart-count'
+        ].forEach(id => {
+          const badge = document.getElementById(id);
+          if (!badge) return;
+          badge.hidden = !cart.ok || count === 0;
+          badge.textContent = text;
+        });
+
+        [
+          'product-header-basket',
+          'commerce-header-basket'
+        ].forEach(id => {
+          const button = document.getElementById(id);
+          if (!button) return;
+          button.setAttribute(
+            'aria-label',
+            cart.ok
+              ? `View basket, ${count} item${count === 1 ? '' : 's'}`
+              : 'View basket'
+          );
+        });
       }
 
       function safeCartImage(value) {
@@ -7702,6 +7937,13 @@
       function showCommerceView(view) {
         if (!commerceViews[view]) return;
 
+        if (view !== 'variant' &&
+            commerceCurrentView === 'variant' &&
+            stagingCartBusy) {
+          cartAddGeneration += 1;
+          cancelCartFlyAnimation();
+        }
+
         if (view !== 'basket' && stagingCartBusy) {
           basketCheckoutToken += 1;
           stagingCartBusy = false;
@@ -7719,6 +7961,9 @@
 
         commerceFooter.hidden = view !== 'variant';
         document.getElementById('commerce-basket-footer').hidden = view !== 'basket';
+
+        const headerBasket = document.getElementById('commerce-header-basket');
+        if (headerBasket) headerBasket.hidden = view === 'basket';
 
         if (view === 'variant') renderVariantSelection();
         if (view === 'basket') renderPreviewBasket();
@@ -7778,6 +8023,8 @@
       function closeCommerce() {
         if (!commerceActive || commerceClosing || checkoutActive || checkoutClosing) return;
 
+        cartAddGeneration += 1;
+        cancelCartFlyAnimation();
         commerceClosing = true;
         if (stagingCartBusy) {
           basketCheckoutToken += 1;
@@ -7841,6 +8088,20 @@
       document.getElementById('open-preview-basket')
         .addEventListener('click', event => {
           openCommerce('basket',event.currentTarget);
+        });
+
+      document.getElementById('product-header-basket')
+        .addEventListener('click', event => {
+          openCommerce('basket', event.currentTarget, 'cart');
+        });
+
+      document.getElementById('commerce-header-basket')
+        .addEventListener('click', () => {
+          if (!commerceActive ||
+              commerceClosing ||
+              stagingCartBusy ||
+              checkoutActive) return;
+          showCommerceView('basket');
         });
 
       document.getElementById('product-catalog-retry')
@@ -7929,7 +8190,13 @@
 
         stagingCartBusy = true;
         commercePrimary.disabled = true;
-        refreshD06CatalogIfStale().then(() => {
+        const addToken = ++cartAddGeneration;
+        refreshD06CatalogIfStale().then(async () => {
+          if (addToken !== cartAddGeneration ||
+              !commerceActive ||
+              commerceClosing ||
+              commerceCurrentView !== 'variant') return;
+
           if (!normalizeQuantity(quantity) || quantity > maxAddQuantity(size)) {
             stagingCartNotice = 'That quantity is no longer available in staging.';
             message(stagingCartNotice);
@@ -7946,6 +8213,14 @@
           }
 
           stagingCartNotice = '';
+          await animateProductIntoCart();
+          updatePreviewCartBadge();
+
+          if (addToken !== cartAddGeneration ||
+              !commerceActive ||
+              commerceClosing ||
+              commerceCurrentView !== 'variant') return;
+
           showCommerceView('basket');
           message('Added to staging basket');
         }).finally(() => {
