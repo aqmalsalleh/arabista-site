@@ -7,6 +7,7 @@
   <meta name="theme-color" content="#0b0b0c">
   <title>Arabista For You — Interface Preview (STAGING)</title>
   <link rel="icon" type="image/x-icon" href="images/favicon.ico">
+  <link rel="preload" as="image" href="images/logo.webp">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -1786,11 +1787,58 @@
       color:#bababa;
     }
 
-    .commerce-action-footer {
+    .commerce-action-footer,
+    .commerce-basket-footer {
       flex:0 0 auto;
       padding:12px 15px calc(12px + env(safe-area-inset-bottom,0px));
       border-top:1px solid #eee;
       background:#fff;
+    }
+
+    .commerce-basket-footer {
+      border-top-color:#efe8dc;
+      background:#fffdf9;
+    }
+
+    .commerce-basket-footer .commerce-basket-total {
+      margin:2px 0 12px;
+      font-size:15px;
+    }
+
+    .commerce-basket-checkout {
+      min-height:50px;
+      letter-spacing:.01em;
+    }
+
+    #commerce-checkout-basket:disabled {
+      opacity:1;
+      background:#d9cbb0;
+      color:#fff;
+      cursor:default;
+    }
+
+    .commerce-basket-continue {
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      width:100%;
+      min-height:44px;
+      margin-top:2px;
+      padding:6px 12px;
+      border:0;
+      border-radius:8px;
+      background:transparent;
+      color:#876a3c;
+      font-size:13px;
+      font-weight:600;
+    }
+
+    .commerce-basket-note {
+      margin:0;
+      text-align:center;
+      font-size:11px;
+      line-height:1.4;
+      color:#9a9084;
     }
 
     .commerce-primary {
@@ -2476,77 +2524,118 @@
       font-size:30px;
     }
 
-    #commerce-checkout-buy,
-    #commerce-checkout-basket {
+    #commerce-checkout-buy {
       margin-top:10px;
     }
 
-    #commerce-checkout-basket {
-      display:inline-flex;
+    .basket-prepare {
+      position:absolute;
+      top:54px;
+      right:0;
+      bottom:0;
+      left:0;
+      z-index:4;
+      display:flex;
+      flex-direction:column;
       align-items:center;
       justify-content:center;
-      gap:8px;
-      box-sizing:border-box;
-      width:17.5em;
-      height:44px;
-      white-space:nowrap;
-      vertical-align:middle;
+      gap:16px;
+      padding:24px 20px;
+      background:rgba(250,246,239,.58);
+      -webkit-backdrop-filter:blur(12px);
+      backdrop-filter:blur(12px);
     }
 
-    #commerce-checkout-basket .basket-checkout-busy {
-      display:inline-flex;
+    .basket-coin-stage {
+      display:flex;
+      flex-direction:column;
       align-items:center;
-      gap:8px;
     }
 
-    #commerce-checkout-basket:disabled {
-      cursor:default;
-    }
-
-    #commerce-checkout-basket.is-preparing,
-    #commerce-checkout-basket.is-preparing:disabled {
-      color:#876a3c;
-      opacity:1;
-    }
-
-    .arabista-spinner {
+    .basket-coin {
       position:relative;
-      flex:0 0 22px;
-      width:22px;
-      height:22px;
-      display:grid;
-      place-items:center;
+      width:84px;
+      height:84px;
+      perspective:720px;
     }
 
-    .arabista-spinner img {
-      width:14px;
-      height:14px;
+    .basket-coin-halo {
+      position:absolute;
+      inset:-14px;
       border-radius:50%;
+      background:radial-gradient(circle, rgba(179,146,87,.4) 0%, rgba(179,146,87,.1) 48%, transparent 72%);
     }
 
-    .arabista-spinner::before {
+    .basket-coin-inner {
+      position:relative;
+      width:100%;
+      height:100%;
+      transform-style:preserve-3d;
+      animation:arabista-coin 1.4s ease-in-out infinite;
+    }
+
+    .basket-coin-face {
+      position:absolute;
+      inset:0;
+      overflow:hidden;
+      border-radius:50%;
+      backface-visibility:hidden;
+      -webkit-backface-visibility:hidden;
+      box-shadow:0 12px 22px rgba(42,30,14,.28);
+    }
+
+    .basket-coin-face img {
+      display:block;
+      width:100%;
+      height:100%;
+      object-fit:cover;
+    }
+
+    .basket-coin-face::after {
       content:"";
       position:absolute;
       inset:0;
+      background:linear-gradient(115deg, rgba(255,248,232,.28), transparent 42%, rgba(42,30,14,.14) 100%);
+      pointer-events:none;
+    }
+
+    .basket-coin-front {
+      transform:rotateY(0deg);
+    }
+
+    .basket-coin-back {
+      transform:rotateY(180deg);
+    }
+
+    .basket-coin-back img {
+      transform:scaleX(-1);
+    }
+
+    .basket-coin-shadow {
+      width:52px;
+      height:8px;
+      margin-top:12px;
       border-radius:50%;
-      border:1.5px solid rgba(179,146,87,.28);
-      border-top-color:#b39257;
-      opacity:0;
+      background:rgba(42,30,14,.22);
+      filter:blur(2px);
     }
 
-    .arabista-spinner.is-visible::before {
-      opacity:1;
-      animation:arabista-spin .9s linear infinite;
+    .basket-prepare-copy {
+      margin:0;
+      color:#5c4630;
+      font-size:14px;
+      font-weight:600;
+      letter-spacing:.01em;
     }
 
-    @keyframes arabista-spin {
-      to { transform:rotate(360deg); }
+    @keyframes arabista-coin {
+      0% { transform:rotateY(0deg); }
+      100% { transform:rotateY(360deg); }
     }
 
     @media (prefers-reduced-motion:reduce) {
-      .arabista-spinner.is-visible::before {
+      .basket-coin-inner {
         animation:none;
-        opacity:1;
       }
     }
 
@@ -3299,11 +3388,6 @@
                class="commerce-view"
                hidden>
 
-            <p class="commerce-preview-note">
-              Staging cart — saved in this browser.
-              Checkout sends a staging order to SenangPay.
-            </p>
-
             <p id="commerce-basket-status"
                class="commerce-preview-note"
                hidden></p>
@@ -3316,37 +3400,6 @@
             </button>
 
             <div id="commerce-basket-items"></div>
-
-            <div class="commerce-basket-total">
-              <span id="commerce-basket-total-label">Staging subtotal</span>
-              <span id="commerce-basket-total">Price unavailable</span>
-            </div>
-
-            <p class="commerce-preview-note">
-              Checkout uses this basket for a staging order.
-              Payment is completed on SenangPay.
-            </p>
-
-            <button id="commerce-continue-shopping"
-                    class="commerce-secondary"
-                    type="button">
-              Continue shopping
-            </button>
-
-            <button id="commerce-checkout-basket"
-                    class="commerce-secondary"
-                    type="button"
-                    disabled
-                    aria-busy="false">
-              <span class="basket-checkout-idle">Checkout</span>
-              <span class="basket-checkout-busy" hidden>
-                <span class="arabista-spinner" aria-hidden="true">
-                  <img src="images/favicon-32x32.png" alt="">
-                </span>
-                Preparing checkout…
-              </span>
-            </button>
-            <p id="basket-checkout-status" class="sr-only" aria-live="polite"></p>
 
           </div>
 
@@ -3404,6 +3457,45 @@
 
           </div>
 
+        </div>
+
+        <footer id="commerce-basket-footer" class="commerce-basket-footer" hidden>
+          <div class="commerce-basket-total">
+            <span id="commerce-basket-total-label">Subtotal</span>
+            <span id="commerce-basket-total">Price unavailable</span>
+          </div>
+          <button id="commerce-checkout-basket"
+                  class="commerce-primary commerce-basket-checkout"
+                  type="button"
+                  disabled
+                  aria-busy="false">
+            Checkout <span aria-hidden="true">→</span>
+          </button>
+          <button id="commerce-continue-shopping"
+                  class="commerce-basket-continue"
+                  type="button">
+            Continue shopping
+          </button>
+          <p class="commerce-basket-note">Staging checkout. Payment is completed on SenangPay.</p>
+        </footer>
+        <p id="basket-checkout-status" class="sr-only" aria-live="polite"></p>
+
+        <div id="basket-prepare" class="basket-prepare" hidden>
+          <div class="basket-coin-stage" aria-hidden="true">
+            <div class="basket-coin">
+              <div class="basket-coin-halo"></div>
+              <div class="basket-coin-inner">
+                <div class="basket-coin-face basket-coin-front">
+                  <img src="images/logo.webp" alt="" width="84" height="84">
+                </div>
+                <div class="basket-coin-face basket-coin-back">
+                  <img src="images/logo.webp" alt="" width="84" height="84">
+                </div>
+              </div>
+            </div>
+            <div class="basket-coin-shadow"></div>
+          </div>
+          <p class="basket-prepare-copy">Preparing your checkout…</p>
         </div>
 
         <footer id="commerce-action-footer"
@@ -7059,7 +7151,7 @@
         const state = calculateStagingCartState();
         const label = document.getElementById('commerce-basket-total-label');
         label.textContent = cart.ok && !cartHasUnverified(cart.items)
-          ? 'Staging subtotal'
+          ? 'Subtotal'
           : 'Cart total';
         document.getElementById('commerce-basket-total').textContent =
           state.totalText;
@@ -7091,6 +7183,7 @@
         commerceHeading.textContent = commerceTitles[view];
 
         commerceFooter.hidden = view !== 'variant';
+        document.getElementById('commerce-basket-footer').hidden = view !== 'basket';
 
         if (view === 'variant') renderVariantSelection();
         if (view === 'basket') renderPreviewBasket();
@@ -9096,28 +9189,40 @@
 
       let basketCheckoutToken = 0;
       let basketCheckoutTimer = null;
+      let basketCheckoutStarted = 0;
 
       function setBasketCheckoutPreparing(preparing) {
         const button = document.getElementById('commerce-checkout-basket');
+        const overlay = document.getElementById('basket-prepare');
         const status = document.getElementById('basket-checkout-status');
-        if (!button) return;
         clearTimeout(basketCheckoutTimer);
-        const idle = button.querySelector('.basket-checkout-idle');
-        const busy = button.querySelector('.basket-checkout-busy');
-        const ring = button.querySelector('.arabista-spinner');
-        button.classList.toggle('is-preparing', preparing);
-        button.setAttribute('aria-busy', preparing ? 'true' : 'false');
-        if (idle) idle.hidden = preparing;
-        if (busy) busy.hidden = !preparing;
-        if (ring) ring.classList.remove('is-visible');
-        if (status) status.textContent = preparing ? 'Preparing checkout' : '';
-        if (!preparing) return;
-        button.disabled = true;
-        basketCheckoutTimer = window.setTimeout(() => {
-          if (button.classList.contains('is-preparing') && ring) {
-            ring.classList.add('is-visible');
-          }
-        }, 120);
+        basketCheckoutTimer = null;
+        if (button) {
+          button.classList.toggle('is-preparing', preparing);
+          button.setAttribute('aria-busy', preparing ? 'true' : 'false');
+          if (preparing) button.disabled = true;
+        }
+        if (overlay) overlay.hidden = !preparing;
+        const basketView = document.getElementById('commerce-basket');
+        const basketFooter = document.getElementById('commerce-basket-footer');
+        if (basketView) basketView.inert = preparing;
+        if (basketFooter) basketFooter.inert = preparing;
+        if (status) status.textContent = preparing ? 'Preparing your checkout' : '';
+      }
+
+      function finishBasketCheckout(token, next) {
+        const wait = Math.max(0, 350 - (Date.now() - basketCheckoutStarted));
+        const run = () => {
+          basketCheckoutTimer = null;
+          if (token !== basketCheckoutToken) return;
+          stagingCartBusy = false;
+          setBasketCheckoutPreparing(false);
+          if (!commerceActive || commerceClosing || commerceCurrentView !== 'basket') return;
+          next();
+          if (commerceCurrentView === 'basket') renderPreviewBasket();
+        };
+        if (wait === 0) run();
+        else basketCheckoutTimer = window.setTimeout(run, wait);
       }
 
       document.getElementById('commerce-checkout-basket')
@@ -9126,24 +9231,27 @@
           if (stagingCartBusy || checkoutActive || trigger.classList.contains('is-preparing')) return;
           const token = ++basketCheckoutToken;
           stagingCartBusy = true;
+          basketCheckoutStarted = Date.now();
           setBasketCheckoutPreparing(true);
           refreshD06CatalogIfStale().then(() => {
             if (token !== basketCheckoutToken) return;
             if (!commerceActive || commerceClosing || commerceCurrentView !== 'basket') return;
             const gate = cartCheckoutGate(readStagingCart());
-            if (!gate.ok) {
-              stagingCartNotice = gate.reason;
-              return;
-            }
-            checkoutOpen('basket', trigger);
+            finishBasketCheckout(token, () => {
+              if (!gate.ok) {
+                stagingCartNotice = gate.reason;
+                renderPreviewBasket();
+                return;
+              }
+              checkoutOpen('basket', trigger);
+            });
           }).catch(() => {
             if (token !== basketCheckoutToken) return;
-            stagingCartNotice = 'Refresh required before checkout.';
-          }).finally(() => {
-            if (token !== basketCheckoutToken) return;
-            stagingCartBusy = false;
-            setBasketCheckoutPreparing(false);
-            if (commerceCurrentView === 'basket') renderPreviewBasket();
+            if (!commerceActive || commerceClosing || commerceCurrentView !== 'basket') return;
+            finishBasketCheckout(token, () => {
+              stagingCartNotice = 'Refresh required before checkout.';
+              renderPreviewBasket();
+            });
           });
         });
 
