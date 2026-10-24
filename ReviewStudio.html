@@ -1,0 +1,1268 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex,nofollow">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root{--bg:#f8f6f2;--paper:#fffefa;--ink:#27231e;--muted:#867d70;--gold:#b39257;--line:#e9e4da;--sand:#f3ede2;--red:#ac5448;--green:#57705b}
+    *{box-sizing:border-box}
+    html,body{margin:0;min-height:100%;background:var(--bg);color:var(--ink);font:13px/1.52 Inter,system-ui,sans-serif}
+    button,input,select,textarea{font:inherit}
+    button{cursor:pointer}
+    button:disabled{cursor:not-allowed;opacity:.47}
+    button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
+    a{color:inherit}
+    .app{display:grid;grid-template-columns:300px minmax(0,1fr);min-height:100vh}
+    .sidebar{padding:29px 17px 23px 22px;background:#f0ece5;border-right:1px solid #e4ded3;position:sticky;top:0;height:100vh;overflow-y:auto}
+    .brand{font:600 33px/1 'Cormorant Garamond',Georgia,serif;letter-spacing:.03em}
+    .eyebrow{font-size:10px;letter-spacing:.17em;font-weight:700;color:var(--gold);text-transform:uppercase}
+    .side-sub{margin:7px 0 27px;color:var(--muted);font-size:11px}
+    .side-label{display:block;font-size:10px;text-transform:uppercase;letter-spacing:.1em;font-weight:700;color:#8b806f;margin:0 0 7px}
+    .field,select,input[type=text],input[type=date],input[type=number],input[type=url],textarea{width:100%;border:1px solid #e0d9cc;background:#fff;padding:11px 12px;border-radius:10px;color:var(--ink);min-width:0}
+    textarea{resize:vertical;min-height:100px}
+    input::placeholder,textarea::placeholder{color:#aea69a}
+    .toolrow{display:flex;align-items:center;gap:8px}
+    .toolrow .field,.toolrow input{flex:1;min-width:0}
+    .btn{border:1px solid transparent;border-radius:11px;padding:11px 14px;min-height:41px;font-weight:600;background:transparent;display:inline-flex;align-items:center;justify-content:center;gap:6px;white-space:nowrap}
+    .btn.primary{background:var(--gold);color:white}
+    .btn.secondary{background:#fff;border-color:#ddd3c1;color:#6a5535}
+    .btn.ghost{background:transparent;color:#7b6f5e;border-color:var(--line)}
+    .btn.danger{background:#fff;color:var(--red);border-color:#ead7d3}
+    .btn.small{padding:7px 9px;min-height:32px;font-size:11px;border-radius:8px}
+    .btn.full{width:100%}
+    .search{margin:14px 0 9px}
+    .side-heading{display:flex;align-items:center;justify-content:space-between;margin:23px 0 8px;font-weight:700}
+    .review-list{display:grid;gap:8px}
+    .review-entry{display:grid;grid-template-columns:minmax(0,1fr) 60px;gap:7px;padding:12px 10px;background:rgba(255,255,255,.5);border:1px solid transparent;border-radius:12px}
+    .review-entry.selected{border-color:var(--gold);background:#fff}
+    .entry-open{text-align:left;border:0;background:transparent;min-width:0;padding:0;color:inherit}
+    .entry-name{font-weight:700;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .entry-meta{font-size:10px;color:var(--muted)}
+    .entry-excerpt{font-size:11px;color:#706858;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin:4px 0 0}
+    .reorder{display:flex;align-items:center;gap:4px;justify-content:end}
+    .reorder button{border:1px solid #e7decd;background:white;border-radius:6px;color:#76674f;width:26px;height:29px;font-weight:700}
+    .no-records{color:var(--muted);padding:18px 9px;font-size:12px}
+    .side-footer{margin-top:24px;border-top:1px solid #dcd5c9;padding-top:12px;color:var(--muted);font-size:10px;line-height:1.8}
+    .work{padding:29px clamp(18px,3.5vw,55px) 65px;max-width:1550px;width:100%;margin:0 auto}
+    .top{display:flex;align-items:flex-start;justify-content:space-between;gap:20px;margin:0 0 23px}
+    h1,h2,h3,p{margin-top:0}
+    h1{font:600 clamp(32px,3.6vw,48px)/1 'Cormorant Garamond',Georgia,serif;margin:7px 0}
+    h2{font:600 26px/1.1 'Cormorant Garamond',Georgia,serif;margin:0 0 5px}
+    h3{font-size:13px;margin:0 0 5px}
+    .muted{color:var(--muted)}.micro{font-size:11px}
+    .top-actions{display:flex;gap:9px;align-items:center;flex-wrap:wrap;justify-content:flex-end}
+    .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:11px;margin-bottom:20px}
+    .stat{background:var(--paper);border:1px solid var(--line);border-radius:13px;padding:14px 16px}
+    .stat strong{display:block;font:600 28px/1 'Cormorant Garamond',Georgia,serif}
+    .stat span{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+    .layout{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(265px,.8fr);align-items:start;gap:20px}
+    .editor{min-width:0}
+    .section{background:var(--paper);border:1px solid var(--line);padding:22px;border-radius:17px;margin-bottom:15px;box-shadow:0 7px 24px rgba(65,46,22,.025)}
+    .section-head{display:flex;align-items:center;gap:13px;margin-bottom:18px}
+    .section-num{display:grid;place-items:center;border-radius:50%;height:29px;width:29px;flex:0 0 29px;color:#765c32;border:1px solid #dfd0b0;background:#fbf7ef;font-size:11px;font-weight:700}
+    .section-head p{color:var(--muted);font-size:11px;margin:0}
+    .form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    label{display:block;font-size:11px;font-weight:700;color:#625a4e;margin-bottom:6px}
+    .group{margin-bottom:13px}
+    .group:last-child{margin-bottom:0}
+    .chips{display:flex;gap:7px;flex-wrap:wrap}
+    .chip{border:1px solid #ded5c5;background:white;padding:8px 12px;border-radius:999px;font-size:11px;color:#6f6556}
+    .chip.selected{background:var(--sand);border-color:#c0a16b;color:#644d2a;font-weight:700}
+    .note{font-size:11px;color:#8c816f;margin-top:5px}
+    .placeholder{background:#f7f4ef;border:1px dashed #e2d9c9;border-radius:11px;padding:15px;font-size:11px;color:#8b8072}
+    .media-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}
+    .media-item{position:relative;aspect-ratio:3/4;min-width:0;background:#ece6dc;border-radius:10px;overflow:hidden}
+    .media-item img{display:block;width:100%;height:100%;object-fit:cover}
+    .media-item .remove{position:absolute;top:6px;right:6px;width:25px;height:25px;color:white;background:#241e1bbb;border:none;border-radius:50%;font-size:17px}
+    .media-item .zoom{position:absolute;inset:0;border:0;background:transparent;outline-offset:-3px}
+    .media-item .remove{z-index:1}
+    .media-empty{grid-column:1/-1;padding:22px;background:#faf8f4;border:1px dashed #e5dcd0;border-radius:11px;text-align:center;font-size:11px;color:var(--muted)}
+    .fileinput{display:none}
+    .preview-panel{position:sticky;top:21px;min-width:0}
+    .preview-card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:18px;box-shadow:0 12px 40px #3d28130b}
+    .preview-top{display:flex;align-items:center;gap:9px}
+    .avatar{width:35px;height:35px;display:grid;place-items:center;border-radius:50%;background:#eee1c9;color:#806133;font-weight:700}
+    .preview-name{font-weight:700;font-size:12px}
+    .preview-date{font-size:10px;color:#918778}
+    .stars{color:#c6a054;letter-spacing:2px;font-size:14px}
+    .preview-body{white-space:pre-wrap;line-height:1.8;color:#4c453b;font-size:12px;min-height:45px}
+    .preview-photos{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;margin-top:12px}
+    .preview-photos img{width:100%;aspect-ratio:3/4;object-fit:cover;border-radius:9px}
+    .divider{border-top:1px solid #ede7dd;margin:17px 0}
+    .sticky-actions{display:flex;align-items:center;flex-wrap:wrap;gap:9px}
+    #notice{position:fixed;bottom:18px;right:18px;max-width:min(420px,calc(100vw - 32px));padding:12px 17px;border-radius:11px;background:#34281d;color:white;box-shadow:0 7px 28px #0003;z-index:10;font-size:12px}
+    #notice.error{background:#7c3d34}
+    [hidden]{display:none!important}
+    .busy:after{content:' · working';font-size:10px;letter-spacing:0;color:var(--gold)}
+    .caps{font-size:10px;letter-spacing:.1em;color:var(--gold);font-weight:700;text-transform:uppercase}
+    dialog{border:0;border-radius:14px;background:#191714;padding:12px;max-width:min(90vw,780px);max-height:90vh;color:#fff}
+    dialog::backdrop{background:#000b}
+    dialog img{max-width:100%;max-height:75vh;display:block;margin:auto;object-fit:contain}
+    .preview-foot{font-size:10px;color:#958a79;margin-top:12px}
+    @media(max-width:1150px){.layout{grid-template-columns:1fr}.preview-panel{position:static}.app{grid-template-columns:260px minmax(0,1fr)}}
+    @media(max-width:700px){.app{display:block}.sidebar{position:static;height:auto;padding:19px}.side-sub{margin-bottom:14px}.review-list{display:flex;overflow-x:auto;padding-bottom:6px}.review-entry{min-width:190px}.work{padding:22px 15px 55px}.top{flex-direction:column}.top-actions{justify-content:flex-start}.section{padding:17px}.form-row{grid-template-columns:1fr}.stats{gap:7px}.stat{padding:12px}.stat strong{font-size:24px}}
+    @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+
+    .ai-settings{border:1px solid #e1d7c5;border-radius:12px;background:#fcf8f0;margin:0 0 16px}
+    .ai-settings summary{cursor:pointer;list-style:none;padding:13px 15px;font-weight:700;color:#69502c;display:flex;justify-content:space-between;gap:8px}
+    .ai-settings summary::-webkit-details-marker{display:none}
+    .ai-settings summary:after{content:'▾';color:var(--gold)}
+    .ai-settings[open] summary:after{content:'▴'}
+    .ai-inner{border-top:1px solid #e9ddc8;padding:15px}
+    .ai-inner input[type=range]{width:100%;accent-color:var(--gold)}
+    .ai-slider-head{display:flex;align-items:baseline;justify-content:space-between;gap:9px}
+    .ai-setting-note{color:var(--muted);font-size:10px;line-height:1.45}
+    #referenceLibraryDialog{width:min(94vw,920px);max-width:920px;background:#241f19;padding:19px;color:#fff}
+    .ref-library-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(145px,1fr));gap:11px;max-height:60vh;overflow-y:auto}
+    .ref-library-item{display:block;text-align:left;padding:7px;background:#383027;border:1px solid #695b46;border-radius:10px;color:#fff;min-width:0;white-space:normal}
+    .ref-library-item:focus-visible{outline:2px solid #e0c38a;outline-offset:2px}
+    .ref-library-image{display:grid;place-items:center;aspect-ratio:3/4;background:#504639;border-radius:6px;overflow:hidden;color:#bdb09c;font-size:10px}
+    .ref-library-image img{height:100%;width:100%;object-fit:cover}
+    .ref-library-name{font-size:11px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-top:7px}
+    .ref-library-source{font-size:10px;color:#c4b9a7;margin-top:2px}
+  </style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="eyebrow">Private management · staging</div>
+    <div class="brand">Arabista</div>
+    <p class="side-sub">Customer Review Studio</p>
+    <label class="side-label" for="product">Product</label>
+    <select id="product"><option value="D06">Loading products…</option></select>
+    <div class="side-heading"><span>Review Library</span><span id="listCount" class="caps">0</span></div>
+    <button class="btn primary full" id="new">＋ New review</button>
+    <input class="search" id="search" type="text" placeholder="Search name or review text" aria-label="Search reviews">
+    <div id="reviewList" class="review-list"><p class="no-records">Loading…</p></div>
+    <div class="side-footer">
+      <div>Google Sheets · Google Drive · Apps Script</div>
+      <div>Staging content management only</div>
+    </div>
+  </aside>
+
+  <main class="work">
+    <header class="top">
+      <div>
+        <div class="eyebrow">Content management / Review Studio</div>
+        <h1>Customer Reviews</h1>
+        <p class="muted micro" id="productInfo">Loading D06 profile…</p>
+      </div>
+      <div class="top-actions">
+        <button id="health" class="btn ghost small" type="button">Check connection</button>
+        <button id="aiHealth" class="btn ghost small" type="button">Test AI connection</button>
+        <button id="refresh" class="btn ghost small" type="button">↻ Refresh</button>
+      </div>
+    </header>
+
+    <div class="stats">
+      <div class="stat"><strong id="statTotal">0</strong><span>Reviews</span></div>
+      <div class="stat"><strong id="statReady">0</strong><span>Ready in staging</span></div>
+      <div class="stat"><strong id="statMedia">0</strong><span>Attached photos</span></div>
+    </div>
+
+    <div class="layout">
+      <div class="editor">
+        <form id="form">
+          <div class="section">
+            <div class="section-head"><span class="section-num">01</span><div><h2>Reviewer information</h2><p>Name, date and rating</p></div></div>
+            <div class="form-row">
+              <div class="group">
+                <label for="name">Name</label>
+                <div class="toolrow">
+                  <input id="name" type="text" maxlength="80" required placeholder="Enter a name">
+                  <button type="button" class="btn secondary small" id="randomName">⤨ Randomize</button>
+                </div>
+                <div class="note">Masked preview: <strong id="nameMask">—</strong></div>
+              </div>
+              <div class="group">
+                <label for="date">Review date</label>
+                <div class="toolrow">
+                  <input id="date" type="date" required>
+                  <button type="button" class="btn secondary small" id="randomDate">⤨ Randomize</button>
+                </div>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="group">
+                <label for="stars">Star rating</label>
+                <select id="stars">
+                  <option value="5">★★★★★ · 5 stars</option>
+                  <option value="4">★★★★☆ · 4 stars</option>
+                  <option value="3">★★★☆☆ · 3 stars</option>
+                  <option value="2">★★☆☆☆ · 2 stars</option>
+                  <option value="1">★☆☆☆☆ · 1 star</option>
+                </select>
+              </div>
+              <div class="group">
+                <label for="status">Staging workflow</label>
+                <select id="status">
+                  <option value="Draft">Draft</option>
+                  <option value="Ready">Ready</option>
+                  <option value="Archived">Archived</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="section">
+            <div class="section-head"><span class="section-num">02</span><div><h2>Review text</h2><p>Generate and refine internal staging sample copy</p></div></div>
+            <div class="group">
+              <label>Length preference</label>
+              <div id="lengthChips" class="chips">
+                <button type="button" class="chip" data-length="short">Short</button>
+                <button type="button" class="chip selected" data-length="medium">Medium</button>
+                <button type="button" class="chip" data-length="long">Long</button>
+              </div>
+            </div>
+            <details id="aiSettingsPanel" class="ai-settings">
+              <summary><span>⚙ AI Writing Defaults</span><span class="muted" style="font-size:10px;font-weight:400">Saved across sessions</span></summary>
+              <div class="ai-inner">
+                <div class="group">
+                  <label for="aiTonePreset">Default writing tone</label>
+                  <select id="aiTonePreset">
+                    <option value="everyday">Everyday Malay (recommended)</option>
+                    <option value="whatsapp">WhatsApp casual</option>
+                    <option value="minimal">Minimal / straightforward</option>
+                    <option value="balanced">Balanced / lightly informal</option>
+                  </select>
+                </div>
+                <div class="group">
+                  <div class="ai-slider-head"><label for="aiCasualness">Casualness</label><output id="aiCasualnessValue">75</output></div>
+                  <input type="range" id="aiCasualness" min="0" max="100" step="5" value="75">
+                </div>
+                <div class="group">
+                  <div class="ai-slider-head"><label for="aiShorthand">Malay short forms</label><output id="aiShorthandValue">40</output></div>
+                  <input type="range" id="aiShorthand" min="0" max="100" step="5" value="40">
+                </div>
+                <div class="group">
+                  <div class="ai-slider-head"><label for="aiVariation">Variation / creativity</label><output id="aiVariationValue">65</output></div>
+                  <input type="range" id="aiVariation" min="0" max="100" step="5" value="65">
+                  <div class="ai-setting-note">This controls how prompts vary. It is not the API temperature parameter.</div>
+                </div>
+                <div class="group">
+                  <label for="aiDefaultGuidance">Default style guidance (optional)</label>
+                  <textarea id="aiDefaultGuidance" maxlength="600" style="min-height:75px" placeholder="Extra instructions applied to every future generation"></textarea>
+                </div>
+                <div class="toolrow" style="flex-wrap:wrap">
+                  <button type="button" class="btn primary small" id="aiSaveDefaults">Save AI defaults</button>
+                  <button type="button" class="btn ghost small" id="aiResetDefaults">Restore defaults</button>
+                  <span id="aiDefaultsStatus" class="ai-setting-note" role="status">Loading settings…</span>
+                </div>
+              </div>
+            </details>
+            <div class="group">
+              <label for="styleNote">Writing style instructions · optional</label>
+              <textarea id="styleNote" style="min-height:68px" placeholder="Focus on fabric, cutting or appearance. Malay is the default."></textarea>
+            </div>
+            <div class="group">
+              <label for="text">Review text</label>
+              <textarea id="text" required maxlength="5000" style="min-height:145px" placeholder="Write your own staging sample or click Generate Text below."></textarea>
+            </div>
+            <div class="toolrow">
+              <button type="button" class="btn secondary small" id="generateText">✦ Generate text</button>
+              <button type="button" class="btn ghost small" id="regenerateText">↻ Regenerate</button>
+            </div>
+          </div>
+
+          <div class="section">
+            <div class="section-head"><span class="section-num">03</span><div><h2>Photo generation & media</h2><p>Four verified photo-style presets · one reference image</p></div></div>
+            <div class="form-row">
+              <div class="group">
+                <label for="photoStyle">Photo style · four tested prompts</label>
+                <select id="photoStyle">
+                  <option value="fullbody">1 · Casual full-body photo</option>
+                  <option value="mirror">2 · Faceless / cropped mirror selfie</option>
+                  <option value="pov">3 · First-person close-up selfie</option>
+                  <option value="conteng">4 · Daily life with conteng face</option>
+                </select>
+              </div>
+              <div class="group">
+                <label for="photoCount">Generate how many?</label>
+                <select id="photoCount">
+                  <option>1</option><option>2</option><option>3</option><option>5</option>
+                </select>
+              </div>
+            </div>
+            <div class="group">
+              <label for="imageQuality">AI image quality · saved across sessions</label>
+              <select id="imageQuality" disabled>
+                <option value="low">Low · lowest generation cost</option>
+                <option value="medium">Medium · recommended first test</option>
+                <option value="high" selected>High · original verified setting</option>
+              </select>
+              <div class="note" id="imageQualityStatus" role="status" aria-live="polite">Loading saved image quality…</div>
+            </div>
+            <div class="group">
+              <label for="imageReference">Product reference (required)</label>
+              <select id="imageReference"><option value="">Upload or import a reference photo first</option></select>
+              <div class="note">Uses exactly one reference image; prompts preserve abaya colour, sleeves and trim.</div>
+            </div>
+            <div class="group">
+              <label for="scene">Scene description · optional</label>
+              <textarea id="scene" style="min-height:70px" placeholder="Optional extra scene detail. Leave blank to reproduce the original tested prompt."></textarea>
+            </div>
+            <div class="group">
+              <label for="url">Import reference from direct image URL</label>
+              <div class="toolrow">
+                <input id="url" type="url" placeholder="https://example.com/photo.jpg">
+                <button id="importUrl" type="button" class="btn secondary small">Import</button>
+              </div>
+              <div class="note">Paste a direct HTTPS image URL to import automatically. Webpage and Pinterest page links need a direct image URL.</div>
+            </div>
+            <div class="group">
+              <div class="toolrow" style="flex-wrap:wrap">
+                <button type="button" id="chooseReference" class="btn secondary small">＋ Upload reference image</button>
+                <button type="button" id="chooseLibrary" class="btn secondary small">Browse Reference Library</button>
+                <button type="button" id="choosePhoto" class="btn secondary small">＋ Attach review photo</button>
+                <button type="button" class="btn primary small" id="generatePhoto">✦ Generate product photo</button>
+              </div>
+              <input type="file" id="referenceUpload" accept="image/jpeg,image/png,image/webp,image/gif,image/avif" multiple class="fileinput">
+              <input type="file" id="photoUpload" accept="image/jpeg,image/png,image/webp,image/gif,image/avif" multiple class="fileinput">
+            </div>
+            <div id="photoProgress" class="note" role="status" aria-live="polite">AI images are for staging; they are logged as generated assets.</div>
+            <div class="group">
+              <label>Reference images <span class="muted" id="referenceCount">(0)</span></label>
+              <div id="referenceGrid" class="media-grid"></div>
+            </div>
+            <div class="group">
+              <label>Attached review photos <span class="muted" id="photoAttachedCount">(0)</span></label>
+              <div id="photoGrid" class="media-grid"></div>
+            </div>
+            <div class="note">Image files are saved to Drive during upload/import. Their association with a review is saved when you press Save Review. Removing an attachment does not permanently delete the Drive file.</div>
+          </div>
+
+          <div class="section">
+            <div class="section-head"><span class="section-num">04</span><div><h2>Video generation</h2><p>Architecture reserved for a future phase</p></div></div>
+            <div class="placeholder">Video generation is intentionally deferred. The media architecture can be expanded later without rebuilding the editor.</div>
+          </div>
+
+          <div class="section">
+            <div class="form-row">
+              <div class="group">
+                <label for="order">Display order</label>
+                <input id="order" type="number" min="1" max="1000000" placeholder="Auto if empty">
+              </div>
+              <div class="group">
+                <label>Review ID</label>
+                <div id="reviewId" class="placeholder" style="padding:11px 12px;min-height:41px;overflow-wrap:anywhere">New review</div>
+              </div>
+            </div>
+            <div class="sticky-actions">
+              <button type="submit" class="btn primary" id="save">Save Review</button>
+              <button type="button" class="btn ghost" id="reset">New review</button>
+              <button type="button" class="btn danger" id="delete" hidden>Delete review</button>
+              <span class="note" id="saveState">Changes not saved</span>
+            </div>
+          </div>
+        </form>
+      </div>
+
+      <aside class="preview-panel">
+        <div class="preview-card">
+          <span class="caps">Product sheet preview · D06</span>
+          <div class="divider"></div>
+          <div class="preview-top">
+            <div class="avatar" id="avatar">N</div>
+            <div>
+              <div id="previewName" class="preview-name">—</div>
+              <div id="previewDate" class="preview-date">—</div>
+            </div>
+          </div>
+          <div id="previewStars" class="stars" style="margin:12px 0 9px">★★★★★</div>
+          <div id="previewText" class="preview-body muted">The review preview updates as you edit.</div>
+          <div class="preview-photos" id="previewPhotos"></div>
+          <div class="preview-foot">The public-facing FYP integration is a separate phase. This preview is local to Review Studio.</div>
+        </div>
+        <p class="micro muted" style="margin:12px 4px">Text and AI product-photo mockup generation are active in this staging studio. Video generation remains inactive.</p>
+      </aside>
+    </div>
+  </main>
+</div>
+
+<div id="notice" role="status" aria-live="polite" hidden></div>
+<dialog id="referenceLibraryDialog" aria-label="Reference Image Library">
+  <div class="toolrow" style="justify-content:space-between;gap:18px;margin-bottom:14px">
+    <div><h2 style="margin:0;color:#fff">Reference Image Library</h2>
+      <div class="micro" style="color:#c7bda8">Previously uploaded Drive images · no re-upload required</div>
+    </div>
+    <button type="button" class="btn ghost small" style="color:#fff" id="closeReferenceLibrary">Close ✕</button>
+  </div>
+  <div class="toolrow" style="margin-bottom:10px">
+    <input id="referenceLibrarySearch" type="text" placeholder="Search file name or source" aria-label="Search reference images">
+    <button id="refreshReferenceLibrary" type="button" class="btn secondary small">↻ Refresh</button>
+  </div>
+  <div id="referenceLibraryStatus" class="micro" role="status" aria-live="polite" style="color:#c7bda8;margin-bottom:10px">Select a previously uploaded reference.</div>
+  <div id="referenceLibraryGrid" class="ref-library-grid"></div>
+</dialog>
+<dialog id="lightbox" aria-label="Media preview">
+  <div style="text-align:right;margin:0 0 8px"><button type="button" class="btn ghost small" style="color:white" id="closeLightbox">Close ✕</button></div>
+  <img id="lightboxImage" alt="Media image enlarged">
+</dialog>
+
+<script>
+(() => {
+  'use strict';
+
+  const $ = id => document.getElementById(id);
+  const state = {
+    products:[], reviews:[], sku:'D06', id:null, media:[],
+    dirty:false, busy:false, length:'medium', uploading:0, aiDefaultsLoaded:false, aiDefaultsDirty:false, imageQualityLoaded:false, imageQualitySaving:false, savedImageQuality:'high', generatedPhotoIds:new Set(), referenceLibrary:[], referenceLibraryLoading:false, referenceLibraryLimited:false
+  };
+
+  const nameStarts = [
+    'Nur','Siti','Farah','Aina','Nurul','Alya','Nadia','Amirah',
+    'Izzati','Aisyah','Hannah','Balqis','Nabila','Maisarah','Atiqah',
+    'Hajar','Nadhirah','Syafiqah','Sofea','Adriana'
+  ];
+  const nameEnds = [
+    'Aisyah','Hajar','Nadia','Iman','Sofea','Balqis','Amirah',
+    'Khadijah','Izzati','Maisarah','Zahra','Alya','Husna','Farhana',
+    'Batrisyia','Aqilah','Aminah','Nasuha','Najwa','Sabrina'
+  ];
+
+  function call(name, ...args) {
+    return new Promise((resolve, reject) => {
+      if (!window.google || !google.script || !google.script.run) {
+        reject(new Error('Open the deployed Google Apps Script URL to use this studio.'));
+        return;
+      }
+      google.script.run.withSuccessHandler(resolve)
+        .withFailureHandler(err => reject(new Error(err && err.message ? err.message : String(err))))[name](...args);
+    });
+  }
+
+  let noticeTimer;
+  function notice(message, error = false) {
+    const el = $('notice');
+    el.textContent = message;
+    el.classList.toggle('error', error);
+    el.hidden = false;
+    clearTimeout(noticeTimer);
+    noticeTimer = setTimeout(() => {el.hidden = true;}, 4500);
+  }
+
+  function setBusy(flag) {
+    state.busy = flag;
+    ['save','delete','new','refresh','product','importUrl','chooseReference','choosePhoto','generateText','regenerateText','generatePhoto','photoStyle','photoCount','imageReference','imageQuality','chooseLibrary','aiHealth','aiSaveDefaults','aiResetDefaults']
+      .forEach(id => {const node = $(id); if (node) node.disabled = flag ||
+        (id === 'imageQuality' && (!state.imageQualityLoaded || state.imageQualitySaving));});
+    $('save').textContent = flag ? 'Saving / Working…' : 'Save Review';
+  }
+
+  function maskName(name) {
+    return String(name || '').trim().split(/\s+/).filter(Boolean)
+      .map(part => part.length < 3 ? part :
+        part[0] + '*'.repeat(Math.min(3,part.length - 2)) + part.slice(-1))
+      .join(' ') || '—';
+  }
+
+  function randomName() {
+    let candidate = '';
+    let rounds = 0;
+    do {
+      candidate = nameStarts[Math.floor(Math.random() * nameStarts.length)] +
+        ' ' + nameEnds[Math.floor(Math.random() * nameEnds.length)];
+      rounds++;
+    } while (candidate === $('name').value && rounds < 15);
+    $('name').value = candidate;
+    change();
+  }
+
+  function todayLocal() {
+    const dt = new Date();
+    const yyyy = dt.getFullYear();
+    const mm = String(dt.getMonth() + 1).padStart(2,'0');
+    const dd = String(dt.getDate()).padStart(2,'0');
+    return `${yyyy}-${mm}-${dd}`;
+  }
+
+  function randomDate() {
+    const d = new Date();
+    d.setDate(d.getDate() - Math.floor(Math.random() * 350));
+    $('date').value = d.getFullYear() + '-' +
+      String(d.getMonth() + 1).padStart(2,'0') + '-' +
+      String(d.getDate()).padStart(2,'0');
+    change();
+  }
+
+  function change() {
+    state.dirty = true;
+    $('saveState').textContent = 'Unsaved changes';
+    renderPreview();
+  }
+
+  function isSafeToLeave() {
+    return !state.dirty || window.confirm('Discard unsaved changes?');
+  }
+
+  function updateProductInfo() {
+    const product = state.products.find(item => item.sku === state.sku);
+    $('productInfo').textContent = product
+      ? `${product.sku} · ${product.title} · ${product.fabric}`
+      : `${state.sku} · Product profile unavailable`;
+  }
+
+  function setProductOptions() {
+    const select = $('product');
+    select.replaceChildren();
+    state.products.forEach(item => {
+      const opt = document.createElement('option');
+      opt.value = item.sku;
+      opt.textContent = `${item.sku} · ${item.title}`;
+      select.appendChild(opt);
+    });
+    if (state.products.some(item => item.sku === state.sku)) select.value = state.sku;
+    else if (state.products[0]) {
+      state.sku = state.products[0].sku;
+      select.value = state.sku;
+    }
+    updateProductInfo();
+  }
+
+  function renderStats() {
+    $('statTotal').textContent = state.reviews.length;
+    $('statReady').textContent = state.reviews.filter(r=>r.status==='Ready').length;
+    $('statMedia').textContent = state.reviews.reduce((total,review) =>
+      total + review.media.filter(m=>m.type==='photo').length,0);
+    $('listCount').textContent = String(state.reviews.length);
+  }
+
+  function make(text,tag='span',className='') {
+    const el = document.createElement(tag);
+    el.textContent = text;
+    if (className) el.className=className;
+    return el;
+  }
+
+  function renderReviewList() {
+    const container = $('reviewList');
+    container.replaceChildren();
+    const q = $('search').value.trim().toLowerCase();
+    const reviews = state.reviews.filter(r =>
+      !q || `${r.name} ${r.text} ${r.status}`.toLowerCase().includes(q));
+    if (!reviews.length) {
+      container.appendChild(make(q?'No matching reviews.':'No reviews yet. Click New review.','p','no-records'));
+      return;
+    }
+    reviews.forEach(review => {
+      const card = document.createElement('div');
+      card.className = 'review-entry' + (review.id === state.id ? ' selected':'');
+      const open = document.createElement('button');
+      open.type = 'button';
+      open.className = 'entry-open';
+      open.appendChild(make(`${review.name} · ${review.stars}★`,'span','entry-name'));
+      open.appendChild(make(`${review.date} · ${review.status}`,'span','entry-meta'));
+      open.appendChild(make(review.text,'p','entry-excerpt'));
+      open.addEventListener('click', () => {
+        if (isSafeToLeave()) loadReview(review);
+      });
+      const reorder = document.createElement('div');
+      reorder.className = 'reorder';
+      [['↑','up'],['↓','down']].forEach(([label,direction])=>{
+        const btn = make(label,'button');
+        btn.type = 'button';
+        btn.setAttribute('aria-label',`Move review ${direction}`);
+        btn.disabled = state.busy;
+        btn.addEventListener('click',()=>moveReview(review.id,direction));
+        reorder.appendChild(btn);
+      });
+      card.append(open,reorder);
+      container.appendChild(card);
+    });
+  }
+
+  function setLength(value) {
+    state.length=value;
+    document.querySelectorAll('#lengthChips .chip').forEach(btn =>
+      btn.classList.toggle('selected',btn.dataset.length===value));
+  }
+
+  function freshReview() {
+    state.id = null;
+    state.media = [];
+    $('name').value = '';
+    $('date').value = todayLocal();
+    $('stars').value = '5';
+    $('status').value = 'Draft';
+    $('text').value = '';
+    $('styleNote').value = '';
+    $('scene').value = '';
+    $('photoStyle').value = 'fullbody';
+    $('url').value = '';
+    $('order').value = '';
+    $('reviewId').textContent = 'New review';
+    $('delete').hidden = true;
+    setLength('medium');
+    state.dirty = false;
+    $('saveState').textContent = 'New review · not yet saved';
+    renderMedia();
+    renderPreview();
+    renderReviewList();
+    $('name').focus();
+  }
+
+  function loadReview(review) {
+    state.id = review.id;
+    state.media = review.media.map(item => ({...item}));
+    $('name').value = review.name;
+    $('date').value = review.date || todayLocal();
+    $('stars').value = String(review.stars);
+    $('status').value = review.status;
+    $('text').value = review.text;
+    $('styleNote').value = '';
+    $('scene').value = '';
+    $('photoStyle').value = 'fullbody';
+    $('order').value = String(review.order);
+    $('url').value = '';
+    $('reviewId').textContent = review.id;
+    $('delete').hidden = false;
+    state.dirty = false;
+    $('saveState').textContent = 'Saved';
+    renderMedia();
+    renderPreview();
+    renderReviewList();
+  }
+
+  function tileSrc(media) {
+    return media.previewData || media.url ||
+      'https:' + '/' + '/drive.google.com/thumbnail?id=' +
+      encodeURIComponent(media.fileId) + '&sz=w400';
+  }
+
+  function imageNode(media, alt) {
+    const image = document.createElement('img');
+    image.alt = alt;
+    image.loading = 'lazy';
+    image.src = tileSrc(media);
+    image.onerror = async () => {
+      if (image.dataset.fallback) return;
+      image.dataset.fallback = '1';
+      try {
+        const result = await call('studioGetImagePreview',media.fileId);
+        media.previewData = result.dataUrl;
+        image.src = result.dataUrl;
+      } catch(e) {
+        image.style.opacity = '.2';
+        image.title = 'Image preview unavailable — file remains in Drive';
+      }
+    };
+    return image;
+  }
+
+  function mediaCards(type, containerId, countId) {
+    const items = state.media.filter(m=>m.type===type);
+    $(countId).textContent = `(${items.length})`;
+    const grid = $(containerId);
+    grid.replaceChildren();
+    if (!items.length) {
+      grid.appendChild(make('No images attached yet','div','media-empty'));
+      return;
+    }
+    items.forEach(media=>{
+      const tile = document.createElement('div');
+      tile.className='media-item';
+      const img = imageNode(media,'Attached '+type+' image');
+      const zoom = document.createElement('button');
+      zoom.className='zoom';
+      zoom.type='button';
+      zoom.setAttribute('aria-label','Enlarge image');
+      zoom.addEventListener('click',()=>{
+        $('lightboxImage').src = tileSrc(media);
+        $('lightbox').showModal();
+      });
+      const remove = make('×','button','remove');
+      remove.type='button';
+      remove.setAttribute('aria-label','Detach image from this review');
+      remove.addEventListener('click',()=>{
+        state.media = state.media.filter(item=>item.fileId!==media.fileId);
+        renderMedia();change();
+      });
+      if (media.generated || state.generatedPhotoIds.has(media.fileId)) {
+        const marker = make('AI staging', 'span', 'ai-origin');
+        marker.style.cssText = 'position:absolute;bottom:6px;left:6px;z-index:2;padding:3px 6px;background:#352b24d9;color:#fff;font-size:10px;border-radius:5px;pointer-events:none';
+        tile.appendChild(marker);
+      }
+      tile.append(img,zoom,remove);
+      grid.appendChild(tile);
+    });
+  }
+
+  function renderReferenceSelector() {
+    const select = $('imageReference');
+    const last = select.value;
+    select.replaceChildren();
+    const refs = state.media.filter(m => m.type === 'reference');
+    if (!refs.length) {
+      const option = document.createElement('option');
+      option.value = '';
+      option.textContent = 'Upload/import a real product reference first';
+      select.appendChild(option);
+    } else {
+      refs.forEach((media, i) => {
+        const option = document.createElement('option');
+        option.value = media.fileId;
+        option.textContent = 'Reference ' + (i + 1) + ' · ' + media.fileId.slice(0, 9);
+        select.appendChild(option);
+      });
+      if (refs.some(m => m.fileId === last)) select.value = last;
+    }
+  }
+
+  // Load references directly from the existing private Drive reference folders.
+  async function openReferenceLibrary() {
+    if (state.busy || state.referenceLibraryLoading) return;
+    $('referenceLibraryDialog').showModal();
+    await loadReferenceLibrary();
+  }
+
+  async function loadReferenceLibrary() {
+    if (state.referenceLibraryLoading) return;
+    state.referenceLibraryLoading = true;
+    $('refreshReferenceLibrary').disabled = true;
+    $('referenceLibraryStatus').textContent = 'Loading your existing Drive references…';
+    $('referenceLibraryGrid').replaceChildren();
+    try {
+      const result = await call('studioListReferenceImages', state.sku);
+      if (!result || result.sku !== state.sku || !Array.isArray(result.items)) {
+        throw new Error('Reference library returned an unexpected response.');
+      }
+      state.referenceLibrary = result.items;
+      state.referenceLibraryLimited = !!result.limited;
+      renderReferenceLibrary();
+    } catch (e) {
+      state.referenceLibrary = [];
+      $('referenceLibraryStatus').textContent = 'Could not load reference images.';
+      $('referenceLibraryGrid').appendChild(make(e.message, 'div', 'media-empty'));
+      notice('Reference library: ' + e.message, true);
+    } finally {
+      state.referenceLibraryLoading = false;
+      $('refreshReferenceLibrary').disabled = false;
+    }
+  }
+
+  function renderReferenceLibrary() {
+    const term = $('referenceLibrarySearch').value.trim().toLowerCase();
+    const found = state.referenceLibrary.filter(item =>
+      (item.name + ' ' + item.source).toLowerCase().includes(term));
+    $('referenceLibraryStatus').textContent = found.length + ' of ' +
+      state.referenceLibrary.length + ' available references' +
+      (state.referenceLibraryLimited ? ' · up to 200 shown from Drive scan' : '') +
+      ' · select an image to reuse';
+    const grid = $('referenceLibraryGrid');
+    grid.replaceChildren();
+    if (!found.length) {
+      grid.appendChild(make(term ? 'No matching reference images.' :
+        'No references found in imported or selected-product folders.', 'div', 'media-empty'));
+      return;
+    }
+    found.forEach(item => {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'ref-library-item';
+      button.title = item.name;
+      button.setAttribute('aria-label','Use reference ' + item.name);
+      const frame = document.createElement('div');
+      frame.className = 'ref-library-image';
+      const photo = document.createElement('img');
+      photo.loading = 'lazy';
+      photo.alt = '';
+      photo.src = item.url;
+      photo.onerror = async () => {
+        if (photo.dataset.fallback) return;
+        photo.dataset.fallback = '1';
+        try {
+          const result = await call('studioGetReferenceImageThumbnail', item.fileId);
+          if (!result || !result.dataUrl) throw new Error('No thumbnail available');
+          photo.src = result.dataUrl;
+        } catch (e) {
+          photo.remove();
+          frame.textContent = 'Preview unavailable';
+        }
+      };
+      frame.appendChild(photo);
+      button.append(frame, make(item.name,'div','ref-library-name'),
+        make(item.source,'div','ref-library-source'));
+      button.addEventListener('click',()=>useReferenceFromLibrary(item));
+      grid.appendChild(button);
+    });
+  }
+
+  function useReferenceFromLibrary(item) {
+    if (state.busy || state.uploading || state.media.length >= 20 &&
+        !state.media.some(m => m.fileId === item.fileId)) {
+      notice('Finish the current task or free an attachment slot first.', true);
+      return;
+    }
+    const existing = state.media.find(m => m.fileId === item.fileId);
+    if (existing && existing.type !== 'reference') {
+      notice('This file is attached as a review photo. Detach it before using it as a reference.', true);
+      return;
+    }
+    if (!existing) {
+      state.media.push({fileId:item.fileId, type:'reference', url:item.url,
+        dimensions:'', mediaId:null});
+      renderMedia();
+      change();
+    }
+    $('imageReference').value = item.fileId;
+    $('referenceLibraryDialog').close();
+    notice('Existing Drive reference selected. No new upload was made.');
+  }
+
+  function renderMedia() {
+    renderReferenceSelector();
+    mediaCards('reference','referenceGrid','referenceCount');
+    mediaCards('photo','photoGrid','photoAttachedCount');
+    renderPreviewPhotos();
+  }
+
+  function renderPreviewPhotos() {
+    const photos = state.media.filter(m=>m.type==='photo').slice(0,4);
+    $('previewPhotos').replaceChildren(...photos.map(m=>imageNode(m,'Review photo')));
+  }
+
+  function renderPreview() {
+    const masked = maskName($('name').value);
+    $('nameMask').textContent = masked;
+    $('previewName').textContent = masked;
+    $('avatar').textContent = $('name').value.trim().charAt(0).toUpperCase() || 'A';
+    $('previewDate').textContent = $('date').value || 'Date';
+    const count = Number($('stars').value) || 5;
+    $('previewStars').textContent = '★'.repeat(count) + '☆'.repeat(5-count);
+    $('previewText').textContent = $('text').value.trim() || 'The review preview updates as you edit.';
+  }
+
+  async function loadWorkspace(preserveId=null) {
+    setBusy(true);
+    try {
+      if (!state.products.length) {
+        const initial = await call('studioBootstrap');
+        state.products = initial.products;
+        state.reviews = initial.reviews;
+        setProductOptions();
+      } else {
+        state.reviews = await call('studioListReviews',state.sku);
+      }
+      renderStats();
+      const review = state.reviews.find(r=>r.id===preserveId);
+      if (review) loadReview(review); else freshReview();
+      notice('Connected to the staging review database.');
+      loadGeneratedOrigins();
+    } catch(e) {
+      notice(e.message,true);
+      $('reviewList').replaceChildren(make(e.message,'p','no-records'));
+    } finally {
+      setBusy(false);
+    }
+  }
+
+
+  // Settings are stored in Script Properties, not in a public HTML or review row.
+  function aiSettingsFromUi() {
+    return {
+      preset: $('aiTonePreset').value,
+      casualness: Number($('aiCasualness').value),
+      shorthand: Number($('aiShorthand').value),
+      variation: Number($('aiVariation').value),
+      guidance: $('aiDefaultGuidance').value.trim()
+    };
+  }
+
+  function updateAiSliders() {
+    ['Casualness','Shorthand','Variation'].forEach(name => {
+      $('ai' + name + 'Value').textContent = $('ai' + name).value;
+    });
+  }
+
+  function applyAiSettings(config) {
+    $('aiTonePreset').value = config.preset;
+    $('aiCasualness').value = config.casualness;
+    $('aiShorthand').value = config.shorthand;
+    $('aiVariation').value = config.variation;
+    $('aiDefaultGuidance').value = config.guidance || '';
+    updateAiSliders();
+    state.aiDefaultsLoaded = true;
+    state.aiDefaultsDirty = false;
+    $('aiDefaultsStatus').textContent = 'Saved in Apps Script settings';
+  }
+
+  async function loadAiSettings() {
+    try {
+      applyAiSettings(await call('studioGetAIWritingSettings'));
+    } catch(e) {
+      state.aiDefaultsLoaded = false;
+      $('aiDefaultsStatus').textContent = 'Unable to load defaults';
+      notice('AI settings: ' + e.message, true);
+    }
+  }
+
+  async function saveAiSettings() {
+    if (state.busy || !state.aiDefaultsLoaded) return;
+    setBusy(true);
+    try {
+      const updated = await call('studioSaveAIWritingSettings', aiSettingsFromUi());
+      applyAiSettings(updated);
+      notice('AI writing defaults saved. They apply to the next generation.');
+    } catch(e) { notice('Could not save AI defaults: ' + e.message,true); }
+    finally {setBusy(false);}
+  }
+
+  async function resetAiSettings() {
+    if (state.busy || !state.aiDefaultsLoaded) return;
+    if (!window.confirm('Restore the default AI writing style settings?')) return;
+    setBusy(true);
+    try {
+      applyAiSettings(await call('studioResetAIWritingSettings'));
+      notice('Default AI writing settings restored.');
+    } catch(e) { notice(e.message,true); }
+    finally {setBusy(false);}
+  }
+
+  async function generateSampleReview() {
+    if (state.busy) return;
+    if (state.aiDefaultsDirty) {
+      $('aiSettingsPanel').open = true;
+      notice('Save your AI Writing Defaults first, then click Generate.', true);
+      return;
+    }
+    const previousText = $('text').value;
+    setBusy(true);
+    $('generateText').textContent = '✦ Generating…';
+    try {
+      const response = await call('studioGenerateSampleReview', {
+        sku:state.sku,
+        length:state.length,
+        notes:$('styleNote').value,
+        priorText:previousText
+      });
+      if (!response || !response.text) throw new Error('No generated text returned.');
+      $('text').value = response.text;
+      change();
+      const usage = response.usage || {};
+      notice('Text generated with ' + response.model + ' · ' +
+        (usage.output || '?') + ' output tokens. Review and save when ready.');
+    } catch (e) {
+      notice(e.message, true);
+    } finally {
+      setBusy(false);
+      $('generateText').textContent = '✦ Generate text';
+    }
+  }
+
+  function applyImageQualitySettings(settings) {
+    if (!settings || !['low','medium','high'].includes(settings.quality)) {
+      throw new Error('Invalid image quality settings returned from Apps Script.');
+    }
+    state.savedImageQuality = settings.quality;
+    state.imageQualityLoaded = true;
+    $('imageQuality').value = settings.quality;
+    $('imageQualityStatus').textContent = 'Saved for future images · ' +
+      settings.model + ' · 1024 × 1536';
+    $('imageQuality').disabled = state.busy || state.imageQualitySaving;
+  }
+
+  async function loadImageQualitySettings() {
+    try {
+      applyImageQualitySettings(await call('studioGetImageQualitySettings'));
+    } catch (e) {
+      state.imageQualityLoaded = false;
+      $('imageQuality').disabled = true;
+      $('imageQualityStatus').textContent = 'Could not load the saved image quality';
+      notice('Image quality settings: ' + e.message, true);
+    }
+  }
+
+  async function saveImageQualitySettings() {
+    if (state.busy || !state.imageQualityLoaded || state.imageQualitySaving) return;
+    const requested = $('imageQuality').value;
+    state.imageQualitySaving = true;
+    $('imageQuality').disabled = true;
+    $('imageQualityStatus').textContent = 'Saving image quality…';
+    try {
+      const saved = await call('studioSaveImageQualitySettings', {quality: requested});
+      if (!saved || saved.quality !== requested) {
+        throw new Error('The new image quality was not confirmed by the server.');
+      }
+      applyImageQualitySettings(saved);
+      notice('Image quality saved: ' + requested + '. Applies to the next photo.');
+    } catch (e) {
+      $('imageQuality').value = state.savedImageQuality;
+      $('imageQualityStatus').textContent = 'Save failed · using previous ' +
+        state.savedImageQuality + ' quality';
+      notice('Could not save image quality: ' + e.message, true);
+    } finally {
+      state.imageQualitySaving = false;
+      $('imageQuality').disabled = state.busy || !state.imageQualityLoaded;
+    }
+  }
+
+  async function generateProductPhotos() {
+    if (state.busy || state.uploading) return;
+    if (!state.imageQualityLoaded || state.imageQualitySaving) {
+      notice('Image quality settings must finish loading or saving before generation.', true);
+      return;
+    }
+    const referenceFileId = $('imageReference').value;
+    if (!referenceFileId) {
+      notice('Upload or import a product reference photo first.', true);
+      return;
+    }
+    const count = Number($('photoCount').value || 1);
+    const style = $('photoStyle').value;
+    const scene = $('scene').value.trim();
+    if (![1,2,3,5].includes(count)) {
+      notice('Select 1, 2, 3 or 5 images.', true);
+      return;
+    }
+    if (count + state.media.length > 20) {
+      notice('You can attach up to 20 images to a review.', true);
+      return;
+    }
+    setBusy(true);
+    let completed = 0;
+    let failure = null;
+    try {
+      for (let i = 0; i < count; i++) {
+        $('photoProgress').textContent = 'Generating staging photo ' + (i + 1) + ' of ' + count + '…';
+        try {
+          const output = await call('studioGenerateProductMockPhoto', {
+            sku:state.sku,
+            style:style,
+            scene:scene,
+            referenceFileId:referenceFileId
+          });
+          if (!output || !output.fileId) throw new Error('Image generation returned no saved Drive file.');
+          if (!state.media.some(m => m.fileId === output.fileId)) {
+            state.media.push({
+              fileId:output.fileId, type:'photo', url:output.url,
+              dimensions:'1024x1536', mediaId:null, generated:true
+            });
+            state.generatedPhotoIds.add(output.fileId);
+          }
+          completed++;
+          renderMedia(); change();
+          $('photoProgress').textContent = completed + ' of ' + count + ' generated and saved in Google Drive.';
+        } catch (e) {
+          failure = e;
+          break;
+        }
+      }
+      if (failure) {
+        notice(completed + ' image(s) generated; next image failed: ' + failure.message, true);
+      } else {
+        notice(completed + ' AI staging photo(s) saved to Drive. Click Save Review to attach.');
+      }
+    } finally { setBusy(false); }
+  }
+
+  async function loadGeneratedOrigins() {
+    try {
+      const ids = state.reviews.flatMap(r => (r.media || []).map(m => m.fileId));
+      if (!ids.length) return;
+      const matches = await call('studioGetGeneratedPhotoIds', [...new Set(ids)]);
+      (matches || []).forEach(id => state.generatedPhotoIds.add(id));
+      renderMedia();
+    } catch (e) { console.warn('Could not load image origin flags', e); }
+  }
+
+  async function saveReview(event) {
+    event.preventDefault();
+    if (state.busy || state.uploading) {
+      notice('Finish any image upload before saving.',true);return;
+    }
+    if (!$('form').reportValidity()) return;
+    setBusy(true);
+    try {
+      const payload = {
+        id:state.id, sku:state.sku,
+        name:$('name').value, date:$('date').value,
+        stars:Number($('stars').value), text:$('text').value,
+        status:$('status').value, order:$('order').value,
+        media:state.media.map(m=>({
+          fileId:m.fileId,mediaId:m.mediaId,type:m.type,
+          dimensions:m.dimensions||''
+        }))
+      };
+      const response = await call('studioSaveReview',payload);
+      state.reviews=response.reviews;
+      renderStats();
+      const selected = state.reviews.find(r=>r.id===response.id);
+      if (selected) loadReview(selected);
+      notice('Review saved to Google Sheets.');
+    } catch(e){notice(e.message,true);}
+    finally{setBusy(false);}
+  }
+
+  async function deleteReview() {
+    if (!state.id || state.busy) return;
+    if (!window.confirm('Delete this review and detach its media records? Drive files will be retained.')) return;
+    setBusy(true);
+    try {
+      const res=await call('studioDeleteReview',state.id);
+      state.reviews=res.reviews;
+      renderStats();freshReview();
+      notice('Review deleted. Drive media retained.');
+    } catch(e){notice(e.message,true);}
+    finally{setBusy(false);}
+  }
+
+  async function moveReview(id,direction) {
+    if (state.busy || !isSafeToLeave()) return;
+    setBusy(true);
+    try {
+      const res=await call('studioMoveReview',id,direction);
+      state.reviews=res.reviews;
+      renderStats();
+      const current=state.reviews.find(r=>r.id===state.id);
+      if (current) loadReview(current);else renderReviewList();
+    } catch(e){notice(e.message,true);}
+    finally{setBusy(false);}
+  }
+
+  async function uploadFiles(event,purpose) {
+    const files=Array.from(event.target.files||[]);
+    event.target.value='';
+    if (!files.length) return;
+    if (state.busy || state.uploading) return;
+    if (files.length + state.media.length > 20) {
+      notice('Maximum 20 media attachments per review.',true);return;
+    }
+    state.uploading++;
+    try {
+      for (const file of files) {
+        if (!file.type.startsWith('image/') || file.size > 6*1024*1024) {
+          notice(`${file.name}: use a supported image under 6 MB`,true);continue;
+        }
+        const base64 = await new Promise((resolve,reject)=>{
+          const reader = new FileReader();
+          reader.onerror=()=>reject(new Error('Could not read '+file.name));
+          reader.onload=()=>resolve(String(reader.result).split(',')[1]||'');
+          reader.readAsDataURL(file);
+        });
+        notice('Uploading '+file.name+'…');
+        const result = await call('studioUploadImage',{
+          name:file.name,base64,purpose
+        });
+        if (!state.media.some(m=>m.fileId===result.fileId)) {
+          state.media.push({fileId:result.fileId,type:purpose,
+            url:result.url,dimensions:'',mediaId:null});
+        }
+        renderMedia();change();
+      }
+      notice('Image uploaded. Save the review to attach it.');
+    } catch(e) {notice(e.message,true);}
+    finally {state.uploading--;}
+  }
+
+  let importing=false, lastImport='';
+  async function importReferenceUrl() {
+    const url=$('url').value.trim();
+    if (!/^https:\/\/[^ /]+\.[^ /]+/i.test(url) || importing || url===lastImport) return;
+    importing=true;
+    lastImport=url;
+    $('importUrl').disabled=true;
+    try {
+      notice('Importing reference image from URL…');
+      const result=await call('studioImportImageUrl',url);
+      state.media.push({fileId:result.fileId,type:'reference',
+        url:result.url,dimensions:'',mediaId:null});
+      $('url').value='';
+      lastImport='';
+      renderMedia();change();
+      notice('Reference imported into Google Drive. Save the review to attach it.');
+    } catch(e) {
+      lastImport='';
+      notice(e.message,true);
+    } finally {importing=false;$('importUrl').disabled=false;}
+  }
+
+  let pasteTimer=null;
+  function wire() {
+    ['name','date','stars','status','text','styleNote','scene','photoStyle','order']
+      .forEach(id=>$(id).addEventListener('input',change));
+    ['aiTonePreset','aiCasualness','aiShorthand','aiVariation','aiDefaultGuidance'].forEach(id => {
+      $(id).addEventListener('input', () => {
+        updateAiSliders();
+        state.aiDefaultsDirty = true;
+        $('aiDefaultsStatus').textContent = 'Unsaved AI defaults';
+      });
+    });
+    $('aiSaveDefaults').addEventListener('click', saveAiSettings);
+    $('aiResetDefaults').addEventListener('click', resetAiSettings);
+    $('randomName').addEventListener('click',randomName);
+    $('randomDate').addEventListener('click',randomDate);
+    $('generateText').addEventListener('click',generateSampleReview);
+    $('regenerateText').addEventListener('click',generateSampleReview);
+    $('generatePhoto').addEventListener('click',generateProductPhotos);
+    $('imageQuality').addEventListener('change',saveImageQualitySettings);
+    $('aiHealth').addEventListener('click',async ()=>{
+      if (state.busy) return;
+      setBusy(true);
+      try {
+        const result=await call('studioCheckOpenAIConnection');
+        notice('AI connected: ' + result.model + '.');
+      } catch(e) {notice(e.message,true);}
+      finally {setBusy(false);}
+    });
+    $('form').addEventListener('submit',saveReview);
+    $('new').addEventListener('click',()=>{if(isSafeToLeave())freshReview();});
+    $('reset').addEventListener('click',()=>{if(isSafeToLeave())freshReview();});
+    $('delete').addEventListener('click',deleteReview);
+    $('search').addEventListener('input',renderReviewList);
+    $('product').addEventListener('change',async ()=>{
+      if (!isSafeToLeave()) {
+        $('product').value=state.sku;
+        return;
+      }
+      state.sku=$('product').value;
+      updateProductInfo();
+      await loadWorkspace();
+    });
+    $('refresh').addEventListener('click',async ()=>{
+      if (isSafeToLeave()) await loadWorkspace(state.id);
+    });
+    $('health').addEventListener('click',async ()=>{
+      try {
+        const health=await call('studioHealthCheck');
+        notice(`Connected: ${health.spreadsheet}; ${health.folders.length} Drive folders.`);
+      }catch(e){notice(e.message,true);}
+    });
+    document.querySelectorAll('#lengthChips .chip').forEach(btn=>{
+      btn.addEventListener('click',()=>{setLength(btn.dataset.length);change();});
+    });
+    $('chooseLibrary').addEventListener('click',openReferenceLibrary);
+    $('referenceLibrarySearch').addEventListener('input',renderReferenceLibrary);
+    $('refreshReferenceLibrary').addEventListener('click',loadReferenceLibrary);
+    $('closeReferenceLibrary').addEventListener('click',()=> $('referenceLibraryDialog').close());
+    $('referenceLibraryDialog').addEventListener('click',e=>{
+      if (e.target === $('referenceLibraryDialog')) $('referenceLibraryDialog').close();
+    });
+    $('chooseReference').addEventListener('click',()=> $('referenceUpload').click());
+    $('choosePhoto').addEventListener('click',()=> $('photoUpload').click());
+    $('referenceUpload').addEventListener('change',e=>uploadFiles(e,'reference'));
+    $('photoUpload').addEventListener('change',e=>uploadFiles(e,'photo'));
+    $('importUrl').addEventListener('click',importReferenceUrl);
+    $('url').addEventListener('paste',()=>{
+      clearTimeout(pasteTimer);
+      pasteTimer=setTimeout(importReferenceUrl,500);
+    });
+    $('url').addEventListener('change',importReferenceUrl);
+    $('url').addEventListener('input',()=>{if($('url').value!==lastImport)lastImport='';});
+    $('closeLightbox').addEventListener('click',()=> $('lightbox').close());
+    $('lightbox').addEventListener('click',e=>{
+      if (e.target===$('lightbox'))$('lightbox').close();
+    });
+  }
+
+  wire();
+  loadWorkspace();
+  loadAiSettings();
+  loadImageQualitySettings();
+})();
+</script>
+</body>
+</html>

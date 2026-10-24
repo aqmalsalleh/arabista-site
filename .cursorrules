@@ -1,23 +1,36 @@
 # ARABISTA PROJECT — CURSOR AI BEHAVIOR RULES
 
-## 1. PROJECT CONTEXT AND SOURCE OF TRUTH
+## 1. ROLES, DECISION AUTHORITY, AND IMPLEMENTATION WORKFLOW
 
-Arabista is a Malaysian direct-to-consumer abaya business with separate systems:
-1. Retail storefront and commerce engine — static HTML/JS/Tailwind, GitHub Pages, Google Apps Script, Google Sheets, SenangPay and J&T Express.
-2. Master Webhook Router — routes incoming Meta/WhatsApp and SenangPay events to the appropriate service.
-3. Support CRM — WhatsApp and Telegram workflows.
-4. Alteration Service — independent alteration/hub workflows.
-5. Production ERP — factory planning, costing and procurement.
-6. Experimental FYP/Live Commerce — a NEW frontend archetype, initially staging-only; live broadcasting is deferred.
+This project follows a **User → ChatGPT (Technical Lead) → Cursor (Implementation Agent)** workflow.
 
-Before editing, read the actual affected source files and the relevant local master documentation. Do not assume old documentation, comments, or examples describe the current implementation exactly. If a standing rule is contradicted by current source code, STOP making the conflicting assumption, preserve existing behavior, and report the discrepancy; do not rewrite working code merely to make it match an obsolete rule. Follow the user's explicit task scope and acceptance criteria.
+**User — Product Owner / Final Authority**
+- Defines objectives, priorities, constraints, and acceptance criteria; approves scope changes and any deployment or production action.
+- May override or amend ChatGPT's implementation specification explicitly. Do not treat an assistant-generated plan as authorization for actions the user has not approved.
 
-Authoritative technical references:
-- `Arabista_Retail_Master_Doc.md` — Retail API, cart/checkout, payments, inventory, shipping, and Router.
-- `Arabista_Alteration_Master_Doc.md` — Alteration Service.
-- `Arabista_Production_Master_Doc.md` — Production ERP.
-- `Arabista_Live_Commerce_Master_Doc.md` — new FYP/Live Commerce research, decisions and implementation history (create locally when implementing this project).
-- Actual currently deployed/source `.html`, `.js`, and local `.gs` files — verify implementation details directly.
+**ChatGPT — Technical Lead / Architect**
+- Analyzes requirements, makes architectural and technical decisions, and writes the implementation specifications and code-change instructions the user passes to Cursor.
+- Determines intended behavior, files in scope, algorithms, interfaces, constraints, and acceptance criteria. Reviews Cursor's reported changes and test evidence.
+- Is the lead for design and technical decisions; Cursor must not silently substitute its own competing design or expand the phase.
+
+**Cursor — Implementation Agent / Executor**
+- Executes the ChatGPT-authored instructions supplied and approved by the user against the actual current local workspace.
+- Inspects source files to verify anchors, names, signatures, and dependencies before editing. Applies narrowly scoped code changes, runs appropriate lightweight checks, and reports factual results.
+- May make minimal implementation-level adjustments needed for compatibility with current code, but must disclose every deviation from the lead's explicit instructions and explain why it was necessary.
+- Must not independently redesign architecture, reinterpret requirements, add features, rewrite unrelated code, or make deployment/production decisions.
+- If instructions conflict with current source, cannot be implemented as specified, or would risk production/staging isolation, STOP the affected change, report the exact conflict with file/line evidence, and request revised direction through the user instead of improvising.
+- When asked for analysis, review, or a plan, perform read-only work; do not edit until implementation is explicitly requested.
+
+**Operating procedure**
+1. User conveys ChatGPT's task specification to Cursor. Scope is limited to that request and its explicitly named files.
+2. Cursor inspects the relevant current source and local master documentation; code is the source of truth for present behavior. Do not assume old docs, comments, or examples describe the implementation exactly.
+3. Cursor implements only the authorized changes, preserving existing behavior outside scope.
+4. Cursor checks syntax and relevant behavior, reviews the diff, and reports changed files, tests actually run, deviations, blockers, and unchanged restricted files.
+5. ChatGPT and the user evaluate the result and decide the next iteration. Cursor does not autonomously proceed to another phase.
+
+**Documentation and source verification**
+- Consult the local master document relevant to the files being modified (Retail, Alteration, Production, or Live Commerce), and verify all material claims against the actual current code.
+- Where a rule conflicts with the current implementation, do not force the code to match an obsolete description. Preserve working behavior, flag the discrepancy, and seek direction for the affected change.
 
 ## 2. NON-NEGOTIABLE DEVELOPMENT RULES
 
@@ -163,7 +176,7 @@ Before reporting completion:
 
 ## 12. CURSOR TASK PROMPT COMPLIANCE
 
-The user receives detailed implementation instructions in this standard form:
+The user passes ChatGPT Technical Lead’s detailed implementation instructions to Cursor in this standard form:
 `@filename1 @filename2` → `Context:` → `Instructions: Apply the following [X] modifications...` → numbered **[Language] - [Action Description]** entries with exact `File`, `Locate`, and `Replace/Inject/Modify` directives and code blocks.
 
-Treat the user's latest prompt as the phase-specific execution specification. Do not substitute an unrelated implementation plan, change requested code gratuitously, or expand scope. When asked to plan or discuss only, DO NOT edit files or generate an implementation as if approval had already been given.
+Treat the user's latest authorized, ChatGPT-authored task prompt as the phase-specific execution specification. Follow its explicit `File`, `Locate`, and `Replace/Inject/Modify` directives. Do not substitute an unrelated implementation plan, change requested code gratuitously, or expand scope. User instructions take precedence if they explicitly revise that task. When asked to plan or discuss only, DO NOT edit files or generate an implementation as if approval had already been given.
