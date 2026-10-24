@@ -20,8 +20,9 @@
     button:focus-visible { outline:2px solid var(--gold); outline-offset:3px; }
     svg { display:block; width:26px; height:26px; fill:none; stroke:currentColor; stroke-width:1.9; stroke-linecap:round; stroke-linejoin:round; }
     .app { position:relative; margin:auto; width:100%; max-width:440px; height:100dvh; max-height:956px; overflow:hidden; background:#050505; box-shadow:0 20px 75px rgba(0,0,0,.45); }
-    .feed { position:relative; height:calc(100% - 54px - env(safe-area-inset-bottom, 0px)); overflow:hidden; touch-action:pan-y; overscroll-behavior:contain; }
+    .feed { position:relative; height:calc(100% - 54px - env(safe-area-inset-bottom, 0px)); overflow:hidden; touch-action:none; overscroll-behavior:contain; }
     .track { height:100%; display:flex; flex-direction:column; will-change:transform; transition:transform 420ms cubic-bezier(.22,1,.36,1); }
+    .track.is-dragging { transition:none !important; }
     .slide { height:100%; flex:0 0 100%; position:relative; overflow:hidden; background:#090909; }
     .media { position:absolute; inset:0; overflow:hidden; display:grid; place-items:center; }
     .media video { width:100%; height:100%; object-fit:cover; object-position:center center; }
@@ -831,18 +832,31 @@
 
     .app.is-product-peek #video-hit-area {
       display:block;
+      height:var(--product-peek-height,220px);
+      overflow:hidden;
       background:#000;
     }
 
     .app.is-product-peek #d06-video {
       position:absolute;
-      top:0;
-      left:0;
-      width:100%;
-      height:var(--product-peek-height,220px);
-      object-fit:contain;
+      top:var(--product-video-top,0px);
+      left:var(--product-video-left,0px);
+      width:var(--product-video-width,100%);
+      height:var(--product-video-height,var(--product-peek-height,220px));
+      max-width:none;
+      object-fit:cover;
       object-position:center center;
       background:#000;
+    }
+
+    #product-sheet:focus,
+    #product-sheet:focus-visible {
+      outline:none;
+    }
+
+    .product-grab:focus-visible {
+      outline:2px solid var(--gold);
+      outline-offset:3px;
     }
 
     /* PHASE 3A.3 — SMOOTH FYP OVERLAY TRANSITIONS */
@@ -2008,6 +2022,45 @@
       text-align:center;
     }
 
+    .checkout-address-compact {
+      position:absolute;
+      top:var(--checkout-header-height,58px);
+      left:0;
+      right:0;
+      z-index:4;
+      display:flex;
+      align-items:center;
+      gap:10px;
+      min-height:48px;
+      padding:8px 15px;
+      border:0;
+      border-bottom:1px solid #eee;
+      background:#fff;
+      color:#222;
+      text-align:left;
+      box-shadow:0 8px 16px rgba(22,24,35,.05);
+    }
+
+    .checkout-address-compact-copy {
+      flex:1;
+      min-width:0;
+      display:flex;
+      flex-direction:column;
+      gap:2px;
+    }
+
+    .checkout-address-compact-copy strong,
+    .checkout-address-compact-copy span {
+      overflow:hidden;
+      text-overflow:ellipsis;
+      white-space:nowrap;
+    }
+
+    .checkout-address-compact-copy span {
+      color:#777;
+      font-size:12px;
+    }
+
     .checkout-icon-button {
       display:grid;
       place-items:center;
@@ -2132,6 +2185,13 @@
       line-height:1.6;
     }
 
+    #checkout-view-addresses > .checkout-muted,
+    #checkout-address-list > .checkout-muted,
+    #checkout-view-address-form > .checkout-muted {
+      margin-left:16px;
+      margin-right:16px;
+    }
+
     .checkout-item {
       display:flex;
       gap:12px;
@@ -2161,6 +2221,44 @@
     .checkout-item-info small {
       display:block;
       color:#888;
+    }
+
+    .checkout-item-controls,
+    .checkout-size-picker {
+      display:flex;
+      flex-wrap:wrap;
+      align-items:center;
+      gap:6px;
+      margin-top:8px;
+    }
+
+    .checkout-item-controls button,
+    .checkout-size-picker button,
+    .checkout-postcode-choices button {
+      min-width:32px;
+      height:32px;
+      padding:0 10px;
+      border:1px solid #e4e4e4;
+      border-radius:8px;
+      background:#fff;
+      color:#222;
+      font-size:13px;
+    }
+
+    .checkout-size-picker button[aria-pressed="true"],
+    .checkout-postcode-choices button[aria-pressed="true"] {
+      border-color:#b39257;
+      color:#8b6e38;
+    }
+
+    .checkout-item-qty {
+      min-width:22px;
+      text-align:center;
+      font-weight:600;
+    }
+
+    .checkout-empty-action {
+      margin:8px 0 0;
     }
 
     .checkout-payment-options {
@@ -2306,6 +2404,23 @@
       line-height:1.5;
     }
 
+    .checkout-postcode-hint,
+    .checkout-postcode-choices {
+      margin:0 15px 4px;
+    }
+
+    .checkout-postcode-choices {
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+    }
+
+    .checkout-address-confirm {
+      margin:8px 0 0;
+      color:#555;
+      font-size:12px;
+    }
+
     .checkout-address-card {
       padding:17px 15px;
       border-bottom:1px solid #eee;
@@ -2321,7 +2436,8 @@
 
     .checkout-address-actions {
       display:flex;
-      gap:12px;
+      flex-wrap:wrap;
+      gap:8px;
       margin-top:12px;
     }
 
@@ -2686,6 +2802,7 @@
         role="dialog"
         aria-modal="true"
         aria-labelledby="product-sheet-heading"
+        tabindex="-1"
         hidden>
 
         <header class="product-grab" id="product-grab" tabindex="0">
@@ -2960,7 +3077,7 @@
                   id="open-product-buy"
                   aria-haspopup="dialog"
                   aria-controls="commerce-panel">
-            Buy now · Preview
+            Buy now
           </button>
         </footer>
       </section>
@@ -3156,37 +3273,6 @@
 
           </div>
 
-          <!-- NON-TRANSACTIONAL BUY NOW SUMMARY -->
-          <div id="commerce-order"
-               class="commerce-view"
-               hidden>
-
-            <p class="commerce-preview-note">
-              This Buy now summary uses the staging catalog.
-              It does not change the staging basket.
-            </p>
-
-            <div id="commerce-order-summary"
-                 class="commerce-order-summary"></div>
-
-            <p class="commerce-preview-note">
-              No order, reservation or payment has been created.
-            </p>
-
-            <button id="commerce-back-to-options"
-                    class="commerce-secondary"
-                    type="button">
-              Back to options
-            </button>
-
-            <button id="commerce-checkout-buy"
-                    class="commerce-secondary"
-                    type="button">
-              Continue to checkout preview
-            </button>
-
-          </div>
-
           <!-- LOCAL-ONLY CHAT -->
           <div id="commerce-chat"
                class="commerce-view"
@@ -3289,6 +3375,18 @@
           </button>
 
         </header>
+
+        <button id="checkout-address-compact"
+                class="checkout-address-compact"
+                type="button"
+                hidden>
+          <span class="checkout-address-icon" aria-hidden="true">⌖</span>
+          <span class="checkout-address-compact-copy">
+            <strong id="checkout-address-compact-name">Add address</strong>
+            <span id="checkout-address-compact-line">Add a delivery address</span>
+          </span>
+          <span aria-hidden="true">›</span>
+        </button>
 
         <main id="checkout-scroll" class="checkout-scroll">
 
@@ -3493,6 +3591,7 @@
               <label class="checkout-field">
                 Postcode
                 <input name="postcode"
+                       id="checkout-address-postcode"
                        type="text"
                        inputmode="numeric"
                        maxlength="5"
@@ -3501,6 +3600,14 @@
                        autocomplete="off"
                        placeholder="5-digit postcode">
               </label>
+
+              <p id="checkout-postcode-hint"
+                 class="checkout-muted checkout-postcode-hint"
+                 hidden></p>
+
+              <div id="checkout-postcode-choices"
+                   class="checkout-postcode-choices"
+                   hidden></div>
 
               <label class="checkout-field">
                 City
@@ -3542,6 +3649,8 @@
             <p class="checkout-muted">
               Use test details. This address stays in this checkout
               until you continue, and it is not saved in this browser.
+              City and state suggestions come from the Malaysia Open
+              Data postcode list (CC BY 4.0).
             </p>
 
           </section>
@@ -3615,7 +3724,6 @@
       const count = track.children.length;
       let active = 0;
       let transitioning = false;
-      let startY = null;
       let toastTimer = null;
       let userPaused = false;
 
@@ -3678,11 +3786,12 @@
 
         trigger.setAttribute('aria-expanded', 'true');
 
-        const closeButton =
-          sheetMap[type].querySelector('[data-close-sheet]');
-
-        if (closeButton) {
-          closeButton.focus({ preventScroll: true });
+        if (type === 'product') {
+          productSheet.focus({ preventScroll: true });
+        } else {
+          const closeButton =
+            sheetMap[type].querySelector('[data-close-sheet]');
+          if (closeButton) closeButton.focus({ preventScroll: true });
         }
       }
 
@@ -3746,12 +3855,18 @@
         if (attempt && typeof attempt.catch === 'function') attempt.catch(() => { updatePauseCue(); message('Tap the video to start playback'); });
         updatePauseCue();
       }
-      function move(direction) {
-        if (activeSheet || commerceActive || checkoutActive || transitioning) return;
-        const next = Math.max(0, Math.min(count - 1, active + direction));
-        if (next === active) return;
-        transitioning = true;
-        active = next;
+      let feedDrag = null;
+      let feedFrame = null;
+      let feedSuppressClick = false;
+
+      function feedBlocked() {
+        return Boolean(activeSheet || commerceActive || checkoutActive);
+      }
+
+      function paintFeedSlide(index, animate) {
+        active = index;
+        if (animate) track.classList.remove('is-dragging');
+        else track.classList.add('is-dragging');
         track.style.transform = `translate3d(0, ${-active * 100}%, 0)`;
         document.getElementById('creator-name').textContent = captions[active].creator;
         document.getElementById('video-caption').textContent = captions[active].text;
@@ -3760,17 +3875,99 @@
         muteButton.hidden = active !== 0;
         document.getElementById('screen-reader-status').textContent = `Video ${active + 1} of ${count}`;
         syncPlayback();
-        window.setTimeout(() => { transitioning = false; }, window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 440);
       }
-      feed.addEventListener('touchstart', e => { if (e.touches.length === 1) startY = e.touches[0].clientY; }, { passive:true });
-      feed.addEventListener('touchend', e => {
-        if (startY === null || e.changedTouches.length !== 1) { startY = null; return; }
-        const change = startY - e.changedTouches[0].clientY;
-        startY = null;
-        if (Math.abs(change) >= 55) move(change > 0 ? 1 : -1);
-      }, { passive:true });
-      feed.addEventListener('touchcancel', () => { startY = null; }, { passive:true });
-      feed.addEventListener('wheel', e => { if (Math.abs(e.deltaY) > 25) { e.preventDefault(); move(e.deltaY > 0 ? 1 : -1); } }, { passive:false });
+
+      function settleFeed(index) {
+        const next = Math.max(0, Math.min(count - 1, index));
+        transitioning = true;
+        paintFeedSlide(next, !prefersReducedMotion());
+        if (prefersReducedMotion()) track.classList.remove('is-dragging');
+        window.setTimeout(() => { transitioning = false; }, prefersReducedMotion() ? 0 : 440);
+      }
+
+      function move(direction) {
+        if (feedBlocked() || transitioning || feedDrag) return;
+        const next = Math.max(0, Math.min(count - 1, active + direction));
+        if (next === active) return;
+        settleFeed(next);
+      }
+
+      function renderFeedDrag() {
+        feedFrame = null;
+        if (!feedDrag) return;
+        track.classList.add('is-dragging');
+        track.style.transform = `translate3d(0, ${feedDrag.y}px, 0)`;
+      }
+
+      function finishFeedDrag(pointerId, clientY, cancelled) {
+        if (!feedDrag || feedDrag.id !== pointerId) return;
+        const drag = feedDrag;
+        feedDrag = null;
+        if (feedFrame !== null) {
+          cancelAnimationFrame(feedFrame);
+          feedFrame = null;
+        }
+        if (cancelled || !drag.moved) {
+          if (drag.moved) settleFeed(active);
+          return;
+        }
+        feedSuppressClick = true;
+        const height = feed.clientHeight || 1;
+        const dy = clientY - drag.startY;
+        const distance = height * 0.18;
+        let next = active;
+        if (dy <= -distance || drag.velocity <= -0.55) {
+          next = Math.min(count - 1, active + 1);
+        } else if (dy >= distance || drag.velocity >= 0.55) {
+          next = Math.max(0, active - 1);
+        }
+        settleFeed(next);
+      }
+
+      feed.addEventListener('pointerdown', event => {
+        if (event.button !== 0) return;
+        if (feedBlocked() || transitioning) return;
+        if (event.target.closest('button, a, input, textarea, select')) return;
+        const height = feed.clientHeight || 1;
+        feedDrag = {
+          id: event.pointerId,
+          startY: event.clientY,
+          lastY: event.clientY,
+          origin: -active * height,
+          y: -active * height,
+          moved: false,
+          lastTime: performance.now(),
+          velocity: 0
+        };
+        try { feed.setPointerCapture(event.pointerId); } catch (error) {}
+      });
+
+      feed.addEventListener('pointermove', event => {
+        if (!feedDrag || feedDrag.id !== event.pointerId) return;
+        const dy = event.clientY - feedDrag.startY;
+        if (!feedDrag.moved && Math.abs(dy) < 6) return;
+        feedDrag.moved = true;
+        const now = performance.now();
+        const dt = Math.max(1, now - feedDrag.lastTime);
+        feedDrag.velocity = (event.clientY - feedDrag.lastY) / dt;
+        feedDrag.lastY = event.clientY;
+        feedDrag.lastTime = now;
+        const height = feed.clientHeight || 1;
+        const minY = -(count - 1) * height;
+        let y = feedDrag.origin + dy;
+        if (y > 0) y = 0;
+        if (y < minY) y = minY;
+        feedDrag.y = y;
+        if (feedFrame === null) feedFrame = requestAnimationFrame(renderFeedDrag);
+      });
+
+      feed.addEventListener('pointerup', event => {
+        finishFeedDrag(event.pointerId, event.clientY, false);
+      });
+      feed.addEventListener('pointercancel', event => {
+        finishFeedDrag(event.pointerId, event.clientY, true);
+      });
+      feed.addEventListener('wheel', e => { if (feedDrag) return; if (Math.abs(e.deltaY) > 25) { e.preventDefault(); move(e.deltaY > 0 ? 1 : -1); } }, { passive:false });
       window.addEventListener('keydown', e => {
         if (activeSheet || commerceActive || checkoutActive || ['INPUT','TEXTAREA','SELECT'].includes(document.activeElement?.tagName)) return;
         if (e.key === 'ArrowDown') { e.preventDefault(); move(1); }
@@ -3782,7 +3979,15 @@
         userPaused = !video.paused;
         syncPlayback();
       }
-      document.getElementById('video-hit-area').addEventListener('click', togglePause);
+      document.getElementById('video-hit-area').addEventListener('click', event => {
+        if (feedSuppressClick) {
+          feedSuppressClick = false;
+          event.preventDefault();
+          event.stopPropagation();
+          return;
+        }
+        togglePause();
+      });
       video.addEventListener('play', updatePauseCue);
       video.addEventListener('pause', updatePauseCue);
       video.addEventListener('error', () => { document.getElementById('video-fallback').hidden = false; message('D06 video failed to load'); });
@@ -4657,6 +4862,7 @@
           '--product-peek-height',
           `${visibleVideoHeight}px`
         );
+        syncProductVideoFrame(visibleVideoHeight);
 
         return height;
       }
@@ -4680,6 +4886,30 @@
         productSheet.classList.remove('is-dragging');
       }
 
+      function syncProductVideoFrame(visibleHeight) {
+        const width = Math.max(1, feed.clientWidth || fypApp.clientWidth);
+        const full = Math.max(1, feed.clientHeight || fypApp.clientHeight);
+        const height = Math.max(0, Math.min(visibleHeight, full));
+        const ratio = video.videoWidth > 0 && video.videoHeight > 0
+          ? video.videoWidth / video.videoHeight
+          : 9 / 16;
+        const partialVisible = full * (1 - PRODUCT_PARTIAL_RATIO);
+        const span = Math.max(1, full - partialVisible);
+        const fit = height <= partialVisible
+          ? 0
+          : Math.max(0, Math.min(1, (height - partialVisible) / span));
+        const containW = Math.min(width, height * ratio);
+        const containH = Math.min(height, width / ratio);
+        const coverW = Math.max(width, height * ratio);
+        const coverH = Math.max(height, width / ratio);
+        const drawW = containW + (coverW - containW) * fit;
+        const drawH = containH + (coverH - containH) * fit;
+        fypApp.style.setProperty('--product-video-left', `${(width - drawW) / 2}px`);
+        fypApp.style.setProperty('--product-video-top', `${(height - drawH) / 2}px`);
+        fypApp.style.setProperty('--product-video-width', `${drawW}px`);
+        fypApp.style.setProperty('--product-video-height', `${drawH}px`);
+      }
+
       function syncPeekToVisibleSheet() {
         const appBox = fypApp.getBoundingClientRect();
         const sheetTop =
@@ -4694,6 +4924,7 @@
           '--product-peek-height',
           `${visible}px`
         );
+        syncProductVideoFrame(visible);
 
         if (fypApp.classList.contains('is-product-exiting')) {
           const appHeight = fypApp.clientHeight;
@@ -5194,6 +5425,7 @@
           '--product-peek-height',
           `${geometry.appHeight}px`
         );
+        syncProductVideoFrame(geometry.appHeight);
 
         if (prefersReducedMotion()) {
           applyProductGeometry(geometry.partial, geometry);
@@ -5239,6 +5471,10 @@
         stopProductPreview();
         fypApp.classList.remove('is-product-peek');
         fypApp.style.removeProperty('--product-peek-height');
+        fypApp.style.removeProperty('--product-video-left');
+        fypApp.style.removeProperty('--product-video-top');
+        fypApp.style.removeProperty('--product-video-width');
+        fypApp.style.removeProperty('--product-video-height');
         fypApp.classList.remove('is-product-exiting');
 
         fypApp.style.removeProperty('--fyp-header-return');
@@ -5526,14 +5762,12 @@
       const commerceViews = {
         variant:document.getElementById('commerce-variant'),
         basket:document.getElementById('commerce-basket'),
-        order:document.getElementById('commerce-order'),
         chat:document.getElementById('commerce-chat')
       };
 
       const commerceTitles = {
         variant:'Choose options',
         basket:'Your basket · Staging',
-        order:'Order preview',
         chat:'Arabista · Chat preview'
       };
 
@@ -5892,6 +6126,38 @@
         return commitStagingCart(next, cart.raw);
       }
 
+      function retargetStagingCartLine(id, size) {
+        const cart = readStagingCart();
+        if (!cart.ok) return cart;
+        const index = cart.items.findIndex(item => item && item.id === id);
+        if (index < 0) {
+          return { ok:false, items:cart.items, raw:cart.raw, error:'missing' };
+        }
+        const item = cart.items[index];
+        if (!isSupportedD06Line(item) || !COMMERCE_SIZES.includes(size)) {
+          return { ok:false, items:cart.items, raw:cart.raw, error:'unsupported' };
+        }
+        if (stagingCatalog.status !== 'ready') {
+          return { ok:false, items:cart.items, raw:cart.raw, error:'catalog' };
+        }
+        const info = getD06SizeInfo(size);
+        const others = aggregateD06Quantity(size, cart.items) -
+          (item.size === size ? item.qty : 0);
+        if (!info || !info.purchasable || item.qty + others > info.available) {
+          return { ok:false, items:cart.items, raw:cart.raw, error:'stock' };
+        }
+        const next = cart.items.map((entry, entryIndex) => {
+          if (entryIndex !== index) return entry;
+          return Object.assign({}, entry, {
+            size,
+            retailPrice:info.retailPrice,
+            price:info.effectivePrice,
+            unitWeight:info.weightKg
+          });
+        });
+        return commitStagingCart(next, cart.raw);
+      }
+
       function removeStagingCartLine(id) {
         const cart = readStagingCart();
         if (!cart.ok) return cart;
@@ -5910,7 +6176,12 @@
 
       function toD06PreviewLine(item) {
         if (!isSupportedD06Line(item)) return null;
-        return { sku:'D06', size:item.size, quantity:item.qty };
+        return {
+          sku:'D06',
+          size:item.size,
+          quantity:item.qty,
+          cartLineId:item.id
+        };
       }
 
       function cartCheckoutGate(cart) {
@@ -6221,10 +6492,7 @@
             commerceCurrentView === 'basket') {
           renderPreviewBasket();
         }
-        if (typeof renderOrderPreview === 'function' &&
-            commerceCurrentView === 'order') {
-          renderOrderPreview();
-        }
+        if (checkoutActive) checkoutRenderItems();
         if (typeof checkoutRenderItems === 'function' &&
             checkoutActive) {
           checkoutRenderItems();
@@ -6420,7 +6688,7 @@
         commercePrimary.disabled = !canPreview || stagingCartBusy;
         commercePrimary.textContent =
           commerceIntent === 'buy'
-            ? 'Buy now · Preview'
+            ? 'Buy now'
             : 'Add to basket';
 
         const note = document.getElementById('commerce-selection-note');
@@ -6724,31 +6992,6 @@
           !state.checkoutAllowed || stagingCartBusy;
       }
 
-      function renderOrderPreview() {
-        const summary =
-          document.getElementById('commerce-order-summary');
-        const valid = isD06SizePurchasable(
-          demoSelectedSize,
-          demoQuantity
-        );
-        const unit = getD06EffectivePrice(demoSelectedSize);
-        const subtotal = valid && unit !== null
-          ? moneyPreview(unit * demoQuantity)
-          : 'Price unavailable';
-
-        summary.textContent =
-          `Dahlia Series D06\n` +
-          `Size: ${demoSelectedSize || '—'}\n` +
-          `Quantity: ${demoQuantity}\n` +
-          `Staging subtotal: ${subtotal}\n` +
-          `Shipping: Not calculated\n` +
-          `Status: Preview only`;
-
-        const checkoutButton =
-          document.getElementById('commerce-checkout-buy');
-        if (checkoutButton) checkoutButton.disabled = !valid;
-      }
-
       function showCommerceView(view) {
         if (!commerceViews[view]) return;
 
@@ -6765,7 +7008,6 @@
 
         if (view === 'variant') renderVariantSelection();
         if (view === 'basket') renderPreviewBasket();
-        if (view === 'order') renderOrderPreview();
       }
 
       function resetCommerceDraft() {
@@ -6932,7 +7174,31 @@
           if (!isD06SizePurchasable(demoSelectedSize, demoQuantity)) {
             return;
           }
-          showCommerceView('order');
+          const size = demoSelectedSize;
+          const quantity = demoQuantity;
+          stagingCartBusy = true;
+          commercePrimary.disabled = true;
+          refreshD06CatalogIfStale().then(() => {
+            if (!isD06SizePurchasable(size, quantity)) {
+              demoSelectionNotice = 'That size is no longer available in staging.';
+              renderVariantSelection();
+              return;
+            }
+            const priced = getD06PreviewSubtotal([{
+              sku:'D06',
+              size,
+              quantity
+            }]);
+            if (!priced.complete || priced.blocked) {
+              demoSelectionNotice = 'Refresh required before checkout.';
+              renderVariantSelection();
+              return;
+            }
+            checkoutOpen('buy', commercePrimary);
+          }).finally(() => {
+            stagingCartBusy = false;
+            if (commerceCurrentView === 'variant') renderVariantSelection();
+          });
           return;
         }
 
@@ -6969,11 +7235,6 @@
           if (commerceCurrentView === 'basket') renderPreviewBasket();
         });
       });
-
-      document.getElementById('commerce-back-to-options')
-        .addEventListener('click', () => {
-          showCommerceView('variant');
-        });
 
       document.getElementById('commerce-continue-shopping')
         .addEventListener('click', closeCommerce);
@@ -7135,7 +7396,7 @@
       };
 
       const checkoutViewTitles = {
-        main:'Checkout · Preview',
+        main:'Checkout · Staging',
         addresses:'Your addresses',
         addressForm:'Add new address',
         complete:'Preview complete'
@@ -7181,6 +7442,11 @@
       let checkoutAddressId = 0;
       let checkoutSelectedAddressId = null;
       let checkoutEditingAddressId = null;
+      let checkoutRemoveAddressId = null;
+      let checkoutSizePicker = null;
+      let postcodeTablePromise = null;
+      let postcodeLookupSerial = 0;
+      let postcodeAutofill = { postcode:'', city:'', state:'' };
 
       const CHECKOUT_STATES = [
         'Johor','Kedah','Kelantan','Melaka',
@@ -7933,22 +8199,156 @@
         checkoutRenderItems();
       }
 
+      function checkoutItemEditsLocked() {
+        if (stagingCheckoutBusy) return true;
+        const status = stagingSubmission.status;
+        if (status === 'validating' ||
+            status === 'submitting' ||
+            status === 'reserved' ||
+            status === 'redirecting') return true;
+        if (stagingSubmission.error === 'network' ||
+            stagingSubmission.error === 'malformed') return true;
+        if (stagingSubmission.result && stagingSubmission.result.orderId) {
+          return true;
+        }
+        return false;
+      }
+
+      function checkoutQuantityFits(size, quantity, ignoreIndex) {
+        const info = getD06SizeInfo(size);
+        const qty = normalizeQuantity(quantity);
+        if (stagingCatalog.status !== 'ready' ||
+            !info ||
+            !info.purchasable ||
+            !qty) return false;
+        let used = 0;
+        checkoutItems.forEach((item, index) => {
+          if (index === ignoreIndex || !item || item.size !== size) return;
+          used += normalizeQuantity(item.quantity) || 0;
+        });
+        return used + qty <= info.available;
+      }
+
+      function checkoutAfterItemEdit() {
+        if (stagingSubmission.status !== 'reserved' &&
+            stagingSubmission.status !== 'redirecting') {
+          stagingSubmission.status = 'idle';
+          stagingSubmission.error = null;
+          stagingSubmission.result = null;
+          showCheckoutSubmission('');
+        }
+        const top = checkoutScroll.scrollTop;
+        checkoutRenderItems();
+        checkoutScroll.scrollTop = top;
+      }
+
+      function checkoutChangeBuyItem(index, size, quantity) {
+        if (checkoutItemEditsLocked()) return false;
+        if (!checkoutQuantityFits(size, quantity, index)) {
+          message('That quantity is no longer available in staging.');
+          return false;
+        }
+        checkoutItems[index] = {
+          sku:'D06',
+          size,
+          quantity
+        };
+        checkoutAfterItemEdit();
+        return true;
+      }
+
+      function checkoutChangeBasketItem(index, size, quantity) {
+        if (checkoutItemEditsLocked()) return false;
+        const item = checkoutItems[index];
+        if (!item || !item.cartLineId) return false;
+        stagingCartBusy = true;
+        let result;
+        if (size !== item.size) {
+          result = retargetStagingCartLine(item.cartLineId, size);
+          if (result.ok && quantity !== item.quantity) {
+            result = updateStagingCartLine(item.cartLineId, quantity);
+          }
+        } else {
+          result = updateStagingCartLine(item.cartLineId, quantity);
+        }
+        stagingCartBusy = false;
+        if (!result.ok) {
+          message(cartFailureMessage(result.error));
+          return false;
+        }
+        stagingSubmission.status = 'idle';
+        stagingSubmission.error = null;
+        stagingSubmission.result = null;
+        showCheckoutSubmission('');
+        syncBasketCheckout();
+        checkoutScroll.scrollTop = checkoutScroll.scrollTop;
+        return true;
+      }
+
+      function checkoutApplyItemChange(index, size, quantity) {
+        const top = checkoutScroll.scrollTop;
+        const changed = checkoutOrigin === 'basket'
+          ? checkoutChangeBasketItem(index, size, quantity)
+          : checkoutChangeBuyItem(index, size, quantity);
+        if (changed) checkoutScroll.scrollTop = top;
+        return changed;
+      }
+
+      function checkoutRemoveCheckoutItem(index) {
+        if (checkoutItemEditsLocked()) return;
+        const top = checkoutScroll.scrollTop;
+        if (checkoutOrigin === 'basket') {
+          const item = checkoutItems[index];
+          if (!item || !item.cartLineId) return;
+          stagingCartBusy = true;
+          const result = removeStagingCartLine(item.cartLineId);
+          stagingCartBusy = false;
+          if (!result.ok) {
+            message(cartFailureMessage(result.error));
+            return;
+          }
+          if (checkoutSizePicker === item.cartLineId) checkoutSizePicker = null;
+          syncBasketCheckout();
+        } else {
+          checkoutItems.splice(index, 1);
+          checkoutSizePicker = null;
+          checkoutAfterItemEdit();
+        }
+        checkoutScroll.scrollTop = top;
+      }
+
       function checkoutRenderItems() {
         const list = document.getElementById('checkout-item-list');
+        if (!list) return;
+        const top = checkoutScroll ? checkoutScroll.scrollTop : 0;
         list.replaceChildren();
 
-        if (checkoutBasketHold) {
+        if (!checkoutItems.length || checkoutBasketHold) {
           const hold = document.createElement('p');
           hold.className = 'checkout-muted';
-          hold.textContent = checkoutBasketHold;
-          list.appendChild(hold);
+          hold.textContent = checkoutBasketHold || 'No items in this checkout.';
+          const back = document.createElement('button');
+          back.type = 'button';
+          back.className = 'checkout-secondary checkout-empty-action';
+          back.textContent = checkoutOrigin === 'basket'
+            ? 'Return to basket'
+            : 'Choose a size';
+          back.addEventListener('click', () => {
+            const origin = checkoutOrigin;
+            checkoutClose();
+            if (origin === 'basket') showCommerceView('basket');
+            else showCommerceView('variant');
+          });
+          list.append(hold, back);
           document.getElementById('checkout-subtotal').textContent =
-            'Full cart total unavailable';
+            checkoutBasketHold ? 'Full cart total unavailable' : 'RM0.00';
           scheduleCheckoutShipping();
+          if (checkoutScroll) checkoutScroll.scrollTop = top;
           return;
         }
 
         const priced = getD06PreviewSubtotal(checkoutItems);
+        const locked = checkoutItemEditsLocked();
 
         checkoutItems.forEach((item, index) => {
           const line = priced.lines[index];
@@ -7966,15 +8366,112 @@
           name.textContent = 'Dahlia Series D06';
 
           const detail = document.createElement('span');
-          detail.textContent =
-            `Size ${item.size} · Quantity ${item.quantity}`;
+          detail.textContent = `Size ${item.size}`;
 
           const price = document.createElement('small');
           price.textContent = !line || line.price === null
             ? 'Price unavailable'
             : `${checkoutMoney(line.lineTotal)} staging`;
 
-          info.append(name, detail, price);
+          const controls = document.createElement('div');
+          controls.className = 'checkout-item-controls';
+
+          const minus = document.createElement('button');
+          minus.type = 'button';
+          minus.textContent = '−';
+          minus.setAttribute('aria-label', `Decrease size ${item.size}`);
+          minus.disabled = locked || item.quantity <= 1;
+          minus.addEventListener('click', () => {
+            checkoutApplyItemChange(index, item.size, item.quantity - 1);
+          });
+
+          const qty = document.createElement('span');
+          qty.className = 'checkout-item-qty';
+          qty.textContent = String(item.quantity);
+
+          const plus = document.createElement('button');
+          plus.type = 'button';
+          plus.textContent = '+';
+          plus.setAttribute('aria-label', `Increase size ${item.size}`);
+          plus.disabled = locked ||
+            !checkoutQuantityFits(item.size, item.quantity + 1, index);
+          if (checkoutOrigin === 'basket') {
+            const info = getD06SizeInfo(item.size);
+            const cart = readStagingCart();
+            const others = cart.ok
+              ? aggregateD06Quantity(item.size, cart.items) - item.quantity
+              : 0;
+            plus.disabled = locked ||
+              !info ||
+              !info.purchasable ||
+              item.quantity + others >= info.available;
+          }
+          plus.addEventListener('click', () => {
+            checkoutApplyItemChange(index, item.size, item.quantity + 1);
+          });
+
+          const change = document.createElement('button');
+          change.type = 'button';
+          change.textContent = 'Change size';
+          change.disabled = locked;
+          change.setAttribute('aria-expanded', checkoutSizePicker === (item.cartLineId || index) ? 'true' : 'false');
+          change.addEventListener('click', () => {
+            const key = item.cartLineId || index;
+            checkoutSizePicker = checkoutSizePicker === key ? null : key;
+            checkoutRenderItems();
+          });
+
+          const remove = document.createElement('button');
+          remove.type = 'button';
+          remove.textContent = 'Remove';
+          remove.disabled = locked;
+          remove.addEventListener('click', () => {
+            checkoutRemoveCheckoutItem(index);
+          });
+
+          controls.append(minus, qty, plus, change, remove);
+          info.append(name, detail, price, controls);
+
+          const pickerKey = item.cartLineId || index;
+          if (checkoutSizePicker === pickerKey) {
+            const picker = document.createElement('div');
+            picker.className = 'checkout-size-picker';
+            COMMERCE_SIZES.forEach(size => {
+              const choice = document.createElement('button');
+              choice.type = 'button';
+              choice.textContent = size;
+              choice.setAttribute('aria-pressed', size === item.size ? 'true' : 'false');
+              const allowed = checkoutOrigin === 'basket'
+                ? (() => {
+                    const sizeInfo = getD06SizeInfo(size);
+                    const cart = readStagingCart();
+                    const others = cart.ok
+                      ? aggregateD06Quantity(size, cart.items) -
+                        (item.size === size ? item.quantity : 0)
+                      : item.quantity;
+                    return Boolean(
+                      sizeInfo &&
+                      sizeInfo.purchasable &&
+                      item.quantity + others <= sizeInfo.available
+                    );
+                  })()
+                : checkoutQuantityFits(size, item.quantity, index) ||
+                  size === item.size;
+              choice.disabled = locked || (size !== item.size && !allowed);
+              choice.addEventListener('click', () => {
+                if (size === item.size) {
+                  checkoutSizePicker = null;
+                  checkoutRenderItems();
+                  return;
+                }
+                checkoutSizePicker = null;
+                checkoutApplyItemChange(index, size, item.quantity);
+              });
+              picker.appendChild(choice);
+            });
+            info.appendChild(picker);
+          }
+
           if (line && line.warning && line.price !== null) {
             const warning = document.createElement('small');
             warning.className = 'commerce-line-warning';
@@ -7992,6 +8489,7 @@
         document.getElementById('checkout-subtotal').textContent =
           subtotalText;
         scheduleCheckoutShipping();
+        if (checkoutScroll) checkoutScroll.scrollTop = top;
       }
 
       function checkoutRenderAddressSummary() {
@@ -8001,6 +8499,7 @@
 
         if (!address) {
           slot.textContent = 'Add delivery address';
+          checkoutRenderAddressCompact();
           return;
         }
 
@@ -8019,6 +8518,178 @@
         ].filter(Boolean).join(', ');
 
         slot.append(name, phone, lines);
+        checkoutRenderAddressCompact();
+      }
+
+      function checkoutRenderAddressCompact() {
+        const name = document.getElementById('checkout-address-compact-name');
+        const line = document.getElementById('checkout-address-compact-line');
+        if (!name || !line) return;
+        const address = checkoutSelectedAddress();
+        if (!address) {
+          name.textContent = 'Add address';
+          line.textContent = 'Add a delivery address';
+          return;
+        }
+        name.textContent = address.recipient;
+        const summary = [
+          address.line1,
+          address.postcode,
+          address.city
+        ].filter(Boolean).join(', ');
+        line.textContent = summary || 'Delivery address';
+      }
+
+      function normalizeCheckoutState(name) {
+        const value = String(name || '').trim();
+        if (CHECKOUT_STATES.includes(value)) return value;
+        const aliases = {
+          'Kuala Lumpur':'W.P. Kuala Lumpur',
+          'Wilayah Persekutuan Kuala Lumpur':'W.P. Kuala Lumpur',
+          'WP Kuala Lumpur':'W.P. Kuala Lumpur',
+          'Labuan':'W.P. Labuan',
+          'Wilayah Persekutuan Labuan':'W.P. Labuan',
+          'Putrajaya':'W.P. Putrajaya',
+          'Wilayah Persekutuan Putrajaya':'W.P. Putrajaya',
+          'Penang':'Pulau Pinang'
+        };
+        return aliases[value] || '';
+      }
+
+      function loadMalaysianPostcodes() {
+        if (!postcodeTablePromise) {
+          postcodeTablePromise = fetch('data/my-postcodes.json', {
+            credentials:'omit'
+          }).then(response => {
+            if (!response.ok) throw new Error('postcode list');
+            return response.json();
+          }).then(data => {
+            if (!data || !data.postcodes || typeof data.postcodes !== 'object') {
+              throw new Error('postcode list');
+            }
+            return data.postcodes;
+          }).catch(() => null);
+        }
+        return postcodeTablePromise;
+      }
+
+      function setPostcodeHint(text) {
+        const hint = document.getElementById('checkout-postcode-hint');
+        if (!hint) return;
+        hint.hidden = !text;
+        hint.textContent = text || '';
+      }
+
+      function clearPostcodeChoices() {
+        const box = document.getElementById('checkout-postcode-choices');
+        if (!box) return;
+        box.replaceChildren();
+        box.hidden = true;
+      }
+
+      function clearObsoletePostcodeAutofill() {
+        const form = checkoutAddressForm;
+        if (!form) return;
+        if (postcodeAutofill.city &&
+            form.elements.city.value.trim() === postcodeAutofill.city) {
+          form.elements.city.value = '';
+        }
+        if (postcodeAutofill.state &&
+            form.elements.state.value === postcodeAutofill.state) {
+          form.elements.state.value = '';
+        }
+        postcodeAutofill = { postcode:'', city:'', state:'' };
+      }
+
+      function applyPostcodeMatch(postcode, match, preserveManual) {
+        const form = checkoutAddressForm;
+        const stateName = normalizeCheckoutState(match && match[0]);
+        const cities = match && Array.isArray(match[1]) ? match[1] : [];
+        clearPostcodeChoices();
+        if (!stateName || !cities.length) {
+          setPostcodeHint('This postcode is not in the official list. Enter the city and state.');
+          return;
+        }
+        if (!form.elements.state.value || !preserveManual) {
+          form.elements.state.value = stateName;
+          postcodeAutofill.state = stateName;
+        } else if (form.elements.state.value === stateName) {
+          postcodeAutofill.state = stateName;
+        }
+        if (cities.length === 1) {
+          const current = form.elements.city.value.trim();
+          if (preserveManual && current && current !== cities[0]) {
+            postcodeAutofill = { postcode, city:'', state:postcodeAutofill.state };
+            setPostcodeHint(`Official locality: ${cities[0]}. Your city was kept and can be edited.`);
+            return;
+          }
+          form.elements.city.value = cities[0];
+          postcodeAutofill = {
+            postcode,
+            city:cities[0],
+            state:stateName
+          };
+          setPostcodeHint('Filled from the official postcode list. You can edit this.');
+          return;
+        }
+        const current = form.elements.city.value.trim();
+        const known = cities.includes(current);
+        if (!known && !preserveManual) form.elements.city.value = '';
+        postcodeAutofill = {
+          postcode,
+          city: known ? current : '',
+          state:stateName
+        };
+        const box = document.getElementById('checkout-postcode-choices');
+        cities.forEach(city => {
+          const button = document.createElement('button');
+          button.type = 'button';
+          button.textContent = city;
+          button.setAttribute('aria-pressed', city === current ? 'true' : 'false');
+          button.addEventListener('click', () => {
+            form.elements.city.value = city;
+            postcodeAutofill.city = city;
+            box.querySelectorAll('button').forEach(choice => {
+              choice.setAttribute(
+                'aria-pressed',
+                choice === button ? 'true' : 'false'
+              );
+            });
+          });
+          box.appendChild(button);
+        });
+        box.hidden = false;
+        setPostcodeHint('This postcode covers more than one locality. Choose one, or type the city.');
+      }
+
+      function lookupCheckoutPostcode(postcode, typing) {
+        const serial = ++postcodeLookupSerial;
+        if (typing) clearObsoletePostcodeAutofill();
+        clearPostcodeChoices();
+        if (!/^\d{5}$/.test(postcode)) {
+          setPostcodeHint(postcode
+            ? 'Enter all 5 digits to look up the city and state.'
+            : '');
+          return;
+        }
+        setPostcodeHint('Looking up the official postcode list…');
+        loadMalaysianPostcodes().then(table => {
+          if (serial !== postcodeLookupSerial) return;
+          if (!checkoutAddressForm ||
+              checkoutAddressForm.elements.postcode.value !== postcode) return;
+          if (!table) {
+            setPostcodeHint('The official postcode list could not be loaded. Enter the city and state.');
+            return;
+          }
+          const match = Object.prototype.hasOwnProperty.call(table, postcode)
+            ? table[postcode]
+            : null;
+          if (!match) {
+            setPostcodeHint('This postcode is not in the official list. Enter the city and state.');
+            return;
+          }
+          applyPostcodeMatch(postcode, match, !typing);
+        });
       }
 
       function checkoutFillAddressForm(address) {
@@ -8031,6 +8702,8 @@
         form.elements.city.value = address.city;
         form.elements.state.value = address.state;
         form.elements.isDefault.checked = Boolean(address.isDefault);
+        postcodeAutofill = { postcode:'', city:'', state:'' };
+        lookupCheckoutPostcode(address.postcode, false);
       }
 
       function checkoutRenderAddressList() {
@@ -8074,9 +8747,13 @@
 
           const select = document.createElement('button');
           select.type = 'button';
-          select.textContent = 'Select';
+          select.textContent = address.id === checkoutSelectedAddressId
+            ? 'Selected'
+            : 'Select';
+          select.disabled = address.id === checkoutSelectedAddressId;
           select.addEventListener('click', () => {
             checkoutSelectedAddressId = address.id;
+            checkoutRemoveAddressId = null;
             checkoutRenderAddressSummary();
             scheduleCheckoutShipping();
             checkoutShowView('main');
@@ -8087,6 +8764,7 @@
           edit.textContent = 'Edit';
           edit.addEventListener('click', () => {
             checkoutEditingAddressId = address.id;
+            checkoutRemoveAddressId = null;
             checkoutFillAddressForm(address);
             const error = document.getElementById('checkout-address-error');
             error.hidden = true;
@@ -8094,7 +8772,49 @@
             checkoutShowView('addressForm');
           });
 
-          actions.append(select, edit);
+          const makeDefault = document.createElement('button');
+          makeDefault.type = 'button';
+          makeDefault.textContent = address.isDefault ? 'Default' : 'Set as default';
+          makeDefault.disabled = address.isDefault;
+          makeDefault.addEventListener('click', () => {
+            checkoutAddresses.forEach(entry => {
+              entry.isDefault = entry.id === address.id;
+            });
+            checkoutSelectedAddressId = address.id;
+            checkoutRemoveAddressId = null;
+            checkoutRenderAddressList();
+            checkoutRenderAddressSummary();
+            scheduleCheckoutShipping();
+          });
+
+          const remove = document.createElement('button');
+          remove.type = 'button';
+          remove.textContent = 'Remove';
+          remove.addEventListener('click', () => {
+            checkoutRemoveAddressId = address.id;
+            checkoutRenderAddressList();
+          });
+
+          actions.append(select, edit, makeDefault, remove);
+          if (checkoutRemoveAddressId === address.id) {
+            const confirm = document.createElement('p');
+            confirm.className = 'checkout-address-confirm';
+            confirm.textContent = 'Remove this address?';
+            const yes = document.createElement('button');
+            yes.type = 'button';
+            yes.textContent = 'Remove';
+            yes.addEventListener('click', () => {
+              removeCheckoutAddress(address.id);
+            });
+            const no = document.createElement('button');
+            no.type = 'button';
+            no.textContent = 'Keep';
+            no.addEventListener('click', () => {
+              checkoutRemoveAddressId = null;
+              checkoutRenderAddressList();
+            });
+            actions.append(confirm, yes, no);
+          }
           card.append(title, badge, body, actions);
           list.appendChild(card);
         });
@@ -8125,6 +8845,14 @@
 
         checkoutFooter.hidden = view !== 'main';
         checkoutScroll.scrollTop = 0;
+        if (view !== 'main') {
+          const compact = document.getElementById('checkout-address-compact');
+          const entry = document.getElementById('checkout-address-entry');
+          if (compact) compact.hidden = true;
+          if (entry) entry.removeAttribute('tabindex');
+        } else if (typeof refreshCheckoutAddressCompact === 'function') {
+          refreshCheckoutAddressCompact();
+        }
 
         if (view === 'complete') {
           document.getElementById('checkout-complete-return')
@@ -8173,6 +8901,14 @@
         checkoutRenderAddressList();
         checkoutRenderPayment();
         checkoutShowView('main');
+
+        const checkoutHeader = checkoutScreen.querySelector('.checkout-header');
+        if (checkoutHeader) {
+          checkoutScreen.style.setProperty(
+            '--checkout-header-height',
+            `${checkoutHeader.offsetHeight}px`
+          );
+        }
 
         checkoutLayer.hidden = false;
         checkoutScreen.getBoundingClientRect();
@@ -8257,20 +8993,6 @@
         checkoutLayer.style.bottom = `${Math.round(overlap)}px`;
       }
 
-      document.getElementById('commerce-checkout-buy')
-        .addEventListener('click', event => {
-          const trigger = event.currentTarget;
-          if (stagingCartBusy || checkoutActive) return;
-          stagingCartBusy = true;
-          refreshD06CatalogIfStale().then(() => {
-            renderOrderPreview();
-            checkoutOpen('buy', trigger);
-          }).finally(() => {
-            stagingCartBusy = false;
-            if (commerceCurrentView === 'order') renderOrderPreview();
-          });
-        });
-
       document.getElementById('commerce-checkout-basket')
         .addEventListener('click', event => {
           const trigger = event.currentTarget;
@@ -8314,7 +9036,88 @@
           scheduleCheckoutShipping();
         });
 
+      function removeCheckoutAddress(id) {
+        const index = checkoutAddresses.findIndex(address => address.id === id);
+        if (index < 0) return;
+        const removed = checkoutAddresses[index];
+        const wasSelected = checkoutSelectedAddressId === id;
+        checkoutAddresses.splice(index, 1);
+        checkoutRemoveAddressId = null;
+        if (!checkoutAddresses.length) {
+          checkoutSelectedAddressId = null;
+        } else {
+          if (removed.isDefault) {
+            const nextDefault = checkoutAddresses.find(
+              address => address.id === checkoutSelectedAddressId
+            ) || checkoutAddresses[0];
+            checkoutAddresses.forEach(address => {
+              address.isDefault = address.id === nextDefault.id;
+            });
+          }
+          if (wasSelected) {
+            const preferred = checkoutAddresses.find(address => address.isDefault) ||
+              checkoutAddresses[0];
+            checkoutSelectedAddressId = preferred.id;
+          }
+        }
+        checkoutRenderAddressList();
+        checkoutRenderAddressSummary();
+        scheduleCheckoutShipping();
+      }
+
+      function refreshCheckoutAddressCompact() {
+        const banner = document.getElementById('checkout-address-compact');
+        const entry = document.getElementById('checkout-address-entry');
+        if (!banner || !entry) return;
+        if (checkoutCurrentView !== 'main') {
+          banner.hidden = true;
+          entry.removeAttribute('tabindex');
+          return;
+        }
+        const root = checkoutScroll.getBoundingClientRect();
+        const box = entry.getBoundingClientRect();
+        const collapsed = box.bottom <= root.top + 8;
+        banner.hidden = !collapsed;
+        if (collapsed) entry.setAttribute('tabindex', '-1');
+        else entry.removeAttribute('tabindex');
+      }
+
+      let checkoutCompactFrame = null;
+      checkoutScroll.addEventListener('scroll', () => {
+        if (checkoutCompactFrame !== null) return;
+        checkoutCompactFrame = requestAnimationFrame(() => {
+          checkoutCompactFrame = null;
+          refreshCheckoutAddressCompact();
+        });
+      }, { passive:true });
+
+      if ('IntersectionObserver' in window) {
+        const addressEntry = document.getElementById('checkout-address-entry');
+        const addressObserver = new IntersectionObserver(entries => {
+          const seen = entries[0];
+          if (!seen || checkoutCurrentView !== 'main') {
+            refreshCheckoutAddressCompact();
+            return;
+          }
+          const banner = document.getElementById('checkout-address-compact');
+          const show = seen.intersectionRatio < 0.15;
+          if (banner) banner.hidden = !show;
+          if (show) addressEntry.setAttribute('tabindex', '-1');
+          else addressEntry.removeAttribute('tabindex');
+        }, {
+          root: checkoutScroll,
+          threshold: [0, 0.15, 1]
+        });
+        addressObserver.observe(addressEntry);
+      }
+
       document.getElementById('checkout-address-entry')
+        .addEventListener('click', () => {
+          checkoutRenderAddressList();
+          checkoutShowView('addresses');
+        });
+
+      document.getElementById('checkout-address-compact')
         .addEventListener('click', () => {
           checkoutRenderAddressList();
           checkoutShowView('addresses');
@@ -8323,11 +9126,24 @@
       document.getElementById('checkout-add-address')
         .addEventListener('click', () => {
           checkoutEditingAddressId = null;
+          checkoutRemoveAddressId = null;
           checkoutAddressForm.reset();
+          postcodeAutofill = { postcode:'', city:'', state:'' };
+          postcodeLookupSerial += 1;
+          clearPostcodeChoices();
+          setPostcodeHint('');
           const error = document.getElementById('checkout-address-error');
           error.hidden = true;
           error.textContent = '';
           checkoutShowView('addressForm');
+        });
+
+      document.getElementById('checkout-address-postcode')
+        .addEventListener('input', () => {
+          const field = checkoutAddressForm.elements.postcode;
+          const digits = field.value.replace(/\D/g, '').slice(0, 5);
+          if (field.value !== digits) field.value = digits;
+          lookupCheckoutPostcode(digits, true);
         });
 
       document.getElementById('checkout-back')
@@ -8408,6 +9224,10 @@
           isDefault
         };
 
+        if (!checkoutEditingAddressId && checkoutAddresses.length === 0) {
+          record.isDefault = true;
+        }
+
         if (checkoutEditingAddressId) {
           const current = checkoutAddresses.find(
             address => address.id === checkoutEditingAddressId
@@ -8421,15 +9241,24 @@
           }
         } else {
           const created = { id:++checkoutAddressId, ...record };
+          if (checkoutAddresses.length === 0) {
+            created.isDefault = true;
+            checkoutSelectedAddressId = created.id;
+          }
           checkoutAddresses.push(created);
           if (created.isDefault) {
             checkoutAddresses.forEach(address => {
               if (address.id !== created.id) address.isDefault = false;
             });
-          }
-          if (checkoutAddresses.length === 1) {
             checkoutSelectedAddressId = created.id;
           }
+        }
+
+        if (!checkoutAddresses.some(address => address.isDefault)) {
+          const keep = checkoutAddresses.find(
+            address => address.id === checkoutSelectedAddressId
+          ) || checkoutAddresses[0];
+          if (keep) keep.isDefault = true;
         }
 
         checkoutEditingAddressId = null;
