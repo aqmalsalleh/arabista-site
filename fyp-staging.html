@@ -26,7 +26,7 @@
     .track.is-dragging { transition:none !important; }
     .slide { height:100%; flex:0 0 100%; position:relative; overflow:hidden; background:#090909; }
     .media { position:absolute; inset:0; overflow:hidden; display:grid; place-items:center; }
-    .media video { width:100%; height:100%; object-fit:cover; object-position:center center; }
+    .media video:not(#d06-video) { width:100%; height:100%; object-fit:cover; object-position:center center; }
     .demo-media { background:radial-gradient(ellipse at 70% 25%,#8e806d 0%,transparent 38%), linear-gradient(145deg,#23242a,#51443f 50%,#161619); }
     .demo-media.alt { background:radial-gradient(ellipse at 20% 33%,#657273 0%,transparent 35%),linear-gradient(145deg,#121c20,#554c3d 65%,#131316); }
     .demo-shape { position:absolute; width:74%; aspect-ratio:3/4; border:1px solid rgba(235,213,177,.35); border-radius:45% 45% 8% 8%; background:linear-gradient(140deg,rgba(241,219,188,.22),rgba(20,20,24,.08)); box-shadow:0 20px 80px #0005; animation:float 6s ease-in-out infinite alternate; }
@@ -826,28 +826,61 @@
        PHASE 3A.1 — NATIVE-STYLE PRODUCT VIDEO PEEK
        ===================================================== */
 
-    /*
-      Product partial mode preserves the ORIGINAL video element.
-      Only its visual presentation changes.
-    */
+    /* PHASE 4C.5 — PERMANENT ADAPTIVE D06 STAGE */
 
-    .app.is-product-peek #video-hit-area {
+    #video-hit-area {
       display:block;
-      height:var(--product-peek-height,220px);
+      isolation:isolate;
       overflow:hidden;
-      background:#000;
+      background:#18120f;
     }
 
-    .app.is-product-peek #d06-video {
+    #d06-video-ambient {
       position:absolute;
-      top:var(--product-video-top,0px);
-      left:var(--product-video-left,0px);
-      width:var(--product-video-width,100%);
-      height:var(--product-video-height,var(--product-peek-height,220px));
+      inset:-24px;
+      z-index:0;
+      pointer-events:none;
+      background-image:url("images/d06-1-hero.webp");
+      background-position:center;
+      background-size:cover;
+      background-repeat:no-repeat;
+      filter:blur(24px) brightness(.57) saturate(.78);
+      transform:scale(1.06);
+      transform-origin:center;
+    }
+
+    #d06-video-window {
+      position:absolute;
+      top:0;
+      left:0;
+      width:100%;
+      height:var(--d06-window-height, 100%);
+      z-index:1;
+      overflow:hidden;
+      pointer-events:none;
+    }
+
+    #d06-video {
+      position:absolute;
+      left:var(--d06-frame-left, 0px);
+      top:var(--d06-frame-top, 0px);
+      width:var(--d06-frame-width, 100%);
+      height:var(--d06-frame-height, 100%);
       max-width:none;
+      display:block;
       object-fit:cover;
       object-position:center center;
-      background:#000;
+      background:transparent;
+      pointer-events:none;
+    }
+
+    #video-hit-area::after {
+      content:"";
+      position:absolute;
+      inset:0;
+      z-index:2;
+      pointer-events:none;
+      background:linear-gradient(180deg, rgba(12,9,8,.20) 0%, transparent 23%, transparent 65%, rgba(18,12,9,.16) 100%);
     }
 
     #product-sheet:focus,
@@ -927,10 +960,10 @@
       background:transparent;
     }
 
-    /* Original fullscreen video styling returns after dismissal. */
-
     @media (prefers-reduced-motion:reduce) {
-      .app.is-product-peek #d06-video {
+      #d06-video,
+      #d06-video-window,
+      #d06-video-ambient {
         transition:none !important;
       }
     }
@@ -2905,9 +2938,22 @@
       <div class="track" id="track">
         <article class="slide" aria-label="Video 1: D06 Dahlia Series">
           <div class="media" id="video-hit-area">
-            <video id="d06-video" muted autoplay loop playsinline preload="metadata" aria-label="D06 abaya demonstration">
-              <source src="images/fyp-d06-shoppable-h264.mp4" type="video/mp4">
-            </video>
+            <div id="d06-video-ambient"
+                 class="video-ambient"
+                 aria-hidden="true"></div>
+            <div id="d06-video-window"
+                 class="video-window">
+              <video id="d06-video"
+                     muted
+                     autoplay
+                     loop
+                     playsinline
+                     preload="metadata"
+                     aria-label="D06 abaya demonstration">
+                <source src="images/fyp-d06-shoppable-h264.mp4"
+                        type="video/mp4">
+              </video>
+            </div>
           </div>
           <div class="pause-cue" id="pause-cue"><svg><use href="#i-play"/></svg></div>
           <div class="video-fallback" id="video-fallback" hidden>D06 video is unavailable. Verify the MP4 file and browser compatibility.</div>
@@ -5282,28 +5328,97 @@
         productSheet.classList.remove('is-dragging');
       }
 
+      let videoGeometryFrame = null;
+      let d06AmbientCaptured = false;
+
       function syncProductVideoFrame(visibleHeight) {
-        const width = Math.max(1, feed.clientWidth || fypApp.clientWidth);
-        const full = Math.max(1, feed.clientHeight || fypApp.clientHeight);
-        const height = Math.max(0, Math.min(visibleHeight, full));
+        const width = Math.max(1, feed.clientWidth);
+        const fullHeight = Math.max(1, feed.clientHeight);
+        const height = Math.max(
+          0,
+          Math.min(
+            fullHeight,
+            Number.isFinite(visibleHeight) ? visibleHeight : fullHeight
+          )
+        );
         const ratio = video.videoWidth > 0 && video.videoHeight > 0
           ? video.videoWidth / video.videoHeight
           : 9 / 16;
-        const partialVisible = full * (1 - PRODUCT_PARTIAL_RATIO);
-        const span = Math.max(1, full - partialVisible);
-        const fit = height <= partialVisible
-          ? 0
-          : Math.max(0, Math.min(1, (height - partialVisible) / span));
-        const containW = Math.min(width, height * ratio);
-        const containH = Math.min(height, width / ratio);
-        const coverW = Math.max(width, height * ratio);
-        const coverH = Math.max(height, width / ratio);
-        const drawW = containW + (coverW - containW) * fit;
-        const drawH = containH + (coverH - containH) * fit;
-        fypApp.style.setProperty('--product-video-left', `${(width - drawW) / 2}px`);
-        fypApp.style.setProperty('--product-video-top', `${(height - drawH) / 2}px`);
-        fypApp.style.setProperty('--product-video-width', `${drawW}px`);
-        fypApp.style.setProperty('--product-video-height', `${drawH}px`);
+        const partialVisible = fullHeight * (1 - PRODUCT_PARTIAL_RATIO);
+        const span = Math.max(1, fullHeight - partialVisible);
+        const progress = Math.max(
+          0,
+          Math.min(1, (height - partialVisible) / span)
+        );
+        const containWidth = Math.min(width, height * ratio);
+        const coverWidth = Math.max(width, height * ratio);
+        const drawWidth = containWidth + (coverWidth - containWidth) * progress;
+        const drawHeight = drawWidth / ratio;
+        const left = (width - drawWidth) / 2;
+        const top = (height - drawHeight) / 2;
+        const px = value => `${Math.round(value * 100) / 100}px`;
+
+        fypApp.style.setProperty('--d06-window-height', px(height));
+        fypApp.style.setProperty('--d06-frame-left', px(left));
+        fypApp.style.setProperty('--d06-frame-top', px(top));
+        fypApp.style.setProperty('--d06-frame-width', px(drawWidth));
+        fypApp.style.setProperty('--d06-frame-height', px(drawHeight));
+      }
+
+      function scheduleD06GeometrySync() {
+        if (videoGeometryFrame !== null) return;
+
+        videoGeometryFrame = requestAnimationFrame(() => {
+          videoGeometryFrame = null;
+
+          if (activeSheet === 'product' && !productSheet.hidden) {
+            if (sheetClosing) {
+              syncPeekToVisibleSheet();
+            } else if (!productDrag) {
+              updateProductPeekGeometry();
+            }
+            return;
+          }
+
+          syncProductVideoFrame(feed.clientHeight);
+        });
+      }
+
+      function captureD06AmbientOnce() {
+        if (d06AmbientCaptured) return;
+        if (video.readyState < HTMLMediaElement.HAVE_CURRENT_DATA ||
+            !video.videoWidth ||
+            !video.videoHeight) return;
+
+        const ambient = document.getElementById('d06-video-ambient');
+        if (!ambient) return;
+
+        try {
+          const canvas = document.createElement('canvas');
+          canvas.width = 72;
+          canvas.height = Math.max(
+            1,
+            Math.round(72 * video.videoHeight / video.videoWidth)
+          );
+          const context = canvas.getContext('2d', { alpha:false });
+          if (!context) return;
+
+          context.drawImage(video, 0, 0, canvas.width, canvas.height);
+          ambient.style.backgroundImage =
+            `url("${canvas.toDataURL('image/jpeg', 0.6)}")`;
+          d06AmbientCaptured = true;
+        } catch (error) {
+          // Keep the static hero if this frame cannot be copied.
+        }
+      }
+
+      function armD06AmbientCapture() {
+        const attempt = () => captureD06AmbientOnce();
+        if (typeof video.requestVideoFrameCallback === 'function') {
+          video.requestVideoFrameCallback(attempt);
+        }
+        video.addEventListener('loadeddata', attempt, { once:true });
+        video.addEventListener('playing', attempt, { once:true });
       }
 
       function syncPeekToVisibleSheet() {
@@ -5865,12 +5980,9 @@
         miniDismissed = false;
         miniDrag = null;
         stopProductPreview();
+        syncProductVideoFrame(feed.clientHeight);
         fypApp.classList.remove('is-product-peek');
         fypApp.style.removeProperty('--product-peek-height');
-        fypApp.style.removeProperty('--product-video-left');
-        fypApp.style.removeProperty('--product-video-top');
-        fypApp.style.removeProperty('--product-video-width');
-        fypApp.style.removeProperty('--product-video-height');
         fypApp.classList.remove('is-product-exiting');
 
         fypApp.style.removeProperty('--fyp-header-return');
@@ -9893,21 +10005,26 @@
       });
 
       if (window.visualViewport) {
-        window.visualViewport.addEventListener(
-          'resize',
-          updateCheckoutKeyboardInset
-        );
+        window.visualViewport.addEventListener('resize', () => {
+          updateCheckoutKeyboardInset();
+          scheduleD06GeometrySync();
+        });
         window.visualViewport.addEventListener(
           'scroll',
           updateCheckoutKeyboardInset
         );
       }
 
-      window.addEventListener('resize', () => {
-        if (activeSheet === 'product') {
-          updateProductPeekGeometry();
-        }
-      });
+      window.addEventListener('resize', scheduleD06GeometrySync);
+      video.addEventListener('loadedmetadata', scheduleD06GeometrySync);
+      if ('onresize' in video) {
+        video.addEventListener('resize', scheduleD06GeometrySync);
+      }
+      if (typeof ResizeObserver === 'function') {
+        new ResizeObserver(scheduleD06GeometrySync).observe(feed);
+      }
+      armD06AmbientCapture();
+      scheduleD06GeometrySync();
 
       document.addEventListener('visibilitychange', () => {
         if (document.hidden) {
