@@ -2481,6 +2481,75 @@
       margin-top:10px;
     }
 
+    #commerce-checkout-basket {
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:8px;
+      box-sizing:border-box;
+      width:17.5em;
+      height:44px;
+      white-space:nowrap;
+      vertical-align:middle;
+    }
+
+    #commerce-checkout-basket .basket-checkout-busy {
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+    }
+
+    #commerce-checkout-basket:disabled {
+      cursor:default;
+    }
+
+    #commerce-checkout-basket.is-preparing,
+    #commerce-checkout-basket.is-preparing:disabled {
+      color:#876a3c;
+      opacity:1;
+    }
+
+    .arabista-spinner {
+      position:relative;
+      flex:0 0 22px;
+      width:22px;
+      height:22px;
+      display:grid;
+      place-items:center;
+    }
+
+    .arabista-spinner img {
+      width:14px;
+      height:14px;
+      border-radius:50%;
+    }
+
+    .arabista-spinner::before {
+      content:"";
+      position:absolute;
+      inset:0;
+      border-radius:50%;
+      border:1.5px solid rgba(179,146,87,.28);
+      border-top-color:#b39257;
+      opacity:0;
+    }
+
+    .arabista-spinner.is-visible::before {
+      opacity:1;
+      animation:arabista-spin .9s linear infinite;
+    }
+
+    @keyframes arabista-spin {
+      to { transform:rotate(360deg); }
+    }
+
+    @media (prefers-reduced-motion:reduce) {
+      .arabista-spinner.is-visible::before {
+        animation:none;
+        opacity:1;
+      }
+    }
+
     @media (prefers-reduced-motion:reduce) {
       .checkout-screen {
         transition:none !important;
@@ -3267,9 +3336,17 @@
             <button id="commerce-checkout-basket"
                     class="commerce-secondary"
                     type="button"
-                    disabled>
-              Checkout preview
+                    disabled
+                    aria-busy="false">
+              <span class="basket-checkout-idle">Checkout</span>
+              <span class="basket-checkout-busy" hidden>
+                <span class="arabista-spinner" aria-hidden="true">
+                  <img src="images/favicon-32x32.png" alt="">
+                </span>
+                Preparing checkout…
+              </span>
             </button>
+            <p id="basket-checkout-status" class="sr-only" aria-live="polite"></p>
 
           </div>
 
@@ -6988,12 +7065,21 @@
           state.totalText;
         updatePreviewCartBadge();
 
-        document.getElementById('commerce-checkout-basket').disabled =
-          !state.checkoutAllowed || stagingCartBusy;
+        const basketCheckout = document.getElementById('commerce-checkout-basket');
+        basketCheckout.disabled =
+          !state.checkoutAllowed ||
+          stagingCartBusy ||
+          basketCheckout.classList.contains('is-preparing');
       }
 
       function showCommerceView(view) {
         if (!commerceViews[view]) return;
+
+        if (view !== 'basket' && stagingCartBusy) {
+          basketCheckoutToken += 1;
+          stagingCartBusy = false;
+          setBasketCheckoutPreparing(false);
+        }
 
         commerceCurrentView = view;
         commercePanel.dataset.view = view;
@@ -7065,6 +7151,11 @@
         if (!commerceActive || commerceClosing || checkoutActive || checkoutClosing) return;
 
         commerceClosing = true;
+        if (stagingCartBusy) {
+          basketCheckoutToken += 1;
+          stagingCartBusy = false;
+          setBasketCheckoutPreparing(false);
+        }
         commerceChatInput.blur();
         commerceLayer.style.bottom = '';
         commerceLayer.classList.remove('is-open');
@@ -7657,7 +7748,7 @@
           return;
         }
         if (!checkoutSelectedAddress()) {
-          statusEl.textContent = 'Add a delivery address';
+          statusEl.textContent = 'Add delivery address';
           return;
         }
         if (checkoutSelectedAddress() &&
@@ -7745,7 +7836,10 @@
           const rate = await pending;
           if (generation !== shippingGeneration) return stagingShipping;
           const latest = checkoutQuoteKey(buildCheckoutShippingContext());
-          if (latest !== key) return stagingShipping;
+          if (latest !== key) {
+            if (generation === shippingGeneration) scheduleCheckoutShipping();
+            return stagingShipping;
+          }
           stagingShipping.status = 'ready';
           stagingShipping.grossRate = rate;
           stagingShipping.effectiveRate = context.freeShipping ? 0 : rate;
@@ -7806,6 +7900,11 @@
         shippingDebounceTimer = setTimeout(() => {
           loadCheckoutShipping();
         }, 200);
+      }
+
+      function syncCheckoutShipping() {
+        if (!checkoutActive || checkoutCurrentView !== 'main') return;
+        scheduleCheckoutShipping();
       }
 
       function stagingQuotedRate(value) {
@@ -8488,7 +8587,7 @@
 
         document.getElementById('checkout-subtotal').textContent =
           subtotalText;
-        scheduleCheckoutShipping();
+        syncCheckoutShipping();
         if (checkoutScroll) checkoutScroll.scrollTop = top;
       }
 
@@ -8853,6 +8952,7 @@
         } else if (typeof refreshCheckoutAddressCompact === 'function') {
           refreshCheckoutAddressCompact();
         }
+        if (view === 'main') syncCheckoutShipping();
 
         if (view === 'complete') {
           document.getElementById('checkout-complete-return')
@@ -8916,6 +9016,7 @@
 
         document.getElementById('checkout-back')
           .focus({ preventScroll:true });
+        syncCheckoutShipping();
       }
 
       function checkoutClose() {
@@ -8993,21 +9094,55 @@
         checkoutLayer.style.bottom = `${Math.round(overlap)}px`;
       }
 
+      let basketCheckoutToken = 0;
+      let basketCheckoutTimer = null;
+
+      function setBasketCheckoutPreparing(preparing) {
+        const button = document.getElementById('commerce-checkout-basket');
+        const status = document.getElementById('basket-checkout-status');
+        if (!button) return;
+        clearTimeout(basketCheckoutTimer);
+        const idle = button.querySelector('.basket-checkout-idle');
+        const busy = button.querySelector('.basket-checkout-busy');
+        const ring = button.querySelector('.arabista-spinner');
+        button.classList.toggle('is-preparing', preparing);
+        button.setAttribute('aria-busy', preparing ? 'true' : 'false');
+        if (idle) idle.hidden = preparing;
+        if (busy) busy.hidden = !preparing;
+        if (ring) ring.classList.remove('is-visible');
+        if (status) status.textContent = preparing ? 'Preparing checkout' : '';
+        if (!preparing) return;
+        button.disabled = true;
+        basketCheckoutTimer = window.setTimeout(() => {
+          if (button.classList.contains('is-preparing') && ring) {
+            ring.classList.add('is-visible');
+          }
+        }, 120);
+      }
+
       document.getElementById('commerce-checkout-basket')
         .addEventListener('click', event => {
           const trigger = event.currentTarget;
-          if (stagingCartBusy || checkoutActive) return;
+          if (stagingCartBusy || checkoutActive || trigger.classList.contains('is-preparing')) return;
+          const token = ++basketCheckoutToken;
           stagingCartBusy = true;
+          setBasketCheckoutPreparing(true);
           refreshD06CatalogIfStale().then(() => {
+            if (token !== basketCheckoutToken) return;
+            if (!commerceActive || commerceClosing || commerceCurrentView !== 'basket') return;
             const gate = cartCheckoutGate(readStagingCart());
             if (!gate.ok) {
               stagingCartNotice = gate.reason;
-              if (commerceCurrentView === 'basket') renderPreviewBasket();
               return;
             }
             checkoutOpen('basket', trigger);
+          }).catch(() => {
+            if (token !== basketCheckoutToken) return;
+            stagingCartNotice = 'Refresh required before checkout.';
           }).finally(() => {
+            if (token !== basketCheckoutToken) return;
             stagingCartBusy = false;
+            setBasketCheckoutPreparing(false);
             if (commerceCurrentView === 'basket') renderPreviewBasket();
           });
         });
