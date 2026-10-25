@@ -1362,6 +1362,17 @@
       font-weight:600;
     }
 
+    .product-size-guide + .product-size-guide {
+      margin-top:16px;
+    }
+
+    .product-size-guide h4 {
+      margin:0 0 6px;
+      color:#222;
+      font-size:13px;
+      font-weight:700;
+    }
+
     .product-review-card {
       padding:13px 0;
       border-bottom:1px solid #eee;
@@ -3466,17 +3477,23 @@
           <section class="product-section" id="product-description">
             <h3>Description</h3>
 
-            <p>
+            <p id="product-description-copy">
               Dahlia Series (D06), made using premium Nidha Dubai
               material. Designed as a comfortable, elegant Abaya Arab
               with practical everyday features.
             </p>
 
+            <div id="product-fabric-block" hidden>
+              <div class="product-info-divider"></div>
+              <h3>Fabric</h3>
+              <p id="product-fabric-copy"></p>
+            </div>
+
             <div class="product-info-divider"></div>
 
             <h3>Features</h3>
 
-            <ul class="product-feature-list">
+            <ul class="product-feature-list" id="product-feature-list">
               <li>Premium Nidha Dubai fabric</li>
               <li>Single-layer cutting</li>
               <li>10-inch nursing-friendly front zip</li>
@@ -3496,49 +3513,25 @@
               XS, S, M, L, XL, XXL and XXXL.
             </p>
 
-            <p class="product-reference-note">
-              Size availability is loaded from the staging catalog.
-              The measurement table below remains historical
-              reference and is not a stock list.
+            <p class="product-reference-note" id="product-size-status">
+              Garment measurements load from the Operations catalog.
+              They are sizing references, not purchase options.
+              Prices and availability still come from the staging shop.
             </p>
 
-            <details>
-              <summary>View D06 staging-page measurement reference</summary>
+            <div id="product-size-guides"></div>
 
+            <div id="product-size-unavailable" hidden>
               <p class="product-reference-note">
-                Historical measurements copied from the supplied
-                D06 staging HTML. For interface testing only.
-                Reconcile with the latest Arabista sizing system
-                before activating purchases.
+                Sizing information is unavailable. Set 1 and Set 2
+                measurements are not shown.
               </p>
-
-              <div class="product-size-table-wrap">
-                <table class="product-size-table">
-                  <thead>
-                    <tr>
-                      <th>Size</th>
-                      <th>Shoulder</th>
-                      <th>Bust</th>
-                      <th>Sleeve</th>
-                      <th>Length</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr><td>XS</td><td>14</td><td>36</td><td>22</td><td>55</td></tr>
-                    <tr><td>S</td><td>15</td><td>39</td><td>22</td><td>55</td></tr>
-                    <tr><td>M</td><td>16</td><td>40</td><td>23</td><td>57</td></tr>
-                    <tr><td>L</td><td>16.5</td><td>43</td><td>23.5</td><td>60</td></tr>
-                    <tr><td>XL</td><td>17.5</td><td>44</td><td>23.5</td><td>60</td></tr>
-                    <tr><td>XXL</td><td>18</td><td>46</td><td>23.5</td><td>60</td></tr>
-                    <tr><td>XXXL</td><td>19</td><td>50</td><td>23.5</td><td>60</td></tr>
-                  </tbody>
-                </table>
-              </div>
-
-              <p class="product-reference-note">
-                All measurements are in inches.
-              </p>
-            </details>
+              <button id="product-size-retry"
+                      class="catalog-retry"
+                      type="button">
+                Retry size guide
+              </button>
+            </div>
           </section>
 
           <section class="product-section" id="product-reviews">
@@ -4383,6 +4376,7 @@
         if (type === 'product') {
           beginProductEntrance();
           loadD06StagingCatalog(false);
+          loadOperationsCatalog(false);
         }
 
         trigger.setAttribute('aria-expanded', 'true');
@@ -6470,6 +6464,9 @@
       // Production Retail is not used. Phase 4B.1 calls get_config only.
       const FYP_STAGING_API_URL = 'https://script.google.com/macros/s/AKfycbw4qGOeC2Sebod06uFnW2u-ZAkj7l8zRdzyWrFEyL1_7eDCn-ks9lVKrd1I226qHxRmQg/exec';
       const FYP_CATALOG_MAX_AGE_MS = 30000;
+      // Public Operations catalog. Not the Retail staging web app.
+      const FYP_OPERATIONS_CATALOG_URL = 'https://script.google.com/macros/s/AKfycbzflFIDCscAgcKGAJXHMzdK72EhrI45fmbX4lnOZ_r8xdAKPAflDDl19biH6U5BtToK/exec';
+      const FYP_OPERATIONS_CATALOG_MAX_AGE_MS = 30000;
 
       const stagingCatalog = {
         status:'idle',
@@ -7345,6 +7342,351 @@
         }
       }
 
+      /* operations-catalog-client:start */
+      const OPERATIONS_SIZE_ORDER = ['XS','S','M','L','XL','XXL','XXXL'];
+
+      function operationsNumber(value) {
+        if (typeof value !== 'number' || !Number.isFinite(value)) return null;
+        if (value < 0 || value > 400) return null;
+        return value;
+      }
+
+      function operationsText(value, max) {
+        if (typeof value !== 'string') return '';
+        const text = value.trim();
+        if (!text || text.length > max) return '';
+        return text;
+      }
+
+      function operationsFeatureLines(features) {
+        return String(features || '')
+          .split(';')
+          .map(part => part.trim())
+          .filter(Boolean);
+      }
+
+      function operationsShouldApply(currentUpdatedAt, nextUpdatedAt, hasReadyData) {
+        const next = Date.parse(nextUpdatedAt);
+        if (!Number.isFinite(next)) return false;
+        if (!hasReadyData) return true;
+        const current = Date.parse(currentUpdatedAt);
+        if (!Number.isFinite(current)) return true;
+        return next >= current;
+      }
+
+      function acceptOperationsCatalog(payload) {
+        try {
+          if (!payload || payload.ok !== true) return null;
+          if (payload.apiVersion !== 'ao.public.v1') return null;
+          if (payload.schemaVersion !== 1) return null;
+          if (!Number.isFinite(Date.parse(payload.updatedAt))) return null;
+          const data = payload.data;
+          if (!data || data.productCode !== 'D06') return null;
+          const title = operationsText(data.title, 200);
+          const description = operationsText(data.description, 2000);
+          const fabric = operationsText(data.fabric, 200);
+          const features = operationsText(data.features, 4000);
+          const featureLines = operationsFeatureLines(features);
+          if (!title || !description || !fabric || !featureLines.length) return null;
+          if (!Array.isArray(data.sizeProfiles) || data.sizeProfiles.length !== 2) return null;
+          const commerce = data.commerce;
+          if (!commerce || typeof commerce !== 'object') return null;
+          if (typeof commerce.purchasable !== 'boolean') return null;
+          const enums = {
+            prices:['UNSET','SET'],
+            media:['NONE','PRESENT'],
+            inventory:['UNINITIALIZED','INITIALIZED'],
+            lengthAssignment:['UNASSIGNED','ASSIGNED']
+          };
+          const commerceOk = Object.keys(enums).every(key =>
+            enums[key].includes(commerce[key])
+          );
+          if (!commerceOk) return null;
+          const profiles = [];
+          const seenSets = {};
+          for (let index = 0; index < data.sizeProfiles.length; index += 1) {
+            const profile = data.sizeProfiles[index];
+            if (!profile || (profile.setCode !== 'S1' && profile.setCode !== 'S2')) return null;
+            if (seenSets[profile.setCode]) return null;
+            if (index === 0 && profile.setCode !== 'S1') return null;
+            if (index === 1 && profile.setCode !== 'S2') return null;
+            seenSets[profile.setCode] = true;
+            const label = operationsText(profile.label, 80);
+            if (!label || profile.lengthUnit !== 'in' || profile.heightUnit !== 'cm') return null;
+            if (!Array.isArray(profile.sizes) || profile.sizes.length !== 7) return null;
+            const sizes = [];
+            for (let sizeIndex = 0; sizeIndex < OPERATIONS_SIZE_ORDER.length; sizeIndex += 1) {
+              const row = profile.sizes[sizeIndex];
+              if (!row || row.size !== OPERATIONS_SIZE_ORDER[sizeIndex]) return null;
+              const measurement = {
+                size:row.size,
+                shoulderIn:operationsNumber(row.shoulderIn),
+                bustIn:operationsNumber(row.bustIn),
+                sleeveIn:operationsNumber(row.sleeveIn),
+                lengthIn:operationsNumber(row.lengthIn),
+                heightMinCm:operationsNumber(row.heightMinCm),
+                heightMaxCm:operationsNumber(row.heightMaxCm)
+              };
+              if (Object.keys(measurement).some(key => key !== 'size' && measurement[key] === null)) {
+                return null;
+              }
+              if (measurement.heightMinCm > measurement.heightMaxCm) return null;
+              sizes.push(measurement);
+            }
+            profiles.push({
+              setCode:profile.setCode,
+              label,
+              lengthUnit:profile.lengthUnit,
+              heightUnit:profile.heightUnit,
+              sizes
+            });
+          }
+          return {
+            updatedAt:payload.updatedAt,
+            data:{
+              productCode:'D06',
+              title,
+              description,
+              fabric,
+              features,
+              sizeProfiles:profiles,
+              commerce:{
+                purchasable:commerce.purchasable,
+                prices:commerce.prices,
+                media:commerce.media,
+                inventory:commerce.inventory,
+                lengthAssignment:commerce.lengthAssignment
+              }
+            }
+          };
+        } catch (error) {
+          return null;
+        }
+      }
+
+      function operationsGuideModel(data) {
+        const titles = {
+          S1:'Set 1 \u2014 Standard (S1)',
+          S2:'Set 2 \u2014 Long (S2)'
+        };
+        return data.sizeProfiles.map(profile => ({
+          setCode:profile.setCode,
+          title:titles[profile.setCode],
+          label:profile.label,
+          columns:[
+            'Size',
+            'Shoulder (' + profile.lengthUnit + ')',
+            'Bust (' + profile.lengthUnit + ')',
+            'Sleeve (' + profile.lengthUnit + ')',
+            'Length (' + profile.lengthUnit + ')',
+            'Height (' + profile.heightUnit + ')'
+          ],
+          rows:profile.sizes.map(row => [
+            row.size,
+            String(row.shoulderIn),
+            String(row.bustIn),
+            String(row.sleeveIn),
+            String(row.lengthIn),
+            String(row.heightMinCm) + '\u2013' + String(row.heightMaxCm)
+          ])
+        }));
+      }
+      /* operations-catalog-client:end */
+
+      const operationsCatalog = {
+        status:'idle',
+        data:null,
+        updatedAt:'',
+        loadedAt:0,
+        error:null
+      };
+
+      let operationsCatalogRequest = null;
+      let operationsCatalogGeneration = 0;
+
+      function clearElement(node) {
+        if (!node) return;
+        while (node.firstChild) node.removeChild(node.firstChild);
+      }
+
+      function renderOperationsGuides(data) {
+        const host = document.getElementById('product-size-guides');
+        clearElement(host);
+        if (!host) return;
+        operationsGuideModel(data).forEach(guide => {
+          const section = document.createElement('section');
+          section.className = 'product-size-guide';
+          const heading = document.createElement('h4');
+          heading.textContent = guide.title;
+          const note = document.createElement('p');
+          note.className = 'product-reference-note';
+          note.textContent = guide.label + '. Reference only. This is not a purchase option.';
+          const wrap = document.createElement('div');
+          wrap.className = 'product-size-table-wrap';
+          const table = document.createElement('table');
+          table.className = 'product-size-table';
+          const head = document.createElement('thead');
+          const headRow = document.createElement('tr');
+          guide.columns.forEach(label => {
+            const cell = document.createElement('th');
+            cell.scope = 'col';
+            cell.textContent = label;
+            headRow.appendChild(cell);
+          });
+          head.appendChild(headRow);
+          const body = document.createElement('tbody');
+          guide.rows.forEach(row => {
+            const line = document.createElement('tr');
+            row.forEach(value => {
+              const cell = document.createElement('td');
+              cell.textContent = value;
+              line.appendChild(cell);
+            });
+            body.appendChild(line);
+          });
+          table.appendChild(head);
+          table.appendChild(body);
+          wrap.appendChild(table);
+          section.appendChild(heading);
+          section.appendChild(note);
+          section.appendChild(wrap);
+          host.appendChild(section);
+        });
+      }
+
+      function applyOperationsCopy(data) {
+        const heading = document.getElementById('product-sheet-heading');
+        const description = document.getElementById('product-description-copy');
+        const fabricBlock = document.getElementById('product-fabric-block');
+        const fabric = document.getElementById('product-fabric-copy');
+        const list = document.getElementById('product-feature-list');
+        if (heading) heading.textContent = data.title;
+        if (description) description.textContent = data.description;
+        if (fabric && fabricBlock) {
+          fabric.textContent = data.fabric;
+          fabricBlock.hidden = false;
+        }
+        if (!list) return;
+        clearElement(list);
+        operationsFeatureLines(data.features).forEach(line => {
+          const item = document.createElement('li');
+          item.textContent = line;
+          list.appendChild(item);
+        });
+      }
+
+      function renderOperationsProduct() {
+        try {
+          const status = document.getElementById('product-size-status');
+          const unavailable = document.getElementById('product-size-unavailable');
+          const guides = document.getElementById('product-size-guides');
+          if (operationsCatalog.status === 'ready' && operationsCatalog.data) {
+            applyOperationsCopy(operationsCatalog.data);
+            renderOperationsGuides(operationsCatalog.data);
+            if (unavailable) unavailable.hidden = true;
+            if (status) {
+              status.textContent =
+                'Set 1 and Set 2 are sizing references. They are not purchase options and are not added to the basket. Prices and availability still come from the staging shop.';
+            }
+            return;
+          }
+          clearElement(guides);
+          if (operationsCatalog.status === 'error') {
+            if (unavailable) unavailable.hidden = false;
+            if (status) {
+              status.textContent =
+                'Prices and availability still come from the staging shop.';
+            }
+            return;
+          }
+          if (unavailable) unavailable.hidden = true;
+          if (status && operationsCatalog.status === 'loading') {
+            status.textContent = 'Loading size information\u2026';
+          }
+        } catch (error) {
+          console.error('Operations catalog could not be shown.');
+        }
+      }
+
+      async function loadOperationsCatalog(forceRefresh = false) {
+        const fresh = operationsCatalog.status === 'ready' &&
+          (Date.now() - operationsCatalog.loadedAt) <= FYP_OPERATIONS_CATALOG_MAX_AGE_MS;
+        if (!forceRefresh && fresh) return operationsCatalog;
+        if (!forceRefresh && operationsCatalogRequest) {
+          return operationsCatalogRequest;
+        }
+
+        const generation = ++operationsCatalogGeneration;
+        if (operationsCatalog.status !== 'ready') {
+          operationsCatalog.status = 'loading';
+          operationsCatalog.error = null;
+          renderOperationsProduct();
+        }
+
+        const pending = (async () => {
+          const url = new URL(FYP_OPERATIONS_CATALOG_URL);
+          url.searchParams.set('action', 'catalog');
+          url.searchParams.set('product', 'D06');
+          url.searchParams.set('nocache', String(Date.now()));
+          const response = await fetch(url.toString(), {
+            method:'GET',
+            credentials:'omit',
+            redirect:'follow',
+            cache:'no-store',
+            signal:AbortSignal.timeout(20000)
+          });
+          if (!response.ok) {
+            throw new Error('Operations catalog request failed');
+          }
+          return response.json();
+        })();
+
+        operationsCatalogRequest = pending;
+
+        try {
+          const json = await pending;
+          const accepted = acceptOperationsCatalog(json);
+          const hasReadyData = operationsCatalog.status === 'ready' &&
+            !!operationsCatalog.data;
+          if (!accepted) {
+            if (generation !== operationsCatalogGeneration) return operationsCatalog;
+            if (hasReadyData) return operationsCatalog;
+            operationsCatalog.status = 'error';
+            operationsCatalog.error = 'Sizing information is unavailable.';
+            renderOperationsProduct();
+            return operationsCatalog;
+          }
+          const canApply = operationsShouldApply(
+            operationsCatalog.updatedAt,
+            accepted.updatedAt,
+            hasReadyData
+          );
+          if (!canApply) return operationsCatalog;
+          const latest = generation === operationsCatalogGeneration;
+          const strictlyNewer = hasReadyData &&
+            Date.parse(accepted.updatedAt) > Date.parse(operationsCatalog.updatedAt);
+          if (!latest && !strictlyNewer) return operationsCatalog;
+          operationsCatalog.data = accepted.data;
+          operationsCatalog.updatedAt = accepted.updatedAt;
+          operationsCatalog.loadedAt = Date.now();
+          operationsCatalog.status = 'ready';
+          operationsCatalog.error = null;
+          renderOperationsProduct();
+          return operationsCatalog;
+        } catch (error) {
+          if (generation !== operationsCatalogGeneration) return operationsCatalog;
+          if (operationsCatalog.status === 'ready') return operationsCatalog;
+          operationsCatalog.status = 'error';
+          operationsCatalog.error = 'Sizing information is unavailable.';
+          renderOperationsProduct();
+          return operationsCatalog;
+        } finally {
+          if (operationsCatalogRequest === pending) {
+            operationsCatalogRequest = null;
+          }
+        }
+      }
+
       async function loadD06StagingCatalog(forceRefresh = false) {
         const fresh = stagingCatalog.status === 'ready' &&
           (Date.now() - stagingCatalog.loadedAt) <= FYP_CATALOG_MAX_AGE_MS;
@@ -8107,6 +8449,11 @@
       document.getElementById('product-catalog-retry')
         .addEventListener('click', () => {
           loadD06StagingCatalog(true);
+        });
+
+      document.getElementById('product-size-retry')
+        .addEventListener('click', () => {
+          loadOperationsCatalog(true);
         });
 
       document.getElementById('commerce-catalog-retry')
