@@ -108,6 +108,13 @@
     @media (hover:none) and (pointer:coarse){
       select,textarea,input[type=text],input[type=search],input[type=password],input[type=date],input[type=number],input[type=url],input[type=email]{font-size:16px}
     }
+    .batch-bar{height:8px;background:#efe8dc;border-radius:99px;overflow:hidden;margin:8px 0}
+    .batch-bar span{display:block;height:100%;background:var(--gold);width:0}
+    .batch-styles{display:flex;flex-wrap:wrap;gap:8px}
+    .batch-styles label{display:flex;align-items:center;gap:6px;margin:0;min-height:32px}
+    .batch-history{display:grid;gap:8px}
+    .batch-card{border:1px solid var(--line);border-radius:12px;padding:12px;background:#fff}
+    .batch-card button{min-height:36px}
     @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}}
 
     .ai-settings{border:1px solid #e1d7c5;border-radius:12px;background:#fcf8f0;margin:0 0 16px}
@@ -138,6 +145,7 @@
   </style>
 </head>
 <body>
+<form id="batchFields" hidden></form>
 <div id="gate" class="gate">
   <form id="gateForm" class="gate-card" method="post" action="">
     <div class="brand">Arabista</div>
@@ -360,6 +368,61 @@
               <div id="photoGrid" class="media-grid"></div>
             </div>
             <div class="note">Image files are saved to Drive during upload/import. Their association with a review is saved when you press Save Review. Removing an attachment does not permanently delete the Drive file.</div>
+          </div>
+
+          <div class="section">
+            <div class="section-head"><span class="section-num">B</span><div><h2>Batch Review Generator</h2><p>Server-side staging drafts. Safari can close while work continues.</p></div></div>
+            <div class="form-row">
+              <div class="group">
+                <label for="batchTextOnly">Text-only drafts</label>
+                <input id="batchTextOnly" form="batchFields" type="number" min="0" max="50" step="1" value="10">
+              </div>
+              <div class="group">
+                <label for="batchPhotoDrafts">Text + photo drafts</label>
+                <input id="batchPhotoDrafts" form="batchFields" type="number" min="0" max="50" step="1" value="0">
+              </div>
+            </div>
+            <div class="group">
+              <div class="ai-slider-head"><label for="batchMix">Photo share of this total</label><output id="batchMixValue">0%</output></div>
+              <input id="batchMix" form="batchFields" type="range" min="0" max="100" step="1" value="0">
+              <div class="note" id="batchTotal">10 drafts · 10 text requests · 0 photographs</div>
+            </div>
+            <div class="form-row">
+              <div class="group">
+                <label for="batchPhotosEach">Photos per photo draft</label>
+                <select id="batchPhotosEach" form="batchFields">
+                  <option>1</option><option>2</option><option>3</option><option>4</option><option>5</option>
+                </select>
+              </div>
+              <div class="group">
+                <label>Photo styles in this batch</label>
+                <div class="batch-styles" id="batchStyles">
+                  <label><input form="batchFields" type="checkbox" value="fullbody" checked> Full body</label>
+                  <label><input form="batchFields" type="checkbox" value="mirror" checked> Mirror</label>
+                  <label><input form="batchFields" type="checkbox" value="pov" checked> POV</label>
+                  <label><input form="batchFields" type="checkbox" value="conteng" checked> Conteng</label>
+                  <label><input form="batchFields" type="checkbox" value="home" checked> Home</label>
+                </div>
+              </div>
+            </div>
+            <p class="note">Text length, scenario and photo framing stay with the existing generators. Photo drafts use the reference selected above. Image quality is the saved setting.</p>
+            <div class="toolrow" style="flex-wrap:wrap">
+              <button type="button" class="btn primary" id="batchStart">Start batch generation</button>
+            </div>
+            <p id="batchFormError" class="note" style="color:var(--red)" hidden></p>
+            <div id="batchProgress" class="batch-card" hidden>
+              <div class="side-heading"><span id="batchProgressTitle">Batch progress</span><span id="batchProgressPercent" class="caps">0%</span></div>
+              <div class="batch-bar" aria-hidden="true"><span id="batchProgressFill"></span></div>
+              <p class="note" id="batchProgressMeta"></p>
+              <p class="note" id="batchProgressError" hidden></p>
+              <div class="toolrow" style="flex-wrap:wrap">
+                <button type="button" class="btn secondary small" id="batchPause">Pause</button>
+                <button type="button" class="btn secondary small" id="batchResume">Resume</button>
+                <button type="button" class="btn danger small" id="batchCancel">Cancel</button>
+              </div>
+            </div>
+            <div class="side-heading"><span>Batch history</span><button type="button" class="btn ghost small" id="batchOlder">Older</button></div>
+            <div id="batchHistory" class="batch-history"><p class="no-records">No batches yet.</p></div>
           </div>
 
           <div class="section">
@@ -587,6 +650,7 @@
 
   function showGate() {
     sessionToken = '';
+    stopBatchWatch();
     $('gate').hidden = false;
     $('app').hidden = true;
   }
@@ -1344,6 +1408,240 @@
   }
 
   let pasteTimer=null;
+  let batchOffset = 0;
+  let batchWatchId = '';
+  let batchPollTimer = 0;
+  let batchPollBusy = false;
+  let batchSyncing = false;
+  let batchShowingItems = false;
+
+  function batchCounts() {
+    const textOnly = Math.max(0, Math.floor(Number($('batchTextOnly').value) || 0));
+    const photoDrafts = Math.max(0, Math.floor(Number($('batchPhotoDrafts').value) || 0));
+    const photosEach = Number($('batchPhotosEach').value) || 1;
+    return {textOnly, photoDrafts, photosEach, total: textOnly + photoDrafts, images: photoDrafts * photosEach};
+  }
+
+  function renderBatchCounts(fromSlider) {
+    if (batchSyncing) return;
+    batchSyncing = true;
+    const textOnlyInput = $('batchTextOnly');
+    const photoInput = $('batchPhotoDrafts');
+    let textOnly = Math.max(0, Math.floor(Number(textOnlyInput.value) || 0));
+    let photoDrafts = Math.max(0, Math.floor(Number(photoInput.value) || 0));
+    if (fromSlider) {
+      const total = textOnly + photoDrafts;
+      photoDrafts = Math.round(total * Number($('batchMix').value) / 100);
+      textOnly = total - photoDrafts;
+      textOnlyInput.value = String(textOnly);
+      photoInput.value = String(photoDrafts);
+    }
+    const counts = batchCounts();
+    $('batchMix').value = counts.total ? String(Math.round(counts.photoDrafts * 100 / counts.total)) : '0';
+    $('batchMixValue').textContent = $('batchMix').value + '%';
+    $('batchTotal').textContent = counts.total + ' drafts · ' + counts.total + ' text requests · ' + counts.images + ' photographs';
+    $('batchPhotosEach').disabled = counts.photoDrafts === 0;
+    $('batchStart').disabled = counts.total === 0;
+    $('batchFormError').hidden = counts.total !== 0;
+    if (!counts.total) {
+      $('batchFormError').hidden = false;
+      $('batchFormError').textContent = 'Choose at least one draft.';
+    }
+    batchSyncing = false;
+  }
+
+  function paintBatchProgress(batch) {
+    $('batchProgress').hidden = false;
+    $('batchProgressTitle').textContent = batch.batchId + ' · ' + batch.sku + ' · ' + batch.status;
+    $('batchProgressPercent').textContent = batch.percent + '%';
+    $('batchProgressFill').style.width = batch.percent + '%';
+    $('batchProgressMeta').textContent = [
+      batch.completedDrafts + ' of ' + batch.totalDrafts + ' drafts saved',
+      batch.imageSteps + ' of ' + batch.imageRequests + ' photographs',
+      batch.stage || 'Waiting',
+      batch.updated ? 'Updated ' + batch.updated : ''
+    ].filter(Boolean).join(' · ');
+    $('batchProgressError').hidden = !batch.lastError;
+    $('batchProgressError').textContent = batch.lastError || '';
+    const active = ['QUEUED', 'RUNNING', 'WAITING_QUOTA'].indexOf(batch.status) >= 0;
+    $('batchPause').disabled = !active;
+    $('batchResume').disabled = ['PAUSED', 'WAITING_QUOTA', 'NEEDS_ATTENTION'].indexOf(batch.status) < 0;
+    $('batchCancel').disabled = ['COMPLETED', 'COMPLETED_WITH_ERRORS', 'CANCELLED'].indexOf(batch.status) >= 0;
+  }
+
+  function renderBatchHistory(listed) {
+    const host = $('batchHistory');
+    const batches = listed && listed.batches || [];
+    host.textContent = '';
+    if (!batches.length) {
+      host.innerHTML = '<p class="no-records">No batches yet.</p>';
+      return;
+    }
+    batches.forEach(batch => {
+      const card = document.createElement('article');
+      card.className = 'batch-card';
+      const title = document.createElement('strong');
+      title.textContent = batch.batchId + ' · ' + batch.sku;
+      const meta = document.createElement('p');
+      meta.className = 'note';
+      meta.textContent = [
+        batch.created,
+        batch.status,
+        batch.textOnly + ' text-only',
+        batch.photoDrafts + ' photo drafts',
+        batch.photosEach + ' photos each',
+        batch.percent + '%',
+        batch.completedDrafts + ' saved',
+        batch.failed + ' need attention'
+      ].join(' · ');
+      const open = document.createElement('button');
+      open.type = 'button';
+      open.className = 'btn ghost small';
+      open.textContent = 'View drafts';
+      open.addEventListener('click', () => showBatchDrafts(batch.batchId));
+      card.append(title, meta, open);
+      host.append(card);
+    });
+  }
+
+  async function showBatchDrafts(batchId) {
+    const details = await call('studioGetBatchDetails', batchId);
+    batchShowingItems = true;
+    batchWatchId = batchId;
+    paintBatchProgress(details);
+    const host = $('batchHistory');
+    const list = document.createElement('div');
+    list.className = 'batch-history';
+    (details.items || []).forEach(item => {
+      const row = document.createElement('div');
+      row.className = 'batch-card';
+      const label = document.createElement('p');
+      label.className = 'note';
+      label.textContent = 'Draft ' + item.sequence + ' · ' + item.kind + ' · ' + item.itemStatus +
+        (item.reviewId ? ' · ' + item.reviewId : '') +
+        (item.error ? ' · ' + item.error : '');
+      row.append(label);
+      if (item.reviewId) {
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'btn secondary small';
+        button.textContent = 'Open in editor';
+        button.addEventListener('click', async () => {
+          if (!isSafeToLeave()) return;
+          if ($('product').value !== details.sku) {
+            $('product').value = details.sku;
+            state.sku = details.sku;
+            updateProductInfo();
+          }
+          await loadWorkspace(item.reviewId);
+        });
+        row.append(button);
+      }
+      list.append(row);
+    });
+    host.textContent = '';
+    host.append(list);
+  }
+
+  function stopBatchWatch() {
+    clearInterval(batchPollTimer);
+    batchPollTimer = 0;
+  }
+
+  function watchBatch() {
+    if (document.hidden || batchPollTimer) return;
+    batchPollTimer = setInterval(() => { if (!document.hidden) refreshBatchPanel(); }, 12000);
+  }
+
+  async function refreshBatchPanel() {
+    if (batchPollBusy || !sessionToken) return;
+    batchPollBusy = true;
+    try {
+      const listed = await call('studioListBatches', {offset: batchOffset});
+      if (!batchShowingItems) renderBatchHistory(listed);
+      const active = (listed.batches || []).find(batch =>
+        ['QUEUED', 'RUNNING', 'PAUSED', 'WAITING_QUOTA', 'NEEDS_ATTENTION'].indexOf(batch.status) >= 0);
+      const watch = batchWatchId || (active && active.batchId) || '';
+      if (!watch) {
+        $('batchProgress').hidden = true;
+        stopBatchWatch();
+        return;
+      }
+      const status = await call('studioGetBatchStatus', watch);
+      paintBatchProgress(status);
+      if (['COMPLETED', 'COMPLETED_WITH_ERRORS', 'CANCELLED'].indexOf(status.status) >= 0) stopBatchWatch();
+      else watchBatch();
+    } catch (error) {
+      $('batchFormError').hidden = false;
+      $('batchFormError').textContent = error.message;
+      stopBatchWatch();
+    } finally {
+      batchPollBusy = false;
+    }
+  }
+
+  async function startBatch() {
+    renderBatchCounts(false);
+    const counts = batchCounts();
+    if (!counts.total || state.busy) return;
+    const styles = Array.from(document.querySelectorAll('#batchStyles input:checked')).map(node => node.value);
+    if (counts.photoDrafts && !styles.length) {
+      $('batchFormError').hidden = false;
+      $('batchFormError').textContent = 'Choose at least one photo style.';
+      return;
+    }
+    if (counts.photoDrafts && !$('imageReference').value) {
+      $('batchFormError').hidden = false;
+      $('batchFormError').textContent = 'Choose a product reference image for photo drafts.';
+      return;
+    }
+    $('batchStart').disabled = true;
+    try {
+      const listed = await call('studioListBatches', {offset: 0});
+      const allowance = listed.allowance || {};
+      const quality = $('imageQuality').value || state.savedImageQuality || 'the saved setting';
+      const summary = [
+        'Start this staging batch?',
+        'SKU: ' + state.sku,
+        'Text-only: ' + counts.textOnly,
+        'Text + photo: ' + counts.photoDrafts,
+        'Photos per photo draft: ' + counts.photosEach,
+        'Text requests: ' + counts.total,
+        'Image requests: ' + counts.images,
+        'Image quality: ' + quality,
+        'Text allowance left today: ' + (allowance.textLeft == null ? 'not available' : allowance.textLeft + ' of ' + allowance.textCap),
+        'Image allowance left today: ' + (allowance.imageLeft == null ? 'not available' : allowance.imageLeft + ' of ' + allowance.imageCap),
+        'API cost depends on actual usage. Drafts stay staging samples.'
+      ].join('\n');
+      if (!window.confirm(summary)) return;
+      const started = await call('studioStartBatch', {
+        sku: state.sku,
+        textOnly: counts.textOnly,
+        photoDrafts: counts.photoDrafts,
+        photosEach: counts.photosEach,
+        styles: styles,
+        referenceFileId: $('imageReference').value
+      });
+      batchWatchId = started.batchId;
+      batchShowingItems = false;
+      batchOffset = 0;
+      stopBatchWatch();
+      await refreshBatchPanel();
+    } catch (error) {
+      $('batchFormError').hidden = false;
+      $('batchFormError').textContent = error.message;
+    } finally {
+      renderBatchCounts(false);
+    }
+  }
+
+  async function batchAction(name) {
+    if (!batchWatchId) return;
+    await call(name, batchWatchId);
+    stopBatchWatch();
+    await refreshBatchPanel();
+  }
+
   function wire() {
     ['name','date','stars','status','text','styleNote','scene','photoStyle','order']
       .forEach(id=>$(id).addEventListener('input',change));
@@ -1424,6 +1722,25 @@
       $('gateToggle').setAttribute('aria-pressed', shown ? 'false' : 'true');
     });
     $('lockStudio').addEventListener('click', lockStudio);
+    $('batchTextOnly').addEventListener('input', () => renderBatchCounts(false));
+    $('batchPhotoDrafts').addEventListener('input', () => renderBatchCounts(false));
+    $('batchPhotosEach').addEventListener('change', () => renderBatchCounts(false));
+    $('batchMix').addEventListener('input', () => renderBatchCounts(true));
+    $('batchStart').addEventListener('click', startBatch);
+    $('batchPause').addEventListener('click', () => batchAction('studioPauseBatch').catch(error => notice(error.message, true)));
+    $('batchResume').addEventListener('click', () => batchAction('studioResumeBatch').catch(error => notice(error.message, true)));
+    $('batchCancel').addEventListener('click', () => batchAction('studioCancelBatch').catch(error => notice(error.message, true)));
+    $('batchOlder').addEventListener('click', () => {
+      batchOffset += 20;
+      batchWatchId = '';
+      batchShowingItems = false;
+      refreshBatchPanel();
+    });
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) stopBatchWatch();
+      else refreshBatchPanel();
+    });
+    renderBatchCounts(false);
     $('closeLightbox').addEventListener('click',()=> $('lightbox').close());
     $('lightbox').addEventListener('click',e=>{
       if (e.target===$('lightbox'))$('lightbox').close();
@@ -1445,6 +1762,7 @@
       await loadWorkspace();
       loadAiSettings();
       loadImageQualitySettings();
+      refreshBatchPanel();
     } catch (e) {
       $('gateError').textContent = e.message || 'Sign in failed.';
       $('gateError').hidden = false;
