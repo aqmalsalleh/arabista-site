@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="robots" content="noindex,nofollow">
+  <title>Arabista Review Bridge</title>
+</head>
+<body>
+<script>
+(() => {
+  'use strict';
+  // Injected by Apps Script. This page has no dashboard and never displays a password.
+  // ALLOWALL framing applies only here. Messages are accepted from the configured website origins.
+  const ALLOWED = <?!= originsJson ?>;
+  const HANDSHAKE = <?!= handshakeJson ?>;
+  const SOURCE = 'arabista-review-bridge';
+
+  function allowed(origin) {
+    return Array.isArray(ALLOWED) && ALLOWED.indexOf(origin) !== -1;
+  }
+
+  function handshakeOk(value) {
+    return typeof HANDSHAKE === 'string' && HANDSHAKE.length === 32 && value === HANDSHAKE;
+  }
+
+  function reply(target, origin, payload) {
+    if (!target || !allowed(origin) || !handshakeOk(HANDSHAKE)) return;
+    target.postMessage(payload, origin);
+  }
+
+  function announce() {
+    if (!handshakeOk(HANDSHAKE) || !Array.isArray(ALLOWED)) return;
+    ALLOWED.forEach(origin => {
+      try {
+        window.top.postMessage({source: SOURCE, type: 'ready', handshake: HANDSHAKE}, origin);
+      } catch (e) {}
+    });
+  }
+
+  function run(fn, args, done, fail) {
+    const runner = google.script.run.withSuccessHandler(done).withFailureHandler(fail);
+    if (fn === 'studioAuthenticate') runner.studioAuthenticate(args[0], args[1]);
+    else if (fn === 'studioLogout') runner.studioLogout(args[0]);
+    else if (fn === 'studioDispatch') runner.studioDispatch(args[0], args[1], args[2]);
+    else fail(new Error('Unknown operation.'));
+  }
+
+  window.addEventListener('message', event => {
+    if (!handshakeOk(HANDSHAKE) || !allowed(event.origin) || !event.source) return;
+    const data = event.data;
+    if (!data || typeof data !== 'object' || Array.isArray(data)) return;
+    if (data.source !== 'arabista-review-studio' || data.type !== 'request') return;
+    if (!handshakeOk(data.handshake)) return;
+    if (typeof data.id !== 'string' || data.id.length < 8 || data.id.length > 80) return;
+    if (!Array.isArray(data.args)) return;
+    const respond = (ok, result, error) => reply(event.source, event.origin, {
+      source: SOURCE, type: 'response', handshake: HANDSHAKE, id: data.id, ok, result, error
+    });
+    if (!window.google || !google.script || !google.script.run) {
+      respond(false, null, 'Apps Script bridge is unavailable.');
+      return;
+    }
+    run(data.fn, data.args,
+      result => respond(true, result, ''),
+      err => respond(false, null, err && err.message ? err.message : 'Request failed.'));
+  });
+
+  if (document.readyState === 'complete') announce();
+  else window.addEventListener('load', announce);
+})();
+</script>
+</body>
+</html>

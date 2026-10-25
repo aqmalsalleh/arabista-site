@@ -187,6 +187,7 @@
       <div class="top-actions">
         <button id="lockStudio" class="btn ghost small" type="button">Lock Studio</button>
         <button id="health" class="btn ghost small" type="button">Check connection</button>
+        <button id="publishFeed" class="btn ghost small" type="button">Publish staging feed</button>
         <button id="aiHealth" class="btn ghost small" type="button">Test AI connection</button>
         <button id="refresh" class="btn ghost small" type="button">↻ Refresh</button>
       </div>
@@ -674,7 +675,7 @@
 
   function setBusy(flag) {
     state.busy = flag;
-    ['save','delete','new','refresh','product','importUrl','chooseReference','choosePhoto','generateText','regenerateText','generatePhoto','photoStyle','photoCount','imageReference','imageQuality','chooseLibrary','aiHealth','aiSaveDefaults','aiResetDefaults']
+    ['save','delete','new','refresh','product','importUrl','chooseReference','choosePhoto','generateText','regenerateText','generatePhoto','photoStyle','photoCount','imageReference','imageQuality','chooseLibrary','aiHealth','aiSaveDefaults','aiResetDefaults','publishFeed']
       .forEach(id => {const node = $(id); if (node) node.disabled = flag ||
         (id === 'imageQuality' && (!state.imageQualityLoaded || state.imageQualitySaving));});
     $('save').textContent = flag ? 'Saving / Working…' : 'Save Review';
@@ -1691,6 +1692,18 @@
         const health=await call('studioHealthCheck');
         notice(`Connected: ${health.spreadsheet}; ${health.folders.length} Drive folders.`);
       }catch(e){notice(e.message,true);}
+    });
+    $('publishFeed').addEventListener('click',async ()=>{
+      if (state.busy) return;
+      setBusy(true);
+      try {
+        const result = await call('studioSyncReviewPublication');
+        const summary = result.ok
+          ? `Staging feed updated. ${result.published} ready review(s), ${result.created} new photo copy(s), ${result.reused} reused.`
+          : (result.message || 'Publication did not finish.');
+        notice(summary, !result.ok);
+      } catch (e) { notice(e.message, true); }
+      finally { setBusy(false); }
     });
     document.querySelectorAll('#lengthChips .chip').forEach(btn=>{
       btn.addEventListener('click',()=>{setLength(btn.dataset.length);change();});
