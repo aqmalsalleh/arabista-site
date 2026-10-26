@@ -1549,8 +1549,24 @@
     }
 
     .review-sort,
+    .review-filters,
+    .review-panel > .review-bars,
+    .review-filter-note {
+      flex:0 0 auto;
+      position:relative;
+      z-index:2;
+      background:#fff;
+    }
+
+    .review-sort,
     .review-filters {
       padding:0 16px 10px;
+    }
+
+    .review-filters {
+      flex-wrap:nowrap;
+      overflow-y:hidden;
+      -webkit-overflow-scrolling:touch;
     }
 
     .review-chip {
@@ -1575,6 +1591,8 @@
       z-index:4;
       display:flex;
       flex-direction:column;
+      min-height:0;
+      overflow:hidden;
       background:#fff;
       overscroll-behavior:contain;
     }
@@ -3445,7 +3463,12 @@
   transition:transform .23s ease, box-shadow .23s ease;
 }
 #product-sheet .review-thumb:active { transform:scale(.97); }
-#product-sheet #product-review-preview .product-review-card:nth-child(n+3) { display:none; }
+#product-sheet .review-show-more {
+  display:block; width:100%; margin:2px 0 0; padding:12px 8px;
+  border:0; border-radius:8px; background:transparent;
+  color:var(--m-gold); font-size:12px; font-weight:600; letter-spacing:-.01em;
+}
+#product-sheet .review-show-more:active { background:var(--m-gold-pale); }
 #product-sheet .product-review-card { padding:13px 0 15px; border-bottom:1px solid #f0f0f0; }
 #product-sheet .review-card-meta { gap:5px 9px; }
 #product-sheet .review-card-meta strong { font-size:12px; color:#333; font-weight:700; }
@@ -3486,6 +3509,17 @@
 #product-sheet .product-size-table td { color:#444; }
 #product-sheet .product-size-table th,
 #product-sheet .product-size-table td { border-bottom:1px solid #eee; padding:10px 5px; }
+#product-sheet .product-size-table tbody tr { cursor:pointer; }
+#product-sheet .product-size-table tbody tr.is-size-selected td {
+  background:#f7f4ec;
+  box-shadow:inset 0 1px 0 #c6ae84, inset 0 -1px 0 #c6ae84;
+}
+#product-sheet .product-size-table tbody tr.is-size-selected td:first-child {
+  box-shadow:inset 1px 0 0 #c6ae84, inset 0 1px 0 #c6ae84, inset 0 -1px 0 #c6ae84;
+}
+#product-sheet .product-size-table tbody tr.is-size-selected td:last-child {
+  box-shadow:inset -1px 0 0 #c6ae84, inset 0 1px 0 #c6ae84, inset 0 -1px 0 #c6ae84;
+}
 #product-sheet #product-sizes:has(.product-size-guide) #product-size-status { display:none; }
 #product-sheet #product-size-status { color:#999; font-size:11px; }
 #product-sheet #product-description-copy { margin-top:15px; margin-bottom:16px; font-size:12.5px; }
@@ -3545,7 +3579,24 @@
 #product-sheet .product-buy-button:active,
 #product-sheet .product-cart-button:active { transform:scale(.98); }
 #product-sheet .review-panel {
-  background:#fff; color:#282828;
+  background:#fff; color:#282828; overflow:hidden; min-height:0;
+}
+#product-sheet .review-panel-head,
+#product-sheet .review-panel > .review-bars,
+#product-sheet .review-sort,
+#product-sheet .review-filters,
+#product-sheet .review-filter-note {
+  flex:0 0 auto; position:relative; z-index:2; background:#fff;
+}
+#product-sheet .review-filters {
+  flex-wrap:nowrap; overflow-x:auto; overflow-y:hidden;
+  touch-action:pan-x; -webkit-overflow-scrolling:touch;
+  overscroll-behavior-x:contain;
+}
+#product-sheet .review-panel-list {
+  position:relative; z-index:1; min-height:0;
+  overflow-x:hidden; overflow-y:auto; touch-action:pan-y;
+  -webkit-overflow-scrolling:touch;
 }
 #product-sheet .review-panel-head { padding:20px 18px 13px; border-bottom:1px solid #f2f2f2; }
 #product-sheet .review-panel-title { font-size:16px; }
@@ -4014,6 +4065,7 @@
     </div>
     <div id="product-review-strip" class="review-photo-strip" hidden aria-label="Review photos"></div>
     <div id="product-review-preview"></div>
+    <button id="product-review-more" class="review-show-more" type="button" hidden>Show more reviews</button>
     <p class="product-reference-note" id="product-review-context" hidden>
       Staging reviews for interface testing · Not verified purchases.
     </p>
@@ -4885,6 +4937,10 @@
       let sheetClosing = false;
       let previousSheetFocus = null;
       let sheetCloseTimer = null;
+      let productScrollExpandArmed = false;
+      let productScrollUserUntil = 0;
+      let productScrollTouch = null;
+      let reviewPreviewLimit = 2;
 
       const prefersReducedMotion = () =>
         window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -4894,7 +4950,14 @@
 
         if (type === 'product') {
           productSheet.classList.remove('is-expanded');
+          productScrollExpandArmed = false;
+          productScrollUserUntil = 0;
           productScroll.scrollTop = 0;
+          productScrollExpandArmed = true;
+          reviewPreviewLimit = 2;
+          if (operationsReviews.status === 'ready' && operationsReviews.data) {
+            renderReviewPreview(operationsReviews.data);
+          }
         }
 
         activeSheet = type;
@@ -4946,6 +5009,8 @@
         const restoreFocus = previousSheetFocus;
 
         if (closingType === 'product') {
+          productScrollExpandArmed = false;
+          productScrollUserUntil = 0;
           beginProductExit();
         }
 
@@ -6920,6 +6985,74 @@
         }
       });
 
+      function noteProductScrollIntent(target, deltaX, deltaY) {
+        if (!productScrollExpandArmed || sheetClosing) return;
+        if (reviewListIsOpen() || reviewViewerIsOpen()) return;
+        if (target && target.closest) {
+          const gallery = target.closest('#product-gallery-track');
+          if (gallery && Math.abs(deltaX) >= Math.abs(deltaY)) return;
+        }
+        if (Math.abs(deltaY) < 1) return;
+        productScrollUserUntil = performance.now() + 500;
+      }
+
+      function maybeExpandProductFromScroll() {
+        if (!productScrollExpandArmed) return;
+        if (performance.now() > productScrollUserUntil) return;
+        if (activeSheet !== 'product' || sheetClosing || productDrag) return;
+        if (productSheet.classList.contains('is-expanded')) {
+          productScrollExpandArmed = false;
+          return;
+        }
+        if (reviewListIsOpen() || reviewViewerIsOpen()) return;
+        if (productScroll.scrollTop < 30) return;
+        productScrollExpandArmed = false;
+        productScrollUserUntil = 0;
+        setProductExpanded(true);
+      }
+
+      productScroll.addEventListener('wheel', event => {
+        noteProductScrollIntent(event.target, event.deltaX, event.deltaY);
+      }, { passive: true });
+
+      productScroll.addEventListener('touchstart', event => {
+        if (!event.touches || !event.touches.length) return;
+        const touch = event.touches[0];
+        productScrollTouch = {
+          x: touch.clientX,
+          y: touch.clientY,
+          target: event.target
+        };
+      }, { passive: true });
+
+      productScroll.addEventListener('touchmove', event => {
+        if (!productScrollTouch || !event.touches || !event.touches.length) return;
+        const touch = event.touches[0];
+        noteProductScrollIntent(
+          productScrollTouch.target,
+          touch.clientX - productScrollTouch.x,
+          productScrollTouch.y - touch.clientY
+        );
+      }, { passive: true });
+
+      productScroll.addEventListener('touchend', () => {
+        productScrollTouch = null;
+      }, { passive: true });
+
+      productScroll.addEventListener('touchcancel', () => {
+        productScrollTouch = null;
+      }, { passive: true });
+
+      productScroll.addEventListener('scroll', () => {
+        maybeExpandProductFromScroll();
+      }, { passive: true });
+
+      document.querySelectorAll('#product-sheet [data-modern-go]').forEach(tab => {
+        tab.addEventListener('click', () => {
+          productScrollUserUntil = 0;
+        });
+      });
+
       productTag.addEventListener('click', () => {
         if (active !== 0) return;
         openSheet('product', productTag);
@@ -8543,13 +8676,33 @@
         host.hidden = !host.childElementCount;
       }
 
+      function updateReviewMore(total) {
+        const more = document.getElementById('product-review-more');
+        if (!more) return;
+        more.hidden = !(typeof total === 'number' && total > reviewPreviewLimit);
+      }
+
       function renderReviewPreview(data) {
         const host = document.getElementById('product-review-preview');
         clearElement(host);
-        if (!host) return;
-        selectReviews(data.reviews, { sort: 'recommended', stars: 0, photosOnly: false })
-          .slice(0, 3)
-          .forEach(review => host.appendChild(makeReviewCard(review)));
+        if (!host || !data) {
+          updateReviewMore(0);
+          return;
+        }
+        const ordered = selectReviews(data.reviews, { sort: 'recommended', stars: 0, photosOnly: false });
+        ordered.forEach((review, index) => {
+          const card = makeReviewCard(review);
+          card.hidden = index >= reviewPreviewLimit;
+          host.appendChild(card);
+        });
+        updateReviewMore(ordered.length);
+      }
+
+      function showMoreReviews() {
+        const data = operationsReviews.data;
+        if (!data || !data.count) return;
+        reviewPreviewLimit += 3;
+        renderReviewPreview(data);
       }
 
       function renderReviewControls() {
@@ -8603,10 +8756,11 @@
           const seeAll = document.getElementById('product-review-see-all');
           const ready = operationsReviews.status === 'ready' && operationsReviews.data;
           if (retry) {
-            retry.hidden = operationsReviews.status === 'loading' || operationsReviews.status === 'idle';
-            retry.textContent = operationsReviews.status === 'error' ? 'Retry reviews' : 'Refresh reviews';
+            retry.hidden = operationsReviews.status !== 'error';
+            retry.textContent = 'Retry reviews';
           }
           if (!ready) {
+            updateReviewMore(0);
             if (summary) summary.hidden = true;
             if (context) context.hidden = true;
             if (bars) {
@@ -8639,6 +8793,7 @@
             clearElement(bars);
             clearElement(strip);
             clearElement(preview);
+            updateReviewMore(0);
             resetReviewOverlay();
             if (note) note.textContent = 'No published reviews.';
             return;
@@ -8669,6 +8824,7 @@
         reviewView.sort = 'recommended';
         reviewView.stars = 0;
         reviewView.photosOnly = false;
+        productScrollUserUntil = 0;
         const panel = document.getElementById('product-review-panel');
         if (!panel) return;
         panel.hidden = false;
@@ -8691,6 +8847,7 @@
       }
 
       function openReviewViewer(reviewId, sequence, opener) {
+        productScrollUserUntil = 0;
         const data = operationsReviews.data;
         if (!data) return;
         const review = data.reviews.filter(item => item.reviewId === reviewId)[0];
@@ -8767,6 +8924,8 @@
             loadOperationsReviews(true);
           });
         }
+        const moreReviews = document.getElementById('product-review-more');
+        if (moreReviews) moreReviews.addEventListener('click', showMoreReviews);
         const recommended = document.getElementById('review-sort-recommended');
         const recent = document.getElementById('review-sort-recent');
         if (recommended) {
@@ -12071,6 +12230,15 @@
   }));
   new MutationObserver(applySizeTabs).observe(guides,{childList:true});
   applySizeTabs();
+  guides.addEventListener('click', event => {
+    const row = event.target.closest('tbody tr');
+    if (!row || !guides.contains(row)) return;
+    if (row.classList.contains('is-size-selected')) return;
+    guides.querySelectorAll('tbody tr.is-size-selected').forEach(item => {
+      item.classList.remove('is-size-selected');
+    });
+    row.classList.add('is-size-selected');
+  });
 })();
 </script>
 
