@@ -11,6 +11,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root { color-scheme: dark; --gold:#c0a062; --cream:#f5f1e8; --ink:#0b0b0c; }
     * { box-sizing:border-box; }
@@ -3298,6 +3299,310 @@
     @media (min-width:700px) { body { display:grid; place-items:center; } .app { border-radius:14px; } }
     @media (max-width:699px) { .app { max-height:none; box-shadow:none; } }
     @media (prefers-reduced-motion:reduce) { .track,.toast { transition:none !important; } .demo-shape { animation:none; } }
+
+
+/* =========================================================
+   ARABISTA MODERN / PRODUCT SHEET DRAFT 02
+   Clean white, quiet gold, deliberate hierarchy.
+   Scoped to Product and Review overlays. No checkout changes.
+   ========================================================= */
+#product-sheet {
+  --m-ink:#202124; --m-muted:#76777b; --m-line:#ececec;
+  --m-soft:#f7f7f7; --m-gold:#a88a54; --m-gold-pale:#f7f4ec;
+  font-family:'DM Sans',Inter,system-ui,sans-serif;
+  color:var(--m-ink);
+  background:#fff;
+  border-radius:20px 20px 0 0;
+  box-shadow:0 -12px 50px rgba(10,10,10,.12);
+}
+#product-sheet button { font-family:inherit; }
+#product-sheet .product-grab {
+  flex-basis:40px; min-height:40px; padding:0 17px;
+  background:#fff; border-bottom:1px solid #f3f3f3;
+}
+#product-sheet .product-handle { background:#dadada; top:5px; width:34px; height:3px; }
+#product-sheet .product-grab-label {
+  padding-top:9px; color:#272727; font-size:10px; font-weight:700;
+  letter-spacing:.13em;
+}
+#product-sheet .product-grab-actions { padding-top:7px; gap:8px; }
+#product-sheet .product-header-basket,
+#product-sheet .product-close { color:#292929; width:33px; height:33px; }
+#product-sheet .product-scroll { background:#fff; scroll-behavior:smooth; }
+#product-sheet .modern-product-tabs {
+  position:sticky; top:0; z-index:7;
+  height:44px; display:grid; grid-template-columns:repeat(4,minmax(0,1fr));
+  background:rgba(255,255,255,.97);
+  border-bottom:1px solid #f0f0f0;
+  -webkit-backdrop-filter:blur(14px); backdrop-filter:blur(14px);
+}
+#product-sheet .modern-tab {
+  position:relative; min-width:0; height:43px; padding:0 2px;
+  border:0; background:transparent; color:#8b8b8b;
+  font-size:12px; font-weight:600; letter-spacing:-.015em;
+  transition:color .22s ease;
+}
+#product-sheet .modern-tab::after {
+  content:''; position:absolute; left:27%; right:27%; bottom:0;
+  height:2px; background:var(--m-gold); border-radius:2px;
+  transform:scaleX(0); transform-origin:center;
+  transition:transform .34s cubic-bezier(.2,.8,.2,1);
+}
+#product-sheet .modern-tab.is-active { color:#1f1f1f; }
+#product-sheet .modern-tab.is-active::after { transform:scaleX(1); }
+#product-sheet .product-gallery {
+  background:#f6f6f5; overflow:hidden;
+  border-bottom:1px solid #f1f1f1;
+  scroll-margin-top:44px;
+}
+#product-sheet .product-gallery-track {
+  height:clamp(275px,39svh,345px); min-height:0;
+  background:linear-gradient(145deg,#f9f9f8,#f1f1ef);
+}
+#product-sheet .product-gallery-slide {
+  height:100%; min-height:0; align-items:center;
+  background:transparent;
+}
+#product-sheet .product-gallery-slide img {
+  height:100%; width:88%; max-height:100%; object-fit:contain;
+  transition:transform .6s cubic-bezier(.22,1,.36,1);
+}
+#product-sheet .product-gallery-count {
+  right:14px; bottom:14px; padding:5px 10px;
+  background:rgba(255,255,255,.88); color:#444;
+  font-size:11px; font-weight:600; border:1px solid rgba(0,0,0,.045);
+  border-radius:999px; box-shadow:0 2px 10px #0000000a;
+}
+#product-sheet .product-overview {
+  padding:20px 19px 16px;
+  background:#fff;
+  scroll-margin-top:44px;
+}
+#product-sheet .product-price { gap:8px; align-items:baseline; }
+#product-sheet .product-price strong {
+  font-size:29px; line-height:1.12; font-weight:700;
+  letter-spacing:-.055em; color:#242424;
+}
+#product-sheet .product-price del { font-size:12px; color:#9a9a9a; }
+#product-sheet #product-price-label { display:none !important; }
+#product-sheet .product-price strong.is-status { font-size:15px; font-weight:600; letter-spacing:0; color:#777; }
+#product-sheet .product-name {
+  font-size:15px; font-weight:600; line-height:1.55;
+  letter-spacing:-.023em; margin:11px 0 5px; color:#252525;
+}
+#product-sheet .product-review-summary {
+  gap:6px; margin:6px 0 0; font-size:12px; color:#747474;
+}
+#product-sheet .product-review-summary .rating-star { color:var(--m-gold); font-size:15px; }
+#product-sheet .product-review-summary strong { color:#272727; font-weight:700; }
+#product-sheet .product-review-count { font-size:12px; color:#747474; }
+#product-sheet .modern-review-arrow { font-size:17px; color:#aaa; line-height:1; }
+#product-sheet #product-review-note { font-size:11px; color:#9a9a9a; margin:4px 0 0; }
+#product-sheet #product-review-summary:not([hidden]) + #product-review-note { display:none; }
+#product-sheet .modern-highlights {
+  display:flex; flex-wrap:wrap; gap:0 9px; margin-top:17px;
+  padding:11px 0; border-top:1px solid var(--m-line); border-bottom:1px solid var(--m-line);
+  color:#6a6a6a; font-size:11px; line-height:1.55; font-weight:500;
+}
+#product-sheet .modern-highlights span:not(:last-child)::after {
+  content:'·'; color:var(--m-gold); padding-left:9px;
+}
+#product-sheet .modern-size-link {
+  display:flex; justify-content:space-between; align-items:center;
+  width:100%; border:0; border-bottom:1px solid var(--m-line);
+  background:#fff; min-height:56px; padding:9px 0; text-align:left; color:#262626;
+}
+#product-sheet .modern-size-left { display:flex; align-items:baseline; flex-wrap:wrap; gap:10px; }
+#product-sheet .modern-row-title { font-size:13px; font-weight:700; }
+#product-sheet .modern-row-detail { font-size:12px; color:#888; font-weight:500; }
+#product-sheet .modern-row-trailing { font-size:12px; color:var(--m-gold); font-weight:700; }
+#product-sheet .modern-row-trailing span { font-size:18px; padding-left:4px; font-weight:400; }
+#product-sheet .modern-shipping-line {
+  display:flex; align-items:center; gap:10px;
+  min-height:43px; font-size:11px; color:#777; font-weight:500;
+}
+#product-sheet .modern-shipping-line svg { width:17px; height:17px; color:#898989; flex:0 0 17px; }
+#product-sheet .product-section {
+  padding:23px 19px 25px; border-top:7px solid #f7f7f7;
+  background:#fff; scroll-margin-top:44px;
+}
+#product-sheet .product-section h3 {
+  font-size:16px; font-weight:700; letter-spacing:-.025em;
+  color:#252525; margin:0; line-height:1.35;
+}
+#product-sheet .product-section p { font-size:13px; color:#656565; line-height:1.75; }
+#product-sheet .review-section-head { align-items:center; margin-bottom:16px; }
+#product-sheet .review-see-all { font-size:12px; font-weight:600; color:var(--m-gold); }
+#product-sheet .review-panel > .review-bars {
+  margin:10px 18px 14px; padding:12px 15px;
+  border:1px solid #ededed; border-radius:10px;
+  background:#fafafa;
+}
+#product-sheet .review-panel > .review-bars .review-bar > span { background:#bea06b; }
+#product-sheet .review-photo-strip { margin:0 0 14px; gap:8px; }
+#product-sheet .review-thumb {
+  width:73px; height:92px; border-radius:9px; background:#f7f7f7;
+  transition:transform .23s ease, box-shadow .23s ease;
+}
+#product-sheet .review-thumb:active { transform:scale(.97); }
+#product-sheet #product-review-preview .product-review-card:nth-child(n+3) { display:none; }
+#product-sheet .product-review-card { padding:13px 0 15px; border-bottom:1px solid #f0f0f0; }
+#product-sheet .review-card-meta { gap:5px 9px; }
+#product-sheet .review-card-meta strong { font-size:12px; color:#333; font-weight:700; }
+#product-sheet .review-stars { color:#c3a166; font-size:12px; letter-spacing:.03em; }
+#product-sheet .review-date { color:#a0a0a0; font-size:10px; }
+#product-sheet .product-review-card p {
+  margin:6px 0 0; font-size:12.5px; line-height:1.7; color:#555;
+}
+#product-sheet #product-review-context {
+  margin:14px 0 0; color:#aaa; font-size:10px; line-height:1.5;
+}
+#product-sheet .modern-section-header {
+  display:flex; justify-content:space-between; gap:10px; align-items:baseline;
+  margin-bottom:15px;
+}
+#product-sheet .modern-section-header > span { font-size:10px; color:#9b9b9b; }
+#product-sheet .modern-length-tabs {
+  display:grid; grid-template-columns:1fr 1fr; gap:4px;
+  padding:4px; margin:0 0 14px; border-radius:10px;
+  background:#f5f5f5;
+}
+#product-sheet .modern-length-tab {
+  border:0; border-radius:7px; background:transparent;
+  color:#858585; font-size:12px; font-weight:600;
+  padding:10px 6px; min-width:0;
+  transition:background .25s ease,color .25s ease,box-shadow .25s ease;
+}
+#product-sheet .modern-length-tab.is-active {
+  color:#303030; background:white; box-shadow:0 1px 6px rgba(0,0,0,.07);
+}
+#product-sheet .product-size-guide h4 { display:none; }
+#product-sheet .product-size-guide > p { display:none; }
+#product-sheet .product-size-table-wrap { border:1px solid #ececec; border-radius:9px; overflow-x:auto; }
+#product-sheet .product-size-table { min-width:310px; font-size:11px; }
+#product-sheet .product-size-table th {
+  background:#f7f7f6; color:#757575; font-weight:700; font-size:10px;
+}
+#product-sheet .product-size-table td { color:#444; }
+#product-sheet .product-size-table th,
+#product-sheet .product-size-table td { border-bottom:1px solid #eee; padding:10px 5px; }
+#product-sheet #product-sizes:has(.product-size-guide) #product-size-status { display:none; }
+#product-sheet #product-size-status { color:#999; font-size:11px; }
+#product-sheet #product-description-copy { margin-top:15px; margin-bottom:16px; font-size:12.5px; }
+#product-sheet .modern-detail-fold { border-top:1px solid #eee; }
+#product-sheet .modern-detail-fold summary {
+  list-style:none; display:flex; justify-content:space-between; align-items:center;
+  padding:16px 0; font-size:12px; font-weight:600; color:#333; cursor:pointer;
+}
+#product-sheet .modern-detail-fold summary::-webkit-details-marker { display:none; }
+#product-sheet .modern-detail-fold summary span {
+  color:#9c824f; font-size:20px; font-weight:400;
+  transition:transform .25s ease;
+}
+#product-sheet .modern-detail-fold[open] summary span { transform:rotate(45deg); }
+#product-sheet .modern-detail-body { padding:0 0 4px; }
+#product-sheet .modern-detail-body h4 {
+  margin:12px 0 4px; color:#4a4a4a; font-size:11px;
+}
+#product-sheet .product-feature-list {
+  margin:4px 0 14px; padding:0; list-style:none;
+  display:grid; gap:8px;
+}
+#product-sheet .product-feature-list li {
+  padding:0 0 0 13px; position:relative;
+  color:#696969; line-height:1.6; font-size:12px;
+}
+#product-sheet .product-feature-list li::before {
+  content:''; width:4px; height:4px; background:var(--m-gold);
+  border-radius:50%; position:absolute; left:0; top:8px;
+}
+#product-sheet .product-footer {
+  background:#fff; border-top:1px solid #ebebeb;
+  grid-template-columns:40px 40px 48px minmax(0,1fr); gap:9px;
+  padding:9px 15px calc(10px + env(safe-area-inset-bottom,0px));
+  box-shadow:0 -5px 18px rgba(0,0,0,.035);
+}
+#product-sheet .product-footer-small { color:#555; font-size:10px; height:46px; }
+#product-sheet .product-footer-small svg { width:21px; height:21px; }
+#product-sheet .product-cart-button {
+  height:46px; border-radius:13px; background:#f6f5f2;
+  color:#a88a54; border:1px solid #e9e6dd;
+  transition:background .22s ease,transform .22s ease;
+}
+#product-sheet .product-buy-button {
+  position:relative; overflow:hidden; isolation:isolate;
+  min-height:46px; border-radius:13px; font-size:13px; font-weight:700;
+  background:#252525; color:#fff; letter-spacing:.01em;
+  transition:background .22s ease, transform .22s ease,box-shadow .22s ease;
+}
+#product-sheet .product-buy-button::before {
+  content:''; position:absolute; top:0; left:-80%; width:44%; height:100%;
+  transform:skewX(-25deg); pointer-events:none;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.17),transparent);
+  animation:modern-gentle-sheen 7s ease-in-out 2s infinite;
+}
+@keyframes modern-gentle-sheen { 0%,78%,100% { left:-80%; } 90% { left:145%; } }
+#product-sheet .product-buy-button:active,
+#product-sheet .product-cart-button:active { transform:scale(.98); }
+#product-sheet .review-panel {
+  background:#fff; color:#282828;
+}
+#product-sheet .review-panel-head { padding:20px 18px 13px; border-bottom:1px solid #f2f2f2; }
+#product-sheet .review-panel-title { font-size:16px; }
+#product-sheet .review-panel-close { color:#a88a54; font-weight:600; }
+#product-sheet .review-sort,
+#product-sheet .review-filters { padding:11px 16px 4px; }
+#product-sheet .review-chip { border-color:#eaeaea; background:#fff; font-size:11px; padding:8px 11px; }
+#product-sheet .review-chip.is-selected { background:#262626; border-color:#262626; color:white; }
+#product-sheet .review-panel-list { padding:10px 18px 20px; }
+#product-sheet .review-viewer { background:#121212; }
+#product-sheet .review-viewer-head { padding:17px; }
+#product-sheet .review-viewer-close { color:#fff; }
+#product-sheet .catalog-retry { font-size:11px; padding:6px 10px; color:#987949; }
+#product-sheet .product-mini { box-shadow:none; }
+#product-sheet :is(.modern-size-link,.modern-tab,.modern-length-tab,.product-buy-button,.product-cart-button):focus-visible {
+  outline:2px solid #ad905a; outline-offset:2px;
+}
+/* Calm editorial entrances; no ornamental copy or noisy motion */
+.sheet-layer.is-open #product-sheet .product-overview {
+  animation:modern-reveal .45s cubic-bezier(.2,.8,.2,1) both;
+}
+.sheet-layer.is-open #product-sheet .product-gallery {
+  animation:modern-reveal .48s cubic-bezier(.2,.8,.2,1) both;
+}
+@keyframes modern-reveal {
+  from { opacity:.72; transform:translateY(7px); }
+  to { opacity:1; transform:none; }
+}
+#product-sheet #product-review-preview .product-review-card,
+#product-sheet .review-photo-strip .review-thumb { animation:modern-reveal .35s ease both; }
+@media (hover:hover) {
+  #product-sheet .product-buy-button:hover { background:#363636; box-shadow:0 6px 18px #00000020; }
+  #product-sheet .product-cart-button:hover { background:#eeeae2; }
+  #product-sheet .review-thumb:hover { transform:translateY(-2px); box-shadow:0 5px 14px #00000015; }
+  #product-sheet .modern-size-link:hover { background:#fafafa; }
+}
+@media (max-width:365px) {
+  #product-sheet .modern-tab { font-size:11px; }
+  #product-sheet .product-overview { padding-left:16px; padding-right:16px; }
+  #product-sheet .product-section { padding-left:16px; padding-right:16px; }
+  #product-sheet .product-gallery-track { height:clamp(260px,36svh,318px); }
+  #product-sheet .product-footer { gap:5px; padding-left:10px; padding-right:10px; grid-template-columns:38px 38px 45px minmax(0,1fr); }
+}
+@media (prefers-reduced-motion:reduce) {
+  #product-sheet .modern-tab::after,
+  #product-sheet .modern-length-tab,
+  #product-sheet .product-buy-button,
+  #product-sheet .product-cart-button,
+  #product-sheet .review-thumb,
+  #product-sheet .product-gallery-slide img { animation:none !important; transition:none !important; }
+  #product-sheet .product-overview,
+  #product-sheet .product-gallery,
+  #product-sheet .product-review-card { animation:none !important; }
+  #product-sheet .product-buy-button::before { animation:none !important; }
+  #product-sheet .product-scroll { scroll-behavior:auto; }
+}
+
   </style>
 </head>
 <body>
@@ -3657,183 +3962,101 @@
           </div>
         </header>
 
-        <div id="product-scroll" class="product-scroll">
 
-          <div class="product-gallery"
-               id="product-gallery"
-               aria-label="D06 product image gallery">
+<div id="product-scroll" class="product-scroll">
+  <nav class="modern-product-tabs" aria-label="Product information">
+    <button type="button" class="modern-tab is-active" data-modern-go="product-gallery" aria-current="true">Overview</button>
+    <button type="button" class="modern-tab" data-modern-go="product-reviews">Reviews</button>
+    <button type="button" class="modern-tab" data-modern-go="product-sizes">Size guide</button>
+    <button type="button" class="modern-tab" data-modern-go="product-description">Details</button>
+  </nav>
 
-            <div id="product-gallery-track"
-                 class="product-gallery-track"
-                 tabindex="0"
-                 role="region"
-                 aria-label="Swipe through D06 product images">
-            </div>
+  <div class="product-gallery" id="product-gallery" aria-label="D06 product image gallery">
+    <div id="product-gallery-track" class="product-gallery-track" tabindex="0"
+         role="region" aria-label="Swipe through D06 product images"></div>
+    <span id="product-gallery-count" class="product-gallery-count" aria-live="polite">1/8</span>
+  </div>
 
-            <span id="product-gallery-count"
-                  class="product-gallery-count"
-                  aria-live="polite">1/8</span>
+  <div class="product-overview" id="product-overview">
+    <div class="product-price" id="product-price">
+      <del id="product-price-compare" hidden></del>
+      <strong id="product-price-value" class="is-status">Checking latest price…</strong>
+      <span id="product-price-label" class="product-preview-label" hidden>Staging catalog price</span>
+    </div>
+    <button id="product-catalog-retry" class="catalog-retry" type="button" hidden>Retry</button>
+    <h2 id="product-sheet-heading" class="product-name">Dahlia Series D06 · Premium Nidha Dubai</h2>
+    <div class="product-review-summary" id="product-review-summary" hidden>
+      <span class="rating-star" aria-hidden="true">★</span>
+      <strong id="product-review-average"></strong>
+      <button id="product-review-count" class="product-review-count" type="button"></button>
+      <span class="modern-review-arrow" aria-hidden="true">›</span>
+    </div>
+    <p class="product-reference-note" id="product-review-note">Reviews load when this sheet opens.</p>
+    <button id="product-review-retry" class="catalog-retry" type="button" hidden>Retry reviews</button>
+    <div class="modern-highlights" aria-label="Product highlights">
+      <span>Premium Nidha Dubai</span><span>Nursing zip</span><span>Free shawl</span>
+    </div>
+    <button class="modern-size-link" id="modern-size-select" type="button"
+            aria-label="Select size and shopping options">
+      <span class="modern-size-left"><span class="modern-row-title">Select size</span><span class="modern-row-detail">XS – XXXL</span></span>
+      <span class="modern-row-trailing">Choose <span aria-hidden="true">›</span></span>
+    </button>
+    <div class="modern-shipping-line" aria-label="Delivery information">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h11v10H3zM14 10h4l3 3v3h-7z"/><circle cx="7.5" cy="18" r="1.6"/><circle cx="17.5" cy="18" r="1.6"/></svg>
+      <span>Delivery estimate available at checkout</span>
+    </div>
+  </div>
 
-          </div>
+  <section class="product-section" id="product-reviews">
+    <div class="review-section-head">
+      <h3>Customer reviews</h3>
+      <button id="product-review-see-all" class="review-see-all" type="button" hidden>See all <span aria-hidden="true">›</span></button>
+    </div>
+    <div id="product-review-strip" class="review-photo-strip" hidden aria-label="Review photos"></div>
+    <div id="product-review-preview"></div>
+    <p class="product-reference-note" id="product-review-context" hidden>
+      Staging reviews for interface testing · Not verified purchases.
+    </p>
+  </section>
 
-          <div class="product-overview" id="product-overview">
+  <section class="product-section" id="product-sizes">
+    <div class="modern-section-header">
+      <h3>Size guide</h3>
+      <span>Garment in · Height cm</span>
+    </div>
+    <div id="modern-length-tabs" class="modern-length-tabs" role="group" aria-label="Garment length set" hidden>
+      <button type="button" id="modern-set-standard" class="modern-length-tab is-active" aria-pressed="true">Set 1 · Standard</button>
+      <button type="button" id="modern-set-long" class="modern-length-tab" aria-pressed="false">Set 2 · Long</button>
+    </div>
+    <p class="product-reference-note" id="product-size-status">Size measurements are loading…</p>
+    <div id="product-size-guides"></div>
+    <div id="product-size-unavailable" hidden>
+      <p class="product-reference-note">Size guide is currently unavailable.</p>
+      <button id="product-size-retry" class="catalog-retry" type="button">Retry size guide</button>
+    </div>
+  </section>
 
-            <div class="product-price" id="product-price">
-              <del id="product-price-compare" hidden></del>
-              <strong id="product-price-value" class="is-status">
-                Checking latest price…
-              </strong>
-              <span id="product-price-label"
-                    class="product-preview-label"
-                    hidden>
-                Staging catalog price
-              </span>
-            </div>
-
-            <button id="product-catalog-retry"
-                    class="catalog-retry"
-                    type="button"
-                    hidden>
-              Retry
-            </button>
-
-            <h2 id="product-sheet-heading" class="product-name">
-              ARABISTA | Abaya Arab — Dahlia Series
-              (Kod D06) Nidha Premium Dubai
-            </h2>
-
-            <div class="product-review-summary" id="product-review-summary" hidden>
-              <span class="rating-star" aria-hidden="true">★</span>
-              <strong id="product-review-average"></strong>
-              <button id="product-review-count"
-                      class="product-review-count"
-                      type="button"></button>
-            </div>
-
-            <p class="product-reference-note" id="product-review-note">
-              Published reviews load when this sheet opens.
-            </p>
-
-            <button id="product-review-retry"
-                    class="catalog-retry"
-                    type="button"
-                    hidden>
-              Retry reviews
-            </button>
-
-            <div class="product-preview-notice">
-              Prices and availability are loaded from the staging
-              catalog. The staging basket is saved in this browser.
-              Checkout can start a staging order. Payment is completed
-              on SenangPay, and the server confirms it.
-            </div>
-
-          </div>
-
-          <section class="product-section" id="product-description">
-            <h3>Description</h3>
-
-            <p id="product-description-copy">
-              Dahlia Series (D06), made using premium Nidha Dubai
-              material. Designed as a comfortable, elegant Abaya Arab
-              with practical everyday features.
-            </p>
-
-            <div id="product-fabric-block" hidden>
-              <div class="product-info-divider"></div>
-              <h3>Fabric</h3>
-              <p id="product-fabric-copy"></p>
-            </div>
-
-            <div class="product-info-divider"></div>
-
-            <h3>Features</h3>
-
-            <ul class="product-feature-list" id="product-feature-list">
-              <li>Premium Nidha Dubai fabric</li>
-              <li>Single-layer cutting</li>
-              <li>10-inch nursing-friendly front zip</li>
-              <li>Left and right pockets</li>
-              <li>Full inner sleeve lining (wudhu-friendly)</li>
-              <li>Complimentary chiffon shawl — 190 × 70 cm</li>
-              <li>Premium gift box packaging</li>
-            </ul>
-
-          </section>
-
-          <section class="product-section" id="product-sizes">
-            <h3>Size information</h3>
-
-            <p>
-              Available size categories in the D06 product reference:
-              XS, S, M, L, XL, XXL and XXXL.
-            </p>
-
-            <p class="product-reference-note" id="product-size-status">
-              Garment measurements load from the Operations catalog.
-              They are sizing references, not purchase options.
-              Prices and availability still come from the staging shop.
-            </p>
-
-            <div id="product-size-guides"></div>
-
-            <div id="product-size-unavailable" hidden>
-              <p class="product-reference-note">
-                Sizing information is unavailable. Set 1 and Set 2
-                measurements are not shown.
-              </p>
-              <button id="product-size-retry"
-                      class="catalog-retry"
-                      type="button">
-                Retry size guide
-              </button>
-            </div>
-          </section>
-
-          <section class="product-section" id="product-reviews">
-            <div class="review-section-head">
-              <h3>Customer reviews</h3>
-              <button id="product-review-see-all"
-                      class="review-see-all"
-                      type="button"
-                      hidden>
-                See all reviews
-              </button>
-            </div>
-
-            <p class="product-reference-note" id="product-review-context" hidden>
-              Published staging reviews for interface testing.
-              Not verified purchases.
-            </p>
-
-            <div id="product-review-bars"
-                 class="review-bars"
-                 hidden></div>
-
-            <div id="product-review-strip"
-                 class="review-photo-strip"
-                 hidden
-                 aria-label="Review photos"></div>
-
-            <div id="product-review-preview"></div>
-          </section>
-
-          <section class="product-section" id="product-shipping">
-            <h3>Delivery and shopping</h3>
-
-            <p>
-              Checkout can request a staging delivery estimate.
-              A courier shipment is created only after the server
-              confirms payment.
-            </p>
-
-            <p>
-              Size selection and the staging basket are active in
-              this browser. Checkout sends the order to staging.
-            </p>
-          </section>
-
+  <section class="product-section" id="product-description">
+    <h3>Product details</h3>
+    <p id="product-description-copy">Dahlia Series D06, made with premium Nidha Dubai fabric.</p>
+    <details class="modern-detail-fold">
+      <summary>Fabric &amp; features <span aria-hidden="true">+</span></summary>
+      <div class="modern-detail-body">
+        <div id="product-fabric-block" hidden>
+          <h4>Fabric</h4>
+          <p id="product-fabric-copy"></p>
         </div>
+        <h4>Features</h4>
+        <ul class="product-feature-list" id="product-feature-list">
+          <li>Premium Nidha Dubai fabric</li>
+          <li>Nursing-friendly zip</li>
+          <li>Dual pockets</li>
+          <li>Complimentary chiffon shawl</li>
+        </ul>
+      </div>
+    </details>
+  </section>
+</div>
 
         <div id="product-mini"
              class="product-mini"
@@ -3916,6 +4139,7 @@
               Close
             </button>
           </div>
+          <div id="product-review-bars" class="review-bars" hidden></div>
           <div class="review-sort" role="group" aria-label="Sort reviews">
             <button id="review-sort-recommended"
                     class="review-chip is-selected"
@@ -11774,5 +11998,81 @@
       syncPlayback();
     })();
   </script>
+
+<script>
+/* Modern product-sheet navigation and size-guide presentation.
+   The existing API, commerce, and review controllers are unchanged. */
+(() => {
+  'use strict';
+  const sheet = document.getElementById('product-sheet');
+  const scroll = document.getElementById('product-scroll');
+  if (!sheet || !scroll) return;
+  const tabs = Array.from(sheet.querySelectorAll('[data-modern-go]'));
+  const targets = tabs.map(tab => document.getElementById(tab.dataset.modernGo));
+  const prefersLessMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+  function activeTab(index) {
+    tabs.forEach((tab, i) => {
+      tab.classList.toggle('is-active', i === index);
+      if (i === index) tab.setAttribute('aria-current','true');
+      else tab.removeAttribute('aria-current');
+    });
+  }
+  let lockUntil = 0;
+  tabs.forEach((tab,i) => tab.addEventListener('click',() => {
+    const target = targets[i]; if (!target) return;
+    activeTab(i);
+    lockUntil = Date.now()+650;
+    const relative = target.getBoundingClientRect().top - scroll.getBoundingClientRect().top;
+    const top = scroll.scrollTop + relative - 56;
+    scroll.scrollTo({top:Math.max(0,top),behavior:prefersLessMotion.matches?'auto':'smooth'});
+  }));
+  const select = document.getElementById('modern-size-select');
+  if (select) select.addEventListener('click', () => {
+    const buy = document.getElementById('open-product-buy');
+    if (buy) buy.click();
+  });
+  let scrollPending = false;
+  scroll.addEventListener('scroll', () => {
+    if (scrollPending || Date.now()<lockUntil) return;
+    scrollPending = true;
+    requestAnimationFrame(() => {
+      scrollPending = false;
+      let active=0;
+      const guideY=scroll.scrollTop+72;
+      targets.forEach((target,i) => { if (target && target.offsetTop<=guideY) active=i; });
+      activeTab(active);
+    });
+  },{passive:true});
+
+  const guides = document.getElementById('product-size-guides');
+  const controls = document.getElementById('modern-length-tabs');
+  const standard = document.getElementById('modern-set-standard');
+  const long = document.getElementById('modern-set-long');
+  if (!guides || !controls || !standard || !long) return;
+  let selected=0;
+  function applySizeTabs() {
+    const sections = Array.from(guides.querySelectorAll('.product-size-guide'));
+    controls.hidden = sections.length < 2;
+    sections.forEach((el,i) => {
+      el.hidden = sections.length>=2 && i!==selected;
+      const headings = el.querySelectorAll('thead th');
+      ['Size','Shoulder','Bust','Sleeve','Length','Height'].forEach((label,k) => {
+        if(headings[k]) headings[k].textContent=label;
+      });
+    });
+    [standard,long].forEach((el,i) => {
+      const active = i===selected;
+      el.classList.toggle('is-active',active);
+      el.setAttribute('aria-pressed',String(active));
+    });
+  }
+  [standard,long].forEach((btn,i) => btn.addEventListener('click', () => {
+    selected=i; applySizeTabs();
+  }));
+  new MutationObserver(applySizeTabs).observe(guides,{childList:true});
+  applySizeTabs();
+})();
+</script>
+
 </body>
 </html>
