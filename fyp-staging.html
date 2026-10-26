@@ -1138,28 +1138,34 @@
 
     .cart-fly-thumbnail {
       position:fixed;
-      width:46px;
-      height:62px;
+      width:78px;
+      height:104px;
       object-fit:cover;
-      border-radius:9px;
-      box-shadow:0 8px 22px rgba(28,19,10,.30);
+      border:1px solid rgba(198,174,132,.85);
+      border-radius:12px;
+      box-shadow:0 16px 34px rgba(42,30,14,.32);
       pointer-events:none;
       transform-origin:center;
       z-index:9999;
     }
 
     @keyframes cart-arrival-pulse {
-      0% { transform:scale(1); background:transparent; }
-      45% { transform:scale(1.14); background:rgba(179,146,87,.18); }
-      100% { transform:scale(1); background:transparent; }
+      0% { transform:scale(1); box-shadow:0 0 0 0 rgba(179,146,87,0); }
+      42% { transform:scale(1.18); box-shadow:0 0 0 7px rgba(179,146,87,.28); }
+      100% { transform:scale(1); box-shadow:0 0 0 0 rgba(179,146,87,0); }
     }
 
-    .commerce-header-basket.cart-arrival {
-      animation:cart-arrival-pulse 360ms ease-out;
+    .commerce-header-basket.cart-arrival,
+    .commerce-header-basket.cart-arrival .cart-shortcut-badge,
+    #commerce-header-cart-count.cart-arrival {
+      animation:cart-arrival-pulse 560ms ease-out;
     }
 
     @media (prefers-reduced-motion:reduce) {
-      .commerce-header-basket.cart-arrival {
+      .commerce-header-basket.cart-arrival,
+      .commerce-header-basket.cart-arrival .cart-shortcut-badge,
+      #commerce-header-cart-count.cart-arrival,
+      .cart-fly-thumbnail {
         animation:none;
       }
     }
@@ -2145,15 +2151,234 @@
     }
 
     .commerce-size-button[aria-pressed="true"] {
-      border:2px solid #b39257;
-      background:#f7f2e9;
-      color:#8c6836;
+      border:1px solid #c6ae84;
+      box-shadow:inset 0 0 0 1px #c6ae84;
+      background:#f7f4ec;
+      color:#6f5a32;
     }
 
     .commerce-size-button:disabled {
       background:#f3f3f3;
-      color:#a3a3a3;
+      color:#b0b0b0;
       border-color:#ececec;
+      box-shadow:none;
+    }
+
+    .commerce-set-preview {
+      margin-top:18px;
+    }
+
+    .commerce-set-note {
+      margin:8px 0 0;
+    }
+
+    .commerce-set-toggle {
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:4px;
+      padding:4px;
+      border-radius:12px;
+      background:#f5f5f5;
+    }
+
+    .commerce-set-toggle button {
+      min-height:42px;
+      border:1px solid transparent;
+      border-radius:9px;
+      background:transparent;
+      color:#858585;
+      font-size:12px;
+      font-weight:600;
+      transition:background .25s ease, color .25s ease, border-color .25s ease, box-shadow .25s ease;
+    }
+
+    .commerce-set-toggle button[aria-pressed="true"] {
+      background:#f7f4ec;
+      border-color:#c6ae84;
+      box-shadow:inset 0 0 0 1px #c6ae84;
+      color:#6f5a32;
+    }
+
+    .commerce-size-grid {
+      max-height:260px;
+      overflow:hidden;
+      transition:max-height .32s ease, opacity .32s ease, margin-top .32s ease;
+    }
+
+    .commerce-size-grid.is-set-locked {
+      max-height:0;
+      margin-top:0;
+      opacity:0;
+      pointer-events:none;
+    }
+
+    .commerce-size-button {
+      position:relative;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      height:48px;
+      gap:1px;
+    }
+
+    .commerce-size-state {
+      color:#a3a3a3;
+      font-size:8px;
+      font-weight:700;
+      letter-spacing:.04em;
+      line-height:1;
+      text-transform:uppercase;
+    }
+
+    .fit-card {
+      margin:0 0 14px;
+      padding:12px;
+      border:1px solid #eee;
+      border-radius:14px;
+      background:#fafafa;
+    }
+
+    .fit-card-head {
+      display:flex;
+      align-items:center;
+      gap:8px;
+      margin-bottom:10px;
+      color:#303030;
+      font-size:13px;
+      font-weight:700;
+    }
+
+    .fit-card-head svg {
+      width:16px;
+      height:16px;
+      color:#a88a54;
+    }
+
+    .fit-fields {
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:8px;
+    }
+
+    .fit-fields label {
+      display:flex;
+      flex-direction:column;
+      gap:4px;
+      color:#8a8a8a;
+      font-size:10px;
+      font-weight:600;
+    }
+
+    .fit-fields input {
+      width:100%;
+      min-height:40px;
+      padding:8px 10px;
+      border:1px solid #e6e6e6;
+      border-radius:10px;
+      background:#fff;
+      color:#242424;
+      font:inherit;
+      font-size:14px;
+      font-weight:600;
+    }
+
+    .fit-fields input:focus {
+      outline:1px solid #c6ae84;
+      border-color:#c6ae84;
+      background:#fffdf8;
+    }
+
+    .fit-result {
+      min-height:1.2em;
+      margin:8px 0 0;
+      color:#6f5a32;
+      font-size:12px;
+      line-height:1.45;
+    }
+
+    .basket-stepper {
+      display:inline-flex;
+      align-items:center;
+      gap:2px;
+      padding:3px;
+      border:1px solid #efe6d8;
+      border-radius:999px;
+      background:#f7f5f1;
+    }
+
+    .basket-step,
+    .basket-remove {
+      display:grid;
+      place-items:center;
+      border:0;
+      border-radius:50%;
+      background:#fff;
+      color:#8b6e38;
+      transition:background .2s ease, transform .2s ease;
+    }
+
+    .basket-step {
+      width:36px;
+      height:36px;
+    }
+
+    .basket-remove {
+      width:44px;
+      height:44px;
+      background:transparent;
+    }
+
+    .basket-step svg,
+    .basket-remove svg {
+      width:16px;
+      height:16px;
+      stroke:currentColor;
+      fill:none;
+      stroke-width:1.7;
+    }
+
+    .basket-qty {
+      min-width:22px;
+      color:#303030;
+      font-size:13px;
+      font-weight:700;
+      text-align:center;
+    }
+
+    .commerce-basket-controls .basket-step,
+    .commerce-basket-controls .basket-remove {
+      min-width:0;
+      border:0;
+      color:#8b6e38;
+    }
+
+    .basket-step:disabled,
+    .basket-remove:disabled {
+      opacity:.38;
+    }
+
+    .basket-step:active,
+    .basket-remove:active {
+      transform:scale(.94);
+    }
+
+    @media (hover:hover) {
+      .basket-step:hover,
+      .basket-remove:hover,
+      .commerce-set-toggle button:hover {
+        background:#f7f4ec;
+      }
+    }
+
+    @media (prefers-reduced-motion:reduce) {
+      .commerce-size-grid,
+      .commerce-set-toggle button,
+      .basket-step,
+      .basket-remove,
+      .fit-fields input {
+        transition:none !important;
+      }
     }
 
     .product-price del,
@@ -3559,25 +3784,26 @@
 #product-sheet .product-footer-small { color:#555; font-size:10px; height:46px; }
 #product-sheet .product-footer-small svg { width:21px; height:21px; }
 #product-sheet .product-cart-button {
-  height:46px; border-radius:13px; background:#f6f5f2;
-  color:#a88a54; border:1px solid #e9e6dd;
-  transition:background .22s ease,transform .22s ease;
+  height:46px; border-radius:16px; background:#fff;
+  color:#876a3c; border:1px solid #e4d7c2;
+  transition:background .22s ease, transform .22s ease, border-color .22s ease;
 }
 #product-sheet .product-buy-button {
   position:relative; overflow:hidden; isolation:isolate;
-  min-height:46px; border-radius:13px; font-size:13px; font-weight:700;
-  background:#252525; color:#fff; letter-spacing:.01em;
-  transition:background .22s ease, transform .22s ease,box-shadow .22s ease;
+  min-height:46px; border-radius:23px; font-size:13px; font-weight:700;
+  background:#b39257; color:#fff; letter-spacing:.01em;
+  box-shadow:inset 0 1px 0 rgba(255,248,236,.35);
+  transition:background .22s ease, transform .22s ease, box-shadow .22s ease;
 }
 #product-sheet .product-buy-button::before {
-  content:''; position:absolute; top:0; left:-80%; width:44%; height:100%;
-  transform:skewX(-25deg); pointer-events:none;
-  background:linear-gradient(90deg,transparent,rgba(255,255,255,.17),transparent);
+  content:''; position:absolute; top:0; left:-80%; width:42%; height:100%;
+  transform:skewX(-22deg); pointer-events:none;
+  background:linear-gradient(90deg,transparent,rgba(255,248,236,.5),transparent);
   animation:modern-gentle-sheen 7s ease-in-out 2s infinite;
 }
 @keyframes modern-gentle-sheen { 0%,78%,100% { left:-80%; } 90% { left:145%; } }
 #product-sheet .product-buy-button:active,
-#product-sheet .product-cart-button:active { transform:scale(.98); }
+#product-sheet .product-cart-button:active { transform:scale(.97); }
 #product-sheet .review-panel {
   background:#fff; color:#282828; overflow:hidden; min-height:0;
 }
@@ -3628,8 +3854,8 @@
 #product-sheet #product-review-preview .product-review-card,
 #product-sheet .review-photo-strip .review-thumb { animation:modern-reveal .35s ease both; }
 @media (hover:hover) {
-  #product-sheet .product-buy-button:hover { background:#363636; box-shadow:0 6px 18px #00000020; }
-  #product-sheet .product-cart-button:hover { background:#eeeae2; }
+  #product-sheet .product-buy-button:hover { background:#c4a36a; box-shadow:inset 0 1px 0 rgba(255,248,236,.4), 0 6px 16px rgba(139,110,56,.22); }
+  #product-sheet .product-cart-button:hover { background:#f7f4ec; border-color:#c6ae84; }
   #product-sheet .review-thumb:hover { transform:translateY(-2px); box-shadow:0 5px 14px #00000015; }
   #product-sheet .modern-size-link:hover { background:#fafafa; }
 }
@@ -4076,6 +4302,21 @@
       <h3>Size guide</h3>
       <span>Garment in · Height cm</span>
     </div>
+    <form id="product-fit" class="fit-card" autocomplete="off">
+      <div class="fit-card-head">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" aria-hidden="true"><path d="M4 8h16M8 8v3M12 8v5M16 8v3M6 20V8M18 20V8"/></svg>
+        <strong>Find my size</strong>
+      </div>
+      <div class="fit-fields">
+        <label>Height
+          <input id="product-fit-height" data-fit="height" type="text" inputmode="decimal" placeholder="cm" aria-label="Height in centimetres">
+        </label>
+        <label>Weight
+          <input id="product-fit-weight" data-fit="weight" type="text" inputmode="decimal" placeholder="kg" aria-label="Weight in kilograms">
+        </label>
+      </div>
+      <p id="product-fit-result" class="fit-result" aria-live="polite"></p>
+    </form>
     <div id="modern-length-tabs" class="modern-length-tabs" role="group" aria-label="Garment length set" hidden>
       <button type="button" id="modern-set-standard" class="modern-length-tab is-active" aria-pressed="true">Set 1 · Standard</button>
       <button type="button" id="modern-set-long" class="modern-length-tab" aria-pressed="false">Set 2 · Long</button>
@@ -4346,27 +4587,52 @@
               </div>
             </div>
 
+            <form id="commerce-fit" class="fit-card" autocomplete="off">
+              <div class="fit-card-head">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" aria-hidden="true"><path d="M4 8h16M8 8v3M12 8v5M16 8v3M6 20V8M18 20V8"/></svg>
+                <strong>Find my size</strong>
+              </div>
+              <div class="fit-fields">
+                <label>Height
+                  <input id="commerce-fit-height" data-fit="height" type="text" inputmode="decimal" placeholder="cm" aria-label="Height in centimetres">
+                </label>
+                <label>Weight
+                  <input id="commerce-fit-weight" data-fit="weight" type="text" inputmode="decimal" placeholder="kg" aria-label="Weight in kilograms">
+                </label>
+              </div>
+              <p id="commerce-fit-result" class="fit-result" aria-live="polite"></p>
+            </form>
+
+            <div class="commerce-set-preview">
+              <div class="commerce-section-title">Length</div>
+              <div class="commerce-set-toggle" role="group" aria-label="Length set preview">
+                <button type="button" id="commerce-set-standard" data-preview-set="S1" aria-pressed="false">Set 1 · Standard</button>
+                <button type="button" id="commerce-set-long" data-preview-set="S2" aria-pressed="false">Set 2 · Long</button>
+              </div>
+              <p class="commerce-preview-note commerce-set-note">Length set is a visual preview, not a stock option.</p>
+            </div>
+
             <div class="commerce-section-title">Saiz</div>
 
             <div id="commerce-size-grid"
-                 class="commerce-size-grid"
+                 class="commerce-size-grid is-set-locked"
                  role="group"
                  aria-label="Select demonstration size">
 
               <button type="button" class="commerce-size-button"
-                      data-demo-size="XS" aria-pressed="false" disabled>XS</button>
+                      data-demo-size="XS" aria-pressed="false" disabled><span>XS</span><small class="commerce-size-state" hidden>Sold out</small></button>
               <button type="button" class="commerce-size-button"
-                      data-demo-size="S" aria-pressed="false" disabled>S</button>
+                      data-demo-size="S" aria-pressed="false" disabled><span>S</span><small class="commerce-size-state" hidden>Sold out</small></button>
               <button type="button" class="commerce-size-button"
-                      data-demo-size="M" aria-pressed="false" disabled>M</button>
+                      data-demo-size="M" aria-pressed="false" disabled><span>M</span><small class="commerce-size-state" hidden>Sold out</small></button>
               <button type="button" class="commerce-size-button"
-                      data-demo-size="L" aria-pressed="false" disabled>L</button>
+                      data-demo-size="L" aria-pressed="false" disabled><span>L</span><small class="commerce-size-state" hidden>Sold out</small></button>
               <button type="button" class="commerce-size-button"
-                      data-demo-size="XL" aria-pressed="false" disabled>XL</button>
+                      data-demo-size="XL" aria-pressed="false" disabled><span>XL</span><small class="commerce-size-state" hidden>Sold out</small></button>
               <button type="button" class="commerce-size-button"
-                      data-demo-size="XXL" aria-pressed="false" disabled>XXL</button>
+                      data-demo-size="XXL" aria-pressed="false" disabled><span>XXL</span><small class="commerce-size-state" hidden>Sold out</small></button>
               <button type="button" class="commerce-size-button"
-                      data-demo-size="XXXL" aria-pressed="false" disabled>XXXL</button>
+                      data-demo-size="XXXL" aria-pressed="false" disabled><span>XXXL</span><small class="commerce-size-state" hidden>Sold out</small></button>
 
             </div>
 
@@ -7227,6 +7493,14 @@
 
       let demoSelectedSize = null;
       let demoQuantity = 1;
+      let previewSet = null;
+      let sizeFit = null;
+      /* Local demonstration only. XS is hidden on Set 2 so the preview can
+         show an unavailable length/size pair. This is not inventory. */
+      const PREVIEW_SET_UNOFFERED = { S2: { XS: true } };
+      const FIT_SIZES = ['XS', 'S', 'M', 'L', 'XL', 'XXL', 'XXXL'];
+      const FIT_BUST = { XS: 36, S: 38, M: 40, L: 42, XL: 44, XXL: 46, XXXL: 50 };
+      const FIT_BMI = [19.53, 22.27, 25, 27.73, 30.47, 33.2];
       let stagingCartBusy = false;
       let stagingCartNotice = '';
       let cartFlyAnimation = null;
@@ -7997,6 +8271,11 @@
             checkoutActive) {
           checkoutRenderItems();
           checkoutSyncPrimary();
+        }
+        const fitHeight = document.getElementById('product-fit-height');
+        const fitWeight = document.getElementById('product-fit-weight');
+        if (fitHeight && fitWeight && (fitHeight.value || fitWeight.value)) {
+          publishSizeFit(fitHeight.value, fitWeight.value);
         }
       }
 
@@ -8846,19 +9125,38 @@
         counter.textContent = (index + 1) + ' / ' + track.children.length;
       }
 
+      function reviewPhotoSlides(data, reviewId) {
+        const slides = [];
+        const source = reviewId
+          ? data.reviews.filter(item => item.reviewId === reviewId)
+          : selectReviews(data.reviews, { sort: 'recommended', stars: 0, photosOnly: false });
+        source.forEach(review => {
+          review.photos.forEach(photo => {
+            slides.push({
+              reviewId: review.reviewId,
+              sequence: photo.sequence,
+              url: photo.url
+            });
+          });
+        });
+        return slides;
+      }
+
       function openReviewViewer(reviewId, sequence, opener) {
         productScrollUserUntil = 0;
         const data = operationsReviews.data;
         if (!data) return;
-        const review = data.reviews.filter(item => item.reviewId === reviewId)[0];
-        if (!review || !review.photos.length) return;
+        const fromStrip = Boolean(opener && opener.closest && opener.closest('#product-review-strip'));
+        const slides = reviewPhotoSlides(data, fromStrip ? '' : reviewId);
+        if (!slides.length) return;
         const viewer = document.getElementById('review-viewer');
         const track = document.getElementById('review-viewer-track');
         if (!viewer || !track) return;
         clearElement(track);
-        review.photos.forEach(photo => {
+        slides.forEach(photo => {
           const slide = document.createElement('div');
           slide.className = 'review-viewer-slide';
+          slide.dataset.reviewId = photo.reviewId;
           slide.dataset.sequence = String(photo.sequence);
           const image = document.createElement('img');
           image.alt = 'Review photo ' + photo.sequence;
@@ -8870,7 +9168,7 @@
         });
         reviewViewerReturn = opener || null;
         viewer.hidden = false;
-        const index = Math.max(0, review.photos.findIndex(photo => photo.sequence === sequence));
+        const index = Math.max(0, slides.findIndex(photo => photo.reviewId === reviewId && photo.sequence === sequence));
         requestAnimationFrame(() => {
           const width = track.clientWidth || 1;
           track.scrollTo({ left: index * width, behavior: 'auto' });
@@ -9136,6 +9434,154 @@
             : 'Staging catalog price';
       }
 
+      function previewSizeOffered(set, size) {
+        return !(set && PREVIEW_SET_UNOFFERED[set] && PREVIEW_SET_UNOFFERED[set][size]);
+      }
+
+      function fitWeightIndex(weight) {
+        if (weight < 50) return 0;
+        if (weight <= 57) return 1;
+        if (weight <= 64) return 2;
+        if (weight <= 71) return 3;
+        if (weight <= 78) return 4;
+        if (weight <= 85) return 5;
+        if (weight <= 95) return 6;
+        return -1;
+      }
+
+      function fitBmiIndex(bmi) {
+        for (let index = 0; index < FIT_BMI.length; index += 1) {
+          if (bmi <= FIT_BMI[index]) return index;
+        }
+        return 6;
+      }
+
+      function fitBoundaryAdjust(weight, weightIndex, bmiIndex) {
+        const up = { 0: 48, 1: 56, 2: 63, 3: 70, 4: 77, 5: 84 };
+        const down = { 1: 51, 2: 59, 3: 66, 4: 73, 5: 80, 6: 87 };
+        if (bmiIndex > weightIndex && weight >= up[weightIndex]) return weightIndex + 1;
+        if (bmiIndex < weightIndex && weight <= down[weightIndex]) return weightIndex - 1;
+        return weightIndex;
+      }
+
+      function fitHeightMinimum(height) {
+        if (height <= 163) return 0;
+        if (height < 166) return 2;
+        if (height <= 167) return 3;
+        return -1;
+      }
+
+      function fitSetFor(sizeIndex, height) {
+        if (sizeIndex <= 1) return height <= 156 ? 'S1' : 'S2';
+        if (sizeIndex === 2) return height <= 159 ? 'S1' : 'S2';
+        return height <= 160 ? 'S1' : 'S2';
+      }
+
+      function recommendArabistaFit(heightValue, weightValue) {
+        const height = Number(String(heightValue).trim());
+        const weight = Number(String(weightValue).trim());
+        if (!Number.isFinite(height) || !Number.isFinite(weight) || height <= 0 || weight <= 0) {
+          return { ok: false, reason: 'invalid' };
+        }
+        if (height < 150) return { ok: false, reason: 'height-low' };
+        if (height > 167) return { ok: false, reason: 'height-high' };
+        if (weight > 95) return { ok: false, reason: 'weight-high' };
+        const weightIndex = fitWeightIndex(weight);
+        if (weightIndex < 0) return { ok: false, reason: 'weight-high' };
+        const metres = height / 100;
+        const bmiIndex = fitBmiIndex(weight / (metres * metres));
+        const adjusted = fitBoundaryAdjust(weight, weightIndex, bmiIndex);
+        const minimum = fitHeightMinimum(height);
+        const sizeIndex = Math.max(adjusted, minimum);
+        const size = FIT_SIZES[sizeIndex];
+        const set = fitSetFor(sizeIndex, height);
+        return {
+          ok: true,
+          set,
+          setLabel: set === 'S1' ? 'Set 1 · Standard' : 'Set 2 · Long',
+          size,
+          bustIn: FIT_BUST[size]
+        };
+      }
+
+      function fitMessage(result, unavailable) {
+        if (!result) return '';
+        if (!result.ok) {
+          if (result.reason === 'height-low') return 'This height is below the supported garment range.';
+          if (result.reason === 'height-high') return 'This height is above the supported garment range.';
+          if (result.reason === 'weight-high') return 'This weight is above the supported garment range.';
+          return 'Enter a height in centimetres and a weight in kilograms.';
+        }
+        if (unavailable) {
+          return result.setLabel + ' · Size ' + result.size + ' is unavailable in this staging preview.';
+        }
+        return result.setLabel + ' · Size ' + result.size + '. Bust up to ' + result.bustIn + ' in.';
+      }
+
+      function publishSizeFit(heightValue, weightValue) {
+        const heightInputs = document.querySelectorAll('[data-fit="height"]');
+        const weightInputs = document.querySelectorAll('[data-fit="weight"]');
+        heightInputs.forEach(input => {
+          if (input.value !== heightValue) input.value = heightValue;
+        });
+        weightInputs.forEach(input => {
+          if (input.value !== weightValue) input.value = weightValue;
+        });
+        const blank = !String(heightValue).trim() || !String(weightValue).trim();
+        sizeFit = blank ? null : recommendArabistaFit(heightValue, weightValue);
+        const sheet = document.getElementById('product-sheet');
+        if (sheet) {
+          if (sizeFit && sizeFit.ok) {
+            sheet.dataset.fitSet = sizeFit.set === 'S1' ? '0' : '1';
+            sheet.dataset.fitSize = sizeFit.size;
+          } else {
+            delete sheet.dataset.fitSet;
+            delete sheet.dataset.fitSize;
+          }
+          document.dispatchEvent(new CustomEvent('arabista-fit'));
+        }
+        applyFitToCommerce();
+        const unavailable = Boolean(sizeFit && sizeFit.ok && !commercePreviewCanSelect(sizeFit));
+        const sheetText = blank ? '' : fitMessage(sizeFit, false);
+        const commerceText = blank ? '' : fitMessage(sizeFit, unavailable);
+        const sheetResult = document.getElementById('product-fit-result');
+        const commerceResult = document.getElementById('commerce-fit-result');
+        if (sheetResult) sheetResult.textContent = sheetText;
+        if (commerceResult) commerceResult.textContent = commerceText;
+      }
+
+      function commercePreviewCanSelect(result) {
+        if (!result || !result.ok) return false;
+        if (!previewSizeOffered(result.set, result.size)) return false;
+        return stagingCatalog.status === 'ready' && selectorCap(result.size) >= 1;
+      }
+
+      function applyFitToCommerce() {
+        if (!sizeFit || !sizeFit.ok) return;
+        previewSet = sizeFit.set;
+        if (commercePreviewCanSelect(sizeFit)) {
+          demoSelectedSize = sizeFit.size;
+          const cap = selectorCap(sizeFit.size);
+          demoQuantity = Math.min(Math.max(1, demoQuantity), Math.max(1, cap));
+          demoSelectionNotice = '';
+        } else {
+          demoSelectedSize = null;
+          demoQuantity = 1;
+        }
+        renderVariantSelection();
+      }
+
+      function bindSizeFit() {
+        document.querySelectorAll('.fit-card').forEach(form => {
+          form.addEventListener('submit', event => event.preventDefault());
+          form.addEventListener('input', () => {
+            const height = form.querySelector('[data-fit="height"]');
+            const weight = form.querySelector('[data-fit="weight"]');
+            publishSizeFit(height ? height.value : '', weight ? weight.value : '');
+          });
+        });
+      }
+
       function renderVariantSelection() {
         if (demoSelectedSize && stagingCatalog.status === 'ready') {
           const earlyCap = selectorCap(demoSelectedSize);
@@ -9152,17 +9598,34 @@
           }
         }
 
+        if (previewSet && demoSelectedSize && !previewSizeOffered(previewSet, demoSelectedSize)) {
+          demoSelectedSize = null;
+          demoQuantity = 1;
+          demoSelectionNotice = 'That size is not in this set preview.';
+        }
+        const sizeGrid = document.getElementById('commerce-size-grid');
+        if (sizeGrid) sizeGrid.classList.toggle('is-set-locked', !previewSet);
+        document.querySelectorAll('[data-preview-set]').forEach(button => {
+          button.setAttribute('aria-pressed', String(button.dataset.previewSet === previewSet));
+        });
+
         commerceSizeButtons.forEach(button => {
           const size = button.dataset.demoSize;
           const info = getD06SizeInfo(size);
           const cap = selectorCap(size);
-          const enabled = stagingCatalog.status === 'ready' && cap >= 1;
+          const offered = previewSizeOffered(previewSet, size);
+          const enabled = Boolean(previewSet) && offered && stagingCatalog.status === 'ready' && cap >= 1;
+          const soldOut = Boolean(info && info.reason === 'sold_out' && offered);
+          const state = button.querySelector('.commerce-size-state');
+          if (state) state.hidden = !soldOut;
           button.disabled = !enabled;
           button.setAttribute(
             'aria-pressed',
             String(enabled && size === demoSelectedSize)
           );
-          if (info && info.purchasable && cap < 1 && commerceIntent !== 'buy') {
+          if (!offered && previewSet) {
+            button.setAttribute('aria-label', `${size}, not in this set preview`);
+          } else if (info && info.purchasable && cap < 1 && commerceIntent !== 'buy') {
             button.setAttribute(
               'aria-label',
               `${size}, staging quantity already in basket`
@@ -9225,9 +9688,18 @@
         } else if (stagingCatalog.status === 'ready' &&
             COMMERCE_SIZES.every(size => selectorCap(size) < 1)) {
           note.textContent = 'Currently unavailable in staging';
+        } else if (!previewSet) {
+          note.textContent = 'Choose a length set to see sizes. The set is a visual preview, not a stock option.';
         } else {
           note.textContent =
             'Select a size to continue. Sold-out sizes stay visible and cannot be selected.';
+        }
+        if (previewSet && note &&
+            stagingCatalog.status !== 'loading' &&
+            stagingCatalog.status !== 'idle' &&
+            !note.textContent.includes('not a stock option') &&
+            !note.textContent.includes('not reserved')) {
+          note.textContent += ' Length set is a visual preview and is not reserved.';
         }
 
         if (selected && selected.purchasable) {
@@ -9257,11 +9729,14 @@
       }
 
       function pulseCartShortcut() {
-        const target = document.getElementById('commerce-header-basket');
-        if (!target || target.hidden || prefersReducedMotion()) return;
-        target.classList.remove('cart-arrival');
-        void target.offsetWidth;
-        target.classList.add('cart-arrival');
+        if (prefersReducedMotion()) return;
+        ['commerce-header-basket', 'commerce-header-cart-count'].forEach(id => {
+          const target = document.getElementById(id);
+          if (!target || target.hidden) return;
+          target.classList.remove('cart-arrival');
+          void target.offsetWidth;
+          target.classList.add('cart-arrival');
+        });
       }
 
       async function animateProductIntoCart() {
@@ -9269,15 +9744,15 @@
           '#commerce-variant .commerce-product-card img'
         );
         const target = document.getElementById('commerce-header-basket');
-        if (!source || !target || target.hidden || prefersReducedMotion()) return;
-        if (typeof Element.prototype.animate !== 'function') return;
+        if (!source || !target || target.hidden || prefersReducedMotion()) return false;
+        if (typeof Element.prototype.animate !== 'function') return false;
 
         cancelCartFlyAnimation();
 
         const sourceRect = source.getBoundingClientRect();
         const targetRect = target.getBoundingClientRect();
-        const tileWidth = 46;
-        const tileHeight = 62;
+        const tileWidth = 78;
+        const tileHeight = 104;
         const startX = sourceRect.left + sourceRect.width / 2 - tileWidth / 2;
         const startY = sourceRect.top + sourceRect.height / 2 - tileHeight / 2;
         const dx = targetRect.left + targetRect.width / 2 - (startX + tileWidth / 2);
@@ -9296,25 +9771,28 @@
           [
             {
               offset:0,
-              transform:'translate3d(0,0,0) scale(1) rotate(-4deg)',
+              transform:'translate3d(0,0,0) scale(1) rotate(-6deg)',
               opacity:1
             },
             {
-              offset:0.45,
-              transform:
-                `translate3d(${dx * .35}px, ${dy * .55 - 25}px, 0) scale(.85) rotate(7deg)`,
+              offset:0.38,
+              transform:`translate3d(${dx * 0.16}px, ${dy * 0.05 - 86}px, 0) scale(.94) rotate(-2deg)`,
+              opacity:1
+            },
+            {
+              offset:0.72,
+              transform:`translate3d(${dx * 0.68}px, ${dy * 0.58 - 28}px, 0) scale(.62) rotate(8deg)`,
               opacity:1
             },
             {
               offset:1,
-              transform:
-                `translate3d(${dx}px, ${dy}px, 0) scale(.12) rotate(12deg)`,
-              opacity:.35
+              transform:`translate3d(${dx}px, ${dy}px, 0) scale(.34) rotate(4deg)`,
+              opacity:.92
             }
           ],
           {
-            duration:500,
-            easing:'cubic-bezier(.22,.75,.30,1)',
+            duration:920,
+            easing:'cubic-bezier(.22,.8,.24,1)',
             fill:'forwards'
           }
         );
@@ -9331,10 +9809,7 @@
           tile.remove();
           if (cartFlyElement === tile) cartFlyElement = null;
         }
-
-        if (completed && commerceActive && !commerceClosing) {
-          pulseCartShortcut();
-        }
+        return completed && commerceActive && !commerceClosing;
       }
 
       function updatePreviewCartBadge() {
@@ -9531,10 +10006,13 @@
             const lineId = item && typeof item.id === 'string' ? item.id : '';
 
             if (supported) {
+              const stepper = document.createElement('div');
+              stepper.className = 'basket-stepper';
               const minus = document.createElement('button');
               minus.type = 'button';
-              minus.textContent = '−';
-              minus.setAttribute('aria-label', 'Decrease basket item');
+              minus.className = 'basket-step';
+              minus.appendChild(basketGlyph('minus'));
+              minus.setAttribute('aria-label', 'Decrease quantity');
               minus.disabled = item.qty <= 1 || stagingCartBusy;
               minus.addEventListener('click', () => {
                 if (stagingCartBusy) return;
@@ -9548,10 +10026,15 @@
                 refreshStagingCartUI();
               });
 
+              const quantity = document.createElement('span');
+              quantity.className = 'basket-qty';
+              quantity.textContent = String(item.qty);
+
               const plus = document.createElement('button');
               plus.type = 'button';
-              plus.textContent = '+';
-              plus.setAttribute('aria-label', 'Increase basket item');
+              plus.className = 'basket-step';
+              plus.appendChild(basketGlyph('plus'));
+              plus.setAttribute('aria-label', 'Increase quantity');
               const info = getD06SizeInfo(item.size);
               const aggregate = aggregateD06Quantity(item.size, cart.items);
               plus.disabled = stagingCartBusy ||
@@ -9571,14 +10054,16 @@
                 refreshStagingCartUI();
               });
 
-              controls.append(minus, plus);
+              stepper.append(minus, quantity, plus);
+              controls.appendChild(stepper);
             }
 
             if (lineId) {
               const remove = document.createElement('button');
               remove.type = 'button';
-              remove.textContent = 'Remove';
-              remove.setAttribute('aria-label', 'Remove basket item');
+              remove.className = 'basket-remove';
+              remove.appendChild(basketGlyph('trash'));
+              remove.setAttribute('aria-label', 'Remove item from basket');
               remove.disabled = stagingCartBusy;
               remove.addEventListener('click', () => {
                 if (stagingCartBusy) return;
@@ -9665,8 +10150,10 @@
       function resetCommerceDraft() {
         demoSelectedSize = null;
         demoQuantity = 1;
+        previewSet = null;
         demoSelectionNotice = '';
         renderVariantSelection();
+        applyFitToCommerce();
       }
 
       function openCommerce(view, trigger, intent = 'cart') {
@@ -9817,9 +10304,38 @@
           loadD06StagingCatalog(true);
         });
 
+      function basketGlyph(kind) {
+        const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+        svg.setAttribute('viewBox', '0 0 24 24');
+        svg.setAttribute('aria-hidden', 'true');
+        const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        path.setAttribute('d', kind === 'minus'
+          ? 'M6 12h12'
+          : kind === 'plus'
+            ? 'M12 6v12M6 12h12'
+            : 'M5 7h14M9 7V5h6v2M8 7l.8 12h6.4L16 7');
+        svg.appendChild(path);
+        return svg;
+      }
+
+      bindSizeFit();
+
+      document.querySelectorAll('[data-preview-set]').forEach(button => {
+        button.addEventListener('click', () => {
+          previewSet = button.dataset.previewSet;
+          if (demoSelectedSize && !previewSizeOffered(previewSet, demoSelectedSize)) {
+            demoSelectedSize = null;
+            demoQuantity = 1;
+            demoSelectionNotice = 'That size is not in this set preview.';
+          }
+          renderVariantSelection();
+        });
+      });
+
       commerceSizeButtons.forEach(button => {
         button.addEventListener('click', () => {
           const size = button.dataset.demoSize;
+          if (!previewSet || !previewSizeOffered(previewSet, size)) return;
           if (!COMMERCE_SIZES.includes(size)) return;
           const cap = selectorCap(size);
           if (cap < 1) return;
@@ -9844,6 +10360,9 @@
 
       commercePrimary.addEventListener('click', () => {
         if (!demoSelectedSize || commerceCurrentView !== 'variant') {
+          return;
+        }
+        if (previewSet && !previewSizeOffered(previewSet, demoSelectedSize)) {
           return;
         }
         if (stagingCartBusy) return;
@@ -9911,8 +10430,9 @@
           }
 
           stagingCartNotice = '';
-          await animateProductIntoCart();
+          const arrived = await animateProductIntoCart();
           updatePreviewCartBadge();
+          if (arrived) pulseCartShortcut();
 
           if (addToken !== cartAddGeneration ||
               !commerceActive ||
@@ -12228,14 +12748,38 @@
   [standard,long].forEach((btn,i) => btn.addEventListener('click', () => {
     selected=i; applySizeTabs();
   }));
-  new MutationObserver(applySizeTabs).observe(guides,{childList:true});
+  function applyFitHighlight() {
+    guides.querySelectorAll('tbody tr.is-fit').forEach(row => {
+      row.classList.remove('is-fit', 'is-size-selected');
+    });
+    const setIndex = sheet.dataset.fitSet;
+    const size = sheet.dataset.fitSize;
+    if (setIndex !== '0' && setIndex !== '1' || !size) return;
+    selected = Number(setIndex);
+    applySizeTabs();
+    const section = guides.querySelectorAll('.product-size-guide')[selected];
+    if (!section) return;
+    const row = Array.from(section.querySelectorAll('tbody tr')).find(item => {
+      return item.cells[0] && item.cells[0].textContent.trim() === size;
+    });
+    if (!row) return;
+    guides.querySelectorAll('tbody tr.is-size-selected').forEach(item => {
+      item.classList.remove('is-size-selected');
+    });
+    row.classList.add('is-size-selected', 'is-fit');
+  }
+  new MutationObserver(() => {
+    applySizeTabs();
+    applyFitHighlight();
+  }).observe(guides,{childList:true});
   applySizeTabs();
+  document.addEventListener('arabista-fit', applyFitHighlight);
   guides.addEventListener('click', event => {
     const row = event.target.closest('tbody tr');
     if (!row || !guides.contains(row)) return;
     if (row.classList.contains('is-size-selected')) return;
-    guides.querySelectorAll('tbody tr.is-size-selected').forEach(item => {
-      item.classList.remove('is-size-selected');
+    guides.querySelectorAll('tbody tr.is-size-selected, tbody tr.is-fit').forEach(item => {
+      item.classList.remove('is-size-selected', 'is-fit');
     });
     row.classList.add('is-size-selected');
   });
