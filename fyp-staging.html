@@ -10,7 +10,7 @@
   <link rel="preload" as="image" href="images/logo.webp">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root { color-scheme: dark; --gold:#c0a062; --cream:#f5f1e8; --ink:#0b0b0c; }
     * { box-sizing:border-box; }
@@ -3298,227 +3298,6 @@
     @media (min-width:700px) { body { display:grid; place-items:center; } .app { border-radius:14px; } }
     @media (max-width:699px) { .app { max-height:none; box-shadow:none; } }
     @media (prefers-reduced-motion:reduce) { .track,.toast { transition:none !important; } .demo-shape { animation:none; } }
-
-    /* ====================================================================
-       ARABISTA ATELIER · PRODUCT SHEET / EDITORIAL NOIR — DESIGN DRAFT 01
-       The dark theme is scoped to the product sheet. Core commerce and FYP
-       video logic remain owned by the existing scripts.
-       ==================================================================== */
-    #product-sheet {
-      --a-obsidian:#0A0A0B; --a-panel:#101113; --a-panel-raised:#171719;
-      --a-gold:#C0A062; --a-bright:#E6C77A; --a-champagne:#D4B896;
-      --a-ivory:#F5F1E8; --a-muted:#AAA49B; --a-hair:rgba(192,160,98,.21);
-      --a-ease:cubic-bezier(.16,1,.3,1);
-      color-scheme:dark; background:var(--a-obsidian); color:var(--a-ivory);
-      border-radius:21px 21px 0 0;
-      border-top:1px solid rgba(230,199,122,.25);
-      box-shadow:0 -22px 90px rgba(0,0,0,.72), 0 -2px 28px rgba(192,160,98,.08);
-      font-family:Inter,system-ui,sans-serif;
-    }
-    #product-sheet::before {content:'';position:absolute;top:0;left:16%;right:16%;height:1px;background:linear-gradient(90deg,transparent,#E6C77A77,transparent);pointer-events:none;z-index:7}
-    #product-sheet button:focus-visible {outline:2px solid var(--a-bright);outline-offset:3px}
-    #product-sheet .product-grab {
-      height:49px;flex-basis:49px;min-height:49px;
-      background:linear-gradient(180deg,#1C1A18 0%,#101011 100%);
-      border-bottom:1px solid rgba(192,160,98,.17);padding:0 16px;
-    }
-    #product-sheet .product-handle {top:5px;height:3px;width:43px;background:linear-gradient(90deg,#745F3E,#DCBF82,#745F3E);opacity:.84}
-    #product-sheet .product-grab-label {padding-top:8px;display:flex;align-items:center;gap:10px;letter-spacing:.17em;font-size:9px;color:#D3BA86;font-weight:600}
-    #product-sheet .atelier-grab-mark {font:italic 26px/.8 'Cormorant Garamond',Georgia,serif;letter-spacing:0;color:#E6C77A}
-    #product-sheet .atelier-grab-slash {opacity:.45;margin:0 5px}
-    #product-sheet .product-grab-actions {padding-top:9px;gap:9px}
-    #product-sheet .product-header-basket,#product-sheet .product-close {color:#E8D6B4;width:32px;height:32px;border-radius:50%;background:rgba(192,160,98,.085);border:1px solid rgba(192,160,98,.15);transition:background .3s,color .3s,transform .3s}
-    #product-sheet .product-header-basket:hover,#product-sheet .product-close:hover {background:rgba(192,160,98,.23);color:#fff;transform:translateY(-1px)}
-    #product-sheet .cart-shortcut-badge {background:#D4B896;color:#111}
-    #product-sheet .product-scroll {background:radial-gradient(ellipse 120% 380px at 50% 0%,#211E19 0%,#0B0B0D 75%,#0B0B0D 100%);color:var(--a-ivory);scrollbar-width:thin;scrollbar-color:#6C5B3E transparent;scroll-padding-top:65px}
-    /* Product navigation — stays under the pull handle. */
-    #product-sheet .atelier-nav {position:sticky;top:0;z-index:5;display:grid;grid-template-columns:repeat(4,1fr);align-items:stretch;min-height:50px;background:rgba(10,10,11,.94);border-bottom:1px solid var(--a-hair);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);isolation:isolate}
-    #product-sheet .atelier-nav-link {position:relative;z-index:2;color:#9D9689;background:transparent;border:0;font-size:10px;font-weight:500;letter-spacing:.015em;padding:15px 2px 14px;transition:color .3s ease}
-    #product-sheet .atelier-nav-link.is-active {color:var(--a-bright);font-weight:600}
-    #product-sheet .atelier-nav-link:hover {color:#F5E4C3}
-    #product-sheet .atelier-nav-indicator {position:absolute;bottom:-1px;left:0;width:25%;height:2px;background:linear-gradient(90deg,#7F6137,#E6C77A,#7F6137);transform:translateX(var(--atelier-active-index,0%));transition:transform .65s var(--a-ease);box-shadow:0 0 14px rgba(230,199,122,.45);pointer-events:none}
-    /* Gallery — a dark fashion editorial stage, with framing instead of UI chrome. */
-    #product-sheet .product-gallery {height:clamp(260px,38dvh,415px);background:radial-gradient(ellipse at 50% 38%,#35302A 0%,#201C19 36%,#0A0A0B 82%);isolation:isolate;overflow:hidden}
-    #product-sheet:not(.is-expanded) .product-gallery {height:clamp(222px,28dvh,280px)}
-    #product-sheet .product-gallery {transition:height .48s var(--a-ease)}
-    #product-sheet .product-gallery::before {content:'';position:absolute;inset:17px 16px 28px;border:1px solid rgba(212,184,150,.19);z-index:2;pointer-events:none}
-    #product-sheet .product-gallery::after {content:'';position:absolute;left:0;right:0;bottom:0;height:29%;background:linear-gradient(0deg,rgba(7,7,8,.62),transparent);z-index:2;pointer-events:none}
-    #product-sheet .atelier-gallery-light {position:absolute;width:85%;aspect-ratio:1;top:-55%;left:7%;border-radius:50%;background:radial-gradient(circle,rgba(212,184,150,.20),transparent 68%);filter:blur(10px);pointer-events:none;animation:atelierHalo 17s ease-in-out infinite alternate}
-    #product-sheet .product-gallery-track {position:relative;z-index:1;height:100%;background:transparent;overscroll-behavior-x:contain}
-    #product-sheet .product-gallery-slide {height:100%;align-items:center;position:relative;background:transparent;overflow:hidden}
-    #product-sheet .product-gallery-slide img {width:100%;height:100%;max-width:none;object-fit:contain;object-position:center center;filter:contrast(1.04) saturate(.94);transform:scale(1.01);transition:transform 1s var(--a-ease)}
-    #product-sheet .product-gallery-slide:focus-visible img {transform:scale(1.04)}
-    #product-sheet .atelier-gallery-top,#product-sheet .atelier-gallery-bottom {position:absolute;left:27px;right:27px;z-index:3;display:flex;align-items:center;justify-content:space-between;pointer-events:none;color:#F0E0C4;font-size:8px;letter-spacing:.29em;text-shadow:0 1px 8px #000}
-    #product-sheet .atelier-gallery-top {top:32px}
-    #product-sheet .atelier-gallery-bottom {bottom:19px;font-size:7px;opacity:.9}
-    #product-sheet .atelier-gallery-cross {font-size:16px;letter-spacing:0;color:#D7BD86}
-    #product-sheet .product-gallery-count {z-index:4;bottom:38px;right:25px;background:rgba(10,10,11,.74);border:1px solid rgba(212,184,150,.37);color:#EEE0C8;padding:6px 11px;border-radius:2px;font-size:10px;letter-spacing:.17em;backdrop-filter:blur(8px)}
-    /* Headline and commercial hierarchy */
-    #product-sheet .product-overview {padding:27px 22px 26px;background:radial-gradient(ellipse at 100% 0%,rgba(147,113,58,.095),transparent 52%),#101012;border-bottom:1px solid var(--a-hair);animation:atelierIntro .85s var(--a-ease) both}
-    #product-sheet .atelier-eyebrow,#product-sheet .atelier-section-kicker {display:flex;align-items:center;gap:10px;font-size:9px;font-weight:600;letter-spacing:.27em;color:var(--a-gold);text-transform:uppercase}
-    #product-sheet .atelier-eyebrow-rule {width:25px;height:1px;background:linear-gradient(90deg,#B9955E,transparent)}
-    #product-sheet .atelier-edition {margin-left:auto;font:italic 20px/1 'Cormorant Garamond',Georgia,serif;color:#D6BC8D;letter-spacing:0}
-    #product-sheet .product-name {margin:17px 0 5px;color:var(--a-ivory);font:500 clamp(31px,8.2vw,43px)/.99 'Cormorant Garamond',Georgia,serif;letter-spacing:-.025em;max-width:340px;text-wrap:balance}
-    #product-sheet .atelier-tagline {font:italic 18px/1.25 'Cormorant Garamond',Georgia,serif;color:#BBA983;margin:7px 0 24px}
-    #product-sheet .atelier-overview-line {display:flex;gap:14px;align-items:end;justify-content:space-between;padding:16px 0 17px;border-bottom:1px solid var(--a-hair)}
-    #product-sheet .product-price {display:flex;align-items:baseline;gap:9px;margin:0;max-width:78%}
-    #product-sheet .product-price strong {font:500 clamp(28px,7.5vw,36px)/1.15 Inter,system-ui,sans-serif;color:#F0D7A5;letter-spacing:-.055em;text-shadow:0 0 42px rgba(192,160,98,.12)}
-    #product-sheet .product-price del {color:#8E877D;font-size:11px}
-    #product-sheet .product-preview-label {color:#B9A582;border:1px solid var(--a-hair);background:#2A241C;font-size:9px}
-    #product-sheet .atelier-premium-mark {flex:0 0 auto;text-align:right;color:#968870;font-size:8px;letter-spacing:.15em;line-height:1.6}
-    #product-sheet .product-review-summary {margin-top:20px;display:flex;gap:9px;align-items:center;color:#EBD8BB;font-size:12px}
-    #product-sheet .product-review-summary .rating-star {font-size:13px;letter-spacing:.02em;color:var(--a-bright)}
-    #product-sheet .product-review-summary strong {font-size:13px;color:#F7F1E6}
-    #product-sheet .product-review-count {font-size:11px;color:#C9BFAF;border:0;border-bottom:1px solid #837050;padding:2px;background:transparent}
-    #product-sheet .atelier-review-arrow {color:var(--a-bright);font-size:14px}
-    #product-sheet .product-reference-note {color:#A39B8E;font-size:11px;line-height:1.65}
-    #product-sheet #product-review-note {margin:6px 0 0;color:#827A6F;font-size:10px}
-    #product-sheet .catalog-retry {display:inline-flex;align-items:center;justify-content:center;min-height:33px;margin-top:9px;padding:6px 16px;background:transparent;border:1px solid #A98E5D;border-radius:2px;color:#E6C77A;font-size:12px}
-    /* A triptych of quiet product features. */
-    #product-sheet .atelier-highlights {display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0;padding:19px 14px 22px;border-bottom:1px solid var(--a-hair);background:linear-gradient(180deg,#151412,#101011)}
-    #product-sheet .atelier-highlight {display:flex;flex-direction:column;align-items:center;gap:7px;text-align:center;color:#F0E4D2;font-size:10px;font-weight:500;line-height:1.4;padding:0 3px}
-    #product-sheet .atelier-highlight+.atelier-highlight {border-left:1px solid rgba(192,160,98,.17)}
-    #product-sheet .atelier-highlight-icon {color:var(--a-gold);font:24px/1 'Cormorant Garamond',Georgia,serif}
-    #product-sheet .atelier-highlight em {font-style:normal;color:#AFA494;font-size:9px;font-weight:400}
-    /* Purchase option shortcut — business flow remains the original commerce overlay. */
-    #product-sheet .atelier-choice {padding:33px 22px 33px;background:#0B0B0D;border-bottom:1px solid var(--a-hair)}
-    #product-sheet .atelier-choice-head {display:flex;align-items:center;justify-content:space-between;margin:14px 0 20px}
-    #product-sheet .atelier-choice h3,#product-sheet .product-section h3 {color:#F5F0E7;font:500 clamp(29px,7.8vw,38px)/1.05 'Cormorant Garamond',Georgia,serif;letter-spacing:-.015em;margin:0}
-    #product-sheet .atelier-choice h3 i,#product-sheet .product-section h3 i {color:#D1B27A;font-weight:400}
-    #product-sheet .atelier-choice-head p {font-size:11px;margin:8px 0 0;color:#AAA094}
-    #product-sheet .atelier-choice-emblem {width:57px;height:57px;border:1px solid var(--a-hair);border-radius:50%;display:grid;place-items:center;color:#BCA372;font:italic 38px 'Cormorant Garamond',Georgia,serif;box-shadow:0 0 45px rgba(192,160,98,.065)}
-    #product-sheet .atelier-size-labels {display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:5px;margin-bottom:16px}
-    #product-sheet .atelier-size-labels span {display:grid;place-items:center;height:38px;min-width:0;border:1px solid rgba(192,160,98,.21);background:#151516;color:#D9D1C7;font-size:10px}
-    #product-sheet .atelier-select-size {position:relative;overflow:hidden;width:100%;min-height:51px;border:1px solid #D4B896;background:linear-gradient(120deg,#A3824E 0%,#D6B678 42%,#E4CCA0 53%,#AF8F59 100%);color:#14110C;font-size:12px;font-weight:700;letter-spacing:.045em;display:flex;align-items:center;justify-content:center;gap:12px;transition:box-shadow .45s,transform .3s}
-    #product-sheet .atelier-select-size::after {content:'';position:absolute;top:-140%;left:-40%;width:28%;height:380%;transform:rotate(23deg) translateX(-100%);background:linear-gradient(90deg,transparent,rgba(255,255,255,.5),transparent);transition:transform 1.05s var(--a-ease);pointer-events:none}
-    #product-sheet .atelier-select-size:hover::after {transform:rotate(23deg) translateX(460%)}
-    #product-sheet .atelier-select-size:hover {box-shadow:0 0 35px rgba(192,160,98,.26)}
-    #product-sheet .atelier-button-arrow {font-size:20px;font-weight:400;line-height:1}
-    #product-sheet .atelier-underlink {display:block;width:100%;padding:16px 0 0;border:0;background:none;color:#AAA095;font-size:11px;text-align:center}
-    #product-sheet .atelier-underlink strong {font-weight:500;color:#E1C58E;border-bottom:1px solid #88734D;padding-bottom:2px}
-    /* Restrained fulfilment information. */
-    #product-sheet .atelier-service {display:grid;grid-template-columns:37px minmax(0,1fr) 18px;gap:12px;align-items:center;padding:22px;background:linear-gradient(120deg,#1B1915,#111112);border-bottom:1px solid var(--a-hair)}
-    #product-sheet .atelier-service-icon {width:36px;height:36px;display:grid;place-items:center;border:1px solid var(--a-hair);border-radius:50%;color:#D7B980}
-    #product-sheet .atelier-service-icon svg {width:19px;height:19px;stroke:currentColor;stroke-width:1.4;fill:none}
-    #product-sheet .atelier-service h3 {color:#EDE5D7;font-size:12px;font-weight:600;margin:0 0 5px}
-    #product-sheet .atelier-service p {color:#9E9587;font-size:10px;line-height:1.5;margin:0}
-    #product-sheet .atelier-service-diamond {color:#AE9463;font-size:12px}
-    /* Section rhythm */
-    #product-sheet .product-section {padding:37px 22px 42px;background:#0E0E10;border-top:0;border-bottom:1px solid var(--a-hair)}
-    #product-sheet .atelier-section-kicker {margin:0 0 13px;font-size:9px}
-    #product-sheet .atelier-section-intro {font:italic 17px/1.35 'Cormorant Garamond',Georgia,serif;color:#B9AA92;margin:10px 0 18px}
-    #product-sheet .review-section-head {align-items:center;margin-bottom:12px}
-    #product-sheet .review-see-all {border:0;background:none;color:#D5BA87;font-size:11px;font-weight:500;white-space:nowrap;padding:10px 0}
-    #product-sheet .review-see-all:hover {color:#F4DCAB}
-    #product-sheet #product-review-context {max-width:320px;margin:4px 0 14px;color:#91867A;font-size:10px}
-    #product-sheet .review-bars {margin:23px 0 23px;gap:7px;padding:16px;background:#171618;border:1px solid rgba(192,160,98,.13);border-radius:3px}
-    #product-sheet .review-bar-row {grid-template-columns:19px minmax(0,1fr) 27px;gap:10px;color:#C4B6A1;font-size:10px}
-    #product-sheet .review-bar {height:4px;background:#34312D;border-radius:1px}
-    #product-sheet .review-bar >span {background:linear-gradient(90deg,#A1814D,#E6C77A);box-shadow:0 0 10px rgba(230,199,122,.23)}
-    #product-sheet .atelier-photo-heading {display:flex;justify-content:space-between;margin:13px 0 11px;color:#9A8B77;font-size:9px;letter-spacing:.17em}
-    #product-sheet .review-photo-strip {gap:9px;margin:0 -22px 17px;padding:0 22px 4px}
-    #product-sheet .review-thumb {width:87px;height:110px;border:1px solid rgba(192,160,98,.2);border-radius:3px;background:#24211E;transition:transform .45s var(--a-ease),border-color .3s}
-    #product-sheet .review-thumb:hover {transform:translateY(-2px);border-color:#CBB17B}
-    #product-sheet .product-review-card {padding:20px 0;border-bottom:1px solid var(--a-hair)}
-    #product-sheet .product-review-card strong {color:#EEE3D1;font-size:12px}
-    #product-sheet .product-review-card p {color:#C5BDB3;font-size:12px;line-height:1.8;margin:10px 0 0}
-    #product-sheet .review-stars {color:#E6C77A;letter-spacing:.08em;font-size:11px}
-    #product-sheet .review-date {color:#8B847B;font-size:10px}
-    #product-sheet .review-card-photos .review-thumb {width:74px;height:93px}
-    #product-sheet .review-photo-failed {color:#B5A78C;background:#24211F}
-    #product-sheet .review-panel {background:radial-gradient(ellipse 120% 160px at 50% 0%,#252018,#101011 80%);color:var(--a-ivory)}
-    #product-sheet .review-panel-head {padding:22px 20px 15px;border-bottom:1px solid var(--a-hair)}
-    #product-sheet .review-panel-title {font:500 28px/1 'Cormorant Garamond',Georgia,serif;color:#F6EDDC}
-    #product-sheet .review-panel-close {font-size:12px;font-weight:500;color:#E0C38F;padding:8px 0}
-    #product-sheet .review-panel-list {padding:0 20px 32px}
-    #product-sheet .review-sort,#product-sheet .review-filters {padding:13px 20px 6px;gap:8px}
-    #product-sheet .review-chip {border:1px solid #4C4030;border-radius:2px;background:#1A1919;color:#C7B9A4;font-size:11px;padding:8px 11px;transition:background .3s,color .3s,border-color .3s}
-    #product-sheet .review-chip.is-selected {background:linear-gradient(115deg,#C0A062,#D8B987);border-color:#E2CA9D;color:#18140F;font-weight:600}
-    #product-sheet .review-filter-note {margin:10px 20px}
-    #product-sheet .review-viewer {background:#080808;color:#F5F1E8}
-    #product-sheet .review-viewer-head {padding:15px 20px;background:#11100F;border-bottom:1px solid var(--a-hair)}
-    #product-sheet .review-viewer-close {color:#D7B780}
-    /* Sizing selector — keeps both API-sourced tables mounted for compatibility. */
-    #product-sheet .atelier-length-tabs {display:grid;grid-template-columns:1fr 1fr;gap:7px;margin:19px 0 20px}
-    #product-sheet .atelier-length-tab {display:flex;gap:13px;justify-content:center;align-items:center;padding:12px 8px;background:#161516;border:1px solid #423727;border-radius:2px;color:#9F917D;font:italic 21px/1 'Cormorant Garamond',Georgia,serif;transition:background .35s,color .35s,border .35s}
-    #product-sheet .atelier-length-tab span {font:500 12px Inter,system-ui,sans-serif;font-style:normal}
-    #product-sheet .atelier-length-tab.is-active {background:linear-gradient(115deg,#3A2D1C,#1C1916);border-color:#B3965F;color:#EED4A3;box-shadow:inset 0 0 22px rgba(192,160,98,.06)}
-    #product-sheet #product-size-status {margin:0 0 14px;color:#ABA08F}
-    #product-sheet #product-size-guides[data-active-set="S1"] .product-size-guide:nth-child(2),#product-sheet #product-size-guides[data-active-set="S2"] .product-size-guide:nth-child(1) {display:none}
-    #product-sheet .product-size-guide {animation:atelierIntro .48s var(--a-ease) both}
-    #product-sheet .product-size-guide h4 {font:500 20px/1.2 'Cormorant Garamond',Georgia,serif;color:#EDE1C8;margin:0 0 6px}
-    #product-sheet .product-size-guide>.product-reference-note {margin:0 0 15px;color:#988D7E}
-    #product-sheet .product-size-table-wrap {width:100%;overflow-x:auto;border:1px solid var(--a-hair);border-radius:3px;background:#141415}
-    #product-sheet .product-size-table {min-width:340px;font-size:11px;color:#DAD2C7}
-    #product-sheet .product-size-table th {background:#241F19;color:#E4C994;letter-spacing:.05em;font-size:10px;font-weight:600}
-    #product-sheet .product-size-table th,#product-sheet .product-size-table td {border-bottom:1px solid rgba(192,160,98,.11);padding:12px 5px}
-    #product-sheet .product-size-table tbody tr:nth-child(even) {background:rgba(192,160,98,.035)}
-    #product-sheet .product-size-table tbody tr:hover {background:rgba(192,160,98,.09)}
-    #product-sheet .product-size-table tbody tr:last-child td {border-bottom:0}
-    #product-sheet .atelier-measure-note {margin:16px 0 0;color:#8E8579;font-size:10px;line-height:1.7;display:flex;gap:8px}
-    #product-sheet .atelier-measure-note span {color:#D8B987}
-    /* Description as an editorial chapter. */
-    #product-sheet .atelier-description {background:radial-gradient(ellipse at 0% 0%,rgba(192,160,98,.09),transparent 65%),#111011}
-    #product-sheet .atelier-description h3 {max-width:300px;margin-bottom:18px}
-    #product-sheet .atelier-description #product-description-copy {color:#C7BEB0;font:400 12px/2 Inter,system-ui,sans-serif;margin:0 0 25px}
-    #product-sheet .atelier-fabric-block {padding:17px 0;border-top:1px solid var(--a-hair);border-bottom:1px solid var(--a-hair);margin-bottom:20px}
-    #product-sheet .atelier-fabric-block p {font:italic 21px/1.15 'Cormorant Garamond',Georgia,serif;color:#E4D1AD;margin:9px 0 0}
-    #product-sheet .atelier-detail-label {color:#C1A575;font-size:9px;letter-spacing:.22em;font-weight:600;margin:11px 0 16px}
-    #product-sheet .product-feature-list {list-style:none;padding:0;margin:0;color:#D4CABE;font-size:11px;line-height:1.7}
-    #product-sheet .product-feature-list li {position:relative;padding:11px 0 11px 21px;border-bottom:1px solid rgba(192,160,98,.11)}
-    #product-sheet .product-feature-list li::before {content:'✦';position:absolute;left:0;top:12px;color:#C9AD78;font-size:9px}
-    /* Closing brand story — noir, warm glow, high-fashion typography. */
-    #product-sheet .atelier-brand-story {position:relative;overflow:hidden;isolation:isolate;min-height:295px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:44px 35px 48px;background:radial-gradient(ellipse at 50% 35%,#372D20 0%,#1A1714 42%,#0A0A0B 85%);border-bottom:1px solid var(--a-hair)}
-    #product-sheet .atelier-brand-story::before {content:'';position:absolute;inset:13px;border:1px solid rgba(212,184,150,.21);pointer-events:none}
-    #product-sheet .atelier-brand-decoration {position:absolute;font:italic 260px/1 'Cormorant Garamond',Georgia,serif;color:rgba(192,160,98,.055);top:-18px;right:-4px;pointer-events:none;z-index:-1}
-    #product-sheet .atelier-brand-eyebrow {color:#D8B987;font-size:9px;letter-spacing:.32em;margin:0 0 16px}
-    #product-sheet .atelier-brand-story h3 {font:400 38px/.95 'Cormorant Garamond',Georgia,serif;color:#F6F1E7;letter-spacing:-.025em;margin:0 0 22px}
-    #product-sheet .atelier-brand-story h3 em {font-weight:400;color:#E1BE81}
-    #product-sheet .atelier-brand-rule {width:62px;height:1px;background:linear-gradient(90deg,transparent,#E6C77A,transparent);margin-bottom:17px}
-    #product-sheet .atelier-brand-story p:not(.atelier-brand-eyebrow) {max-width:300px;color:#BBB0A0;font-size:11px;line-height:1.85;margin:0}
-    #product-sheet .atelier-brand-signature {display:block;margin-top:25px;color:#CBAF79;font-size:9px;letter-spacing:.45em}
-    #product-sheet .atelier-staging-disclosure {background:#09090A;padding:23px 22px 34px}
-    #product-sheet .atelier-staging-disclosure details {font-size:10px;line-height:1.7;color:#8C8275}
-    #product-sheet .atelier-staging-disclosure summary {cursor:pointer;color:#B3A181}
-    #product-sheet .atelier-staging-disclosure p {max-width:360px;color:#90877B;line-height:1.65}
-    /* Fixed purchase bar — a precious-metal strip without aggressive sales chrome. */
-    #product-sheet .product-footer {position:relative;z-index:3;grid-template-columns:39px 39px 46px minmax(0,1fr);gap:9px;padding:10px 14px calc(11px + env(safe-area-inset-bottom,0px));border-top:1px solid rgba(192,160,98,.3);background:linear-gradient(180deg,#191716,#0B0B0D);box-shadow:0 -10px 32px rgba(0,0,0,.45)}
-    #product-sheet .product-footer-small {color:#C8BDAD;font-size:9px;gap:3px;height:48px}
-    #product-sheet .product-footer-small svg {color:#C9AA74;width:19px;height:19px}
-    #product-sheet .product-footer-small:hover {color:#FFF3E0}
-    #product-sheet .product-cart-button {background:#231F19;border:1px solid #785F39;border-radius:2px;color:#E0C38F;height:46px}
-    #product-sheet .product-buy-button {position:relative;overflow:hidden;border-radius:2px;height:47px;min-height:47px;background:linear-gradient(114deg,#987544 0%,#C3A165 33%,#E8CCA0 53%,#B39058 85%,#9C7D4C 100%);color:#14110D;font-size:13px;font-weight:700;letter-spacing:.06em;display:flex;justify-content:center;align-items:center;gap:13px;box-shadow:0 4px 26px rgba(192,160,98,.14);transition:box-shadow .4s,filter .35s}
-    #product-sheet .product-buy-button::after {content:'';position:absolute;inset:0;background:linear-gradient(100deg,transparent 30%,rgba(255,255,255,.15) 47%,transparent 63%);background-size:260% 100%;animation:atelierGoldSweep 10s ease-in-out infinite;pointer-events:none}
-    #product-sheet .product-buy-button:hover {filter:brightness(1.08);box-shadow:0 4px 35px rgba(192,160,98,.3)}
-    #product-sheet .atelier-buy-arrow {font-size:18px;font-weight:400}
-    #product-sheet .product-mini-return {border-color:#A88A55;box-shadow:0 7px 29px rgba(0,0,0,.6)}
-    #product-sheet .product-mini-close {border:1px solid #9A7C4E}
-    #product-sheet .atelier-eyebrow-rule {transform-origin:left;animation:atelierLineReveal 1.25s var(--a-ease) .2s both}
-    #product-sheet .atelier-brand-rule {animation:atelierLineReveal 1.7s var(--a-ease) both}
-    @keyframes atelierLineReveal {from{opacity:0;transform:scaleX(0)}to{opacity:1;transform:scaleX(1)}}
-    @keyframes atelierIntro {from{opacity:0;transform:translateY(15px)}to{opacity:1;transform:translateY(0)}}
-    @keyframes atelierHalo {from{transform:translateX(-7%) scale(.95);opacity:.7}to{transform:translateX(7%) scale(1.12);opacity:1}}
-    @keyframes atelierGoldSweep {0%,74%,100%{background-position:200% 0}88%{background-position:-120% 0}}
-    #product-sheet.atelier-live .atelier-reveal:not(.is-seen) {opacity:0;transform:translateY(23px)}
-    #product-sheet .atelier-reveal {transition:opacity .9s var(--a-ease),transform .9s var(--a-ease)}
-    /* On small phones, keep purchase actions and headings readable. */
-    @media(max-width:375px) {
-      #product-sheet .product-gallery {height:clamp(272px,37dvh,342px)}
-      #product-sheet .product-overview {padding:23px 18px}
-      #product-sheet .product-section,#product-sheet .atelier-choice {padding-left:18px;padding-right:18px}
-      #product-sheet .product-footer {padding-left:9px;padding-right:9px;gap:5px;grid-template-columns:36px 36px 42px minmax(0,1fr)}
-      #product-sheet .product-name {font-size:31px}
-      #product-sheet .atelier-gallery-top,#product-sheet .atelier-gallery-bottom {left:22px;right:22px}
-      #product-sheet .atelier-nav-link {font-size:9px}
-    }
-    @media(prefers-reduced-motion:reduce) {
-      #product-sheet .atelier-gallery-light,#product-sheet .product-buy-button::after,#product-sheet .atelier-eyebrow-rule,#product-sheet .atelier-brand-rule {animation:none!important}
-      #product-sheet .product-gallery {transition:none!important}
-      #product-sheet .product-overview,#product-sheet .product-size-guide {animation:none!important}
-      #product-sheet .atelier-reveal {opacity:1!important;transform:none!important;transition:none!important}
-      #product-sheet .atelier-select-size::after,#product-sheet .atelier-nav-indicator {transition:none!important}
-    }
-
   </style>
 </head>
 <body>
@@ -3837,7 +3616,7 @@
       <!-- PHASE 3A: D06 SHOPPING PRODUCT SHEET -->
       <section
         id="product-sheet"
-        class="sheet sheet--product atelier-sheet"
+        class="sheet sheet--product"
         role="dialog"
         aria-modal="true"
         aria-labelledby="product-sheet-heading"
@@ -3847,7 +3626,7 @@
         <header class="product-grab" id="product-grab" tabindex="0">
           <span class="product-handle" aria-hidden="true"></span>
 
-          <span class="product-grab-label"><span class="atelier-grab-mark">A</span> <span>ARABISTA <span class="atelier-grab-slash">/</span> DAHLIA Nº 06</span></span>
+          <span class="product-grab-label">ARABISTA · D06</span>
 
           <div class="product-grab-actions">
             <button
@@ -3878,139 +3657,182 @@
           </div>
         </header>
 
-        <!-- ARABISTA ATELIER / D06 · EDITORIAL PRODUCT STORY -->
         <div id="product-scroll" class="product-scroll">
-          <nav class="atelier-nav" id="atelier-nav" aria-label="Explore this abaya">
-            <button type="button" class="atelier-nav-link is-active" data-atelier-target="product-gallery" aria-current="true">Discover</button>
-            <button type="button" class="atelier-nav-link" data-atelier-target="product-reviews">Reviews</button>
-            <button type="button" class="atelier-nav-link" data-atelier-target="product-sizes">Size guide</button>
-            <button type="button" class="atelier-nav-link" data-atelier-target="product-description">The details</button>
-            <span class="atelier-nav-indicator" aria-hidden="true"></span>
-          </nav>
 
-          <div class="product-gallery" id="product-gallery" aria-label="D06 product image gallery">
-            <div class="atelier-gallery-light" aria-hidden="true"></div>
-            <div class="atelier-gallery-top" aria-hidden="true">
-              <span>ARABISTA / THE DAHLIA EDITION</span>
-              <span class="atelier-gallery-cross">✦</span>
+          <div class="product-gallery"
+               id="product-gallery"
+               aria-label="D06 product image gallery">
+
+            <div id="product-gallery-track"
+                 class="product-gallery-track"
+                 tabindex="0"
+                 role="region"
+                 aria-label="Swipe through D06 product images">
             </div>
-            <div id="product-gallery-track" class="product-gallery-track" tabindex="0"
-                 role="region" aria-label="Swipe through D06 product images"></div>
-            <div class="atelier-gallery-bottom" aria-hidden="true"><span>DESIGNED FOR EVERYDAY ELEGANCE</span><span>✧</span></div>
-            <span id="product-gallery-count" class="product-gallery-count" aria-live="polite">1/8</span>
+
+            <span id="product-gallery-count"
+                  class="product-gallery-count"
+                  aria-live="polite">1/8</span>
+
           </div>
 
           <div class="product-overview" id="product-overview">
-            <div class="atelier-eyebrow"><span class="atelier-eyebrow-rule"></span> THE DAHLIA COLLECTION <span class="atelier-edition">Nº 06</span></div>
-            <div class="atelier-overview-line">
-              <div class="product-price" id="product-price">
-                <del id="product-price-compare" hidden></del>
-                <strong id="product-price-value" class="is-status">Checking latest price…</strong>
-                <span id="product-price-label" class="product-preview-label" hidden>Staging catalog price</span>
-              </div>
-              <div class="atelier-premium-mark" aria-label="Premium Nidha Dubai">PREMIUM<br>NIDHA DUBAI</div>
+
+            <div class="product-price" id="product-price">
+              <del id="product-price-compare" hidden></del>
+              <strong id="product-price-value" class="is-status">
+                Checking latest price…
+              </strong>
+              <span id="product-price-label"
+                    class="product-preview-label"
+                    hidden>
+                Staging catalog price
+              </span>
             </div>
-            <h2 id="product-sheet-heading" class="product-name">D06 Dahlia Series Abaya</h2>
-            <p class="atelier-tagline">Quiet elegance. Made to move with you.</p>
-            <button id="product-catalog-retry" class="catalog-retry" type="button" hidden>Retry price</button>
+
+            <button id="product-catalog-retry"
+                    class="catalog-retry"
+                    type="button"
+                    hidden>
+              Retry
+            </button>
+
+            <h2 id="product-sheet-heading" class="product-name">
+              ARABISTA | Abaya Arab — Dahlia Series
+              (Kod D06) Nidha Premium Dubai
+            </h2>
+
             <div class="product-review-summary" id="product-review-summary" hidden>
               <span class="rating-star" aria-hidden="true">★</span>
               <strong id="product-review-average"></strong>
-              <button id="product-review-count" class="product-review-count" type="button"></button>
-              <span class="atelier-review-arrow" aria-hidden="true">↗</span>
+              <button id="product-review-count"
+                      class="product-review-count"
+                      type="button"></button>
             </div>
-            <p class="product-reference-note" id="product-review-note">Published reviews load when this sheet opens.</p>
-            <button id="product-review-retry" class="catalog-retry" type="button" hidden>Retry reviews</button>
+
+            <p class="product-reference-note" id="product-review-note">
+              Published reviews load when this sheet opens.
+            </p>
+
+            <button id="product-review-retry"
+                    class="catalog-retry"
+                    type="button"
+                    hidden>
+              Retry reviews
+            </button>
+
+            <div class="product-preview-notice">
+              Prices and availability are loaded from the staging
+              catalog. The staging basket is saved in this browser.
+              Checkout can start a staging order. Payment is completed
+              on SenangPay, and the server confirms it.
+            </div>
+
           </div>
 
-          <section class="atelier-highlights atelier-reveal" aria-label="What makes Dahlia special">
-            <div class="atelier-highlight"><span class="atelier-highlight-icon" aria-hidden="true">✧</span><span>Soft Nidha<br><em>Dubai fabric</em></span></div>
-            <div class="atelier-highlight"><span class="atelier-highlight-icon" aria-hidden="true">⌁</span><span>Nursing<br><em>friendly zip</em></span></div>
-            <div class="atelier-highlight"><span class="atelier-highlight-icon" aria-hidden="true">◈</span><span>Thoughtful<br><em>daily details</em></span></div>
+          <section class="product-section" id="product-description">
+            <h3>Description</h3>
+
+            <p id="product-description-copy">
+              Dahlia Series (D06), made using premium Nidha Dubai
+              material. Designed as a comfortable, elegant Abaya Arab
+              with practical everyday features.
+            </p>
+
+            <div id="product-fabric-block" hidden>
+              <div class="product-info-divider"></div>
+              <h3>Fabric</h3>
+              <p id="product-fabric-copy"></p>
+            </div>
+
+            <div class="product-info-divider"></div>
+
+            <h3>Features</h3>
+
+            <ul class="product-feature-list" id="product-feature-list">
+              <li>Premium Nidha Dubai fabric</li>
+              <li>Single-layer cutting</li>
+              <li>10-inch nursing-friendly front zip</li>
+              <li>Left and right pockets</li>
+              <li>Full inner sleeve lining (wudhu-friendly)</li>
+              <li>Complimentary chiffon shawl — 190 × 70 cm</li>
+              <li>Premium gift box packaging</li>
+            </ul>
+
           </section>
 
-          <section class="atelier-choice atelier-reveal" id="atelier-choose" aria-labelledby="atelier-choice-heading">
-            <div class="atelier-section-kicker">01 / A PERSONAL FIT</div>
-            <div class="atelier-choice-head">
-              <div><h3 id="atelier-choice-heading">Find your <i>fit.</i></h3><p>Available in XS – XXXL</p></div>
-              <span class="atelier-choice-emblem" aria-hidden="true">A</span>
+          <section class="product-section" id="product-sizes">
+            <h3>Size information</h3>
+
+            <p>
+              Available size categories in the D06 product reference:
+              XS, S, M, L, XL, XXL and XXXL.
+            </p>
+
+            <p class="product-reference-note" id="product-size-status">
+              Garment measurements load from the Operations catalog.
+              They are sizing references, not purchase options.
+              Prices and availability still come from the staging shop.
+            </p>
+
+            <div id="product-size-guides"></div>
+
+            <div id="product-size-unavailable" hidden>
+              <p class="product-reference-note">
+                Sizing information is unavailable. Set 1 and Set 2
+                measurements are not shown.
+              </p>
+              <button id="product-size-retry"
+                      class="catalog-retry"
+                      type="button">
+                Retry size guide
+              </button>
             </div>
-            <div class="atelier-size-labels" aria-label="Sizes available: XS, S, M, L, XL, XXL and XXXL">
-              <span>XS</span><span>S</span><span>M</span><span>L</span><span>XL</span><span>XXL</span><span>XXXL</span>
-            </div>
-            <button id="atelier-select-size" class="atelier-select-size" type="button">
-              <span>Choose your size</span><span class="atelier-button-arrow" aria-hidden="true">↗</span>
-            </button>
-            <button id="atelier-size-guide-link" class="atelier-underlink" type="button">Not sure about sizing? <strong>View our size guide <span aria-hidden="true">↗</span></strong></button>
           </section>
 
-          <section class="atelier-service atelier-reveal" id="product-shipping" aria-labelledby="atelier-service-title">
-            <div class="atelier-service-icon" aria-hidden="true">
-              <svg viewBox="0 0 32 32"><path d="M3 10h17v12H3zM20 14h5l4 5v3h-9M8 25a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5ZM24 25a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5"/></svg>
-            </div>
-            <div><h3 id="atelier-service-title">Thoughtful delivery</h3>
-              <p>Shipping cost and availability are confirmed during checkout.</p></div>
-            <span class="atelier-service-diamond" aria-hidden="true">✦</span>
-          </section>
-
-          <section class="product-section atelier-reviews atelier-reveal" id="product-reviews">
-            <div class="atelier-section-kicker">02 / WORDS FROM THE COLLECTION</div>
+          <section class="product-section" id="product-reviews">
             <div class="review-section-head">
-              <h3>Worn &amp; <i>loved.</i></h3>
-              <button id="product-review-see-all" class="review-see-all" type="button" hidden>View all <span aria-hidden="true">↗</span></button>
+              <h3>Customer reviews</h3>
+              <button id="product-review-see-all"
+                      class="review-see-all"
+                      type="button"
+                      hidden>
+                See all reviews
+              </button>
             </div>
-            <p class="product-reference-note" id="product-review-context" hidden>Published staging reviews for interface testing. Not verified purchases.</p>
-            <div id="product-review-bars" class="review-bars" hidden></div>
-            <div class="atelier-photo-heading">MOMENTS FROM THE COLLECTION <span aria-hidden="true">—</span></div>
-            <div id="product-review-strip" class="review-photo-strip" hidden aria-label="Review photos"></div>
+
+            <p class="product-reference-note" id="product-review-context" hidden>
+              Published staging reviews for interface testing.
+              Not verified purchases.
+            </p>
+
+            <div id="product-review-bars"
+                 class="review-bars"
+                 hidden></div>
+
+            <div id="product-review-strip"
+                 class="review-photo-strip"
+                 hidden
+                 aria-label="Review photos"></div>
+
             <div id="product-review-preview"></div>
           </section>
 
-          <section class="product-section atelier-sizing atelier-reveal" id="product-sizes">
-            <div class="atelier-section-kicker">03 / MADE FOR YOUR SILHOUETTE</div>
-            <h3>Find your <i>length.</i></h3>
-            <p class="atelier-section-intro">Two considered lengths. One effortless silhouette.</p>
-            <div class="atelier-length-tabs" role="tablist" aria-label="Choose length guide">
-              <button class="atelier-length-tab is-active" type="button" role="tab" id="atelier-length-s1" data-atelier-size="S1" aria-selected="true" aria-controls="product-size-guides">01 <span>Standard</span></button>
-              <button class="atelier-length-tab" type="button" role="tab" id="atelier-length-s2" data-atelier-size="S2" aria-selected="false" aria-controls="product-size-guides">02 <span>Long</span></button>
-            </div>
-            <p class="product-reference-note" id="product-size-status">Garment measurements load from the Operations catalog.</p>
-            <div id="product-size-guides" data-active-set="S1" role="tabpanel" aria-labelledby="atelier-length-s1"></div>
-            <div id="product-size-unavailable" hidden>
-              <p class="product-reference-note">Sizing information is temporarily unavailable.</p>
-              <button id="product-size-retry" class="catalog-retry" type="button">Retry size guide</button>
-            </div>
-            <p class="atelier-measure-note"><span aria-hidden="true">✧</span> Measurements are in inches; recommended height is in centimetres. Size guide is informational. Purchase availability is determined at checkout.</p>
+          <section class="product-section" id="product-shipping">
+            <h3>Delivery and shopping</h3>
+
+            <p>
+              Checkout can request a staging delivery estimate.
+              A courier shipment is created only after the server
+              confirms payment.
+            </p>
+
+            <p>
+              Size selection and the staging basket are active in
+              this browser. Checkout sends the order to staging.
+            </p>
           </section>
 
-          <section class="product-section atelier-description atelier-reveal" id="product-description">
-            <div class="atelier-section-kicker">04 / THE MAKING OF DAHLIA</div>
-            <h3>Considered in <i>every detail.</i></h3>
-            <p id="product-description-copy">Dahlia Series (D06), made using premium Nidha Dubai material. Designed as a comfortable, elegant Abaya Arab with practical everyday features.</p>
-            <div id="product-fabric-block" class="atelier-fabric-block" hidden>
-              <div class="atelier-detail-label">THE FABRIC</div>
-              <p id="product-fabric-copy"></p>
-            </div>
-            <div class="atelier-detail-label">THE THOUGHTFUL DETAILS</div>
-            <ul class="product-feature-list" id="product-feature-list">
-              <li>Premium Nidha Dubai fabric</li><li>Single-layer cutting</li><li>10-inch nursing-friendly front zip</li><li>Left and right pockets</li><li>Full inner sleeve lining (wudhu-friendly)</li><li>Complimentary chiffon shawl — 190 × 70 cm</li><li>Premium gift box packaging</li>
-            </ul>
-          </section>
-
-          <section class="atelier-brand-story atelier-reveal" aria-label="About Arabista">
-            <div class="atelier-brand-decoration" aria-hidden="true">A</div>
-            <p class="atelier-brand-eyebrow">AN ARABISTA CREATION</p>
-            <h3>Elegance is in<br><em>the everyday.</em></h3>
-            <div class="atelier-brand-rule"></div>
-            <p>Thoughtfully made in our Malaysian workshop with Premium Nidha Dubai fabric. A quiet expression of comfort, practicality and grace.</p>
-            <span class="atelier-brand-signature">A R A B I S T A</span>
-          </section>
-
-          <div class="atelier-staging-disclosure">
-            <details><summary>Staging preview information</summary>
-              <p>This is a staging shopping experience. Prices and inventory come from the staging Retail system. Shipping estimates and checkout are handled separately. Published staging reviews are not verified customer purchases.</p>
-            </details>
-          </div>
         </div>
 
         <div id="product-mini"
@@ -4077,7 +3899,7 @@
                   id="open-product-buy"
                   aria-haspopup="dialog"
                   aria-controls="commerce-panel">
-            <span>Buy now</span><span class="atelier-buy-arrow" aria-hidden="true">↗</span>
+            Buy now
           </button>
         </footer>
 
@@ -11952,106 +11774,5 @@
       syncPlayback();
     })();
   </script>
-
-  <script>
-  /* ARABISTA ATELIER / PAGE-PRESENTATION CONTROLS ONLY */
-  (() => {
-    'use strict';
-    const sheet = document.getElementById('product-sheet');
-    const scroll = document.getElementById('product-scroll');
-    const nav = document.getElementById('atelier-nav');
-    const links = [...document.querySelectorAll('.atelier-nav-link')];
-    const sizeHost = document.getElementById('product-size-guides');
-    if (!sheet || !scroll || !nav || !sizeHost) return;
-    const ids = links.map(button => button.dataset.atelierTarget);
-    let programmaticScroll = false;
-    let scrollRelease = null;
-    let scheduledScroll = false;
-
-    function highlightTab(index) {
-      if (index < 0 || index >= links.length) return;
-      links.forEach((button, i) => {
-        const active = i === index;
-        button.classList.toggle('is-active', active);
-        if (active) button.setAttribute('aria-current', 'true');
-        else button.removeAttribute('aria-current');
-      });
-      nav.style.setProperty('--atelier-active-index', `${index * 100}%`);
-    }
-    function jumpTo(id) {
-      const target = document.getElementById(id);
-      if (!target) return;
-      programmaticScroll = true;
-      clearTimeout(scrollRelease);
-      const offset = target.getBoundingClientRect().top - scroll.getBoundingClientRect().top + scroll.scrollTop - nav.offsetHeight - 12;
-      scroll.scrollTo({ top: Math.max(0, offset), behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth' });
-      const index = ids.indexOf(id);
-      if (index >= 0) highlightTab(index);
-      scrollRelease = setTimeout(() => { programmaticScroll = false; }, 800);
-    }
-    links.forEach(button => button.addEventListener('click', () => jumpTo(button.dataset.atelierTarget)));
-    scroll.addEventListener('scroll', () => {
-      if (scheduledScroll) return;
-      scheduledScroll = true;
-      requestAnimationFrame(() => {
-        scheduledScroll = false;
-        if (programmaticScroll) return;
-        const trigger = scroll.getBoundingClientRect().top + nav.offsetHeight + 45;
-        let selected = 0;
-        ids.forEach((id, i) => {
-          const target = document.getElementById(id);
-          if (target && target.getBoundingClientRect().top <= trigger) selected = i;
-        });
-        highlightTab(selected);
-      });
-    }, {passive:true});
-    document.getElementById('atelier-size-guide-link')?.addEventListener('click', () => jumpTo('product-sizes'));
-    document.getElementById('atelier-select-size')?.addEventListener('click', () => {
-      // Reuse the existing verified Retail variant flow; never synthesize inventory/length options.
-      document.getElementById('open-product-cart')?.click();
-    });
-
-    // Both measurement sets remain in the DOM so the original API rendering and
-    // regression checks can continue to inspect S1 and S2.
-    const sizeTabs = [...document.querySelectorAll('[data-atelier-size]')];
-    sizeTabs.forEach(tab => tab.addEventListener('click', () => {
-      const set = tab.dataset.atelierSize;
-      if (set !== 'S1' && set !== 'S2') return;
-      sizeHost.dataset.activeSet = set;
-      sizeHost.setAttribute('aria-labelledby', tab.id);
-      sizeTabs.forEach(button => {
-        const active = button.dataset.atelierSize === set;
-        button.classList.toggle('is-active', active);
-        button.setAttribute('aria-selected', String(active));
-        button.tabIndex = active ? 0 : -1;
-      });
-    }));
-    sizeTabs.forEach((tab, i) => tab.addEventListener('keydown', event => {
-      if (event.key !== 'ArrowRight' && event.key !== 'ArrowLeft') return;
-      event.preventDefault();
-      const next = sizeTabs[(i + (event.key === 'ArrowRight' ? 1 : -1) + sizeTabs.length) % sizeTabs.length];
-      next.focus();next.click();
-    }));
-
-    // Reveals are optical accents only; actual content remains rendered and
-    // accessible when IntersectionObserver is unavailable.
-    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const animated = [...sheet.querySelectorAll('.atelier-reveal')];
-    if (!reducedMotion && 'IntersectionObserver' in window) {
-      const observer = new IntersectionObserver(entries => {
-        entries.forEach(entry => {
-          if (!entry.isIntersecting) return;
-          entry.target.classList.add('is-seen');
-          observer.unobserve(entry.target);
-        });
-      }, { root:scroll, threshold:.06, rootMargin:'0px 0px 44px 0px' });
-      animated.forEach(node => observer.observe(node));
-      sheet.classList.add('atelier-live');
-    } else {
-      animated.forEach(node => node.classList.add('is-seen'));
-    }
-  })();
-  </script>
-
 </body>
 </html>
