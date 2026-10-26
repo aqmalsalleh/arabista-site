@@ -1389,6 +1389,254 @@
       line-height:1.6;
     }
 
+    .product-review-summary[hidden],
+    .review-bars[hidden],
+    .review-photo-strip[hidden],
+    .review-panel[hidden],
+    .review-viewer[hidden],
+    #product-review-see-all[hidden],
+    #product-review-context[hidden],
+    #product-review-retry[hidden] {
+      display:none !important;
+    }
+
+    .product-review-count,
+    .review-see-all,
+    .review-chip,
+    .review-panel-close,
+    .review-viewer-close {
+      border:0;
+      background:transparent;
+      color:#8b6e38;
+      font:inherit;
+    }
+
+    .product-review-count {
+      padding:0;
+      color:#555;
+      font-size:12px;
+    }
+
+    .review-section-head,
+    .review-panel-head,
+    .review-viewer-head {
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+    }
+
+    .review-see-all,
+    .review-panel-close,
+    .review-viewer-close {
+      font-size:13px;
+      font-weight:700;
+    }
+
+    .review-bars {
+      display:grid;
+      gap:6px;
+      margin:12px 0;
+    }
+
+    .review-bar-row {
+      display:grid;
+      grid-template-columns:14px minmax(0,1fr) 28px;
+      gap:8px;
+      align-items:center;
+      color:#666;
+      font-size:12px;
+    }
+
+    .review-bar {
+      display:block;
+      height:6px;
+      overflow:hidden;
+      border-radius:99px;
+      background:#eee;
+    }
+
+    .review-bar > span {
+      display:block;
+      height:100%;
+      background:#d6a435;
+    }
+
+    .review-photo-strip,
+    .review-card-photos,
+    .review-filters,
+    .review-sort {
+      display:flex;
+      gap:8px;
+    }
+
+    .review-photo-strip,
+    .review-filters {
+      overflow-x:auto;
+      overscroll-behavior-x:contain;
+      touch-action:pan-x;
+      scrollbar-width:none;
+    }
+
+    .review-photo-strip {
+      margin:4px 0 12px;
+      scroll-snap-type:x mandatory;
+      touch-action:pan-x pan-y;
+    }
+
+    .review-thumb {
+      position:relative;
+      flex:0 0 auto;
+      width:72px;
+      height:96px;
+      padding:0;
+      overflow:hidden;
+      border:0;
+      border-radius:8px;
+      background:#f4f2ee;
+      scroll-snap-align:start;
+    }
+
+    .review-card-photos .review-thumb {
+      width:64px;
+      height:84px;
+    }
+
+    .review-thumb img,
+    .review-viewer-slide img {
+      display:block;
+      width:100%;
+      height:100%;
+      object-fit:cover;
+    }
+
+    .review-viewer-slide img {
+      object-fit:contain;
+    }
+
+    .review-photo-failed {
+      display:grid;
+      place-items:center;
+      width:100%;
+      height:100%;
+      padding:4px;
+      color:#8a8174;
+      font-size:10px;
+      line-height:1.3;
+      text-align:center;
+    }
+
+    .review-card-meta {
+      display:flex;
+      flex-wrap:wrap;
+      gap:6px 10px;
+      align-items:baseline;
+    }
+
+    .review-stars {
+      color:#d6a435;
+      letter-spacing:.08em;
+    }
+
+    .review-date {
+      color:#8d8d8d;
+      font-size:11px;
+    }
+
+    .review-card-photos {
+      margin-top:8px;
+    }
+
+    .review-sort,
+    .review-filters {
+      padding:0 16px 10px;
+    }
+
+    .review-chip {
+      flex:0 0 auto;
+      border:1px solid #e6e1d8;
+      border-radius:99px;
+      padding:6px 10px;
+      color:#333;
+      font-size:12px;
+    }
+
+    .review-chip.is-selected {
+      border-color:#171717;
+      background:#171717;
+      color:#fff;
+    }
+
+    .review-panel,
+    .review-viewer {
+      position:absolute;
+      inset:0;
+      z-index:4;
+      display:flex;
+      flex-direction:column;
+      background:#fff;
+      overscroll-behavior:contain;
+    }
+
+    .review-viewer {
+      z-index:6;
+      background:#111;
+      color:#fff;
+    }
+
+    .review-panel-head,
+    .review-viewer-head {
+      flex:0 0 auto;
+      padding:14px 16px 8px;
+    }
+
+    .review-panel-title {
+      margin:0;
+      color:#222;
+      font-size:15px;
+      font-weight:700;
+    }
+
+    .review-viewer-head {
+      color:#fff;
+    }
+
+    .review-viewer-close {
+      color:#fff;
+    }
+
+    .review-panel-list,
+    .review-viewer-track {
+      flex:1 1 auto;
+      min-height:0;
+      overscroll-behavior:contain;
+    }
+
+    .review-panel-list {
+      overflow-y:auto;
+      touch-action:pan-y;
+      padding:0 16px 24px;
+    }
+
+    .review-viewer-track {
+      display:flex;
+      overflow-x:auto;
+      scroll-snap-type:x mandatory;
+      touch-action:pan-x;
+    }
+
+    .review-viewer-slide {
+      flex:0 0 100%;
+      display:grid;
+      place-items:center;
+      min-width:100%;
+      scroll-snap-align:center;
+    }
+
+    .review-filter-note {
+      margin:0 16px 8px;
+    }
+
     .product-preview-notice {
       padding:10px 12px;
       margin-top:10px;
@@ -3454,16 +3702,24 @@
               (Kod D06) Nidha Premium Dubai
             </h2>
 
-            <div class="product-review-summary">
+            <div class="product-review-summary" id="product-review-summary" hidden>
               <span class="rating-star" aria-hidden="true">★</span>
-              <strong>4.9</strong>
-              <span>41 reviews</span>
+              <strong id="product-review-average"></strong>
+              <button id="product-review-count"
+                      class="product-review-count"
+                      type="button"></button>
             </div>
 
-            <p class="product-reference-note">
-              Rating and review count are from the supplied D06 staging
-              product-page snapshot, not live marketplace data.
+            <p class="product-reference-note" id="product-review-note">
+              Published reviews load when this sheet opens.
             </p>
+
+            <button id="product-review-retry"
+                    class="catalog-retry"
+                    type="button"
+                    hidden>
+              Retry reviews
+            </button>
 
             <div class="product-preview-notice">
               Prices and availability are loaded from the staging
@@ -3535,35 +3791,31 @@
           </section>
 
           <section class="product-section" id="product-reviews">
-            <h3>Customer reviews · Staging reference</h3>
+            <div class="review-section-head">
+              <h3>Customer reviews</h3>
+              <button id="product-review-see-all"
+                      class="review-see-all"
+                      type="button"
+                      hidden>
+                See all reviews
+              </button>
+            </div>
 
-            <p class="product-reference-note">
-              The examples below originate from the supplied D06
-              staging product HTML. This is not a live review feed.
+            <p class="product-reference-note" id="product-review-context" hidden>
+              Published staging reviews for interface testing.
+              Not verified purchases.
             </p>
 
-            <div class="product-review-card">
-              <strong>5** F**Y M**T · ★★★★★</strong>
-              <p>
-                Alhamdulillah dah selamat sampai.
-                Ni jubah ke 5...
-              </p>
-            </div>
+            <div id="product-review-bars"
+                 class="review-bars"
+                 hidden></div>
 
-            <div class="product-review-card">
-              <strong>m**8 · ★★★★★</strong>
-              <p>
-                Baju dah Smpai cantik sgt2...
-                lembut&amp;sejuk kain...
-              </p>
-            </div>
+            <div id="product-review-strip"
+                 class="review-photo-strip"
+                 hidden
+                 aria-label="Review photos"></div>
 
-            <div class="product-review-card">
-              <strong>h**i · ★★★★★</strong>
-              <p>
-                Abaya sangat cantik cutting pun best kain...
-              </p>
-            </div>
+            <div id="product-review-preview"></div>
           </section>
 
           <section class="product-section" id="product-shipping">
@@ -3650,6 +3902,69 @@
             Buy now
           </button>
         </footer>
+
+        <div id="product-review-panel"
+             class="review-panel"
+             hidden>
+          <div class="review-panel-head">
+            <p id="product-review-panel-title" class="review-panel-title">
+              All reviews
+            </p>
+            <button id="product-review-close"
+                    class="review-panel-close"
+                    type="button">
+              Close
+            </button>
+          </div>
+          <div class="review-sort" role="group" aria-label="Sort reviews">
+            <button id="review-sort-recommended"
+                    class="review-chip is-selected"
+                    type="button">
+              Recommended
+            </button>
+            <button id="review-sort-recent"
+                    class="review-chip"
+                    type="button">
+              Most recent
+            </button>
+          </div>
+          <div class="review-filters" role="group" aria-label="Filter reviews">
+            <button class="review-chip is-selected"
+                    type="button"
+                    data-review-stars="0">All</button>
+            <button class="review-chip" type="button" data-review-stars="5">5 stars</button>
+            <button class="review-chip" type="button" data-review-stars="4">4 stars</button>
+            <button class="review-chip" type="button" data-review-stars="3">3 stars</button>
+            <button class="review-chip" type="button" data-review-stars="2">2 stars</button>
+            <button class="review-chip" type="button" data-review-stars="1">1 star</button>
+            <button id="review-filter-photos"
+                    class="review-chip"
+                    type="button">
+              With photos
+            </button>
+          </div>
+          <p id="product-review-filter-note"
+             class="product-reference-note review-filter-note"></p>
+          <div id="product-review-list" class="review-panel-list"></div>
+        </div>
+
+        <div id="review-viewer"
+             class="review-viewer"
+             role="dialog"
+             aria-modal="true"
+             aria-label="Review photo"
+             hidden>
+          <div class="review-viewer-head">
+            <span id="review-viewer-count"></span>
+            <button id="review-viewer-close"
+                    class="review-viewer-close"
+                    type="button">
+              Close
+            </button>
+          </div>
+          <div id="review-viewer-track"
+               class="review-viewer-track"></div>
+        </div>
       </section>
 
       <!-- PHASE 3A.2: FULLSCREEN PRODUCT IMAGE VIEWER -->
@@ -4377,6 +4692,7 @@
           beginProductEntrance();
           loadD06StagingCatalog(false);
           loadOperationsCatalog(false);
+          loadOperationsReviews(false);
         }
 
         trigger.setAttribute('aria-expanded', 'true');
@@ -4427,6 +4743,7 @@
           sheetLayer.hidden = true;
 
           if (closingType === 'product') {
+            resetReviewOverlay();
             finishProductExit();
           }
 
@@ -4748,11 +5065,21 @@
 
         const lightbox = document.getElementById('product-lightbox');
         const lightboxOpen = lightbox && !lightbox.hidden;
+        const reviewViewerOpen = reviewViewerIsOpen();
+        const reviewListOpen = reviewListIsOpen();
 
-        if (!activeSheet && !lightboxOpen) return;
+        if (!activeSheet && !lightboxOpen && !reviewViewerOpen) return;
 
         if (event.key === 'Escape') {
           event.preventDefault();
+          if (reviewViewerOpen) {
+            closeReviewViewer(true);
+            return;
+          }
+          if (reviewListOpen) {
+            closeReviewList(true);
+            return;
+          }
           if (lightboxOpen) {
             closeProductLightbox();
             return;
@@ -7686,6 +8013,647 @@
           }
         }
       }
+
+      /* operations-reviews-client:start */
+      function reviewPhotoUrl(value) {
+        if (typeof value !== 'string') return '';
+        const text = value.trim();
+        if (!/^https:\/\/drive\.google\.com\/thumbnail\?id=[A-Za-z0-9_-]{20,120}&sz=w1200$/.test(text)) {
+          return '';
+        }
+        return text;
+      }
+
+      function reviewDateOk(value) {
+        if (typeof value !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(value)) return false;
+        const parsed = new Date(value + 'T00:00:00Z');
+        return !isNaN(parsed.getTime()) && parsed.toISOString().slice(0, 10) === value;
+      }
+
+      function reviewWhole(value, min, max) {
+        if (typeof value !== 'number' || !Number.isInteger(value)) return null;
+        if (value < min || value > max) return null;
+        return value;
+      }
+
+      function formatReviewAverage(value) {
+        if (typeof value !== 'number' || !Number.isFinite(value)) return '';
+        return value.toFixed(1);
+      }
+
+      function compareReviews(mode, a, b) {
+        if (mode === 'recent') {
+          const byDate = String(b.date).localeCompare(String(a.date));
+          if (byDate) return byDate;
+        }
+        return a.displayOrder - b.displayOrder ||
+          String(a.date).localeCompare(String(b.date)) ||
+          String(a.reviewId).localeCompare(String(b.reviewId));
+      }
+
+      function selectReviews(reviews, view) {
+        const mode = view && view.sort === 'recent' ? 'recent' : 'recommended';
+        const stars = view ? reviewWhole(view.stars, 0, 5) : null;
+        const photosOnly = !!(view && view.photosOnly);
+        return reviews.filter(review => {
+          if (stars && review.stars !== stars) return false;
+          if (photosOnly && !review.photos.length) return false;
+          return true;
+        }).slice().sort((a, b) => compareReviews(mode, a, b));
+      }
+
+      function reviewsShouldApply(currentRevision, currentUpdatedAt, nextRevision, nextUpdatedAt, hasReadyData) {
+        if (!Number.isInteger(nextRevision)) return false;
+        if (!Number.isFinite(Date.parse(nextUpdatedAt))) return false;
+        if (!hasReadyData) return true;
+        if (nextRevision > currentRevision) return true;
+        if (nextRevision < currentRevision) return false;
+        const next = Date.parse(nextUpdatedAt);
+        const current = Date.parse(currentUpdatedAt);
+        if (!Number.isFinite(current)) return true;
+        return next >= current;
+      }
+
+      function acceptOperationsReviews(payload) {
+        try {
+          if (!payload || payload.ok !== true || payload.apiVersion !== 'ao.public.v1') return null;
+          const data = payload.data;
+          if (!data || data.productCode !== 'D06') return null;
+          const revision = reviewWhole(data.revision, 1, 1000000);
+          if (revision === null || !Number.isFinite(Date.parse(data.updatedAt))) return null;
+          const count = reviewWhole(data.count, 0, 100);
+          if (count === null || !Array.isArray(data.reviews) || data.reviews.length !== count) return null;
+          if (count === 0) {
+            if (data.averageRating !== null) return null;
+          } else if (typeof data.averageRating !== 'number' ||
+              data.averageRating < 1 || data.averageRating > 5) {
+            return null;
+          }
+          if (!Array.isArray(data.distribution) || data.distribution.length !== 5) return null;
+          const expectedStars = [5, 4, 3, 2, 1];
+          const distribution = [];
+          for (let index = 0; index < 5; index += 1) {
+            const item = data.distribution[index];
+            const stars = reviewWhole(item && item.stars, 1, 5);
+            const itemCount = reviewWhole(item && item.count, 0, 100);
+            if (stars !== expectedStars[index] || itemCount === null) return null;
+            distribution.push({ stars, count: itemCount });
+          }
+          const seen = {};
+          const reviews = [];
+          for (let index = 0; index < data.reviews.length; index += 1) {
+            const row = data.reviews[index];
+            if (!row || typeof row.reviewId !== 'string' ||
+                !/^[A-Za-z0-9-]{6,80}$/.test(row.reviewId)) return null;
+            if (seen[row.reviewId] || row.sku !== 'D06') return null;
+            seen[row.reviewId] = true;
+            if (typeof row.name !== 'string' || !row.name.trim() ||
+                row.name.trim().length > 80 || /[\r\n]/.test(row.name)) return null;
+            if (!reviewDateOk(row.date)) return null;
+            const stars = reviewWhole(row.stars, 1, 5);
+            const order = reviewWhole(row.displayOrder, 0, 100000);
+            if (stars === null || order === null) return null;
+            if (typeof row.text !== 'string' || !row.text.trim() || row.text.length > 4000) return null;
+            if (!Array.isArray(row.photos) || row.photos.length > 8) return null;
+            const photos = [];
+            const sequences = {};
+            for (let photoIndex = 0; photoIndex < row.photos.length; photoIndex += 1) {
+              const photo = row.photos[photoIndex];
+              const sequence = reviewWhole(photo && photo.sequence, 1, 8);
+              const url = reviewPhotoUrl(photo && photo.url);
+              if (sequence === null || !url || sequences[sequence]) return null;
+              sequences[sequence] = true;
+              photos.push({ sequence, url });
+            }
+            photos.sort((a, b) => a.sequence - b.sequence);
+            reviews.push({
+              reviewId: row.reviewId,
+              sku: 'D06',
+              name: row.name.trim(),
+              date: row.date,
+              stars,
+              text: row.text,
+              displayOrder: order,
+              photos
+            });
+          }
+          const counts = { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 };
+          let sum = 0;
+          reviews.forEach(review => {
+            counts[review.stars] += 1;
+            sum += review.stars;
+          });
+          if (distribution.some(item => item.count !== counts[item.stars])) return null;
+          if (distribution.reduce((total, item) => total + item.count, 0) !== count) return null;
+          if (count) {
+            const mean = Math.round((sum / count) * 100) / 100;
+            if (Math.abs(data.averageRating - mean) > 0.001) return null;
+          }
+          return {
+            revision,
+            updatedAt: data.updatedAt,
+            data: {
+              productCode: 'D06',
+              revision,
+              updatedAt: data.updatedAt,
+              count,
+              averageRating: count ? data.averageRating : null,
+              distribution,
+              reviews
+            }
+          };
+        } catch (error) {
+          return null;
+        }
+      }
+      /* operations-reviews-client:end */
+
+      const operationsReviews = {
+        status: 'idle',
+        data: null,
+        revision: 0,
+        updatedAt: '',
+        loadedAt: 0,
+        error: null
+      };
+
+      let operationsReviewsRequest = null;
+      let operationsReviewsGeneration = 0;
+      const reviewView = { sort: 'recommended', stars: 0, photosOnly: false };
+      let reviewStripMoved = false;
+      let reviewViewerReturn = null;
+
+      function reviewViewerIsOpen() {
+        const viewer = document.getElementById('review-viewer');
+        return !!(viewer && !viewer.hidden);
+      }
+
+      function reviewListIsOpen() {
+        const panel = document.getElementById('product-review-panel');
+        return !!(panel && !panel.hidden);
+      }
+
+      function closeReviewViewer(restoreFocus) {
+        const viewer = document.getElementById('review-viewer');
+        const track = document.getElementById('review-viewer-track');
+        if (viewer) viewer.hidden = true;
+        clearElement(track);
+        const opener = reviewViewerReturn;
+        reviewViewerReturn = null;
+        if (restoreFocus && opener && opener.isConnected) opener.focus();
+      }
+
+      function closeReviewList(restoreFocus) {
+        const panel = document.getElementById('product-review-panel');
+        if (panel) panel.hidden = true;
+        if (!restoreFocus) return;
+        const seeAll = document.getElementById('product-review-see-all');
+        if (seeAll && !seeAll.hidden) seeAll.focus();
+      }
+
+      function resetReviewOverlay() {
+        closeReviewViewer(false);
+        closeReviewList(false);
+      }
+
+      function isolateReviewGesture(node) {
+        if (!node) return;
+        node.addEventListener('pointerdown', event => event.stopPropagation());
+        node.addEventListener('wheel', event => event.stopPropagation(), { passive: true });
+      }
+
+      function markReviewImage(image, button) {
+        image.loading = 'lazy';
+        image.decoding = 'async';
+        image.addEventListener('error', () => {
+          image.removeAttribute('src');
+          image.hidden = true;
+          const failed = document.createElement('span');
+          failed.className = 'review-photo-failed';
+          failed.textContent = 'Photo unavailable';
+          button.appendChild(failed);
+        }, { once: true });
+      }
+
+      function makeReviewThumb(reviewId, photo, lazy) {
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'review-thumb';
+        button.dataset.reviewId = reviewId;
+        button.dataset.sequence = String(photo.sequence);
+        button.setAttribute('aria-label', 'Review photo ' + photo.sequence);
+        const image = document.createElement('img');
+        markReviewImage(image, button);
+        if (!lazy) image.loading = 'eager';
+        image.src = photo.url;
+        button.appendChild(image);
+        button.addEventListener('click', () => {
+          if (button.closest('#product-review-strip') && reviewStripMoved) return;
+          openReviewViewer(reviewId, photo.sequence, button);
+        });
+        return button;
+      }
+
+      function makeReviewCard(review) {
+        const card = document.createElement('article');
+        card.className = 'product-review-card';
+        card.dataset.reviewId = review.reviewId;
+        const meta = document.createElement('div');
+        meta.className = 'review-card-meta';
+        const name = document.createElement('strong');
+        name.textContent = review.name;
+        const stars = document.createElement('span');
+        stars.className = 'review-stars';
+        stars.textContent = '\u2605'.repeat(review.stars);
+        stars.setAttribute('aria-label', review.stars + ' out of 5');
+        const date = document.createElement('span');
+        date.className = 'review-date';
+        date.textContent = review.date;
+        meta.append(name, stars, date);
+        const text = document.createElement('p');
+        text.textContent = review.text;
+        card.append(meta, text);
+        if (review.photos.length) {
+          const photos = document.createElement('div');
+          photos.className = 'review-card-photos';
+          review.photos.forEach(photo => {
+            photos.appendChild(makeReviewThumb(review.reviewId, photo, true));
+          });
+          card.appendChild(photos);
+        }
+        return card;
+      }
+
+      function renderReviewBars(data) {
+        const host = document.getElementById('product-review-bars');
+        clearElement(host);
+        if (!host) return;
+        host.hidden = false;
+        data.distribution.forEach(item => {
+          const row = document.createElement('div');
+          row.className = 'review-bar-row';
+          const label = document.createElement('span');
+          label.textContent = String(item.stars);
+          const track = document.createElement('span');
+          track.className = 'review-bar';
+          const fill = document.createElement('span');
+          fill.style.width = (data.count ? Math.round((item.count / data.count) * 100) : 0) + '%';
+          track.appendChild(fill);
+          const count = document.createElement('span');
+          count.textContent = String(item.count);
+          row.append(label, track, count);
+          host.appendChild(row);
+        });
+      }
+
+      function renderReviewStrip(data) {
+        const host = document.getElementById('product-review-strip');
+        clearElement(host);
+        if (!host) return;
+        const ordered = selectReviews(data.reviews, { sort: 'recommended', stars: 0, photosOnly: false });
+        ordered.forEach(review => {
+          review.photos.forEach(photo => {
+            host.appendChild(makeReviewThumb(review.reviewId, photo, true));
+          });
+        });
+        host.hidden = !host.childElementCount;
+      }
+
+      function renderReviewPreview(data) {
+        const host = document.getElementById('product-review-preview');
+        clearElement(host);
+        if (!host) return;
+        selectReviews(data.reviews, { sort: 'recommended', stars: 0, photosOnly: false })
+          .slice(0, 3)
+          .forEach(review => host.appendChild(makeReviewCard(review)));
+      }
+
+      function renderReviewControls() {
+        document.querySelectorAll('[data-review-stars]').forEach(button => {
+          button.classList.toggle('is-selected', Number(button.dataset.reviewStars) === reviewView.stars);
+        });
+        const recommended = document.getElementById('review-sort-recommended');
+        const recent = document.getElementById('review-sort-recent');
+        const photos = document.getElementById('review-filter-photos');
+        if (recommended) recommended.classList.toggle('is-selected', reviewView.sort === 'recommended');
+        if (recent) recent.classList.toggle('is-selected', reviewView.sort === 'recent');
+        if (photos) photos.classList.toggle('is-selected', reviewView.photosOnly);
+      }
+
+      function renderReviewList() {
+        const list = document.getElementById('product-review-list');
+        const note = document.getElementById('product-review-filter-note');
+        const title = document.getElementById('product-review-panel-title');
+        const data = operationsReviews.data;
+        clearElement(list);
+        if (!data) return;
+        if (title) {
+          title.textContent = 'All reviews \u00b7 ' +
+            formatReviewAverage(data.averageRating) + ' \u00b7 ' + data.count;
+        }
+        const selected = selectReviews(data.reviews, reviewView);
+        if (note) {
+          note.textContent = 'Showing ' + selected.length + ' of ' + data.count + ' reviews.';
+        }
+        if (!selected.length) {
+          const empty = document.createElement('p');
+          empty.className = 'product-reference-note';
+          empty.textContent = 'No reviews match this filter.';
+          if (list) list.appendChild(empty);
+          return;
+        }
+        selected.forEach(review => list.appendChild(makeReviewCard(review)));
+      }
+
+      function renderOperationsReviews() {
+        try {
+          const summary = document.getElementById('product-review-summary');
+          const average = document.getElementById('product-review-average');
+          const count = document.getElementById('product-review-count');
+          const note = document.getElementById('product-review-note');
+          const retry = document.getElementById('product-review-retry');
+          const context = document.getElementById('product-review-context');
+          const bars = document.getElementById('product-review-bars');
+          const strip = document.getElementById('product-review-strip');
+          const preview = document.getElementById('product-review-preview');
+          const seeAll = document.getElementById('product-review-see-all');
+          const ready = operationsReviews.status === 'ready' && operationsReviews.data;
+          if (retry) {
+            retry.hidden = operationsReviews.status === 'loading' || operationsReviews.status === 'idle';
+            retry.textContent = operationsReviews.status === 'error' ? 'Retry reviews' : 'Refresh reviews';
+          }
+          if (!ready) {
+            if (summary) summary.hidden = true;
+            if (context) context.hidden = true;
+            if (bars) {
+              bars.hidden = true;
+              clearElement(bars);
+            }
+            if (strip) {
+              strip.hidden = true;
+              clearElement(strip);
+            }
+            clearElement(preview);
+            if (seeAll) seeAll.hidden = true;
+            resetReviewOverlay();
+            if (note) {
+              note.textContent = operationsReviews.status === 'error'
+                ? 'Reviews are unavailable.'
+                : operationsReviews.status === 'loading'
+                  ? 'Loading published reviews\u2026'
+                  : 'Published reviews load when this sheet opens.';
+            }
+            return;
+          }
+          const data = operationsReviews.data;
+          if (!data.count) {
+            if (summary) summary.hidden = true;
+            if (context) context.hidden = true;
+            if (bars) bars.hidden = true;
+            if (strip) strip.hidden = true;
+            if (seeAll) seeAll.hidden = true;
+            clearElement(bars);
+            clearElement(strip);
+            clearElement(preview);
+            resetReviewOverlay();
+            if (note) note.textContent = 'No published reviews.';
+            return;
+          }
+          if (summary) summary.hidden = false;
+          if (average) average.textContent = formatReviewAverage(data.averageRating);
+          if (count) count.textContent = data.count === 1 ? '1 review' : data.count + ' reviews';
+          if (note) note.textContent = 'Rating and review count come from the published staging feed.';
+          if (context) context.hidden = false;
+          if (seeAll) seeAll.hidden = false;
+          renderReviewBars(data);
+          renderReviewStrip(data);
+          renderReviewPreview(data);
+          if (reviewListIsOpen()) renderReviewList();
+          if (reviewViewerIsOpen()) {
+            const current = reviewViewerReturn && reviewViewerReturn.dataset
+              ? reviewViewerReturn.dataset.reviewId
+              : '';
+            if (!data.reviews.some(review => review.reviewId === current)) closeReviewViewer(false);
+          }
+        } catch (error) {
+          console.error('Reviews could not be shown.');
+        }
+      }
+
+      function openReviewList() {
+        if (!operationsReviews.data || !operationsReviews.data.count) return;
+        reviewView.sort = 'recommended';
+        reviewView.stars = 0;
+        reviewView.photosOnly = false;
+        const panel = document.getElementById('product-review-panel');
+        if (!panel) return;
+        panel.hidden = false;
+        renderReviewControls();
+        renderReviewList();
+        const close = document.getElementById('product-review-close');
+        if (close) close.focus();
+      }
+
+      function syncReviewViewerCounter() {
+        const track = document.getElementById('review-viewer-track');
+        const counter = document.getElementById('review-viewer-count');
+        if (!track || !counter) return;
+        const width = track.clientWidth || 1;
+        const index = Math.max(0, Math.min(
+          track.children.length - 1,
+          Math.round(track.scrollLeft / width)
+        ));
+        counter.textContent = (index + 1) + ' / ' + track.children.length;
+      }
+
+      function openReviewViewer(reviewId, sequence, opener) {
+        const data = operationsReviews.data;
+        if (!data) return;
+        const review = data.reviews.filter(item => item.reviewId === reviewId)[0];
+        if (!review || !review.photos.length) return;
+        const viewer = document.getElementById('review-viewer');
+        const track = document.getElementById('review-viewer-track');
+        if (!viewer || !track) return;
+        clearElement(track);
+        review.photos.forEach(photo => {
+          const slide = document.createElement('div');
+          slide.className = 'review-viewer-slide';
+          slide.dataset.sequence = String(photo.sequence);
+          const image = document.createElement('img');
+          image.alt = 'Review photo ' + photo.sequence;
+          markReviewImage(image, slide);
+          image.loading = 'eager';
+          image.src = photo.url;
+          slide.appendChild(image);
+          track.appendChild(slide);
+        });
+        reviewViewerReturn = opener || null;
+        viewer.hidden = false;
+        const index = Math.max(0, review.photos.findIndex(photo => photo.sequence === sequence));
+        requestAnimationFrame(() => {
+          const width = track.clientWidth || 1;
+          track.scrollTo({ left: index * width, behavior: 'auto' });
+          syncReviewViewerCounter();
+        });
+        const close = document.getElementById('review-viewer-close');
+        if (close) close.focus();
+      }
+
+      function bindReviewControls() {
+        const strip = document.getElementById('product-review-strip');
+        const list = document.getElementById('product-review-list');
+        const viewerTrack = document.getElementById('review-viewer-track');
+        const panel = document.getElementById('product-review-panel');
+        const viewer = document.getElementById('review-viewer');
+        isolateReviewGesture(strip);
+        isolateReviewGesture(list);
+        isolateReviewGesture(viewerTrack);
+        isolateReviewGesture(panel);
+        isolateReviewGesture(viewer);
+        if (strip) {
+          let startX = 0;
+          let startY = 0;
+          strip.addEventListener('pointerdown', event => {
+            reviewStripMoved = false;
+            startX = event.clientX;
+            startY = event.clientY;
+          });
+          strip.addEventListener('pointermove', event => {
+            if (Math.abs(event.clientX - startX) > 8 || Math.abs(event.clientY - startY) > 8) {
+              reviewStripMoved = true;
+            }
+          });
+        }
+        if (viewerTrack) {
+          viewerTrack.addEventListener('scroll', () => {
+            syncReviewViewerCounter();
+          }, { passive: true });
+        }
+        const seeAll = document.getElementById('product-review-see-all');
+        const count = document.getElementById('product-review-count');
+        const close = document.getElementById('product-review-close');
+        const viewerClose = document.getElementById('review-viewer-close');
+        const retry = document.getElementById('product-review-retry');
+        if (seeAll) seeAll.addEventListener('click', openReviewList);
+        if (count) count.addEventListener('click', openReviewList);
+        if (close) close.addEventListener('click', () => closeReviewList(true));
+        if (viewerClose) viewerClose.addEventListener('click', () => closeReviewViewer(true));
+        if (retry) {
+          retry.addEventListener('click', () => {
+            loadOperationsReviews(true);
+          });
+        }
+        const recommended = document.getElementById('review-sort-recommended');
+        const recent = document.getElementById('review-sort-recent');
+        if (recommended) {
+          recommended.addEventListener('click', () => {
+            reviewView.sort = 'recommended';
+            renderReviewControls();
+            renderReviewList();
+          });
+        }
+        if (recent) {
+          recent.addEventListener('click', () => {
+            reviewView.sort = 'recent';
+            renderReviewControls();
+            renderReviewList();
+          });
+        }
+        document.querySelectorAll('[data-review-stars]').forEach(button => {
+          button.addEventListener('click', () => {
+            reviewView.stars = Number(button.dataset.reviewStars) || 0;
+            renderReviewControls();
+            renderReviewList();
+          });
+        });
+        const photos = document.getElementById('review-filter-photos');
+        if (photos) {
+          photos.addEventListener('click', () => {
+            reviewView.photosOnly = !reviewView.photosOnly;
+            renderReviewControls();
+            renderReviewList();
+          });
+        }
+      }
+
+      async function loadOperationsReviews(forceRefresh = false) {
+        const fresh = operationsReviews.status === 'ready' &&
+          (Date.now() - operationsReviews.loadedAt) <= FYP_OPERATIONS_CATALOG_MAX_AGE_MS;
+        if (!forceRefresh && fresh) return operationsReviews;
+        if (!forceRefresh && operationsReviewsRequest) return operationsReviewsRequest;
+
+        const generation = ++operationsReviewsGeneration;
+        if (operationsReviews.status !== 'ready') {
+          operationsReviews.status = 'loading';
+          operationsReviews.error = null;
+          renderOperationsReviews();
+        }
+
+        const pending = (async () => {
+          const url = new URL(FYP_OPERATIONS_CATALOG_URL);
+          url.searchParams.set('action', 'reviews');
+          url.searchParams.set('product', 'D06');
+          url.searchParams.set('nocache', String(Date.now()));
+          const response = await fetch(url.toString(), {
+            method: 'GET',
+            credentials: 'omit',
+            redirect: 'follow',
+            cache: 'no-store',
+            signal: AbortSignal.timeout(20000)
+          });
+          if (!response.ok) throw new Error('Reviews request failed');
+          return response.json();
+        })();
+
+        operationsReviewsRequest = pending;
+
+        try {
+          const json = await pending;
+          const accepted = acceptOperationsReviews(json);
+          const hasReadyData = operationsReviews.status === 'ready' && !!operationsReviews.data;
+          if (!accepted) {
+            if (generation !== operationsReviewsGeneration) return operationsReviews;
+            if (hasReadyData) return operationsReviews;
+            operationsReviews.status = 'error';
+            operationsReviews.error = 'Reviews are unavailable.';
+            renderOperationsReviews();
+            return operationsReviews;
+          }
+          const canApply = reviewsShouldApply(
+            operationsReviews.revision,
+            operationsReviews.updatedAt,
+            accepted.revision,
+            accepted.updatedAt,
+            hasReadyData
+          );
+          if (!canApply) return operationsReviews;
+          const latest = generation === operationsReviewsGeneration;
+          const newerRevision = hasReadyData && accepted.revision > operationsReviews.revision;
+          const newerTime = hasReadyData &&
+            accepted.revision === operationsReviews.revision &&
+            Date.parse(accepted.updatedAt) > Date.parse(operationsReviews.updatedAt);
+          if (!latest && !newerRevision && !newerTime) return operationsReviews;
+          operationsReviews.data = accepted.data;
+          operationsReviews.revision = accepted.revision;
+          operationsReviews.updatedAt = accepted.updatedAt;
+          operationsReviews.loadedAt = Date.now();
+          operationsReviews.status = 'ready';
+          operationsReviews.error = null;
+          renderOperationsReviews();
+          return operationsReviews;
+        } catch (error) {
+          if (generation !== operationsReviewsGeneration) return operationsReviews;
+          if (operationsReviews.status === 'ready') return operationsReviews;
+          operationsReviews.status = 'error';
+          operationsReviews.error = 'Reviews are unavailable.';
+          renderOperationsReviews();
+          return operationsReviews;
+        } finally {
+          if (operationsReviewsRequest === pending) operationsReviewsRequest = null;
+        }
+      }
+
+      bindReviewControls();
 
       async function loadD06StagingCatalog(forceRefresh = false) {
         const fresh = stagingCatalog.status === 'ready' &&
