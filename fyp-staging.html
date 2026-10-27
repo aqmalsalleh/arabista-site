@@ -3278,6 +3278,35 @@
       font-weight:700;
     }
 
+    .checkout-payment-assurance {
+      display:flex;
+      align-items:flex-start;
+      gap:12px;
+    }
+
+    .checkout-payment-assurance svg {
+      flex:0 0 22px;
+      width:22px;
+      height:22px;
+      margin-top:1px;
+      color:#a88a54;
+    }
+
+    .checkout-payment-assurance p {
+      margin:0;
+      color:#3a3a3a;
+      font-size:13px;
+      line-height:1.55;
+    }
+
+    .checkout-payment-assurance p + p {
+      margin-top:8px;
+      padding-top:8px;
+      border-top:1px solid #eeeae4;
+      color:#8d8d8d;
+      font-size:12px;
+    }
+
     .checkout-row {
       display:flex;
       justify-content:space-between;
@@ -6029,7 +6058,7 @@
                   type="button">
             Continue shopping
           </button>
-          <p class="commerce-basket-note">Staging checkout. Payment is completed on DOKU. Opening the payment page does not confirm payment.</p>
+          <p class="commerce-basket-note">Staging checkout. Payment is completed on the next secure page. Opening the payment page does not confirm payment.</p>
         </footer>
         <p id="basket-checkout-status" class="sr-only" aria-live="polite"></p>
 
@@ -6136,8 +6165,9 @@
             <p class="checkout-disclaimer">
               This is an Arabista staging transaction. The amount
               comes from the staging catalog and delivery estimate.
-              DOKU hosts the payment. Opening that page does not
-              confirm payment. The server confirms a successful payment.
+              Payment continues on the next secure page. Opening
+              that page does not confirm payment. The server
+              confirms a successful payment.
             </p>
 
             <button id="checkout-address-entry"
@@ -6256,16 +6286,18 @@
             <div class="checkout-divider"></div>
 
             <section class="checkout-section" id="checkout-payment">
-              <h3>Secure Payment via DOKU</h3>
+              <h3>Secure payment</h3>
 
-              <p class="checkout-muted">
-                Available payment options will be shown securely
-                on DOKU.
-              </p>
-
-              <p class="checkout-muted">
-                Card numbers are not collected on this page.
-              </p>
+              <div class="checkout-payment-assurance">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M12 3.5l7 2.8v5.4c0 4.2-2.8 7.1-7 8.8-4.2-1.7-7-4.6-7-8.8V6.3z"/>
+                  <path d="M8.6 12.1l2.2 2.2 4.6-4.8"/>
+                </svg>
+                <div>
+                  <p>Choose your preferred payment method on the next secure page.</p>
+                  <p>Payment details are not collected on this page.</p>
+                </div>
+              </div>
 
               <p id="checkout-submission-note"
                  class="commerce-line-warning"
