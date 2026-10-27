@@ -4344,6 +4344,574 @@
   #product-sheet .product-scroll { scroll-behavior:auto; }
 }
 
+/* ============================================
+   ARABISTA — MODERN PREMIUM VOUCHERS
+   ============================================ */
+
+#product-sheet .deal-section {
+  padding-top:20px;
+  padding-bottom:21px;
+}
+
+#product-sheet .deal-section-head {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  margin-bottom:15px;
+}
+
+#product-sheet .deal-heading {
+  display:flex;
+  align-items:center;
+  gap:9px;
+  min-width:0;
+}
+
+#product-sheet .deal-demo-label {
+  font-size:9px;
+  font-weight:700;
+  letter-spacing:.055em;
+  color:#A38652;
+  background:#F7F3EA;
+  border-radius:4px;
+  padding:4px 6px;
+}
+
+#product-sheet .deal-view-all {
+  flex:0 0 auto;
+  display:flex;
+  align-items:center;
+  gap:5px;
+  border:0;
+  background:none;
+  color:#A38652;
+  font-size:12px;
+  font-weight:600;
+  padding:8px 0 8px 8px;
+}
+
+#product-sheet .deal-view-all span {
+  font-size:19px;
+  font-weight:400;
+  line-height:1;
+}
+
+/* Compact voucher preview */
+
+#product-sheet .deal-teaser {
+  width:100%;
+  min-height:83px;
+  display:grid;
+  grid-template-columns:63px minmax(0,1fr) auto;
+  align-items:center;
+  gap:12px;
+  padding:10px 14px 10px 0;
+
+  border:1px solid #E7DBCA;
+  border-radius:12px;
+
+  background:linear-gradient(
+    110deg,
+    #FBF9F4 0%,
+    #F7F1E7 100%
+  );
+
+  color:#272727;
+  text-align:left;
+  overflow:hidden;
+
+  transition:
+    border-color .24s ease,
+    box-shadow .24s ease,
+    transform .24s ease;
+}
+
+#product-sheet .deal-teaser:active {
+  transform:scale(.985);
+}
+
+#product-sheet .deal-teaser-icon {
+  width:63px;
+  height:60px;
+  display:grid;
+  place-items:center;
+  border-right:1px dashed #D5C6AD;
+  color:#A88A54;
+}
+
+#product-sheet .deal-teaser-icon svg {
+  width:25px;
+  height:25px;
+  fill:none;
+  stroke:currentColor;
+  stroke-width:1.7;
+  stroke-linecap:round;
+  stroke-linejoin:round;
+}
+
+#product-sheet .deal-teaser-copy {
+  min-width:0;
+  display:flex;
+  flex-direction:column;
+  gap:4px;
+}
+
+#product-sheet .deal-teaser-copy strong {
+  font-size:18px;
+  font-weight:700;
+  line-height:1.15;
+  letter-spacing:-.035em;
+  color:#866737;
+}
+
+#product-sheet .deal-teaser-copy > span {
+  font-size:11px;
+  color:#857B6D;
+  line-height:1.4;
+}
+
+#product-sheet .deal-teaser-action {
+  display:flex;
+  align-items:center;
+  gap:3px;
+  font-size:11px;
+  font-weight:700;
+  color:#A18450;
+  white-space:nowrap;
+}
+
+#product-sheet .deal-teaser-action span {
+  font-size:20px;
+  font-weight:400;
+}
+
+#product-sheet .deal-fineprint {
+  margin:9px 0 0;
+  color:#A19B91;
+  font-size:10px;
+  line-height:1.5;
+}
+
+/* Voucher modal */
+
+#product-sheet .deal-modal {
+  position:absolute;
+  inset:0;
+  z-index:20;
+
+  display:flex;
+  flex-direction:column;
+  min-width:0;
+  min-height:0;
+
+  background:#FFFFFF;
+  color:#272727;
+
+  animation:deal-modal-enter
+    .32s cubic-bezier(.22,1,.36,1) both;
+}
+
+#product-sheet .deal-modal-header {
+  position:relative;
+  flex:0 0 58px;
+
+  display:grid;
+  grid-template-columns:44px 1fr 44px;
+  align-items:center;
+  gap:4px;
+
+  padding:0 14px;
+  background:#FFFFFF;
+  border-bottom:1px solid #EFEFEF;
+}
+
+#product-sheet .deal-modal-header h2 {
+  margin:0;
+  font-size:16px;
+  font-weight:700;
+  text-align:center;
+  letter-spacing:-.025em;
+}
+
+#product-sheet .deal-modal-close {
+  width:40px;
+  height:40px;
+  display:grid;
+  place-items:center;
+
+  border:0;
+  border-radius:50%;
+  background:#F6F6F6;
+  color:#393939;
+}
+
+#product-sheet .deal-modal-close svg {
+  width:18px;
+  height:18px;
+  fill:none;
+  stroke:currentColor;
+  stroke-width:1.8;
+  stroke-linecap:round;
+}
+
+#product-sheet .deal-modal-scroll {
+  flex:1 1 auto;
+  min-height:0;
+  overflow-y:auto;
+  overscroll-behavior:contain;
+  -webkit-overflow-scrolling:touch;
+
+  padding:0 18px calc(
+    28px + env(safe-area-inset-bottom,0px)
+  );
+}
+
+#product-sheet .deal-modal-intro {
+  padding:26px 0 24px;
+}
+
+#product-sheet .deal-intro-label {
+  color:#A88A54;
+  font-size:10px;
+  font-weight:700;
+  letter-spacing:.13em;
+}
+
+#product-sheet .deal-modal-intro p {
+  margin:8px 0 5px;
+  color:#292929;
+  font-size:21px;
+  font-weight:600;
+  letter-spacing:-.045em;
+  line-height:1.3;
+}
+
+#product-sheet .deal-modal-intro small {
+  font-size:11px;
+  color:#939393;
+}
+
+#product-sheet .deal-modal-subheading {
+  margin:0 0 14px;
+  font-size:14px;
+  font-weight:700;
+  letter-spacing:-.02em;
+}
+
+/* Premium ticket cards */
+
+#product-sheet .deal-ticket {
+  display:grid;
+  grid-template-columns:75px minmax(0,1fr) 72px;
+  align-items:stretch;
+  min-height:127px;
+
+  margin-bottom:12px;
+
+  border:1px solid #E8DFD1;
+  border-radius:13px;
+
+  overflow:hidden;
+  background:#FCFAF6;
+
+  box-shadow:0 3px 14px rgba(73,52,22,.035);
+}
+
+#product-sheet .deal-ticket-rail {
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:9px;
+
+  padding:12px 5px;
+
+  background:#F4EDE1;
+  border-right:1px dashed #CDBB9C;
+  color:#997847;
+}
+
+#product-sheet .deal-ticket-rail svg {
+  width:26px;
+  height:26px;
+  fill:none;
+  stroke:currentColor;
+  stroke-width:1.65;
+  stroke-linecap:round;
+  stroke-linejoin:round;
+}
+
+#product-sheet .deal-ticket-rail span {
+  font-size:9px;
+  font-weight:700;
+  letter-spacing:.04em;
+}
+
+#product-sheet .deal-ticket-details {
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  min-width:0;
+  gap:4px;
+  padding:15px 6px 15px 13px;
+}
+
+#product-sheet .deal-ticket-type {
+  color:#A78C5E;
+  font-size:9px;
+  font-weight:700;
+  letter-spacing:.045em;
+}
+
+#product-sheet .deal-ticket-details strong {
+  font-size:20px;
+  line-height:1.15;
+  letter-spacing:-.045em;
+  color:#77582D;
+}
+
+#product-sheet .deal-ticket-details > span:not(.deal-ticket-type) {
+  color:#3D3D3D;
+  font-size:11px;
+  font-weight:600;
+}
+
+#product-sheet .deal-ticket-details small {
+  color:#949087;
+  font-size:10px;
+  line-height:1.4;
+}
+
+#product-sheet .deal-ticket-action {
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:8px;
+}
+
+#product-sheet .deal-claim {
+  width:100%;
+  min-height:37px;
+  padding:8px 5px;
+  border:1px solid #AE915C;
+  border-radius:999px;
+  background:#AE915C;
+  color:#FFFFFF;
+
+  font-size:11px;
+  font-weight:700;
+
+  transition:
+    background .2s ease,
+    color .2s ease,
+    transform .2s ease;
+}
+
+#product-sheet .deal-claim:active {
+  transform:scale(.95);
+}
+
+#product-sheet .deal-claim.is-claimed {
+  background:#F5F0E7;
+  border-color:#D9CAB2;
+  color:#927347;
+}
+
+#product-sheet .deal-show-more {
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  gap:7px;
+
+  width:100%;
+  padding:15px 0;
+  border:0;
+  background:transparent;
+  color:#8E8E8E;
+
+  font-size:12px;
+  font-weight:600;
+}
+
+#product-sheet .deal-show-more span {
+  font-size:17px;
+}
+
+#product-sheet .deal-demo-status {
+  min-height:20px;
+  margin:8px 0;
+  text-align:center;
+  color:#977B4F;
+  font-size:11px;
+}
+
+#product-sheet .deal-modal-disclaimer {
+  margin:18px 0 0;
+  padding:13px 14px;
+  border-radius:9px;
+  background:#F8F8F8;
+  color:#909090;
+  font-size:11px;
+  line-height:1.6;
+}
+
+#product-sheet .deal-ticket.deal-enter {
+  animation:deal-card-enter
+    .38s cubic-bezier(.22,1,.36,1) both;
+}
+
+@keyframes deal-modal-enter {
+  from {
+    opacity:.75;
+    transform:translateY(14px);
+  }
+  to {
+    opacity:1;
+    transform:translateY(0);
+  }
+}
+
+@keyframes deal-card-enter {
+  from {
+    opacity:0;
+    transform:translateY(9px);
+  }
+  to {
+    opacity:1;
+    transform:translateY(0);
+  }
+}
+
+@media (hover:hover) {
+  #product-sheet .deal-teaser:hover {
+    border-color:#CBB38C;
+    box-shadow:0 6px 20px rgba(91,67,29,.08);
+  }
+
+  #product-sheet .deal-claim:hover {
+    background:#947645;
+  }
+}
+
+@media (max-width:350px) {
+  #product-sheet .deal-ticket {
+    grid-template-columns:63px minmax(0,1fr) 67px;
+  }
+
+  #product-sheet .deal-ticket-details {
+    padding-left:9px;
+  }
+
+  #product-sheet .deal-ticket-details strong {
+    font-size:18px;
+  }
+
+  #product-sheet .deal-teaser {
+    grid-template-columns:53px minmax(0,1fr) auto;
+    gap:8px;
+  }
+
+  #product-sheet .deal-teaser-icon {
+    width:53px;
+  }
+}
+
+@media (prefers-reduced-motion:reduce) {
+  #product-sheet .deal-modal,
+  #product-sheet .deal-ticket.deal-enter {
+    animation:none !important;
+  }
+
+  #product-sheet .deal-teaser,
+  #product-sheet .deal-claim {
+    transition:none !important;
+  }
+}
+
+/* ============================================
+   ARABISTA — REVIEW RATING SUMMARY
+   ============================================ */
+
+#product-sheet .review-quick-summary {
+  display:flex;
+  align-items:center;
+  flex-wrap:wrap;
+  gap:7px 10px;
+
+  margin:0 0 17px;
+  padding:2px 0 0;
+}
+
+#product-sheet .review-quick-rating {
+  display:flex;
+  align-items:baseline;
+  gap:5px;
+  min-width:0;
+}
+
+#product-sheet .review-quick-average {
+  color:#272727;
+  font-size:27px;
+  font-weight:700;
+  line-height:1.1;
+  letter-spacing:-.055em;
+}
+
+#product-sheet .review-quick-outof {
+  color:#999999;
+  font-size:15px;
+  font-weight:400;
+}
+
+#product-sheet .review-quick-stars {
+  position:relative;
+  display:inline-block;
+  margin-left:5px;
+
+  font-size:19px;
+  line-height:1;
+  letter-spacing:2px;
+  white-space:nowrap;
+}
+
+#product-sheet .review-star-base {
+  color:#E7E7E7;
+}
+
+#product-sheet .review-star-fill {
+  position:absolute;
+  top:0;
+  left:0;
+  width:0%;
+  overflow:hidden;
+  white-space:nowrap;
+  color:#D2A74D;
+}
+
+#product-sheet .review-quick-count {
+  color:#8D8D8D;
+  font-size:11px;
+  line-height:1.5;
+  margin-left:auto;
+}
+
+@media (max-width:350px) {
+  #product-sheet .review-quick-average {
+    font-size:24px;
+  }
+
+  #product-sheet .review-quick-stars {
+    font-size:16px;
+    letter-spacing:1px;
+  }
+
+  #product-sheet .review-quick-count {
+    margin-left:0;
+    width:100%;
+  }
+}
+
   </style>
 </head>
 <body>
@@ -4751,10 +5319,86 @@
     </div>
   </div>
 
+  <!-- TODO: Load active product promotions from Product Manager
+       when the voucher/discount backend is implemented. -->
+  <section class="product-section deal-section" id="product-deals">
+
+    <div class="deal-section-head">
+      <div class="deal-heading">
+        <h3>Deals &amp; vouchers</h3>
+        <span class="deal-demo-label">DEMO</span>
+      </div>
+
+      <button id="product-deal-view-all"
+              class="deal-view-all"
+              type="button"
+              aria-haspopup="dialog"
+              aria-controls="product-deal-modal">
+        View all
+        <span aria-hidden="true">›</span>
+      </button>
+    </div>
+
+    <button id="product-deal-teaser"
+            class="deal-teaser"
+            type="button"
+            aria-label="Explore sample deals and vouchers"
+            aria-haspopup="dialog"
+            aria-controls="product-deal-modal">
+
+      <span class="deal-teaser-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24">
+          <path d="M3 7h11v10H3zM14 10h4l3 3v4h-7z"/>
+          <circle cx="7.5" cy="18" r="1.5"/>
+          <circle cx="17.5" cy="18" r="1.5"/>
+        </svg>
+      </span>
+
+      <span class="deal-teaser-copy">
+        <strong>RM8 OFF</strong>
+        <span>Sample voucher · Min. RM120</span>
+      </span>
+
+      <span class="deal-teaser-action">
+        Explore
+        <span aria-hidden="true">›</span>
+      </span>
+
+    </button>
+
+    <p class="deal-fineprint">
+      Promotion preview only. Discounts are not yet active.
+    </p>
+
+  </section>
   <section class="product-section" id="product-reviews">
     <div class="review-section-head">
       <h3>Customer reviews <span class="sample-reviews">Sample reviews</span></h3>
       <button id="product-review-see-all" class="review-see-all" type="button" hidden>See all <span aria-hidden="true">›</span></button>
+    </div>
+    <div id="review-quick-summary"
+         class="review-quick-summary"
+         hidden>
+
+      <div class="review-quick-rating">
+        <strong id="review-quick-average">0.0</strong>
+        <span class="review-quick-outof">/5</span>
+
+        <span class="review-quick-stars"
+              aria-hidden="true">
+
+          <span class="review-star-base">★★★★★</span>
+
+          <span id="review-star-fill"
+                class="review-star-fill">★★★★★</span>
+
+        </span>
+      </div>
+
+      <span id="review-quick-count"
+            class="review-quick-count">
+      </span>
+
     </div>
     <div id="product-review-strip" class="review-photo-strip" hidden aria-label="Review photos"></div>
     <div id="product-review-preview"></div>
@@ -4947,6 +5591,154 @@
           </div>
           <div id="review-viewer-track"
                class="review-viewer-track"></div>
+        </div>
+
+        <div id="product-deal-modal"
+             class="deal-modal"
+             role="dialog"
+             aria-modal="true"
+             aria-labelledby="deal-modal-title"
+             hidden>
+
+          <header class="deal-modal-header">
+            <span class="deal-header-spacer" aria-hidden="true"></span>
+
+            <h2 id="deal-modal-title">Deals &amp; vouchers</h2>
+
+            <button id="deal-modal-close"
+                    class="deal-modal-close"
+                    type="button"
+                    aria-label="Close vouchers">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M5 5l14 14M19 5L5 19"/>
+              </svg>
+            </button>
+          </header>
+
+          <div class="deal-modal-scroll">
+
+            <div class="deal-modal-intro">
+              <span class="deal-intro-label">ARABISTA REWARDS</span>
+              <p>
+                Enjoy a little extra with every purchase.
+              </p>
+              <small>Sample offers for interface preview.</small>
+            </div>
+
+            <h3 class="deal-modal-subheading">Available vouchers</h3>
+
+            <!-- Voucher 1 -->
+            <article class="deal-ticket">
+
+              <div class="deal-ticket-rail">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M3 7h11v10H3zM14 10h4l3 3v4h-7z"/>
+                  <circle cx="7.5" cy="18" r="1.5"/>
+                  <circle cx="17.5" cy="18" r="1.5"/>
+                </svg>
+                <span>SHIPPING</span>
+              </div>
+
+              <div class="deal-ticket-details">
+                <span class="deal-ticket-type">DEMO VOUCHER</span>
+                <strong>RM10 OFF</strong>
+                <span>Min. spend RM150</span>
+                <small>Sample shipping promotion</small>
+              </div>
+
+              <div class="deal-ticket-action">
+                <button class="deal-claim"
+                        type="button"
+                        data-demo-claim
+                        aria-pressed="false">
+                  Claim
+                </button>
+              </div>
+
+            </article>
+
+            <!-- Voucher 2 -->
+            <article class="deal-ticket">
+
+              <div class="deal-ticket-rail">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M3 7h11v10H3zM14 10h4l3 3v4h-7z"/>
+                  <circle cx="7.5" cy="18" r="1.5"/>
+                  <circle cx="17.5" cy="18" r="1.5"/>
+                </svg>
+                <span>SHIPPING</span>
+              </div>
+
+              <div class="deal-ticket-details">
+                <span class="deal-ticket-type">DEMO VOUCHER</span>
+                <strong>RM8 OFF</strong>
+                <span>Min. spend RM120</span>
+                <small>Sample shipping promotion</small>
+              </div>
+
+              <div class="deal-ticket-action">
+                <button class="deal-claim"
+                        type="button"
+                        data-demo-claim
+                        aria-pressed="false">
+                  Claim
+                </button>
+              </div>
+
+            </article>
+
+            <!-- Third voucher, initially hidden -->
+            <article id="deal-extra-voucher"
+                     class="deal-ticket"
+                     hidden>
+
+              <div class="deal-ticket-rail">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M3 6h18v5a2 2 0 0 0 0 4v4H3v-4a2 2 0 0 0 0-4z"/>
+                  <path d="M12 6v13" stroke-dasharray="2 3"/>
+                </svg>
+                <span>REWARD</span>
+              </div>
+
+              <div class="deal-ticket-details">
+                <span class="deal-ticket-type">DEMO VOUCHER</span>
+                <strong>RM15 OFF</strong>
+                <span>Min. spend RM200</span>
+                <small>Sample order promotion</small>
+              </div>
+
+              <div class="deal-ticket-action">
+                <button class="deal-claim"
+                        type="button"
+                        data-demo-claim
+                        aria-pressed="false">
+                  Claim
+                </button>
+              </div>
+
+            </article>
+
+            <button id="deal-show-more"
+                    class="deal-show-more"
+                    type="button"
+                    aria-expanded="false"
+                    aria-controls="deal-extra-voucher">
+              Show more
+              <span aria-hidden="true">⌄</span>
+            </button>
+
+            <p id="deal-demo-status"
+               class="deal-demo-status"
+               role="status"
+               aria-live="polite">
+            </p>
+
+            <div class="deal-modal-disclaimer">
+              Demo vouchers are not applied to your basket or checkout.
+              Actual promotions will appear here when available.
+            </div>
+
+          </div>
         </div>
       </section>
 
@@ -5809,6 +6601,15 @@
         const restoreFocus = previousSheetFocus;
 
         if (closingType === 'product') {
+          const dealModal = document.getElementById('product-deal-modal');
+          if (dealModal) dealModal.hidden = true;
+          [
+            document.getElementById('product-grab'),
+            document.getElementById('product-scroll'),
+            productSheet.querySelector('.product-footer')
+          ].forEach(node => {
+            if (node) node.inert = false;
+          });
           productScrollExpandArmed = false;
           productScrollExpandReady = false;
           productScrollUserUntil = 0;
@@ -6194,6 +6995,12 @@
         const reviewListOpen = reviewListIsOpen();
 
         if (!activeSheet && !lightboxOpen && !reviewViewerOpen) return;
+
+        const dealModal = document.getElementById('product-deal-modal');
+        if (dealModal && !dealModal.hidden &&
+            (event.key === 'Escape' || event.key === 'Tab')) {
+          return;
+        }
 
         if (event.key === 'Escape') {
           event.preventDefault();
@@ -9873,6 +10680,59 @@
           const preview = document.getElementById('product-review-preview');
           const seeAll = document.getElementById('product-review-see-all');
           const ready = operationsReviews.status === 'ready' && operationsReviews.data;
+          const quickSummary =
+            document.getElementById('review-quick-summary');
+
+          const quickAverage =
+            document.getElementById('review-quick-average');
+
+          const quickCount =
+            document.getElementById('review-quick-count');
+
+          const quickFill =
+            document.getElementById('review-star-fill');
+
+          const quickReady = Boolean(
+            ready &&
+            operationsReviews.data.count > 0 &&
+            Number.isFinite(Number(operationsReviews.data.averageRating))
+          );
+
+          if (quickSummary) {
+            quickSummary.hidden = !quickReady;
+          }
+
+          if (quickReady) {
+            const rating = Math.max(
+              0,
+              Math.min(5, Number(operationsReviews.data.averageRating))
+            );
+
+            if (quickAverage) {
+              quickAverage.textContent = formatReviewAverage(rating);
+            }
+
+            if (quickFill) {
+              quickFill.style.width = (rating / 5 * 100) + '%';
+            }
+
+            if (quickCount) {
+              const count = operationsReviews.data.count;
+
+              quickCount.textContent =
+                count + (count === 1 ? ' sample review' : ' sample reviews');
+
+              if (quickSummary) {
+                quickSummary.setAttribute(
+                  'aria-label',
+                  formatReviewAverage(rating) +
+                  ' out of 5 from ' +
+                  count +
+                  ' sample reviews'
+                );
+              }
+            }
+          }
           if (retry) {
             retry.hidden = operationsReviews.status !== 'error';
             retry.textContent = 'Retry reviews';
@@ -14069,6 +14929,136 @@
     });
     row.classList.add('is-size-selected');
   });
+})();
+</script>
+
+<script>
+(() => {
+  'use strict';
+
+  const sheet = document.getElementById('product-sheet');
+  const modal = document.getElementById('product-deal-modal');
+  const closeButton = document.getElementById('deal-modal-close');
+
+  if (!sheet || !modal || !closeButton) return;
+
+  const triggers = [
+    document.getElementById('product-deal-view-all'),
+    document.getElementById('product-deal-teaser')
+  ].filter(Boolean);
+
+  const backgroundRegions = [
+    sheet.querySelector('.product-grab'),
+    document.getElementById('product-scroll'),
+    sheet.querySelector('.product-footer')
+  ].filter(Boolean);
+
+  const previousInert = new Map();
+  let returnFocus = null;
+
+  function openDeals(trigger) {
+    if (!modal.hidden) return;
+
+    returnFocus = trigger || document.activeElement;
+
+    previousInert.clear();
+    backgroundRegions.forEach(node => {
+      previousInert.set(node, node.inert);
+      node.inert = true;
+    });
+
+    modal.hidden = false;
+
+    closeButton.focus({ preventScroll:true });
+  }
+
+  function closeDeals() {
+    if (modal.hidden) return;
+
+    modal.hidden = true;
+
+    previousInert.forEach((value, node) => {
+      node.inert = value;
+    });
+
+    previousInert.clear();
+
+    if (returnFocus && returnFocus.isConnected) {
+      returnFocus.focus({ preventScroll:true });
+    }
+
+    returnFocus = null;
+  }
+
+  triggers.forEach(button => {
+    button.addEventListener('click', () => openDeals(button));
+  });
+
+  closeButton.addEventListener('click', closeDeals);
+
+  modal.addEventListener('keydown', event => {
+    if (event.key === 'Escape') {
+      event.preventDefault();
+      closeDeals();
+      return;
+    }
+
+    if (event.key !== 'Tab') return;
+
+    const focusables = [...modal.querySelectorAll(
+      'button:not([disabled]):not([hidden])'
+    )].filter(button => button.getClientRects().length);
+
+    if (!focusables.length) return;
+
+    const first = focusables[0];
+    const last = focusables[focusables.length - 1];
+
+    if (event.shiftKey && document.activeElement === first) {
+      event.preventDefault();
+      last.focus();
+    } else if (!event.shiftKey && document.activeElement === last) {
+      event.preventDefault();
+      first.focus();
+    }
+  });
+
+  // Demonstration interaction only.
+  // Does NOT create discounts, checkout claims or API calls.
+  modal.querySelectorAll('[data-demo-claim]').forEach(button => {
+    button.addEventListener('click', () => {
+      const claimed = !button.classList.contains('is-claimed');
+
+      button.classList.toggle('is-claimed', claimed);
+      button.setAttribute('aria-pressed', String(claimed));
+      button.textContent = claimed ? 'Saved' : 'Claim';
+
+      const status = document.getElementById('deal-demo-status');
+
+      if (status) {
+        status.textContent = claimed
+          ? 'Saved for preview only. No checkout discount applied.'
+          : 'Preview voucher removed.';
+      }
+    });
+  });
+
+  const showMore = document.getElementById('deal-show-more');
+  const extra = document.getElementById('deal-extra-voucher');
+
+  if (showMore && extra) {
+    showMore.addEventListener('click', () => {
+      extra.hidden = false;
+      showMore.hidden = true;
+      showMore.setAttribute('aria-expanded', 'true');
+
+      if (!window.matchMedia(
+        '(prefers-reduced-motion: reduce)'
+      ).matches) {
+        extra.classList.add('deal-enter');
+      }
+    });
+  }
 })();
 </script>
 
