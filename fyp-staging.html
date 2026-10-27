@@ -13049,13 +13049,12 @@
         return /^STGORD-[A-Z0-9]+(?:-[A-Z0-9]+)*$/.test(String(value || ''));
       }
 
-      // Malaysia Checkout v3 returns payment.checkout_url. That page can
-      // use a different host from the API base and does not need order_id
-      // or amount query parameters. The cited DOKU Malaysia reference does
-      // not publish the sandbox payment hostname, and the Indonesia Jokul
-      // sandbox host belongs to a different API. The allowlist stays empty
-      // until that hostname is verified.
-      const DOKU_SANDBOX_PAYMENT_HOSTS = [];
+      // Malaysia Checkout v3 returns payment.checkout_url. The sandbox
+      // hosted-payment hostname was verified by the authenticated
+      // diagnoseDokuSandboxCheckout() response as staging.doku.com.
+      // Matching is exact and HTTPS-only. Production and lookalike hosts
+      // stay rejected.
+      const DOKU_SANDBOX_PAYMENT_HOSTS = ['staging.doku.com'];
       const DOKU_PRODUCTION_PAYMENT_HOSTS = [
         'jokul.doku.com',
         'app.senangpay.my',
