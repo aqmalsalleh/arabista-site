@@ -1516,16 +1516,16 @@
       overflow:hidden;
     }
 
-    .media-pending > img {
+    .media-pending:not(.product-gallery-slide) > img {
       opacity:0;
     }
 
-    .media-pending.is-ready > img {
+    .media-pending.is-ready:not(.product-gallery-slide) > img {
       opacity:1;
       transition:opacity .4s ease;
     }
 
-    .media-pending:not(.is-ready):not(.is-failed)::before {
+    .media-pending:not(.is-ready):not(.is-failed):not(.product-gallery-slide)::before {
       content:'';
       position:absolute;
       inset:0;
@@ -1533,7 +1533,7 @@
       pointer-events:none;
     }
 
-    .media-pending:not(.is-ready):not(.is-failed)::after {
+    .media-pending:not(.is-ready):not(.is-failed):not(.product-gallery-slide)::after {
       content:'';
       position:absolute;
       inset:0;
@@ -3840,10 +3840,8 @@
   height:clamp(275px,39svh,345px); min-height:0;
   background:linear-gradient(145deg,#f9f9f8,#f1f1ef);
 }
-/* ================================================
-   ARABISTA — PREMIUM GALLERY AMBIENT FIX
-   Sharp centered image + subtle blurred background
-   ================================================ */
+/* Dynamic ambient gallery. One photograph, sharp and contained,
+   over its own blurred colour field. No fade or shimmer. */
 
 #product-sheet .product-gallery-slide {
   position: relative;
@@ -3858,101 +3856,61 @@
   background: #f7f6f4;
 }
 
-/* Blurred ambient background */
-
 #product-sheet .product-gallery-slide .gallery-ambient {
   position: absolute;
-  inset: -8%;
-  width: auto;
-  height: auto;
+  inset: -18%;
   z-index: 0;
-
   background-position: center;
   background-repeat: no-repeat;
   background-size: cover;
-
-  filter: blur(24px) saturate(.75);
-  transform: scale(1.04);
-
+  filter: blur(32px) saturate(.75);
+  transform: scale(1.08);
   opacity: 0;
   pointer-events: none;
-
-  transition: opacity .45s ease;
 }
-
-/* Warm white veil */
 
 #product-sheet .product-gallery-slide .gallery-veil {
   position: absolute;
   inset: 0;
   z-index: 1;
-
-  background: rgba(250, 249, 247, .76);
+  background: rgba(250, 249, 247, .30);
   pointer-events: none;
 }
-
-/* Original sharp product photograph */
 
 #product-sheet .product-gallery-slide > img.gallery-photo {
   position: relative;
   z-index: 2;
-
   display: block;
   flex: 0 1 auto;
-
-  width: 88%;
+  width: auto;
   max-width: 88%;
   height: 100%;
   max-height: 100%;
-
   margin: 0 auto;
-
   object-fit: contain;
   object-position: center;
-
-  transform: none;
-  filter: none;
-
   opacity: 0;
-  transition: opacity .4s ease;
+  -webkit-mask-image: linear-gradient(to right, transparent, #000 8px, #000 calc(100% - 8px), transparent);
+  mask-image: linear-gradient(to right, transparent, #000 8px, #000 calc(100% - 8px), transparent);
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-size: 100% 100%;
+  mask-size: 100% 100%;
 }
 
-/* Reveal original photograph after loading */
+#product-sheet .product-gallery-slide.is-ready .gallery-ambient {
+  opacity: .70;
+}
 
-#product-sheet
-.product-gallery-slide.media-pending.is-ready
-.gallery-photo {
+#product-sheet .product-gallery-slide.is-ready > img.gallery-photo {
   opacity: 1;
 }
 
-/* Reveal subtle background after loading */
-
-#product-sheet
-.product-gallery-slide.media-pending.is-ready
-.gallery-ambient {
-  opacity: .22;
-}
-
-/* Keep loading skeleton above image layers */
-
-#product-sheet
-.product-gallery-slide.media-pending:not(.is-ready):not(.is-failed)::before,
-
-#product-sheet
-.product-gallery-slide.media-pending:not(.is-ready):not(.is-failed)::after {
-  z-index: 4;
-}
-
-/* Reduced motion */
-
 @media (prefers-reduced-motion: reduce) {
-  #product-sheet .gallery-ambient {
-    display: none;
-  }
-
-  #product-sheet
-  .product-gallery-slide > img.gallery-photo {
+  #product-sheet .product-gallery-slide .gallery-ambient,
+  #product-sheet .product-gallery-slide > img.gallery-photo {
     transition: none;
+    animation: none;
   }
 }
 
@@ -4219,9 +4177,6 @@
 /* Calm editorial entrances; no ornamental copy or noisy motion */
 .sheet-layer.is-open #product-sheet .product-overview {
   animation:modern-reveal .45s cubic-bezier(.2,.8,.2,1) both;
-}
-.sheet-layer.is-open #product-sheet .product-gallery {
-  animation:modern-reveal .48s cubic-bezier(.2,.8,.2,1) both;
 }
 @keyframes modern-reveal {
   from { opacity:.72; transform:translateY(7px); }
@@ -7157,6 +7112,7 @@
         if (lazy) image.loading = 'lazy';
         image.src = src;
         if (className === 'product-gallery-slide') {
+          image.decoding = 'async';
           const ambient = document.createElement('span');
           ambient.className = 'gallery-ambient';
           ambient.setAttribute('aria-hidden', 'true');
@@ -7184,7 +7140,7 @@
             src,
             productImageAlts[index],
             'product-gallery-slide',
-            index > 0
+            index > 2
           )
         );
 
@@ -7197,6 +7153,32 @@
           )
         );
       });
+
+      function warmGallerySlide(index) {
+        const slide = productGalleryTrack.children[index];
+        if (!slide || slide.dataset.galleryWarm === '1') return;
+        const image = slide.querySelector('img.gallery-photo');
+        if (!image) return;
+        slide.dataset.galleryWarm = '1';
+        if (image.getAttribute('loading') === 'lazy') image.loading = 'eager';
+        const reveal = () => {
+          if (image.naturalWidth > 0 && !slide.classList.contains('is-failed')) {
+            slide.classList.add('is-ready');
+          }
+        };
+        image.addEventListener('load', reveal);
+        reveal();
+        if (typeof image.decode !== 'function') return;
+        image.decode().then(reveal).catch(() => {});
+      }
+
+      function warmGalleryAround(index) {
+        warmGallerySlide(index - 1);
+        warmGallerySlide(index);
+        warmGallerySlide(index + 1);
+      }
+
+      [0, 1, 2].forEach(warmGallerySlide);
 
       function scrollTrackTo(track, index, smooth) {
         const width = track.clientWidth || 1;
@@ -7234,12 +7216,14 @@
 
         productImageCount.textContent =
           `${productImageIndex + 1}/${productImages.length}`;
+        warmGalleryAround(productImageIndex);
       }
 
       function syncGalleryFromScroll() {
         productImageIndex = readTrackIndex(productGalleryTrack);
         productImageCount.textContent =
           `${productImageIndex + 1}/${productImages.length}`;
+        warmGalleryAround(productImageIndex);
       }
 
       let galleryScrollFrame = null;
