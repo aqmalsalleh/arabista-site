@@ -1396,7 +1396,6 @@
     .review-panel[hidden],
     .review-viewer[hidden],
     #product-review-see-all[hidden],
-    #product-review-context[hidden],
     #product-review-retry[hidden] {
       display:none !important;
     }
@@ -4083,9 +4082,6 @@
 #product-sheet .product-section p { font-size:13px; color:#656565; line-height:1.75; }
 #product-sheet .review-section-head { align-items:center; margin-bottom:16px; }
 #product-sheet .review-section-head h3 { display:flex; align-items:baseline; gap:8px; min-width:0; }
-#product-sheet .sample-reviews {
-  color:#a08a62; font-size:10px; font-weight:600; letter-spacing:.03em;
-}
 #product-sheet .review-see-all { font-size:12px; font-weight:600; color:var(--m-gold); }
 #product-sheet .review-panel > .review-bars {
   margin:10px 18px 14px; padding:12px 15px;
@@ -4112,9 +4108,6 @@
 #product-sheet .review-date { color:#a0a0a0; font-size:10px; }
 #product-sheet .product-review-card p {
   margin:6px 0 0; font-size:12.5px; line-height:1.7; color:#555;
-}
-#product-sheet #product-review-context {
-  margin:14px 0 0; color:#aaa; font-size:10px; line-height:1.5;
 }
 #product-sheet .modern-section-header {
   display:flex; justify-content:space-between; gap:10px; align-items:baseline;
@@ -5373,7 +5366,7 @@
   </section>
   <section class="product-section" id="product-reviews">
     <div class="review-section-head">
-      <h3>Customer reviews <span class="sample-reviews">Sample reviews</span></h3>
+      <h3>Customer reviews</h3>
       <button id="product-review-see-all" class="review-see-all" type="button" hidden>See all <span aria-hidden="true">›</span></button>
     </div>
     <div id="review-quick-summary"
@@ -10455,6 +10448,16 @@
         return button;
       }
 
+      function maskReviewerName(name) {
+        const text = String(name || '').trim();
+        if (!text || text.indexOf('*') >= 0) return text;
+        return text.split(/\s+/).filter(Boolean).map(part => {
+          const chars = Array.from(part);
+          if (chars.length < 2) return part;
+          return chars[0] + '*'.repeat(chars.length - 1);
+        }).join(' ');
+      }
+
       function makeReviewCard(review) {
         const card = document.createElement('article');
         card.className = 'product-review-card';
@@ -10462,7 +10465,7 @@
         const meta = document.createElement('div');
         meta.className = 'review-card-meta';
         const name = document.createElement('strong');
-        name.textContent = review.name;
+        name.textContent = maskReviewerName(review.name);
         const stars = document.createElement('span');
         stars.className = 'review-stars';
         stars.textContent = '\u2605'.repeat(review.stars);
@@ -10719,16 +10722,15 @@
             if (quickCount) {
               const count = operationsReviews.data.count;
 
-              quickCount.textContent =
-                count + (count === 1 ? ' sample review' : ' sample reviews');
+              const countLabel = count === 1 ? '1 review' : count + ' reviews';
+              quickCount.textContent = countLabel;
 
               if (quickSummary) {
                 quickSummary.setAttribute(
                   'aria-label',
                   formatReviewAverage(rating) +
                   ' out of 5 from ' +
-                  count +
-                  ' sample reviews'
+                  countLabel
                 );
               }
             }
@@ -10753,11 +10755,12 @@
             if (seeAll) seeAll.hidden = true;
             resetReviewOverlay();
             if (note) {
+              note.hidden = false;
               note.textContent = operationsReviews.status === 'error'
                 ? 'Reviews are unavailable.'
                 : operationsReviews.status === 'loading'
-                  ? 'Loading published reviews\u2026'
-                  : 'Published reviews load when this sheet opens.';
+                  ? 'Loading reviews\u2026'
+                  : 'Reviews load when this sheet opens.';
             }
             return;
           }
@@ -10773,13 +10776,19 @@
             clearElement(preview);
             updateReviewMore(0);
             resetReviewOverlay();
-            if (note) note.textContent = 'No published reviews.';
+            if (note) {
+              note.hidden = false;
+              note.textContent = 'No reviews yet.';
+            }
             return;
           }
           if (summary) summary.hidden = false;
           if (average) average.textContent = formatReviewAverage(data.averageRating);
           if (count) count.textContent = data.count === 1 ? '1 review' : data.count + ' reviews';
-          if (note) note.textContent = 'Rating and review count come from the published staging feed.';
+          if (note) {
+            note.textContent = '';
+            note.hidden = true;
+          }
           if (context) context.hidden = false;
           if (seeAll) seeAll.hidden = false;
           renderReviewBars(data);
