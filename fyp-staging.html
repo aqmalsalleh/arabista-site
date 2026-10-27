@@ -1518,6 +1518,61 @@
       object-fit:cover;
     }
 
+    .media-pending {
+      position:relative;
+      overflow:hidden;
+    }
+
+    .media-pending > img {
+      opacity:0;
+    }
+
+    .media-pending.is-ready > img {
+      opacity:1;
+      transition:opacity .4s ease;
+    }
+
+    .media-pending:not(.is-ready):not(.is-failed)::before {
+      content:'';
+      position:absolute;
+      inset:0;
+      background:#f1f0ee;
+      pointer-events:none;
+    }
+
+    .media-pending:not(.is-ready):not(.is-failed)::after {
+      content:'';
+      position:absolute;
+      inset:0;
+      background:linear-gradient(100deg, transparent 28%, rgba(255,255,255,.78) 50%, transparent 72%);
+      transform:translateX(-120%);
+      animation:media-shimmer 1.35s ease-in-out infinite;
+      pointer-events:none;
+    }
+
+    .media-dark.media-pending:not(.is-ready):not(.is-failed)::before {
+      background:#1b1b1b;
+    }
+
+    .media-dark.media-pending:not(.is-ready):not(.is-failed)::after {
+      background:linear-gradient(100deg, transparent 28%, rgba(255,255,255,.16) 50%, transparent 72%);
+    }
+
+    @keyframes media-shimmer {
+      100% { transform:translateX(120%); }
+    }
+
+    @keyframes review-fade-up {
+      from { opacity:0; transform:translateY(8px); }
+      to { opacity:1; transform:none; }
+    }
+
+    @keyframes fit-row-glow {
+      0% { background-color:#f7f4ec; }
+      38% { background-color:#f0ddb4; }
+      100% { background-color:#f6efe2; }
+    }
+
     .review-viewer-slide img {
       object-fit:contain;
     }
@@ -2089,13 +2144,21 @@
       margin-bottom:24px;
     }
 
-    .commerce-product-card img {
+    .commerce-photo {
+      position:relative;
       width:88px;
       height:118px;
       flex:0 0 88px;
-      object-fit:cover;
+      overflow:hidden;
       border-radius:9px;
       background:#eee;
+    }
+
+    .commerce-photo img {
+      display:block;
+      width:100%;
+      height:100%;
+      object-fit:cover;
     }
 
     .commerce-product-info {
@@ -2200,17 +2263,11 @@
       color:#6f5a32;
     }
 
-    .commerce-size-grid {
-      max-height:260px;
-      overflow:hidden;
-      transition:max-height .32s ease, opacity .32s ease, margin-top .32s ease;
-    }
-
-    .commerce-size-grid.is-set-locked {
-      max-height:0;
-      margin-top:0;
-      opacity:0;
-      pointer-events:none;
+    .commerce-size-hint {
+      margin:-2px 0 8px;
+      color:#8a8174;
+      font-size:11px;
+      line-height:1.4;
     }
 
     .commerce-size-button {
@@ -2280,8 +2337,13 @@
       background:#fff;
       color:#242424;
       font:inherit;
-      font-size:14px;
+      font-size:16px;
       font-weight:600;
+    }
+
+    #product-sheet :is(input, textarea, select):not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="button"]):not([type="submit"]):not([type="hidden"]),
+    #commerce-panel :is(input, textarea, select):not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="button"]):not([type="submit"]):not([type="hidden"]) {
+      font-size:16px;
     }
 
     .fit-fields input:focus {
@@ -2377,8 +2439,15 @@
       .commerce-set-toggle button,
       .basket-step,
       .basket-remove,
-      .fit-fields input {
+      .fit-fields input,
+      .media-pending.is-ready > img {
         transition:none !important;
+      }
+
+      .media-pending::after,
+      .product-review-card.is-review-enter,
+      .product-size-table tbody tr.is-fit-pulse td {
+        animation:none !important;
       }
     }
 
@@ -3609,8 +3678,10 @@
 }
 #product-sheet .product-gallery-slide img {
   height:100%; width:88%; max-height:100%; object-fit:contain;
-  transition:transform .6s cubic-bezier(.22,1,.36,1);
+  transition:transform .6s cubic-bezier(.22,1,.36,1), opacity .4s ease;
 }
+#product-sheet .product-gallery-slide.media-pending:not(.is-ready) img { opacity:0; }
+#product-sheet .product-gallery-slide.media-pending.is-ready img { opacity:1; }
 #product-sheet .product-gallery-count {
   right:14px; bottom:14px; padding:5px 10px;
   background:rgba(255,255,255,.88); color:#444;
@@ -3746,6 +3817,19 @@
 #product-sheet .product-size-table tbody tr.is-size-selected td:last-child {
   box-shadow:inset -1px 0 0 #c6ae84, inset 0 1px 0 #c6ae84, inset 0 -1px 0 #c6ae84;
 }
+#product-sheet .product-size-table tbody tr.is-fit td {
+  background:#f6efe2;
+  box-shadow:inset 0 2px 0 #b39257, inset 0 -2px 0 #b39257;
+}
+#product-sheet .product-size-table tbody tr.is-fit td:first-child {
+  box-shadow:inset 2px 0 0 #b39257, inset 0 2px 0 #b39257, inset 0 -2px 0 #b39257;
+}
+#product-sheet .product-size-table tbody tr.is-fit td:last-child {
+  box-shadow:inset -2px 0 0 #b39257, inset 0 2px 0 #b39257, inset 0 -2px 0 #b39257;
+}
+#product-sheet .product-size-table tbody tr.is-fit-pulse td {
+  animation:fit-row-glow .9s ease;
+}
 #product-sheet #product-sizes:has(.product-size-guide) #product-size-status { display:none; }
 #product-sheet #product-size-status { color:#999; font-size:11px; }
 #product-sheet #product-description-copy { margin-top:15px; margin-bottom:16px; font-size:12.5px; }
@@ -3852,8 +3936,9 @@
   from { opacity:.72; transform:translateY(7px); }
   to { opacity:1; transform:none; }
 }
-#product-sheet #product-review-preview .product-review-card,
-#product-sheet .review-photo-strip .review-thumb { animation:modern-reveal .35s ease both; }
+#product-sheet #product-review-preview .product-review-card.is-review-enter {
+  animation:review-fade-up .45s cubic-bezier(.22,1,.36,1) both;
+}
 @media (hover:hover) {
   #product-sheet .product-buy-button:hover { background:#c4a36a; box-shadow:inset 0 1px 0 rgba(255,248,236,.4), 0 6px 16px rgba(139,110,56,.22); }
   #product-sheet .product-cart-button:hover { background:#f7f4ec; border-color:#c6ae84; }
@@ -3876,7 +3961,10 @@
   #product-sheet .product-gallery-slide img { animation:none !important; transition:none !important; }
   #product-sheet .product-overview,
   #product-sheet .product-gallery,
-  #product-sheet .product-review-card { animation:none !important; }
+  #product-sheet .product-review-card,
+  #product-sheet .product-size-table tbody tr.is-fit-pulse td { animation:none !important; }
+  #product-sheet .media-pending.is-ready > img,
+  #product-sheet .product-gallery-slide img { transition:none !important; }
   #product-sheet .product-buy-button::before { animation:none !important; }
   #product-sheet .product-scroll { scroll-behavior:auto; }
 }
@@ -4565,8 +4653,10 @@
           <div id="commerce-variant" class="commerce-view">
 
             <div class="commerce-product-card">
-              <img src="images/d06-1-hero.webp"
-                   alt="D06 Dahlia Abaya">
+              <span class="commerce-photo">
+                <img src="images/d06-1-hero.webp"
+                     alt="D06 Dahlia Abaya">
+              </span>
 
               <div class="commerce-product-info">
                 <del id="commerce-price-compare"
@@ -4614,6 +4704,7 @@
             </div>
 
             <div class="commerce-section-title">Saiz</div>
+            <p id="commerce-size-hint" class="commerce-size-hint">Choose length first</p>
 
             <div id="commerce-size-grid"
                  class="commerce-size-grid is-set-locked"
@@ -4694,8 +4785,10 @@
                hidden>
 
             <div class="commerce-product-card">
-              <img src="images/d06-1-hero.webp"
-                   alt="D06 Dahlia Abaya">
+              <span class="commerce-photo">
+                <img src="images/d06-1-hero.webp"
+                     alt="D06 Dahlia Abaya">
+              </span>
 
               <div class="commerce-product-info">
                 <strong>Arabista</strong>
@@ -6742,10 +6835,12 @@
         slide.className = className;
 
         const image = document.createElement('img');
-        image.src = src;
         image.alt = alt;
         image.draggable = false;
         if (lazy) image.loading = 'lazy';
+        image.src = src;
+        if (className !== 'product-gallery-slide') slide.classList.add('media-dark');
+        watchMedia(slide, image);
 
         slide.append(image);
         return slide;
@@ -7302,6 +7397,10 @@
 
       function holdProductScrollPosition() {
         if (!productScrollHold) return;
+        if (productScroll.dataset.scrollingToFit === '1') {
+          productScrollHold.top = productScroll.scrollTop;
+          return;
+        }
         if (performance.now() <= productScrollFollowUntil) {
           productScrollHold.top = productScroll.scrollTop;
           return;
@@ -7432,6 +7531,10 @@
       }, { passive: true });
 
       productScroll.addEventListener('scroll', () => {
+        if (productScroll.dataset.scrollingToFit === '1') {
+          if (productScrollHold) productScrollHold.top = productScroll.scrollTop;
+          return;
+        }
         if (productScrollHold) holdProductScrollPosition();
         maybeExpandProductFromScroll();
       }, { passive: true });
@@ -8944,6 +9047,10 @@
       const reviewView = { sort: 'recommended', stars: 0, photosOnly: false };
       let reviewStripMoved = false;
       let reviewViewerReturn = null;
+      let reviewExpandToken = 0;
+      const reviewStripPool = new Map();
+      const reviewListPool = new Map();
+      const reviewViewerPool = new Map();
 
       function reviewViewerIsOpen() {
         const viewer = document.getElementById('review-viewer');
@@ -8984,12 +9091,38 @@
         node.addEventListener('wheel', event => event.stopPropagation(), { passive: true });
       }
 
+      function watchMedia(frame, image) {
+        if (!frame || !image) return;
+        frame.classList.add('media-pending');
+        const finish = ok => {
+          frame.classList.toggle('is-ready', ok);
+          frame.classList.toggle('is-failed', !ok);
+        };
+        if (image.complete && image.naturalWidth > 0) finish(true);
+        else if (image.complete && image.currentSrc) finish(false);
+        else {
+          image.addEventListener('load', () => finish(true), { once: true });
+          image.addEventListener('error', () => finish(false), { once: true });
+        }
+      }
+
+      function prepareStaticMedia() {
+        document.querySelectorAll('.commerce-photo').forEach(frame => {
+          const image = frame.querySelector('img');
+          if (image) watchMedia(frame, image);
+        });
+      }
+
+      prepareStaticMedia();
+
       function markReviewImage(image, button) {
         image.loading = 'lazy';
         image.decoding = 'async';
         image.addEventListener('error', () => {
+          if (button.querySelector('.review-photo-failed')) return;
           image.removeAttribute('src');
           image.hidden = true;
+          button.classList.add('is-failed');
           const failed = document.createElement('span');
           failed.className = 'review-photo-failed';
           failed.textContent = 'Photo unavailable';
@@ -9007,7 +9140,9 @@
         const image = document.createElement('img');
         markReviewImage(image, button);
         if (!lazy) image.loading = 'eager';
+        image.alt = 'Review photo ' + photo.sequence;
         image.src = photo.url;
+        watchMedia(button, image);
         button.appendChild(image);
         button.addEventListener('click', () => {
           if (button.closest('#product-review-strip') && reviewStripMoved) return;
@@ -9070,15 +9205,24 @@
 
       function renderReviewStrip(data) {
         const host = document.getElementById('product-review-strip');
-        clearElement(host);
         if (!host) return;
         const ordered = selectReviews(data.reviews, { sort: 'recommended', stars: 0, photosOnly: false });
+        const thumbs = [];
         ordered.forEach(review => {
           review.photos.forEach(photo => {
-            host.appendChild(makeReviewThumb(review.reviewId, photo, true));
+            const key = review.reviewId + ':' + photo.sequence;
+            let thumb = reviewStripPool.get(key);
+            if (!thumb) {
+              thumb = makeReviewThumb(review.reviewId, photo, true);
+              reviewStripPool.set(key, thumb);
+            }
+            thumbs.push(thumb);
           });
         });
-        host.hidden = !host.childElementCount;
+        const same = host.childElementCount === thumbs.length &&
+          thumbs.every((thumb, index) => host.children[index] === thumb);
+        if (!same) host.replaceChildren(...thumbs);
+        host.hidden = !thumbs.length;
       }
 
       function updateReviewMore(total) {
@@ -9089,18 +9233,79 @@
 
       function renderReviewPreview(data) {
         const host = document.getElementById('product-review-preview');
-        clearElement(host);
         if (!host || !data) {
+          if (host) clearElement(host);
           updateReviewMore(0);
           return;
         }
         const ordered = selectReviews(data.reviews, { sort: 'recommended', stars: 0, photosOnly: false });
+        const ids = ordered.map(review => review.reviewId).join('|');
+        const current = Array.from(host.children).map(card => card.dataset.reviewId).join('|');
+        if (current !== ids) {
+          const pool = new Map(Array.from(host.children).map(card => [card.dataset.reviewId, card]));
+          const cards = ordered.map(review => {
+            let card = pool.get(review.reviewId);
+            if (card) pool.delete(review.reviewId);
+            else card = makeReviewCard(review);
+            return card;
+          });
+          pool.forEach(card => card.remove());
+          const top = productScroll.scrollTop;
+          host.replaceChildren(...cards);
+          if (productScroll.scrollTop !== top) productScroll.scrollTop = top;
+        }
+        const reduce = prefersReducedMotion();
+        const before = host.offsetHeight;
+        const revealed = [];
         ordered.forEach((review, index) => {
-          const card = makeReviewCard(review);
+          const card = host.children[index];
+          if (!card) return;
+          const show = index < reviewPreviewLimit;
+          if (current === ids && show && card.hidden) revealed.push(card);
+        });
+        if (revealed.length && !reduce) {
+          host.style.overflow = 'hidden';
+          host.style.height = before + 'px';
+        }
+        ordered.forEach((review, index) => {
+          const card = host.children[index];
+          if (!card) return;
           card.hidden = index >= reviewPreviewLimit;
-          host.appendChild(card);
         });
         updateReviewMore(ordered.length);
+        if (!revealed.length) return;
+        const top = productScroll.scrollTop;
+        revealed.forEach(card => {
+          card.classList.remove('is-review-enter');
+          if (!reduce) {
+            void card.offsetWidth;
+            card.classList.add('is-review-enter');
+          }
+        });
+        if (productScroll.scrollTop !== top) productScroll.scrollTop = top;
+        if (reduce) return;
+        const token = ++reviewExpandToken;
+        const after = host.scrollHeight;
+        if (after <= before + 1) {
+          host.style.height = '';
+          host.style.overflow = '';
+          host.style.transition = '';
+          return;
+        }
+        requestAnimationFrame(() => {
+          if (token !== reviewExpandToken) return;
+          host.style.transition = 'height .45s cubic-bezier(.22,1,.36,1)';
+          host.style.height = after + 'px';
+        });
+        const settle = event => {
+          if (event.target !== host || event.propertyName !== 'height') return;
+          host.removeEventListener('transitionend', settle);
+          if (token !== reviewExpandToken) return;
+          host.style.height = '';
+          host.style.overflow = '';
+          host.style.transition = '';
+        };
+        host.addEventListener('transitionend', settle);
       }
 
       function showMoreReviews() {
@@ -9127,8 +9332,11 @@
         const note = document.getElementById('product-review-filter-note');
         const title = document.getElementById('product-review-panel-title');
         const data = operationsReviews.data;
-        clearElement(list);
-        if (!data) return;
+        if (!list) return;
+        if (!data) {
+          clearElement(list);
+          return;
+        }
         if (title) {
           title.textContent = 'All reviews \u00b7 ' +
             formatReviewAverage(data.averageRating) + ' \u00b7 ' + data.count;
@@ -9141,10 +9349,18 @@
           const empty = document.createElement('p');
           empty.className = 'product-reference-note';
           empty.textContent = 'No reviews match this filter.';
-          if (list) list.appendChild(empty);
+          list.replaceChildren(empty);
           return;
         }
-        selected.forEach(review => list.appendChild(makeReviewCard(review)));
+        const cards = selected.map(review => {
+          let card = reviewListPool.get(review.reviewId);
+          if (!card) {
+            card = makeReviewCard(review);
+            reviewListPool.set(review.reviewId, card);
+          }
+          return card;
+        });
+        list.replaceChildren(...cards);
       }
 
       function renderOperationsReviews() {
@@ -9284,20 +9500,26 @@
         const viewer = document.getElementById('review-viewer');
         const track = document.getElementById('review-viewer-track');
         if (!viewer || !track) return;
-        clearElement(track);
-        slides.forEach(photo => {
-          const slide = document.createElement('div');
-          slide.className = 'review-viewer-slide';
-          slide.dataset.reviewId = photo.reviewId;
-          slide.dataset.sequence = String(photo.sequence);
-          const image = document.createElement('img');
-          image.alt = 'Review photo ' + photo.sequence;
-          markReviewImage(image, slide);
-          image.loading = 'eager';
-          image.src = photo.url;
-          slide.appendChild(image);
-          track.appendChild(slide);
+        const frames = slides.map(photo => {
+          const key = photo.reviewId + ':' + photo.sequence;
+          let slide = reviewViewerPool.get(key);
+          if (!slide) {
+            slide = document.createElement('div');
+            slide.className = 'review-viewer-slide media-dark';
+            slide.dataset.reviewId = photo.reviewId;
+            slide.dataset.sequence = String(photo.sequence);
+            const image = document.createElement('img');
+            image.alt = 'Review photo ' + photo.sequence;
+            markReviewImage(image, slide);
+            image.loading = 'eager';
+            image.src = photo.url;
+            watchMedia(slide, image);
+            slide.appendChild(image);
+            reviewViewerPool.set(key, slide);
+          }
+          return slide;
         });
+        track.replaceChildren(...frames);
         reviewViewerReturn = opener || null;
         viewer.hidden = false;
         const index = Math.max(0, slides.findIndex(photo => photo.reviewId === reviewId && photo.sequence === sequence));
@@ -9737,6 +9959,8 @@
         }
         const sizeGrid = document.getElementById('commerce-size-grid');
         if (sizeGrid) sizeGrid.classList.toggle('is-set-locked', !previewSet);
+        const sizeHint = document.getElementById('commerce-size-hint');
+        if (sizeHint) sizeHint.hidden = Boolean(previewSet);
         document.querySelectorAll('[data-preview-set]').forEach(button => {
           button.setAttribute('aria-pressed', String(button.dataset.previewSet === previewSet));
         });
@@ -9755,7 +9979,9 @@
             'aria-pressed',
             String(enabled && size === demoSelectedSize)
           );
-          if (!offered && previewSet) {
+          if (!previewSet) {
+            button.setAttribute('aria-label', `${size}, choose length first`);
+          } else if (!offered) {
             button.setAttribute('aria-label', `${size}, not in this set preview`);
           } else if (info && info.purchasable && cap < 1 && commerceIntent !== 'buy') {
             button.setAttribute(
@@ -9821,7 +10047,7 @@
             COMMERCE_SIZES.every(size => selectorCap(size) < 1)) {
           note.textContent = 'Currently unavailable in staging';
         } else if (!previewSet) {
-          note.textContent = 'Choose a length set to see sizes. The set is a visual preview, not a stock option.';
+          note.textContent = 'Choose length first. The set is a visual preview, not a stock option.';
         } else {
           note.textContent =
             'Select a size to continue. Sold-out sizes stay visible and cannot be selected.';
@@ -12863,6 +13089,23 @@
   const long = document.getElementById('modern-set-long');
   if (!guides || !controls || !standard || !long) return;
   let selected=0;
+  let lastFitKey='';
+  let fitIntroKey='';
+  let fitOverride=false;
+  function revealFitRow(row) {
+    const view = scroll.getBoundingClientRect();
+    const box = row.getBoundingClientRect();
+    if (box.top >= view.top + 72 && box.bottom <= view.bottom - 8) return;
+    const top = scroll.scrollTop + box.top - view.top - Math.min(120, Math.max(64, (view.height - box.height) / 3));
+    scroll.dataset.scrollingToFit = '1';
+    scroll.scrollTo({
+      top: Math.max(0, top),
+      behavior: prefersLessMotion.matches ? 'auto' : 'smooth'
+    });
+    window.setTimeout(() => {
+      if (scroll.dataset.scrollingToFit === '1') delete scroll.dataset.scrollingToFit;
+    }, prefersLessMotion.matches ? 40 : 900);
+  }
   function applySizeTabs() {
     const sections = Array.from(guides.querySelectorAll('.product-size-guide'));
     controls.hidden = sections.length < 2;
@@ -12883,12 +13126,25 @@
     selected=i; applySizeTabs();
   }));
   function applyFitHighlight() {
-    guides.querySelectorAll('tbody tr.is-fit').forEach(row => {
-      row.classList.remove('is-fit', 'is-size-selected');
-    });
     const setIndex = sheet.dataset.fitSet;
     const size = sheet.dataset.fitSize;
-    if (setIndex !== '0' && setIndex !== '1' || !size) return;
+    const key = (setIndex === '0' || setIndex === '1') && size ? setIndex + '|' + size : '';
+    if (!key) {
+      lastFitKey = '';
+      fitIntroKey = '';
+      fitOverride = false;
+      guides.querySelectorAll('tbody tr.is-fit').forEach(row => {
+        row.classList.remove('is-fit', 'is-fit-pulse', 'is-size-selected');
+      });
+      return;
+    }
+    if (fitOverride && key === lastFitKey) return;
+    const changed = key !== lastFitKey;
+    if (changed) {
+      fitOverride = false;
+      fitIntroKey = '';
+    }
+    lastFitKey = key;
     selected = Number(setIndex);
     applySizeTabs();
     const section = guides.querySelectorAll('.product-size-guide')[selected];
@@ -12897,10 +13153,18 @@
       return item.cells[0] && item.cells[0].textContent.trim() === size;
     });
     if (!row) return;
-    guides.querySelectorAll('tbody tr.is-size-selected').forEach(item => {
-      item.classList.remove('is-size-selected');
+    guides.querySelectorAll('tbody tr.is-size-selected, tbody tr.is-fit').forEach(item => {
+      if (item !== row) item.classList.remove('is-size-selected', 'is-fit', 'is-fit-pulse');
     });
     row.classList.add('is-size-selected', 'is-fit');
+    if (fitIntroKey === key) return;
+    fitIntroKey = key;
+    row.classList.remove('is-fit-pulse');
+    if (!prefersLessMotion.matches) {
+      void row.offsetWidth;
+      row.classList.add('is-fit-pulse');
+    }
+    requestAnimationFrame(() => revealFitRow(row));
   }
   new MutationObserver(() => {
     applySizeTabs();
@@ -12911,9 +13175,10 @@
   guides.addEventListener('click', event => {
     const row = event.target.closest('tbody tr');
     if (!row || !guides.contains(row)) return;
-    if (row.classList.contains('is-size-selected')) return;
+    if (row.classList.contains('is-size-selected') && !row.classList.contains('is-fit')) return;
+    fitOverride = true;
     guides.querySelectorAll('tbody tr.is-size-selected, tbody tr.is-fit').forEach(item => {
-      item.classList.remove('is-size-selected', 'is-fit');
+      item.classList.remove('is-size-selected', 'is-fit', 'is-fit-pulse');
     });
     row.classList.add('is-size-selected');
   });
