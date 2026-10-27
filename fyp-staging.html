@@ -3999,80 +3999,22 @@
 }
 #product-sheet .product-gallery-track {
   height:clamp(275px,39svh,345px); min-height:0;
-  background:linear-gradient(145deg,#f9f9f8,#f1f1ef);
+  background:#f6f6f5;
 }
-/* Dynamic ambient gallery. One photograph, sharp and contained,
-   over its own blurred colour field. No fade or shimmer. */
-
 #product-sheet .product-gallery-slide {
-  position: relative;
-  isolation: isolate;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-  height: 100%;
-  min-width: 100%;
-  padding: 0;
-  background: #f7f6f4;
+  height:100%;
+  background:#f6f6f5;
 }
-
-#product-sheet .product-gallery-slide .gallery-ambient {
-  position: absolute;
-  inset: -18%;
-  z-index: 0;
-  background-position: center;
-  background-repeat: no-repeat;
-  background-size: cover;
-  filter: blur(32px) saturate(.75);
-  transform: scale(1.08);
-  opacity: 0;
-  pointer-events: none;
+#product-sheet .product-gallery-slide > img {
+  display:block;
+  width:100%;
+  height:100%;
+  object-fit:contain;
+  object-position:center;
+  opacity:0;
 }
-
-#product-sheet .product-gallery-slide .gallery-veil {
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-  background: rgba(250, 249, 247, .30);
-  pointer-events: none;
-}
-
-#product-sheet .product-gallery-slide > img.gallery-photo {
-  position: relative;
-  z-index: 2;
-  display: block;
-  flex: 0 1 auto;
-  width: auto;
-  max-width: 88%;
-  height: 100%;
-  max-height: 100%;
-  margin: 0 auto;
-  object-fit: contain;
-  object-position: center;
-  opacity: 0;
-  -webkit-mask-image: linear-gradient(to right, transparent, #000 8px, #000 calc(100% - 8px), transparent);
-  mask-image: linear-gradient(to right, transparent, #000 8px, #000 calc(100% - 8px), transparent);
-  -webkit-mask-repeat: no-repeat;
-  mask-repeat: no-repeat;
-  -webkit-mask-size: 100% 100%;
-  mask-size: 100% 100%;
-}
-
-#product-sheet .product-gallery-slide.is-ready .gallery-ambient {
-  opacity: .70;
-}
-
-#product-sheet .product-gallery-slide.is-ready > img.gallery-photo {
-  opacity: 1;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  #product-sheet .product-gallery-slide .gallery-ambient,
-  #product-sheet .product-gallery-slide > img.gallery-photo {
-    transition: none;
-    animation: none;
-  }
+#product-sheet .product-gallery-slide.is-ready > img {
+  opacity:1;
 }
 
 #product-sheet .product-gallery-count {
@@ -4777,6 +4719,7 @@
   </div>
 
   <div class="product-overview" id="product-overview">
+    <!-- TODO: Original and promotional prices should later come from the new Product Manager, not the legacy Retail catalog. -->
     <div class="product-price" id="product-price">
       <del id="product-price-compare" hidden></del>
       <strong id="product-price-value" class="is-status">Checking latest price…</strong>
@@ -4796,6 +4739,7 @@
     <div class="modern-highlights" aria-label="Product highlights">
       <span>Premium Nidha Dubai</span><span>Nursing zip</span><span>Free shawl</span>
     </div>
+    <!-- TODO: This size summary should later be derived from the product's available variants in the new Product Manager. -->
     <button class="modern-size-link" id="modern-size-select" type="button"
             aria-label="Select size and shopping options">
       <span class="modern-size-left"><span class="modern-row-title">Select size</span><span class="modern-row-detail">XS – XXXL</span></span>
@@ -4851,7 +4795,9 @@
 
   <section class="product-section" id="product-description">
     <h3>Product details</h3>
+    <!-- TODO: Product details should later come from the new Product Manager. -->
     <p id="product-description-copy">Dahlia Series D06, made with premium Nidha Dubai fabric.</p>
+    <!-- TODO: Fabric and features should later come from the new Product Manager. -->
     <details class="modern-detail-fold">
       <summary>Fabric &amp; features <span aria-hidden="true">+</span></summary>
       <div class="modern-detail-body">
@@ -5790,7 +5736,6 @@
       let productExpandTimer = 0;
       let productScrollHold = null;
       let productScrollHoldToken = 0;
-      let productScrollFollowUntil = 0;
       let reviewPreviewLimit = 2;
 
       const prefersReducedMotion = () =>
@@ -7011,10 +6956,6 @@
         return 1 - Math.pow(1 - t, 3);
       }
 
-      function easeInOutCubic(t) {
-        return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
-      }
-
       function cancelProductMotion() {
         if (productFrame !== null) {
           cancelAnimationFrame(productFrame);
@@ -7044,6 +6985,8 @@
       let d06BaseWidth = 0;
       let d06BaseHeight = 0;
       let d06DebugPaintedAt = 0;
+      let d06PaintedVisible = -1;
+      let d06PaintedWidth = 0;
       const videoDebug = new URLSearchParams(window.location.search).get('videoDebug') === '1';
 
       function ensureD06BaseGeometry() {
@@ -7106,6 +7049,12 @@
         );
         const scale = Math.max(0.001, visible / fullHeight);
         const offsetX = (width * (1 - scale)) / 2;
+        const paintedVisible = Math.round(visible);
+        if (!videoDebug &&
+            paintedVisible === d06PaintedVisible &&
+            width === d06PaintedWidth) return;
+        d06PaintedVisible = paintedVisible;
+        d06PaintedWidth = width;
 
         video.style.transform =
           `translate3d(${offsetX.toFixed(2)}px, 0px, 0px) scale(${scale.toFixed(6)})`;
@@ -7307,20 +7256,20 @@
           }
 
           const progress = Math.min(1, (now - started) / duration);
+          const done = progress >= 1;
           applyProductGeometry(
-            start + (target - start) * ease(progress),
+            done ? target : Math.round(start + (target - start) * ease(progress)),
             geometry
           );
           holdProductScrollPosition();
 
-          if (progress < 1) {
+          if (!done) {
             productSettleFrame = requestAnimationFrame(step);
-          } else {
-            productSettleFrame = null;
-            applyProductGeometry(target, geometry);
-            holdProductScrollPosition();
-            finishLockedMotion();
+            return;
           }
+
+          productSettleFrame = null;
+          finishLockedMotion();
         }
 
         productSettleFrame = requestAnimationFrame(step);
@@ -7361,18 +7310,6 @@
         image.src = src;
         if (className === 'product-gallery-slide') {
           image.decoding = 'async';
-          const ambient = document.createElement('span');
-          ambient.className = 'gallery-ambient';
-          ambient.setAttribute('aria-hidden', 'true');
-          ambient.style.backgroundImage =
-            'url(' + JSON.stringify(src) + ')';
-
-          const veil = document.createElement('span');
-          veil.className = 'gallery-veil';
-          veil.setAttribute('aria-hidden', 'true');
-
-          image.classList.add('gallery-photo');
-          slide.append(ambient, veil);
         } else {
           slide.classList.add('media-dark');
         }
@@ -7405,7 +7342,7 @@
       function warmGallerySlide(index) {
         const slide = productGalleryTrack.children[index];
         if (!slide || slide.dataset.galleryWarm === '1') return;
-        const image = slide.querySelector('img.gallery-photo');
+        const image = slide.querySelector('img');
         if (!image) return;
         slide.dataset.galleryWarm = '1';
         if (image.getAttribute('loading') === 'lazy') image.loading = 'eager';
@@ -7821,9 +7758,8 @@
           productScrollExpandReady = false;
           releaseProductScrollHold();
           productScroll.scrollTop = 0;
+          syncMiniVisibility();
         }
-
-        syncMiniVisibility();
 
         const geometry = getProductGeometry();
         animateProductHeight(next ? geometry.maximum : geometry.partial, next ? motion : null);
@@ -7850,7 +7786,7 @@
         }
 
         productSheet.classList.toggle('is-expanded', expanded);
-        syncMiniVisibility();
+        if (!expanded) syncMiniVisibility();
         animateProductHeight(
           expanded ? geometry.maximum : geometry.partial
         );
@@ -7950,7 +7886,6 @@
       function releaseProductScrollHold() {
         productScrollHoldToken += 1;
         productScrollHold = null;
-        productScrollFollowUntil = 0;
         productScroll.style.scrollBehavior = '';
       }
 
@@ -7965,25 +7900,14 @@
           productScrollHold.top = productScroll.scrollTop;
           return;
         }
-        if (performance.now() <= productScrollFollowUntil) {
-          productScrollHold.top = productScroll.scrollTop;
-          return;
+        if (productScroll.scrollTop !== productScrollHold.top) {
+          productScroll.scrollTop = productScrollHold.top;
         }
-        const top = productScrollHold.top;
-        if (Math.abs(productScroll.scrollTop - top) > 0.5) productScroll.scrollTop = top;
       }
 
       function endProductScrollHold() {
-        if (!productScrollHold) return;
-        const token = productScrollHoldToken;
-        const started = performance.now();
-        const tail = now => {
-          if (token !== productScrollHoldToken || !productScrollHold) return;
-          holdProductScrollPosition();
-          if (now - started < 160) requestAnimationFrame(tail);
-          else if (token === productScrollHoldToken) releaseProductScrollHold();
-        };
-        requestAnimationFrame(tail);
+        holdProductScrollPosition();
+        releaseProductScrollHold();
       }
 
       function clearProductExpandTimer() {
@@ -8001,7 +7925,6 @@
         }
         if (Math.abs(deltaY) < 1) return;
         productScrollUserUntil = performance.now() + 500;
-        if (productScrollHold) productScrollFollowUntil = performance.now() + 80;
       }
 
       function commitProductExpand() {
@@ -8023,8 +7946,8 @@
         productScrollExpandReady = false;
         productScrollUserUntil = 0;
         setProductExpanded(true, {
-          duration: 480,
-          ease: easeInOutCubic,
+          duration: 340,
+          ease: easeOutCubic,
           lockScroll: true
         });
       }
@@ -8034,7 +7957,7 @@
         if (productScroll.scrollTop < 30) return;
         clearProductExpandTimer();
         if (productScrollTouch || productDrag) return;
-        productExpandTimer = window.setTimeout(commitProductExpand, 64);
+        commitProductExpand();
       }
 
       function maybeExpandProductFromScroll() {
@@ -8056,7 +7979,6 @@
         }
         if (!productScrollExpandReady && performance.now() > productScrollUserUntil) return;
         productScrollExpandReady = true;
-        armProductScrollHold();
         queueProductExpand();
       }
 
