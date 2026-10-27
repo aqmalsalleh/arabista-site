@@ -1225,41 +1225,6 @@
       background:#f7f5f2;
     }
 
-    .gallery-ambient {
-      position:absolute;
-      inset:-10%;
-      z-index:0;
-      width:120%;
-      height:120%;
-      max-width:none;
-      object-fit:cover;
-      filter:blur(18px);
-      transform:scale(1.08);
-      opacity:.28;
-      pointer-events:none;
-    }
-
-    .gallery-veil {
-      position:absolute;
-      inset:0;
-      z-index:1;
-      background:rgba(255,250,245,.64);
-      pointer-events:none;
-    }
-
-    .product-gallery-slide img,
-    .gallery-photo {
-      position:relative;
-      z-index:2;
-      display:block;
-      width:75%;
-      max-width:100%;
-      height:auto;
-      object-fit:contain;
-      user-select:none;
-      -webkit-user-drag:none;
-    }
-
     .product-gallery-count {
       position:absolute;
       z-index:3;
@@ -2256,6 +2221,39 @@
       box-shadow:none;
     }
 
+    .commerce-fit-strip {
+      display:flex;
+      align-items:center;
+      gap:8px;
+      margin:0 0 10px;
+      padding:8px 10px;
+      border-radius:10px;
+      background:#f7f4ec;
+      color:#6f5a32;
+      font-size:12px;
+      line-height:1.35;
+      letter-spacing:.01em;
+      animation:fit-strip-in .35s ease;
+    }
+
+    .commerce-fit-mark {
+      width:6px;
+      height:6px;
+      flex:0 0 auto;
+      border-radius:50%;
+      background:#c6ae84;
+      box-shadow:0 0 0 3px rgba(198,174,132,.28);
+    }
+
+    @keyframes fit-strip-in {
+      from { opacity:0; transform:translateY(4px); }
+      to { opacity:1; transform:none; }
+    }
+
+    @media (prefers-reduced-motion:reduce) {
+      .commerce-fit-strip { animation:none; }
+    }
+
     .commerce-set-preview {
       margin-top:18px;
     }
@@ -3020,6 +3018,79 @@
       overflow-wrap:anywhere;
     }
 
+    .checkout-email {
+      padding:2px 15px 16px;
+      background:#fff;
+    }
+
+    .checkout-email-label {
+      display:flex;
+      align-items:baseline;
+      justify-content:space-between;
+      margin:0 0 8px;
+      color:#202124;
+      font-size:13px;
+      font-weight:600;
+    }
+
+    .checkout-email-required {
+      color:#a88a54;
+      font-size:11px;
+      font-weight:600;
+      letter-spacing:.02em;
+    }
+
+    .checkout-email-field {
+      display:flex;
+      align-items:center;
+      gap:10px;
+      min-height:52px;
+      padding:0 14px;
+      border:1px solid #e4ddd2;
+      border-radius:12px;
+      background:#fff;
+      transition:border-color .25s ease, box-shadow .25s ease;
+    }
+
+    .checkout-email-field:focus-within {
+      border-color:#c6ae84;
+      box-shadow:0 0 0 3px rgba(198,174,132,.18);
+    }
+
+    .checkout-email-icon {
+      flex:0 0 auto;
+      width:16px;
+      height:16px;
+      color:#a88a54;
+    }
+
+    .checkout-email-field input {
+      flex:1;
+      min-width:0;
+      border:0;
+      padding:14px 0;
+      background:transparent;
+      color:#202124;
+      font-size:16px;
+      line-height:1.3;
+      outline:none;
+    }
+
+    .checkout-email-help,
+    .checkout-email-error {
+      margin:8px 0 0;
+      font-size:12px;
+      line-height:1.4;
+    }
+
+    .checkout-email-help {
+      color:#8a8680;
+    }
+
+    .checkout-email-error {
+      color:#8a4b3c;
+    }
+
     #checkout-address-summary {
       display:flex;
       flex-direction:column;
@@ -3769,18 +3840,122 @@
   height:clamp(275px,39svh,345px); min-height:0;
   background:linear-gradient(145deg,#f9f9f8,#f1f1ef);
 }
+/* ================================================
+   ARABISTA — PREMIUM GALLERY AMBIENT FIX
+   Sharp centered image + subtle blurred background
+   ================================================ */
+
 #product-sheet .product-gallery-slide {
-  height:100%; min-height:0; align-items:center;
-  background:transparent;
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  height: 100%;
+  min-width: 100%;
+  padding: 0;
+  background: #f7f6f4;
 }
-#product-sheet .product-gallery-slide img.gallery-photo {
-  height:100%; width:88%; max-height:100%; object-fit:contain;
-  transition:transform .6s cubic-bezier(.22,1,.36,1), opacity .4s ease;
+
+/* Blurred ambient background */
+
+#product-sheet .product-gallery-slide .gallery-ambient {
+  position: absolute;
+  inset: -8%;
+  width: auto;
+  height: auto;
+  z-index: 0;
+
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+
+  filter: blur(24px) saturate(.75);
+  transform: scale(1.04);
+
+  opacity: 0;
+  pointer-events: none;
+
+  transition: opacity .45s ease;
 }
-#product-sheet .gallery-ambient { transition:opacity .4s ease; }
-#product-sheet .product-gallery-slide.media-pending:not(.is-ready) img { opacity:0; }
-#product-sheet .product-gallery-slide.media-pending.is-ready .gallery-photo { opacity:1; }
-#product-sheet .product-gallery-slide.media-pending.is-ready .gallery-ambient { opacity:.3; }
+
+/* Warm white veil */
+
+#product-sheet .product-gallery-slide .gallery-veil {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+
+  background: rgba(250, 249, 247, .76);
+  pointer-events: none;
+}
+
+/* Original sharp product photograph */
+
+#product-sheet .product-gallery-slide > img.gallery-photo {
+  position: relative;
+  z-index: 2;
+
+  display: block;
+  flex: 0 1 auto;
+
+  width: 88%;
+  max-width: 88%;
+  height: 100%;
+  max-height: 100%;
+
+  margin: 0 auto;
+
+  object-fit: contain;
+  object-position: center;
+
+  transform: none;
+  filter: none;
+
+  opacity: 0;
+  transition: opacity .4s ease;
+}
+
+/* Reveal original photograph after loading */
+
+#product-sheet
+.product-gallery-slide.media-pending.is-ready
+.gallery-photo {
+  opacity: 1;
+}
+
+/* Reveal subtle background after loading */
+
+#product-sheet
+.product-gallery-slide.media-pending.is-ready
+.gallery-ambient {
+  opacity: .22;
+}
+
+/* Keep loading skeleton above image layers */
+
+#product-sheet
+.product-gallery-slide.media-pending:not(.is-ready):not(.is-failed)::before,
+
+#product-sheet
+.product-gallery-slide.media-pending:not(.is-ready):not(.is-failed)::after {
+  z-index: 4;
+}
+
+/* Reduced motion */
+
+@media (prefers-reduced-motion: reduce) {
+  #product-sheet .gallery-ambient {
+    display: none;
+  }
+
+  #product-sheet
+  .product-gallery-slide > img.gallery-photo {
+    transition: none;
+  }
+}
+
 #product-sheet .product-gallery-count {
   right:14px; bottom:14px; padding:5px 10px;
   background:rgba(255,255,255,.88); color:#444;
@@ -3898,6 +4073,19 @@
 }
 #product-sheet .modern-length-tab.is-active {
   color:#303030; background:white; box-shadow:0 1px 6px rgba(0,0,0,.07);
+}
+#product-sheet .modern-length-tab.is-fit {
+  color:#6f5a32;
+  background:#f7f4ec;
+  box-shadow:inset 0 0 0 1.5px #c6ae84;
+}
+#product-sheet .modern-length-tab.is-fit.is-fit-pulse {
+  animation:fit-tab-glow .9s ease;
+}
+@keyframes fit-tab-glow {
+  0% { box-shadow:inset 0 0 0 1.5px #c6ae84, 0 0 0 0 rgba(198,174,132,.45); }
+  55% { box-shadow:inset 0 0 0 1.5px #c6ae84, 0 0 0 7px rgba(198,174,132,0); }
+  100% { box-shadow:inset 0 0 0 1.5px #c6ae84; }
 }
 #product-sheet .product-size-guide h4 { display:none; }
 #product-sheet .product-size-guide > p { display:none; }
@@ -4066,9 +4254,8 @@
   #product-sheet .product-gallery,
   #product-sheet .product-review-card,
   #product-sheet .product-size-table tbody tr.is-fit-pulse td { animation:none !important; }
-  #product-sheet .media-pending.is-ready > img,
-  #product-sheet .product-gallery-slide img { transition:none !important; }
-  #product-sheet .gallery-ambient { display:none !important; }
+  #product-sheet .media-pending.is-ready > img { transition:none !important; }
+  #product-sheet .modern-length-tab.is-fit-pulse,
   #product-sheet .product-buy-button::before { animation:none !important; }
   #product-sheet .product-scroll { scroll-behavior:auto; }
 }
@@ -4499,10 +4686,10 @@
       </div>
       <div class="fit-fields">
         <label>Height
-          <input id="product-fit-height" data-fit="height" type="text" inputmode="decimal" placeholder="cm" aria-label="Height in centimetres">
+          <input id="product-fit-height" data-fit="height" type="text" inputmode="decimal" enterkeyhint="next" placeholder="cm" aria-label="Height in centimetres">
         </label>
         <label>Weight
-          <input id="product-fit-weight" data-fit="weight" type="text" inputmode="decimal" placeholder="kg" aria-label="Weight in kilograms">
+          <input id="product-fit-weight" data-fit="weight" type="text" inputmode="decimal" enterkeyhint="done" placeholder="kg" aria-label="Weight in kilograms">
         </label>
       </div>
       <p id="product-fit-result" class="fit-result" aria-live="polite"></p>
@@ -4786,16 +4973,20 @@
               </div>
               <div class="fit-fields">
                 <label>Height
-                  <input id="commerce-fit-height" data-fit="height" type="text" inputmode="decimal" placeholder="cm" aria-label="Height in centimetres">
+                  <input id="commerce-fit-height" data-fit="height" type="text" inputmode="decimal" enterkeyhint="next" placeholder="cm" aria-label="Height in centimetres">
                 </label>
                 <label>Weight
-                  <input id="commerce-fit-weight" data-fit="weight" type="text" inputmode="decimal" placeholder="kg" aria-label="Weight in kilograms">
+                  <input id="commerce-fit-weight" data-fit="weight" type="text" inputmode="decimal" enterkeyhint="done" placeholder="kg" aria-label="Weight in kilograms">
                 </label>
               </div>
               <p id="commerce-fit-result" class="fit-result" aria-live="polite"></p>
             </form>
 
             <div class="commerce-set-preview">
+              <p id="commerce-fit-strip" class="commerce-fit-strip" hidden>
+                <span class="commerce-fit-mark" aria-hidden="true"></span>
+                <span id="commerce-fit-strip-text"></span>
+              </p>
               <div class="commerce-section-title">Length</div>
               <div class="commerce-set-toggle" role="group" aria-label="Length set preview">
                 <button type="button" id="commerce-set-standard" data-preview-set="S1" aria-pressed="false">Set 1 · Standard</button>
@@ -4955,7 +5146,7 @@
                   type="button">
             Continue shopping
           </button>
-          <p class="commerce-basket-note">Staging checkout. Payment is completed on SenangPay.</p>
+          <p class="commerce-basket-note">Staging checkout. Payment is completed on DOKU. Opening the payment page does not confirm payment.</p>
         </footer>
         <p id="basket-checkout-status" class="sr-only" aria-live="polite"></p>
 
@@ -5045,8 +5236,8 @@
             <p class="checkout-disclaimer">
               This is an Arabista staging transaction. The amount
               comes from the staging catalog and delivery estimate.
-              SenangPay hosts the payment. The server confirms a
-              successful payment.
+              DOKU hosts the payment. Opening that page does not
+              confirm payment. The server confirms a successful payment.
             </p>
 
             <button id="checkout-address-entry"
@@ -5062,6 +5253,31 @@
               <span aria-hidden="true">›</span>
 
             </button>
+
+            <div class="checkout-email">
+              <label class="checkout-email-label" for="checkout-email">
+                Email address
+                <span class="checkout-email-required">Required</span>
+              </label>
+              <div class="checkout-email-field">
+                <svg class="checkout-email-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <rect x="3" y="5" width="18" height="14" rx="2"></rect>
+                  <path d="M3 7l9 7 9-7"></path>
+                </svg>
+                <input id="checkout-email"
+                       name="email"
+                       type="email"
+                       inputmode="email"
+                       autocomplete="email"
+                       enterkeyhint="done"
+                       required
+                       aria-required="true"
+                       aria-invalid="false"
+                       aria-describedby="checkout-email-help">
+              </div>
+              <p id="checkout-email-help" class="checkout-email-help">For your order confirmation and payment updates.</p>
+              <p id="checkout-email-error" class="checkout-email-error" role="alert" hidden></p>
+            </div>
 
             <div class="checkout-divider"></div>
 
@@ -5140,11 +5356,11 @@
             <div class="checkout-divider"></div>
 
             <section class="checkout-section" id="checkout-payment">
-              <h3>Secure Payment via SenangPay</h3>
+              <h3>Secure Payment via DOKU</h3>
 
               <p class="checkout-muted">
                 Available payment options will be shown securely
-                on SenangPay.
+                on DOKU.
               </p>
 
               <p class="checkout-muted">
@@ -6941,17 +7157,16 @@
         if (lazy) image.loading = 'lazy';
         image.src = src;
         if (className === 'product-gallery-slide') {
-          const ambient = document.createElement('img');
+          const ambient = document.createElement('span');
           ambient.className = 'gallery-ambient';
-          ambient.alt = '';
           ambient.setAttribute('aria-hidden', 'true');
-          ambient.draggable = false;
-          ambient.decoding = 'async';
-          ambient.loading = lazy ? 'lazy' : 'eager';
-          ambient.src = src;
+          ambient.style.backgroundImage =
+            'url(' + JSON.stringify(src) + ')';
+
           const veil = document.createElement('span');
           veil.className = 'gallery-veil';
           veil.setAttribute('aria-hidden', 'true');
+
           image.classList.add('gallery-photo');
           slide.append(ambient, veil);
         } else {
@@ -10019,6 +10234,17 @@
         const commerceResult = document.getElementById('commerce-fit-result');
         if (sheetResult) sheetResult.textContent = sheetText;
         if (commerceResult) commerceResult.textContent = commerceText;
+        const strip = document.getElementById('commerce-fit-strip');
+        const stripText = document.getElementById('commerce-fit-strip-text');
+        if (strip && stripText) {
+          const show = Boolean(sizeFit && sizeFit.ok);
+          strip.hidden = !show;
+          stripText.textContent = show
+            ? 'Recommended · ' +
+              (sizeFit.set === 'S1' ? 'Set 1 Standard' : 'Set 2 Long') +
+              ' · Size ' + sizeFit.size
+            : '';
+        }
       }
 
       function commercePreviewCanSelect(result) {
@@ -10049,6 +10275,20 @@
             const height = form.querySelector('[data-fit="height"]');
             const weight = form.querySelector('[data-fit="weight"]');
             publishSizeFit(height ? height.value : '', weight ? weight.value : '');
+          });
+          form.addEventListener('keydown', event => {
+            if (event.key !== 'Enter') return;
+            const height = form.querySelector('[data-fit="height"]');
+            const weight = form.querySelector('[data-fit="weight"]');
+            if (event.target === height) {
+              event.preventDefault();
+              if (weight) weight.focus({ preventScroll:true });
+              return;
+            }
+            if (event.target !== weight) return;
+            event.preventDefault();
+            publishSizeFit(height ? height.value : '', weight ? weight.value : '');
+            if (weight) weight.blur();
           });
         });
       }
@@ -11106,6 +11346,7 @@
         result:null
       };
       let stagingCheckoutBusy = false;
+      let checkoutEmailTouched = false;
 
       const stagingShipping = {
         status:'idle',
@@ -11542,6 +11783,19 @@
         return /^STGORD-[A-Z0-9]+(?:-[A-Z0-9]+)*$/.test(String(value || ''));
       }
 
+      // Malaysia Checkout v3 returns payment.checkout_url. That page can
+      // use a different host from the API base and does not need order_id
+      // or amount query parameters. The cited DOKU Malaysia reference does
+      // not publish the sandbox payment hostname, and the Indonesia Jokul
+      // sandbox host belongs to a different API. The allowlist stays empty
+      // until that hostname is verified.
+      const DOKU_SANDBOX_PAYMENT_HOSTS = [];
+      const DOKU_PRODUCTION_PAYMENT_HOSTS = [
+        'jokul.doku.com',
+        'app.senangpay.my',
+        'sandbox.senangpay.my'
+      ];
+
       function inspectStagingPaymentUrl(paymentUrl, orderId, amount) {
         let url;
         try {
@@ -11550,24 +11804,62 @@
           return { ok:false, reason:'invalid', host:'' };
         }
         const host = url.hostname.toLowerCase();
-        if (url.protocol !== 'https:') {
+        if (url.protocol !== 'https:' || url.username || url.password) {
           return { ok:false, reason:'invalid', host };
         }
-        if (host === 'app.senangpay.my') {
+        if (DOKU_PRODUCTION_PAYMENT_HOSTS.indexOf(host) !== -1) {
           return { ok:false, reason:'live', host };
         }
-        if (host !== 'sandbox.senangpay.my') {
+        if (DOKU_SANDBOX_PAYMENT_HOSTS.indexOf(host) === -1) {
           return { ok:false, reason:'unverified', host };
         }
-        if (!isStagingOrderId(orderId) ||
+        if (!isStagingOrderId(orderId)) {
+          return { ok:false, reason:'order', host };
+        }
+        const total = Number(amount);
+        if (!Number.isFinite(total) || total < 0) {
+          return { ok:false, reason:'amount', host };
+        }
+        if (url.searchParams.has('order_id') &&
             url.searchParams.get('order_id') !== orderId) {
           return { ok:false, reason:'order', host };
         }
-        const expected = Number(amount).toFixed(2);
-        if (url.searchParams.get('amount') !== expected) {
+        if (url.searchParams.has('amount') &&
+            url.searchParams.get('amount') !== total.toFixed(2)) {
           return { ok:false, reason:'amount', host };
         }
         return { ok:true, reason:'', host };
+      }
+
+      function checkoutEmailAddress() {
+        const input = document.getElementById('checkout-email');
+        return input ? input.value.trim() : '';
+      }
+
+      function checkoutEmailValid(value) {
+        return /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(String(value || ''));
+      }
+
+      function checkoutEmailProblem(value) {
+        if (!value) return 'Enter an email address.';
+        if (!checkoutEmailValid(value)) return 'Enter a valid email address.';
+        return '';
+      }
+
+      function renderCheckoutEmail() {
+        const input = document.getElementById('checkout-email');
+        const error = document.getElementById('checkout-email-error');
+        if (!input || !error) return;
+        const problem = checkoutEmailTouched
+          ? checkoutEmailProblem(checkoutEmailAddress())
+          : '';
+        error.hidden = !problem;
+        error.textContent = problem;
+        input.setAttribute('aria-invalid', problem ? 'true' : 'false');
+        input.setAttribute(
+          'aria-describedby',
+          problem ? 'checkout-email-help checkout-email-error' : 'checkout-email-help'
+        );
       }
 
       function buildFypStagingReservationPayload() {
@@ -11577,7 +11869,8 @@
           return null;
         }
         const phone = fypNormalizePhone(address.phone);
-        if (!phone) return null;
+        const email = checkoutEmailAddress();
+        if (!phone || !checkoutEmailValid(email)) return null;
 
         const items = [];
         let basePrice = 0;
@@ -11632,7 +11925,7 @@
           totalPaid:fypRoundMoney(productAmount + shippingFee),
           name:address.recipient,
           phone,
-          email:'',
+          email: checkoutEmailAddress(),
           address:[address.line1, address.line2, address.city]
             .filter(Boolean)
             .join(', '),
@@ -11715,8 +12008,10 @@
         );
         if (!inspection.ok) {
           const reason = inspection.reason === 'live'
-            ? 'The payment address is not the SenangPay sandbox, so it was not opened. The staging reservation can expire through the existing reservation process. No second reservation was created.'
-            : 'The payment address could not be verified as the SenangPay sandbox, so it was not opened. No second reservation was created.';
+            ? 'The payment address is not the DOKU sandbox, so it was not opened. The staging reservation can expire through the existing reservation process. No second reservation was created. Opening a payment page does not confirm payment.'
+            : inspection.reason === 'unverified'
+              ? 'The DOKU sandbox payment host could not be verified, so the payment address was not opened. No second reservation was created. Opening a payment page does not confirm payment.'
+              : 'The payment address could not be verified, so it was not opened. No second reservation was created. Opening a payment page does not confirm payment.';
           showReservationRecovery(orderId, reason);
           return;
         }
@@ -11741,6 +12036,14 @@
         if (stagingCheckoutBusy) return;
         if (stagingSubmission.status === 'reserved' ||
             stagingSubmission.status === 'redirecting') {
+          return;
+        }
+        const emailProblem = checkoutEmailProblem(checkoutEmailAddress());
+        if (emailProblem) {
+          checkoutEmailTouched = true;
+          renderCheckoutEmail();
+          const emailInput = document.getElementById('checkout-email');
+          if (emailInput) emailInput.focus({ preventScroll:true });
           return;
         }
         if (!checkoutCanComplete()) return;
@@ -11842,7 +12145,8 @@
           priced.complete &&
           !priced.blocked &&
           checkoutSelectedAddress() !== null &&
-          checkoutHasValidShippingQuote()
+          checkoutHasValidShippingQuote() &&
+          checkoutEmailValid(checkoutEmailAddress())
         );
       }
 
@@ -13137,6 +13441,19 @@
           redirectToSandboxPayment(result.paymentUrl);
         });
 
+      const checkoutEmailInput = document.getElementById('checkout-email');
+      if (checkoutEmailInput) {
+        checkoutEmailInput.addEventListener('input', () => {
+          if (checkoutEmailTouched) renderCheckoutEmail();
+          checkoutSyncPrimary();
+        });
+        checkoutEmailInput.addEventListener('blur', () => {
+          checkoutEmailTouched = true;
+          renderCheckoutEmail();
+          checkoutSyncPrimary();
+        });
+      }
+
       checkoutPrimary.addEventListener('click', () => {
         beginFypStagingCheckout();
       });
@@ -13283,7 +13600,10 @@
     });
   }
   [standard,long].forEach((btn,i) => btn.addEventListener('click', () => {
-    selected=i; applySizeTabs();
+    selected=i;
+    fitOverride = true;
+    [standard, long].forEach(el => el.classList.remove('is-fit', 'is-fit-pulse'));
+    applySizeTabs();
   }));
   function applyFitHighlight() {
     const setIndex = sheet.dataset.fitSet;
@@ -13296,6 +13616,7 @@
       guides.querySelectorAll('tbody tr.is-fit').forEach(row => {
         row.classList.remove('is-fit', 'is-fit-pulse', 'is-size-selected');
       });
+      [standard, long].forEach(el => el.classList.remove('is-fit', 'is-fit-pulse'));
       return;
     }
     if (fitOverride && key === lastFitKey) return;
@@ -13317,12 +13638,20 @@
       if (item !== row) item.classList.remove('is-size-selected', 'is-fit', 'is-fit-pulse');
     });
     row.classList.add('is-size-selected', 'is-fit');
+    const recommendedTab = selected === 0 ? standard : long;
+    [standard, long].forEach(el => {
+      el.classList.toggle('is-fit', el === recommendedTab);
+      if (el !== recommendedTab) el.classList.remove('is-fit-pulse');
+    });
     if (fitIntroKey === key) return;
     fitIntroKey = key;
     row.classList.remove('is-fit-pulse');
+    recommendedTab.classList.remove('is-fit-pulse');
     if (!prefersLessMotion.matches) {
       void row.offsetWidth;
       row.classList.add('is-fit-pulse');
+      void recommendedTab.offsetWidth;
+      recommendedTab.classList.add('is-fit-pulse');
     }
     requestAnimationFrame(() => revealFitRow(row));
   }
