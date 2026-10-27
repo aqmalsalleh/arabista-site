@@ -2126,6 +2126,167 @@
       background:#fff;
     }
 
+    .commerce-size-guide-bar {
+      display:none;
+      flex:0 0 38px;
+      align-items:center;
+      justify-content:flex-end;
+      padding:0 16px;
+      background:#fff;
+    }
+
+    .commerce-panel[data-view="variant"] .commerce-size-guide-bar {
+      display:flex;
+    }
+
+    .commerce-size-guide-open {
+      display:inline-flex;
+      align-items:center;
+      justify-content:flex-end;
+      gap:6px;
+      min-height:38px;
+      padding:6px 2px;
+      border:0;
+      background:transparent;
+      color:#a88a54;
+      font-size:12px;
+      font-weight:600;
+      letter-spacing:.01em;
+      transition:color .2s ease, opacity .2s ease;
+    }
+
+    .commerce-size-guide-open svg {
+      width:15px;
+      height:15px;
+    }
+
+    .commerce-size-guide-open:hover,
+    .commerce-size-guide-open:active {
+      color:#8b6e38;
+    }
+
+    .commerce-size-guide {
+      position:absolute;
+      inset:0;
+      z-index:8;
+      display:flex;
+      flex-direction:column;
+      background:#fff;
+      color:#202124;
+      transform:translateX(18px);
+      opacity:0;
+      transition:transform .32s ease, opacity .32s ease;
+    }
+
+    .commerce-size-guide.is-shown {
+      transform:none;
+      opacity:1;
+    }
+
+    .commerce-size-guide-head {
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      flex:0 0 52px;
+      padding:0 14px 0 16px;
+      border-bottom:1px solid #f0f0f0;
+    }
+
+    .commerce-size-guide-head h3 {
+      margin:0;
+      font-size:15px;
+      font-weight:700;
+    }
+
+    .commerce-size-guide-close {
+      width:32px;
+      height:32px;
+      border:0;
+      border-radius:50%;
+      background:#f2f2f2;
+      color:#333;
+      font-size:20px;
+    }
+
+    .commerce-size-guide-tabs {
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:4px;
+      margin:12px 16px;
+      padding:4px;
+      border-radius:12px;
+      background:#f5f5f5;
+    }
+
+    .commerce-size-guide-tabs button {
+      min-height:40px;
+      border:0;
+      border-radius:9px;
+      background:transparent;
+      color:#858585;
+      font-size:12px;
+      font-weight:600;
+      transition:background .2s ease, color .2s ease, box-shadow .2s ease;
+    }
+
+    .commerce-size-guide-tabs button.is-active {
+      background:#fff;
+      color:#303030;
+      box-shadow:0 1px 6px rgba(0,0,0,.07);
+    }
+
+    .commerce-size-guide-body {
+      flex:1 1 auto;
+      min-height:0;
+      overflow:auto;
+      overscroll-behavior:contain;
+      padding:0 16px 20px;
+    }
+
+    .commerce-guide-table-wrap {
+      overflow-x:auto;
+      border:1px solid #ececec;
+      border-radius:9px;
+    }
+
+    .commerce-guide-table {
+      width:100%;
+      min-width:310px;
+      border-collapse:collapse;
+      font-size:11px;
+    }
+
+    .commerce-guide-table th,
+    .commerce-guide-table td {
+      padding:10px 6px;
+      border-bottom:1px solid #eee;
+      text-align:left;
+      white-space:nowrap;
+    }
+
+    .commerce-guide-table th {
+      background:#f7f7f6;
+      color:#757575;
+      font-size:10px;
+      font-weight:700;
+    }
+
+    .commerce-guide-table td {
+      color:#444;
+    }
+
+    .commerce-guide-table tr.is-guide-fit td {
+      background:#f7f4ec;
+    }
+
+    @media (prefers-reduced-motion:reduce) {
+      .commerce-size-guide,
+      .commerce-size-guide-open,
+      .commerce-size-guide-tabs button {
+        transition:none;
+      }
+    }
+
     .commerce-view {
       min-width:0;
     }
@@ -4070,6 +4231,31 @@
   background:#f6efe2;
   box-shadow:inset 0 2px 0 #b39257, inset 0 -2px 0 #b39257;
 }
+#product-sheet .size-cell-label {
+  font-weight:700;
+}
+#product-sheet .size-recommended {
+  display:inline-block;
+  margin-left:4px;
+  padding:1px 5px;
+  border:1px solid #e4d3b0;
+  border-radius:999px;
+  background:#f7f4ec;
+  color:#8b6e38;
+  font-size:8px;
+  font-weight:700;
+  letter-spacing:.02em;
+  line-height:1.35;
+  vertical-align:1px;
+  white-space:nowrap;
+}
+#product-sheet .size-recommended.is-badge-in {
+  animation:size-badge-in .36s ease both;
+}
+@keyframes size-badge-in {
+  from { opacity:0; transform:scale(.92); }
+  to { opacity:1; transform:none; }
+}
 #product-sheet .product-size-table tbody tr.is-fit td:first-child {
   box-shadow:inset 2px 0 0 #b39257, inset 0 2px 0 #b39257, inset 0 -2px 0 #b39257;
 }
@@ -4208,7 +4394,8 @@
   #product-sheet .product-overview,
   #product-sheet .product-gallery,
   #product-sheet .product-review-card,
-  #product-sheet .product-size-table tbody tr.is-fit-pulse td { animation:none !important; }
+  #product-sheet .product-size-table tbody tr.is-fit-pulse td,
+  #product-sheet .size-recommended.is-badge-in { animation:none !important; }
   #product-sheet .media-pending.is-ready > img { transition:none !important; }
   #product-sheet .modern-length-tab.is-fit-pulse,
   #product-sheet .product-buy-button::before { animation:none !important; }
@@ -4605,6 +4792,7 @@
     </div>
     <p class="product-reference-note" id="product-review-note">Reviews load when this sheet opens.</p>
     <button id="product-review-retry" class="catalog-retry" type="button" hidden>Retry reviews</button>
+    <!-- TODO: These highlights should later come from each product's Product Manager attributes. -->
     <div class="modern-highlights" aria-label="Product highlights">
       <span>Premium Nidha Dubai</span><span>Nursing zip</span><span>Free shawl</span>
     </div>
@@ -4890,6 +5078,15 @@
                   aria-label="Close shopping preview">×</button>
         </header>
 
+        <div id="commerce-size-guide-bar" class="commerce-size-guide-bar">
+          <button id="commerce-size-guide-open" class="commerce-size-guide-open" type="button">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" aria-hidden="true">
+              <path d="M4 7h16M4 12h10M4 17h16M8 7v3M14 17v-3M18 12v3"/>
+            </svg>
+            Size guide
+          </button>
+        </div>
+
         <div class="commerce-body">
 
           <!-- PRODUCT VARIANTS -->
@@ -5134,6 +5331,23 @@
           </button>
 
         </footer>
+
+        <div id="commerce-size-guide"
+             class="commerce-size-guide"
+             role="dialog"
+             aria-modal="true"
+             aria-labelledby="commerce-size-guide-title"
+             hidden>
+          <header class="commerce-size-guide-head">
+            <h3 id="commerce-size-guide-title">Size guide</h3>
+            <button id="commerce-size-guide-close" class="commerce-size-guide-close" type="button" aria-label="Close size guide">×</button>
+          </header>
+          <div class="commerce-size-guide-tabs" role="tablist" aria-label="Abaya length set">
+            <button id="commerce-guide-standard" type="button" role="tab" aria-selected="true">Set 1 · Standard</button>
+            <button id="commerce-guide-long" type="button" role="tab" aria-selected="false">Set 2 · Long</button>
+          </div>
+          <div id="commerce-size-guide-body" class="commerce-size-guide-body"></div>
+        </div>
 
       </section>
 
@@ -5643,6 +5857,7 @@
           cancelReply();
         }
 
+        cancelFitDismiss();
         sheetClosing = true;
 
         const closingType = activeSheet;
@@ -5953,6 +6168,39 @@
         }
 
         if (commerceActive) {
+          if (commerceSizeGuideOpen) {
+            const guide = document.getElementById('commerce-size-guide');
+            if (event.key === 'Escape') {
+              event.preventDefault();
+              event.stopPropagation();
+              closeCommerceSizeGuide(true);
+              return;
+            }
+            if (event.key === 'Tab' && guide) {
+              const focusable = Array.from(
+                guide.querySelectorAll('button:not([disabled]), [tabindex="0"]')
+              ).filter(element =>
+                !element.hidden &&
+                !element.closest('[hidden]') &&
+                element.getClientRects().length > 0
+              );
+              if (focusable.length) {
+                const first = focusable[0];
+                const last = focusable[focusable.length - 1];
+                if (event.shiftKey && document.activeElement === first) {
+                  event.preventDefault();
+                  last.focus();
+                } else if (!event.shiftKey && document.activeElement === last) {
+                  event.preventDefault();
+                  first.focus();
+                } else if (!focusable.includes(document.activeElement)) {
+                  event.preventDefault();
+                  first.focus();
+                }
+              }
+            }
+            return;
+          }
           if (event.key === 'Escape') {
             event.preventDefault();
             event.stopPropagation();
@@ -9045,9 +9293,17 @@
           const body = document.createElement('tbody');
           guide.rows.forEach(row => {
             const line = document.createElement('tr');
-            row.forEach(value => {
+            line.dataset.size = row[0];
+            row.forEach((value, index) => {
               const cell = document.createElement('td');
-              cell.textContent = value;
+              if (index === 0) {
+                const label = document.createElement('span');
+                label.className = 'size-cell-label';
+                label.textContent = value;
+                cell.appendChild(label);
+              } else {
+                cell.textContent = value;
+              }
               line.appendChild(cell);
             });
             body.appendChild(line);
@@ -9096,6 +9352,7 @@
               status.textContent =
                 'Set 1 and Set 2 are sizing references. They are not purchase options and are not added to the basket. Prices and availability still come from the staging shop.';
             }
+            if (commerceSizeGuideOpen) renderCommerceSizeGuide();
             return;
           }
           clearElement(guides);
@@ -9105,8 +9362,10 @@
               status.textContent =
                 'Prices and availability still come from the staging shop.';
             }
+            if (commerceSizeGuideOpen) renderCommerceSizeGuide();
             return;
           }
+          if (commerceSizeGuideOpen) renderCommerceSizeGuide();
           if (unavailable) unavailable.hidden = true;
           if (status && operationsCatalog.status === 'loading') {
             status.textContent = 'Loading size information\u2026';
@@ -10252,6 +10511,162 @@
         renderVariantSelection();
       }
 
+      let commerceSizeGuideOpen = false;
+      let commerceGuideSet = 0;
+      let commerceGuideScroll = 0;
+      let commerceGuideTimer = 0;
+      let fitDismissTimer = 0;
+      let fitComposing = false;
+
+      function fitNumberComplete(value) {
+        const text = String(value || '').trim();
+        if (!/^\d+(?:\.\d+)?$/.test(text)) return false;
+        const number = Number(text);
+        return Number.isFinite(number) && number > 0;
+      }
+
+      function cancelFitDismiss() {
+        if (!fitDismissTimer) return;
+        clearTimeout(fitDismissTimer);
+        fitDismissTimer = 0;
+      }
+
+      function scheduleFitDismiss(form) {
+        cancelFitDismiss();
+        if (fitComposing || !form) return;
+        const height = form.querySelector('[data-fit="height"]');
+        const weight = form.querySelector('[data-fit="weight"]');
+        if (!height || !weight) return;
+        if (!fitNumberComplete(height.value) || !fitNumberComplete(weight.value)) return;
+        fitDismissTimer = window.setTimeout(() => {
+          fitDismissTimer = 0;
+          const active = document.activeElement;
+          if (!active || !form.contains(active)) return;
+          if (active !== height && active !== weight) return;
+          if (fitComposing) return;
+          if (!fitNumberComplete(height.value) || !fitNumberComplete(weight.value)) return;
+          active.blur();
+        }, 1500);
+      }
+
+      function commerceGuideDefaultSet() {
+        if (previewSet === 'S2') return 1;
+        if (previewSet === 'S1') return 0;
+        if (sizeFit && sizeFit.ok && sizeFit.set === 'S2') return 1;
+        return 0;
+      }
+
+      function renderCommerceSizeGuide() {
+        const body = document.getElementById('commerce-size-guide-body');
+        const standard = document.getElementById('commerce-guide-standard');
+        const long = document.getElementById('commerce-guide-long');
+        if (!body) return;
+        clearElement(body);
+        const ready = operationsCatalog.status === 'ready' && operationsCatalog.data;
+        if (!ready) {
+          const note = document.createElement('p');
+          note.className = 'commerce-preview-note';
+          if (operationsCatalog.status === 'error') {
+            note.textContent = 'Size guide is currently unavailable.';
+            const retry = document.createElement('button');
+            retry.type = 'button';
+            retry.className = 'catalog-retry';
+            retry.textContent = 'Retry size guide';
+            retry.addEventListener('click', () => {
+              loadOperationsCatalog(true);
+            });
+            body.appendChild(note);
+            body.appendChild(retry);
+          } else {
+            note.textContent = 'Loading size information\u2026';
+            body.appendChild(note);
+          }
+          if (standard) standard.disabled = true;
+          if (long) long.disabled = true;
+          return;
+        }
+        const guides = operationsGuideModel(operationsCatalog.data);
+        if (commerceGuideSet > guides.length - 1) commerceGuideSet = 0;
+        guides.forEach((guide, index) => {
+          const wrap = document.createElement('div');
+          wrap.className = 'commerce-guide-table-wrap';
+          wrap.hidden = index !== commerceGuideSet;
+          const table = document.createElement('table');
+          table.className = 'commerce-guide-table';
+          const head = document.createElement('thead');
+          const headRow = document.createElement('tr');
+          guide.columns.forEach(label => {
+            const cell = document.createElement('th');
+            cell.scope = 'col';
+            cell.textContent = label;
+            headRow.appendChild(cell);
+          });
+          head.appendChild(headRow);
+          const tableBody = document.createElement('tbody');
+          guide.rows.forEach(row => {
+            const line = document.createElement('tr');
+            if (sizeFit && sizeFit.ok && sizeFit.set === guide.setCode && row[0] === sizeFit.size) {
+              line.classList.add('is-guide-fit');
+            }
+            row.forEach(value => {
+              const cell = document.createElement('td');
+              cell.textContent = value;
+              line.appendChild(cell);
+            });
+            tableBody.appendChild(line);
+          });
+          table.appendChild(head);
+          table.appendChild(tableBody);
+          wrap.appendChild(table);
+          body.appendChild(wrap);
+        });
+        [standard, long].forEach((button, index) => {
+          if (!button) return;
+          const active = index === commerceGuideSet && !!guides[index];
+          button.disabled = !guides[index];
+          button.classList.toggle('is-active', active);
+          button.setAttribute('aria-selected', String(active));
+        });
+      }
+
+      function closeCommerceSizeGuide(restoreScroll) {
+        const guide = document.getElementById('commerce-size-guide');
+        const commerceBody = document.querySelector('#commerce-panel .commerce-body');
+        if (!guide || !commerceSizeGuideOpen) return;
+        commerceSizeGuideOpen = false;
+        guide.classList.remove('is-shown');
+        if (commerceBody) commerceBody.style.overflow = '';
+        if (restoreScroll !== false && commerceBody) {
+          commerceBody.scrollTop = commerceGuideScroll;
+        }
+        clearTimeout(commerceGuideTimer);
+        const finish = () => {
+          guide.hidden = true;
+          const opener = document.getElementById('commerce-size-guide-open');
+          if (restoreScroll !== false && opener && commerceCurrentView === 'variant') {
+            opener.focus({ preventScroll:true });
+          }
+        };
+        if (prefersReducedMotion()) finish();
+        else commerceGuideTimer = window.setTimeout(finish, 320);
+      }
+
+      function openCommerceSizeGuide() {
+        if (!commerceActive || commerceCurrentView !== 'variant' || commerceSizeGuideOpen) return;
+        const guide = document.getElementById('commerce-size-guide');
+        const commerceBody = document.querySelector('#commerce-panel .commerce-body');
+        if (!guide) return;
+        commerceGuideScroll = commerceBody ? commerceBody.scrollTop : 0;
+        commerceGuideSet = commerceGuideDefaultSet();
+        commerceSizeGuideOpen = true;
+        renderCommerceSizeGuide();
+        guide.hidden = false;
+        if (commerceBody) commerceBody.style.overflow = 'hidden';
+        window.requestAnimationFrame(() => guide.classList.add('is-shown'));
+        const closeButton = document.getElementById('commerce-size-guide-close');
+        if (closeButton) closeButton.focus({ preventScroll:true });
+      }
+
       function bindSizeFit() {
         document.querySelectorAll('.fit-card').forEach(form => {
           form.addEventListener('submit', event => event.preventDefault());
@@ -10259,6 +10674,26 @@
             const height = form.querySelector('[data-fit="height"]');
             const weight = form.querySelector('[data-fit="weight"]');
             publishSizeFit(height ? height.value : '', weight ? weight.value : '');
+            scheduleFitDismiss(form);
+          });
+          form.addEventListener('focusin', () => {
+            scheduleFitDismiss(form);
+          });
+          form.addEventListener('focusout', event => {
+            const next = event.relatedTarget;
+            if (next && form.contains(next)) {
+              scheduleFitDismiss(form);
+              return;
+            }
+            cancelFitDismiss();
+          });
+          form.addEventListener('compositionstart', () => {
+            fitComposing = true;
+            cancelFitDismiss();
+          });
+          form.addEventListener('compositionend', () => {
+            fitComposing = false;
+            scheduleFitDismiss(form);
           });
           form.addEventListener('keydown', event => {
             if (event.key !== 'Enter') return;
@@ -10271,6 +10706,7 @@
             }
             if (event.target !== weight) return;
             event.preventDefault();
+            cancelFitDismiss();
             publishSizeFit(height ? height.value : '', weight ? weight.value : '');
             if (weight) weight.blur();
           });
@@ -10827,6 +11263,7 @@
           setBasketCheckoutPreparing(false);
         }
 
+        if (view !== 'variant' && commerceSizeGuideOpen) closeCommerceSizeGuide(false);
         commerceCurrentView = view;
         commercePanel.dataset.view = view;
 
@@ -10904,6 +11341,8 @@
 
         cartAddGeneration += 1;
         cancelCartFlyAnimation();
+        cancelFitDismiss();
+        if (commerceSizeGuideOpen) closeCommerceSizeGuide(false);
         commerceClosing = true;
         if (stagingCartBusy) {
           basketCheckoutToken += 1;
@@ -10992,6 +11431,26 @@
         .addEventListener('click', () => {
           loadOperationsCatalog(true);
         });
+
+      const commerceSizeGuide = document.getElementById('commerce-size-guide');
+      document.getElementById('commerce-size-guide-open')
+        .addEventListener('click', openCommerceSizeGuide);
+      document.getElementById('commerce-size-guide-close')
+        .addEventListener('click', () => closeCommerceSizeGuide(true));
+      document.getElementById('commerce-guide-standard')
+        .addEventListener('click', () => {
+          commerceGuideSet = 0;
+          renderCommerceSizeGuide();
+        });
+      document.getElementById('commerce-guide-long')
+        .addEventListener('click', () => {
+          commerceGuideSet = 1;
+          renderCommerceSizeGuide();
+        });
+      if (commerceSizeGuide) {
+        commerceSizeGuide.addEventListener('pointerdown', event => event.stopPropagation());
+        commerceSizeGuide.addEventListener('wheel', event => event.stopPropagation(), { passive:true });
+      }
 
       document.getElementById('commerce-catalog-retry')
         .addEventListener('click', () => {
@@ -13567,6 +14026,33 @@
       if (scroll.dataset.scrollingToFit === '1') delete scroll.dataset.scrollingToFit;
     }, prefersLessMotion.matches ? 40 : 900);
   }
+  function rowSizeLabel(item) {
+    if (item.dataset.size) return item.dataset.size;
+    const named = item.querySelector('.size-cell-label');
+    if (named) return named.textContent.trim();
+    return item.cells[0] ? item.cells[0].textContent.trim() : '';
+  }
+  function clearSizeBadges() {
+    guides.querySelectorAll('.size-recommended').forEach(badge => badge.remove());
+  }
+  function showSizeBadge(row, animate) {
+    clearSizeBadges();
+    const cell = row.cells[0];
+    if (!cell) return;
+    let label = cell.querySelector('.size-cell-label');
+    if (!label) {
+      label = document.createElement('span');
+      label.className = 'size-cell-label';
+      label.textContent = cell.textContent.trim();
+      cell.textContent = '';
+      cell.appendChild(label);
+    }
+    const badge = document.createElement('span');
+    badge.className = 'size-recommended';
+    badge.textContent = 'Recommended';
+    if (animate && !prefersLessMotion.matches) badge.classList.add('is-badge-in');
+    cell.appendChild(badge);
+  }
   function applySizeTabs() {
     const sections = Array.from(guides.querySelectorAll('.product-size-guide'));
     controls.hidden = sections.length < 2;
@@ -13597,6 +14083,7 @@
       lastFitKey = '';
       fitIntroKey = '';
       fitOverride = false;
+      clearSizeBadges();
       guides.querySelectorAll('tbody tr.is-fit').forEach(row => {
         row.classList.remove('is-fit', 'is-fit-pulse', 'is-size-selected');
       });
@@ -13615,13 +14102,17 @@
     const section = guides.querySelectorAll('.product-size-guide')[selected];
     if (!section) return;
     const row = Array.from(section.querySelectorAll('tbody tr')).find(item => {
-      return item.cells[0] && item.cells[0].textContent.trim() === size;
+      return rowSizeLabel(item) === size;
     });
     if (!row) return;
     guides.querySelectorAll('tbody tr.is-size-selected, tbody tr.is-fit').forEach(item => {
       if (item !== row) item.classList.remove('is-size-selected', 'is-fit', 'is-fit-pulse');
     });
     row.classList.add('is-size-selected', 'is-fit');
+    const badgeHere = !!row.querySelector('.size-recommended');
+    if (!badgeHere || guides.querySelectorAll('.size-recommended').length !== 1) {
+      showSizeBadge(row, !badgeHere && fitIntroKey !== key);
+    }
     const recommendedTab = selected === 0 ? standard : long;
     [standard, long].forEach(el => {
       el.classList.toggle('is-fit', el === recommendedTab);
@@ -13650,6 +14141,7 @@
     if (!row || !guides.contains(row)) return;
     if (row.classList.contains('is-size-selected') && !row.classList.contains('is-fit')) return;
     fitOverride = true;
+    clearSizeBadges();
     guides.querySelectorAll('tbody tr.is-size-selected, tbody tr.is-fit').forEach(item => {
       item.classList.remove('is-size-selected', 'is-fit', 'is-fit-pulse');
     });
