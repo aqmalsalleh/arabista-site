@@ -3490,8 +3490,12 @@
     }
 
     .checkout-payment-options {
+      display:flex;
+      flex-direction:column;
+      gap:8px;
+      min-width:0;
       border:0;
-      margin:0;
+      margin:0 0 12px;
       padding:0;
     }
 
@@ -3500,15 +3504,25 @@
       justify-content:space-between;
       align-items:center;
       gap:12px;
-      min-height:69px;
-      padding:13px 0;
-      border-bottom:1px solid #eee;
+      min-height:64px;
+      margin:0;
+      padding:12px;
+      border:1px solid #eee;
+      border-radius:12px;
+      background:#fff;
+      cursor:pointer;
     }
 
     .checkout-payment-option span {
       display:flex;
       flex-direction:column;
       gap:5px;
+      min-width:0;
+    }
+
+    .checkout-payment-option strong,
+    .checkout-payment-option small {
+      overflow-wrap:anywhere;
     }
 
     .checkout-payment-option strong {
@@ -3523,7 +3537,59 @@
     .checkout-payment-option input {
       width:21px;
       height:21px;
+      flex:0 0 auto;
       accent-color:#b39257;
+    }
+
+    .checkout-payment-option.is-selected {
+      border-color:#b39257;
+      background:#fbf7f0;
+    }
+
+    .checkout-payment-options:disabled {
+      opacity:.45;
+    }
+
+    .checkout-fpx-panel {
+      min-width:0;
+      margin:0 0 12px;
+    }
+
+    .checkout-fpx-label {
+      display:block;
+      margin:0 0 8px;
+      color:#202124;
+      font-size:13px;
+      font-weight:600;
+    }
+
+    .checkout-fpx-bank {
+      display:block;
+      width:100%;
+      max-width:100%;
+      min-height:48px;
+      padding:10px 12px;
+      border:1px solid #e4ddd2;
+      border-radius:12px;
+      background:#fff;
+      color:#222;
+      font-size:16px;
+      font-weight:400;
+    }
+
+    .checkout-fpx-panel.is-loading .checkout-fpx-bank,
+    .checkout-fpx-bank:disabled {
+      color:#8a8680;
+      background:#f7f5f2;
+    }
+
+    #checkout-payment .checkout-error {
+      margin:8px 0 12px;
+    }
+
+    #checkout-new-attempt {
+      width:100%;
+      margin-top:10px;
     }
 
     .checkout-footer {
@@ -6502,10 +6568,76 @@
                   <path d="M8.6 12.1l2.2 2.2 4.6-4.8"/>
                 </svg>
                 <div>
-                  <p>Choose your preferred payment method on the next secure page.</p>
-                  <p>Payment details are not collected on this page.</p>
+                  <p>Choose Touch 'n Go, GrabPay, ShopeePay or FPX in this checkout.</p>
+                  <p>Card details are not collected on this page. You continue with the selected provider, and this page does not confirm payment.</p>
                 </div>
               </div>
+
+              <fieldset class="checkout-payment-options" id="checkout-payment-methods">
+                <legend class="sr-only">Payment method</legend>
+                <label class="checkout-payment-option">
+                  <span>
+                    <strong>Touch 'n Go eWallet</strong>
+                    <small id="pay-tng-detail">Continue in Touch 'n Go</small>
+                  </span>
+                  <input type="radio"
+                         name="checkout-preview-payment"
+                         value="EWALLET_TNG"
+                         aria-describedby="pay-tng-detail">
+                </label>
+                <label class="checkout-payment-option">
+                  <span>
+                    <strong>GrabPay</strong>
+                    <small id="pay-grab-detail">Continue in Grab</small>
+                  </span>
+                  <input type="radio"
+                         name="checkout-preview-payment"
+                         value="EWALLET_GRABPAY"
+                         aria-describedby="pay-grab-detail">
+                </label>
+                <label class="checkout-payment-option">
+                  <span>
+                    <strong>ShopeePay</strong>
+                    <small id="pay-shopee-detail">Continue in Shopee</small>
+                  </span>
+                  <input type="radio"
+                         name="checkout-preview-payment"
+                         value="EWALLET_SHOPEEPAY"
+                         aria-describedby="pay-shopee-detail">
+                </label>
+                <label class="checkout-payment-option" id="checkout-payment-fpx">
+                  <span>
+                    <strong>FPX Online Banking</strong>
+                    <small id="pay-fpx-detail">Malaysian online banking</small>
+                  </span>
+                  <input type="radio"
+                         name="checkout-preview-payment"
+                         value="INTERNET_BANKING_FPX"
+                         aria-describedby="pay-fpx-detail">
+                </label>
+              </fieldset>
+
+              <div id="checkout-fpx-panel" class="checkout-fpx-panel" hidden>
+                <label class="checkout-fpx-label" for="checkout-fpx-bank">Bank</label>
+                <select id="checkout-fpx-bank"
+                        class="checkout-fpx-bank"
+                        autocomplete="off"
+                        disabled>
+                  <option value="">Select a bank</option>
+                </select>
+                <p id="checkout-fpx-status" class="checkout-muted" role="status"></p>
+                <button id="checkout-fpx-retry"
+                        class="catalog-retry"
+                        type="button"
+                        hidden>
+                  Retry
+                </button>
+              </div>
+
+              <p id="checkout-payment-error"
+                 class="checkout-error"
+                 role="alert"
+                 hidden></p>
 
               <p id="checkout-submission-note"
                  class="commerce-line-warning"
@@ -6516,6 +6648,13 @@
                       type="button"
                       hidden>
                 Continue with the confirmed staging amount
+              </button>
+
+              <button id="checkout-new-attempt"
+                      class="checkout-secondary"
+                      type="button"
+                      hidden>
+                Start a new checkout
               </button>
             </section>
 
@@ -12982,6 +13121,9 @@
 
       let checkoutItems = [];
       let checkoutPayment = null;
+      const fpxBankState = { status:'idle', banks:[], selected:'' };
+      let fpxLoadGeneration = 0;
+      const CHECKOUT_ATTEMPT_KEY = 'arabista-checkout-attempt';
 
       const stagingSubmission = {
         status:'idle',
@@ -13201,7 +13343,7 @@
           }
           if (noteEl) {
             noteEl.textContent =
-              'Staging estimate. No order or shipment will be created.';
+              'Staging estimate. Continuing creates an order. A shipment starts only after payment is confirmed.';
           }
           return;
         }
@@ -13426,19 +13568,17 @@
         return /^STGORD-[A-Z0-9]+(?:-[A-Z0-9]+)*$/.test(String(value || ''));
       }
 
-      // Malaysia Checkout v3 returns payment.checkout_url. The sandbox
-      // hosted-payment hostname was verified by the authenticated
-      // diagnoseDokuSandboxCheckout() response as staging.doku.com.
-      // Matching is exact and HTTPS-only. Production and lookalike hosts
-      // stay rejected.
-      const DOKU_SANDBOX_PAYMENT_HOSTS = ['staging.doku.com'];
+      // Legacy Checkout v3 uses staging.doku.com. Direct Payment sandbox
+      // uses api-sandbox.doku.com. Both are exact HTTPS hosts. A response
+      // cannot add a host. Production and lookalike hosts stay rejected.
+      const DOKU_SANDBOX_PAYMENT_HOSTS = ['staging.doku.com', 'api-sandbox.doku.com'];
       const DOKU_PRODUCTION_PAYMENT_HOSTS = [
         'jokul.doku.com',
         'app.senangpay.my',
         'sandbox.senangpay.my'
       ];
 
-      function inspectStagingPaymentUrl(paymentUrl, orderId, amount) {
+      function inspectStagingPaymentUrl(paymentUrl, orderId, amount, expectations) {
         let url;
         try {
           url = new URL(paymentUrl);
@@ -13459,7 +13599,7 @@
           return { ok:false, reason:'order', host };
         }
         const total = Number(amount);
-        if (!Number.isFinite(total) || total < 0) {
+        if (!Number.isFinite(total) || total <= 0) {
           return { ok:false, reason:'amount', host };
         }
         if (url.searchParams.has('order_id') &&
@@ -13470,7 +13610,132 @@
             url.searchParams.get('amount') !== total.toFixed(2)) {
           return { ok:false, reason:'amount', host };
         }
+        if (expectations) {
+          const redirectHost = String(expectations.redirectHost || '').toLowerCase();
+          if (!redirectHost || redirectHost !== host ||
+              DOKU_SANDBOX_PAYMENT_HOSTS.indexOf(redirectHost) === -1) {
+            return { ok:false, reason:'host', host };
+          }
+          const allowedChannels = ['EWALLET_TNG', 'EWALLET_GRABPAY', 'EWALLET_SHOPEEPAY', 'INTERNET_BANKING_FPX'];
+          const selected = String(expectations.channel || '');
+          const returned = String(expectations.returnedChannel || '');
+          if (allowedChannels.indexOf(selected) === -1 || selected !== returned) {
+            return { ok:false, reason:'channel', host };
+          }
+        }
         return { ok:true, reason:'', host };
+      }
+
+      function detectCheckoutDeviceInfo() {
+        const ua = navigator && typeof navigator.userAgent === 'string'
+          ? navigator.userAgent
+          : '';
+        const uaData = navigator && navigator.userAgentData
+          ? navigator.userAgentData
+          : null;
+        let os = '';
+        if (uaData && typeof uaData.platform === 'string') {
+          os = uaData.platform.trim();
+        }
+        if (!os) {
+          if (/iPhone|iPad|iPod/i.test(ua)) os = 'iOS';
+          else if (/Android/i.test(ua)) os = 'Android';
+          else if (/Windows NT/i.test(ua)) os = 'Windows';
+          else if (/CrOS/i.test(ua)) os = 'ChromeOS';
+          else if (/Mac OS X/i.test(ua)) os = 'macOS';
+          else if (/Linux/i.test(ua)) os = 'Linux';
+        }
+        let browser = '';
+        if (uaData && Array.isArray(uaData.brands)) {
+          for (let index = 0; index < uaData.brands.length; index += 1) {
+            const brand = uaData.brands[index] && uaData.brands[index].brand;
+            if (typeof brand !== 'string') continue;
+            if (/not.?a.?brand|chromium/i.test(brand)) continue;
+            browser = brand.trim();
+            if (browser) break;
+          }
+        }
+        if (!browser) {
+          if (/Edg\//.test(ua)) browser = 'Edge';
+          else if (/OPR\/|Opera/.test(ua)) browser = 'Opera';
+          else if (/FxiOS|Firefox\//.test(ua)) browser = 'Firefox';
+          else if (/CriOS|Chrome\//.test(ua)) browser = 'Chrome';
+          else if (/Version\/[\d.]+.*Safari\//.test(ua)) browser = 'Safari';
+        }
+        browser = browser.replace(/[\u0000-\u001F\u007F]/g, '').trim().slice(0, 64);
+        os = os.replace(/[\u0000-\u001F\u007F]/g, '').trim().slice(0, 64);
+        if (!browser || !os) return null;
+        return { browser:browser, os:os };
+      }
+
+      function mintCheckoutAttemptId() {
+        if (window.crypto && typeof window.crypto.randomUUID === 'function') {
+          const uuid = window.crypto.randomUUID();
+          if (/^[A-Za-z0-9_-]{16,80}$/.test(uuid)) return uuid;
+        }
+        if (!window.crypto || typeof window.crypto.getRandomValues !== 'function') {
+          return '';
+        }
+        const bytes = new Uint8Array(16);
+        window.crypto.getRandomValues(bytes);
+        const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_-';
+        let id = '';
+        for (let index = 0; index < 32; index += 1) {
+          id += alphabet[bytes[index % 16] % alphabet.length];
+        }
+        return /^[A-Za-z0-9_-]{16,80}$/.test(id) ? id : '';
+      }
+
+      function prepareCheckoutSubmission(stored, fingerprint) {
+        const idOk = !!(stored && /^[A-Za-z0-9_-]{16,80}$/.test(String(stored.id || '')));
+        if (idOk && stored.fingerprint === fingerprint) {
+          return { ok:true, id:stored.id, orderId:stored.orderId || '' };
+        }
+        if (idOk && (stored.pending || stored.orderId)) {
+          return { ok:false, reason:'attempt_in_flight', id:stored.id };
+        }
+        const id = mintCheckoutAttemptId();
+        if (!/^[A-Za-z0-9_-]{16,80}$/.test(id)) {
+          return { ok:false, reason:'attempt_id' };
+        }
+        return { ok:true, id:id, orderId:'' };
+      }
+
+      function checkoutCommerceFingerprint(payload) {
+        const items = Array.isArray(payload && payload.items) ? payload.items : [];
+        return JSON.stringify({
+          email:String(payload && payload.email || '').trim().toLowerCase(),
+          phone:String(payload && payload.phone || ''),
+          name:String(payload && payload.name || '').trim(),
+          address:String(payload && payload.address || '').trim(),
+          state:String(payload && payload.state || '').trim(),
+          postcode:String(payload && payload.postcode || '').replace(/\D/g, ''),
+          channel:payload && payload.paymentChannel || '',
+          bankCode:payload && payload.fpxBankCode || '',
+          items:items.map(item => ({
+            sku:item && item.sku || '',
+            qty:item && item.qty,
+            alterations:item && item.alterations || {}
+          }))
+        });
+      }
+
+      function acceptFpxBankList(json) {
+        if (!json || json.status !== 'success' || !Array.isArray(json.banks)) {
+          return { ok:false, banks:[] };
+        }
+        const banks = [];
+        const seen = {};
+        json.banks.forEach(bank => {
+          if (!bank || typeof bank.bankCode !== 'string' || typeof bank.bankName !== 'string') return;
+          if (bank.status && String(bank.status).toUpperCase() !== 'ACTIVE') return;
+          const bankCode = bank.bankCode.trim();
+          const bankName = bank.bankName.trim();
+          if (!/^[A-Za-z0-9_-]{1,32}$/.test(bankCode) || !bankName || seen[bankCode]) return;
+          seen[bankCode] = true;
+          banks.push({ bankCode:bankCode, bankName:bankName.slice(0, 100) });
+        });
+        return banks.length ? { ok:true, banks:banks } : { ok:false, banks:[] };
       }
 
       function checkoutEmailAddress() {
@@ -13512,7 +13777,10 @@
         }
         const phone = fypNormalizePhone(address.phone);
         const email = checkoutEmailAddress();
-        if (!phone || !checkoutEmailValid(email)) return null;
+        const deviceInfo = detectCheckoutDeviceInfo();
+        if (!phone || !checkoutEmailValid(email) || !deviceInfo || !checkoutPaymentReady()) {
+          return null;
+        }
 
         const items = [];
         let basePrice = 0;
@@ -13573,9 +13841,9 @@
             .join(', '),
           state:address.state,
           postcode:String(address.postcode),
-          ttclid:'',
-          userAgent:'',
-          url:''
+          paymentChannel:checkoutPayment,
+          fpxBankCode:checkoutPayment === 'INTERNET_BANKING_FPX' ? fpxBankState.selected : '',
+          deviceInfo:deviceInfo
         };
       }
 
@@ -13631,7 +13899,9 @@
         stagingSubmission.result = {
           orderId: orderId || '',
           paymentUrl: paymentUrl || '',
-          totalPaid: backendTotal
+          totalPaid: backendTotal,
+          paymentChannel: json && json.paymentChannel || '',
+          paymentRedirectHost: json && json.paymentRedirectHost || ''
         };
         stagingSubmission.status = 'reserved';
 
@@ -13643,17 +13913,25 @@
           return;
         }
 
+        const selectedChannel = typeof checkoutPayment === 'string' ? checkoutPayment : '';
         const inspection = inspectStagingPaymentUrl(
           paymentUrl,
           orderId,
-          backendTotal
+          backendTotal,
+          {
+            redirectHost: json && json.paymentRedirectHost,
+            channel: selectedChannel,
+            returnedChannel: json && json.paymentChannel
+          }
         );
         if (!inspection.ok) {
           const reason = inspection.reason === 'live'
             ? 'The payment address is not the DOKU sandbox, so it was not opened. The staging reservation can expire through the existing reservation process. No second reservation was created. Opening a payment page does not confirm payment.'
-            : inspection.reason === 'unverified'
+            : inspection.reason === 'unverified' || inspection.reason === 'host'
               ? 'The DOKU sandbox payment host could not be verified, so the payment address was not opened. No second reservation was created. Opening a payment page does not confirm payment.'
-              : 'The payment address could not be verified, so it was not opened. No second reservation was created. Opening a payment page does not confirm payment.';
+              : inspection.reason === 'channel'
+                ? 'The payment method returned by the server does not match the selected method, so the payment address was not opened. No second reservation was created. Opening a payment page does not confirm payment.'
+                : 'The payment address could not be verified, so it was not opened. No second reservation was created. Opening a payment page does not confirm payment.';
           showReservationRecovery(orderId, reason);
           return;
         }
@@ -13686,6 +13964,20 @@
           renderCheckoutEmail();
           const emailInput = document.getElementById('checkout-email');
           if (emailInput) emailInput.focus({ preventScroll:true });
+          return;
+        }
+        if (!checkoutPaymentReady()) {
+          showCheckoutSubmission(
+            checkoutPayment === 'INTERNET_BANKING_FPX'
+              ? 'Choose an FPX bank from the list before continuing.'
+              : 'Choose Touch \'n Go, GrabPay, ShopeePay or FPX before continuing.'
+          );
+          return;
+        }
+        if (!detectCheckoutDeviceInfo()) {
+          showCheckoutSubmission(
+            'This browser did not provide the device details needed for payment. Try Safari or Chrome, then continue with this same checkout. No order was started.'
+          );
           return;
         }
         if (!checkoutCanComplete()) return;
@@ -13725,21 +14017,47 @@
             );
             return;
           }
+          const fingerprint = checkoutCommerceFingerprint(payload);
+          const prepared = prepareCheckoutSubmission(readCheckoutAttempt(), fingerprint);
+          if (!prepared.ok) {
+            stagingSubmission.status = 'error';
+            stagingSubmission.error = prepared.reason;
+            showCheckoutSubmission(
+              prepared.reason === 'attempt_id'
+                ? 'This browser could not create a secure checkout reference. No order was started.'
+                : 'A checkout attempt for different details may already have reached Arabista. Restore those details, or start a new checkout only if that attempt was not created.'
+            );
+            if (prepared.reason === 'attempt_in_flight') showNewCheckoutAction(true);
+            return;
+          }
+          payload.checkoutAttemptId = prepared.id;
+          writeCheckoutAttempt({
+            id:prepared.id,
+            fingerprint:fingerprint,
+            pending:true,
+            orderId:prepared.orderId || ''
+          });
 
           stagingSubmission.status = 'submitting';
           checkoutSyncPrimary();
           const json = await submitFypStagingReservation(payload);
 
-          if (!json || typeof json !== 'object') {
+          if (!json || typeof json !== 'object' || typeof json.status !== 'string') {
             stagingSubmission.status = 'error';
             stagingSubmission.error = 'malformed';
             showCheckoutSubmission(
-              'The staging server returned an unreadable result. The order was not submitted again, because a reservation may already exist.'
+              'The staging server returned an unreadable result. This checkout attempt was kept and was not submitted again, because an order may already exist.'
             );
             return;
           }
 
           if (json.status === 'success') {
+            writeCheckoutAttempt({
+              id:prepared.id,
+              fingerprint:fingerprint,
+              pending:false,
+              orderId:json.orderId || ''
+            });
             rememberOrderCapability(json);
             acceptReservedPayment(json, payload.totalPaid);
             return;
@@ -13747,7 +14065,107 @@
 
           stagingSubmission.status = 'error';
           stagingSubmission.error = json.reason || json.message || 'error';
+          if (json.reason === 'payment_status_unknown') {
+            writeCheckoutAttempt({
+              id:prepared.id,
+              fingerprint:fingerprint,
+              pending:true,
+              orderId:json.orderId || prepared.orderId || ''
+            });
+            rememberOrderCapability(json);
+            showCheckoutSubmission(
+              json.message || 'Payment could not be confirmed. This checkout attempt was kept. Do not start another order.'
+            );
+            return;
+          }
+          if (json.reason === 'payment_rejected') {
+            writeCheckoutAttempt({
+              id:prepared.id,
+              fingerprint:fingerprint,
+              pending:false,
+              orderId:json.orderId || ''
+            });
+            rememberOrderCapability(json);
+            showCheckoutSubmission(
+              'The payment provider did not accept this attempt. No new order was started.'
+            );
+            showNewCheckoutAction(true);
+            return;
+          }
+          if (json.reason === 'checkout_attempt_mismatch') {
+            showCheckoutSubmission(
+              'This checkout attempt belongs to different checkout details. No new order was started.'
+            );
+            showNewCheckoutAction(true);
+            return;
+          }
+          if (json.reason === 'checkout_attempt_closed') {
+            writeCheckoutAttempt({
+              id:prepared.id,
+              fingerprint:fingerprint,
+              pending:false,
+              orderId:json.orderId || ''
+            });
+            rememberOrderCapability(json);
+            showCheckoutSubmission(
+              'This checkout attempt has ended. Start a new checkout if you still want to pay.'
+            );
+            showNewCheckoutAction(true);
+            return;
+          }
+          if (json.reason === 'already_paid') {
+            writeCheckoutAttempt({
+              id:prepared.id,
+              fingerprint:fingerprint,
+              pending:false,
+              orderId:json.orderId || ''
+            });
+            rememberOrderCapability(json);
+            showCheckoutSubmission(
+              'This checkout is already paid. Arabista is confirming it. This page does not mark an order paid by itself.'
+            );
+            const stored = readStoredOrderStatus();
+            if (stored) startOrderStatusPoll(stored);
+            return;
+          }
+          if (json.reason === 'invalid_device_info') {
+            writeCheckoutAttempt({
+              id:prepared.id,
+              fingerprint:fingerprint,
+              pending:false,
+              orderId:''
+            });
+            showCheckoutSubmission(
+              'This browser did not provide the device details needed for payment. Try Safari or Chrome, then continue with this same checkout. No order was started.'
+            );
+            return;
+          }
+          if (json.reason === 'payment_method_invalid') {
+            writeCheckoutAttempt({
+              id:prepared.id,
+              fingerprint:fingerprint,
+              pending:false,
+              orderId:''
+            });
+            checkoutPayment = null;
+            fpxBankState.selected = '';
+            checkoutRenderPayment();
+            showCheckoutSubmission(
+              json.message || 'Choose Touch \'n Go, GrabPay, ShopeePay or FPX before continuing. No order was started.'
+            );
+            const paymentSection = document.getElementById('checkout-payment');
+            if (paymentSection && paymentSection.scrollIntoView) {
+              paymentSection.scrollIntoView({ block:'nearest' });
+            }
+            return;
+          }
           if (json.reason === 'out_of_stock') {
+            writeCheckoutAttempt({
+              id:prepared.id,
+              fingerprint:fingerprint,
+              pending:false,
+              orderId:''
+            });
             const size = String(json.failedSignature || '').split('|')[0];
             showCheckoutSubmission(
               size
@@ -13758,20 +14176,34 @@
             return;
           }
           if (json.reason === 'unknown_sku') {
+            writeCheckoutAttempt({
+              id:prepared.id,
+              fingerprint:fingerprint,
+              pending:false,
+              orderId:''
+            });
             showCheckoutSubmission(
               'Staging did not recognise one of the selected items. Nothing was removed.'
             );
             loadD06StagingCatalog(true);
             return;
           }
+          if (json.orderId) {
+            writeCheckoutAttempt({
+              id:prepared.id,
+              fingerprint:fingerprint,
+              pending:true,
+              orderId:json.orderId
+            });
+          }
           showCheckoutSubmission(
-            json.message || 'The staging order was not created.'
+            json.message || 'The checkout could not be completed. It was not submitted again.'
           );
         } catch (error) {
           stagingSubmission.status = 'error';
           stagingSubmission.error = 'network';
           showCheckoutSubmission(
-            'The staging server did not return a result. The order was not submitted again, because a reservation may already exist. The basket and address are unchanged.'
+            'The staging server did not return a result. This checkout attempt was kept and was not submitted again, because an order may already exist.'
           );
         } finally {
           if (stagingSubmission.status !== 'redirecting') hidePaymentHandoff();
@@ -13791,24 +14223,48 @@
           !priced.blocked &&
           checkoutSelectedAddress() !== null &&
           checkoutHasValidShippingQuote() &&
-          checkoutEmailValid(checkoutEmailAddress())
+          checkoutEmailValid(checkoutEmailAddress()) &&
+          checkoutPaymentReady()
         );
       }
 
+      function checkoutPaymentReady() {
+        if (checkoutPayment === 'EWALLET_TNG' ||
+            checkoutPayment === 'EWALLET_GRABPAY' ||
+            checkoutPayment === 'EWALLET_SHOPEEPAY') {
+          return true;
+        }
+        if (checkoutPayment !== 'INTERNET_BANKING_FPX') return false;
+        if (fpxBankState.status !== 'ready') return false;
+        return fpxBankState.banks.some(bank => bank.bankCode === fpxBankState.selected);
+      }
+
       function checkoutSyncPrimary() {
+        const status = stagingSubmission.status;
+        const error = stagingSubmission.error;
         const busy = stagingCheckoutBusy ||
-          stagingSubmission.status === 'submitting' ||
-          stagingSubmission.status === 'validating' ||
-          stagingSubmission.status === 'reserved' ||
-          stagingSubmission.status === 'redirecting' ||
-          stagingSubmission.error === 'network' ||
-          stagingSubmission.error === 'malformed';
-        checkoutPrimary.disabled = busy || !checkoutCanComplete();
-        if (stagingSubmission.status === 'validating' ||
-            stagingSubmission.status === 'submitting') {
+          status === 'submitting' ||
+          status === 'validating' ||
+          status === 'reserved' ||
+          status === 'redirecting';
+        const held = error === 'payment_rejected' ||
+          error === 'checkout_attempt_closed' ||
+          error === 'checkout_attempt_mismatch' ||
+          error === 'attempt_in_flight' ||
+          error === 'already_paid';
+        checkoutPrimary.disabled = busy || held || !checkoutCanComplete();
+        const methods = document.getElementById('checkout-payment-methods');
+        if (methods) methods.disabled = checkoutItemEditsLocked();
+        const bank = document.getElementById('checkout-fpx-bank');
+        if (bank) {
+          bank.disabled = checkoutItemEditsLocked() || fpxBankState.status !== 'ready';
+        }
+        if (status === 'validating' || status === 'submitting') {
           checkoutPrimary.textContent = 'Securing staging order…';
-        } else if (stagingSubmission.status === 'redirecting') {
+        } else if (status === 'redirecting') {
           checkoutPrimary.textContent = 'Opening secure payment…';
+        } else if (error === 'network' || error === 'malformed' || error === 'payment_status_unknown') {
+          checkoutPrimary.textContent = 'Retry secure payment';
         } else {
           checkoutPrimary.textContent = 'Proceed to Secure Payment';
         }
@@ -13855,8 +14311,15 @@
             status === 'submitting' ||
             status === 'reserved' ||
             status === 'redirecting') return true;
-        if (stagingSubmission.error === 'network' ||
-            stagingSubmission.error === 'malformed') return true;
+        const error = stagingSubmission.error;
+        if (error === 'network' ||
+            error === 'malformed' ||
+            error === 'payment_status_unknown' ||
+            error === 'payment_rejected' ||
+            error === 'checkout_attempt_closed' ||
+            error === 'checkout_attempt_mismatch' ||
+            error === 'attempt_in_flight' ||
+            error === 'already_paid') return true;
         if (stagingSubmission.result && stagingSubmission.result.orderId) {
           return true;
         }
@@ -14573,12 +15036,146 @@
         });
       }
 
+      function readCheckoutAttempt() {
+        try {
+          const parsed = JSON.parse(sessionStorage.getItem(CHECKOUT_ATTEMPT_KEY) || '');
+          if (!parsed || typeof parsed !== 'object') return null;
+          return parsed;
+        } catch (error) {
+          return null;
+        }
+      }
+
+      function writeCheckoutAttempt(record) {
+        try {
+          sessionStorage.setItem(CHECKOUT_ATTEMPT_KEY, JSON.stringify({
+            id:record.id,
+            fingerprint:record.fingerprint,
+            pending:!!record.pending,
+            orderId:record.orderId || ''
+          }));
+        } catch (error) {}
+      }
+
+      function clearCheckoutAttempt() {
+        try { sessionStorage.removeItem(CHECKOUT_ATTEMPT_KEY); } catch (error) {}
+      }
+
+      function showNewCheckoutAction(visible) {
+        const button = document.getElementById('checkout-new-attempt');
+        if (button) button.hidden = !visible;
+      }
+
+      function beginNewCheckoutAttempt() {
+        clearCheckoutAttempt();
+        stagingSubmission.status = 'idle';
+        stagingSubmission.error = null;
+        stagingSubmission.result = null;
+        stagingCheckoutBusy = false;
+        showNewCheckoutAction(false);
+        showCheckoutSubmission(
+          'The previous checkout attempt was set aside. Continue only if you want a new order.'
+        );
+        checkoutRenderPayment();
+      }
+
+      function selectCheckoutPayment(channel) {
+        if (checkoutItemEditsLocked()) {
+          checkoutRenderPayment();
+          return;
+        }
+        const allowed = ['EWALLET_TNG', 'EWALLET_GRABPAY', 'EWALLET_SHOPEEPAY', 'INTERNET_BANKING_FPX'];
+        checkoutPayment = allowed.indexOf(channel) === -1 ? null : channel;
+        if (checkoutPayment !== 'INTERNET_BANKING_FPX') {
+          fpxLoadGeneration += 1;
+          fpxBankState.selected = '';
+          if (fpxBankState.status === 'loading') {
+            fpxBankState.status = fpxBankState.banks.length ? 'ready' : 'idle';
+          }
+        } else if (fpxBankState.status !== 'ready') {
+          loadFpxBanks();
+        }
+        checkoutRenderPayment();
+      }
+
+      async function loadFpxBanks() {
+        const generation = ++fpxLoadGeneration;
+        fpxBankState.status = 'loading';
+        fpxBankState.banks = [];
+        fpxBankState.selected = '';
+        checkoutRenderPayment();
+        try {
+          if (!fypStagingEndpointAllowed()) throw new Error('endpoint');
+          const response = await fetch(
+            FYP_STAGING_API_URL + '?action=doku_fpx_banks',
+            { method:'GET', credentials:'omit' }
+          );
+          const json = await response.json();
+          if (generation !== fpxLoadGeneration) return;
+          const accepted = acceptFpxBankList(json);
+          if (!accepted.ok) throw new Error('banks');
+          fpxBankState.banks = accepted.banks;
+          fpxBankState.status = 'ready';
+        } catch (error) {
+          if (generation !== fpxLoadGeneration) return;
+          fpxBankState.banks = [];
+          fpxBankState.selected = '';
+          fpxBankState.status = 'error';
+        }
+        checkoutRenderPayment();
+      }
+
       function checkoutRenderPayment() {
         document.querySelectorAll(
           'input[name="checkout-preview-payment"]'
         ).forEach(input => {
           input.checked = input.value === checkoutPayment;
+          const label = input.closest('label');
+          if (label) label.classList.toggle('is-selected', input.checked);
         });
+        const panel = document.getElementById('checkout-fpx-panel');
+        const select = document.getElementById('checkout-fpx-bank');
+        const status = document.getElementById('checkout-fpx-status');
+        const retry = document.getElementById('checkout-fpx-retry');
+        const showFpx = checkoutPayment === 'INTERNET_BANKING_FPX';
+        if (panel) {
+          panel.hidden = !showFpx;
+          panel.classList.toggle('is-loading', showFpx && fpxBankState.status === 'loading');
+          panel.setAttribute('aria-busy', showFpx && fpxBankState.status === 'loading' ? 'true' : 'false');
+        }
+        if (select) {
+          const previous = fpxBankState.selected;
+          select.replaceChildren();
+          const placeholder = document.createElement('option');
+          placeholder.value = '';
+          placeholder.textContent = fpxBankState.status === 'loading'
+            ? 'Loading banks…'
+            : 'Select a bank';
+          select.appendChild(placeholder);
+          if (fpxBankState.status === 'ready') {
+            fpxBankState.banks.forEach(bank => {
+              const option = document.createElement('option');
+              option.value = bank.bankCode;
+              option.textContent = bank.bankName;
+              select.appendChild(option);
+            });
+          }
+          const stillThere = fpxBankState.banks.some(bank => bank.bankCode === previous);
+          fpxBankState.selected = stillThere ? previous : '';
+          select.value = fpxBankState.selected;
+          select.disabled = checkoutItemEditsLocked() || fpxBankState.status !== 'ready';
+          select.setAttribute('aria-invalid', fpxBankState.status === 'error' ? 'true' : 'false');
+        }
+        if (status) {
+          status.textContent = !showFpx
+            ? ''
+            : fpxBankState.status === 'loading'
+              ? 'Loading banks…'
+              : fpxBankState.status === 'error'
+                ? 'The bank list is unavailable. FPX cannot be used until it loads.'
+                : '';
+        }
+        if (retry) retry.hidden = !(showFpx && fpxBankState.status === 'error');
         checkoutSyncPrimary();
       }
 
@@ -14638,6 +15235,8 @@
         checkoutOrigin = origin;
         checkoutTrigger = trigger || null;
         checkoutPayment = null;
+        fpxBankState.selected = '';
+        showNewCheckoutAction(false);
         stagingSubmission.status = 'idle';
         stagingSubmission.error = null;
         stagingSubmission.result = null;
@@ -15080,7 +15679,12 @@
           const inspection = inspectStagingPaymentUrl(
             result.paymentUrl,
             result.orderId,
-            result.totalPaid
+            result.totalPaid,
+            {
+              redirectHost: result.paymentRedirectHost,
+              channel: typeof checkoutPayment === 'string' ? checkoutPayment : '',
+              returnedChannel: result.paymentChannel
+            }
           );
           if (!inspection.ok) return;
           showPaymentHandoff();
@@ -15103,6 +15707,41 @@
       checkoutPrimary.addEventListener('click', () => {
         beginFypStagingCheckout();
       });
+
+      const paymentMethods = document.getElementById('checkout-payment-methods');
+      if (paymentMethods) {
+        paymentMethods.addEventListener('change', event => {
+          const input = event.target;
+          if (!input || input.name !== 'checkout-preview-payment') return;
+          selectCheckoutPayment(input.value);
+        });
+      }
+      const fpxBankSelect = document.getElementById('checkout-fpx-bank');
+      if (fpxBankSelect) {
+        fpxBankSelect.addEventListener('change', () => {
+          if (checkoutItemEditsLocked()) {
+            checkoutRenderPayment();
+            return;
+          }
+          const code = fpxBankSelect.value;
+          fpxBankState.selected = fpxBankState.banks.some(bank => bank.bankCode === code)
+            ? code
+            : '';
+          checkoutSyncPrimary();
+        });
+      }
+      const fpxRetry = document.getElementById('checkout-fpx-retry');
+      if (fpxRetry) {
+        fpxRetry.addEventListener('click', () => {
+          if (checkoutPayment === 'INTERNET_BANKING_FPX') loadFpxBanks();
+        });
+      }
+      const newAttempt = document.getElementById('checkout-new-attempt');
+      if (newAttempt) {
+        newAttempt.addEventListener('click', () => {
+          beginNewCheckoutAttempt();
+        });
+      }
 
       checkoutAddressForm.addEventListener('focusin', () => {
         requestAnimationFrame(updateCheckoutKeyboardInset);
