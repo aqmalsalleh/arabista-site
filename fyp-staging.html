@@ -6858,7 +6858,7 @@
           </div>
           <div class="eyebrow" style="margin-bottom:13px">Arabista · secure checkout</div>
           <h1 class="phase-title">A seamless handoff.</h1>
-          <p class="phase-copy"><span id="handoff-status">Securing your order</span> <span class="three-dots" aria-hidden="true"><span></span><span></span><span></span></span></p>
+          <p class="phase-copy">Preparing your secure payment page <span class="three-dots" aria-hidden="true"><span></span><span></span><span></span></span></p>
         </div>
         <div class="phase-foot">Your order is being securely prepared</div>
       </section>
@@ -11686,16 +11686,6 @@
         return loadD06StagingCatalog(true);
       }
 
-      function warmCheckoutCatalog() {
-        if (!checkoutActive || stagingCheckoutBusy) return;
-        if (stagingCatalog.status === 'loading') return;
-        const age = stagingCatalog.loadedAt
-          ? Date.now() - stagingCatalog.loadedAt
-          : FYP_CATALOG_MAX_AGE_MS + 1;
-        if (stagingCatalog.status === 'ready' && age <= 20000) return;
-        refreshD06CatalogIfStale();
-      }
-
       function renderCommercePrice(summary) {
         paintPriceTarget(
           document.getElementById('commerce-price-value'),
@@ -13131,9 +13121,8 @@
 
       let checkoutItems = [];
       let checkoutPayment = null;
-      const fpxBankState = { status:'idle', banks:[], selected:'', loadedAt:0 };
+      const fpxBankState = { status:'idle', banks:[], selected:'' };
       let fpxLoadGeneration = 0;
-      let fpxRefreshTimer = 0;
       const CHECKOUT_ATTEMPT_KEY = 'arabista-checkout-attempt';
 
       const stagingSubmission = {
@@ -13504,14 +13493,14 @@
         }
       }
 
-      function scheduleCheckoutShipping(immediate) {
+      function scheduleCheckoutShipping() {
         if (!checkoutActive) return;
         const context = buildCheckoutShippingContext();
         const key = checkoutQuoteKey(context);
         if (key &&
             stagingShipping.quoteKey === key &&
             (stagingShipping.status === 'ready' ||
-              (stagingShipping.status === 'loading' && shippingRequest))) {
+              stagingShipping.status === 'loading')) {
           renderCheckoutShipping();
           checkoutSyncPrimary();
           return;
@@ -13535,19 +13524,14 @@
         renderCheckoutShipping();
         checkoutSyncPrimary();
         if (!context) return;
-        if (immediate === true) {
-          loadCheckoutShipping();
-          return;
-        }
         shippingDebounceTimer = setTimeout(() => {
           loadCheckoutShipping();
         }, 200);
       }
 
-      function syncCheckoutShipping(immediate) {
+      function syncCheckoutShipping() {
         if (!checkoutActive || checkoutCurrentView !== 'main') return;
-        scheduleCheckoutShipping(immediate === true);
-        warmCheckoutCatalog();
+        scheduleCheckoutShipping();
       }
 
       function stagingQuotedRate(value) {
@@ -13904,37 +13888,18 @@
 
       const CHECKOUT_TIMING_KEY = 'arabista-checkout-timing';
       let checkoutSubmitStarted = 0;
-      let checkoutStageTiming = null;
-
-      function boundedStageMs(value) {
-        const ms = Number(value);
-        if (!isFinite(ms) || ms < 0 || ms > 180000) return null;
-        return Math.round(ms);
-      }
 
       function rememberCheckoutRedirectTiming(orderId) {
         const started = checkoutSubmitStarted;
-        const stages = checkoutStageTiming || {};
-        const redirectStarted = Number(stages.redirectStarted) || 0;
         checkoutSubmitStarted = 0;
-        checkoutStageTiming = null;
         if (!started || !isStagingOrderId(orderId)) return;
         const elapsed = Date.now() - started;
         if (!isFinite(elapsed) || elapsed < 0 || elapsed > 180000) return;
-        const record = {
-          orderId:String(orderId),
-          submitToRedirectMs:Math.round(elapsed)
-        };
-        ['preflightMs', 'catalogMs', 'shippingWaitMs', 'reserveMs'].forEach(key => {
-          const ms = boundedStageMs(stages[key]);
-          if (ms != null) record[key] = ms;
-        });
-        if (redirectStarted) {
-          const redirectMs = boundedStageMs(Date.now() - redirectStarted);
-          if (redirectMs != null) record.redirectMs = redirectMs;
-        }
         try {
-          sessionStorage.setItem(CHECKOUT_TIMING_KEY, JSON.stringify(record));
+          sessionStorage.setItem(CHECKOUT_TIMING_KEY, JSON.stringify({
+            orderId:String(orderId),
+            submitToRedirectMs:Math.round(elapsed)
+          }));
         } catch (error) {}
       }
 
@@ -13944,16 +13909,12 @@
         catch (error) { stored = null; }
         try { sessionStorage.removeItem(CHECKOUT_TIMING_KEY); } catch (error) {}
         if (!stored || stored.orderId !== orderId) return null;
-        const result = {};
-        ['submitToRedirectMs', 'preflightMs', 'catalogMs', 'shippingWaitMs', 'reserveMs', 'redirectMs'].forEach(key => {
-          const ms = boundedStageMs(stored[key]);
-          if (ms != null) result[key] = ms;
-        });
-        return Object.keys(result).length ? result : null;
+        const ms = Number(stored.submitToRedirectMs);
+        if (!isFinite(ms) || ms < 0 || ms > 180000) return null;
+        return Math.round(ms);
       }
 
       function redirectToSandboxPayment(paymentUrl) {
-        setHandoffPhase('bank');
         const reserved = stagingSubmission.result || {};
         rememberCheckoutRedirectTiming(reserved.orderId);
         stagingSubmission.status = 'redirecting';
@@ -13962,8 +13923,6 @@
       }
 
       function acceptReservedPayment(json, displayedTotal) {
-        if (!checkoutStageTiming) checkoutStageTiming = {};
-        checkoutStageTiming.redirectStarted = Date.now();
         const orderId = json && json.orderId;
         const paymentUrl = json && json.paymentUrl;
         const backendTotal = Number(json && json.totalPaid);
@@ -14054,7 +14013,6 @@
         if (!checkoutCanComplete()) return;
 
         showPaymentHandoff();
-        const proceedAt = Date.now();
         stagingCheckoutBusy = true;
         stagingSubmission.status = 'validating';
         stagingSubmission.error = null;
@@ -14064,40 +14022,14 @@
         checkoutSyncPrimary();
 
         try {
-          const catalogStarted = Date.now();
           await refreshD06CatalogIfStale();
-          const catalogMs = Date.now() - catalogStarted;
-          const shipStarted = Date.now();
-          if (!checkoutHasValidShippingQuote()) {
-            const context = buildCheckoutShippingContext();
-            const key = checkoutQuoteKey(context);
-            let pending = null;
-            if (context &&
-                stagingShipping.status === 'loading' &&
-                stagingShipping.quoteKey === key &&
-                shippingRequest) {
-              pending = shippingRequest;
-            } else if (context) {
-              pending = loadCheckoutShipping();
-            }
-            if (pending) {
-              let timer = 0;
-              try {
-                await Promise.race([
-                  Promise.resolve(pending).catch(() => {}),
-                  new Promise(resolve => { timer = setTimeout(resolve, 8000); })
-                ]);
-              } finally {
-                clearTimeout(timer);
-              }
-            }
+          scheduleCheckoutShipping();
+          const started = Date.now();
+          while (!checkoutHasValidShippingQuote() &&
+                 Date.now() - started < 8000) {
+            if (stagingShipping.status === 'error') break;
+            await new Promise(resolve => setTimeout(resolve, 50));
           }
-          checkoutStageTiming = {
-            preflightMs:Date.now() - proceedAt,
-            catalogMs:catalogMs,
-            shippingWaitMs:Date.now() - shipStarted,
-            redirectStarted:0
-          };
           if (!checkoutCanComplete()) {
             stagingSubmission.status = 'error';
             stagingSubmission.error = 'stale';
@@ -14139,9 +14071,7 @@
           stagingSubmission.status = 'submitting';
           checkoutSyncPrimary();
           checkoutSubmitStarted = Date.now();
-          const reserveStarted = Date.now();
           const json = await submitFypStagingReservation(payload);
-          if (checkoutStageTiming) checkoutStageTiming.reserveMs = Date.now() - reserveStarted;
 
           if (!json || typeof json !== 'object' || typeof json.status !== 'string') {
             stagingSubmission.status = 'error';
@@ -14312,7 +14242,6 @@
               stagingSubmission.status !== 'redirecting') {
             stagingCheckoutBusy = false;
             checkoutSubmitStarted = 0;
-            checkoutStageTiming = null;
           }
           checkoutSyncPrimary();
         }
@@ -15189,19 +15118,14 @@
         }
         const allowed = ['EWALLET_TNG', 'EWALLET_GRABPAY', 'EWALLET_SHOPEEPAY', 'INTERNET_BANKING_FPX'];
         checkoutPayment = allowed.indexOf(channel) === -1 ? null : channel;
-        warmCheckoutCatalog();
-        scheduleCheckoutShipping(true);
         if (checkoutPayment !== 'INTERNET_BANKING_FPX') {
           fpxLoadGeneration += 1;
-          clearTimeout(fpxRefreshTimer);
           fpxBankState.selected = '';
           if (fpxBankState.status === 'loading') {
             fpxBankState.status = fpxBankState.banks.length ? 'ready' : 'idle';
           }
         } else if (fpxBankState.status !== 'ready') {
           loadFpxBanks();
-        } else if (!fpxBankState.loadedAt || Date.now() - fpxBankState.loadedAt > 240000) {
-          refreshFpxBanksQuiet();
         }
         checkoutRenderPayment();
       }
@@ -15223,53 +15147,14 @@
           const accepted = acceptFpxBankList(json);
           if (!accepted.ok) throw new Error('banks');
           fpxBankState.banks = accepted.banks;
-          fpxBankState.loadedAt = Date.now();
           fpxBankState.status = 'ready';
-          scheduleFpxBankRefresh();
         } catch (error) {
           if (generation !== fpxLoadGeneration) return;
           fpxBankState.banks = [];
           fpxBankState.selected = '';
-          fpxBankState.loadedAt = 0;
           fpxBankState.status = 'error';
         }
         checkoutRenderPayment();
-      }
-
-      function scheduleFpxBankRefresh() {
-        clearTimeout(fpxRefreshTimer);
-        if (checkoutPayment !== 'INTERNET_BANKING_FPX' || !fpxBankState.loadedAt) return;
-        const wait = Math.max(1000, fpxBankState.loadedAt + 240000 - Date.now());
-        fpxRefreshTimer = setTimeout(() => {
-          if (checkoutPayment === 'INTERNET_BANKING_FPX' && fpxBankState.status === 'ready') {
-            refreshFpxBanksQuiet();
-          }
-        }, wait);
-      }
-
-      async function refreshFpxBanksQuiet() {
-        const generation = fpxLoadGeneration;
-        try {
-          if (!fypStagingEndpointAllowed()) return;
-          const response = await fetch(
-            FYP_STAGING_API_URL + '?action=doku_fpx_banks',
-            { method:'GET', credentials:'omit' }
-          );
-          const json = await response.json();
-          if (generation !== fpxLoadGeneration) return;
-          if (checkoutPayment !== 'INTERNET_BANKING_FPX') return;
-          const accepted = acceptFpxBankList(json);
-          if (!accepted.ok) return;
-          const selected = fpxBankState.selected;
-          fpxBankState.banks = accepted.banks;
-          fpxBankState.loadedAt = Date.now();
-          fpxBankState.status = 'ready';
-          if (selected && !accepted.banks.some(bank => bank.bankCode === selected)) {
-            fpxBankState.selected = '';
-          }
-          checkoutRenderPayment();
-          scheduleFpxBankRefresh();
-        } catch (error) {}
       }
 
       function checkoutRenderPayment() {
@@ -15416,7 +15301,7 @@
 
         document.getElementById('checkout-back')
           .focus({ preventScroll:true });
-        syncCheckoutShipping(true);
+        syncCheckoutShipping();
       }
 
       function checkoutClose() {
@@ -16003,7 +15888,7 @@
         });
         const live = document.getElementById('journey-live');
         const labels = {
-          handoff:'Securing your order',
+          handoff:'Preparing your secure payment page...',
           checking:'Checking your payment',
           pending:'Your payment is processing.',
           failed:'Payment not completed',
@@ -16013,17 +15898,8 @@
         if (live) live.textContent = labels[name] || '';
       }
 
-      function setHandoffPhase(phase) {
-        const text = phase === 'bank' ? 'Connecting to your bank' : 'Securing your order';
-        const status = document.getElementById('handoff-status');
-        const live = document.getElementById('journey-live');
-        if (status) status.textContent = text;
-        if (live) live.textContent = text;
-      }
-
       function showPaymentHandoff() {
         showJourneyScreen('handoff');
-        setHandoffPhase('securing');
       }
 
       function hidePaymentHandoff() {
@@ -16137,12 +16013,8 @@
             orderId:stored.orderId,
             capability:stored.capability
           };
-          const stageTiming = takeCheckoutRedirectTiming(stored.orderId);
-          if (stageTiming) {
-            ['submitToRedirectMs', 'preflightMs', 'catalogMs', 'shippingWaitMs', 'reserveMs', 'redirectMs'].forEach(key => {
-              if (stageTiming[key] != null) fields[key] = stageTiming[key];
-            });
-          }
+          const submitToRedirectMs = takeCheckoutRedirectTiming(stored.orderId);
+          if (submitToRedirectMs != null) fields.submitToRedirectMs = submitToRedirectMs;
           const json = await postStagingAction('order_status', fields);
           if (json && json.status === 'success' &&
               json.order && json.order.orderId === stored.orderId) {
