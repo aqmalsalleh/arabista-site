@@ -13886,7 +13886,37 @@
         return response.json();
       }
 
+      const CHECKOUT_TIMING_KEY = 'arabista-checkout-timing';
+      let checkoutSubmitStarted = 0;
+
+      function rememberCheckoutRedirectTiming(orderId) {
+        const started = checkoutSubmitStarted;
+        checkoutSubmitStarted = 0;
+        if (!started || !isStagingOrderId(orderId)) return;
+        const elapsed = Date.now() - started;
+        if (!isFinite(elapsed) || elapsed < 0 || elapsed > 180000) return;
+        try {
+          sessionStorage.setItem(CHECKOUT_TIMING_KEY, JSON.stringify({
+            orderId:String(orderId),
+            submitToRedirectMs:Math.round(elapsed)
+          }));
+        } catch (error) {}
+      }
+
+      function takeCheckoutRedirectTiming(orderId) {
+        let stored = null;
+        try { stored = JSON.parse(sessionStorage.getItem(CHECKOUT_TIMING_KEY) || 'null'); }
+        catch (error) { stored = null; }
+        try { sessionStorage.removeItem(CHECKOUT_TIMING_KEY); } catch (error) {}
+        if (!stored || stored.orderId !== orderId) return null;
+        const ms = Number(stored.submitToRedirectMs);
+        if (!isFinite(ms) || ms < 0 || ms > 180000) return null;
+        return Math.round(ms);
+      }
+
       function redirectToSandboxPayment(paymentUrl) {
+        const reserved = stagingSubmission.result || {};
+        rememberCheckoutRedirectTiming(reserved.orderId);
         stagingSubmission.status = 'redirecting';
         checkoutSyncPrimary();
         window.location.assign(paymentUrl);
@@ -14040,6 +14070,7 @@
 
           stagingSubmission.status = 'submitting';
           checkoutSyncPrimary();
+          checkoutSubmitStarted = Date.now();
           const json = await submitFypStagingReservation(payload);
 
           if (!json || typeof json !== 'object' || typeof json.status !== 'string') {
@@ -14210,6 +14241,7 @@
           if (stagingSubmission.status !== 'reserved' &&
               stagingSubmission.status !== 'redirecting') {
             stagingCheckoutBusy = false;
+            checkoutSubmitStarted = 0;
           }
           checkoutSyncPrimary();
         }
@@ -15977,10 +16009,13 @@
         let order = null;
         let rejected = false;
         try {
-          const json = await postStagingAction('order_status', {
+          const fields = {
             orderId:stored.orderId,
             capability:stored.capability
-          });
+          };
+          const submitToRedirectMs = takeCheckoutRedirectTiming(stored.orderId);
+          if (submitToRedirectMs != null) fields.submitToRedirectMs = submitToRedirectMs;
+          const json = await postStagingAction('order_status', fields);
           if (json && json.status === 'success' &&
               json.order && json.order.orderId === stored.orderId) {
             order = json.order;
@@ -16012,7 +16047,10 @@
           showJourneyScreen('failed');
           return;
         }
-        if (Date.now() - journeyPollStarted >= 90000) {
+        // The provider status floor is 60s and a failed check stays quiet for
+        // 20s. 120s leaves room for that retry. The screen stays pending:
+        // this is not a failed payment and it does not start another order.
+        if (Date.now() - journeyPollStarted >= 120000) {
           stopJourneyPoll();
           showJourneyScreen('pending');
           return;
