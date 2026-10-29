@@ -3227,6 +3227,24 @@
       box-shadow:0 0 0 3px rgba(198,174,132,.18);
     }
 
+    .checkout-email.is-invalid .checkout-email-field {
+      border-color:#ad6955;
+      box-shadow:0 0 0 3px rgba(173,105,85,.12);
+    }
+
+    .checkout-email.is-attention .checkout-email-field {
+      animation:checkout-email-attention .7s ease-out 2;
+    }
+
+    @keyframes checkout-email-attention {
+      0%, 100% { box-shadow:0 0 0 3px rgba(173,105,85,.12); }
+      45% { box-shadow:0 0 0 7px rgba(173,105,85,.2); }
+    }
+
+    @media (prefers-reduced-motion:reduce) {
+      .checkout-email.is-attention .checkout-email-field { animation:none; }
+    }
+
     .checkout-email-icon {
       flex:0 0 auto;
       width:16px;
@@ -3581,6 +3599,14 @@
     .checkout-fpx-bank:disabled {
       color:#8a8680;
       background:#f7f5f2;
+    }
+
+    #checkout-fpx-status.is-loading {
+      display:flex;
+      align-items:center;
+      gap:12px;
+      min-height:32px;
+      color:#725b3d;
     }
 
     #checkout-payment .checkout-error {
@@ -5053,6 +5079,17 @@
     #postpay .ambient:after { content:''; position:absolute; inset:0; background:radial-gradient(ellipse at 50% 50%,#ffffff88,transparent 57%); }
     #postpay .handoff-screen,
     #postpay .checking-screen { align-items:center; justify-content:center; text-align:center; }
+    #postpay.is-handoff {
+      background:rgba(250,246,239,.58);
+      -webkit-backdrop-filter:blur(12px);
+      backdrop-filter:blur(12px);
+    }
+    #postpay .handoff-screen.active {
+      gap:16px;
+      padding:24px 20px;
+      background:transparent;
+      animation:none;
+    }
     #postpay .phase-content { position:relative; z-index:2; width:100%; padding:0 30px 75px; display:flex; flex-direction:column; align-items:center; }
     #postpay .flip-wrap { position:relative; perspective:800px; margin:0 0 26px; width:93px; height:93px; }
     #postpay .coin { position:relative; width:93px; height:93px; transform-style:preserve-3d; animation:flip 2.15s cubic-bezier(.62,.08,.27,.89) infinite; filter:drop-shadow(0 15px 17px #b99d7877); }
@@ -6788,8 +6825,8 @@
             </form>
 
             <p class="checkout-muted">
-              Use test details. This address stays in this checkout
-              until you continue, and it is not saved in this browser.
+              Use test details. Saved addresses stay in this browser
+              for your next staging checkout when browser storage is available.
               City and state suggestions come from the Malaysia Open
               Data postcode list (CC BY 4.0).
             </p>
@@ -6847,20 +6884,21 @@
     <div id="postpay" hidden>
       <p id="journey-live" class="sr-only" aria-live="polite"></p>
       <section class="screen handoff-screen" id="screen-handoff" hidden aria-label="Preparing secure payment">
-        <div class="ambient" aria-hidden="true"></div>
-        <div class="phase-content">
-          <div class="flip-wrap" aria-hidden="true">
-            <div class="coin-orbit"></div>
-            <div class="coin">
-              <div class="coin-face"><img src="images/logo.webp" alt=""></div>
-              <div class="coin-face back"><img src="images/logo.webp" alt=""></div>
+        <div class="basket-coin-stage" aria-hidden="true">
+          <div class="basket-coin">
+            <div class="basket-coin-halo"></div>
+            <div class="basket-coin-inner">
+              <div class="basket-coin-face basket-coin-front">
+                <img src="images/logo.webp" alt="" width="84" height="84">
+              </div>
+              <div class="basket-coin-face basket-coin-back">
+                <img src="images/logo.webp" alt="" width="84" height="84">
+              </div>
             </div>
           </div>
-          <div class="eyebrow" style="margin-bottom:13px">Arabista · secure checkout</div>
-          <h1 class="phase-title">A seamless handoff.</h1>
-          <p class="phase-copy">Preparing your secure payment page <span class="three-dots" aria-hidden="true"><span></span><span></span><span></span></span></p>
+          <div class="basket-coin-shadow"></div>
         </div>
-        <div class="phase-foot">Your order is being securely prepared</div>
+        <p class="basket-prepare-copy">Preparing your secure payment page…</p>
       </section>
       <section class="screen checking-screen" id="screen-checking" hidden aria-label="Checking payment status">
         <div class="ambient" aria-hidden="true"></div>
@@ -13132,6 +13170,7 @@
       };
       let stagingCheckoutBusy = false;
       let checkoutEmailTouched = false;
+      let checkoutEmailAttentionTimer = null;
 
       const stagingShipping = {
         status:'idle',
@@ -13150,7 +13189,8 @@
       let shippingGeneration = 0;
       let shippingDebounceTimer = null;
 
-      // All addresses are memory-only.
+      // Separate from production and conventional PDP checkout drafts.
+      const FYP_STAGING_ADDRESSES_KEY = 'arabista_fyp_addresses_stg';
       const checkoutAddresses = [];
       let checkoutAddressId = 0;
       let checkoutSelectedAddressId = null;
@@ -13169,6 +13209,52 @@
         'Terengganu','W.P. Kuala Lumpur',
         'W.P. Labuan','W.P. Putrajaya'
       ];
+
+      function restoreCheckoutAddresses() {
+        try {
+          const raw = localStorage.getItem(FYP_STAGING_ADDRESSES_KEY);
+          if (!raw || raw.length > 100000) return;
+          const saved = JSON.parse(raw);
+          if (!saved || saved.version !== 1 || !Array.isArray(saved.addresses)) return;
+          const ids = new Set();
+          saved.addresses.slice(0, 50).forEach(source => {
+            if (!source || !Number.isSafeInteger(source.id) || source.id < 1 || ids.has(source.id)) return;
+            const address = { id:source.id, isDefault:source.isDefault === true };
+            const limits = { recipient:120, phone:40, line1:300, line2:300, city:100, postcode:5, state:40 };
+            if (!Object.entries(limits).every(([key, max]) => {
+              if (typeof source[key] !== 'string' || source[key].length > max) return false;
+              address[key] = source[key].trim();
+              return true;
+            })) return;
+            if (!address.recipient || !address.line1 || !address.city ||
+                !checkoutPhoneValid(address.phone) || !isValidStagingPostcode(address.postcode) ||
+                !CHECKOUT_STATES.includes(address.state)) return;
+            ids.add(address.id);
+            checkoutAddresses.push(address);
+            checkoutAddressId = Math.max(checkoutAddressId, address.id);
+          });
+          const preferred = checkoutAddresses.find(address => address.isDefault) || checkoutAddresses[0];
+          checkoutAddresses.forEach(address => { address.isDefault = address === preferred; });
+          const selected = checkoutAddresses.find(address => address.id === saved.selectedId) || preferred;
+          checkoutSelectedAddressId = selected ? selected.id : null;
+        } catch (error) { /* Unavailable or invalid browser storage keeps checkout usable. */ }
+      }
+
+      function persistCheckoutAddresses() {
+        try {
+          if (!checkoutAddresses.length) {
+            localStorage.removeItem(FYP_STAGING_ADDRESSES_KEY);
+            return;
+          }
+          localStorage.setItem(FYP_STAGING_ADDRESSES_KEY, JSON.stringify({
+            version:1,
+            addresses:checkoutAddresses,
+            selectedId:checkoutSelectedAddressId
+          }));
+        } catch (error) { /* Addresses remain usable for this visit when storage is unavailable. */ }
+      }
+
+      restoreCheckoutAddresses();
 
       const checkoutStateSelect =
         document.getElementById('checkout-address-state');
@@ -13762,11 +13848,27 @@
           : '';
         error.hidden = !problem;
         error.textContent = problem;
+        input.closest('.checkout-email').classList.toggle('is-invalid', Boolean(problem));
         input.setAttribute('aria-invalid', problem ? 'true' : 'false');
         input.setAttribute(
           'aria-describedby',
           problem ? 'checkout-email-help checkout-email-error' : 'checkout-email-help'
         );
+      }
+
+      function guideCheckoutEmail() {
+        const input = document.getElementById('checkout-email');
+        if (!input) return;
+        checkoutEmailTouched = true;
+        renderCheckoutEmail();
+        const section = input.closest('.checkout-email');
+        clearTimeout(checkoutEmailAttentionTimer);
+        section.classList.remove('is-attention');
+        void section.offsetWidth;
+        section.classList.add('is-attention');
+        input.focus({ preventScroll:true });
+        section.scrollIntoView({ behavior:prefersReducedMotion() ? 'instant' : 'smooth', block:'center' });
+        checkoutEmailAttentionTimer = window.setTimeout(() => section.classList.remove('is-attention'), 1400);
       }
 
       function buildFypStagingReservationPayload() {
@@ -13990,10 +14092,7 @@
         }
         const emailProblem = checkoutEmailProblem(checkoutEmailAddress());
         if (emailProblem) {
-          checkoutEmailTouched = true;
-          renderCheckoutEmail();
-          const emailInput = document.getElementById('checkout-email');
-          if (emailInput) emailInput.focus({ preventScroll:true });
+          guideCheckoutEmail();
           return;
         }
         if (!checkoutPaymentReady()) {
@@ -14247,7 +14346,7 @@
         }
       }
 
-      function checkoutCanComplete() {
+      function checkoutCanComplete(requireEmail = true) {
         const priced = getD06PreviewSubtotal(checkoutItems);
         return (
           checkoutItems.length > 0 &&
@@ -14255,7 +14354,7 @@
           !priced.blocked &&
           checkoutSelectedAddress() !== null &&
           checkoutHasValidShippingQuote() &&
-          checkoutEmailValid(checkoutEmailAddress()) &&
+          (!requireEmail || checkoutEmailValid(checkoutEmailAddress())) &&
           checkoutPaymentReady()
         );
       }
@@ -14284,7 +14383,8 @@
           error === 'checkout_attempt_mismatch' ||
           error === 'attempt_in_flight' ||
           error === 'already_paid';
-        checkoutPrimary.disabled = busy || held || !checkoutCanComplete();
+        // Keep the action reachable for email guidance; submission still requires a valid email.
+        checkoutPrimary.disabled = busy || held || !checkoutCanComplete(false);
         const methods = document.getElementById('checkout-payment-methods');
         if (methods) methods.disabled = checkoutItemEditsLocked();
         const bank = document.getElementById('checkout-fpx-bank');
@@ -15009,6 +15109,7 @@
             deliver.addEventListener('click', () => {
               checkoutSelectedAddressId = address.id;
               checkoutRemoveAddressId = null;
+              persistCheckoutAddresses();
               checkoutRenderAddressSummary();
               scheduleCheckoutShipping();
               checkoutShowView('main');
@@ -15045,6 +15146,7 @@
               });
               checkoutSelectedAddressId = address.id;
               checkoutRemoveAddressId = null;
+              persistCheckoutAddresses();
               checkoutRenderAddressList();
               checkoutRenderAddressSummary();
               scheduleCheckoutShipping();
@@ -15136,11 +15238,13 @@
         fpxBankState.banks = [];
         fpxBankState.selected = '';
         checkoutRenderPayment();
+        const controller = new AbortController();
+        const timeout = window.setTimeout(() => controller.abort(), 20000);
         try {
           if (!fypStagingEndpointAllowed()) throw new Error('endpoint');
           const response = await fetch(
             FYP_STAGING_API_URL + '?action=doku_fpx_banks',
-            { method:'GET', credentials:'omit' }
+            { method:'GET', credentials:'omit', signal:controller.signal }
           );
           const json = await response.json();
           if (generation !== fpxLoadGeneration) return;
@@ -15153,6 +15257,8 @@
           fpxBankState.banks = [];
           fpxBankState.selected = '';
           fpxBankState.status = 'error';
+        } finally {
+          clearTimeout(timeout);
         }
         checkoutRenderPayment();
       }
@@ -15199,6 +15305,8 @@
           select.setAttribute('aria-invalid', fpxBankState.status === 'error' ? 'true' : 'false');
         }
         if (status) {
+          const loading = showFpx && fpxBankState.status === 'loading';
+          status.classList.toggle('is-loading', loading);
           status.textContent = !showFpx
             ? ''
             : fpxBankState.status === 'loading'
@@ -15206,6 +15314,7 @@
               : fpxBankState.status === 'error'
                 ? 'The bank list is unavailable. FPX cannot be used until it loads.'
                 : '';
+          if (loading) status.prepend(createArabistaCoin(true));
         }
         if (retry) retry.hidden = !(showFpx && fpxBankState.status === 'error');
         checkoutSyncPrimary();
@@ -15355,10 +15464,11 @@
       function updateCheckoutKeyboardInset() {
         const field = document.activeElement;
         const inForm = field && checkoutAddressForm.contains(field);
+        const inEmail = field && field.id === 'checkout-email';
 
         if (!checkoutActive ||
-            checkoutCurrentView !== 'addressForm' ||
-            !inForm ||
+            !((checkoutCurrentView === 'addressForm' && inForm) ||
+              (checkoutCurrentView === 'main' && inEmail)) ||
             !window.visualViewport) {
           checkoutLayer.style.bottom = '';
           return;
@@ -15496,6 +15606,7 @@
             checkoutSelectedAddressId = preferred.id;
           }
         }
+        persistCheckoutAddresses();
         checkoutRenderAddressList();
         checkoutRenderAddressSummary();
         scheduleCheckoutShipping();
@@ -15698,6 +15809,7 @@
         }
 
         checkoutEditingAddressId = null;
+        persistCheckoutAddresses();
         checkoutRenderAddressList();
         checkoutRenderAddressSummary();
         scheduleCheckoutShipping();
@@ -15726,13 +15838,19 @@
       const checkoutEmailInput = document.getElementById('checkout-email');
       if (checkoutEmailInput) {
         checkoutEmailInput.addEventListener('input', () => {
+          checkoutEmailInput.closest('.checkout-email').classList.remove('is-attention');
           if (checkoutEmailTouched) renderCheckoutEmail();
           checkoutSyncPrimary();
+        });
+        checkoutEmailInput.addEventListener('focus', () => {
+          requestAnimationFrame(updateCheckoutKeyboardInset);
+          window.setTimeout(updateCheckoutKeyboardInset, 300);
         });
         checkoutEmailInput.addEventListener('blur', () => {
           checkoutEmailTouched = true;
           renderCheckoutEmail();
           checkoutSyncPrimary();
+          window.setTimeout(updateCheckoutKeyboardInset, 0);
         });
       }
 
@@ -15878,6 +15996,7 @@
         const root = document.getElementById('postpay');
         if (!root) return;
         root.hidden = false;
+        root.classList.toggle('is-handoff', name === 'handoff');
         journeyScreen = name;
         ['handoff','checking','pending','failed','success','orders'].forEach(id => {
           const screen = document.getElementById('screen-' + id);
