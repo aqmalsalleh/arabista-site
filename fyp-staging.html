@@ -3973,6 +3973,7 @@
     }
 
     .basket-coin {
+      display:block;
       position:relative;
       width:84px;
       height:84px;
@@ -3987,6 +3988,7 @@
     }
 
     .basket-coin-inner {
+      display:block;
       position:relative;
       width:100%;
       height:100%;
@@ -5090,6 +5092,12 @@
       background:transparent;
       animation:none;
     }
+    #postpay .order-access-loading {
+      inset:0;
+      z-index:5;
+      text-align:center;
+      outline:none;
+    }
     #postpay .phase-content { position:relative; z-index:2; width:100%; padding:0 30px 75px; display:flex; flex-direction:column; align-items:center; }
     #postpay .flip-wrap { position:relative; perspective:800px; margin:0 0 26px; width:93px; height:93px; }
     #postpay .coin { position:relative; width:93px; height:93px; transform-style:preserve-3d; animation:flip 2.15s cubic-bezier(.62,.08,.27,.89) infinite; filter:drop-shadow(0 15px 17px #b99d7877); }
@@ -5749,11 +5757,11 @@
         <strong>Find my size</strong>
       </div>
       <div class="fit-fields">
-        <label>Height
-          <input id="product-fit-height" data-fit="height" type="text" inputmode="decimal" enterkeyhint="next" placeholder="cm" aria-label="Height in centimetres">
-        </label>
         <label>Weight
-          <input id="product-fit-weight" data-fit="weight" type="text" inputmode="decimal" enterkeyhint="done" placeholder="kg" aria-label="Weight in kilograms">
+          <input id="product-fit-weight" data-fit="weight" type="text" inputmode="decimal" enterkeyhint="next" placeholder="kg" aria-label="Weight in kilograms">
+        </label>
+        <label>Height
+          <input id="product-fit-height" data-fit="height" type="text" inputmode="numeric" enterkeyhint="done" maxlength="3" placeholder="cm" aria-label="Height in centimetres">
         </label>
       </div>
       <p id="product-fit-result" class="fit-result" aria-live="polite"></p>
@@ -6195,11 +6203,11 @@
                 <strong>Find my size</strong>
               </div>
               <div class="fit-fields">
-                <label>Height
-                  <input id="commerce-fit-height" data-fit="height" type="text" inputmode="decimal" enterkeyhint="next" placeholder="cm" aria-label="Height in centimetres">
-                </label>
                 <label>Weight
-                  <input id="commerce-fit-weight" data-fit="weight" type="text" inputmode="decimal" enterkeyhint="done" placeholder="kg" aria-label="Weight in kilograms">
+                  <input id="commerce-fit-weight" data-fit="weight" type="text" inputmode="decimal" enterkeyhint="next" placeholder="kg" aria-label="Weight in kilograms">
+                </label>
+                <label>Height
+                  <input id="commerce-fit-height" data-fit="height" type="text" inputmode="numeric" enterkeyhint="done" maxlength="3" placeholder="cm" aria-label="Height in centimetres">
                 </label>
               </div>
               <p id="commerce-fit-result" class="fit-result" aria-live="polite"></p>
@@ -6989,6 +6997,10 @@
         </div>
       </section>
       <section class="screen orders-screen" id="screen-orders" hidden aria-label="My Order">
+        <div id="order-access-loading" class="basket-prepare order-access-loading" role="status" aria-live="polite" tabindex="-1" hidden>
+          <div id="order-access-coin" class="basket-coin-stage" aria-hidden="true"></div>
+          <p id="order-access-loading-copy" class="basket-prepare-copy"></p>
+        </div>
         <header class="orders-head">
           <div class="eyebrow">Your Arabista journey</div>
           <h1>My Order</h1>
@@ -11833,7 +11845,7 @@
         weightInputs.forEach(input => {
           if (input.value !== weightValue) input.value = weightValue;
         });
-        const blank = !String(heightValue).trim() || !String(weightValue).trim();
+        const blank = !/^\d{3}$/.test(String(heightValue).trim()) || !String(weightValue).trim();
         sizeFit = blank ? null : recommendArabistaFit(heightValue, weightValue);
         const sheet = document.getElementById('product-sheet');
         if (sheet) {
@@ -11908,13 +11920,18 @@
         fitDismissTimer = 0;
       }
 
-      function scheduleFitDismiss(form) {
+      function scheduleFitDismiss(form, heightEntered = false) {
         cancelFitDismiss();
         if (fitComposing || !form) return;
         const height = form.querySelector('[data-fit="height"]');
         const weight = form.querySelector('[data-fit="weight"]');
         if (!height || !weight) return;
-        if (!fitNumberComplete(height.value) || !fitNumberComplete(weight.value)) return;
+        if (!/^\d{3}$/.test(height.value.trim()) || !fitNumberComplete(weight.value)) return;
+        if (heightEntered && document.activeElement === height) {
+          height.blur();
+          return;
+        }
+        if (document.activeElement !== weight) return;
         fitDismissTimer = window.setTimeout(() => {
           fitDismissTimer = 0;
           const active = document.activeElement;
@@ -12047,11 +12064,11 @@
       function bindSizeFit() {
         document.querySelectorAll('.fit-card').forEach(form => {
           form.addEventListener('submit', event => event.preventDefault());
-          form.addEventListener('input', () => {
+          form.addEventListener('input', event => {
             const height = form.querySelector('[data-fit="height"]');
             const weight = form.querySelector('[data-fit="weight"]');
             publishSizeFit(height ? height.value : '', weight ? weight.value : '');
-            scheduleFitDismiss(form);
+            scheduleFitDismiss(form, event.target === height);
           });
           form.addEventListener('focusin', () => {
             scheduleFitDismiss(form);
@@ -12068,24 +12085,27 @@
             fitComposing = true;
             cancelFitDismiss();
           });
-          form.addEventListener('compositionend', () => {
+          form.addEventListener('compositionend', event => {
             fitComposing = false;
-            scheduleFitDismiss(form);
-          });
-          form.addEventListener('keydown', event => {
-            if (event.key !== 'Enter') return;
             const height = form.querySelector('[data-fit="height"]');
             const weight = form.querySelector('[data-fit="weight"]');
-            if (event.target === height) {
+            publishSizeFit(height ? height.value : '', weight ? weight.value : '');
+            scheduleFitDismiss(form, event.target === height);
+          });
+          form.addEventListener('keydown', event => {
+            if (event.key !== 'Enter' || event.isComposing || fitComposing) return;
+            const height = form.querySelector('[data-fit="height"]');
+            const weight = form.querySelector('[data-fit="weight"]');
+            if (event.target === weight) {
               event.preventDefault();
-              if (weight) weight.focus({ preventScroll:true });
+              if (height) height.focus({ preventScroll:true });
               return;
             }
-            if (event.target !== weight) return;
+            if (event.target !== height) return;
             event.preventDefault();
             cancelFitDismiss();
             publishSizeFit(height ? height.value : '', weight ? weight.value : '');
-            if (weight) weight.blur();
+            if (height) height.blur();
           });
         });
       }
@@ -13191,6 +13211,7 @@
 
       // Separate from production and conventional PDP checkout drafts.
       const FYP_STAGING_ADDRESSES_KEY = 'arabista_fyp_addresses_stg';
+      const FYP_STAGING_EMAIL_KEY = 'arabista_fyp_email_stg';
       const checkoutAddresses = [];
       let checkoutAddressId = 0;
       let checkoutSelectedAddressId = null;
@@ -15837,7 +15858,18 @@
 
       const checkoutEmailInput = document.getElementById('checkout-email');
       if (checkoutEmailInput) {
+        try {
+          const savedEmail = localStorage.getItem(FYP_STAGING_EMAIL_KEY);
+          if (typeof savedEmail === 'string' && savedEmail.length <= 254) {
+            checkoutEmailInput.value = savedEmail;
+          }
+        } catch (error) { /* Checkout stays usable when browser storage is blocked. */ }
         checkoutEmailInput.addEventListener('input', () => {
+          try {
+            const email = checkoutEmailAddress();
+            if (email && email.length <= 254) localStorage.setItem(FYP_STAGING_EMAIL_KEY, email);
+            else localStorage.removeItem(FYP_STAGING_EMAIL_KEY);
+          } catch (error) { /* Keep the entered email for this visit. */ }
           checkoutEmailInput.closest('.checkout-email').classList.remove('is-attention');
           if (checkoutEmailTouched) renderCheckoutEmail();
           checkoutSyncPrimary();
@@ -15957,6 +15989,52 @@
       let journeyOrders = [];
       let journeySection = 'all';
       let journeyLookupIdentity = '';
+      let orderAccessRequest = null;
+
+      function beginOrderAccessLoading(text) {
+        if (orderAccessRequest) return null;
+        const request = { controller:new AbortController(), timer:null };
+        request.timer = window.setTimeout(() => request.controller.abort(), 20000);
+        orderAccessRequest = request;
+        const overlay = document.getElementById('order-access-loading');
+        const stage = document.getElementById('order-access-coin');
+        if (!stage.firstChild) {
+          stage.appendChild(createArabistaCoin(false));
+          const shadow = document.createElement('span');
+          shadow.className = 'basket-coin-shadow';
+          stage.appendChild(shadow);
+        }
+        document.getElementById('order-access-loading-copy').textContent = text;
+        document.querySelectorAll('#screen-orders > .orders-head, #screen-orders > .orders-scroll, #screen-orders > .journey-nav')
+          .forEach(node => { node.inert = true; });
+        document.getElementById('screen-orders').setAttribute('aria-busy', 'true');
+        overlay.hidden = false;
+        overlay.focus({ preventScroll:true });
+        return request;
+      }
+
+      function endOrderAccessLoading(request, focusTarget) {
+        if (!request || request !== orderAccessRequest) return;
+        clearTimeout(request.timer);
+        orderAccessRequest = null;
+        document.getElementById('order-access-loading').hidden = true;
+        document.querySelectorAll('#screen-orders > .orders-head, #screen-orders > .orders-scroll, #screen-orders > .journey-nav')
+          .forEach(node => { node.inert = false; });
+        document.getElementById('screen-orders').removeAttribute('aria-busy');
+        if (journeyScreen === 'orders' && focusTarget && focusTarget.getClientRects().length) {
+          focusTarget.focus({ preventScroll:true });
+        }
+      }
+
+      function cleanPaymentReturnUrl() {
+        try {
+          const url = new URL(window.location.href);
+          if (!url.searchParams.has('status') && !url.searchParams.has('success')) return;
+          url.searchParams.delete('status');
+          url.searchParams.delete('success');
+          history.replaceState(history.state, '', url.pathname + url.search + url.hash);
+        } catch (error) { /* URL cleanup must not interrupt verified order access. */ }
+      }
 
       function mapPaymentJourney(paymentStatus) {
         const pay = String(paymentStatus || '').toUpperCase();
@@ -16033,6 +16111,10 @@
 
       function hideJourney() {
         stopJourneyPoll();
+        if (orderAccessRequest) {
+          orderAccessRequest.controller.abort();
+          endOrderAccessLoading(orderAccessRequest);
+        }
         const root = document.getElementById('postpay');
         if (root) root.hidden = true;
         journeyScreen = '';
@@ -16091,7 +16173,7 @@
         }
       }
 
-      async function postStagingAction(action, fields) {
+      async function postStagingAction(action, fields, signal) {
         const body = new URLSearchParams();
         Object.keys(fields || {}).forEach(key => {
           if (fields[key] != null) body.set(key, String(fields[key]));
@@ -16102,7 +16184,8 @@
             method:'POST',
             headers:{ 'Content-Type':'application/x-www-form-urlencoded' },
             body:body.toString(),
-            credentials:'omit'
+            credentials:'omit',
+            signal
           }
         );
         if (!response.ok) throw new Error('Order HTTP');
@@ -16233,6 +16316,11 @@
 
       function showVerifiedSuccess(order, quiet) {
         journeyPurchase = order;
+        cleanPaymentReturnUrl();
+        const storedStatus = readStoredOrderStatus();
+        if (storedStatus && storedStatus.orderId === order.orderId) {
+          try { sessionStorage.removeItem(ORDER_STATUS_KEY); } catch (error) {}
+        }
         const receiptId = document.getElementById('receipt-id');
         if (receiptId) receiptId.textContent = order.orderId || '';
         const items = document.getElementById('receipt-items');
@@ -16487,7 +16575,7 @@
         showLookup();
       }
 
-      async function loadOrderHistory(session) {
+      async function loadOrderHistory(session, signal) {
         const empty = document.getElementById('orders-empty');
         showOrderList([]);
         if (empty) {
@@ -16495,7 +16583,8 @@
           empty.textContent = 'Loading your orders…';
         }
         try {
-          const json = await postStagingAction('order_history_list', { session });
+          const json = await postStagingAction('order_history_list', { session }, signal);
+          if (signal && signal.aborted) return;
           if (!json || json.status === 'expired') {
             sessionStorage.removeItem(ORDER_HISTORY_KEY);
             showLookup();
@@ -16512,6 +16601,7 @@
           }
           showOrderList(json.orders);
         } catch (error) {
+          if (signal && signal.aborted && !orderAccessRequest) return;
           if (empty) {
             empty.hidden = false;
             empty.textContent = 'Orders are unavailable right now. Please try again.';
@@ -16615,6 +16705,7 @@
       });
 
       async function requestOrderCode() {
+        if (orderAccessRequest) return;
         const input = document.getElementById('lookup-identifier');
         const error = document.getElementById('lookup-error');
         const identity = classifyOrderLookup(input.value);
@@ -16626,10 +16717,13 @@
         journeyLookupIdentity = input.value.trim();
         const button = document.getElementById('lookup-submit');
         button.disabled = true;
+        const request = beginOrderAccessLoading('Sending your verification code…');
+        let focusTarget = input;
         try {
           const json = await postStagingAction('order_history_request_code', {
             identifier:journeyLookupIdentity
-          });
+          }, request.controller.signal);
+          if (request !== orderAccessRequest) return;
           if (!json || json.status === 'unavailable' || json.status === 'throttled' || json.status === 'error') {
             error.textContent = (json && json.message) || 'Verification could not be sent just now. Please try again shortly.';
             return;
@@ -16639,15 +16733,18 @@
           document.getElementById('otp-error').textContent = '';
           const code = document.getElementById('otp-code');
           code.value = '';
-          code.focus({ preventScroll:true });
+          focusTarget = code;
         } catch (error) {
+          if (request !== orderAccessRequest) return;
           document.getElementById('lookup-error').textContent = 'Orders are unavailable right now. Please try again.';
         } finally {
           button.disabled = false;
+          endOrderAccessLoading(request, focusTarget);
         }
       }
 
       async function verifyOrderCode() {
+        if (orderAccessRequest) return;
         const code = document.getElementById('otp-code').value.trim();
         const error = document.getElementById('otp-error');
         if (!/^\d{6}$/.test(code)) {
@@ -16657,11 +16754,14 @@
         error.textContent = '';
         const button = document.getElementById('otp-submit');
         button.disabled = true;
+        const request = beginOrderAccessLoading('Verifying your code…');
+        let focusTarget = document.getElementById('otp-code');
         try {
           const json = await postStagingAction('order_history_verify_code', {
             identifier:journeyLookupIdentity,
             code
-          });
+          }, request.controller.signal);
+          if (request !== orderAccessRequest) return;
           if (!json || json.status !== 'success' || !json.session) {
             error.textContent = (json && json.message) || 'The verification code is not valid.';
             return;
@@ -16671,11 +16771,15 @@
             expiresAt:Number(json.expiresAt)
           }));
           document.getElementById('lookup-otp').hidden = true;
-          await loadOrderHistory(String(json.session));
+          document.getElementById('order-access-loading-copy').textContent = 'Loading your orders…';
+          await loadOrderHistory(String(json.session), request.controller.signal);
+          focusTarget = document.querySelector('#orders-results button');
         } catch (failure) {
+          if (request !== orderAccessRequest) return;
           error.textContent = 'Orders are unavailable right now. Please try again.';
         } finally {
           button.disabled = false;
+          endOrderAccessLoading(request, focusTarget);
         }
       }
 
@@ -16689,6 +16793,7 @@
       window.addEventListener('pageshow', event => {
         if (event.persisted) resumeStoredOrderStatus();
       });
+      cleanPaymentReturnUrl();
       resumeStoredOrderStatus();
     })();
   </script>
