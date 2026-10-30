@@ -5249,6 +5249,7 @@
     }
 
   </style>
+  <script src="arabista-product-config.js"></script>
 </head>
 <body>
   <svg xmlns="http://www.w3.org/2000/svg" class="sr-only" aria-hidden="true">
@@ -8737,6 +8738,70 @@
         );
       });
 
+      const defaultProductImages = productImages.slice();
+      const defaultProductImageAlts = productImageAlts.slice();
+      let managedGalleryKey = '';
+      let managedOptionsKey = '';
+
+      function applyManagedProductMedia(data) {
+        const media = data.media || [], key = media.map(m => m.url).join('|');
+        if (key === managedGalleryKey) return;
+        managedGalleryKey = key;
+        productImages.splice(0, productImages.length, ...(media.length ? media.map(m=>m.url) : defaultProductImages));
+        productImageAlts.splice(0, productImageAlts.length, ...(media.length ? media.map(m=>m.alt) : defaultProductImageAlts));
+        clearElement(productGalleryTrack); clearElement(productLightboxTrack);
+        productImages.forEach((src,index) => {
+          productGalleryTrack.append(makeProductSlide(src,productImageAlts[index],'product-gallery-slide',index>2));
+          productLightboxTrack.append(makeProductSlide(src,productImageAlts[index],'product-lightbox-slide',true));
+        });
+        productImageIndex = 0; productGalleryTrack.scrollLeft = 0; productLightboxTrack.scrollLeft = 0;
+        productImageCount.textContent = '1/' + productImages.length;
+        productLightboxCounter.textContent = '1 / ' + productImages.length;
+        FYP_CART_IMAGE = productImages[0];
+      }
+
+      function renderManagedProductOptions(data) {
+        const config = activeProductConfiguration();
+        if (!config) return;
+        const key = JSON.stringify(config);
+        if (key === managedOptionsKey) return;
+        managedOptionsKey = key;
+        const sets = document.querySelector('.commerce-set-preview .commerce-set-toggle');
+        if (sets) {
+          clearElement(sets);
+          globalThis.ArabistaProductConfig.options(config,'length').forEach(option => {
+            const button = document.createElement('button'); button.type='button';button.dataset.previewSet=option.id;button.textContent=option.label;if(option.id==='S1')button.id='commerce-set-standard';if(option.id==='S2')button.id='commerce-set-long';
+            button.setAttribute('aria-pressed',String(previewSet===option.id));
+            button.addEventListener('click',()=>{ previewSet=option.id; if(demoSelectedSize&&!previewSizeOffered(previewSet,demoSelectedSize)){ demoSelectedSize=null;demoQuantity=1; } renderVariantSelection(); });
+            sets.appendChild(button);
+          });
+        }
+        const sizeOptions = globalThis.ArabistaProductConfig.options(config,'size');
+        const grid = document.getElementById('commerce-size-grid');
+        if (grid) {
+          clearElement(grid);
+          sizeOptions.forEach(option => {
+            const button=document.createElement('button');button.type='button';button.className='commerce-size-button';button.dataset.demoSize=option.id;button.disabled=true;
+            const label=document.createElement('span');label.textContent=option.label;
+            const stock=document.createElement('small');stock.className='commerce-size-state';stock.hidden=true;stock.textContent='Unavailable';button.append(label,stock);
+            button.addEventListener('click',()=>{if(!previewSet||!previewSizeOffered(previewSet,option.id))return; const cap=selectorCap(option.id);if(cap<1)return;demoSelectedSize=option.id;demoQuantity=Math.min(Math.max(1,demoQuantity),cap);demoSelectionNotice='';renderVariantSelection();});
+            grid.appendChild(button);
+          });
+          commerceSizeButtons = Array.from(grid.querySelectorAll('[data-demo-size]'));
+        }
+        let colours = document.getElementById('managed-colour-options');
+        if (!colours && sets) { colours=document.createElement('div');colours.id='managed-colour-options';sets.parentElement.appendChild(colours); }
+        if (colours) {
+          clearElement(colours);
+          const options=globalThis.ArabistaProductConfig.options(config,'colour');
+          if(options.length){const label=document.createElement('p');label.className='commerce-section-title';label.textContent=config.attributes.find(a=>a.key==='colour').label;colours.append(label);const group=document.createElement('div');group.className='commerce-set-toggle';options.forEach(option=>{const button=document.createElement('button');button.type='button';button.textContent=option.label;button.disabled=true;group.append(button);});colours.append(group);const note=document.createElement('p');note.className='commerce-preview-note';note.textContent='These colour variants are not available to purchase yet.';colours.append(note);}
+        }
+        if(previewSet&&!config.profiles.some(p=>p.setCode===previewSet)){previewSet=null;demoSelectedSize=null;}
+        renderVariantSelection();
+        const height=document.querySelector('[data-fit="height"]'), weight=document.querySelector('[data-fit="weight"]');
+        if(height&&weight&&height.value&&weight.value)publishSizeFit(height.value,weight.value);
+      }
+
       function warmGallerySlide(index) {
         const slide = productGalleryTrack.children[index];
         if (!slide || slide.dataset.galleryWarm === '1') return;
@@ -9558,7 +9623,7 @@
       const commerceFooter =
         document.getElementById('commerce-action-footer');
 
-      const commerceSizeButtons = Array.from(
+      let commerceSizeButtons = Array.from(
         document.querySelectorAll('[data-demo-size]')
       );
 
@@ -9608,12 +9673,6 @@
       let demoQuantity = 1;
       let previewSet = null;
       let sizeFit = null;
-      /* Local demonstration only. XS is hidden on Set 2 so the preview can
-         show an unavailable length/size pair. This is not inventory. */
-      const PREVIEW_SET_UNOFFERED = { S2: { XS: true } };
-      const FIT_SIZES = ['XS', 'S', 'M', 'L', 'XL', 'XXL', 'XXXL'];
-      const FIT_BUST = { XS: 36, S: 38, M: 40, L: 42, XL: 44, XXL: 46, XXXL: 50 };
-      const FIT_BMI = [19.53, 22.27, 25, 27.73, 30.47, 33.2];
       let stagingCartBusy = false;
       let stagingCartNotice = '';
       let cartFlyAnimation = null;
@@ -9623,7 +9682,7 @@
 
       // Shared with conventional staging PDPs. Production cart is not used.
       const FYP_STAGING_CART_KEY = 'arabista_cart_stg';
-      const FYP_CART_IMAGE = 'images/d06-1-hero.webp';
+      let FYP_CART_IMAGE = 'images/d06-1-hero.webp';
 
       function moneyPreview(amount) {
         return `RM${Number(amount).toFixed(2)}`;
@@ -9892,6 +9951,8 @@
       }
 
       function selectorCap(size) {
+        const managed = activeProductConfiguration();
+        if (managed && (globalThis.ArabistaProductConfig.options(managed,'colour').length || (previewSet && !['S1','S2'].includes(previewSet)))) return 0;
         return commerceIntent === 'buy'
           ? maxBuyQuantity(size)
           : maxAddQuantity(size);
@@ -10452,102 +10513,51 @@
 
       function acceptOperationsCatalog(payload) {
         try {
-          if (!payload || payload.ok !== true) return null;
-          if (payload.apiVersion !== 'ao.public.v1') return null;
-          if (payload.schemaVersion !== 1) return null;
-          if (!Number.isFinite(Date.parse(payload.updatedAt))) return null;
+          if (!payload || payload.ok !== true || payload.apiVersion !== 'ao.public.v1' || payload.schemaVersion !== 1 || !Number.isFinite(Date.parse(payload.updatedAt))) return null;
           const data = payload.data;
           if (!data || data.productCode !== 'D06') return null;
-          const title = operationsText(data.title, 200);
-          const description = operationsText(data.description, 2000);
-          const fabric = operationsText(data.fabric, 200);
-          const features = operationsText(data.features, 4000);
-          const featureLines = operationsFeatureLines(features);
-          if (!title || !description || !fabric || !featureLines.length) return null;
-          if (!Array.isArray(data.sizeProfiles) || data.sizeProfiles.length !== 2) return null;
-          const commerce = data.commerce;
-          if (!commerce || typeof commerce !== 'object') return null;
-          if (typeof commerce.purchasable !== 'boolean') return null;
-          const enums = {
-            prices:['UNSET','SET'],
-            media:['NONE','PRESENT'],
-            inventory:['UNINITIALIZED','INITIALIZED'],
-            lengthAssignment:['UNASSIGNED','ASSIGNED']
-          };
-          const commerceOk = Object.keys(enums).every(key =>
-            enums[key].includes(commerce[key])
-          );
-          if (!commerceOk) return null;
-          const profiles = [];
-          const seenSets = {};
-          for (let index = 0; index < data.sizeProfiles.length; index += 1) {
-            const profile = data.sizeProfiles[index];
-            if (!profile || (profile.setCode !== 'S1' && profile.setCode !== 'S2')) return null;
-            if (seenSets[profile.setCode]) return null;
-            if (index === 0 && profile.setCode !== 'S1') return null;
-            if (index === 1 && profile.setCode !== 'S2') return null;
-            seenSets[profile.setCode] = true;
-            const label = operationsText(profile.label, 80);
-            if (!label || profile.lengthUnit !== 'in' || profile.heightUnit !== 'cm') return null;
-            if (!Array.isArray(profile.sizes) || profile.sizes.length !== 7) return null;
-            const sizes = [];
-            for (let sizeIndex = 0; sizeIndex < OPERATIONS_SIZE_ORDER.length; sizeIndex += 1) {
-              const row = profile.sizes[sizeIndex];
-              if (!row || row.size !== OPERATIONS_SIZE_ORDER[sizeIndex]) return null;
-              const measurement = {
-                size:row.size,
-                shoulderIn:operationsNumber(row.shoulderIn),
-                bustIn:operationsNumber(row.bustIn),
-                sleeveIn:operationsNumber(row.sleeveIn),
-                lengthIn:operationsNumber(row.lengthIn),
-                heightMinCm:operationsNumber(row.heightMinCm),
-                heightMaxCm:operationsNumber(row.heightMaxCm)
-              };
-              if (Object.keys(measurement).some(key => key !== 'size' && measurement[key] === null)) {
-                return null;
-              }
-              if (measurement.heightMinCm > measurement.heightMaxCm) return null;
-              sizes.push(measurement);
-            }
-            profiles.push({
-              setCode:profile.setCode,
-              label,
-              lengthUnit:profile.lengthUnit,
-              heightUnit:profile.heightUnit,
-              sizes
+          const title = operationsText(data.title, 200), description = operationsText(data.description, 2000);
+          const fabric = operationsText(data.fabric, 200), features = operationsText(data.features, 4000);
+          if (!title || !description || !fabric || !operationsFeatureLines(features).length) return null;
+          if (!Array.isArray(data.sizeProfiles) || !data.sizeProfiles.length || data.sizeProfiles.length > 30) return null;
+          const commerce = data.commerce, enums = { prices:['UNSET','SET'], media:['NONE','PRESENT'], inventory:['UNINITIALIZED','INITIALIZED'], lengthAssignment:['UNASSIGNED','ASSIGNED'] };
+          if (!commerce || typeof commerce.purchasable !== 'boolean' || !Object.keys(enums).every(key => enums[key].includes(commerce[key]))) return null;
+          const seenSets = new Set();
+          const profiles = data.sizeProfiles.map(profile => {
+            if (!profile || !/^[A-Z0-9][A-Z0-9_-]{0,23}$/.test(profile.setCode) || seenSets.has(profile.setCode)) throw new Error('profile');
+            seenSets.add(profile.setCode);
+            const label = operationsText(profile.label, 80), seenSizes = new Set();
+            if (!label || profile.lengthUnit !== 'in' || profile.heightUnit !== 'cm' || !Array.isArray(profile.sizes) || !profile.sizes.length || profile.sizes.length > 30) throw new Error('profile');
+            const sizes = profile.sizes.map(row => {
+              if (!row || !/^[A-Z0-9][A-Z0-9_-]{0,23}$/.test(row.size) || seenSizes.has(row.size)) throw new Error('size');
+              seenSizes.add(row.size);
+              const measurement = { size: row.size };
+              ['shoulderIn','bustIn','sleeveIn','lengthIn','heightMinCm','heightMaxCm'].forEach(key => { measurement[key] = operationsNumber(row[key]); if (measurement[key] === null || measurement[key] <= 0) throw new Error('measurement'); });
+              if (measurement.heightMinCm > measurement.heightMaxCm) throw new Error('range');
+              return measurement;
             });
-          }
-          return {
-            updatedAt:payload.updatedAt,
-            data:{
-              productCode:'D06',
-              title,
-              description,
-              fabric,
-              features,
-              sizeProfiles:profiles,
-              commerce:{
-                purchasable:commerce.purchasable,
-                prices:commerce.prices,
-                media:commerce.media,
-                inventory:commerce.inventory,
-                lengthAssignment:commerce.lengthAssignment
-              }
-            }
-          };
-        } catch (error) {
-          return null;
-        }
+            return { setCode: profile.setCode, label, lengthUnit:'in', heightUnit:'cm', sizes };
+          });
+          let configuration = null;
+          if (data.configuration) {
+            configuration = globalThis.ArabistaProductConfig.normalize(data.configuration, 'D06');
+            if (configuration.profiles.length !== profiles.length || configuration.profiles.some((p,i)=>p.setCode!==profiles[i].setCode || p.sizes.length!==profiles[i].sizes.length || p.sizes.some((r,j)=>Object.keys(profiles[i].sizes[j]).some(key=>r[key]!==profiles[i].sizes[j][key])))) return null;
+          } else if (profiles.length!==2 || profiles.some((p,i)=>p.setCode!==['S1','S2'][i] || p.sizes.map(r=>r.size).join(',')!==OPERATIONS_SIZE_ORDER.join(','))) return null;
+          const media = data.media === undefined ? [] : data.media;
+          if (!Array.isArray(media) || media.length > 12) return null;
+          const images = media.map((item,index) => {
+            if (!item || !/^https:\/\/drive\.google\.com\/thumbnail\?id=[A-Za-z0-9_-]{10,120}&sz=w1600$/.test(item.url)) throw new Error('image');
+            return { url:item.url, alt:operationsText(item.alt,250) || title + ' image ' + (index+1), primary:index===0 };
+          });
+          return { updatedAt:payload.updatedAt, data:{ productCode:'D06',title,description,fabric,features,sizeProfiles:profiles,configuration,media:images,
+            commerce:{ purchasable:commerce.purchasable,prices:commerce.prices,media:commerce.media,inventory:commerce.inventory,lengthAssignment:commerce.lengthAssignment } } };
+        } catch (_) { return null; }
       }
 
       function operationsGuideModel(data) {
-        const titles = {
-          S1:'Set 1 \u2014 Standard (S1)',
-          S2:'Set 2 \u2014 Long (S2)'
-        };
         return data.sizeProfiles.map(profile => ({
           setCode:profile.setCode,
-          title:titles[profile.setCode],
+          title:profile.label,
           label:profile.label,
           columns:[
             'Size',
@@ -10557,8 +10567,9 @@
             'Length (' + profile.lengthUnit + ')',
             'Height (' + profile.heightUnit + ')'
           ],
+          sizeIds:profile.sizes.map(row=>row.size),
           rows:profile.sizes.map(row => [
-            row.size,
+            data.configuration ? globalThis.ArabistaProductConfig.label(data.configuration,'size',row.size) : row.size,
             String(row.shoulderIn),
             String(row.bustIn),
             String(row.sleeveIn),
@@ -10592,6 +10603,8 @@
         operationsGuideModel(data).forEach(guide => {
           const section = document.createElement('section');
           section.className = 'product-size-guide';
+          section.dataset.setCode = guide.setCode;
+          section.dataset.label = guide.label;
           const heading = document.createElement('h4');
           heading.textContent = guide.title;
           const note = document.createElement('p');
@@ -10611,8 +10624,9 @@
           });
           head.appendChild(headRow);
           const body = document.createElement('tbody');
-          guide.rows.forEach(row => {
+          guide.rows.forEach((row,rowIndex) => {
             const line = document.createElement('tr');
+            line.dataset.size = guide.sizeIds[rowIndex];
             line.dataset.size = row[0];
             row.forEach((value, index) => {
               const cell = document.createElement('td');
@@ -10666,11 +10680,13 @@
           const guides = document.getElementById('product-size-guides');
           if (operationsCatalog.status === 'ready' && operationsCatalog.data) {
             applyOperationsCopy(operationsCatalog.data);
+            applyManagedProductMedia(operationsCatalog.data);
+            renderManagedProductOptions(operationsCatalog.data);
             renderOperationsGuides(operationsCatalog.data);
             if (unavailable) unavailable.hidden = true;
             if (status) {
               status.textContent =
-                'Set 1 and Set 2 are sizing references. They are not purchase options and are not added to the basket. Prices and availability still come from the staging shop.';
+                'Measurements and length guidance are managed for this product. Purchase availability comes from the staging shop.';
             }
             if (commerceSizeGuideOpen) renderCommerceSizeGuide();
             return;
@@ -11753,73 +11769,20 @@
       }
 
       function previewSizeOffered(set, size) {
-        return !(set && PREVIEW_SET_UNOFFERED[set] && PREVIEW_SET_UNOFFERED[set][size]);
+        const config = activeProductConfiguration();
+        if (!config) return false;
+        return config.profiles.some(profile => profile.setCode === set && profile.sizes.some(row => row.size === size));
       }
 
-      function fitWeightIndex(weight) {
-        if (weight < 50) return 0;
-        if (weight <= 57) return 1;
-        if (weight <= 64) return 2;
-        if (weight <= 71) return 3;
-        if (weight <= 78) return 4;
-        if (weight <= 85) return 5;
-        if (weight <= 95) return 6;
-        return -1;
-      }
-
-      function fitBmiIndex(bmi) {
-        for (let index = 0; index < FIT_BMI.length; index += 1) {
-          if (bmi <= FIT_BMI[index]) return index;
-        }
-        return 6;
-      }
-
-      function fitBoundaryAdjust(weight, weightIndex, bmiIndex) {
-        const up = { 0: 48, 1: 56, 2: 63, 3: 70, 4: 77, 5: 84 };
-        const down = { 1: 51, 2: 59, 3: 66, 4: 73, 5: 80, 6: 87 };
-        if (bmiIndex > weightIndex && weight >= up[weightIndex]) return weightIndex + 1;
-        if (bmiIndex < weightIndex && weight <= down[weightIndex]) return weightIndex - 1;
-        return weightIndex;
-      }
-
-      function fitHeightMinimum(height) {
-        if (height <= 163) return 0;
-        if (height < 166) return 2;
-        if (height <= 167) return 3;
-        return -1;
-      }
-
-      function fitSetFor(sizeIndex, height) {
-        if (sizeIndex <= 1) return height <= 156 ? 'S1' : 'S2';
-        if (sizeIndex === 2) return height <= 159 ? 'S1' : 'S2';
-        return height <= 160 ? 'S1' : 'S2';
+      function activeProductConfiguration() {
+        const data = operationsCatalog.status === 'ready' && operationsCatalog.data;
+        if (!data || !globalThis.ArabistaProductConfig) return null;
+        return data.configuration || globalThis.ArabistaProductConfig.defaults('D06', data.sizeProfiles);
       }
 
       function recommendArabistaFit(heightValue, weightValue) {
-        const height = Number(String(heightValue).trim());
-        const weight = Number(String(weightValue).trim());
-        if (!Number.isFinite(height) || !Number.isFinite(weight) || height <= 0 || weight <= 0) {
-          return { ok: false, reason: 'invalid' };
-        }
-        if (height < 150) return { ok: false, reason: 'height-low' };
-        if (height > 167) return { ok: false, reason: 'height-high' };
-        if (weight > 95) return { ok: false, reason: 'weight-high' };
-        const weightIndex = fitWeightIndex(weight);
-        if (weightIndex < 0) return { ok: false, reason: 'weight-high' };
-        const metres = height / 100;
-        const bmiIndex = fitBmiIndex(weight / (metres * metres));
-        const adjusted = fitBoundaryAdjust(weight, weightIndex, bmiIndex);
-        const minimum = fitHeightMinimum(height);
-        const sizeIndex = Math.max(adjusted, minimum);
-        const size = FIT_SIZES[sizeIndex];
-        const set = fitSetFor(sizeIndex, height);
-        return {
-          ok: true,
-          set,
-          setLabel: set === 'S1' ? 'Set 1 · Standard' : 'Set 2 · Long',
-          size,
-          bustIn: FIT_BUST[size]
-        };
+        if (!globalThis.ArabistaProductConfig) return { ok:false,reason:'unconfigured' };
+        return globalThis.ArabistaProductConfig.recommend(activeProductConfiguration(),heightValue,weightValue);
       }
 
       function fitMessage(result, unavailable) {
@@ -11828,12 +11791,13 @@
           if (result.reason === 'height-low') return 'This height is below the supported abaya range.';
           if (result.reason === 'height-high') return 'This height is above the supported abaya range.';
           if (result.reason === 'weight-high') return 'This weight is above the supported abaya range.';
+          if (result.reason === 'unconfigured') return 'Size recommendations are unavailable for these measurements. Please check the size chart.';
           return 'Enter a height in centimetres and a weight in kilograms.';
         }
         if (unavailable) {
           return result.setLabel + ' · Size ' + result.size + ' is unavailable in this staging preview.';
         }
-        return result.setLabel + ' · Size ' + result.size + '. Bust up to ' + result.bustIn + ' in.';
+        return result.setLabel + ' · Size ' + (result.sizeLabel || result.size) + (result.bustIn ? '. Bust up to ' + result.bustIn + ' in.' : '.');
       }
 
       function publishSizeFit(heightValue, weightValue) {
@@ -11850,7 +11814,7 @@
         const sheet = document.getElementById('product-sheet');
         if (sheet) {
           if (sizeFit && sizeFit.ok) {
-            sheet.dataset.fitSet = sizeFit.set === 'S1' ? '0' : '1';
+            sheet.dataset.fitSet = String(operationsCatalog.data.sizeProfiles.findIndex(profile => profile.setCode === sizeFit.set));
             sheet.dataset.fitSize = sizeFit.size;
           } else {
             delete sheet.dataset.fitSet;
@@ -11873,7 +11837,7 @@
           strip.hidden = !show;
           stripText.textContent = show
             ? 'Recommended · ' +
-              (sizeFit.set === 'S1' ? 'Set 1 Standard' : 'Set 2 Long') +
+              sizeFit.setLabel +
               ' · Size ' + sizeFit.size
             : '';
         }
@@ -11944,10 +11908,8 @@
       }
 
       function commerceGuideDefaultSet() {
-        if (previewSet === 'S2') return 1;
-        if (previewSet === 'S1') return 0;
-        if (sizeFit && sizeFit.ok && sizeFit.set === 'S2') return 1;
-        return 0;
+        const profiles = operationsCatalog.data ? operationsCatalog.data.sizeProfiles : [];
+        return Math.max(0, profiles.findIndex(p => p.setCode === (previewSet || (sizeFit && sizeFit.ok && sizeFit.set))));
       }
 
       function renderCommerceSizeGuide() {
@@ -11980,6 +11942,12 @@
           return;
         }
         const guides = operationsGuideModel(operationsCatalog.data);
+        const tabs = document.querySelector('#commerce-size-guide [role=tablist]') || document.getElementById('managed-commerce-guide-tabs') || (standard && standard.parentElement);
+        if (tabs) tabs.id = 'managed-commerce-guide-tabs';
+        if (tabs) {
+          clearElement(tabs);
+          guides.forEach((guide,index) => { const button=document.createElement('button'); button.type='button'; button.setAttribute('role','tab'); button.textContent=guide.label; button.classList.toggle('is-active',index===commerceGuideSet); button.setAttribute('aria-selected',String(index===commerceGuideSet)); button.addEventListener('click',()=>{ commerceGuideSet=index;renderCommerceSizeGuide(); }); tabs.appendChild(button); });
+        }
         if (commerceGuideSet > guides.length - 1) commerceGuideSet = 0;
         guides.forEach((guide, index) => {
           const wrap = document.createElement('div');
@@ -11997,9 +11965,10 @@
           });
           head.appendChild(headRow);
           const tableBody = document.createElement('tbody');
-          guide.rows.forEach(row => {
+          guide.rows.forEach((row,rowIndex) => {
             const line = document.createElement('tr');
-            if (sizeFit && sizeFit.ok && sizeFit.set === guide.setCode && row[0] === sizeFit.size) {
+            line.dataset.size = guide.sizeIds[rowIndex];
+            if (sizeFit && sizeFit.ok && sizeFit.set === guide.setCode && guide.sizeIds[rowIndex] === sizeFit.size) {
               line.classList.add('is-guide-fit');
             }
             row.forEach(value => {
@@ -12014,7 +11983,7 @@
           wrap.appendChild(table);
           body.appendChild(wrap);
         });
-        [standard, long].forEach((button, index) => {
+        Array.from(tabs ? tabs.querySelectorAll('button') : []).forEach((button, index) => {
           if (!button) return;
           const active = index === commerceGuideSet && !!guides[index];
           button.disabled = !guides[index];
@@ -12188,7 +12157,7 @@
           selectedCap < 1 || demoQuantity >= selectedCap;
 
         const canPreview = commerceIntent === 'buy'
-          ? isD06SizePurchasable(demoSelectedSize, demoQuantity)
+          ? selectedCap >= demoQuantity && selectedCap >= 1 && previewSizeOffered(previewSet, demoSelectedSize) && isD06SizePurchasable(demoSelectedSize, demoQuantity)
           : selectedCap >= 1 &&
             normalizeQuantity(demoQuantity) !== null &&
             demoQuantity <= selectedCap;
@@ -14720,7 +14689,7 @@
             sets.setAttribute('role', 'group');
             sets.setAttribute('aria-label', 'Length preview');
             const preview = checkoutLengthPreview.get(pickerKey) || '';
-            [['S1', 'Set 1 · Standard'], ['S2', 'Set 2 · Long']].forEach(pair => {
+            (operationsCatalog.data ? operationsCatalog.data.sizeProfiles.map(p => [p.setCode,p.label]) : []).forEach(pair => {
               const setButton = document.createElement('button');
               setButton.type = 'button';
               setButton.textContent = pair[1];
@@ -16847,9 +16816,9 @@
 
   const guides = document.getElementById('product-size-guides');
   const controls = document.getElementById('modern-length-tabs');
-  const standard = document.getElementById('modern-set-standard');
-  const long = document.getElementById('modern-set-long');
-  if (!guides || !controls || !standard || !long) return;
+  if (!guides || !controls) return;
+  const lengthButtons = () => Array.from(controls.querySelectorAll('button'));
+  let tabKey = '';
   let selected=0;
   let lastFitKey='';
   let fitIntroKey='';
@@ -16897,6 +16866,9 @@
   }
   function applySizeTabs() {
     const sections = Array.from(guides.querySelectorAll('.product-size-guide'));
+    const nextKey = sections.map(el=>el.dataset.setCode+'|'+el.dataset.label).join(';');
+    if(nextKey!==tabKey){tabKey=nextKey;controls.textContent='';sections.forEach((el,i)=>{const button=document.createElement('button');button.type='button';button.className='modern-length-tab';button.textContent=el.dataset.label||('Length '+(i+1));if(el.dataset.setCode==='S1')button.id='modern-set-standard';if(el.dataset.setCode==='S2')button.id='modern-set-long';button.dataset.index=String(i);controls.appendChild(button);});}
+    if(selected>=sections.length)selected=0;
     controls.hidden = sections.length < 2;
     sections.forEach((el,i) => {
       el.hidden = sections.length>=2 && i!==selected;
@@ -16905,22 +16877,23 @@
         if(headings[k]) headings[k].textContent=label;
       });
     });
-    [standard,long].forEach((el,i) => {
+    lengthButtons().forEach((el,i) => {
       const active = i===selected;
       el.classList.toggle('is-active',active);
       el.setAttribute('aria-pressed',String(active));
     });
   }
-  [standard,long].forEach((btn,i) => btn.addEventListener('click', () => {
-    selected=i;
+  controls.addEventListener('click', event => {
+    const btn=event.target.closest('button[data-index]');if(!btn)return;
+    selected=Number(btn.dataset.index);
     fitOverride = true;
-    [standard, long].forEach(el => el.classList.remove('is-fit', 'is-fit-pulse'));
+    lengthButtons().forEach(el => el.classList.remove('is-fit', 'is-fit-pulse'));
     applySizeTabs();
-  }));
+  });
   function applyFitHighlight() {
     const setIndex = sheet.dataset.fitSet;
     const size = sheet.dataset.fitSize;
-    const key = (setIndex === '0' || setIndex === '1') && size ? setIndex + '|' + size : '';
+    const key = /^\d+$/.test(setIndex || '') && Number(setIndex)<guides.children.length && size ? setIndex + '|' + size : '';
     if (!key) {
       lastFitKey = '';
       fitIntroKey = '';
@@ -16929,7 +16902,7 @@
       guides.querySelectorAll('tbody tr.is-fit').forEach(row => {
         row.classList.remove('is-fit', 'is-fit-pulse', 'is-size-selected');
       });
-      [standard, long].forEach(el => el.classList.remove('is-fit', 'is-fit-pulse'));
+      lengthButtons().forEach(el => el.classList.remove('is-fit', 'is-fit-pulse'));
       return;
     }
     if (fitOverride && key === lastFitKey) return;
@@ -16944,7 +16917,7 @@
     const section = guides.querySelectorAll('.product-size-guide')[selected];
     if (!section) return;
     const row = Array.from(section.querySelectorAll('tbody tr')).find(item => {
-      return rowSizeLabel(item) === size;
+      return (item.dataset.size || rowSizeLabel(item)) === size;
     });
     if (!row) return;
     guides.querySelectorAll('tbody tr.is-size-selected, tbody tr.is-fit').forEach(item => {
@@ -16955,8 +16928,9 @@
     if (!badgeHere || guides.querySelectorAll('.size-recommended').length !== 1) {
       showSizeBadge(row, !badgeHere && fitIntroKey !== key);
     }
-    const recommendedTab = selected === 0 ? standard : long;
-    [standard, long].forEach(el => {
+    const recommendedTab = lengthButtons()[selected];
+    if(!recommendedTab)return;
+    lengthButtons().forEach(el => {
       el.classList.toggle('is-fit', el === recommendedTab);
       if (el !== recommendedTab) el.classList.remove('is-fit-pulse');
     });
