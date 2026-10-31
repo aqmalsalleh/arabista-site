@@ -41,7 +41,9 @@ This project follows a **User → ChatGPT (Technical Lead) → Cursor (Implement
 - Prefer small, reversible edits. Reuse proven modules when explicitly integrating with them; never paste multiple independent copies of the retail engine across pages.
 - Existing frontend architecture is static HTML + JavaScript + Tailwind; do not introduce React, Next.js, a build pipeline, npm dependencies, or an additional backend without approval.
 - Keep credentials and tokens in Google Apps Script `PropertiesService` or other approved server-side configuration. Never add secrets to HTML, frontend JS, tracked docs, commits, screenshots, or console output.
-- Do NOT run `git commit`, `git push`, publish/deploy, create production orders, or execute payment/fulfilment tests unless the task explicitly authorizes the action. Inspect `git diff` and report all changed files after implementation.
+- Standing user authorization (2026-11-01): automatically sync, push and deploy authorized Google Apps Script changes. Keep canonical clasp source and existing local mirrors synchronized, rebuild generated bundles, run relevant checks, inspect remote source for intervening edits, then push, create a new version and update the existing intended deployment without asking again. Preserve its URL, access settings, scopes and environment. Record the prior version and verify the deployed result. Run clasp commands sequentially because linked projects share an OAuth store. Do not print, copy or commit credentials.
+- Standing user authorization (2026-11-01): after completing and verifying requested repository changes, automatically commit the task-related files and push to the repository's existing intended branch and remote. Fetch first, account for upstream changes, preserve unrelated user edits, respect branch protection and the existing PR workflow where applicable, and verify the remote commit and working-tree status afterward. No additional commit/push confirmation is needed. This includes the repository's normal Git-triggered website deployment; preserve staging/production file boundaries. Do not force-push, rewrite history, force-add ignored private files, or create a new repository without task-specific authorization. Keep credentials, OAuth files, private GAS sources and ignored master documents out of Git. Inspect `git diff` and report the commit and sync result.
+- Separate hosting changes outside the existing Git-triggered workflow, production orders and payment/fulfilment tests still require authorization for those actions.
 - If the prompt supplies exact code and insertion points, follow them precisely. If the anchor or function is absent or changed, do not guess; explain the mismatch and choose the smallest safe correction within the authorized scope.
 
 ## 3. STAGING / PRODUCTION ISOLATION (CRITICAL)
@@ -136,7 +138,7 @@ PHASE GATING — NEVER implement later phases merely because they appear in this
 - Real backend checkout expects customer name, phone, address and postcode; retain correct Malaysian 5-digit postcode handling and J&T shipping calculation. Do not offer delivery services that the backend does not support.
 - Do not log sensitive personal data or use real customer addresses as prototype defaults. Use fictional test records.
 - The SenangPay hosted checkout remains an external secure payment handoff. The frontend must not collect raw card data.
-- Production deployments, production payments and actual shipping actions require explicit separate approval.
+- Production changes must be explicitly in the user's requested scope; the standing GAS sync/deploy authorization applies once those changes are authorized. It never authorizes promoting staging changes to production implicitly. Production payments and actual shipping actions require explicit separate approval.
 
 ## 8. GOOGLE APPS SCRIPT AND CRM CONVENTIONS
 
