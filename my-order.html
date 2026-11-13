@@ -1,20 +1,143 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" class="scroll-smooth">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Arabista — My Order</title>
-  <link rel="canonical" href="https://www.arabistaofficial.com/my-order" />
+  <meta name="description" content="Secure Arabista My Order entry. An invoice link identifies your order but does not unlock private details by itself." />
+  <meta name="theme-color" content="#0F0F10" />
+  <meta name="robots" content="noindex,nofollow" />
+
+  <link rel="icon" type="image/x-icon" href="/images/favicon.ico">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="/images/favicon-192x192.png">
+
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://www.arabistaofficial.com/my-order" />
+  <meta property="og:title" content="Arabista — My Order" />
+  <meta property="og:image" content="https://storage.googleapis.com/arabista-cdn/social-preview.webp" />
+  <meta property="og:description" content="Invoice links are locators only. Private order details require verified access." />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
   <script>
-    (function () {
-      var q = window.location.search || '';
-      var h = window.location.hash || '';
-      window.location.replace('/my-order/' + q + h);
-    })();
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            display: ['"Cormorant Garamond"', 'serif'],
+            sans: ['Inter', 'ui-sans-serif', 'system-ui']
+          },
+          colors: {
+            brand: '#0F0F10',
+            luxe: '#C0A062',
+            cream: '#F5F1E8'
+          }
+        }
+      }
+    }
   </script>
-  <meta http-equiv="refresh" content="0; url=/my-order/" />
 </head>
-<body style="background:#0F0F10;color:#9ca3af;font:14px/1.5 Inter,system-ui,sans-serif;padding:2rem">
-  <p>Opening My Order… <a href="/my-order/" style="color:#C0A062">Continue</a></p>
+<body class="bg-brand text-gray-300 font-sans antialiased min-h-screen flex flex-col selection:bg-gray-700 selection:text-white">
+  <header class="w-full border-b border-gray-800 bg-brand/90 backdrop-blur-md sticky top-0 z-50">
+    <div class="max-w-xl mx-auto px-5 py-4 flex items-center justify-between">
+      <a href="/" class="flex items-center gap-3 transition-opacity hover:opacity-80">
+        <div class="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center border border-gray-700">
+          <span class="text-white font-display font-bold text-sm">A</span>
+        </div>
+        <div class="text-xl font-display font-semibold text-white tracking-[0.28em]">ARABISTA</div>
+      </a>
+      <a href="/abaya.html" class="text-[11px] uppercase tracking-[0.2em] text-gray-400 hover:text-luxe">Shop</a>
+    </div>
+  </header>
+
+  <main class="flex-grow max-w-xl mx-auto px-5 py-12 md:py-16 w-full">
+    <p class="text-[10px] uppercase tracking-[0.28em] text-luxe/80 mb-4">My Order</p>
+    <h1 class="font-display text-4xl md:text-5xl text-white font-semibold tracking-wide mb-3">Order access</h1>
+    <p class="text-sm text-gray-400 leading-relaxed mb-8">
+      WhatsApp and website links can identify your invoice. Private payment, shipping, and tracking details unlock only after purchase-bound access or verified customer re-entry — never from the invoice alone.
+    </p>
+
+    <section class="rounded-2xl border border-white/10 bg-white/[0.03] p-5 md:p-6 mb-6" aria-live="polite">
+      <div id="state-banner" class="text-[11px] uppercase tracking-[0.18em] text-amber-200/90 mb-3">Verification required</div>
+      <div class="grid gap-4 sm:grid-cols-2">
+        <div>
+          <div class="text-[10px] uppercase tracking-[0.16em] text-gray-500 mb-1">Invoice</div>
+          <div id="invoice-value" class="text-white font-medium break-all">—</div>
+        </div>
+        <div>
+          <div class="text-[10px] uppercase tracking-[0.16em] text-gray-500 mb-1">Private details</div>
+          <div class="text-white font-medium">Locked</div>
+        </div>
+      </div>
+      <p id="message" class="mt-5 text-sm text-gray-400 leading-relaxed">
+        Continue in the original checkout browser session when available. Customer OTP / cross-device verification is not enabled on this public page.
+      </p>
+    </section>
+
+    <section class="rounded-2xl border border-white/10 bg-black/20 p-5 md:p-6 mb-8">
+      <h2 class="font-display text-2xl text-white mb-2">What you can do now</h2>
+      <ul class="text-sm text-gray-400 space-y-2 list-disc pl-5">
+        <li>Confirm the invoice shown matches your WhatsApp confirmation.</li>
+        <li>Keep this link for later — it does not expose card, address, or AWB data.</li>
+        <li>Message Arabista WhatsApp support if you need help with this order.</li>
+      </ul>
+    </section>
+
+    <div class="flex flex-col sm:flex-row gap-3">
+      <a href="/" class="inline-flex justify-center items-center rounded-full border border-white/15 px-5 py-3 text-sm text-white hover:border-luxe/60 hover:text-luxe transition">
+        Back to Arabista
+      </a>
+      <a href="https://wa.me/60174920942" class="inline-flex justify-center items-center rounded-full bg-luxe text-brand px-5 py-3 text-sm font-medium hover:opacity-90 transition">
+        WhatsApp support
+      </a>
+    </div>
+
+    <p class="mt-10 text-[11px] text-gray-600 leading-relaxed">
+      Outcome reference: <span class="text-gray-500">VERIFICATION_REQUIRED</span> · invoice is a locator only · no bearer token accepted in this URL.
+    </p>
+  </main>
+
+  <footer class="border-t border-gray-800 py-6">
+    <div class="max-w-xl mx-auto px-5 text-[11px] text-gray-600 flex flex-wrap gap-4 justify-between">
+      <span>© Arabista</span>
+      <a href="/privacy.html" class="hover:text-gray-400">Privacy</a>
+    </div>
+  </footer>
+
+  <script>
+(function () {
+  function readInvoice() {
+    try {
+      var params = new URLSearchParams(window.location.search || '');
+      return String(params.get('invoice') || params.get('invoice_no') || '').trim();
+    } catch (e) {
+      return '';
+    }
+  }
+
+  var invoice = readInvoice();
+  var invoiceEl = document.getElementById('invoice-value');
+  var banner = document.getElementById('state-banner');
+  var message = document.getElementById('message');
+
+  if (invoice) {
+    invoiceEl.textContent = invoice;
+    banner.textContent = 'Verification required';
+    message.textContent =
+      'This My Order link identifies invoice ' + invoice
+      + ' but does not unlock private order details by itself. Continue in the original checkout browser session, or complete customer verification when available.';
+  } else {
+    invoiceEl.textContent = 'Not provided';
+    banner.textContent = 'Access refused';
+    message.textContent =
+      'No invoice was provided. My Order requires a purchase-bound session grant or verified customer re-entry. Do not share access tokens in the URL.';
+  }
+})();
+  </script>
 </body>
 </html>
