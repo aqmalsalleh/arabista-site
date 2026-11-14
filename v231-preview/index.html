@@ -940,7 +940,7 @@
     document.querySelectorAll('#feed video').forEach(function(video){
       var post=video.closest('.post');
       var visible = activeTab==='discover' && $('globalBusy').hidden
-        && video.dataset.userPaused !== 'true' && !document.hidden && post
+        && $('shopDetail').hidden && video.dataset.userPaused !== 'true' && !document.hidden && post
         && Math.abs(post.getBoundingClientRect().top - $('feed').getBoundingClientRect().top)<$('feed').clientHeight*.55;
       if(visible){var play=video.play();if(play&&play.catch)play.catch(function(){});}
       else if(!video.paused)video.pause();
@@ -1012,28 +1012,53 @@
   function closeDetail(restore){
     var d=$('shopDetail');if(d.hidden)return;d.hidden=true;$('shopDetailBackdrop').hidden=true;clear(d);document.body.classList.remove('preview-modal');
     if(restore!==false&&detailFocus&&detailFocus.isConnected)detailFocus.focus();
+    syncActiveVideo();
     detailFocus=null
   }
   function openDetail(id,opener){
-    var p=byId[id];if(!p)return;closeDetail(false);detailFocus=opener||document.activeElement;
-    var d=$('shopDetail');clear(d);d.hidden=false;$('shopDetailBackdrop').hidden=false;document.body.classList.add('preview-modal');
-    var head=node('div',null,'detail-head'),h=node('h2',p.title);head.appendChild(h);
-    var close=node('button','Close','action-secondary');close.type='button';close.addEventListener('click',function(){closeDetail(true)});head.appendChild(close);d.appendChild(head);
-    var gallery=node('div',null,'shop-gallery');gallery.setAttribute('aria-label','Product photos');
-    p.gallery.forEach(function(src){var image=node('img');image.src=src;image.alt=p.title+' product image';image.loading='lazy';gallery.appendChild(image)});
-    d.appendChild(gallery);
-    d.appendChild(node('p',money(p.price)+' · sample price','price'));
-    d.appendChild(node('p','Public UI preview · sample products and prices. No actual purchase is possible.','muted'));
+    var p=byId[id];if(!p)return;
+    closeDetail(false);detailFocus=opener||document.activeElement;
+    var d=$('shopDetail');
+    clear(d);d.hidden=false;$('shopDetailBackdrop').hidden=false;
+    document.body.classList.add('preview-modal');
+    var head=node('div',null,'detail-head');
+    head.appendChild(node('h2','Product details'));
+    var close=node('button','✕','action-secondary');
+    close.type='button';close.setAttribute('aria-label','Close product details');
+    close.addEventListener('click',function(){closeDetail(true)});
+    head.appendChild(close);d.appendChild(head);
+    var body=node('div',null,'shop-detail-scroll');
+    var gallery=node('div',null,'shop-gallery');
+    gallery.setAttribute('aria-label','Swipe through product photos');
+    p.gallery.forEach(function(src,i){
+      var image=node('img');image.src=src;image.alt=p.title+' photo '+(i+1);
+      image.loading=i===0?'eager':'lazy';gallery.appendChild(image)
+    });
+    body.appendChild(gallery);
+    body.appendChild(node('p',money(p.price)+' · example price','price'));
+    body.appendChild(node('h3',p.title,'product-name'));
+    body.appendChild(node('p','Sample product for interface review. Availability and final pricing are not connected.','muted'));
+    d.appendChild(body);
+    var footer=node('div',null,'shop-detail-footer');
     var controls=node('div',null,'detail-fields'),field=node('label','Variation');
-    var sel=node('select');var opt=node('option','Sample / '+p.label);opt.value=p.id;sel.appendChild(opt);field.appendChild(sel);controls.appendChild(field);
-    var qtyField=node('label','Quantity'),qty=node('input');qty.type='number';qty.value='1';qty.min='1';qty.max='5';qty.step='1';qty.style.width='5rem';qtyField.appendChild(qty);controls.appendChild(qtyField);
+    var sel=node('select');var opt=node('option','Sample / '+p.label);
+    opt.value=p.id;sel.appendChild(opt);field.appendChild(sel);controls.appendChild(field);
+    var qtyField=node('label','Quantity'),qty=node('input');
+    qty.type='number';qty.value='1';qty.min='1';qty.max='5';qty.step='1';
+    qtyField.appendChild(qty);controls.appendChild(qtyField);
     var add=node('button',p.available?'Add to sample Cart':'Sample sold out','action-primary');
-    add.type='button';add.disabled=!p.available;add.addEventListener('click',function(){
-      var n=Number(qty.value);if(!Number.isInteger(n)||n<1||n>5){message.textContent='Choose a quantity from 1 to 5.';return}
-      cart[p.id]=(cart[p.id]||0)+n;drawCart();flyToCart(d.querySelector('.shop-gallery img')||opener);message.textContent='Added to sample Cart';message.hidden=false
-    });controls.appendChild(add);d.appendChild(controls);
-    var message=node('p','', 'quote-notice');message.hidden=true;d.appendChild(message);
-    d.focus({preventScroll:true})
+    add.type='button';add.disabled=!p.available;
+    add.addEventListener('click',function(){
+      var n=Number(qty.value);
+      if(!Number.isInteger(n)||n<1||n>5){message.textContent='Choose a quantity from 1 to 5.';return}
+      cart[p.id]=(cart[p.id]||0)+n;
+      drawCart();flyToCart(gallery.querySelector('img')||opener);
+      message.textContent='Added to sample Cart';message.hidden=false
+    });
+    controls.appendChild(add);footer.appendChild(controls);
+    var message=node('p','', 'quote-notice');message.hidden=true;
+    footer.appendChild(message);d.appendChild(footer);
+    body.scrollTop=0;d.focus({preventScroll:true});syncActiveVideo()
   }
   function drawCart(){
     var entries=Object.keys(cart).filter(function(id){return cart[id]>0}),count=entries.reduce(function(n,id){return n+cart[id]},0);
@@ -1069,15 +1094,17 @@
       stage.appendChild(node('div',null,'shade'));
       stage.appendChild(node('span',label,'preview-media-tag'));
       var meta=node('div',null,'meta');
-      meta.appendChild(node('strong','Arabista','creator'));meta.appendChild(node('p',caption,'caption'));
-      var btn=node('button','View piece','shop-btn');
-      btn.type='button';btn.addEventListener('click',function(){show('shop');openDetail(p.id,btn)});
+      meta.appendChild(node('strong','@arabistaofficial','creator'));meta.appendChild(node('p',caption,'caption'));
+      var btn=node('button','Shop | '+p.label,'shop-btn');
+      btn.type='button';btn.setAttribute('aria-haspopup','dialog');
+      btn.setAttribute('aria-controls','shopDetail');
+      btn.addEventListener('click',function(){openDetail(p.id,btn)});
       meta.appendChild(btn);stage.appendChild(meta);
       post.appendChild(stage);post.dataset.kind=kind;
       return {post:post,stage:stage,media:media};
     }
     // Source file is an existing public legacy asset; no private Cloudflare or DEV media exposed.
-    var videoPost=postBase('Video','VIDEO · LEGACY ASSET','Arabista in motion.',products[0]);
+    var videoPost=postBase('Video','VIDEO · LEGACY ASSET','Dahlia Series · Premium abaya',products[0]);
     var videoSlide=node('div',null,'slide'),video=node('video');
     video.src='../images/fyp-d06-shoppable-h264.mp4';
     video.poster='../images/d06-1-hero.webp';
@@ -1085,25 +1112,23 @@
     video.preload='metadata';video.setAttribute('aria-label','Arabista legacy product video preview');
     videoSlide.appendChild(video);videoPost.media.appendChild(videoSlide);
     var mediaActions=node('div',null,'preview-media-actions');
-    var play=node('button','Ⅱ'),sound=node('button','♫');
-    play.type=sound.type='button';play.setAttribute('aria-label','Pause video');sound.setAttribute('aria-label','Unmute video');
-    play.addEventListener('click',function(){
+    var sound=node('button','');
+    sound.type='button';sound.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4zM17 9l4 6M21 9l-4 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>';
+    sound.setAttribute('aria-label','Unmute video');
+    sound.addEventListener('click',function(){
+      video.muted=!video.muted;sound.setAttribute('aria-label',video.muted?'Unmute video':'Mute video');
+      sound.style.color=video.muted?'#fff':'#c0a062';
+    });
+    mediaActions.appendChild(sound);videoPost.stage.appendChild(mediaActions);
+    videoSlide.addEventListener('click',function(){
       if(video.paused){
         video.dataset.userPaused='false';
         var response=video.play();if(response&&response.catch)response.catch(function(){});
-        play.textContent='Ⅱ';play.setAttribute('aria-label','Pause video');
-      }
-      else {
-        video.dataset.userPaused='true';
-        video.pause();play.textContent='▶';play.setAttribute('aria-label','Play video');
-      }
+      }else{video.dataset.userPaused='true';video.pause();}
     });
-    sound.addEventListener('click',function(){video.muted=!video.muted;sound.textContent=video.muted?'♫':'♪';sound.setAttribute('aria-label',video.muted?'Unmute video':'Mute video')});
-    mediaActions.appendChild(play);mediaActions.appendChild(sound);videoPost.stage.appendChild(mediaActions);
-    videoPost.stage.appendChild(node('span','Swipe up for carousel · video starts muted','preview-video-note'));
     root.appendChild(videoPost.post);
 
-    var carousel=postBase('Carousel','CAROUSEL · 4 PHOTOS','Explore every detail.',products[2]);
+    var carousel=postBase('Carousel','CAROUSEL · 4 PHOTOS','Dahlia Series · The collection',products[2]);
     var track=node('div',null,'track');
     track.tabIndex=0;track.setAttribute('role','group');track.setAttribute('aria-label','Four-photo product carousel. Swipe horizontally.');
     track.setAttribute('aria-roledescription','carousel');
@@ -1141,7 +1166,7 @@
     track.addEventListener('keydown',function(e){if(e.key==='ArrowLeft'||e.key==='ArrowRight'){e.preventDefault();goSlide(Math.round(track.scrollLeft/(track.clientWidth||1))+(e.key==='ArrowRight'?1:-1))}});
     updateDots();root.appendChild(carousel.post);
 
-    var imagePost=postBase('Image','PHOTO','A closer look at the collection.',products[1]);
+    var imagePost=postBase('Image','PHOTO','Maraya Series · Crafted details',products[1]);
     var imageSlide=node('div',null,'slide'),photo=node('img');photo.src='../images/m01-1-hero.webp';
     photo.alt='Arabista Maraya product photo';photo.loading='lazy';
     imageSlide.appendChild(photo);imagePost.media.appendChild(imageSlide);root.appendChild(imagePost.post);
