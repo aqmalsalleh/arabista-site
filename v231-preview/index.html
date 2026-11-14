@@ -832,8 +832,8 @@
   function syncActiveVideo(){
     document.querySelectorAll('#feed video').forEach(function(video){
       var post=video.closest('.post');
-      var visible = activeTab==='discover' && !$('globalBusy').hidden && false;
-      visible = activeTab==='discover' && $('globalBusy').hidden && !document.hidden && post
+      var visible = activeTab==='discover' && $('globalBusy').hidden
+        && video.dataset.userPaused !== 'true' && !document.hidden && post
         && Math.abs(post.getBoundingClientRect().top - $('feed').getBoundingClientRect().top)<$('feed').clientHeight*.55;
       if(visible){var play=video.play();if(play&&play.catch)play.catch(function(){});}
       else if(!video.paused)video.pause();
@@ -981,8 +981,15 @@
     var play=node('button','Ⅱ'),sound=node('button','♫');
     play.type=sound.type='button';play.setAttribute('aria-label','Pause video');sound.setAttribute('aria-label','Unmute video');
     play.addEventListener('click',function(){
-      if(video.paused){var response=video.play();if(response&&response.catch)response.catch(function(){});play.textContent='Ⅱ';play.setAttribute('aria-label','Pause video');}
-      else {video.pause();play.textContent='▶';play.setAttribute('aria-label','Play video');}
+      if(video.paused){
+        video.dataset.userPaused='false';
+        var response=video.play();if(response&&response.catch)response.catch(function(){});
+        play.textContent='Ⅱ';play.setAttribute('aria-label','Pause video');
+      }
+      else {
+        video.dataset.userPaused='true';
+        video.pause();play.textContent='▶';play.setAttribute('aria-label','Play video');
+      }
     });
     sound.addEventListener('click',function(){video.muted=!video.muted;sound.textContent=video.muted?'♫':'♪';sound.setAttribute('aria-label',video.muted?'Unmute video':'Mute video')});
     mediaActions.appendChild(play);mediaActions.appendChild(sound);videoPost.stage.appendChild(mediaActions);
@@ -1049,7 +1056,17 @@
   document.querySelectorAll('[data-shop-view]').forEach(function(b){b.addEventListener('click',function(){showShopView(b.dataset.shopView)})});
   ['shopSearch','shopStock','shopSort'].forEach(function(id){$(id).addEventListener('input',renderShop);$(id).addEventListener('change',renderShop)});
   $('shopDetailBackdrop').addEventListener('click',function(){closeDetail(true)});
-  document.addEventListener('keydown',function(e){if(e.key==='Escape')closeDetail(true)});
+  document.addEventListener('keydown',function(e){
+    var dialog=$('shopDetail');
+    if(dialog.hidden)return;
+    if(e.key==='Escape'){e.preventDefault();closeDetail(true);return}
+    if(e.key!=='Tab')return;
+    var focusable=Array.from(dialog.querySelectorAll('button:not(:disabled),input:not(:disabled),select:not(:disabled),a[href]'));
+    if(!focusable.length)return;
+    var first=focusable[0],last=focusable[focusable.length-1];
+    if(e.shiftKey && (document.activeElement===first || document.activeElement===dialog)){e.preventDefault();last.focus();}
+    else if(!e.shiftKey && (document.activeElement===last || document.activeElement===dialog)){e.preventDefault();first.focus();}
+  });
   $('btnClear').addEventListener('click',function(){cart={};drawCart()});
   $('btnQuote').addEventListener('click',function(){
     busy('cartBusy',true,'Preparing sample total…');$('btnQuote').disabled=true;
