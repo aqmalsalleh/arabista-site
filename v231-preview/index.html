@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="en">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="robots" content="noindex,nofollow"><meta name="theme-color" content="#0b0b0c"><meta name="referrer" content="no-referrer"><title>Arabista v2.31 — Mobile Design Preview</title><link rel="icon" href="../images/favicon.ico"><style>
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="robots" content="noindex,nofollow"><meta name="theme-color" content="#0b0b0c"><meta name="referrer" content="no-referrer"><title>Arabista v2.31 — Mobile Design Preview</title><link rel="icon" href="../images/favicon.ico"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet"><style>
 
     :root {
       --obs: #0b0b0c;
@@ -570,8 +570,121 @@
   .tab[aria-hidden="true"]{display:none}
   @media(max-width:680px){.preview-fyp-label{top:51px} .shop-intro{display:none}}
 
+
+  /* v2.31 mobile visual pass 2: modern type, choreographed transitions, full-screen brand loading */
+  :root { --premium-font:"Manrope",ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
+    --premium-ease:cubic-bezier(.22,1,.36,1); }
+  body,.brand-name,h1,h2,h3,h4,button,input,select,.page-title,.section-title,
+  .shop-tile h3,.shop-tile .price,.price,.editorial .quote,.feed-status h3,
+  .shop-detail .detail-head h2,.shop-btn { font-family:var(--premium-font) !important; }
+  body {font-weight:500;letter-spacing:-.012em}
+  .page-title{font-weight:800!important;letter-spacing:-.05em}
+  .brand-name{letter-spacing:.09em;font-weight:800!important}
+  .shop-tile h3{font-weight:700!important;letter-spacing:-.02em}
+  .shop-tile .price,.price{font-weight:800!important;letter-spacing:-.025em}
+  .site-header {position:relative;z-index:11}
+  .header-cart,.fyp-cart{position:relative;display:inline-grid;place-items:center;flex:none;
+    border:1px solid #baa17966;border-radius:12px;background:#b99a6021;color:#f4e9d4;
+    width:43px;height:41px;min-height:41px;padding:8px;transition:transform .3s var(--premium-ease),background-color .3s}
+  .header-cart svg,.fyp-cart svg{display:block;width:23px;height:23px;stroke:currentColor;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+  .header-cart .cart-count,.fyp-cart .cart-count{position:absolute;top:-6px;right:-6px;
+    display:grid;place-items:center;min-width:18px;height:18px;border-radius:99px;
+    font:800 10px/1 var(--premium-font);background:#bd9b5e;color:#111}
+  .header-cart:hover,.fyp-cart:hover {background:#b99a6044;transform:translateY(-2px)}
+  .header-side{gap:8px}
+  .fyp-topbar{grid-template-columns:36px 1fr 40px 40px;gap:6px}
+  .fyp-topbar button[data-go-tab="shop"]{grid-column:3}
+  .fyp-topbar .fyp-cart{grid-column:4;width:39px;height:39px;padding:7px}
+  .fyp-topbar button:last-child{grid-column:auto}
+  .fyp-topbar .fyp-label{font-weight:750;letter-spacing:-.025em}
+  .tab.on:not(#discover){animation:premium-panel-in .43s var(--premium-ease) both}
+  .shop-view:not([hidden]){animation:premium-panel-in .34s var(--premium-ease) both}
+  .shop-tile{animation:premium-item-in .55s var(--premium-ease) both;animation-delay:calc(var(--tile-index,0)*45ms);
+    transition:transform .32s var(--premium-ease), box-shadow .32s ease,border-color .32s ease}
+  .shop-tile:hover{transform:translateY(-4px);box-shadow:0 15px 28px rgba(20,19,17,.09);border-color:#cdbb9d}
+  .shop-tile .thumb img{transition:transform .55s var(--premium-ease)}
+  .shop-tile .thumb:active img{transform:scale(1.035)}
+  .shop-subtabs button,.site-tabs button{transition:color .23s ease,background-color .23s ease}
+  #shopDetail:not([hidden]){animation:premium-sheet-in .44s var(--premium-ease) both}
+  #shopDetailBackdrop:not([hidden]){animation:premium-dim-in .3s ease both}
+  .action-primary,.store-go,.shop-btn,.tile-open{transition:transform .28s var(--premium-ease),box-shadow .28s,background-color .28s}
+  .action-primary:active,.store-go:active,.shop-btn:active,.tile-open:active{transform:scale(.97)}
+  #shopDetail .detail-fields{gap:10px!important;align-items:flex-end}
+  #shopDetail .detail-fields label:first-child{flex:1 1 54%;min-width:130px}
+  #shopDetail .detail-fields label:nth-child(2){flex:0 0 104px;min-width:94px}
+  #shopDetail .detail-fields select,#shopDetail .detail-fields input{height:47px!important;min-height:47px!important;
+    width:100%!important;max-width:none!important;box-sizing:border-box!important;
+    border-radius:11px!important;padding:0 11px!important;font:650 13px/1.2 var(--premium-font)!important}
+  #shopDetail .detail-fields .action-primary{flex:1 0 100%;min-height:48px;border-radius:11px;font-weight:800}
+  .preview-fyp-label{top:61px;background:#101014b8;backdrop-filter:blur(12px)}
+  .preview-media-tag{position:absolute;z-index:5;left:13px;top:94px;padding:6px 9px;border:1px solid #eadbb77a;
+    border-radius:7px;background:#10101295;backdrop-filter:blur(12px);
+    color:#f4e9d4;font:750 10px/1.2 var(--premium-font);letter-spacing:.05em}
+  .preview-media-actions{position:absolute;right:12px;top:135px;z-index:8;display:grid;gap:8px}
+  .preview-media-actions button{background:#111a;backdrop-filter:blur(10px);border:1px solid #ffffff58;
+    width:43px;height:43px;border-radius:50%;font-size:17px;padding:8px}
+  .preview-carousel-hint{position:absolute;bottom:130px;left:50%;transform:translateX(-50%);
+    background:#171513a6;color:#fff;border:1px solid #ffffff44;padding:6px 12px;border-radius:50px;
+    font:700 11px var(--premium-font);z-index:6;pointer-events:none}
+  .preview-video-note{position:absolute;left:13px;top:130px;z-index:4;
+    color:#fff;font:600 11px var(--premium-font);text-shadow:0 2px 7px #111}
+  .preview-carousel .dots button{width:28px;height:5px;border-radius:8px}
+  .preview-carousel .car-nav{font-size:25px;backdrop-filter:blur(8px)}
+  .cart-burst{animation:premium-bump .5s var(--premium-ease)}
+  .fly-to-cart{position:fixed;z-index:10004;pointer-events:none;border-radius:12px;
+    object-fit:cover;box-shadow:0 12px 26px #0007;border:2px solid #b99a60}
+  .premium-loader{position:fixed;inset:0;z-index:9999;display:grid;place-items:center;overflow:hidden;
+    isolation:isolate;background:rgba(11,10,13,.66);backdrop-filter:blur(24px) saturate(.85);
+    -webkit-backdrop-filter:blur(24px) saturate(.85);color:#f3eee5;animation:premium-dim-in .22s both}
+  .premium-loader[hidden]{display:none!important}
+  .premium-loader::before{content:"";position:absolute;inset:-30%;z-index:-1;background:
+    radial-gradient(circle at 53% 49%,rgba(210,169,105,.2),transparent 32%),
+    radial-gradient(circle at 18% 85%,rgba(201,174,128,.07),transparent 25%)}
+  .premium-loader .premium-loader-content{position:relative;display:flex;flex-direction:column;
+    align-items:center;justify-content:center;gap:22px;text-align:center;padding:30px}
+  .premium-loader .premium-orbit{position:relative;width:155px;height:155px;display:grid;place-items:center}
+  .premium-loader .premium-orbit::before,.premium-loader .premium-orbit::after{
+    content:"";position:absolute;border:1px solid rgba(206,176,120,.32);border-radius:50%}
+  .premium-loader .premium-orbit::before{inset:0;box-shadow:0 0 60px #b9975b2c,inset 0 0 33px #d5b87b18}
+  .premium-loader .premium-orbit::after{inset:10px;border-style:dashed;animation:premium-orbit 8s linear infinite}
+  .premium-loader .coin-loader{width:90px;height:90px;perspective:800px;filter:drop-shadow(0 14px 15px #0009)}
+  .premium-loader .coin-loader .coin-halo{inset:-14px;background:radial-gradient(circle,#c8a86c65,transparent 68%)}
+  .premium-loader .coin-loader .coin-inner{animation:arabista-coin 1.8s ease-in-out infinite}
+  .premium-loader .premium-loader-brand{font:800 15px/1.2 var(--premium-font);
+    letter-spacing:.32em;text-transform:uppercase}
+  .premium-loader .premium-loader-copy{font:600 12px/1.5 var(--premium-font);color:#d8cec0;letter-spacing:.04em}
+  .premium-loader .premium-loader-rule{height:1px;width:48px;background:linear-gradient(90deg,transparent,#c8aa72,transparent)}
+  @keyframes premium-panel-in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+  @keyframes premium-item-in{from{opacity:0;transform:translateY(16px) scale(.985)}to{opacity:1;transform:translateY(0) scale(1)}}
+  @keyframes premium-sheet-in{from{opacity:.9;transform:translate(-50%,24px)}to{opacity:1;transform:translate(-50%,0)}}
+  @keyframes premium-dim-in{from{opacity:0}to{opacity:1}}
+  @keyframes premium-bump{0%,100%{transform:scale(1)}40%{transform:scale(1.17)}70%{transform:scale(.94)}}
+  @keyframes premium-orbit{to{transform:rotate(360deg)}}
+  @media(max-width:680px){
+    .header-cart{width:37px;height:37px;min-height:37px;border-radius:9px}
+    .header-cart svg{width:20px;height:20px}
+    .header-side .dev-chip{display:none}
+    .preview-fyp-label{top:55px}
+    .premium-loader .premium-orbit{width:146px;height:146px}
+    .premium-loader .coin-loader{width:84px;height:84px}
+  }
+  @media(prefers-reduced-motion:reduce){
+    .tab.on:not(#discover),.shop-view:not([hidden]),.shop-tile,
+    #shopDetail:not([hidden]),#shopDetailBackdrop:not([hidden]),.premium-loader{animation:none!important}
+    .premium-loader .coin-inner,.premium-loader .premium-orbit::after{animation:none!important}
+    .cart-burst{animation:none!important}
+    .shop-tile,.shop-tile .thumb img,.action-primary,.store-go,.shop-btn{transition:none!important}
+  }
+
 </style></head>
 <body>
+<div id="globalBusy" class="premium-loader" role="status" aria-live="polite" aria-label="Loading preview" hidden>
+  <div class="premium-loader-content">
+    <div class="premium-orbit" aria-hidden="true"><span class="coin-loader"><span class="coin-halo"></span><span class="coin-inner"><span class="coin-face"></span><span class="coin-face coin-back"></span></span></span></div>
+    <span class="premium-loader-brand">Arabista</span><span class="premium-loader-rule" aria-hidden="true"></span>
+    <span id="globalBusyText" class="premium-loader-copy">Preparing your experience…</span>
+  </div>
+</div>
 <a class="skip-link" href="#main">Skip to content</a>
 <header class="site-header">
   <div class="brand" aria-label="Arabista">
@@ -580,6 +693,7 @@
   <div class="header-side">
     <span class="dev-chip">PUBLIC DESIGN PREVIEW</span>
     <button class="header-cta" type="button" data-go-tab="shop">Shop</button>
+    <button id="headerCart" class="header-cart" type="button" data-go-tab="cart" aria-label="Open Cart"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 4h2l2.1 11h11.7L21 7H6"/><circle cx="9" cy="20" r="1"/><circle cx="18" cy="20" r="1"/></svg><span id="headerCartCount" class="cart-count" hidden>0</span></button>
   </div>
 </header>
 <nav class="site-tabs" role="tablist" aria-label="Arabista sections">
@@ -593,8 +707,9 @@
   <section id="discover" class="tab on" role="tabpanel" aria-labelledby="tab-discover" aria-label="Discover feed">
     <div class="preview-fyp-label">VISUAL PREVIEW · SAMPLE DATA</div><div class="fyp-topbar">
       <span aria-hidden="true"></span>
-      <span class="fyp-label">For You</span>
+      <span class="fyp-label">The Edit</span>
       <button type="button" data-go-tab="shop" data-shop-products="true" aria-label="Find products"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="7.5"/><path d="m16.4 16.4 5 5"/></svg></button>
+      <button id="fypCart" class="fyp-cart" type="button" data-go-tab="cart" aria-label="Open Cart"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 4h2l2.1 11h11.7L21 7H6"/><circle cx="9" cy="20" r="1"/><circle cx="18" cy="20" r="1"/></svg><span id="fypCartCount" class="cart-count" hidden>0</span></button>
     </div>
     <div id="feedStatus" class="feed-status" role="status" aria-live="polite"></div>
     <div id="feed" tabindex="0" aria-label="Discover posts. Scroll vertically between posts." hidden></div>
