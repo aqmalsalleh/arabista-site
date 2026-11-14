@@ -884,6 +884,43 @@ body,button,input,select,textarea{font-family:var(--ref-ui)!important}
   border-radius:10px!important;background:#c0a062!important}
 @media(prefers-reduced-motion:reduce){#feed .preview-carousel .dots button{transition:none!important}}
 
+
+/* True source-inspired D06 peek: video resizes above its sheet; swipe/scroll expands sheet fully. */
+body.preview-modal.is-discover {--preview-peek-height:min(72dvh,740px)}
+body.preview-modal.is-discover #feed .post .stage {height:calc(100dvh - var(--preview-peek-height))!important;
+  min-height:0!important;transition:height .34s cubic-bezier(.22,1,.36,1)!important}
+body.preview-modal.is-discover #feed .post .stage .media,
+body.preview-modal.is-discover #feed .post .stage .slide,
+body.preview-modal.is-discover #feed .post .stage .slide video,
+body.preview-modal.is-discover #feed .post .stage .slide img {
+  height:100%!important;width:100%!important;object-fit:cover!important;
+}
+body.preview-modal.is-discover #feed .meta,
+body.preview-modal.is-discover #feed .fyp-topbar,
+body.preview-modal.is-discover #feed .preview-media-actions,
+body.preview-modal.is-discover #feed .dots,
+body.preview-modal.is-discover #feed .car-nav{
+  opacity:0!important;pointer-events:none!important;transition:opacity .18s!important}
+body.preview-modal #shopDetail{height:min(72dvh,740px)!important;
+  transition:height .34s cubic-bezier(.22,1,.36,1),border-radius .34s ease!important}
+body.preview-modal.preview-expanded #shopDetail {
+  height:calc(100dvh - env(safe-area-inset-top,0px))!important;
+  max-height:100dvh!important;border-radius:0!important}
+body.preview-modal.preview-expanded.is-discover #feed .post .stage {height:0!important}
+#shopDetail .detail-head{position:relative}
+#shopDetail .detail-head:before{display:none!important}
+#shopDetail .detail-head .sheet-expand-handle {
+  position:absolute;top:0;left:50%;transform:translateX(-50%);z-index:3;
+  display:grid;place-items:center;width:70px;min-height:18px;height:18px;
+  border:0!important;background:transparent!important;border-radius:0!important;
+  padding:0!important;touch-action:manipulation}
+#shopDetail .detail-head .sheet-expand-handle:after{content:"";width:36px;height:4px;
+  display:block;border-radius:9px;background:#d6d6d6}
+@media (prefers-reduced-motion:reduce){
+  body.preview-modal.is-discover #feed .post .stage,
+  body.preview-modal #shopDetail{transition:none!important}
+}
+
 </style></head>
 <body>
 <div id="globalBusy" class="premium-loader" role="status" aria-live="polite" aria-label="Loading preview" hidden>
@@ -1053,7 +1090,8 @@ body,button,input,select,textarea{font-family:var(--ref-ui)!important}
     document.querySelectorAll('#feed video').forEach(function(video){
       var post=video.closest('.post');
       var visible = activeTab==='discover' && $('globalBusy').hidden
-        && $('shopDetail').hidden && video.dataset.userPaused !== 'true' && !document.hidden && post
+        && ($('shopDetail').hidden || !document.body.classList.contains('preview-expanded'))
+        && video.dataset.userPaused !== 'true' && !document.hidden && post
         && Math.abs(post.getBoundingClientRect().top - $('feed').getBoundingClientRect().top)<$('feed').clientHeight*.55;
       if(visible){var play=video.play();if(play&&play.catch)play.catch(function(){});}
       else if(!video.paused)video.pause();
@@ -1123,8 +1161,18 @@ body,button,input,select,textarea{font-family:var(--ref-ui)!important}
     if(!list.length)$('catalog').appendChild(node('p','No matching sample products.','fine-print'));
     setNote(list.length+' sample products · layout demonstration only')
   }
+  function setPreviewProductExpanded(expanded){
+    var active = !!expanded && activeTab === 'discover' && !$('shopDetail').hidden;
+    document.body.classList.toggle('preview-expanded', active);
+    var handle = $('sheetExpandHandle');
+    if (handle) {
+      handle.setAttribute('aria-label', active ? 'Collapse product sheet' : 'Expand product sheet');
+      handle.setAttribute('aria-expanded', active ? 'true' : 'false');
+    }
+    syncActiveVideo();
+  }
   function closeDetail(restore){
-    var d=$('shopDetail');if(d.hidden)return;d.hidden=true;$('shopDetailBackdrop').hidden=true;clear(d);document.body.classList.remove('preview-modal');
+    var d=$('shopDetail');if(d.hidden)return;d.hidden=true;$('shopDetailBackdrop').hidden=true;clear(d);document.body.classList.remove('preview-modal','preview-expanded');
     if(restore!==false&&detailFocus&&detailFocus.isConnected)detailFocus.focus();
     syncActiveVideo();
     detailFocus=null
@@ -1135,7 +1183,24 @@ body,button,input,select,textarea{font-family:var(--ref-ui)!important}
     var d=$('shopDetail');
     clear(d);d.hidden=false;$('shopDetailBackdrop').hidden=false;
     document.body.classList.add('preview-modal');
+    document.body.classList.remove('preview-expanded');
     var head=node('div',null,'detail-head');
+    var expandHandle=node('button',null,'sheet-expand-handle');
+    expandHandle.id='sheetExpandHandle';expandHandle.type='button';
+    expandHandle.setAttribute('aria-label','Expand product sheet');
+    expandHandle.setAttribute('aria-expanded','false');
+    expandHandle.addEventListener('click',function(){
+      setPreviewProductExpanded(!document.body.classList.contains('preview-expanded'));
+    });
+    head.appendChild(expandHandle);
+    var gestureY=null;
+    head.addEventListener('touchstart',function(e){if(e.touches.length===1)gestureY=e.touches[0].clientY},{passive:true});
+    head.addEventListener('touchend',function(e){
+      if(gestureY===null||e.changedTouches.length!==1)return;
+      var delta=e.changedTouches[0].clientY-gestureY;gestureY=null;
+      if(delta < -40) setPreviewProductExpanded(true);
+      else if(delta > 40) setPreviewProductExpanded(false);
+    },{passive:true});
     head.appendChild(node('h2','Product details'));
     var close=node('button','✕','action-secondary');
     close.type='button';close.setAttribute('aria-label','Close product details');
@@ -1179,7 +1244,12 @@ body,button,input,select,textarea{font-family:var(--ref-ui)!important}
     controls.appendChild(add);footer.appendChild(controls);
     var message=node('p','', 'quote-notice');message.hidden=true;
     footer.appendChild(message);d.appendChild(footer);
-    body.scrollTop=0;d.focus({preventScroll:true});syncActiveVideo()
+    body.scrollTop=0;
+    body.addEventListener('scroll',function(){
+      if(activeTab==='discover' && body.scrollTop > 30 &&
+        !document.body.classList.contains('preview-expanded'))setPreviewProductExpanded(true);
+    },{passive:true});
+    d.focus({preventScroll:true});syncActiveVideo()
   }
   function drawCart(){
     var entries=Object.keys(cart).filter(function(id){return cart[id]>0}),count=entries.reduce(function(n,id){return n+cart[id]},0);
@@ -1191,8 +1261,17 @@ body,button,input,select,textarea{font-family:var(--ref-ui)!important}
     entries.forEach(function(id){var p=byId[id],card=node('div',null,'card');
       var title=node('h3',p.title);card.appendChild(title);
       var row=node('div',null,'summary-line');row.appendChild(node('span',money(p.price)+' · sample'));row.appendChild(node('strong','Qty '+cart[id]));card.appendChild(row);
-      var actions=node('div',null,'cart-actions'),minus=node('button','−','action-secondary'),plus=node('button','+','action-secondary'),remove=node('button','Remove','action-quiet');
-      [minus,plus,remove].forEach(function(b){b.type='button';actions.appendChild(b)});
+      var actions=node('div',null,'cart-actions reference-cart-actions'),
+      stepper=node('div',null,'reference-stepper'),
+      minus=node('button',null,'reference-decrease'),
+      qtyDisplay=node('span',String(cart[id]),'reference-stepper-value'),
+      plus=node('button',null,'reference-increase'),
+      remove=node('button','Remove','action-quiet');
+      minus.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"/></svg>';
+      plus.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M12 5v14"/></svg>';
+      [minus,plus,remove].forEach(function(b){b.type='button'});
+      stepper.appendChild(minus);stepper.appendChild(qtyDisplay);stepper.appendChild(plus);
+      actions.appendChild(stepper);actions.appendChild(remove);
       minus.setAttribute('aria-label','Reduce '+p.title);plus.setAttribute('aria-label','Increase '+p.title);
       minus.addEventListener('click',function(){cart[id]--;drawCart()});plus.addEventListener('click',function(){cart[id]++;drawCart()});remove.addEventListener('click',function(){delete cart[id];drawCart()});
       card.appendChild(actions);root.appendChild(card)
