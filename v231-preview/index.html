@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="en">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="robots" content="noindex,nofollow"><meta name="theme-color" content="#0b0b0c"><meta name="referrer" content="no-referrer"><title>Arabista v2.31 — Mobile Design Preview</title><link rel="icon" href="../images/favicon.ico"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet"><style>
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="robots" content="noindex,nofollow"><meta name="theme-color" content="#0b0b0c"><meta name="referrer" content="no-referrer"><title>Arabista v2.31 — Mobile Design Preview</title><link rel="icon" href="../images/favicon.ico"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Sans:wght@400;500;600;700;800&family=Cormorant+Garamond:wght@500;600;700&display=swap" rel="stylesheet"><style>
 
     :root {
       --obs: #0b0b0c;
@@ -793,6 +793,97 @@
     background:#b39257;color:#fff;font:700 9px/1 "Inter",sans-serif;
     min-width:16px;height:16px;border-radius:50%;display:grid;place-items:center}
 
+
+/* Owner reference fidelity: source fyp-staging.html My Order and visual typography */
+:root {--ref-gold:#ad8957;--ref-cream:#f5f1e8;--ref-ink:#252420;--ref-sand:#faf9f6;
+  --ref-serif:"Cormorant Garamond",Georgia,serif;--ref-ui:"DM Sans","Inter",system-ui,sans-serif}
+body,button,input,select,textarea{font-family:var(--ref-ui)!important}
+.brand-name,.page-title,.section-title,.cart-side h3,.order-panel h2,.profile-panel h2,
+.shop-home-title,.shop-hero h1,.shop-detail h2,.reference-orders h1,.reference-orders h2{
+  font-family:var(--ref-serif)!important;font-weight:600!important;letter-spacing:-.025em!important}
+.site-header .brand-name{font:600 27px/1 var(--ref-serif)!important;letter-spacing:0!important;
+  text-transform:none!important;color:var(--ref-cream)!important}
+.page-title{font-size:clamp(38px,6vw,56px)!important;line-height:1.05!important}
+.section-title{font-size:clamp(25px,4vw,34px)!important;line-height:1.1!important}
+.shop-tile h3,.cart-items .card h3{font-family:var(--ref-ui)!important;font-size:13px!important;font-weight:600!important;letter-spacing:-.015em!important}
+.shop-tile .price,.cart-items .price{font-family:var(--ref-ui)!important;letter-spacing:-.02em!important}
+#main:not(.discover-mode){background:var(--ref-sand)!important}
+#main:not(.discover-mode) .page-head{background:#fff!important}
+#main:not(.discover-mode) .page-head .eyebrow,.reference-eyebrow{
+  text-transform:uppercase;letter-spacing:.16em;font:700 10px/1.3 var(--ref-ui);
+  color:#ad8957}
+#main:not(.discover-mode) .page-content{padding-top:22px}
+.cart-side,.profile-panel,.order-panel{background:#fff!important;border:1px solid #eae3d8!important;
+  border-radius:16px!important;box-shadow:0 15px 35px #8b775b0b!important}
+.action-primary,.reference-continue{font:700 14px/1.2 var(--ref-ui)!important;
+  color:#fff!important;border:0!important;background:#b39257!important;border-radius:999px!important}
+.action-primary:disabled{opacity:.45}
+.site-tabs{background:#fff!important;border-top:1px solid #efebe5!important;
+  box-shadow:0 -3px 14px #00000006}
+.site-tabs button{color:#9e9e9d!important;font:700 10px/1.25 var(--ref-ui)!important}
+.site-tabs button[aria-selected="true"]{color:#947142!important}
+.site-tabs button[aria-selected="true"]::after{background:#ad8957!important}
+.site-tabs button[data-tab="shop"] .nav-ic{color:#977a4c!important;background:#fff!important;
+  border:1px solid #b9a17782!important}
+.site-tabs button:not([aria-selected="true"]) svg{opacity:.7}
+.reference-orders{background:var(--ref-sand)!important;color:var(--ref-ink)!important;min-height:100%}
+.reference-orders-head{padding:clamp(34px,7vh,58px) 22px 25px;background:#fff;border-bottom:1px solid #efebe6}
+.reference-orders-head h1{font:600 clamp(42px,8vw,56px)/1 var(--ref-serif)!important;
+  letter-spacing:-.03em!important;margin:12px 0!important;color:#24211e!important}
+.reference-orders-head p{font:400 12px/1.6 var(--ref-ui);color:#928b81;margin:0}
+.reference-orders-body{padding:22px 22px calc(100px + env(safe-area-inset-bottom,0px))}
+.reference-lookup{background:#fff;border:1px solid #eae3d8;border-radius:16px;
+  padding:23px 19px 21px;box-shadow:0 15px 35px #8b775b0b;max-width:560px;margin:auto}
+.reference-lookup h2{font:600 clamp(30px,6vw,38px)/1.13 var(--ref-serif)!important;
+  letter-spacing:-.03em!important;margin:9px 0 13px!important;color:#24211e}
+.reference-intro{font:400 12px/1.75 var(--ref-ui)!important;color:#90877b!important;
+  margin:9px 0 21px!important}
+.reference-field-label{font:700 10px/1.3 var(--ref-ui);color:#6f685f;
+  letter-spacing:.035em;text-transform:uppercase;display:block;margin-bottom:10px}
+.reference-field{display:flex;align-items:center;gap:12px;height:50px;border:1px solid #ded7ce;
+  border-radius:10px;padding:0 13px;background:#fff}
+.reference-field svg,.reference-secure svg{width:17px;height:17px;fill:none;stroke:#a29279;
+  stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.reference-field input{min-width:0;flex:1;height:100%;border:0;outline:none;background:transparent;
+  color:#24221e;font:400 16px/1.3 var(--ref-ui)!important}
+.reference-field input::placeholder{color:#aaa69e}
+.reference-field:focus-within{border-color:#b39257;box-shadow:0 0 0 3px #b3925720}
+.reference-continue{width:100%;height:52px;display:flex;gap:12px;align-items:center;
+  justify-content:center;margin-top:18px!important;background:#282623!important;
+  font-size:14px!important}
+.reference-continue span{font-size:22px;font-weight:400}
+.reference-preview-note{font:400 10px/1.5 var(--ref-ui);color:#a49a8d;min-height:15px;
+  margin:10px 0 0}
+.reference-secure{display:flex;gap:9px;align-items:center;color:#a59c90;
+  font:400 11px/1.4 var(--ref-ui);margin-top:20px}
+.reference-orders .order-summary{padding:12px;margin-top:10px;border:1px solid #ece5d9;
+  border-radius:12px;background:#faf9f6;font:500 12px/1.55 var(--ref-ui)}
+/* Source's integrated pill stepper: thin icons, central quantity, no separate square blocks. */
+.cart-actions.reference-cart-actions{display:flex;align-items:center;gap:10px}
+.reference-stepper{display:inline-flex;align-items:center;gap:0;border:1px solid #efe6d8;
+  border-radius:999px;overflow:hidden;background:#f3f1ed}
+.reference-stepper button{width:43px;height:43px;display:grid;place-items:center;
+  border:0!important;background:transparent!important;color:#8b6e38!important;
+  border-radius:0!important;padding:0!important}
+.reference-stepper button svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.7;
+  stroke-linecap:round;stroke-linejoin:round}
+.reference-stepper .reference-stepper-value{min-width:22px;text-align:center;
+  font:700 13px/1 var(--ref-ui);color:#303030}
+.reference-cart-actions .action-quiet{font:600 12px var(--ref-ui)!important;
+  color:#88704d!important;border:0!important;text-decoration:none}
+/* Only elegant bottom-centered dots, never rectangular arrows obscuring the carousel. */
+#feed .preview-carousel .car-nav{display:none!important}
+#feed .preview-carousel .dots{position:absolute!important;top:auto!important;bottom:86px!important;
+  left:50%!important;right:auto!important;transform:translateX(-50%)!important;
+  z-index:9;display:flex;align-items:center;gap:7px}
+#feed .preview-carousel .dots button{width:6px!important;height:6px!important;
+  flex:none;min-height:6px!important;border-radius:50%!important;border:0!important;
+  padding:0!important;background:#f5f1e894!important;box-shadow:0 0 3px #0005;
+  transition:width .25s ease,background .25s ease}
+#feed .preview-carousel .dots button[aria-current="true"]{width:17px!important;
+  border-radius:10px!important;background:#c0a062!important}
+@media(prefers-reduced-motion:reduce){#feed .preview-carousel .dots button{transition:none!important}}
+
 </style></head>
 <body>
 <div id="globalBusy" class="premium-loader" role="status" aria-live="polite" aria-label="Loading preview" hidden>
@@ -893,24 +984,35 @@
     </div>
   </section>
 
-  <section id="orders" class="tab" role="tabpanel" aria-labelledby="tab-orders">
-    <div class="page-head"><h1 class="page-title">My Order</h1></div>
-    <div class="page-content">
-      <div class="order-panel">
-        <h2 class="section-title">Order status</h2>
-        <p class="fine-print">Private to your purchase session. This public preview contains no real orders or payment access.</p>
-        <div class="cart-actions">
-          <button type="button" id="btnOpenOrder" class="action-primary">View order</button>
-          <button type="button" id="btnSettle" class="action-secondary" disabled hidden>Disabled</button>
-          <button type="button" id="btnSellerDetail" class="action-quiet" disabled hidden>Disabled</button>
-    </div>
+  <section id="orders" class="tab reference-orders" role="tabpanel" aria-labelledby="tab-orders">
+    <header class="reference-orders-head">
+      <div class="reference-eyebrow">Your Arabista journey</div>
+      <h1>My Order</h1>
+      <p>Every beautiful detail, from checkout to delivery.</p>
+    </header>
+    <div class="reference-orders-body">
+      <div class="reference-lookup">
+        <div class="reference-eyebrow">Private order access</div>
+        <h2>Find your orders.</h2>
+        <p class="reference-intro">Enter the email address or phone number used at checkout. We'll help verify your access before displaying your history.</p>
+        <label for="lookupIdentifier" class="reference-field-label">Email or phone number</label>
+        <div class="reference-field">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="6" width="18" height="12" rx="2"/><path d="m3 7 9 7 9-7"/></svg>
+          <input id="lookupIdentifier" type="text" autocomplete="off" placeholder="Your email or mobile number">
+        </div>
+        <button type="button" id="btnOpenOrder" class="reference-continue">Continue securely <span aria-hidden="true">→</span></button>
+        <p id="orderNotice" class="reference-preview-note" role="status" aria-live="polite">Design preview only. This form cannot access real orders.</p>
+        <div id="orderSummary" class="order-summary" aria-label="Sample order details" aria-live="polite" hidden></div>
+        <div class="reference-secure">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="10" width="14" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
+          Your order history is private.
+        </div>
         <div id="orderBusy" class="coin-busy" role="status" aria-live="polite" hidden>
-  <span class="coin-loader" aria-hidden="true"><span class="coin-halo"></span><span class="coin-inner"><span class="coin-face"></span><span class="coin-face coin-back"></span></span></span>
-  <span class="coin-copy">Checking order…</span>
-</div>
-        <p id="orderNotice" class="quote-notice" role="status" aria-live="polite"></p>
-        <div id="orderSummary" class="order-summary" aria-label="Verified purchase details" aria-live="polite" hidden></div>
-        
+          <span class="coin-loader" aria-hidden="true"><span class="coin-inner"><span class="coin-face"></span><span class="coin-face coin-back"></span></span></span>
+          <span class="coin-copy">Preview only…</span>
+        </div>
+        <button type="button" id="btnSettle" hidden disabled>Disabled</button>
+        <button type="button" id="btnSellerDetail" hidden disabled>Disabled</button>
       </div>
     </div>
   </section>
