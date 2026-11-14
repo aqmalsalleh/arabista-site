@@ -807,7 +807,8 @@
         <h2 class="section-title">Your session</h2>
         <p id="profileState" role="status" aria-live="polite"></p>
         <div class="cart-actions"><button type="button" class="action-primary" data-go-tab="shop">Browse Shop</button>
-          <button type="button" class="action-secondary" data-go-tab="orders">My Order</button></div>
+          <button type="button" class="action-secondary" data-go-tab="orders">My Order</button>
+          <button type="button" id="replayLoader" class="action-quiet">Replay logo loading</button></div>
         <p class="fine-print">No customer account or checkout is available in this design preview.</p>
       </div>
     </div>
@@ -993,7 +994,7 @@
     });
     sound.addEventListener('click',function(){video.muted=!video.muted;sound.textContent=video.muted?'♫':'♪';sound.setAttribute('aria-label',video.muted?'Unmute video':'Mute video')});
     mediaActions.appendChild(play);mediaActions.appendChild(sound);videoPost.stage.appendChild(mediaActions);
-    videoPost.stage.appendChild(node('span','Tap to play/pause · sound off initially','preview-video-note'));
+    videoPost.stage.appendChild(node('span','Swipe up for carousel · video starts muted','preview-video-note'));
     root.appendChild(videoPost.post);
 
     var carousel=postBase('Carousel','CAROUSEL · 4 PHOTOS','Explore every detail.',products[2]);
@@ -1086,6 +1087,10 @@
   $('grant').textContent='No purchase grants or private order data are used in this public preview.';
   $('profileState').textContent='Public mobile design preview · sample product photography · no account or checkout.';
   $('promo').disabled=true;$('promo').placeholder='Not available in preview';
+  $('replayLoader').addEventListener('click',function(){
+    busy('previewReplay',true,'Arabista, in motion…');
+    window.setTimeout(function(){busy('previewReplay',false)},2000);
+  });
   document.querySelector('.site-tabs').addEventListener('keydown',function(e){
     if(!['ArrowLeft','ArrowRight','Home','End'].includes(e.key))return;
     var bs=Array.from(document.querySelectorAll('.site-tabs button[data-tab]'));var i=bs.indexOf(document.activeElement);if(i<0)return;
