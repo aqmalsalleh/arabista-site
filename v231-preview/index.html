@@ -921,6 +921,17 @@ body.preview-modal.preview-expanded.is-discover #feed .post .stage {height:0!imp
   body.preview-modal #shopDetail{transition:none!important}
 }
 
+
+/* Small visible dots, generous invisible touch target: never block the product photograph. */
+#feed .preview-carousel .dots{gap:0!important}
+#feed .preview-carousel .dots button{position:relative!important;display:grid;place-items:center;
+  width:28px!important;height:30px!important;min-height:30px!important;background:transparent!important;
+  box-shadow:none!important;border:0!important;padding:0!important}
+#feed .preview-carousel .dots button:before{content:"";display:block;width:6px;height:6px;border-radius:50%;
+  background:#f5f1e894;box-shadow:0 0 3px #0004;transition:width .2s ease,background .2s}
+#feed .preview-carousel .dots button[aria-current="true"]:before{width:17px;border-radius:8px;background:#c0a062}
+@media(prefers-reduced-motion:reduce){#feed .preview-carousel .dots button:before{transition:none!important}}
+
 </style></head>
 <body>
 <div id="globalBusy" class="premium-loader" role="status" aria-live="polite" aria-label="Loading preview" hidden>
