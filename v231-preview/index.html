@@ -996,6 +996,66 @@ body.is-discover .site-tabs{background:linear-gradient(180deg,rgba(8,8,10,.22),r
 .coin-busy .coin-halo{display:none!important}
 .reference-field input:disabled{opacity:1;color:#aaa397;-webkit-text-fill-color:#aaa397}
 
+
+/* v2.31 sixth mobile review — media passes underneath a fully floating tab bar. */
+@media(max-width:680px){
+ body.is-discover #main.discover-mode{
+   flex:1 1 auto!important;height:100dvh!important;min-height:0!important;
+   padding:0!important;overflow:hidden!important;
+ }
+ body.is-discover #discover.tab.on{height:100%!important;min-height:0!important}
+ body.is-discover #feed{height:100%!important;min-height:0!important}
+ body.is-discover #feed .post{height:100%!important;min-height:0!important}
+ body.is-discover:not(.preview-modal):not(.discover-product-open) #feed .post .stage{
+   height:100%!important;min-height:0!important
+ }
+ body.is-discover .site-tabs{
+   position:fixed!important;left:0!important;right:0!important;bottom:0!important;
+   height:calc(54px + env(safe-area-inset-bottom,0px))!important;
+   background:transparent!important;border:0!important;box-shadow:none!important;
+   backdrop-filter:none!important;-webkit-backdrop-filter:none!important;
+   isolation:isolate;overflow:visible;z-index:45
+ }
+ body.is-discover .site-tabs::before{
+   content:"";position:absolute;z-index:-1;
+   left:0;right:0;top:-34px;bottom:0;
+   background:linear-gradient(180deg,rgba(7,7,10,0),rgba(7,7,10,.18) 38%,rgba(7,7,10,.47));
+   pointer-events:none
+ }
+ body.is-discover .site-tabs button{
+   color:#f4f0e6!important;text-shadow:0 1px 5px #000d;
+   background:transparent!important;box-shadow:none!important;
+ }
+ body.is-discover .site-tabs button[aria-selected="true"]{color:#ead09b!important}
+ body.is-discover #feed .meta{
+   bottom:calc(54px + env(safe-area-inset-bottom,0px) + 13px)!important
+ }
+ body.is-discover #feed .post .stage > .dots{
+   bottom:calc(54px + env(safe-area-inset-bottom,0px) + 7px)!important
+ }
+}
+/* Pointer-driven product sheet gestures, with motion disabled while actively dragging. */
+.sheet-resize-handle{touch-action:none!important;user-select:none;-webkit-user-select:none;cursor:ns-resize}
+body.sheet-is-dragging #shopDetail,
+body.sheet-is-dragging #sheet,
+body.sheet-is-dragging #feed .post .stage{
+ transition:none!important
+}
+@media(prefers-reduced-motion:reduce){
+ .sheet-resize-handle,#shopDetail,#sheet{scroll-behavior:auto!important}
+}
+
+
+body.preview-modal #shopDetail{height:var(--preview-sheet-height,min(72dvh,740px))!important}
+body.preview-modal.preview-expanded #shopDetail{
+ height:var(--preview-sheet-height,calc(100dvh - env(safe-area-inset-top,0px)))!important
+}
+body.preview-modal.is-discover #feed .post .stage,
+body.preview-modal.preview-expanded.is-discover #feed .post .stage{
+ height:calc(100dvh - var(--preview-sheet-height,min(72dvh,740px)))!important
+}
+#shopDetail .sheet-expand-handle{touch-action:none!important;cursor:ns-resize!important}
+
 </style></head>
 <body>
 <div id="globalBusy" class="premium-loader" role="status" aria-live="polite" aria-label="Loading preview" hidden>
