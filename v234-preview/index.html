@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="robots" content="noindex,nofollow" />
+  <meta name="referrer" content="no-referrer" />
+  <meta name="theme-color" content="#0b0b0c" />
+  <title>Arabista Seller Center · Orders — Mobile Design Preview</title>
+  <style>
+:root {
+  --ink: #1c1917;
+  --muted: #57534e;
+  --paper: #faf7f2;
+  --panel: #ffffff;
+  --line: #e7e5e4;
+  --brand: #0f3d2e;
+  --warn: #9a3412;
+  --warn-soft: #ffedd5;
+  --danger: #991b1b;
+  --danger-soft: #fee2e2;
+  --ok: #166534;
+  --ok-soft: #dcfce7;
+  --info: #1e3a5f;
+  --info-soft: #e8eef5;
+  --radius: 14px;
+  --shadow: 0 10px 30px rgba(28, 25, 23, 0.06);
+  --font-display: "Segoe UI Semibold", "Segoe UI", system-ui, sans-serif;
+  --font-body: "Segoe UI", system-ui, sans-serif;
+}
+
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  color: var(--ink);
+  background:
+    radial-gradient(circle at top left, #f3ebe1 0%, transparent 42%),
+    linear-gradient(180deg, #f7f3ec 0%, var(--paper) 48%, #f4f1ec 100%);
+  font-family: var(--font-body);
+  line-height: 1.45;
+}
+a { color: inherit; }
+.skip-link {
+  position: absolute; left: -999px; top: 0;
+  background: var(--brand); color: white; padding: 0.6rem 1rem; z-index: 1000;
+}
+.skip-link:focus { left: 0.75rem; top: 0.75rem; }
+
+.app-shell {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 260px minmax(0, 1fr);
+  align-items: stretch;
+}
+.sidebar {
+  background: var(--brand);
+  color: #f8fafc;
+  padding: 1.25rem 1rem 2rem;
+  position: sticky; top: 0; height: 100vh; overflow: auto;
+  align-self: stretch;
+  width: 100%;
+  min-width: 0;
+}
+.module-nav > li { margin: 0; }
+.brand { font-family: var(--font-display); font-size: 1.15rem; margin: 0 0 0.25rem; }
+.brand-sub { margin: 0 0 1.5rem; color: #cce3d8; font-size: 0.85rem; }
+.nav-label {
+  font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.08em;
+  color: #9fbfb0; margin: 0 0 0.5rem;
+}
+.module-nav { list-style: none; margin: 0; padding: 0; }
+.nav-item {
+  display: flex; align-items: center; justify-content: space-between; gap: 0.5rem;
+  width: 100%; text-align: left; text-decoration: none;
+  padding: 0.55rem 0.75rem; border-radius: 10px; color: #e8f5ef;
+  background: transparent; border: 0; font: inherit; cursor: pointer;
+}
+.nav-item:disabled, .nav-item[aria-disabled="true"] { color: #8fafa0; cursor: not-allowed; }
+.nav-item.is-current { background: rgba(255,255,255,0.12); font-weight: 600; }
+.nav-state {
+  font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.04em; color: #9fbfb0;
+}
+
+.main { padding: 1.5rem 1.5rem 3rem; min-width: 0; }
+.page-header {
+  display: flex; justify-content: space-between; gap: 1rem; align-items: flex-start;
+  margin-bottom: 1.25rem;
+}
+.page-header h1 { margin: 0 0 0.35rem; font-family: var(--font-display); font-size: 1.75rem; }
+.page-header p { margin: 0; color: var(--muted); max-width: 48rem; }
+.header-pills { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+.status-pill {
+  display: inline-flex; align-items: center; padding: 0.28rem 0.65rem;
+  border-radius: 999px; font-size: 0.72rem; font-weight: 700; letter-spacing: 0.04em;
+}
+.status-pill.warn { background: var(--warn-soft); color: var(--warn); }
+.status-pill.danger { background: var(--danger-soft); color: var(--danger); }
+.status-pill.ok { background: var(--ok-soft); color: var(--ok); }
+.status-pill.info { background: var(--info-soft); color: var(--info); }
+
+.notice-stack { display: grid; gap: 0.5rem; margin-bottom: 1rem; }
+.notice {
+  background: var(--info-soft); color: var(--info);
+  border-left: 3px solid var(--info);
+  padding: 0.7rem 0.9rem; border-radius: 0 10px 10px 0; font-size: 0.9rem;
+}
+
+.toolbar {
+  display: flex; flex-wrap: wrap; gap: 0.75rem; margin-bottom: 1rem; align-items: end;
+}
+.field { display: grid; gap: 0.3rem; min-width: 12rem; }
+.field label { font-size: 0.75rem; letter-spacing: 0.04em; color: var(--muted); text-transform: uppercase; }
+.field input, .field select {
+  border: 1px solid var(--line); border-radius: 10px; padding: 0.55rem 0.7rem;
+  font: inherit; background: white;
+}
+.summary-grid {
+  display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0.75rem;
+  margin-bottom: 1.25rem;
+}
+.summary-card {
+  background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius);
+  padding: 0.9rem 1rem; box-shadow: var(--shadow);
+}
+.summary-card .label { color: var(--muted); font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.04em; }
+.summary-card .value { font-size: 1.5rem; font-family: var(--font-display); margin-top: 0.2rem; }
+
+.layout {
+  display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr); gap: 1rem;
+}
+.panel {
+  background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius);
+  box-shadow: var(--shadow); min-height: 24rem;
+}
+.panel-head {
+  padding: 0.85rem 1rem; border-bottom: 1px solid var(--line);
+  display: flex; justify-content: space-between; gap: 0.5rem; align-items: center;
+}
+.panel-head h2 { margin: 0; font-size: 1rem; }
+.order-list { list-style: none; margin: 0; padding: 0; }
+.order-row {
+  width: 100%; text-align: left; border: 0; border-bottom: 1px solid var(--line);
+  background: transparent; padding: 0.9rem 1rem; cursor: pointer; font: inherit;
+}
+.order-row:hover, .order-row.is-selected { background: #f6f3ee; }
+.order-row .top { display: flex; justify-content: space-between; gap: 0.75rem; }
+.order-row .invoice { font-weight: 650; }
+.order-row .meta { color: var(--muted); font-size: 0.85rem; margin-top: 0.25rem; }
+.badge {
+  display: inline-flex; align-items: center; padding: 0.15rem 0.5rem; border-radius: 999px;
+  font-size: 0.72rem; font-weight: 700;
+}
+.badge.paid { background: var(--ok-soft); color: var(--ok); }
+.badge.pending { background: var(--warn-soft); color: var(--warn); }
+.badge.expired, .badge.failed { background: var(--danger-soft); color: var(--danger); }
+.badge.shipped { background: var(--info-soft); color: var(--info); }
+
+.detail { padding: 1rem; }
+.detail h3 { margin: 0 0 0.5rem; font-size: 1.1rem; }
+.detail-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin: 0.75rem 0 1rem;
+}
+.kv {
+  border: 1px solid var(--line); border-radius: 10px; padding: 0.65rem 0.75rem; background: #fcfbf9;
+}
+.kv .k { color: var(--muted); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.04em; }
+.kv .v { margin-top: 0.2rem; font-weight: 600; word-break: break-word; }
+.items { width: 100%; border-collapse: collapse; font-size: 0.92rem; }
+.items th, .items td { text-align: left; padding: 0.45rem 0.35rem; border-bottom: 1px solid var(--line); }
+.empty, .error, .loading {
+  padding: 2rem 1rem; text-align: center; color: var(--muted);
+}
+.footer-note { margin-top: 1.25rem; color: var(--muted); font-size: 0.85rem; }
+.muted { color: var(--muted); }
+.simulated-tag {
+  display: inline-block; margin-top: 0.35rem;
+  font-size: 0.72rem; font-weight: 700; color: var(--warn);
+}
+
+@media (max-width: 980px) {
+  .app-shell { grid-template-columns: 1fr; }
+  .sidebar {
+    position: static;
+    height: auto;
+    width: 100%;
+  }
+  .summary-grid, .layout, .detail-grid { grid-template-columns: 1fr; }
+}
+
+
+/* v2.34 ChatGPT-first Seller Center / orders design system */
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=DM+Sans:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap');
+:root{--ink:#242019;--muted:#6d655a;--paper:#f5f1e8;--panel:#fffdf9;--line:#e5ddce;--brand:#0b0b0c;--radius:16px;--shadow:none;--gold:#c0a062;--font-display:"Cormorant Garamond",Georgia,serif;--font-body:"DM Sans",Inter,system-ui,sans-serif}
+body{background:var(--paper);color:var(--ink);letter-spacing:-.008em}
+.app-shell{grid-template-columns:235px minmax(0,1fr)}
+.sidebar{background:#0b0b0c;color:#f5f1e8;border-right:1px solid #342c1e;padding:1.4rem 1rem}
+.brand{font:500 1.65rem/1.1 var(--font-display)}
+.brand-sub{font:500 .68rem/1.5 Inter,system-ui,sans-serif;color:#b6ae9f;letter-spacing:.05em}
+.nav-label{color:var(--gold)}
+.module-nav{display:grid;gap:3px}
+.nav-item{color:#ddd5c9;font:500 .82rem/1.45 Inter,system-ui,sans-serif;border-radius:10px;padding:.75rem .8rem;transition:background .15s}
+.nav-item:hover:not(:disabled){background:#27231d;color:#fff}
+.nav-item.is-current{background:#30281c;color:#ecd9ae;box-shadow:inset 2px 0 var(--gold)}
+.nav-state{color:#ae9d7b;font-size:.61rem}
+.main{padding:clamp(1.15rem,2.6vw,2.4rem);padding-bottom:3rem;max-width:1580px;margin-inline:auto;width:100%}
+.page-header{align-items:center}
+.page-header h1{font:500 clamp(2.4rem,4vw,3.6rem)/.97 var(--font-display);letter-spacing:-.025em}
+.page-header p{font-size:.83rem;line-height:1.65}
+.sc-eyebrow{font:600 .66rem Inter,system-ui,sans-serif!important;color:#967947!important;text-transform:uppercase;letter-spacing:.13em}
+.header-pills{max-width:290px;justify-content:flex-end}
+.status-pill{font:600 .64rem Inter,system-ui,sans-serif;letter-spacing:.045em;border:1px solid #e4dccf}
+.notice{background:#fffdf8;color:#5b4c39;border:1px solid var(--line);border-left:3px solid var(--gold);border-radius:9px}
+.summary-card{box-shadow:none;border-radius:14px;min-height:95px}
+.summary-card .label{font:600 .67rem Inter,system-ui,sans-serif;letter-spacing:.07em}
+.summary-card .value{font:500 2.15rem/1.08 var(--font-display)}
+.field{flex:1 1 190px;min-width:0}
+.field label{font:600 .67rem Inter,system-ui,sans-serif}
+.field input,.field select{background:#fffdfa;border:1px solid #d9d0c1;min-height:44px;padding:.65rem .8rem}
+.sc-action{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:.68rem 1rem;background:#171614;border:1px solid #171614;color:#f9f3e8;border-radius:11px;font:600 .77rem Inter,system-ui,sans-serif;cursor:pointer}
+.sc-action.secondary{background:transparent;color:#655135;border-color:#bda98a}
+.sc-action:hover:not(:disabled){filter:brightness(1.15)}
+.sc-action:disabled{opacity:.5;cursor:not-allowed}
+.layout{grid-template-columns:minmax(0,.94fr) minmax(0,1.06fr);gap:.85rem;align-items:start}
+.panel{background:#fffdfa;border-radius:16px;box-shadow:none;border-color:var(--line);overflow:hidden}
+.panel-head{padding:1rem 1.15rem}
+.panel-head h2{font:500 1.55rem var(--font-display)}
+.order-list{max-height:680px;overflow:auto}
+.order-row{border-left:3px solid transparent;padding:1rem 1.1rem}
+.order-row:hover{background:#faf6ed}
+.order-row.is-selected{background:#f7f0e3;border-left-color:var(--gold)}
+.order-row .invoice{font:600 .85rem Inter,system-ui,sans-serif;word-break:break-word}
+.order-row .meta{font-size:.72rem;line-height:1.6}
+.badge{font-size:.66rem;max-width:52%;text-align:right}
+.detail{padding:1.1rem}
+.detail h3{font:500 1.92rem/1.1 var(--font-display)}
+.detail-grid{gap:.5rem}
+.kv{background:#faf8f3;border-color:#e9e1d4}
+.kv .k{font:600 .63rem Inter,system-ui,sans-serif;letter-spacing:.05em}
+.kv .v{font-size:.82rem;font-weight:500}
+.sc-section-label{font:600 .68rem Inter,system-ui,sans-serif;letter-spacing:.08em;text-transform:uppercase;color:#987c4b;margin:1.15rem 0 .5rem}
+.sc-next{padding-left:1.15rem;font-size:.82rem;color:#62594c;line-height:1.6}
+.sc-actions{display:flex;flex-wrap:wrap;align-items:center;gap:.6rem;margin-top:1.2rem}
+.sc-footnote{font-size:.73rem;color:#73695c;line-height:1.6}
+.simulated-tag{color:#846a38;font-size:.67rem}
+a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid #b39257;outline-offset:2px}
+@media(max-width:1100px){.layout{grid-template-columns:1fr}.order-list{max-height:400px}}
+@media(max-width:760px){.app-shell{display:block}.sidebar{position:static;height:auto;padding:.8rem .8rem .55rem}.brand{font-size:1.42rem}.brand-sub{margin-bottom:.5rem}.nav-label{display:none}.module-nav{display:flex;gap:3px;overflow-x:auto}.module-nav li{flex:0 0 auto}.module-nav .nav-item{white-space:nowrap;font-size:.7rem;min-height:42px;padding:.55rem .65rem}.nav-state{display:none}.main{padding:1rem .82rem calc(2rem + env(safe-area-inset-bottom))}.page-header{display:block}.header-pills{justify-content:flex-start;max-width:none;margin-top:1rem}.summary-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.detail-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:400px){.detail-grid{grid-template-columns:1fr}}
+@media(prefers-reduced-motion:reduce){.nav-item{transition:none}}
+
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <div class="app-shell">
+    <aside class="sidebar" aria-label="Sample Seller Center navigation">
+      <p class="brand">Arabista Seller Center</p>
+      <p class="brand-sub">v2.34 · MOBILE DESIGN PREVIEW</p>
+      <p class="nav-label">Modules</p>
+      <ul class="module-nav" data-seller-nav="v229">
+        <li><button type="button" class="nav-item" data-seller-target="overview">Overview <span class="nav-state">open</span></button></li>
+        <li><button type="button" class="nav-item" data-seller-target="products">Products <span class="nav-state">open</span></button></li>
+        <li><button type="button" class="nav-item" data-seller-target="stock">Stock <span class="nav-state">open</span></button></li>
+        <li><button type="button" class="nav-item is-current" aria-current="page">Orders <span class="nav-state">live DEV</span></button></li>
+        <li><button type="button" class="nav-item" data-seller-target="shipping">Shipping <span class="nav-state">open</span></button></li>
+        <li><button type="button" class="nav-item" data-seller-target="promotions">Promotions <span class="nav-state">open</span></button></li>
+        <li><button type="button" class="nav-item" data-seller-target="reviews">Reviews <span class="nav-state">open</span></button></li>
+        <li><button type="button" class="nav-item" data-seller-target="discover">Discover <span class="nav-state">open</span></button></li>
+        <li><button type="button" class="nav-item" data-seller-target="chat">Chat <span class="nav-state">open</span></button></li>
+      </ul>
+    </aside>
+    <main class="main" id="main">
+      <header class="page-header">
+        <div>
+          <p class="sc-eyebrow">Seller Center / Commerce</p>
+           <h1>Orders</h1>
+           <p>A refined home for daily orders, payment status and fulfilment. All records on this preview are fictional examples.</p>
+        </div>
+        <div class="header-pills">
+          <span class="status-pill ok">PUBLIC SAMPLE</span>
+          <span class="status-pill warn">DEV SANDBOX</span>
+          <span class="status-pill danger">NO LIVE ACTIONS</span>
+        </div>
+      </header>
+      <div class="toolbar" aria-label="Order tools">
+        <button type="button" class="sc-action" data-refresh-orders>Reset demo</button>
+        <button type="button" class="sc-action secondary" data-multiline-detail disabled title="Only available in private DEV">Technical order detail</button>
+      </div>
+      <pre class="notice" data-multiline-detail-out hidden style="white-space:pre-wrap"></pre>
+      <p class="notice" data-mode-status role="status">PUBLIC DESIGN PREVIEW · Fictional sample orders only · Not connected to Google Sheets, payment or shipping services.</p>
+      <div class="summary-grid">
+        <div class="summary-card"><div class="label">Orders</div><div class="value" data-count-total>0</div></div>
+        <div class="summary-card"><div class="label">Paid</div><div class="value" data-count-paid>0</div></div>
+        <div class="summary-card"><div class="label">Pending / expired</div><div class="value" data-count-pending>0</div></div>
+        <div class="summary-card"><div class="label">Shipped lifecycle</div><div class="value" data-count-shipped>0</div></div>
+      </div>
+      <div class="toolbar">
+        <div class="field">
+          <label for="order-search">Search</label>
+          <input id="order-search" type="search" placeholder="Invoice, payment, status" />
+        </div>
+        <div class="field">
+          <label for="order-status">Filter</label>
+          <select id="order-status">
+            <option value="ALL">All</option>
+            <option value="PAID">Paid</option>
+            <option value="PENDING">Pending</option>
+            <option value="EXPIRED">Expired</option>
+            <option value="UNBOOKED">Paid · unbooked</option>
+            <option value="SHIPPED">Shipping lifecycle</option>
+          </select>
+        </div>
+      </div>
+      <div class="layout">
+        <section class="panel" aria-label="Order list">
+          <div class="panel-head"><h2>Order queue</h2></div>
+          <p class="loading" data-loading>Loading live orders…</p>
+          <p class="error" data-error hidden></p>
+          <p class="empty" data-empty hidden>No orders match this filter.</p>
+          <ul class="order-list" data-order-list></ul>
+        </section>
+        <section class="panel" aria-label="Order detail">
+          <div class="panel-head"><h2>Selected order</h2></div>
+          <div class="detail" data-order-detail aria-live="polite"><p class="empty">Select an order to inspect server-derived detail.</p></div>
+        </section>
+      </div>
+      <p class="footer-note">Public visual sample only. No actual customers, staff authentication, provider data, shipment records or transaction APIs are exposed.</p>
+    </main>
+  </div>
+  <script>
+
+(function(){
+"use strict";
+const $=s=>document.querySelector(s);
+const sample=[
+ {order_id:"DEMO-ORDER-1004",invoice:"DEMO-1004",created:"Today · 14:20",status:"PAID",paid:true,confirmation:"CONFIRMED",evidence:"TEST_ONLY · simulated settlement",stock:"COMMITTED",commitment:"Order-bound TEST_ONLY reserve",fulfilment:"Awaiting preparation",progress:"Ready for internal preparation",amount:18900,shipping:700,items:[["Linen Set · Sand","LIN-SAND-M",1,18900]],shipState:"UNBOOKED",booking:"NONE",awb:"",steps:["Internal shipment preparation would be available only after private server checks."],category:"PAID"},
+ {order_id:"DEMO-ORDER-1003",invoice:"DEMO-1003",created:"Today · 11:45",status:"PAID",paid:true,confirmation:"CONFIRMED",evidence:"TEST_ONLY · simulated settlement",stock:"COMMITTED",commitment:"Order-bound TEST_ONLY reserve",fulfilment:"Prepared internally",progress:"Prepared — not carrier-booked",amount:25900,shipping:700,items:[["Relaxed Shirt · Ivory","SHR-IVRY-S",2,12950]],shipState:"QUEUED",booking:"PREPARED_NOT_BOOKED",awb:"",steps:["This shipment is only internally prepared.","J&T booking and tracking are not active."],category:"PREPARED"},
+ {order_id:"DEMO-ORDER-1002",invoice:"DEMO-1002",created:"Yesterday · 17:05",status:"PENDING",paid:false,confirmation:"PENDING",evidence:"TEST_ONLY · no payment captured",stock:"ACTIVE",commitment:"Not yet committed",fulfilment:"Awaiting payment",progress:"Awaiting payment",amount:9900,shipping:700,items:[["Everyday Tee · Ink","TEE-INK-L",1,9900]],shipState:"UNBOOKED",booking:"NONE",awb:"",steps:["Await authoritative settlement evidence before fulfilment."],category:"PENDING"},
+ {order_id:"DEMO-ORDER-1001",invoice:"DEMO-1001",created:"Yesterday · 09:10",status:"VERIFICATION_REQUIRED",paid:false,confirmation:"VERIFICATION_REQUIRED",evidence:"Evidence incomplete · review required",stock:"UNKNOWN",commitment:"Reconciliation needed",fulfilment:"On hold",progress:"Requires attention",amount:14900,shipping:700,items:[["Pleated Trousers · Stone","TRS-STONE-M",1,14900]],shipState:"UNBOOKED",booking:"NONE",awb:"",steps:["Reconcile payment and reservation evidence.","Preparation remains unavailable."],category:"EXCEPTION"},
+ {order_id:"DEMO-ORDER-1000",invoice:"DEMO-1000",created:"12 Nov · 15:30",status:"EXPIRED",paid:false,confirmation:"EXPIRED",evidence:"TEST_ONLY · simulated unpaid expiry",stock:"RELEASED",commitment:"No committed reservation",fulfilment:"Closed",progress:"Expired",amount:7900,shipping:700,items:[["Canvas Tote · Natural","TOT-NAT",1,7900]],shipState:"UNBOOKED",booking:"NONE",awb:"",steps:["No fulfilment action for an expired order."],category:"EXPIRED"}
+];
+let selected=sample[0].order_id;
+function n(tag,cls,value){const x=document.createElement(tag);if(cls)x.className=cls;if(value!==undefined&&value!==null)x.textContent=String(value);return x}
+function money(v){return "RM "+(Number(v)/100).toFixed(2)}
+function badge(o){return o.category==="PAID"||o.category==="PREPARED"?"paid":o.category==="EXCEPTION"?"failed":o.category==="EXPIRED"?"expired":"pending"}
+function filtered(){
+ const q=$("#order-search").value.trim().toLowerCase(), f=$("#order-status").value;
+ return sample.filter(o=>{
+  if(q&&![o.invoice,o.order_id,o.status,o.progress,o.stock].join(" ").toLowerCase().includes(q))return false;
+  if(f==="ALL")return true;
+  if(f==="PAID")return o.paid;
+  if(f==="PENDING")return o.status==="PENDING"||o.category==="EXCEPTION";
+  if(f==="EXPIRED")return o.status==="EXPIRED";
+  if(f==="UNBOOKED")return o.paid&&o.shipState==="UNBOOKED";
+  if(f==="SHIPPED")return false;
+  return true;
+ });
+}
+function kv(host,label,value){const c=n("div","kv");c.append(n("div","k",label),n("div","v",value));host.appendChild(c)}
+function detail(o){
+ const root=$("[data-order-detail]");root.replaceChildren();
+ if(!o){root.appendChild(n("p","empty","Select an order to inspect the sample details."));return}
+ root.append(n("h3","",o.invoice),n("p","muted",o.order_id),n("span","simulated-tag","FICTIONAL SAMPLE · NO LIVE CUSTOMER DATA"));
+ const grid=n("div","detail-grid");
+ kv(grid,"Order status",o.status);kv(grid,"Payment evidence",o.confirmation+" · "+o.evidence);
+ kv(grid,"Stock reservation",o.stock+" · "+o.commitment);
+ kv(grid,"Fulfilment",o.progress);kv(grid,"Shipment",o.shipState==="QUEUED"?"QUEUED · PREPARED_NOT_BOOKED":"No shipment recorded");
+ kv(grid,"Carrier tracking","No verified AWB");kv(grid,"Merchandise",money(o.amount));
+ kv(grid,"Shipping charge",money(o.shipping));kv(grid,"Payable",money(o.amount+o.shipping));
+ kv(grid,"Recovery",o.category==="EXCEPTION"?"Review required":"None reported");
+ root.appendChild(grid);
+ root.appendChild(n("p","sc-section-label","Order items"));
+ const table=n("table","items"),head=n("thead"),tr=n("tr"),body=n("tbody");
+ ["Item","Qty","Amount"].forEach(t=>{const th=n("th","",t);th.scope="col";tr.appendChild(th)});
+ head.appendChild(tr);table.appendChild(head);
+ o.items.forEach(item=>{const r=n("tr"),product=n("td");product.append(n("strong","",item[0]),n("div","muted",item[1]));r.append(product,n("td","",item[2]),n("td","",money(item[3]*item[2])));body.appendChild(r)});
+ table.appendChild(body);root.appendChild(table);
+ root.appendChild(n("p","sc-section-label","Operational next steps"));
+ const ul=n("ul","sc-next");o.steps.forEach(s=>ul.appendChild(n("li","",s)));root.appendChild(ul);
+ const actions=n("div","sc-actions"),b=n("button","sc-action","Prepare TEST_ONLY shipment");
+ b.type="button";b.disabled=true;b.title="No operations are available in this public design preview";actions.appendChild(b);root.append(actions,n("p","sc-footnote","Sample only · No payments, reservations, J&T booking, AWB or notifications."));
+}
+function render(){
+ const rows=filtered(),list=$("[data-order-list]");list.replaceChildren();
+ $("[data-loading]").hidden=true;$("[data-empty]").hidden=rows.length>0;
+ if(!rows.some(x=>x.order_id===selected))selected=rows.length?rows[0].order_id:null;
+ const frag=document.createDocumentFragment();
+ rows.forEach(o=>{const li=n("li"),b=n("button","order-row"+(selected===o.order_id?" is-selected":""));b.type="button";b.setAttribute("aria-pressed",selected===o.order_id?"true":"false");
+ const top=n("div","top");top.append(n("span","invoice",o.invoice),n("span","badge "+badge(o),o.progress));b.append(top,n("div","meta",[o.status,money(o.amount+o.shipping),"Stock "+o.stock,o.created].join(" · ")),n("span","simulated-tag","SAMPLE · NOT A REAL ORDER"));
+ b.addEventListener("click",()=>{selected=o.order_id;render()});li.appendChild(b);frag.appendChild(li)});
+ list.appendChild(frag);
+ detail(rows.find(o=>o.order_id===selected));
+}
+function reset(){
+ $("#order-search").value="";$("#order-status").value="ALL";selected=sample[0].order_id;render();
+ $("[data-mode-status]").textContent="PUBLIC DESIGN PREVIEW · Fictional examples. Refresh resets the sample view; no Google Sheets requests are made.";
+}
+function nav(){
+ document.querySelectorAll("[data-seller-target]").forEach(b=>{
+  const target=b.dataset.sellerTarget;
+  if(target==="shipping")b.addEventListener("click",()=>{location.href="./shipping.html"});
+  else{b.disabled=true;b.setAttribute("aria-disabled","true");b.title="Only Orders and Shipping are included in this design preview";}
+ });
+}
+$("[data-count-total]").textContent=String(sample.length);
+$("[data-count-paid]").textContent=String(sample.filter(o=>o.paid).length);
+$("[data-count-pending]").textContent=String(sample.filter(o=>o.status==="PENDING"||o.category==="EXCEPTION"||o.status==="EXPIRED").length);
+$("[data-count-shipped]").textContent="0";
+$("[data-error]").hidden=true;
+$("#order-search").addEventListener("input",render);
+$("#order-status").addEventListener("change",render);
+$("[data-refresh-orders]").addEventListener("click",reset);
+const technical=$("[data-multiline-detail]");technical.disabled=true;
+nav();render();
+})();
+
+  </script>
+</body>
+</html>
