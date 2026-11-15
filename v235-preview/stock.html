@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+<meta name="robots" content="noindex,nofollow"/><meta name="referrer" content="no-referrer"/>
+<title>Arabista Seller Center · Stock — Mobile Visual Preview</title><style>
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=DM+Sans:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap');
+:root{--ink:#242019;--muted:#6d655a;--paper:#f5f1e8;--panel:#fffdf9;--line:#e5ddce;--gold:#c0a062;--gold-cta:#b39257;--dark:#0b0b0c;--display:"Cormorant Garamond",Georgia,serif;--body:"DM Sans",Inter,system-ui,sans-serif}
+*{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font:14px/1.5 var(--body)}
+button,input,select{font:inherit}button{cursor:pointer}button:disabled{opacity:.52;cursor:not-allowed}
+:focus-visible{outline:2px solid var(--gold-cta);outline-offset:2px}[hidden]{display:none!important}
+.skip{position:absolute;left:-200vw;top:0;background:var(--dark);color:white;padding:.65rem 1rem;z-index:15}.skip:focus{left:10px}
+.app{display:grid;grid-template-columns:235px minmax(0,1fr);min-height:100vh}
+.sidebar{background:var(--dark);color:#f5f1e8;border-right:1px solid #342c1e;padding:1.4rem 1rem}
+.brand{font:500 1.65rem/1.1 var(--display);margin:0}
+.brand-sub{font:500 .68rem/1.6 Inter,system-ui,sans-serif;color:#b6ae9f;letter-spacing:.05em;margin:.35rem 0 1.4rem}
+.nav-label{font:600 .68rem Inter,system-ui,sans-serif;text-transform:uppercase;letter-spacing:.08em;color:var(--gold)}
+.modules{list-style:none;display:grid;gap:3px;margin:.5rem 0 0;padding:0}
+.modules button{border:0;width:100%;min-height:42px;text-align:left;border-radius:10px;color:#ddd5c9;background:transparent;padding:.75rem .8rem;font:500 .82rem Inter,system-ui,sans-serif}
+.modules button:hover:not(:disabled){background:#27231d;color:#fff}
+.modules .current{background:#30281c;color:#ecd9ae;box-shadow:inset 2px 0 var(--gold)}
+.main{padding:clamp(1.15rem,2.6vw,2.4rem);padding-bottom:3rem;width:100%;max-width:1580px;margin:0 auto;min-width:0}
+.eyebrow{font:600 .66rem Inter,system-ui,sans-serif;letter-spacing:.13em;text-transform:uppercase;color:#967947;margin:0 0 .35rem}
+h1{font:500 clamp(2.4rem,4vw,3.6rem)/.97 var(--display);letter-spacing:-.025em;margin:0 0 .5rem}
+h2{font:500 1.55rem/1.1 var(--display);margin:0}
+h3{font:500 1.3rem var(--display);margin:0}
+.intro{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;margin-bottom:1rem}
+.intro-copy{max-width:650px;font-size:.84rem;color:var(--muted);line-height:1.65;margin:.1rem 0 .6rem}
+.tag{display:inline-flex;border:1px solid #e8d8b5;background:#f5eedd;color:#775d31;border-radius:999px;padding:.32rem .64rem;letter-spacing:.045em;text-transform:uppercase;font:600 .65rem Inter,system-ui,sans-serif}
+.tag.neutral{background:#ede9e2;color:#5b5850;border-color:#ded6c8}
+.action{border:1px solid #171614;border-radius:11px;min-height:44px;background:#171614;color:#f9f3e8;padding:.65rem 1rem;font:600 .76rem Inter,system-ui,sans-serif}
+.action:hover:not(:disabled){background:#3b3126}.action.secondary{background:transparent;color:#655135;border-color:#bda98a}.action.secondary:hover:not(:disabled){background:#f7f0e1}
+.status{margin:1rem 0;padding:.75rem .9rem;border:1px solid var(--line);border-left:3px solid var(--gold);border-radius:11px;background:#fffdfa;color:#5d503b;font-size:.81rem}
+.status.error{border-left-color:#a35b43;color:#7a3c2e}
+.metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:.65rem;margin:1.1rem 0 1.3rem}
+.metric{border:1px solid var(--line);border-radius:14px;background:var(--panel);padding:1rem;min-height:95px}
+.metric .label{font:600 .65rem/1.5 Inter,system-ui,sans-serif;letter-spacing:.065em;text-transform:uppercase;color:var(--muted)}
+.metric .number{font:500 2.2rem/1.12 var(--display);margin-top:.4rem}
+.metric .detail{font-size:.71rem;color:var(--muted);line-height:1.5;margin-top:.2rem}
+.layout{display:grid;grid-template-columns:minmax(0,.98fr) minmax(0,1.02fr);gap:.85rem;align-items:start}
+.panel{border:1px solid var(--line);border-radius:16px;background:var(--panel);overflow:hidden;min-width:0}
+.panel-head{display:flex;align-items:center;justify-content:space-between;padding:1rem 1.15rem;border-bottom:1px solid var(--line);gap:.5rem}
+.panel-content{padding:1.1rem}
+.list{list-style:none;padding:0;margin:0}
+.list li{border-bottom:1px solid var(--line);padding:.82rem 1rem}
+.list li:last-child{border-bottom:0}
+.list .top{display:flex;align-items:baseline;justify-content:space-between;gap:.6rem;flex-wrap:wrap;font:600 .8rem Inter,system-ui,sans-serif}
+.list .sub{font-size:.74rem;line-height:1.6;color:var(--muted);margin-top:.28rem;overflow-wrap:anywhere}
+.cell-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.5rem}
+.cell{background:#faf8f3;border:1px solid #e9e1d4;padding:.75rem .8rem;border-radius:10px;overflow-wrap:anywhere}
+.cell .k{font:600 .63rem Inter,system-ui,sans-serif;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+.cell .v{font-size:.84rem;margin-top:.25rem;font-weight:500}
+.field{display:grid;gap:.3rem;flex:1 1 170px}
+.field label{font:600 .66rem Inter,system-ui,sans-serif;letter-spacing:.07em;color:var(--muted);text-transform:uppercase}
+.field input,.field select{min-height:44px;border:1px solid #d9d0c1;border-radius:10px;background:#fffdfa;padding:.6rem .8rem;min-width:0;width:100%}
+.tools{display:flex;align-items:flex-end;gap:.65rem;flex-wrap:wrap;margin:1rem 0}
+.table-scroll{overflow-x:auto}table{width:100%;border-collapse:collapse;text-align:left}th,td{padding:.7rem .75rem;border-bottom:1px solid var(--line);font-size:.78rem;overflow-wrap:anywhere}
+th{color:var(--muted);font:600 .65rem Inter,system-ui,sans-serif;letter-spacing:.05em;text-transform:uppercase}
+.empty{padding:1.4rem 1.1rem;text-align:center;color:var(--muted);font-size:.82rem}
+.small{font-size:.73rem;color:var(--muted);line-height:1.65}.footer{margin-top:1.4rem;color:var(--muted);font-size:.73rem;line-height:1.7}
+.link-button{display:block;width:100%;text-align:left;border:0;background:transparent;color:var(--ink);padding:.75rem 1rem;border-bottom:1px solid var(--line)}
+.link-button:hover{background:#faf6ed}.link-button.selected{background:#f7f0e3;box-shadow:inset 3px 0 var(--gold)}
+@media(max-width:1100px){.layout{grid-template-columns:1fr}.metrics{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:760px){.app{display:block}.sidebar{padding:.8rem .8rem .55rem}.brand{font-size:1.42rem}.brand-sub{margin-bottom:.55rem}.nav-label{display:none}.modules{display:flex;gap:3px;overflow-x:auto;margin:0}.modules li{flex:0 0 auto}.modules button{white-space:nowrap;font-size:.7rem;padding:.55rem .65rem}.main{padding:1rem .82rem calc(2rem + env(safe-area-inset-bottom))}.metrics{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:390px){.cell-grid{grid-template-columns:1fr}}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
+</style></head>
+<body><a class="skip" href="#main">Skip to Stock</a><div class="app">
+<aside class="sidebar" aria-label="Seller Center navigation">
+<p class="brand">Arabista Seller Center</p><p class="brand-sub">v2.35 · MOBILE DESIGN PREVIEW</p>
+<p class="nav-label">Modules</p><ul class="modules" data-seller-nav="v229"><li><button type="button" data-seller-target="overview">Overview</button></li>
+<li><button type="button" data-seller-target="products">Products</button></li>
+<li><button type="button" class="current" aria-current="page" disabled>Stock</button></li>
+<li><button type="button" data-seller-target="orders">Orders</button></li>
+<li><button type="button" data-seller-target="shipping">Shipping</button></li>
+<li><button type="button" data-seller-target="promotions">Promotions</button></li>
+<li><button type="button" data-seller-target="reviews">Reviews</button></li>
+<li><button type="button" data-seller-target="discover">Discover</button></li>
+<li><button type="button" data-seller-target="chat">Chat</button></li></ul></aside>
+<main class="main" id="main"><header class="intro"><div><p class="eyebrow">Seller Center / Inventory</p><h1>Stock</h1>
+<p class="intro-copy">Explore fictional Stock balances and availability in the new mobile design. No live inventory is connected.</p></div>
+<div><span class="tag">DEMO · SAMPLE ONLY</span> <span class="tag neutral">No live services</span></div></header>
+<p class="status" id="status" role="status">PUBLIC DESIGN PREVIEW · All Stock balances and movements are fictional.</p>
+<div class="metrics" aria-label="Stock summary">
+<div class="metric"><div class="label">Balances</div><div class="number" id="total">—</div></div>
+<div class="metric"><div class="label">ATS positive</div><div class="number" id="available">—</div></div>
+<div class="metric"><div class="label">ATS ≤ 1</div><div class="number" id="low">—</div></div>
+<div class="metric"><div class="label">Recent movements</div><div class="number" id="movements-count">—</div></div>
+</div>
+<div class="tools"><button type="button" id="refresh" class="action">Refresh Stock</button>
+<div class="field"><label for="query">Search SKU / balance</label><input id="query" type="search" placeholder="SKU, balance or location" autocomplete="off"/></div>
+<div class="field"><label for="filter">Availability</label><select id="filter">
+<option value="ALL">All balances</option><option value="AVAILABLE">Available to sell</option>
+<option value="LOW">Low / zero ATS</option><option value="SYNTHETIC">Synthetic DEV only</option></select></div></div>
+<div class="layout">
+<section class="panel" aria-label="Stock balances"><header class="panel-head"><h2>Stock balances</h2><span class="small" id="count">—</span></header><div id="balances"><p class="empty">Loading…</p></div></section>
+<section class="panel" aria-label="Selected balance details"><header class="panel-head"><h2>Balance detail</h2><span class="tag neutral">Evidence view</span></header>
+<div id="detail" class="panel-content" aria-live="polite"><p class="empty">Select a balance.</p></div></section>
+</div>
+<p class="status" id="adjustment">No adjustment package evidence has been loaded. Stock adjustments are not available on this screen.</p>
+<p class="footer">Public mobile visual sample only · No live Stock, private credentials, customer records, payment services or write operations.</p>
+</main></div><script>(function(){
+"use strict";
+const $=id=>document.getElementById(id),n=(tag,cls,val)=>{const el=document.createElement(tag);if(cls)el.className=cls;if(val!==undefined&&val!==null)el.textContent=String(val);return el};
+const balances=[
+ {balance_id:"demo-bal-001",sku_id:"syn-demo-shirt-ivory-m",location_id:"Sample Warehouse",physical_qty:9,reserved_qty:4,committed_qty:2,safety_qty:2,available_to_sell:1,revision:12,synthetic:true},
+ {balance_id:"demo-bal-002",sku_id:"syn-demo-tote-natural",location_id:"Sample Warehouse",physical_qty:4,reserved_qty:1,committed_qty:2,safety_qty:1,available_to_sell:0,revision:7,synthetic:true},
+ {balance_id:"demo-bal-003",sku_id:"syn-demo-trousers-stone-l",location_id:"Sample Warehouse",physical_qty:20,reserved_qty:2,committed_qty:1,safety_qty:3,available_to_sell:14,revision:5,synthetic:true},
+ {balance_id:"demo-bal-004",sku_id:"syn-demo-linen-sand-s",location_id:"Sample Warehouse",physical_qty:15,reserved_qty:1,committed_qty:2,safety_qty:2,available_to_sell:10,revision:8,synthetic:true}
+];
+const movements=[
+ {sku_id:"syn-demo-shirt-ivory-m",event_type:"RESERVATION_COMMIT",qty_delta:-1,reason_code:"TEST_ONLY_SETTLE",source_type:"Demo checkout",created_at_utc:"2026-11-15 14:20 · sample"},
+ {sku_id:"syn-demo-shirt-ivory-m",event_type:"RESERVATION_RELEASE",qty_delta:1,reason_code:"DEMO_EXPIRED",source_type:"Demo checkout",created_at_utc:"2026-11-15 12:10 · sample"},
+ {sku_id:"syn-demo-tote-natural",event_type:"MANUAL_ADJUSTMENT",qty_delta:2,reason_code:"DEMO_SAMPLE",source_type:"Illustration only",created_at_utc:"2026-11-14 09:40 · sample"},
+ {sku_id:"syn-demo-linen-sand-s",event_type:"RESERVATION_COMMIT",qty_delta:-2,reason_code:"TEST_ONLY_SETTLE",source_type:"Demo checkout",created_at_utc:"2026-11-13 11:10 · sample"}
+];
+let selected=balances[0].balance_id;
+function qty(v){return String(v)}
+function cell(grid,label,value){const e=n("div","cell");e.append(n("div","k",label),n("div","v",value));grid.appendChild(e)}
+function filtered(){
+ const q=$("query").value.trim().toLowerCase(),f=$("filter").value;
+ return balances.filter(b=>{if(q&&![b.sku_id,b.balance_id,b.location_id].join(" ").toLowerCase().includes(q))return false;
+ if(f==="LOW"&&b.available_to_sell>1)return false;
+ if(f==="AVAILABLE"&&b.available_to_sell<=0)return false;
+ if(f==="SYNTHETIC"&&!b.synthetic)return false;return true});
+}
+function detail(b){
+ const host=$("detail");host.replaceChildren();
+ if(!b){host.appendChild(n("p","empty","Choose a Stock balance in the sample queue."));return}
+ host.append(n("h3","",b.sku_id),n("p","small",b.balance_id+" · fictional"));
+ const grid=n("div","cell-grid");
+ [["Physical",b.physical_qty],["Active reservations",b.reserved_qty],["Committed / unshipped",b.committed_qty],
+ ["Safety Stock",b.safety_qty],["Available to sell",b.available_to_sell],["Revision",b.revision],
+ ["Location",b.location_id],["Source","Synthetic sample"]].forEach(x=>cell(grid,...x));
+ host.appendChild(grid);host.appendChild(n("p","small","No real inventory is displayed or modified. The figures are solely to assess the interface."));
+ host.appendChild(n("h3","","Recent movement evidence (samples)"));
+ const ms=movements.filter(m=>m.sku_id===b.sku_id);
+ if(!ms.length){host.appendChild(n("p","empty","No sample movements recorded for this SKU."));return}
+ const wrap=n("div","table-scroll"),table=n("table"),head=n("thead"),tr=n("tr");
+ ["Event","Change","Reason / source","Recorded"].forEach(v=>{const th=n("th","",v);th.scope="col";tr.appendChild(th)});
+ head.appendChild(tr);table.appendChild(head);
+ const tbody=n("tbody");ms.forEach(m=>{const row=n("tr");
+ row.append(n("td","",m.event_type),n("td","",qty(m.qty_delta)),n("td","",m.reason_code+" · "+m.source_type),n("td","",m.created_at_utc));
+ tbody.appendChild(row)});table.appendChild(tbody);wrap.appendChild(table);host.appendChild(wrap);
+}
+function draw(){
+ const rows=filtered(),root=$("balances");root.replaceChildren();
+ $("count").textContent=rows.length+" shown";
+ if(!rows.some(b=>b.balance_id===selected))selected=rows[0]?rows[0].balance_id:null;
+ if(!rows.length){root.appendChild(n("p","empty","No fictional balances match this filter."));detail(null);return}
+ rows.forEach(b=>{const btn=n("button","link-button"+(selected===b.balance_id?" selected":""));
+ btn.type="button";btn.setAttribute("aria-pressed",selected===b.balance_id?"true":"false");
+ btn.append(n("div","top",b.sku_id),n("div","small",["ATS "+qty(b.available_to_sell),"Reserved "+qty(b.reserved_qty),"Committed "+qty(b.committed_qty),b.location_id].join(" · ")),
+ n("span","tag","DEMO SKU"));
+ btn.addEventListener("click",()=>{selected=b.balance_id;draw()});root.appendChild(btn)});
+ detail(rows.find(b=>b.balance_id===selected));
+}
+function reset(){
+ $("query").value="";$("filter").value="ALL";selected=balances[0].balance_id;draw();
+ $("status").textContent="PUBLIC DESIGN PREVIEW · Fictional Stock values only · No Google Sheets connection.";
+}
+$("total").textContent=String(balances.length);
+$("available").textContent=String(balances.filter(x=>x.available_to_sell>0).length);
+$("low").textContent=String(balances.filter(x=>x.available_to_sell<=1).length);
+$("movements-count").textContent=String(movements.length);
+$("adjustment").textContent="SAMPLE ONLY · No adjustment package exists and no changes can be saved.";
+$("refresh").textContent="Reset demo";
+document.querySelectorAll("[data-seller-target]").forEach(b=>{
+ if(b.dataset.sellerTarget==="overview")b.addEventListener("click",()=>{location.href="./index.html"});
+ else{b.disabled=true;b.title="Only Overview and Stock included in mobile design preview";b.setAttribute("aria-disabled","true")}
+});
+$("query").addEventListener("input",draw);$("filter").addEventListener("change",draw);
+$("refresh").addEventListener("click",reset);reset();
+}());</script></body></html>
