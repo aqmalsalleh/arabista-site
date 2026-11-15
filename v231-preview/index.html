@@ -818,13 +818,14 @@ body,button,input,select,textarea{font-family:var(--ref-ui)!important}
 .action-primary,.reference-continue{font:700 14px/1.2 var(--ref-ui)!important;
   color:#fff!important;border:0!important;background:#b39257!important;border-radius:999px!important}
 .action-primary:disabled{opacity:.45}
-.site-tabs{background:#fff!important;border-top:1px solid #efebe5!important;
-  box-shadow:0 -3px 14px #00000006}
-.site-tabs button{color:#9e9e9d!important;font:700 10px/1.25 var(--ref-ui)!important}
-.site-tabs button[aria-selected="true"]{color:#947142!important}
+.site-tabs{background:rgba(11,11,13,.85)!important;border-top:1px solid #c9ad7d36!important;
+  box-shadow:0 -6px 24px #00000020!important;
+  backdrop-filter:blur(22px) saturate(1.15);-webkit-backdrop-filter:blur(22px) saturate(1.15)}
+.site-tabs button{color:#eee9e0af!important;font:600 9px/1.25 var(--ref-ui)!important}
+.site-tabs button[aria-selected="true"]{color:#d8b782!important}
 .site-tabs button[aria-selected="true"]::after{background:#ad8957!important}
-.site-tabs button[data-tab="shop"] .nav-ic{color:#977a4c!important;background:#fff!important;
-  border:1px solid #b9a17782!important}
+.site-tabs button[data-tab="shop"] .nav-ic{color:#e4c792!important;background:#b99c6826!important;
+  border:1px solid #cbb18470!important}
 .site-tabs button:not([aria-selected="true"]) svg{opacity:.7}
 .reference-orders{background:var(--ref-sand)!important;color:var(--ref-ink)!important;min-height:100%}
 .reference-orders-head{padding:clamp(34px,7vh,58px) 22px 25px;background:#fff;border-bottom:1px solid #efebe6}
@@ -931,6 +932,69 @@ body.preview-modal.preview-expanded.is-discover #feed .post .stage {height:0!imp
   background:#f5f1e894;box-shadow:0 0 3px #0004;transition:width .2s ease,background .2s}
 #feed .preview-carousel .dots button[aria-current="true"]:before{width:17px;border-radius:8px;background:#c0a062}
 @media(prefers-reduced-motion:reduce){#feed .preview-carousel .dots button:before{transition:none!important}}
+
+
+/* Owner mobile polish: compact, translucent obsidian navigation; media stays the hero. */
+body.is-discover .site-tabs{background:linear-gradient(180deg,rgba(8,8,10,.22),rgba(8,8,10,.65))!important;
+  border-top:1px solid #eee2ca24!important;box-shadow:0 -8px 18px #0000000a!important}
+.site-tabs button[aria-selected="true"]::after{height:2px!important;bottom:0!important;
+  background:#d5b67e!important;border-radius:3px}
+.site-tabs .nav-ic svg{stroke-width:1.7!important}
+@media(max-width:680px){
+ .site-tabs{height:calc(54px + env(safe-area-inset-bottom,0px))!important;
+   min-height:0!important;display:grid!important;grid-template-columns:repeat(5,minmax(0,1fr));
+   padding:2px 5px calc(2px + env(safe-area-inset-bottom,0px))!important;gap:0!important}
+ .site-tabs button{height:48px!important;min-height:48px!important;min-width:0!important;
+   padding:3px 0!important;gap:2px!important;font-size:9px!important;
+   font-weight:600!important;letter-spacing:0!important}
+ .site-tabs .nav-ic{width:20px!important;height:20px!important}
+ .site-tabs button[data-tab="shop"] .nav-ic{width:29px!important;height:25px!important;padding:3px!important}
+ #main.discover-mode{padding-bottom:calc(54px + env(safe-area-inset-bottom,0px))!important}
+ #main:not(.discover-mode){padding-bottom:calc(64px + env(safe-area-inset-bottom,0px))!important}
+}
+/* Brand-mark assets retain their original silhouette: no CSS circles, edging, or halos. */
+.brand-symbol,.fyp-logo-mark,.store-avatar,
+.coin-loader .coin-face,.coin-loader .coin-back:after,
+.shop-tile .thumb .ph::before {
+ border-radius:0!important;border:0!important;box-shadow:none!important;
+ filter:none!important;background-size:contain!important;
+}
+.coin-loader .coin-halo{display:none!important}
+.brand-symbol,.store-avatar{outline:0!important}
+/* Tiny dots inside one restrained frosted capsule just above the navigation. */
+#feed .preview-carousel .stage > .dots{
+ top:auto!important;bottom:12px!important;left:50%!important;right:auto!important;
+ transform:translateX(-50%)!important;width:max-content!important;height:27px!important;
+ display:flex!important;align-items:center!important;justify-content:center!important;
+ gap:0!important;padding:2px 6px!important;border-radius:999px!important;
+ border:1px solid #ffffff20!important;background:#0a0a0d70!important;
+ backdrop-filter:blur(10px) saturate(1.1);-webkit-backdrop-filter:blur(10px) saturate(1.1);
+ box-shadow:0 4px 12px #0004!important;z-index:13!important;
+}
+#feed .preview-carousel .stage > .dots button{
+ position:relative!important;display:grid!important;place-items:center!important;
+ width:20px!important;height:23px!important;min-height:23px!important;
+ padding:0!important;background:transparent!important;border:0!important;
+ border-radius:0!important;box-shadow:none!important;
+}
+#feed .preview-carousel .stage > .dots button:before{
+ content:"";display:block;width:5px!important;height:5px!important;min-height:5px!important;
+ border-radius:50%!important;background:#f5f1e8b8!important;
+ box-shadow:none!important;transition:background-color .18s,transform .18s;
+}
+#feed .preview-carousel .stage > .dots button[aria-current="true"]:before{
+ width:7px!important;height:7px!important;background:#d9b982!important;
+ box-shadow:0 0 0 2px #d9b98218!important;
+}
+@media(prefers-reduced-motion:reduce){
+ #feed .preview-carousel .stage > .dots button:before{transition:none!important}
+}
+/* Minor actions should report progress beside the relevant content, not block the whole app. */
+.coin-busy:not([hidden]){display:flex;align-items:center;gap:8px;padding:7px 1px;
+ color:#80643c;font:600 11px/1.35 var(--ref-ui);background:transparent}
+.coin-busy .coin-loader{width:24px!important;height:24px!important;flex:none}
+.coin-busy .coin-halo{display:none!important}
+.reference-field input:disabled{opacity:1;color:#aaa397;-webkit-text-fill-color:#aaa397}
 
 </style></head>
 <body>
@@ -1042,14 +1106,14 @@ body.preview-modal.preview-expanded.is-discover #feed .post .stage {height:0!imp
       <div class="reference-lookup">
         <div class="reference-eyebrow">Private order access</div>
         <h2>Find your orders.</h2>
-        <p class="reference-intro">Enter the email address or phone number used at checkout. We'll help verify your access before displaying your history.</p>
-        <label for="lookupIdentifier" class="reference-field-label">Email or phone number</label>
+        <p class="reference-intro">Arabista V2 keeps order access linked to a verified purchase session—not to an email search.</p>
+        <label for="lookupIdentifier" class="reference-field-label">Purchase-linked access</label>
         <div class="reference-field">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="6" width="18" height="12" rx="2"/><path d="m3 7 9 7 9-7"/></svg>
-          <input id="lookupIdentifier" type="text" autocomplete="off" placeholder="Your email or mobile number">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="10" width="14" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
+          <input id="lookupIdentifier" type="text" disabled placeholder="Available after checkout">
         </div>
-        <button type="button" id="btnOpenOrder" class="reference-continue">Continue securely <span aria-hidden="true">→</span></button>
-        <p id="orderNotice" class="reference-preview-note" role="status" aria-live="polite">Design preview only. This form cannot access real orders.</p>
+        <button type="button" id="btnOpenOrder" class="reference-continue">View sample order <span aria-hidden="true">→</span></button>
+        <p id="orderNotice" class="reference-preview-note" role="status" aria-live="polite">Public design preview · No real customer orders or grants are accessible.</p>
         <div id="orderSummary" class="order-summary" aria-label="Sample order details" aria-live="polite" hidden></div>
         <div class="reference-secure">
           <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="10" width="14" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
@@ -1109,11 +1173,19 @@ body.preview-modal.preview-expanded.is-discover #feed .post .stage {height:0!imp
     });
   }
   function busy(id,on,text){
-    var n=$(id); if(n){ n.hidden=true; if(text){var c=n.querySelector('.coin-copy');if(c)c.textContent=text;} }
-    if(on)activeRequests.add(id); else activeRequests.delete(id);
-    var overlay=$('globalBusy');
-    overlay.hidden=activeRequests.size===0;
-    $('globalBusyText').textContent=text||(activeRequests.has('shopBusy')?'Preparing the collection…':'Loading…');
+    var global=id==='entryBusy'||id==='previewReplay';
+    var n=$(id);
+    if(n){
+      n.hidden=global ? true : !on;
+      n.setAttribute('aria-busy',on?'true':'false');
+      if(text){var c=n.querySelector('.coin-copy');if(c)c.textContent=text;}
+    }
+    if(global){
+      if(on)activeRequests.add(id); else activeRequests.delete(id);
+      var overlay=$('globalBusy');
+      overlay.hidden=activeRequests.size===0;
+      $('globalBusyText').textContent=text||'Preparing your experience…';
+    }
     if(!on)syncActiveVideo();
   }
   function reduced(){return window.matchMedia('(prefers-reduced-motion:reduce)').matches}
@@ -1222,7 +1294,7 @@ body.preview-modal.preview-expanded.is-discover #feed .post .stage {height:0!imp
     cartButton.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 4h2l2.1 11h11.7L21 7H6"/><circle cx="9" cy="20" r="1"/><circle cx="18" cy="20" r="1"/></svg>';
     cartButton.addEventListener('click',function(){closeDetail(false);show('cart')});
     var count=Object.values(cart).reduce(function(n,q){return n+q},0);
-    if(count){var bubble=node('span',String(count),'cart-count');bubble.id='sheetCartCount';cartButton.appendChild(bubble)}
+    var bubble=node('span',String(count),'cart-count');bubble.id='sheetCartCount';bubble.hidden=!count;cartButton.appendChild(bubble);
     head.appendChild(cartButton);d.appendChild(head);
     var body=node('div',null,'shop-detail-scroll');
     var gallery=node('div',null,'shop-gallery');
@@ -1264,7 +1336,12 @@ body.preview-modal.preview-expanded.is-discover #feed .post .stage {height:0!imp
   }
   function drawCart(){
     var entries=Object.keys(cart).filter(function(id){return cart[id]>0}),count=entries.reduce(function(n,id){return n+cart[id]},0);
-    ['cartBadge','headerCartCount','fypCartCount','sheetCartCount'].forEach(function(id){var badge=$(id);if(!badge)return;badge.textContent=count;badge.hidden=!count;});
+    ['cartBadge','headerCartCount','fypCartCount','sheetCartCount'].forEach(function(id){
+      var badge=$(id);if(!badge)return;badge.textContent=count;badge.hidden=!count;
+    });
+    ['headerCart','fypCart','sheetCart'].forEach(function(id){
+      var button=$(id);if(button)button.setAttribute('aria-label','Open Cart'+(count?' ('+count+' items)':''));
+    });
     $('cartCount').textContent=count+(count===1?' sample item':' sample items');$('cartSummaryCount').textContent=count;
     $('btnQuote').disabled=count===0;$('btnClear').disabled=count===0;$('btnExecute').disabled=true;
     var root=$('basket');clear(root);clear($('verifiedQuote'));$('verifiedQuote').hidden=true;$('quoteNotice').textContent='';
@@ -1438,9 +1515,9 @@ body.preview-modal.preview-expanded.is-discover #feed .post .stage {height:0!imp
     var bs=Array.from(document.querySelectorAll('.site-tabs button[data-tab]'));var i=bs.indexOf(document.activeElement);if(i<0)return;
     e.preventDefault();var j=e.key==='Home'?0:e.key==='End'?bs.length-1:(i+(e.key==='ArrowRight'?1:-1)+bs.length)%bs.length;show(bs[j].dataset.tab);bs[j].focus()
   });
-  busy('shopBusy',true,'Preparing mobile preview…');
+  busy('entryBusy',true,'Welcome to Arabista…');
   showShopView('home');renderShop();drawCart();feed();show('discover');
-  window.setTimeout(function(){busy('shopBusy',false)},900);
+  window.setTimeout(function(){busy('entryBusy',false)},900);
 })();
 
 </script></body></html>
