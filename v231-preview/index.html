@@ -1304,18 +1304,85 @@ body.preview-modal.preview-expanded.is-discover #feed .post .stage{
     if(!list.length)$('catalog').appendChild(node('p','No matching sample products.','fine-print'));
     setNote(list.length+' sample products · layout demonstration only')
   }
-  function setPreviewProductExpanded(expanded){
-    var active = !!expanded && activeTab === 'discover' && !$('shopDetail').hidden;
-    document.body.classList.toggle('preview-expanded', active);
-    var handle = $('sheetExpandHandle');
-    if (handle) {
-      handle.setAttribute('aria-label', active ? 'Collapse product sheet' : 'Expand product sheet');
-      handle.setAttribute('aria-expanded', active ? 'true' : 'false');
+  function attachSheetResizeHandle(handle,sheet,apply,ratio){
+    var gesture=null,ignoreClick=false;
+    handle.classList.add('sheet-resize-handle');
+    handle.setAttribute('aria-keyshortcuts','ArrowUp ArrowDown');
+    function levels(){
+      var vh=window.innerHeight||document.documentElement.clientHeight||800;
+      var full=Math.max(320,vh-8);
+      var peek=Math.min(full,Math.min(740,vh*(ratio||.72)));
+      var compact=Math.min(peek-30,Math.max(240,vh*.46));
+      return [compact,peek,full];
     }
-    syncActiveVideo();
+    function closest(h){
+      return levels().reduce(function(best,v){
+        return Math.abs(v-h)<Math.abs(best-h)?v:best;
+      });
+    }
+    handle.addEventListener('pointerdown',function(e){
+      if(e.button!==0)return;
+      gesture={id:e.pointerId,y:e.clientY,h:sheet.getBoundingClientRect().height,moved:false};
+      if(handle.setPointerCapture)handle.setPointerCapture(e.pointerId);
+    });
+    handle.addEventListener('pointermove',function(e){
+      if(!gesture||gesture.id!==e.pointerId)return;
+      var delta=gesture.y-e.clientY;
+      if(!gesture.moved&&Math.abs(delta)<5)return;
+      gesture.moved=true;
+      document.body.classList.add('sheet-is-dragging');
+      var sizes=levels();
+      apply(Math.max(sizes[0],Math.min(sizes[2],gesture.h+delta)),false);
+      if(e.cancelable)e.preventDefault();
+    });
+    function finish(e){
+      if(!gesture||gesture.id!==e.pointerId)return;
+      if(gesture.moved){
+        apply(closest(sheet.getBoundingClientRect().height),true);
+        ignoreClick=true;
+        window.setTimeout(function(){ignoreClick=false},300);
+      }
+      gesture=null;
+      document.body.classList.remove('sheet-is-dragging');
+    }
+    handle.addEventListener('pointerup',finish);
+    handle.addEventListener('pointercancel',finish);
+    handle.addEventListener('click',function(e){
+      if(ignoreClick){ignoreClick=false;e.preventDefault();return}
+      var sizes=levels(),now=sheet.getBoundingClientRect().height;
+      apply(now>sizes[1]+28?sizes[1]:sizes[2],true);
+    });
+    handle.addEventListener('keydown',function(e){
+      if(e.key!=='ArrowUp'&&e.key!=='ArrowDown')return;
+      e.preventDefault();
+      var now=sheet.getBoundingClientRect().height,sizes=levels(),next;
+      if(e.key==='ArrowUp')next=sizes.find(function(v){return v>now+15})||sizes[2];
+      else next=sizes.slice().reverse().find(function(v){return v<now-15})||sizes[0];
+      apply(next,true);
+    });
+  }
+  function applyPreviewSheetHeight(value,settled){
+    var h=Math.round(value),vh=window.innerHeight||800;
+    document.body.style.setProperty('--preview-sheet-height',h+'px');
+    var expanded=h>vh*.88;
+    document.body.classList.toggle('preview-expanded',expanded);
+    var handle=$('sheetExpandHandle');
+    if(handle){
+      handle.setAttribute('aria-expanded',expanded?'true':'false');
+      handle.setAttribute('aria-label',expanded
+        ? 'Collapse product sheet. Drag or use arrow keys to resize'
+        : 'Expand product sheet. Drag or use arrow keys to resize');
+    }
+    if(settled)syncActiveVideo();
+  }
+  function setPreviewProductExpanded(expanded){
+    if($('shopDetail').hidden)return;
+    var vh=window.innerHeight||800;
+    applyPreviewSheetHeight(expanded?Math.max(320,vh-8):Math.min(740,vh*.72),true);
   }
   function closeDetail(restore){
-    var d=$('shopDetail');if(d.hidden)return;d.hidden=true;$('shopDetailBackdrop').hidden=true;clear(d);document.body.classList.remove('preview-modal','preview-expanded');
+    var d=$('shopDetail');if(d.hidden)return;d.hidden=true;$('shopDetailBackdrop').hidden=true;clear(d);document.body.classList.remove('preview-modal','preview-expanded','sheet-is-dragging');
+    document.body.style.removeProperty('--preview-sheet-height');
     if(restore!==false&&detailFocus&&detailFocus.isConnected)detailFocus.focus();
     syncActiveVideo();
     detailFocus=null
@@ -1326,24 +1393,15 @@ body.preview-modal.preview-expanded.is-discover #feed .post .stage{
     var d=$('shopDetail');
     clear(d);d.hidden=false;$('shopDetailBackdrop').hidden=false;
     document.body.classList.add('preview-modal');
-    document.body.classList.remove('preview-expanded');
+    document.body.classList.remove('preview-expanded','sheet-is-dragging');
+    document.body.style.setProperty('--preview-sheet-height',Math.round(Math.min(740,(window.innerHeight||800)*.72))+'px');
     var head=node('div',null,'detail-head');
     var expandHandle=node('button',null,'sheet-expand-handle');
     expandHandle.id='sheetExpandHandle';expandHandle.type='button';
     expandHandle.setAttribute('aria-label','Expand product sheet');
     expandHandle.setAttribute('aria-expanded','false');
-    expandHandle.addEventListener('click',function(){
-      setPreviewProductExpanded(!document.body.classList.contains('preview-expanded'));
-    });
     head.appendChild(expandHandle);
-    var gestureY=null;
-    head.addEventListener('touchstart',function(e){if(e.touches.length===1)gestureY=e.touches[0].clientY},{passive:true});
-    head.addEventListener('touchend',function(e){
-      if(gestureY===null||e.changedTouches.length!==1)return;
-      var delta=e.changedTouches[0].clientY-gestureY;gestureY=null;
-      if(delta < -40) setPreviewProductExpanded(true);
-      else if(delta > 40) setPreviewProductExpanded(false);
-    },{passive:true});
+    attachSheetResizeHandle(expandHandle,d,applyPreviewSheetHeight,.72);
     head.appendChild(node('h2','Product details'));
     var close=node('button','✕','action-secondary');
     close.type='button';close.setAttribute('aria-label','Close product details');
