@@ -129,7 +129,7 @@ th{color:var(--muted);font:600 .65rem Inter,system-ui,sans-serif;letter-spacing:
 <aside class="sidebar"><p class="brand">Arabista Seller Center</p><p class="brand-sub">v2.39 · FICTIONAL MOBILE SAMPLE</p><p class="nav-label">Modules</p><ul class="modules" data-seller-nav="v229"><li><button type="button" data-seller-target="overview">Overview</button></li><li><button type="button" data-seller-target="products">Products</button></li><li><button type="button" data-seller-target="stock">Stock</button></li><li><button type="button" data-seller-target="orders">Orders</button></li><li><button type="button" data-seller-target="shipping">Shipping</button></li><li><button type="button" data-seller-target="promotions">Promotions</button></li><li><button type="button" class="current" aria-current="page" disabled>Reviews</button></li><li><button type="button" data-seller-target="discover">Discover</button></li><li><button type="button" data-seller-target="chat">Chat</button></li></ul></aside>
 <main class="main" id="main"><header class="intro"><div><p class="eyebrow">Seller Center / Reviews</p><h1>Reviews Suite</h1><p class="intro-copy">One workspace for product-linked review management, internal sample tools, batch activity and publication evidence. The original Arabista Reviews Studio remains the generation engine of record.</p></div>
 <div><span class="tag">PUBLIC DESIGN SAMPLE</span> <span class="tag neutral">Generation gated</span></div></header>
-<div class="hintbar" role="note"><strong>Review provenance matters.</strong> Sample Studio and batch-generated material are internal creative drafts, never genuine customer feedback. Only properly authorized, real customer reviews can appear on product sheets.</div>
+<div class="hintbar" role="note"><strong>Separate content, truthful reviews.</strong> Editorial product content has its own placement; only authenticated customer reviews can contribute to buyer review cards, ratings and counts. Fictional Studio examples remain private-design samples.</div>
 <div class="suite-controls">
 <div class="field"><label for="productSelect">Selected product</label><select id="productSelect" aria-label="Product focus"><option value="">All products</option></select></div>
 <div class="field"><label for="skuSelect">Variation / SKU</label><select id="skuSelect" aria-label="SKU focus"><option value="">All variations</option></select></div>
@@ -170,9 +170,14 @@ th{color:var(--muted);font:600 .65rem Inter,system-ui,sans-serif;letter-spacing:
 <button id="demoDraftConfirm" class="action" type="button" disabled>Confirm local demo</button></div>
 <div id="demoDraftEvidence" class="demo-evidence" hidden aria-live="polite"></div>
 <p class="status" id="demoDraftStatus">Fictional demo only</p></div></section>
-<section class="panel"><header class="panel-head"><h2>Owner product selection</h2></header>
-<div class="panel-content"><p class="mini">The real suite will let the operator select exact product-linked content, preview its product-sheet placement, publish, replace or remove selected items under a separately authorized service.</p>
-<div class="suite-locked"><b>Not connected in this static preview</b><p>No content is published to a live product or review section.</p></div></div></section></div></section>
+<section class="panel"><header class="panel-head"><h2>Owner product display selection</h2></header>
+<div class="panel-content"><p class="mini">Preview editorial product-content placement for a fictional Studio draft. This is not a buyer review, rating or customer contribution. Editing a draft does not publish it.</p>
+<div class="suite-controls"><button class="action secondary" id="demoSelectionPreview" type="button" disabled>Preview editorial placement</button></div>
+<div id="demoSelectionEvidence" class="demo-evidence" hidden aria-live="polite"></div>
+<p class="status" id="demoSelectionStatus" role="status">Choose a fictional Studio draft, then preview its editorial placement. No public publishing is connected.</p>
+<div class="suite-locked"><b>Select / publish / replace / remove — unavailable</b><p>These controls require a separately authorized product-content selection journal. They remain disabled in the accepted DEV service and in this fictional sample.</p>
+<div class="suite-controls"><button class="action secondary" id="demoSelectionSelect" type="button" disabled aria-disabled="true">Select for product display</button>
+<button class="action secondary" id="demoSelectionRemove" type="button" disabled aria-disabled="true">Remove from product display</button></div></div></div></section></div></section>
 <section id="pane-triage" class="review-pane" role="tabpanel" aria-labelledby="tab-triage" hidden>
 <div class="suite-grid">
 <section class="panel"><header class="panel-head"><h2>Internal review disposition</h2><span class="tag neutral">DEV staff · two-step</span></header>
@@ -200,8 +205,8 @@ th{color:var(--muted);font:600 .65rem Inter,system-ui,sans-serif;letter-spacing:
 <div class="suite-controls"><div class="field"><label for="studioType">Sample task</label><select id="studioType"><option value="text">Text draft only</option><option value="photo">Reference photo only</option><option value="both">Text + photo draft</option></select></div></div>
 <button class="action secondary" id="studioPlan" type="button">Preview sample plan</button>
 <div id="studioPlanResult" class="hintbar" style="margin-top:.8rem" aria-live="polite">Select a product to preview the task. Generation is not authorized or executed.</div>
-<div class="suite-locked" style="margin-top:.8rem"><b>Generate — not enabled in this DEV view</b><p>Legacy text/image engines require a verified adapter, execution cost controls and a separately authorized generation gate. No paid API calls occur here.</p>
-<button class="action" type="button" id="studioGenerate" disabled>Generate sample draft</button></div></div></section>
+<div class="suite-locked" style="margin-top:.8rem"><b>Paid generation unavailable</b><p>The private DEV suite has an offline, provider-neutral adapter for the original text, photo and batch request contracts. This public design sample does not connect to that adapter or run AI calls.</p>
+<button class="action" type="button" id="studioGenerate" disabled>Run offline fixture · private DEV only</button></div></div></section>
 <section class="panel"><header class="panel-head"><h2>Original Studio capabilities</h2></header>
 <ul class="task-list"><li><strong>Text sample generation</strong><span class="mini">Original ReviewAI engine · 60/day, 7-second minimum interval</span></li>
 <li><strong>Photo creation</strong><span class="mini">Reference-driven ReviewImage engine · 20/day, 2-second minimum interval</span></li>
@@ -213,7 +218,7 @@ th{color:var(--muted);font:600 .65rem Inter,system-ui,sans-serif;letter-spacing:
 <div class="suite-controls"><div class="field"><label for="batchCount">Drafts (max 50)</label><input type="number" id="batchCount" min="1" max="50" value="5"></div>
 <div class="field"><label for="batchPhotos">Reference photos (max 20)</label><input type="number" id="batchPhotos" min="0" max="20" value="2"></div></div>
 <button class="action secondary" type="button" id="batchPlan">Review batch plan</button><p class="status" id="batchPlanResult" role="status">Planning is local and performs zero writes.</p>
-<div class="suite-locked"><b>Execution controls require authorization</b><p>Start/Pause/Resume/Cancel will be connected to the original engine only after the adapter, job identity, quotas and separate execution approval are validated.</p>
+<div class="suite-locked"><b>Execution controls require authorization</b><p>The original batch operations are mapped in private DEV. Live Start/Pause/Resume/Cancel still need an approved batch journal, quota enforcement and separate execution authority.</p>
 <div class="suite-controls"><button id="batchStart" class="action" type="button" disabled>Start</button><button id="batchPause" class="action secondary" type="button" disabled>Pause</button><button id="batchResume" class="action secondary" type="button" disabled>Resume</button><button id="batchCancel" class="action secondary" type="button" disabled>Cancel</button></div></div></div></section>
 <section class="panel"><header class="panel-head"><h2>Job history</h2><span class="tag neutral">Staff records</span></header><div id="batchHistory"><p class="suite-empty">Job snapshots unavailable until the original adapter is connected.</p></div></section></div></section>
 <section id="pane-publication" class="review-pane" role="tabpanel" aria-labelledby="tab-publication" hidden><div class="suite-grid">
@@ -243,7 +248,37 @@ const products=[
  {review_id:"demo-103",product_id:"syn-preview-tote",sku_id:"syn-preview-tote-natural",title:"Another Studio draft",body:"Imaginary product feedback created solely for reviewing the Seller Center interface.",status:"REJECTED",source_type:"STUDIO_TEST",is_synthetic:true,rating:3,created_at_utc:"2026-11-13 (sample)"},
  {review_id:"demo-104",product_id:"syn-preview-shirt",sku_id:"syn-preview-shirt-l",title:"Fictional imported note",body:"A sample unverified imported note. It carries no genuine buyer claims.",status:"PENDING",source_type:"IMPORTED_SAMPLE",is_synthetic:true,rating:4,created_at_utc:"2026-11-12 (sample)"}
 ],batches=[{job_ref:"DEMO-BATCH-001",status:"PAUSED SAMPLE",created_at_utc:"2026-11-14 (fictional)",items_total:5},{job_ref:"DEMO-BATCH-002",status:"COMPLETED SAMPLE",created_at_utc:"2026-11-12 (fictional)",items_total:8}];
-let selected="demo-101";
+let selected="demo-101",selectionPreview=null;
+function clearSampleSelection(msg){
+ selectionPreview=null;
+ $("demoSelectionEvidence").replaceChildren();
+ $("demoSelectionEvidence").hidden=true;
+ $("demoSelectionStatus").textContent=msg||"Choose a fictional Studio draft, then preview editorial placement. No content is published.";
+}
+function syncSampleSelection(){
+ const r=reviews.find(x=>x.review_id===selected);
+ const valid=!!r&&r.source_type==="STUDIO_TEST"&&r.is_synthetic===true
+   &&(!pid()||r.product_id===pid())&&(!$("skuSelect").value||r.sku_id===$("skuSelect").value);
+ $("demoSelectionPreview").disabled=!valid;
+ if(!valid||(selectionPreview&&(selectionPreview.review_id!==r.review_id
+   ||selectionPreview.title!==r.title||selectionPreview.body!==r.body)))clearSampleSelection();
+}
+function previewSampleSelection(){
+ const r=reviews.find(x=>x.review_id===selected);
+ if(!r||r.source_type!=="STUDIO_TEST"||r.is_synthetic!==true
+   ||(pid()&&r.product_id!==pid())||($("skuSelect").value&&r.sku_id!==$("skuSelect").value)){
+   clearSampleSelection("Choose a matching fictional Studio draft for the selected product/SKU.");return;
+ }
+ selectionPreview={review_id:r.review_id,title:r.title,body:r.body};
+ const h=$("demoSelectionEvidence");h.replaceChildren();
+ h.append(el("span","tag neutral","Fictional staff-only placement"),
+   el("p","mini","Arabista product content"),
+   el("h3","suite-title",r.title),
+   el("p","story",r.body),
+   el("p","mini","No buyer byline, stars, customer review count or live publication."));
+ h.hidden=false;
+ $("demoSelectionStatus").textContent="PREVIEW ONLY · Editorial placement is distinct from customer reviews. Select/publish/replace/remove remain unavailable.";
+}
 function pid(){return $("productSelect").value}
 function current(){return reviews.filter(r=>(!pid()||r.product_id===pid())&&(!$("skuSelect").value||r.sku_id===$("skuSelect").value))}
 function selectedProduct(){return products.find(p=>p.product_id===pid())}
@@ -259,8 +294,8 @@ if(!rows.some(r=>r.review_id===selected))selected=rows[0]?.review_id||"";
 rows.forEach(r=>{const b=el("button","review-pick");b.type="button";b.setAttribute("aria-pressed",selected===r.review_id?"true":"false");
 const top=el("div","pick-head");top.append(el("span","",r.title),el("span","tag neutral","Studio sample"));
 b.append(top,el("div","pick-sub",[r.product_id,r.sku_id,r.status].join(" · ")));
-b.addEventListener("click",()=>{selected=r.review_id;library()});list.append(b)});
-if(!rows.length)list.append(el("p","suite-empty","No matching sample records."));detail(rows.find(r=>r.review_id===selected));}
+b.addEventListener("click",()=>{selected=r.review_id;clearSampleSelection();library()});list.append(b)});
+if(!rows.length)list.append(el("p","suite-empty","No matching sample records."));detail(rows.find(r=>r.review_id===selected));syncSampleSelection();}
 function productPane(){const h=$("productReviewList"),t=$("productTotals"),p=$("publicProductPreview");h.replaceChildren();t.replaceChildren();p.replaceChildren();
 if(!selectedProduct()){h.append(el("p","suite-empty","Choose a product to inspect its fictional review records."));p.append(el("p","suite-empty","No product selected."));return;}
 const rows=current();
@@ -307,13 +342,13 @@ function previewDemoDraft(){
 function confirmDemoDraft(){
  const p=draftPreview;if(!p||$("demoDraftTitle").value.trim()!==p.title||$("demoDraftBody").value.trim()!==p.body)return;
  const r=reviews.find(x=>x.review_id===p.id);if(!r)return;
- r.title=p.title;r.body=p.body;draftPreview=null;$("demoDraftConfirm").disabled=true;
+ r.title=p.title;r.body=p.body;draftPreview=null;$("demoDraftConfirm").disabled=true;clearSampleSelection();
  library();productPane();$("demoDraftStatus").textContent="LOCAL DEMO UPDATED · No actual draft saved or published.";
 }
 function activate(k){["library","product","drafts","triage","studio","batch","publication"].forEach(x=>{$("tab-"+x).setAttribute("aria-selected",x===k?"true":"false");$("pane-"+x).hidden=x!==k});if(k==="triage")drawTriage();if(k==="drafts")showDemoDraft();}
 products.forEach(p=>{const x=el("option","",p.title);x.value=p.product_id;$("productSelect").append(x)});
-$("productSelect").addEventListener("change",()=>{configureSku();render()});
-$("skuSelect").addEventListener("change",render);
+$("productSelect").addEventListener("change",()=>{configureSku();clearSampleSelection();render()});
+$("skuSelect").addEventListener("change",()=>{clearSampleSelection();render()});
 ["reviewSearch","reviewStatus","reviewOrigin"].forEach(id=>$(id).addEventListener(id==="reviewSearch"?"input":"change",library));
 ["library","product","drafts","triage","studio","batch","publication"].forEach(k=>$("tab-"+k).addEventListener("click",()=>activate(k)));
 $("studioPlan").addEventListener("click",()=>{const p=selectedProduct();$("studioPlanResult").textContent=p?
@@ -338,15 +373,16 @@ $("triageConfirm").addEventListener("click",()=>{
  if(!previewValid)return;
  const r=reviews.find(x=>x.review_id===selected);if(!r)return;
  r.status=$("triageAction").value==="REJECT"?"REJECTED":"PENDING";
- previewValid=false;render();drawTriage();
+ previewValid=false;clearSampleSelection();render();drawTriage();
  $("triageStatus").textContent="FICTIONAL LOCAL DEMO UPDATED · No Apps Script, Sheets or genuine review changed.";
 });
 $("demoDraftPreview").addEventListener("click",previewDemoDraft);
 $("demoDraftConfirm").addEventListener("click",confirmDemoDraft);
+$("demoSelectionPreview").addEventListener("click",previewSampleSelection);
 ["demoDraftTitle","demoDraftBody"].forEach(k=>$(k).addEventListener("input",()=>{
  draftPreview=null;$("demoDraftConfirm").disabled=true;$("demoDraftEvidence").hidden=true;
 }));
-$("refresh").textContent="Reset demo";$("refresh").addEventListener("click",()=>{["productSelect","skuSelect","reviewSearch","reviewStatus","reviewOrigin"].forEach(k=>$(k).value=k.startsWith("review")&&k!=="reviewSearch"?"ALL":"");configureSku();selected="demo-101";render();});
+$("refresh").textContent="Reset demo";$("refresh").addEventListener("click",()=>{["productSelect","skuSelect","reviewSearch","reviewStatus","reviewOrigin"].forEach(k=>$(k).value=k.startsWith("review")&&k!=="reviewSearch"?"ALL":"");configureSku();selected="demo-101";clearSampleSelection();render();});
 $("status").textContent="FICTIONAL MOBILE DESIGN PREVIEW · No private APIs, real reviews, provider calls or Sheets writes.";
 activate("library");configureSku();render();
 }());</script></body></html>
