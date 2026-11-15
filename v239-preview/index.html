@@ -1,0 +1,352 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="robots" content="noindex,nofollow"><meta name="referrer" content="no-referrer"><title>Arabista Reviews Suite — fictional mobile design preview</title><style>
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=DM+Sans:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap');
+:root{--ink:#242019;--muted:#6d655a;--paper:#f5f1e8;--panel:#fffdf9;--line:#e5ddce;--gold:#c0a062;--gold-cta:#b39257;--dark:#0b0b0c;--display:"Cormorant Garamond",Georgia,serif;--body:"DM Sans",Inter,system-ui,sans-serif}
+*{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font:14px/1.5 var(--body)}
+button,input,select{font:inherit}button{cursor:pointer}button:disabled{opacity:.52;cursor:not-allowed}
+:focus-visible{outline:2px solid var(--gold-cta);outline-offset:2px}[hidden]{display:none!important}
+.skip{position:absolute;left:-200vw;top:0;background:var(--dark);color:white;padding:.65rem 1rem;z-index:15}.skip:focus{left:10px}
+.app{display:grid;grid-template-columns:235px minmax(0,1fr);min-height:100vh}
+.sidebar{background:var(--dark);color:#f5f1e8;border-right:1px solid #342c1e;padding:1.4rem 1rem}
+.brand{font:500 1.65rem/1.1 var(--display);margin:0}
+.brand-sub{font:500 .68rem/1.6 Inter,system-ui,sans-serif;color:#b6ae9f;letter-spacing:.05em;margin:.35rem 0 1.4rem}
+.nav-label{font:600 .68rem Inter,system-ui,sans-serif;text-transform:uppercase;letter-spacing:.08em;color:var(--gold)}
+.modules{list-style:none;display:grid;gap:3px;margin:.5rem 0 0;padding:0}
+.modules button{border:0;width:100%;min-height:42px;text-align:left;border-radius:10px;color:#ddd5c9;background:transparent;padding:.75rem .8rem;font:500 .82rem Inter,system-ui,sans-serif}
+.modules button:hover:not(:disabled){background:#27231d;color:#fff}
+.modules .current{background:#30281c;color:#ecd9ae;box-shadow:inset 2px 0 var(--gold)}
+.main{padding:clamp(1.15rem,2.6vw,2.4rem);padding-bottom:3rem;width:100%;max-width:1580px;margin:0 auto;min-width:0}
+.eyebrow{font:600 .66rem Inter,system-ui,sans-serif;letter-spacing:.13em;text-transform:uppercase;color:#967947;margin:0 0 .35rem}
+h1{font:500 clamp(2.4rem,4vw,3.6rem)/.97 var(--display);letter-spacing:-.025em;margin:0 0 .5rem}
+h2{font:500 1.55rem/1.1 var(--display);margin:0}
+h3{font:500 1.3rem var(--display);margin:0}
+.intro{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;margin-bottom:1rem}
+.intro-copy{max-width:650px;font-size:.84rem;color:var(--muted);line-height:1.65;margin:.1rem 0 .6rem}
+.tag{display:inline-flex;border:1px solid #e8d8b5;background:#f5eedd;color:#775d31;border-radius:999px;padding:.32rem .64rem;letter-spacing:.045em;text-transform:uppercase;font:600 .65rem Inter,system-ui,sans-serif}
+.tag.neutral{background:#ede9e2;color:#5b5850;border-color:#ded6c8}
+.action{border:1px solid #171614;border-radius:11px;min-height:44px;background:#171614;color:#f9f3e8;padding:.65rem 1rem;font:600 .76rem Inter,system-ui,sans-serif}
+.action:hover:not(:disabled){background:#3b3126}.action.secondary{background:transparent;color:#655135;border-color:#bda98a}.action.secondary:hover:not(:disabled){background:#f7f0e1}
+.status{margin:1rem 0;padding:.75rem .9rem;border:1px solid var(--line);border-left:3px solid var(--gold);border-radius:11px;background:#fffdfa;color:#5d503b;font-size:.81rem}
+.status.error{border-left-color:#a35b43;color:#7a3c2e}
+.metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:.65rem;margin:1.1rem 0 1.3rem}
+.metric{border:1px solid var(--line);border-radius:14px;background:var(--panel);padding:1rem;min-height:95px}
+.metric .label{font:600 .65rem/1.5 Inter,system-ui,sans-serif;letter-spacing:.065em;text-transform:uppercase;color:var(--muted)}
+.metric .number{font:500 2.2rem/1.12 var(--display);margin-top:.4rem}
+.metric .detail{font-size:.71rem;color:var(--muted);line-height:1.5;margin-top:.2rem}
+.layout{display:grid;grid-template-columns:minmax(0,.98fr) minmax(0,1.02fr);gap:.85rem;align-items:start}
+.panel{border:1px solid var(--line);border-radius:16px;background:var(--panel);overflow:hidden;min-width:0}
+.panel-head{display:flex;align-items:center;justify-content:space-between;padding:1rem 1.15rem;border-bottom:1px solid var(--line);gap:.5rem}
+.panel-content{padding:1.1rem}
+.list{list-style:none;padding:0;margin:0}
+.list li{border-bottom:1px solid var(--line);padding:.82rem 1rem}
+.list li:last-child{border-bottom:0}
+.list .top{display:flex;align-items:baseline;justify-content:space-between;gap:.6rem;flex-wrap:wrap;font:600 .8rem Inter,system-ui,sans-serif}
+.list .sub{font-size:.74rem;line-height:1.6;color:var(--muted);margin-top:.28rem;overflow-wrap:anywhere}
+.cell-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.5rem}
+.cell{background:#faf8f3;border:1px solid #e9e1d4;padding:.75rem .8rem;border-radius:10px;overflow-wrap:anywhere}
+.cell .k{font:600 .63rem Inter,system-ui,sans-serif;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+.cell .v{font-size:.84rem;margin-top:.25rem;font-weight:500}
+.field{display:grid;gap:.3rem;flex:1 1 170px}
+.field label{font:600 .66rem Inter,system-ui,sans-serif;letter-spacing:.07em;color:var(--muted);text-transform:uppercase}
+.field input,.field select{min-height:44px;border:1px solid #d9d0c1;border-radius:10px;background:#fffdfa;padding:.6rem .8rem;min-width:0;width:100%}
+.tools{display:flex;align-items:flex-end;gap:.65rem;flex-wrap:wrap;margin:1rem 0}
+.table-scroll{overflow-x:auto}table{width:100%;border-collapse:collapse;text-align:left}th,td{padding:.7rem .75rem;border-bottom:1px solid var(--line);font-size:.78rem;overflow-wrap:anywhere}
+th{color:var(--muted);font:600 .65rem Inter,system-ui,sans-serif;letter-spacing:.05em;text-transform:uppercase}
+.empty{padding:1.4rem 1.1rem;text-align:center;color:var(--muted);font-size:.82rem}
+.small{font-size:.73rem;color:var(--muted);line-height:1.65}.footer{margin-top:1.4rem;color:var(--muted);font-size:.73rem;line-height:1.7}
+.link-button{display:block;width:100%;text-align:left;border:0;background:transparent;color:var(--ink);padding:.75rem 1rem;border-bottom:1px solid var(--line)}
+.link-button:hover{background:#faf6ed}.link-button.selected{background:#f7f0e3;box-shadow:inset 3px 0 var(--gold)}
+@media(max-width:1100px){.layout{grid-template-columns:1fr}.metrics{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:760px){.app{display:block}.sidebar{padding:.8rem .8rem .55rem}.brand{font-size:1.42rem}.brand-sub{margin-bottom:.55rem}.nav-label{display:none}.modules{display:flex;gap:3px;overflow-x:auto;margin:0}.modules li{flex:0 0 auto}.modules button{white-space:nowrap;font-size:.7rem;padding:.55rem .65rem}.main{padding:1rem .82rem calc(2rem + env(safe-area-inset-bottom))}.metrics{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:390px){.cell-grid{grid-template-columns:1fr}}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
+
+.tools .field{min-width:175px}.panel-head .hint{font-size:.7rem;color:var(--muted)}
+.record-button{width:100%;background:transparent;border:0;border-bottom:1px solid var(--line);padding:.9rem 1rem;text-align:left;display:grid;gap:.25rem;align-items:start;color:var(--ink)}
+.record-button.selected{background:#f7f0e3;box-shadow:inset 3px 0 var(--gold)}
+.record-button:hover:not(.selected){background:#faf6ed}
+.record-title{font:600 .82rem Inter,system-ui,sans-serif;overflow-wrap:anywhere}
+.record-meta{color:var(--muted);font-size:.74rem;overflow-wrap:anywhere}
+.record-top{display:flex;justify-content:space-between;align-items:start;gap:.5rem;flex-wrap:wrap}
+.details{padding:1.15rem;display:grid;gap:.7rem}
+.details h3{font:500 1.9rem/1.15 var(--display);margin:0;overflow-wrap:anywhere}
+.detail-note{font-size:.76rem;color:#665a4a;line-height:1.6;margin:0}
+.status-list{list-style:none;padding:0;margin:0;display:grid;gap:.5rem}
+.status-list li{border:1px solid var(--line);border-radius:10px;background:#faf8f3;padding:.7rem .8rem;line-height:1.55;font-size:.79rem}
+.thread-box{display:grid;gap:.7rem;max-height:460px;overflow-y:auto;padding:.1rem 0 .25rem}
+.bubble{border:1px solid var(--line);background:#faf8f3;border-radius:13px;padding:.7rem .8rem;max-width:92%;min-width:0;overflow-wrap:anywhere}
+.bubble.staff{margin-left:auto;background:#f4ecd9;border-color:#e1d2ae}
+.bubble .kind{font:600 .66rem Inter,system-ui,sans-serif;color:#7c6746;text-transform:uppercase}
+.bubble .body{font-size:.84rem;margin:.2rem 0}
+.bubble .time{font-size:.66rem;color:var(--muted)}
+.warning{border:1px solid #e6d7ba;background:#faf4e7;color:#735728;border-radius:10px;padding:.7rem .8rem;font-size:.77rem}
+@media(min-width:1101px){.layout{grid-template-columns:minmax(280px,.95fr) minmax(0,1.05fr)}}
+
+.reviews-suitetabs{display:flex;gap:.35rem;padding:.3rem;overflow:auto;background:#eee7dc;border:1px solid var(--line);border-radius:13px;margin:1rem 0 1.1rem;scrollbar-width:thin}
+.reviews-suitetabs button{border:0;background:transparent;color:#756958;padding:.78rem .82rem;border-radius:10px;min-height:44px;white-space:nowrap;font:600 .73rem Inter,system-ui,sans-serif}
+.reviews-suitetabs button[aria-selected=true]{background:#181715;color:#ead9b7}
+.reviews-suitetabs button:hover:not([aria-selected=true]){background:#fff9ec}
+.review-pane[hidden]{display:none}
+.suite-controls{display:flex;align-items:flex-end;gap:.6rem;flex-wrap:wrap;margin:1rem 0}
+.suite-controls .field{flex:1 1 165px}
+.linkish{border:0;padding:.35rem .2rem;background:none;color:#756036;text-decoration:underline;font-weight:600}
+.suite-two{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.7rem}
+.hintbar{background:#f7f1e4;border:1px solid #e6d7b8;padding:.85rem .95rem;border-radius:12px;color:#63513b;font-size:.76rem;line-height:1.6}
+.review-pick{display:block;width:100%;text-align:left;background:transparent;border:0;border-bottom:1px solid var(--line);padding:.85rem 1rem}
+.review-pick:hover{background:#f9f6ed}.review-pick[aria-pressed=true]{background:#f9f0dc;box-shadow:inset 3px 0 #b99b61}
+.pick-head{display:flex;justify-content:space-between;gap:.6rem;flex-wrap:wrap;font:600 .82rem Inter,system-ui,sans-serif}
+.pick-sub{font-size:.72rem;color:var(--muted);margin-top:.2rem;overflow-wrap:anywhere}
+.suite-section{padding:1.1rem;border-bottom:1px solid var(--line)}
+.suite-section:last-child{border-bottom:0}
+.suite-row{display:flex;justify-content:space-between;align-items:center;gap:1rem;flex-wrap:wrap}
+.suite-row>div{min-width:0}
+.suite-section p{margin:.45rem 0 0}
+.review-detail{display:grid;gap:.8rem;padding:1.15rem}
+.review-detail .story{white-space:pre-wrap;overflow-wrap:anywhere;font-size:.82rem;line-height:1.7;margin:0}
+.suite-controls input,.suite-controls select,.suite-controls textarea{width:100%;min-height:44px;border:1px solid #ded2bc;background:#fffefb;border-radius:10px;padding:.67rem .75rem}
+.suite-controls textarea{min-height:82px;resize:vertical}
+.suite-title{font:500 1.65rem/1.1 var(--display)}
+.suite-grid{display:grid;grid-template-columns:minmax(0,.95fr) minmax(0,1.05fr);gap:.9rem}
+.suite-mark{font:600 .66rem Inter,system-ui,sans-serif;letter-spacing:.08em;text-transform:uppercase;color:#907447}
+.suite-locked{padding:.85rem .9rem;background:#f7f3eb;border:1px solid #e6ddce;border-radius:12px}
+.suite-locked b{font-size:.8rem}.suite-locked p{font-size:.75rem;color:#6b6254;margin:.4rem 0}
+.task-list{list-style:none;padding:0;margin:0}
+.task-list li{border-bottom:1px solid var(--line);padding:.8rem 1rem;display:grid;gap:.2rem}
+.task-list li:last-child{border-bottom:0}
+.mini{font-size:.74rem;color:var(--muted)}
+.suite-empty{padding:1.2rem;color:var(--muted);font-size:.82rem}
+@media(max-width:1000px){.suite-grid{grid-template-columns:1fr}}
+@media(max-width:620px){.suite-two{grid-template-columns:1fr}.suite-controls .field{flex:1 1 145px}.reviews-suitetabs{margin-left:-.25rem;margin-right:-.25rem}.suite-section{padding:.9rem}}
+
+.triage-workspace{padding:1rem;display:grid;gap:.85rem}
+.triage-workspace h3{font:500 1.6rem var(--display);margin:0}
+.triage-workspace label{display:block;font:600 .72rem Inter,system-ui,sans-serif;margin:0 0 .4rem}
+.triage-workspace select,.triage-workspace textarea{width:100%;border:1px solid #dacdb5;border-radius:10px;background:#fff;padding:.65rem .8rem;min-height:44px}
+.triage-workspace textarea{min-height:100px;resize:vertical}
+.triage-preview{border:1px solid #ddcdab;background:#f9f2e2;border-radius:10px;padding:.9rem;font-size:.8rem;white-space:pre-wrap}
+.triage-preview[hidden]{display:none}
+.demo-draft{display:grid;gap:.75rem;padding:1rem}.demo-draft input,.demo-draft textarea{width:100%;background:#fff;border:1px solid #d7c8b0;border-radius:10px;padding:.8rem;min-height:44px}.demo-draft textarea{min-height:145px}.demo-evidence{padding:.8rem;background:#faf3e5;border:1px solid #ddccab;border-radius:10px}.demo-evidence[hidden]{display:none}</style></head>
+<body><a href="#main" class="skip">Skip to Reviews Suite</a><div class="app">
+<aside class="sidebar"><p class="brand">Arabista Seller Center</p><p class="brand-sub">v2.39 · FICTIONAL MOBILE SAMPLE</p><p class="nav-label">Modules</p><ul class="modules" data-seller-nav="v229"><li><button type="button" data-seller-target="overview">Overview</button></li><li><button type="button" data-seller-target="products">Products</button></li><li><button type="button" data-seller-target="stock">Stock</button></li><li><button type="button" data-seller-target="orders">Orders</button></li><li><button type="button" data-seller-target="shipping">Shipping</button></li><li><button type="button" data-seller-target="promotions">Promotions</button></li><li><button type="button" class="current" aria-current="page" disabled>Reviews</button></li><li><button type="button" data-seller-target="discover">Discover</button></li><li><button type="button" data-seller-target="chat">Chat</button></li></ul></aside>
+<main class="main" id="main"><header class="intro"><div><p class="eyebrow">Seller Center / Reviews</p><h1>Reviews Suite</h1><p class="intro-copy">One workspace for product-linked review management, internal sample tools, batch activity and publication evidence. The original Arabista Reviews Studio remains the generation engine of record.</p></div>
+<div><span class="tag">PUBLIC DESIGN SAMPLE</span> <span class="tag neutral">Generation gated</span></div></header>
+<div class="hintbar" role="note"><strong>Review provenance matters.</strong> Sample Studio and batch-generated material are internal creative drafts, never genuine customer feedback. Only properly authorized, real customer reviews can appear on product sheets.</div>
+<div class="suite-controls">
+<div class="field"><label for="productSelect">Selected product</label><select id="productSelect" aria-label="Product focus"><option value="">All products</option></select></div>
+<div class="field"><label for="skuSelect">Variation / SKU</label><select id="skuSelect" aria-label="SKU focus"><option value="">All variations</option></select></div>
+<button class="action" id="refresh" type="button">Refresh workspace</button></div>
+<p class="status" role="status" id="status">This is a fictional design sample. No private Sheets or generation engines are connected.</p>
+<div class="metrics" aria-label="Review counts in current view">
+<div class="metric"><div class="label">Reviews in view</div><div class="number" id="m-total">—</div></div>
+<div class="metric"><div class="label">Pending review</div><div class="number" id="m-pending">—</div></div>
+<div class="metric"><div class="label">Internal samples</div><div class="number" id="m-synthetic">—</div></div>
+<div class="metric"><div class="label">Genuine published</div><div class="number" id="m-published">—</div><div class="detail">Unavailable until author/provenance proof</div></div></div>
+<div class="reviews-suitetabs" role="tablist" aria-label="Review Suite areas">
+<button id="tab-library" role="tab" aria-controls="pane-library" aria-selected="true" type="button">Review library</button>
+<button id="tab-product" role="tab" aria-controls="pane-product" aria-selected="false" type="button">Product reviews</button>
+<button id="tab-drafts" role="tab" aria-controls="pane-drafts" aria-selected="false" type="button">Draft editor</button>
+<button id="tab-triage" role="tab" aria-controls="pane-triage" aria-selected="false" type="button">Review triage</button>
+<button id="tab-studio" role="tab" aria-controls="pane-studio" aria-selected="false" type="button">Sample Studio</button>
+<button id="tab-batch" role="tab" aria-controls="pane-batch" aria-selected="false" type="button">Batch jobs</button>
+<button id="tab-publication" role="tab" aria-controls="pane-publication" aria-selected="false" type="button">Publication</button></div>
+<section id="pane-library" class="review-pane" role="tabpanel" aria-labelledby="tab-library">
+<div class="suite-controls"><div class="field"><label for="reviewSearch">Search title, review or product</label><input id="reviewSearch" type="search" placeholder="Search review library" autocomplete="off"></div>
+<div class="field"><label for="reviewStatus">Moderation status</label><select id="reviewStatus"><option value="ALL">All statuses</option><option value="PENDING">Pending</option><option value="APPROVED">Approved</option><option value="REJECTED">Rejected</option></select></div>
+<div class="field"><label for="reviewOrigin">Review provenance</label><select id="reviewOrigin"><option value="ALL">All origins</option><option value="SYNTHETIC">Synthetic / Studio</option><option value="CUSTOMER">Customer recorded</option><option value="OTHER">Other / imported</option></select></div></div>
+<div class="suite-grid"><section class="panel"><header class="panel-head"><h2>Review library</h2><span class="mini" id="libraryCount">—</span></header><div id="reviewList"><p class="suite-empty">Awaiting staff read.</p></div></section>
+<section class="panel"><header class="panel-head"><h2>Review inspection</h2><span class="tag neutral">No edits</span></header><div id="reviewDetail" class="review-detail" aria-live="polite"><p class="suite-empty">Select a review after the authorized read.</p></div></section></div>
+</section>
+<section id="pane-product" class="review-pane" role="tabpanel" aria-labelledby="tab-product" hidden>
+<div class="suite-grid"><section class="panel"><header class="panel-head"><h2>Product review ledger</h2><span class="tag neutral">Canonical IDs</span></header><div class="panel-content">
+<p class="mini">Choose a product above. Review rows are linked to its canonical product/SKU IDs, not copied from the legacy Studio workbook.</p><div id="productTotals" class="cell-grid" style="margin:.9rem 0"></div><div id="productReviewList"></div></div></section>
+<section class="panel"><header class="panel-head"><h2>Customer product-sheet preview</h2><span class="tag neutral">Genuine only</span></header><div class="panel-content"><p class="mini">Displays published genuine-review evidence only when the safe customer projection is available. No sample review is promoted into public ratings.</p>
+<div id="publicProductPreview" aria-live="polite"><p class="suite-empty">Select a product to inspect the public-safe projection.</p></div></div></section></div></section>
+<section id="pane-drafts" class="review-pane" role="tabpanel" aria-labelledby="tab-drafts" hidden>
+<div class="suite-grid"><section class="panel"><header class="panel-head"><h2>Studio draft editor</h2><span class="tag neutral">Fictional preview</span></header>
+<div class="demo-draft"><p class="mini">Edit a fictional record, preview the change, and confirm the edit to the temporary page state. No server or real customer records are involved.</p>
+<p id="demoDraftBinding" class="mini">Choose a demo record</p>
+<label for="demoDraftTitle">Title</label><input id="demoDraftTitle" maxlength="180">
+<label for="demoDraftBody">Content</label><textarea id="demoDraftBody" maxlength="4000"></textarea>
+<div class="suite-controls"><button id="demoDraftPreview" class="action secondary" type="button">Preview edit</button>
+<button id="demoDraftConfirm" class="action" type="button" disabled>Confirm local demo</button></div>
+<div id="demoDraftEvidence" class="demo-evidence" hidden aria-live="polite"></div>
+<p class="status" id="demoDraftStatus">Fictional demo only</p></div></section>
+<section class="panel"><header class="panel-head"><h2>Owner product selection</h2></header>
+<div class="panel-content"><p class="mini">The real suite will let the operator select exact product-linked content, preview its product-sheet placement, publish, replace or remove selected items under a separately authorized service.</p>
+<div class="suite-locked"><b>Not connected in this static preview</b><p>No content is published to a live product or review section.</p></div></div></section></div></section>
+<section id="pane-triage" class="review-pane" role="tabpanel" aria-labelledby="tab-triage" hidden>
+<div class="suite-grid">
+<section class="panel"><header class="panel-head"><h2>Internal review disposition</h2><span class="tag neutral">DEV staff · two-step</span></header>
+<div class="triage-workspace">
+<p class="mini">Choose a record in Review Library first. Only <strong>Pending → Rejected</strong> or <strong>Rejected → Pending</strong> are offered. Approval and publication remain separate.</p>
+<h3 id="triageSelected">No review selected</h3>
+<p id="triageProduct" class="mini">Canonical product evidence unavailable</p>
+<div><label for="triageAction">Internal decision</label><select id="triageAction" disabled><option value="">Choose a review first</option></select></div>
+<div><label for="triageNote">Reason / audit note (12–500 characters)</label><textarea id="triageNote" maxlength="500" disabled placeholder="Explain this disposition."></textarea></div>
+<div class="suite-controls"><button type="button" class="action secondary" id="triagePreview" disabled>Preview decision</button><button type="button" class="action" id="triageConfirm" disabled>Confirm decision</button></div>
+<div id="triageEvidence" class="triage-preview" hidden aria-live="polite"></div>
+<p id="triageStatus" class="status" role="status">No decision pending.</p>
+</div></section>
+<section class="panel"><header class="panel-head"><h2>Decision safeguards</h2></header>
+<ul class="task-list"><li><strong>Staff verification</strong><span class="mini">Server verifies canonical DEV operator</span></li>
+<li><strong>Fresh record</strong><span class="mini">Preview and confirmation bind the same product, review and status</span></li>
+<li><strong>One-time confirmation</strong><span class="mini">No replay or blind retry after ambiguous outcome</span></li>
+<li><strong>No publication</strong><span class="mini">Record triage cannot create genuine customer feedback or public ratings</span></li></ul>
+</section></div></section>
+<section id="pane-studio" class="review-pane" role="tabpanel" aria-labelledby="tab-studio" hidden>
+<div class="suite-grid"><section class="panel"><header class="panel-head"><h2>Sample text & photo Studio</h2><span class="tag neutral">Legacy engines</span></header><div class="panel-content">
+<p class="mini">Reuse <code>ReviewAI.gs</code> and <code>ReviewImage.gs</code> via a staff-gated adapter. These controls describe an internal sample task; they do not initiate AI calls.</p>
+<div class="suite-controls"><div class="field"><label for="studioStyle">Text writing style</label><select id="studioStyle"><option value="original">Original Studio style presets</option><option value="short">Short note</option><option value="detailed">Detailed internal example</option></select></div>
+<div class="field"><label for="studioPhotoStyle">Reference photo style</label><select id="studioPhotoStyle"><option value="fullbody">Full body</option><option value="mirror">Mirror</option><option value="pov">POV</option><option value="conteng">Conteng</option><option value="home">Home</option></select></div></div>
+<div class="suite-controls"><div class="field"><label for="studioType">Sample task</label><select id="studioType"><option value="text">Text draft only</option><option value="photo">Reference photo only</option><option value="both">Text + photo draft</option></select></div></div>
+<button class="action secondary" id="studioPlan" type="button">Preview sample plan</button>
+<div id="studioPlanResult" class="hintbar" style="margin-top:.8rem" aria-live="polite">Select a product to preview the task. Generation is not authorized or executed.</div>
+<div class="suite-locked" style="margin-top:.8rem"><b>Generate — not enabled in this DEV view</b><p>Legacy text/image engines require a verified adapter, execution cost controls and a separately authorized generation gate. No paid API calls occur here.</p>
+<button class="action" type="button" id="studioGenerate" disabled>Generate sample draft</button></div></div></section>
+<section class="panel"><header class="panel-head"><h2>Original Studio capabilities</h2></header>
+<ul class="task-list"><li><strong>Text sample generation</strong><span class="mini">Original ReviewAI engine · 60/day, 7-second minimum interval</span></li>
+<li><strong>Photo creation</strong><span class="mini">Reference-driven ReviewImage engine · 20/day, 2-second minimum interval</span></li>
+<li><strong>Reference library</strong><span class="mini">Product-linked source assets and generated-media storage</span></li>
+<li><strong>Studio provenance</strong><span class="mini">All outputs remain explicitly synthetic, staff-only drafts</span></li></ul></section></div></section>
+<section id="pane-batch" class="review-pane" role="tabpanel" aria-labelledby="tab-batch" hidden><div class="suite-grid">
+<section class="panel"><header class="panel-head"><h2>Batch planner</h2><span class="tag neutral">Preview only</span></header><div class="panel-content">
+<p class="mini">Reuse original ReviewBatch job state and orchestration. No trigger is created by opening this page.</p>
+<div class="suite-controls"><div class="field"><label for="batchCount">Drafts (max 50)</label><input type="number" id="batchCount" min="1" max="50" value="5"></div>
+<div class="field"><label for="batchPhotos">Reference photos (max 20)</label><input type="number" id="batchPhotos" min="0" max="20" value="2"></div></div>
+<button class="action secondary" type="button" id="batchPlan">Review batch plan</button><p class="status" id="batchPlanResult" role="status">Planning is local and performs zero writes.</p>
+<div class="suite-locked"><b>Execution controls require authorization</b><p>Start/Pause/Resume/Cancel will be connected to the original engine only after the adapter, job identity, quotas and separate execution approval are validated.</p>
+<div class="suite-controls"><button id="batchStart" class="action" type="button" disabled>Start</button><button id="batchPause" class="action secondary" type="button" disabled>Pause</button><button id="batchResume" class="action secondary" type="button" disabled>Resume</button><button id="batchCancel" class="action secondary" type="button" disabled>Cancel</button></div></div></div></section>
+<section class="panel"><header class="panel-head"><h2>Job history</h2><span class="tag neutral">Staff records</span></header><div id="batchHistory"><p class="suite-empty">Job snapshots unavailable until the original adapter is connected.</p></div></section></div></section>
+<section id="pane-publication" class="review-pane" role="tabpanel" aria-labelledby="tab-publication" hidden><div class="suite-grid">
+<section class="panel"><header class="panel-head"><h2>Publication readiness</h2></header><div class="panel-content">
+<p class="mini">Only genuinely customer-authored, correctly approved records with valid product identity and publication rights may become customer-facing reviews.</p>
+<ul class="task-list">
+<li><strong>Customer-origin verification</strong><span class="mini" id="pub-auth">Not yet independently proven for all records</span></li>
+<li><strong>Canonical product association</strong><span class="mini">Required, including SKU validation</span></li>
+<li><strong>Moderation & rights</strong><span class="mini">Explicit staff authority and approved display rights</span></li>
+<li><strong>Synthetic exclusion</strong><span class="mini">Always enforced, including STUDIO_TEST and generated media</span></li></ul></div></section>
+<section class="panel"><header class="panel-head"><h2>Publication operations</h2></header><div class="panel-content">
+<div class="suite-locked"><b>Publication disabled</b><p>No public publishing, provider generation or STAGING migration may be performed from this implementation. The existing legacy publisher remains protected.</p>
+<button id="publish" class="action" type="button" disabled>Publish approved genuine reviews</button></div>
+<p class="mini" id="pub-status">No public publication attempted.</p></div></section></div></section>
+<p class="footer">v2.39 fictional design preview · Sample content is not real customer feedback. Authentic product reviews and buyer-origin authority are separately verified. This workspace does not publish or invoke AI providers.</p>
+</main></div>
+<script>(function(){
+"use strict";
+const $=id=>document.getElementById(id),el=(t,c,v)=>{const e=document.createElement(t);if(c)e.className=c;if(v!=null)e.textContent=String(v);return e};
+const products=[
+ {product_id:"syn-preview-linen",title:"Sample Linen Collection",skus:[{sku_id:"syn-preview-linen-s",sku_code:"LINEN-S"},{sku_id:"syn-preview-linen-m",sku_code:"LINEN-M"}]},
+ {product_id:"syn-preview-tote",title:"Sample Canvas Tote",skus:[{sku_id:"syn-preview-tote-natural",sku_code:"TOTE-NATURAL"}]},
+ {product_id:"syn-preview-shirt",title:"Sample Everyday Shirt",skus:[{sku_id:"syn-preview-shirt-l",sku_code:"SHIRT-L"}]}
+],reviews=[
+ {review_id:"demo-101",product_id:"syn-preview-linen",sku_id:"syn-preview-linen-s",title:"Fictional linen sample",body:"Internal sample text to demonstrate review formatting. This was not written by a customer.",status:"PENDING",source_type:"STUDIO_TEST",is_synthetic:true,rating:5,created_at_utc:"2026-11-15 (sample)"},
+ {review_id:"demo-102",product_id:"syn-preview-linen",sku_id:"syn-preview-linen-m",title:"Fictional batch example",body:"Second synthetic Studio draft. No genuine purchase or review author is associated with this text.",status:"APPROVED",source_type:"STUDIO_TEST",is_synthetic:true,rating:4,created_at_utc:"2026-11-14 (sample)"},
+ {review_id:"demo-103",product_id:"syn-preview-tote",sku_id:"syn-preview-tote-natural",title:"Another Studio draft",body:"Imaginary product feedback created solely for reviewing the Seller Center interface.",status:"REJECTED",source_type:"STUDIO_TEST",is_synthetic:true,rating:3,created_at_utc:"2026-11-13 (sample)"},
+ {review_id:"demo-104",product_id:"syn-preview-shirt",sku_id:"syn-preview-shirt-l",title:"Fictional imported note",body:"A sample unverified imported note. It carries no genuine buyer claims.",status:"PENDING",source_type:"IMPORTED_SAMPLE",is_synthetic:true,rating:4,created_at_utc:"2026-11-12 (sample)"}
+],batches=[{job_ref:"DEMO-BATCH-001",status:"PAUSED SAMPLE",created_at_utc:"2026-11-14 (fictional)",items_total:5},{job_ref:"DEMO-BATCH-002",status:"COMPLETED SAMPLE",created_at_utc:"2026-11-12 (fictional)",items_total:8}];
+let selected="demo-101";
+function pid(){return $("productSelect").value}
+function current(){return reviews.filter(r=>(!pid()||r.product_id===pid())&&(!$("skuSelect").value||r.sku_id===$("skuSelect").value))}
+function selectedProduct(){return products.find(p=>p.product_id===pid())}
+function configureSku(){const s=$("skuSelect"),p=selectedProduct();s.replaceChildren(el("option","","All variations"));s.firstChild.value="";(p?.skus||[]).forEach(x=>{const opt=el("option","",x.sku_code);opt.value=x.sku_id;s.appendChild(opt)});}
+function detail(r){const h=$("reviewDetail");h.replaceChildren();if(!r){h.append(el("p","suite-empty","No matching sample record."));return}
+h.append(el("h2","suite-title",r.title),el("span","tag","FICTIONAL STUDIO SAMPLE"),el("p","mini",r.review_id));
+const g=el("div","cell-grid");[["Product",r.product_id],["Variation",r.sku_id],["Rating",r.rating+" / 5 (sample only)"],["Moderation",r.status],["Source",r.source_type],["Buyer-authored proof","None — fictional"],["Payment evidence","None — fictional"],["Created",r.created_at_utc]].forEach(([k,v])=>{const x=el("div","cell");x.append(el("div","k",k),el("div","v",v));g.appendChild(x)});
+h.append(g,el("p","story",r.body),el("div","hintbar","Fictional Studio content. It is not genuine customer feedback and is excluded from public ratings."));}
+function library(){const q=$("reviewSearch").value.trim().toLowerCase(),st=$("reviewStatus").value,origin=$("reviewOrigin").value;
+const rows=current().filter(r=>(st==="ALL"||r.status===st)&&(origin==="ALL"||origin==="SYNTHETIC")&&(!q||[r.title,r.body,r.product_id].join(" ").toLowerCase().includes(q)));
+$("libraryCount").textContent=rows.length+" shown";const list=$("reviewList");list.replaceChildren();
+if(!rows.some(r=>r.review_id===selected))selected=rows[0]?.review_id||"";
+rows.forEach(r=>{const b=el("button","review-pick");b.type="button";b.setAttribute("aria-pressed",selected===r.review_id?"true":"false");
+const top=el("div","pick-head");top.append(el("span","",r.title),el("span","tag neutral","Studio sample"));
+b.append(top,el("div","pick-sub",[r.product_id,r.sku_id,r.status].join(" · ")));
+b.addEventListener("click",()=>{selected=r.review_id;library()});list.append(b)});
+if(!rows.length)list.append(el("p","suite-empty","No matching sample records."));detail(rows.find(r=>r.review_id===selected));}
+function productPane(){const h=$("productReviewList"),t=$("productTotals"),p=$("publicProductPreview");h.replaceChildren();t.replaceChildren();p.replaceChildren();
+if(!selectedProduct()){h.append(el("p","suite-empty","Choose a product to inspect its fictional review records."));p.append(el("p","suite-empty","No product selected."));return;}
+const rows=current();
+[["Recorded samples",rows.length],["Pending",rows.filter(r=>r.status==="PENDING").length],["Synthetic samples",rows.length],["Genuine published",0]].forEach(([k,v])=>{
+ const x=el("div","cell");x.append(el("div","k",k),el("div","v",v));t.append(x)});
+rows.forEach(r=>h.append(el("p","mini",r.rating+" (sample) · "+r.title+" · "+r.status)));
+p.append(el("p","suite-empty","No genuine customer feedback is contained in this fictional demonstration. An actual product sheet must display an honest zero-state until the verified publication service is connected."));}
+function totals(){const rows=current();$("m-total").textContent=rows.length;$("m-pending").textContent=rows.filter(r=>r.status==="PENDING").length;$("m-synthetic").textContent=rows.length;$("m-published").textContent="0";}
+function render(){totals();library();productPane();}
+let previewValid=false;
+function drawTriage(){
+ const r=reviews.find(x=>x.review_id===selected);
+ $("triageSelected").textContent=r?r.title:"No sample review selected";
+ $("triageProduct").textContent=r?r.product_id+" · "+r.sku_id+" · "+r.status:"";
+ const s=$("triageAction");s.replaceChildren();
+ const blank=el("option","","Choose a fictional disposition");blank.value="";s.append(blank);
+ const act=r?(r.status==="PENDING"?"REJECT":r.status==="REJECTED"?"RESTORE_PENDING":""):"";
+ if(act){const x=el("option","",act==="REJECT"?"Reject demo record":"Return demo to pending");x.value=act;s.append(x)}
+ s.disabled=!act;$("triageNote").value="";$("triageNote").disabled=!act;
+ invalidateSampleTriage();$("triageStatus").textContent="Fictional local preview only; no DEV sheet write.";
+}
+function invalidateSampleTriage(){
+ previewValid=false;$("triageConfirm").disabled=true;
+ $("triageEvidence").hidden=true;$("triageEvidence").textContent="";
+ $("triagePreview").disabled=$("triageAction").disabled||!$("triageAction").value||
+  $("triageNote").value.trim().length<12;
+}
+let draftPreview=null;
+function showDemoDraft(){
+ const r=reviews.find(x=>x.review_id===selected);
+ $("demoDraftBinding").textContent=r?r.product_id+" · "+r.sku_id+" · fictional record":"No sample record";
+ $("demoDraftTitle").value=r?r.title:"";$("demoDraftBody").value=r?r.body:"";
+ $("demoDraftPreview").disabled=!r;$("demoDraftConfirm").disabled=true;
+ $("demoDraftEvidence").hidden=true;$("demoDraftStatus").textContent="FICTIONAL INTERNAL DEMO — no Sheets or provider operations.";
+ draftPreview=null;
+}
+function previewDemoDraft(){
+ const r=reviews.find(x=>x.review_id===selected),title=$("demoDraftTitle").value.trim(),body=$("demoDraftBody").value.trim();
+ if(!r||title.length<3||body.length<12){$("demoDraftStatus").textContent="Enter at least 3 title and 12 content characters.";return}
+ draftPreview={id:r.review_id,title,body};$("demoDraftConfirm").disabled=false;
+ $("demoDraftEvidence").hidden=false;$("demoDraftEvidence").textContent="Fictional local preview · "+title+" · "+body;
+ $("demoDraftStatus").textContent="Ready to update only the in-page fictional example.";
+}
+function confirmDemoDraft(){
+ const p=draftPreview;if(!p||$("demoDraftTitle").value.trim()!==p.title||$("demoDraftBody").value.trim()!==p.body)return;
+ const r=reviews.find(x=>x.review_id===p.id);if(!r)return;
+ r.title=p.title;r.body=p.body;draftPreview=null;$("demoDraftConfirm").disabled=true;
+ library();productPane();$("demoDraftStatus").textContent="LOCAL DEMO UPDATED · No actual draft saved or published.";
+}
+function activate(k){["library","product","drafts","triage","studio","batch","publication"].forEach(x=>{$("tab-"+x).setAttribute("aria-selected",x===k?"true":"false");$("pane-"+x).hidden=x!==k});if(k==="triage")drawTriage();if(k==="drafts")showDemoDraft();}
+products.forEach(p=>{const x=el("option","",p.title);x.value=p.product_id;$("productSelect").append(x)});
+$("productSelect").addEventListener("change",()=>{configureSku();render()});
+$("skuSelect").addEventListener("change",render);
+["reviewSearch","reviewStatus","reviewOrigin"].forEach(id=>$(id).addEventListener(id==="reviewSearch"?"input":"change",library));
+["library","product","drafts","triage","studio","batch","publication"].forEach(k=>$("tab-"+k).addEventListener("click",()=>activate(k)));
+$("studioPlan").addEventListener("click",()=>{const p=selectedProduct();$("studioPlanResult").textContent=p?
+"FICTIONAL PLAN · "+p.title+" · "+$("studioType").value+" · "+$("studioStyle").value+" · "+$("studioPhotoStyle").value+". No AI request or draft was created.":"Choose a sample product first. No generation available."});
+$("batchPlan").addEventListener("click",()=>{const p=selectedProduct(),drafts=Number($("batchCount").value),photos=Number($("batchPhotos").value);
+$("batchPlanResult").textContent=!p?"Choose a sample product first.":(!Number.isInteger(drafts)||drafts<1||drafts>50||!Number.isInteger(photos)||photos<0||photos>20||photos>drafts)?
+"Use 1–50 drafts and 0–20 photos, no more photos than drafts.":
+"PREVIEW ONLY · "+drafts+" samples and "+photos+" photos for "+p.title+". No job started.";});
+const jobs=$("batchHistory");jobs.replaceChildren();const ul=el("ul","task-list");batches.forEach(b=>{const li=el("li");li.append(el("strong","",b.job_ref),el("span","mini",b.status+" · "+b.created_at_utc+" · "+b.items_total+" fictional drafts"));ul.append(li)});jobs.append(ul);
+document.querySelectorAll("[data-seller-target]").forEach(b=>{b.disabled=true;b.title="Other Seller Center modules are not part of this standalone sample"});
+$("triageAction").addEventListener("change",invalidateSampleTriage);
+$("triageNote").addEventListener("input",invalidateSampleTriage);
+$("triagePreview").addEventListener("click",()=>{
+ invalidateSampleTriage();if($("triagePreview").disabled)return;
+ const r=reviews.find(x=>x.review_id===selected);if(!r)return;
+ previewValid=true;$("triageEvidence").hidden=false;
+ $("triageEvidence").textContent="FICTIONAL LOCAL PREVIEW · "+r.status+" → "+
+  ($("triageAction").value==="REJECT"?"REJECTED":"PENDING")+". No real change or API call.";
+ $("triageConfirm").disabled=false;$("triageStatus").textContent="Sample-only preview, ready to apply to the temporary local demo.";
+});
+$("triageConfirm").addEventListener("click",()=>{
+ if(!previewValid)return;
+ const r=reviews.find(x=>x.review_id===selected);if(!r)return;
+ r.status=$("triageAction").value==="REJECT"?"REJECTED":"PENDING";
+ previewValid=false;render();drawTriage();
+ $("triageStatus").textContent="FICTIONAL LOCAL DEMO UPDATED · No Apps Script, Sheets or genuine review changed.";
+});
+$("demoDraftPreview").addEventListener("click",previewDemoDraft);
+$("demoDraftConfirm").addEventListener("click",confirmDemoDraft);
+["demoDraftTitle","demoDraftBody"].forEach(k=>$(k).addEventListener("input",()=>{
+ draftPreview=null;$("demoDraftConfirm").disabled=true;$("demoDraftEvidence").hidden=true;
+}));
+$("refresh").textContent="Reset demo";$("refresh").addEventListener("click",()=>{["productSelect","skuSelect","reviewSearch","reviewStatus","reviewOrigin"].forEach(k=>$(k).value=k.startsWith("review")&&k!=="reviewSearch"?"ALL":"");configureSku();selected="demo-101";render();});
+$("status").textContent="FICTIONAL MOBILE DESIGN PREVIEW · No private APIs, real reviews, provider calls or Sheets writes.";
+activate("library");configureSku();render();
+}());</script></body></html>
