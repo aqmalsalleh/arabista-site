@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="robots" content="noindex,nofollow" />
+  <meta name="referrer" content="no-referrer" />
+  <meta name="theme-color" content="#0b0b0c" />
+  <title>Arabista Seller Center · Shipping — Mobile Design Preview</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=DM+Sans:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap');
+    :root {
+      --ink:#242019; --muted:#6d655a; --paper:#f5f1e8; --panel:#fffdf9;
+      --line:#e5ddce; --gold:#c0a062; --gold-cta:#b39257;
+      --dark:#0b0b0c; --green:#466143; --warning:#825f2e;
+      --display:"Cormorant Garamond",Georgia,serif;
+      --body:"DM Sans",Inter,system-ui,sans-serif;
+    }
+    * { box-sizing:border-box }
+    body { margin:0; color:var(--ink); background:var(--paper); font:14px/1.55 var(--body); letter-spacing:-.008em }
+    button,input,select { font:inherit }
+    button { cursor:pointer }
+    button:disabled { cursor:not-allowed; opacity:.5 }
+    :focus-visible { outline:2px solid var(--gold-cta); outline-offset:2px }
+    [hidden] { display:none!important }
+    .skip { position:absolute; left:-200vw; top:0; background:var(--dark); color:#fff; z-index:20; padding:.75rem 1rem }
+    .skip:focus { left:10px }
+    .app { display:grid; grid-template-columns:235px minmax(0,1fr); min-height:100vh }
+    .sidebar { background:var(--dark); color:#f5f1e8; padding:1.4rem 1rem 2rem; border-right:1px solid #342c1e }
+    .brand { font:500 1.65rem/1.1 var(--display); margin:0 }
+    .brand-sub { font:500 .68rem/1.6 Inter,system-ui,sans-serif; color:#b6ae9f; letter-spacing:.05em; margin:.35rem 0 1.4rem }
+    .nav-label { color:var(--gold); font:600 .68rem Inter,system-ui,sans-serif; letter-spacing:.08em; text-transform:uppercase }
+    .modules { list-style:none; margin:.55rem 0 0; padding:0; display:grid; gap:3px }
+    .modules button { width:100%; display:flex; justify-content:space-between; align-items:center; border:0; border-radius:10px; background:transparent; color:#ddd5c9; text-align:left; padding:.75rem .8rem; font:500 .82rem Inter,system-ui,sans-serif }
+    .modules button:hover:not(:disabled) { background:#27231d;color:#fff }
+    .modules .current { background:#30281c; color:#ecd9ae; box-shadow:inset 2px 0 var(--gold) }
+    .nav-state { color:#ae9d7b; font-size:.61rem }
+    .main { padding:clamp(1.15rem,2.6vw,2.4rem); max-width:1580px; width:100%; margin-inline:auto; min-width:0 }
+    .eyebrow { text-transform:uppercase; letter-spacing:.13em; color:#967947; font:600 .66rem Inter,system-ui,sans-serif; margin:0 0 .35rem }
+    h1 { font:500 clamp(2.4rem,4vw,3.6rem)/.97 var(--display); letter-spacing:-.025em; margin:0 0 .5rem }
+    h2 { font:500 1.55rem/1.1 var(--display); margin:0 }
+    p { margin:.2rem 0 .65rem }
+    .muted { color:var(--muted) }
+    .intro { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:.8rem; margin-bottom:1.2rem }
+    .intro-copy { font-size:.84rem; max-width:600px; line-height:1.65 }
+    .tag { display:inline-flex; padding:.32rem .64rem; border-radius:999px; background:#f5eedd; border:1px solid #e8d8b5; color:#7c5e30; text-transform:uppercase; letter-spacing:.055em; font:600 .65rem Inter,system-ui,sans-serif }
+    .tag.dark { color:#5b5850; background:#ede9e2; border-color:#ded6c8 }
+    .action { display:inline-flex; align-items:center; justify-content:center; min-height:44px; border-radius:11px; padding:.65rem .95rem; background:#171614; border:1px solid #171614; color:#f9f3e8; font:600 .77rem Inter,system-ui,sans-serif }
+    .action:hover:not(:disabled) { background:#3b3126 }
+    .action.secondary { background:transparent; color:#655135; border-color:#bda98a }
+    .action.secondary:hover:not(:disabled) { background:#f7f0e1 }
+    .status { padding:.75rem .9rem; border-radius:11px; background:#fffdfa; border:1px solid var(--line); border-left:3px solid var(--gold); color:#5d503b; margin:1rem 0; font-size:.81rem }
+    .status.error { border-left-color:#a35b43;color:#7a3c2e }
+    .metrics { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:.65rem; margin:1rem 0 1.3rem }
+    .metric { border:1px solid var(--line); border-radius:14px; background:var(--panel); padding:.95rem 1rem; min-height:95px }
+    .metric .label { font:600 .67rem Inter,system-ui,sans-serif; text-transform:uppercase; letter-spacing:.07em; color:var(--muted) }
+    .metric .number { font:500 2.2rem/1.1 var(--display); margin-top:.5rem }
+    .tools { display:flex; flex-wrap:wrap; align-items:end; gap:.65rem; margin-bottom:1rem }
+    .field { display:grid; gap:.28rem; flex:1 1 220px }
+    .field label { font:600 .67rem Inter,system-ui,sans-serif; text-transform:uppercase; letter-spacing:.06em; color:var(--muted) }
+    .field input,.field select { min-height:44px; background:#fffdfa; border:1px solid #d9d0c1; border-radius:10px; padding:.55rem .8rem; min-width:0 }
+    .work { display:grid; grid-template-columns:minmax(0,.96fr) minmax(0,1.04fr); gap:.85rem; align-items:start }
+    .panel { background:var(--panel); border:1px solid var(--line); border-radius:16px; overflow:hidden; min-width:0 }
+    .panel-head { display:flex; justify-content:space-between; align-items:center; gap:.5rem; padding:1.05rem 1.15rem; border-bottom:1px solid var(--line) }
+    .subtle-count { font-size:.72rem; color:var(--muted) }
+    .queue { list-style:none; margin:0; padding:0; max-height:680px; overflow-y:auto }
+    .queue button { display:block; width:100%; border:0; border-bottom:1px solid var(--line); border-left:3px solid transparent; text-align:left; background:transparent; padding:1rem 1.1rem; color:var(--ink) }
+    .queue button:hover:not(:disabled) { background:#faf6ed }
+    .queue button.selected { background:#f7f0e3; border-left-color:var(--gold) }
+    .queue-top { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:.5rem; font:600 .84rem Inter,system-ui,sans-serif }
+    .queue-meta { color:var(--muted); font-size:.74rem; line-height:1.65; margin-top:.33rem }
+    .detail { padding:1.15rem }
+    .detail h3 { font:500 1.95rem/1.1 var(--display); margin:0 }
+    .detail .ref { overflow-wrap:anywhere; color:var(--muted); margin:.3rem 0 .9rem; font-size:.76rem }
+    .grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:.5rem; margin:1rem 0 }
+    .cell { border:1px solid #e9e1d4; background:#faf8f3; border-radius:10px; padding:.72rem .78rem; overflow-wrap:anywhere }
+    .cell .key { color:var(--muted); font:600 .63rem Inter,system-ui,sans-serif; letter-spacing:.06em; text-transform:uppercase }
+    .cell .val { font-size:.81rem; font-weight:500; margin-top:.26rem }
+    .next-label { font:600 .68rem Inter,system-ui,sans-serif; letter-spacing:.08em; color:#987c4b; text-transform:uppercase; margin:1rem 0 .35rem }
+    .next { padding-left:1.1rem; color:#62594c; font-size:.8rem; line-height:1.65 }
+    .result { margin:.9rem 0 0; background:#faf8f3; border:1px solid var(--line); border-radius:10px; padding:.8rem; font-size:.78rem; overflow-wrap:anywhere }
+    .help { color:var(--muted); font-size:.73rem; line-height:1.6; margin-top:.6rem }
+    .empty { padding:2rem 1rem; text-align:center; color:var(--muted); font-size:.83rem }
+    .footer { margin-top:1.5rem; font-size:.73rem; color:var(--muted); line-height:1.7 }
+    @media(max-width:1100px) { .work { grid-template-columns:1fr }.queue { max-height:400px } }
+    @media(max-width:760px) {
+      .app { display:block }.sidebar { padding:.8rem .8rem .55rem }.brand { font-size:1.42rem }
+      .brand-sub { margin-bottom:.55rem }.nav-label { display:none }.modules { display:flex; gap:3px; overflow-x:auto; margin:0 }
+      .modules li { flex:0 0 auto }.modules button { white-space:nowrap; padding:.6rem .7rem; min-height:42px; font-size:.7rem }
+      .nav-state { display:none }.main { padding:1rem .82rem calc(2rem + env(safe-area-inset-bottom)) }
+      .metrics { grid-template-columns:repeat(2,minmax(0,1fr)) }
+    }
+    @media(max-width:390px) { .grid { grid-template-columns:1fr } }
+    @media(prefers-reduced-motion:reduce) { * { scroll-behavior:auto!important; transition:none!important } }
+  </style>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to Shipping content</a>
+  <div class="app">
+    <aside class="sidebar" aria-label="Sample Seller Center navigation">
+      <p class="brand">Arabista Seller Center</p>
+      <p class="brand-sub">v2.34 · MOBILE DESIGN PREVIEW</p>
+      <p class="nav-label">Modules</p>
+      <ul class="modules" data-seller-nav="v229">
+        <li><button type="button" data-seller-target="overview">Overview <span class="nav-state">open</span></button></li>
+        <li><button type="button" data-seller-target="products">Products <span class="nav-state">open</span></button></li>
+        <li><button type="button" data-seller-target="stock">Stock <span class="nav-state">open</span></button></li>
+        <li><button type="button" data-seller-target="orders">Orders <span class="nav-state">open</span></button></li>
+        <li><button type="button" class="current" aria-current="page" disabled>Shipping <span class="nav-state">DEV</span></button></li>
+        <li><button type="button" data-seller-target="promotions">Promotions <span class="nav-state">open</span></button></li>
+        <li><button type="button" data-seller-target="reviews">Reviews <span class="nav-state">open</span></button></li>
+        <li><button type="button" data-seller-target="discover">Discover <span class="nav-state">open</span></button></li>
+        <li><button type="button" data-seller-target="chat">Chat <span class="nav-state">open</span></button></li>
+      </ul>
+    </aside>
+    <main class="main" id="main">
+      <header class="intro">
+        <div>
+          <p class="eyebrow">Seller Center / Operations</p>
+          <h1>Shipping</h1>
+          <p class="intro-copy muted">Review the visual design for an internal fulfilment queue. All sample orders are fictional and cannot be prepared or booked.</p>
+        </div>
+        <div><span class="tag">SAMPLE ONLY</span> <span class="tag dark">No live actions</span></div>
+      </header>
+      <div class="tools">
+        <button class="action" type="button" id="refresh">Reset demo</button>
+        <label class="field" for="shipping-search">Search orders
+          <input type="search" id="shipping-search" placeholder="Invoice or order reference" autocomplete="off" />
+        </label>
+        <label class="field" for="shipping-filter">View
+          <select id="shipping-filter">
+            <option value="ALL">All awaiting fulfilment</option>
+            <option value="ELIGIBLE">Eligible to prepare</option>
+            <option value="PREPARED">Prepared · not booked</option>
+            <option value="ATTENTION">Requires attention</option>
+          </select>
+        </label>
+      </div>
+      <p class="status" id="capBanner" role="status">PUBLIC DESIGN PREVIEW · Fictional sample shipping records · No backend or carrier connection.</p>
+      <div class="metrics" aria-label="Shipping queue summary">
+        <div class="metric"><div class="label">Orders loaded</div><div class="number" id="metric-all">—</div></div>
+        <div class="metric"><div class="label">Eligible for internal prepare</div><div class="number" id="metric-eligible">—</div></div>
+        <div class="metric"><div class="label">Prepared · not booked</div><div class="number" id="metric-prepared">—</div></div>
+      </div>
+      <div class="work">
+        <section class="panel" aria-label="Shipping order queue">
+          <div class="panel-head"><h2>Fulfilment queue</h2><span class="subtle-count" id="shown">—</span></div>
+          <ul class="queue" id="board"></ul>
+          <p class="empty" id="empty" hidden>No orders match this view.</p>
+        </section>
+        <section class="panel" aria-label="Selected shipment">
+          <div class="panel-head"><h2>Order preparation</h2><span class="tag dark">Visual sample</span></div>
+          <div class="detail" id="detail" aria-live="polite"><p class="empty">Choose an order in the queue.</p></div>
+        </section>
+      </div>
+      <p class="footer">Public visual sample only. There is no staff authentication, Google Sheets connection, customer information, J&amp;T booking or real shipment activity.</p>
+    </main>
+  </div>
+  <script>
+
+(function(){
+"use strict";
+const $=id=>document.getElementById(id);
+const sample=[
+ {order_id:"DEMO-ORDER-1004",invoice_no:"DEMO-1004",payment_evidence:"TEST_ONLY · simulated settled",reservation_status:"COMMITTED",fulfilment_status:"Awaiting preparation",payable_sen:19600,currency:"MYR",booking_state:"NONE",shipment_status:"UNBOOKED",awb:null,test_only:true,prepare_eligible:true,progression:{step:"AWAITING_FULFILMENT"},next_steps:[{label:"Eligible in principle; the actual DEV preparation action requires server authority."}]},
+ {order_id:"DEMO-ORDER-1003",invoice_no:"DEMO-1003",payment_evidence:"TEST_ONLY · simulated settled",reservation_status:"COMMITTED",fulfilment_status:"Prepared internally",payable_sen:26600,currency:"MYR",booking_state:"PREPARED_NOT_BOOKED",shipment_status:"QUEUED",awb:null,test_only:true,prepare_eligible:false,progression:{step:"PREPARED"},next_steps:[{label:"Prepared internally — not booked with J&T."},{label:"Tracking is unavailable because no verified AWB exists."}]},
+ {order_id:"DEMO-ORDER-1002",invoice_no:"DEMO-1002",payment_evidence:"TEST_ONLY · pending",reservation_status:"ACTIVE",fulfilment_status:"Awaiting payment",payable_sen:10600,currency:"MYR",booking_state:"NONE",shipment_status:"UNBOOKED",awb:null,test_only:true,prepare_eligible:false,progression:{step:"PAYMENT_PENDING"},next_steps:[{label:"Do not prepare until payment and Stock reservation are confirmed."}]},
+ {order_id:"DEMO-ORDER-1001",invoice_no:"DEMO-1001",payment_evidence:"Incomplete evidence · review required",reservation_status:"UNKNOWN",fulfilment_status:"On hold",payable_sen:15600,currency:"MYR",booking_state:"NONE",shipment_status:"UNBOOKED",awb:null,test_only:true,prepare_eligible:false,progression:{step:"FAILED_OR_UNCERTAIN"},next_steps:[{label:"Reconcile payment and Stock before any shipment action."}]},
+ {order_id:"DEMO-ORDER-1000",invoice_no:"DEMO-1000",payment_evidence:"TEST_ONLY · expired",reservation_status:"RELEASED",fulfilment_status:"Closed",payable_sen:8600,currency:"MYR",booking_state:"NONE",shipment_status:"UNBOOKED",awb:null,test_only:true,prepare_eligible:false,progression:{step:"EXPIRED"},next_steps:[{label:"No preparation for expired orders."}]}
+];
+let chosen=sample[0].order_id;
+const E=(tag,cls,value)=>{const e=document.createElement(tag);if(cls)e.className=cls;if(value!==undefined&&value!==null)e.textContent=String(value);return e};
+function money(v){return "RM "+(v/100).toFixed(2)}
+function label(r){if(r.booking_state==="PREPARED_NOT_BOOKED")return "Prepared · not booked";if(r.progression.step==="FAILED_OR_UNCERTAIN")return "Needs review";if(r.prepare_eligible)return "Ready for internal preparation";if(r.progression.step==="EXPIRED")return "Expired";return "Not yet prepared"}
+function filtered(){
+ const q=$("shipping-search").value.trim().toLowerCase(), f=$("shipping-filter").value;
+ return sample.filter(r=>{
+ if(q&&![r.invoice_no,r.order_id,r.fulfilment_status].join(" ").toLowerCase().includes(q))return false;
+ if(f==="ELIGIBLE")return r.prepare_eligible;
+ if(f==="PREPARED")return r.booking_state==="PREPARED_NOT_BOOKED";
+ if(f==="ATTENTION")return r.progression.step==="FAILED_OR_UNCERTAIN";
+ return true;
+ });
+}
+function cell(grid,label,value){const d=E("div","cell");d.append(E("div","key",label),E("div","val",value));grid.appendChild(d)}
+function detail(r){
+ const host=$("detail");host.replaceChildren();
+ if(!r){host.appendChild(E("p","empty","Choose an order from the sample fulfilment queue."));return}
+ host.append(E("h3","",r.invoice_no),E("p","ref",r.order_id),E("span","tag","FICTIONAL SAMPLE"));
+ const grid=E("div","grid");
+ cell(grid,"Preparation",label(r));cell(grid,"Payment evidence",r.payment_evidence);
+ cell(grid,"Stock reservation",r.reservation_status);cell(grid,"Fulfilment",r.fulfilment_status);
+ cell(grid,"Order total",money(r.payable_sen));cell(grid,"AWB / carrier tracking","Not available · not carrier booked");
+ host.appendChild(grid);
+ host.appendChild(E("p","next-label","Operational next steps"));
+ const list=E("ul","next");r.next_steps.forEach(s=>list.appendChild(E("li","",s.label)));host.appendChild(list);
+ const button=E("button","action","Prepare internal TEST_ONLY shipment");
+ button.disabled=true;button.type="button";button.title="Sample-only preview; no write actions";
+ host.append(button,E("p","help","Disabled in this public sample. Real DEV preparation requires staff verification, Phase B tables and write approval."));
+ const outcome=E("p","result","Design demonstration only. No action submitted.");outcome.setAttribute("role","status");host.appendChild(outcome);
+}
+function render(){
+ const rows=filtered(),board=$("board");board.replaceChildren();
+ $("shown").textContent=rows.length+" shown";$("empty").hidden=rows.length>0;
+ $("metric-all").textContent=String(sample.length);
+ $("metric-eligible").textContent=String(sample.filter(r=>r.prepare_eligible).length);
+ $("metric-prepared").textContent=String(sample.filter(r=>r.booking_state==="PREPARED_NOT_BOOKED").length);
+ if(!rows.some(r=>r.order_id===chosen))chosen=rows.length?rows[0].order_id:null;
+ const frag=document.createDocumentFragment();
+ rows.forEach(r=>{const li=E("li"),b=E("button"),selected=r.order_id===chosen;
+ b.className=selected?"selected":"";b.type="button";b.setAttribute("aria-pressed",selected?"true":"false");
+ const top=E("div","queue-top");
+ top.append(E("span","",r.invoice_no),E("span","tag dark",label(r)));
+ b.append(top,E("div","queue-meta",[r.payment_evidence,r.reservation_status,money(r.payable_sen)].join(" · ")),E("span","tag","SAMPLE · NO LIVE SHIPMENT"));
+ b.addEventListener("click",()=>{chosen=r.order_id;render()});li.appendChild(b);frag.appendChild(li)});
+ board.appendChild(frag);
+ detail(rows.find(r=>r.order_id===chosen));
+}
+function reset(){
+ $("shipping-search").value="";$("shipping-filter").value="ALL";chosen=sample[0].order_id;render();
+ $("capBanner").textContent="PUBLIC DESIGN PREVIEW · Fictional sample shipping records · No Google Sheets or carrier connection.";
+}
+function nav(){
+ document.querySelectorAll("[data-seller-target]").forEach(b=>{
+ if(b.dataset.sellerTarget==="orders")b.addEventListener("click",()=>{location.href="./index.html"});
+ else{b.disabled=true;b.setAttribute("aria-disabled","true");b.title="Only Orders and Shipping are included in this mobile design preview";}
+ });
+}
+$("shipping-search").addEventListener("input",render);
+$("shipping-filter").addEventListener("change",render);
+$("refresh").addEventListener("click",reset);
+nav();render();
+})();
+
+  </script>
+</body>
+</html>
