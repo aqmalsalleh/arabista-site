@@ -1439,6 +1439,19 @@ body.is-discover #feed .post.has-video .meta{bottom:13px!important}
   box-shadow:none!important;text-shadow:none!important
 }
 
+
+/* v2.46 owner refinement: gesture-only seek at the absolute video bottom,
+   rendered under the higher-stacked fixed mobile navigation. */
+#feed .slide .v246-scrub,
+#feed .slide.v246-show-scrub .v246-scrub,
+#feed .slide.v246-paused .v246-scrub,
+#feed .slide:hover .v246-scrub,
+#feed .slide:focus-within .v246-scrub{
+  bottom:0!important;
+  z-index:3!important;
+}
+body.is-discover .site-tabs{z-index:45!important}
+
 </style>
 <link rel="preload" as="image" fetchpriority="high" href="https://imagedelivery.net/32oxijRdypCO4dk5WrGLwg/c2726925-9313-4bc7-9733-83f5d9429600/public">
 </head>
@@ -3416,6 +3429,8 @@ function closeShopDetail() {
       slide.stream = player;
       player.controls = false;
       player.muted = !soundOn;
+      // Hint Cloudflare to fetch media ahead without background autoplay.
+      try { player.preload = true; } catch (ignored) {}
       ['timeupdate', 'loadedmetadata', 'durationchange', 'seeked'].forEach(function (event) {
         player.addEventListener(event, function () { v246UpdateTimeline(slide); });
       });
@@ -3470,7 +3485,7 @@ function closeShopDetail() {
       frame.loading = 'eager';
       frame.referrerPolicy = 'no-referrer';
       frame.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;border:0;background:#000';
-      frame.dataset.src = spec.embed + (spec.embed.indexOf('?') < 0 ? '?' : '&') + 'controls=false&loop=true&muted=true';
+      frame.dataset.src = spec.embed + (spec.embed.indexOf('?') < 0 ? '?' : '&') + 'controls=false&loop=true&muted=true&preload=auto';
       slide.iframe = frame;
       slide.node.appendChild(frame);
       var pbI = el('button', '▶', 'play-btn');
@@ -3756,8 +3771,37 @@ function closeShopDetail() {
 
   function live() { return tabId === 'discover' && !document.hidden; }
 
+  /* Count actual video posts, not adjacent posts.
+     Images and photo carousels never spend one of the next three video slots. */
+  function v248WarmVideoIndices(anchor) {
+    var selected = new Set();
+    if (anchor < 0 || anchor >= posts.length) return selected;
+    function isVideo(index) {
+      var ctrl = posts[index];
+      return !!(ctrl && ctrl.slides.some(function (slide) {
+        return !slide.failed && !!(slide.video || slide.iframe);
+      }));
+    }
+    if (isVideo(anchor)) selected.add(anchor);
+    var forward = 0;
+    for (var i = anchor + 1; i < posts.length && forward < 3; i++) {
+      if (isVideo(i)) { selected.add(i); forward++; }
+    }
+    var backward = 0;
+    for (var j = anchor - 1; j >= 0 && backward < 2; j--) {
+      if (isVideo(j)) { selected.add(j); backward++; }
+    }
+    return selected;
+  }
+
   function syncAll() {
     var on = live();
+    var warmVideos = on ? v248WarmVideoIndices(activeIdx) : new Set();
+    // The visible video has priority over background player creation.
+    if (on && posts[activeIdx]) {
+      var focused = posts[activeIdx].slides[posts[activeIdx].index];
+      if (focused && (focused.video || focused.iframe)) ensureSrc(focused);
+    }
     if (on && activeIdx >= 0) v246MarkTransition(activeIdx);
     posts.forEach(function (c, i) {
       var active = on && i === activeIdx;
@@ -3765,7 +3809,7 @@ function closeShopDetail() {
         if (s.failed) return;
         var wantPlay = active && si === c.index && (reduced() ? s.userPlay : !s.userPaused);
         if (s.iframe) {
-          var near = on && i >= activeIdx - 2 && i <= activeIdx + 3 && si === c.index;
+          var near = on && warmVideos.has(i) && si === c.index;
           if (near) ensureSrc(s);
           if (s.stream) {
             if (wantPlay) {
@@ -3784,7 +3828,7 @@ function closeShopDetail() {
               s.mutedRetry = false;
             }
           }
-          if (on && Math.abs(i - activeIdx) > 5 && s.iframe.getAttribute('src')) {
+          if (on && !near && s.iframe.getAttribute('src')) {
             if (s.stream) { try { s.stream.pause(); } catch (ignored) {} }
             s.playAttemptToken = (s.playAttemptToken || 0) + 1;
             s.playPending = false;
@@ -3798,7 +3842,7 @@ function closeShopDetail() {
         var v = s.video;
         if (!v) return;
         if (active && si === c.index) ensureSrc(s);
-        else if (on && i >= activeIdx - 2 && i <= activeIdx + 3 && si === 0) ensureSrc(s);
+        else if (on && warmVideos.has(i) && si === c.index) ensureSrc(s);
         if (wantPlay) {
           if (v.paused && !s.playPending && !s.blocked) v247TryPlay(s, c, i, v);
         } else {
@@ -3849,37 +3893,11 @@ function closeShopDetail() {
   }
 
 
-  function positionDiscoverScrub(ctrl) {
-    if (!ctrl || !ctrl.stage || !ctrl.meta || !ctrl.slides.length) return;
-    var stageBox = ctrl.stage.getBoundingClientRect();
-    var metaBox = ctrl.meta.getBoundingClientRect();
-    if (stageBox.height <= 0 || metaBox.height <= 0) return;
-    // Timeline sits just above the top edge of the actual product+caption block.
-    var bottom = Math.max(80, Math.min(stageBox.height - 34, stageBox.bottom - metaBox.top + 10));
-    ctrl.slides.forEach(function (s) {
-      if (s.seek) s.node.style.setProperty('--v247-scrub-bottom', Math.round(bottom) + 'px');
-    });
-  }
-  var v247LayoutObserver = null;
-  function setupDiscoverScrubPositions() {
-    if (v247LayoutObserver) { v247LayoutObserver.disconnect(); v247LayoutObserver = null; }
-    if ('ResizeObserver' in window) {
-      v247LayoutObserver = new ResizeObserver(function () {
-        posts.forEach(positionDiscoverScrub);
-      });
-      posts.forEach(function (c) {
-        if (c.meta) v247LayoutObserver.observe(c.meta);
-        if (c.stage) v247LayoutObserver.observe(c.stage);
-      });
-    }
-    window.requestAnimationFrame(function () { posts.forEach(positionDiscoverScrub); });
-  }
   function buildFeed(list) {
     teardownFeed();
     clear(feedEl);
     posts = list.map(buildPost);
     posts.forEach(function (c) { feedEl.appendChild(c.root); });
-    setupDiscoverScrubPositions();
     feedStatusEl.hidden = true;
     feedEl.hidden = false;
     if ($('discoverFirstArt')) $('discoverFirstArt').hidden = true;
@@ -3900,7 +3918,6 @@ function closeShopDetail() {
 
   function teardownFeed() {
     if (io) { io.disconnect(); io = null; }
-    if (v247LayoutObserver) { v247LayoutObserver.disconnect(); v247LayoutObserver = null; }
     pauseAll();
     posts.forEach(function (c) {
       c.slides.forEach(function (s) {
