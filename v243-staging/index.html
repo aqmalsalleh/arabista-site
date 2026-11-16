@@ -3497,14 +3497,23 @@ function attachSheetResizeHandle(handle,sheet,apply,ratio){
       if ($('btnDokuAuthorize').disabled || !state.last || !state.last.order_id) return;
       $('btnDokuAuthorize').disabled = true;
       busy('cartBusy', true, 'Authorizing one synthetic sandbox transaction…');
-      call('arabistaV243OwnerIssueSandboxOneTx', {
+      // Pages uses public authorize_only (no Create). Staff HtmlService keeps owner issuer.
+      var authRpc = (window.ArabistaV243Bridge && typeof window.ArabistaV243Bridge.call === 'function')
+        ? 'arabistaV243PublicPrepareSandboxPayment'
+        : 'arabistaV243OwnerIssueSandboxOneTx';
+      var authArgs = {
         order_id: state.last.order_id,
         checkout_id: state.last.checkout_id
-      }, function (x) {
+      };
+      if (authRpc === 'arabistaV243PublicPrepareSandboxPayment') {
+        authArgs.authorize_only = true;
+        authArgs.create_payment = false;
+      }
+      call(authRpc, authArgs, function (x) {
         busy('cartBusy', false);
         render('result', x);
         $('quoteNotice').textContent = x && x.ok && x.issued
-          ? 'Owner-only sandbox authorization issued for this exact DEV order. Choose Start DOKU sandbox to pay.'
+          ? 'Sandbox authorization issued for this exact DEV order (no payment created). Choose Start DOKU sandbox to pay.'
           : 'Sandbox authorization refused: ' + String((x && x.reason) || 'unavailable') + '. No payment created.';
         loadJourneyCapabilities();
         renderProfile();
