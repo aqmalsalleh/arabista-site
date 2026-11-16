@@ -1348,6 +1348,44 @@ body.is-discover #feed .post.has-video .meta{
 #feedStatus:not(:empty){position:relative;z-index:1;background:rgba(9,9,9,.45)}
 #feed{position:relative;z-index:1}
 
+
+/* v2.46 touch-first video gestures — transparent hit target, glass seek above product chip */
+#feed .slide .v246-tap-cover{
+  position:absolute;inset:0;z-index:2;width:100%;height:100%;
+  background:transparent!important;outline:none;border:0;box-shadow:none;
+  border-radius:0;-webkit-tap-highlight-color:transparent!important;
+  touch-action:pan-y;user-select:none;-webkit-user-select:none;cursor:pointer
+}
+#feed .slide .v246-tap-cover:focus-visible{outline:2px solid rgba(237,208,158,.8);outline-offset:-4px}
+#feed .slide .v246-scrub{
+  left:16px!important;right:60px!important;bottom:var(--v247-scrub-bottom, 206px)!important;
+  border:1px solid rgba(255,255,255,.17)!important;
+  background:rgba(14,13,11,.17)!important;
+  backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+  border-radius:999px!important;padding:0 11px!important;
+  height:30px!important;min-height:30px!important;max-height:30px!important;
+  box-sizing:border-box;box-shadow:none!important;
+  opacity:0;transition:opacity .16s ease!important
+}
+#feed .slide .v246-range{height:30px!important;touch-action:none!important;-webkit-tap-highlight-color:transparent}
+#feed .slide .v246-range::-webkit-slider-runnable-track{height:2px;background:rgba(255,255,255,.62)}
+#feed .slide .v246-range::-webkit-slider-thumb{height:10px;width:10px;margin-top:-4px;background:#f6eddf;border:0;box-shadow:0 0 0 5px rgba(255,255,255,.08)}
+#feed .slide .v246-range::-moz-range-track{height:2px;background:rgba(255,255,255,.62)}
+#feed .slide .v246-range::-moz-range-thumb{height:10px;width:10px;background:#f6eddf;border:0;box-shadow:0 0 0 5px rgba(255,255,255,.08)}
+#feed .slide.v247-scrubbing .v246-scrub{opacity:1!important;pointer-events:auto!important}
+#feed .slide .play-btn{
+  width:72px!important;height:72px!important;min-height:72px!important;
+  min-width:72px!important;border:0!important;background:transparent!important;
+  border-radius:0!important;box-shadow:none!important;
+  backdrop-filter:none!important;-webkit-backdrop-filter:none!important;
+  -webkit-tap-highlight-color:transparent!important;
+  font-size:39px!important;color:rgba(255,255,255,.92)!important;
+  text-shadow:0 3px 14px rgba(0,0,0,.45)!important;transition:opacity .12s ease!important
+}
+#feed .slide .play-btn:active{background:transparent!important}
+@media(max-width:360px){#feed .slide .v246-scrub{right:52px!important;left:11px!important}}
+@media(prefers-reduced-motion:reduce){#feed .slide .v246-scrub,#feed .slide .play-btn{transition:none!important}}
+
 </style>
 <link rel="preload" as="image" fetchpriority="high" href="https://imagedelivery.net/32oxijRdypCO4dk5WrGLwg/c2726925-9313-4bc7-9733-83f5d9429600/public">
 </head>
@@ -3192,11 +3230,95 @@ function closeShopDetail() {
     }, 3000);
   }
   function v246SetupVideoInteraction(slide) {
-    var tap = document.createElement('button');
-    tap.type = 'button';
+    // A transparent div avoids large browser-native button tap highlights / circular flashes.
+    var tap = document.createElement('div');
     tap.className = 'v246-tap-cover';
-    tap.setAttribute('aria-label', 'Pause or resume video');
-    tap.addEventListener('click', function () { togglePlay(slide); v246ShowTimeline(slide); });
+    tap.setAttribute('role', 'button');
+    tap.setAttribute('tabindex', '0');
+    tap.setAttribute('aria-label', 'Pause or resume. Drag horizontally to seek through video');
+    var contact = null;
+    var seekFrame = 0;
+    var queuedTime = null;
+
+    function validDuration() {
+      var player = v246Player(slide);
+      var duration = player ? Number(player.duration) : 0;
+      return isFinite(duration) && duration > 0 ? duration : 0;
+    }
+    function setSeekTime(target, duration) {
+      if (!duration) return;
+      var safe = Math.max(0, Math.min(duration, target));
+      queuedTime = safe;
+      slide.seek.value = String(Math.round(safe / duration * 1000));
+      slide.seek.setAttribute('aria-valuetext', v246Clock(safe) + ' of ' + v246Clock(duration));
+      if (slide.timeLabel) slide.timeLabel.textContent = v246Clock(safe) + ' / ' + v246Clock(duration);
+      if (!seekFrame) {
+        seekFrame = window.requestAnimationFrame(function () {
+          seekFrame = 0;
+          var player = v246Player(slide);
+          if (!player || queuedTime == null) return;
+          try { player.currentTime = queuedTime; } catch (ignored) {}
+        });
+      }
+    }
+    function finishTouch(e, cancelled) {
+      if (!contact || (e && contact.id !== e.pointerId)) return;
+      var wasDragging = !!contact.dragging;
+      var wasVertical = !!contact.vertical;
+      if (wasDragging) {
+        if (seekFrame) { window.cancelAnimationFrame(seekFrame); seekFrame = 0; }
+        var player = v246Player(slide);
+        if (player && queuedTime != null) {
+          try { player.currentTime = queuedTime; } catch (ignored) {}
+        }
+        slide.seekDragging = false;
+        slide.node.classList.remove('v247-scrubbing');
+        v246UpdateTimeline(slide);
+        v246ShowTimeline(slide);
+      } else if (!cancelled && !wasVertical) {
+        var moved = Math.hypot(e.clientX - contact.x, e.clientY - contact.y);
+        if (moved < 12) { togglePlay(slide); v246ShowTimeline(slide); }
+      }
+      contact = null;
+    }
+    tap.addEventListener('pointerdown', function (e) {
+      if (e.pointerType === 'mouse' && e.button !== 0) return;
+      if (contact) return;
+      var player = v246Player(slide);
+      contact = {
+        id: e.pointerId, x: e.clientX, y: e.clientY,
+        t: player && isFinite(Number(player.currentTime)) ? Number(player.currentTime) : 0,
+        dragging: false, vertical: false
+      };
+    });
+    tap.addEventListener('pointermove', function (e) {
+      if (!contact || contact.id !== e.pointerId || contact.vertical) return;
+      var dx = e.clientX - contact.x;
+      var dy = e.clientY - contact.y;
+      if (!contact.dragging) {
+        if (Math.abs(dy) > 12 && Math.abs(dy) > Math.abs(dx)) {
+          contact.vertical = true; return;
+        }
+        if (Math.abs(dx) < 10 || Math.abs(dx) <= Math.abs(dy) * 1.15) return;
+        if (!validDuration()) return;
+        contact.dragging = true;
+        slide.seekDragging = true;
+        slide.node.classList.add('v247-scrubbing');
+        try { tap.setPointerCapture(e.pointerId); } catch (ignored) {}
+      }
+      var duration = validDuration();
+      if (duration) {
+        setSeekTime(contact.t + dx / Math.max(1, slide.node.clientWidth) * duration, duration);
+        v246ShowTimeline(slide);
+      }
+    });
+    tap.addEventListener('pointerup', function (e) { finishTouch(e, false); });
+    tap.addEventListener('pointercancel', function (e) { finishTouch(e, true); });
+    tap.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault(); togglePlay(slide); v246ShowTimeline(slide);
+      }
+    });
     slide.node.appendChild(tap);
     var bar = document.createElement('div');
     bar.className = 'v246-scrub';
@@ -3210,16 +3332,12 @@ function closeShopDetail() {
     time.className = 'v246-time';
     time.textContent = '0:00 / 0:00';
     seek.addEventListener('pointerdown', function () { slide.seekDragging = true; v246ShowTimeline(slide); });
-    seek.addEventListener('pointerup', function () { slide.seekDragging = false; });
+    seek.addEventListener('pointerup', function () { slide.seekDragging = false; v246UpdateTimeline(slide); });
+    seek.addEventListener('pointercancel', function () { slide.seekDragging = false; v246UpdateTimeline(slide); });
     seek.addEventListener('change', function () { slide.seekDragging = false; v246UpdateTimeline(slide); });
     seek.addEventListener('input', function () {
-      var player = v246Player(slide);
-      var duration = player ? Number(player.duration) : 0;
-      if (isFinite(duration) && duration > 0) {
-        try { player.currentTime = duration * Number(seek.value) / 1000; } catch (ignored) {}
-        time.textContent = v246Clock(duration * Number(seek.value) / 1000) + ' / ' + v246Clock(duration);
-        seek.setAttribute('aria-valuetext', v246Clock(duration * Number(seek.value) / 1000) + ' of ' + v246Clock(duration));
-      }
+      var duration = validDuration();
+      if (duration) setSeekTime(duration * Number(seek.value) / 1000, duration);
       v246ShowTimeline(slide);
     });
     bar.appendChild(seek);
@@ -3491,6 +3609,8 @@ function closeShopDetail() {
     }
     stage.appendChild(meta);
 
+    ctrl.stage = stage;
+    ctrl.meta = meta;
     ctrl.root.appendChild(stage);
     return ctrl;
   }
@@ -3610,11 +3730,38 @@ function closeShopDetail() {
     if (i !== activeIdx) { activeIdx = i; }
   }
 
+
+  function positionDiscoverScrub(ctrl) {
+    if (!ctrl || !ctrl.stage || !ctrl.meta || !ctrl.slides.length) return;
+    var stageBox = ctrl.stage.getBoundingClientRect();
+    var metaBox = ctrl.meta.getBoundingClientRect();
+    if (stageBox.height <= 0 || metaBox.height <= 0) return;
+    // Timeline sits just above the top edge of the actual product+caption block.
+    var bottom = Math.max(80, Math.min(stageBox.height - 34, stageBox.bottom - metaBox.top + 10));
+    ctrl.slides.forEach(function (s) {
+      if (s.seek) s.node.style.setProperty('--v247-scrub-bottom', Math.round(bottom) + 'px');
+    });
+  }
+  var v247LayoutObserver = null;
+  function setupDiscoverScrubPositions() {
+    if (v247LayoutObserver) { v247LayoutObserver.disconnect(); v247LayoutObserver = null; }
+    if ('ResizeObserver' in window) {
+      v247LayoutObserver = new ResizeObserver(function () {
+        posts.forEach(positionDiscoverScrub);
+      });
+      posts.forEach(function (c) {
+        if (c.meta) v247LayoutObserver.observe(c.meta);
+        if (c.stage) v247LayoutObserver.observe(c.stage);
+      });
+    }
+    window.requestAnimationFrame(function () { posts.forEach(positionDiscoverScrub); });
+  }
   function buildFeed(list) {
     teardownFeed();
     clear(feedEl);
     posts = list.map(buildPost);
     posts.forEach(function (c) { feedEl.appendChild(c.root); });
+    setupDiscoverScrubPositions();
     feedStatusEl.hidden = true;
     feedEl.hidden = false;
     if ($('discoverFirstArt')) $('discoverFirstArt').hidden = true;
@@ -3645,6 +3792,7 @@ function closeShopDetail() {
 
   function teardownFeed() {
     if (io) { io.disconnect(); io = null; }
+    if (v247LayoutObserver) { v247LayoutObserver.disconnect(); v247LayoutObserver = null; }
     pauseAll();
     posts.forEach(function (c) {
       c.slides.forEach(function (s) {
