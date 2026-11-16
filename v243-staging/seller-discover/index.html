@@ -161,6 +161,24 @@
       .media-selected-actions{flex-wrap:wrap}
     }
 
+
+/* Premium publication confirmation */
+.publish-overlay[hidden]{display:none!important}
+.publish-overlay{position:fixed;inset:0;z-index:60;display:flex;align-items:center;justify-content:center;padding:22px;background:rgba(18,15,13,.57);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+.publish-card{position:relative;width:min(100%,395px);padding:39px 25px 27px;border-radius:24px;background:linear-gradient(160deg,#fff 32%,#faf7f2);text-align:center;box-shadow:0 25px 80px rgba(16,13,10,.24);animation:publish-card-in .55s cubic-bezier(.2,.9,.2,1) both}
+.publish-close{position:absolute;right:13px;top:13px;width:40px;height:40px;display:grid;place-items:center;border-radius:50%;color:#8a8178;font:400 26px/1 Arial,sans-serif}
+.publish-seal{position:relative;margin:0 auto 21px;width:92px;height:92px;display:grid;place-items:center;border:1px solid #eadac1;border-radius:50%;background:radial-gradient(circle at 35% 20%,#fff8e9,#eedfc5);box-shadow:0 0 0 9px rgba(184,151,97,.07),0 10px 28px rgba(133,103,56,.13)}
+.publish-seal svg{width:42px;height:42px;color:#917042;stroke-dasharray:54;stroke-dashoffset:54;animation:publish-check-in .65s .22s cubic-bezier(.2,.8,.2,1) forwards}
+.publish-kicker{font:700 10px/1.5 -apple-system,sans-serif;letter-spacing:.23em;color:#a58b62}
+.publish-card h2{margin:9px 0 11px;font:400 32px/1.12 Georgia,serif;letter-spacing:-.045em;color:#29231e}
+.publish-card p{max-width:255px;margin:0 auto 26px;font:400 13px/1.7 -apple-system,sans-serif;color:#80766b}
+.publish-view{display:flex;align-items:center;justify-content:center;gap:10px;min-height:50px;padding:12px 18px;border-radius:12px;background:#292520;color:#fff;text-decoration:none;font:700 14px/1 -apple-system,sans-serif}
+.publish-view:active{transform:scale(.985)}
+.publish-another{width:100%;min-height:45px;margin-top:9px;border:0;border-radius:12px;background:transparent;color:#857664;font:650 13px/1 -apple-system,sans-serif}
+.publish-card :is(a,button):focus-visible{outline:2px solid #ac8d5d;outline-offset:3px}
+@keyframes publish-card-in{from{opacity:0;transform:translateY(16px) scale(.96)}to{opacity:1;transform:none}}
+@keyframes publish-check-in{to{stroke-dashoffset:0}}
+@media(prefers-reduced-motion:reduce){.publish-card,.publish-seal svg{animation:none!important}.publish-seal svg{stroke-dashoffset:0!important}}
   </style>
 </head>
 <body>
@@ -268,6 +286,17 @@
   <div class="dock">
     <button type="button" id="btnDraft">Save draft</button>
     <button type="button" id="btnPublish">Publish</button>
+  </div>
+  <div class="publish-overlay" id="publishOverlay" hidden>
+    <section class="publish-card" role="dialog" aria-modal="true" aria-labelledby="publishTitle" aria-describedby="publishDescription">
+      <button type="button" class="publish-close" id="publishClose" aria-label="Close confirmation">×</button>
+      <div class="publish-seal" aria-hidden="true"><svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 25l8 8 16-18"/></svg></div>
+      <span class="publish-kicker">ARABISTA DISCOVER</span>
+      <h2 id="publishTitle">Beautifully published.</h2>
+      <p id="publishDescription">Your post is live on Discover and ready to be viewed.</p>
+      <a class="publish-view" id="publishView" href="../" target="_blank" rel="noopener noreferrer">View your post <span aria-hidden="true">↗</span></a>
+      <button type="button" class="publish-another" id="publishAnother">Create another post</button>
+    </section>
   </div>
 
   <script src="../bridge-client.js?v=246seller1"></script>
@@ -602,6 +631,38 @@
     } catch (e) { say(e.message || 'Could not save draft.', true); }
   }
 
+
+  function publishedPostUrl(postId) {
+    var url = new URL('../', window.location.href);
+    url.searchParams.set('post', String(postId || '').slice(0, 100));
+    return url.href;
+  }
+  var prePublishFocus = null;
+  function closePublishedModal() {
+    $('publishOverlay').hidden = true;
+    if (prePublishFocus && typeof prePublishFocus.focus === 'function') prePublishFocus.focus();
+  }
+  function showPublishedModal(postId) {
+    if (!postId) return;
+    $('publishView').href = publishedPostUrl(postId);
+    prePublishFocus = document.activeElement;
+    $('publishOverlay').hidden = false;
+    $('publishView').focus();
+  }
+  $('publishClose').addEventListener('click', closePublishedModal);
+  $('publishAnother').addEventListener('click', function () { closePublishedModal(); reset(); window.scrollTo({top:0,behavior:'smooth'}); });
+  $('publishOverlay').addEventListener('click', function (e) { if (e.target === $('publishOverlay')) closePublishedModal(); });
+  document.addEventListener('keydown', function (e) {
+    if ($('publishOverlay').hidden) return;
+    if (e.key === 'Escape') { e.preventDefault(); closePublishedModal(); }
+    if (e.key === 'Tab') {
+      var controls = [$('publishClose'), $('publishView'), $('publishAnother')];
+      var n = controls.indexOf(document.activeElement);
+      if (e.shiftKey && n <= 0) { e.preventDefault(); controls[controls.length-1].focus(); }
+      if (!e.shiftKey && n === controls.length-1) { e.preventDefault(); controls[0].focus(); }
+    }
+  });
+
   async function doPublish() {
     try {
       if (!selectedProducts().length) {
@@ -624,8 +685,9 @@
       }, 60000);
       if (!pub || !pub.ok) throw new Error(friendly(pub));
       setPhase(100, 'Published');
-      say('Published. Open Discover to view it.');
+      say('Published.');
       loadLibrary();
+      showPublishedModal(st.video_id);
     } catch (e) {
       say(e.message || 'Could not publish yet.', true);
     } finally {
