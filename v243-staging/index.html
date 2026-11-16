@@ -3523,13 +3523,32 @@ function attachSheetResizeHandle(handle,sheet,apply,ratio){
     });
   });
 
+  function handleDokuReturnLanding() {
+    var params;
+    try { params = new URLSearchParams(location.search || ''); } catch (e) { return false; }
+    var dokuReturn = params.get('doku_return') === '1' || params.get('doku_return') === 'true';
+    var invoice = String(params.get('invoice') || params.get('invoice_no') || '').trim();
+    if (!dokuReturn && !invoice) return false;
+    show('orders');
+    if ($('orderNotice')) {
+      $('orderNotice').textContent = dokuReturn
+        ? 'Returned from DOKU sandbox. This redirect is not payment confirmation — use Reconcile DOKU or open the purchase-bound order after authoritative Retrieve.'
+        : ('Invoice locator ' + invoice + ' noted. Private details still require the purchase-bound grant in this session.');
+    }
+    if (typeof syncDokuButtons === 'function') syncDokuButtons();
+    if (state.grant && state.last && state.last.order_id && $('btnOpenOrder') && !$('btnOpenOrder').disabled) {
+      try { $('btnOpenOrder').click(); } catch (openErr) {}
+    }
+    return true;
+  }
+
   function startConnectedCustomerApp() {
     restorePurchaseSession();
     load();
     drawBasket();
     setCheckoutStep(0);
     loadJourneyCapabilities();
-    show('discover');
+    if (!handleDokuReturnLanding()) show('discover');
     busy('entryBusy', true, 'Opening Arabista…');
     // The initial brand transition is bounded even if DEV Sheets/Apps Script is slow or unavailable.
     window.setTimeout(function () { busy('entryBusy', false); }, 4500);
