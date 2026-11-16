@@ -1386,6 +1386,56 @@ body.is-discover #feed .post.has-video .meta{
 @media(max-width:360px){#feed .slide .v246-scrub{right:52px!important;left:11px!important}}
 @media(prefers-reduced-motion:reduce){#feed .slide .v246-scrub,#feed .slide .play-btn{transition:none!important}}
 
+
+/* v2.46 precision polish: uniform content position, gesture-only seek, matched cart numerals */
+body.is-discover #feed .post.has-video .meta{
+  bottom:calc(54px + env(safe-area-inset-bottom,0px) + 13px)!important
+}
+#feed .slide .v246-scrub,
+#feed .slide.v246-show-scrub .v246-scrub,
+#feed .slide.v246-paused .v246-scrub,
+#feed .slide:hover .v246-scrub,
+#feed .slide:focus-within .v246-scrub{
+  left:13px!important;right:13px!important;width:auto!important;
+  bottom:var(--v247-scrub-bottom,155px)!important;
+  display:block!important;height:2px!important;min-height:2px!important;max-height:2px!important;
+  border:0!important;border-radius:0!important;padding:0!important;
+  background:transparent!important;box-shadow:none!important;
+  backdrop-filter:none!important;-webkit-backdrop-filter:none!important;
+  opacity:0!important;pointer-events:none!important;transition:none!important
+}
+#feed .slide.v247-scrubbing .v246-scrub,
+#feed .slide.v247-scrubbing:hover .v246-scrub{
+  opacity:1!important;pointer-events:none!important
+}
+#feed .slide .v246-range{
+  display:block!important;width:100%!important;height:2px!important;
+  min-height:2px!important;padding:0!important;margin:0!important;
+  border:0!important;border-radius:0!important;
+  appearance:none!important;-webkit-appearance:none!important;
+  pointer-events:none!important;opacity:1!important;
+  background:linear-gradient(to right,
+    rgba(253,250,244,.84) 0%,rgba(253,250,244,.84) var(--seek-progress,0%),
+    rgba(253,250,244,.33) var(--seek-progress,0%),rgba(253,250,244,.33) 100%)!important
+}
+#feed .slide .v246-range::-webkit-slider-runnable-track{height:2px!important;background:transparent!important;border:0!important}
+#feed .slide .v246-range::-moz-range-track{height:2px!important;background:transparent!important;border:0!important}
+#feed .slide .v246-range::-webkit-slider-thumb{
+  width:0!important;height:0!important;margin:0!important;border:0!important;
+  box-shadow:none!important;background:transparent!important;-webkit-appearance:none!important
+}
+#feed .slide .v246-range::-moz-range-thumb{
+  width:0!important;height:0!important;border:0!important;box-shadow:none!important;
+  background:transparent!important
+}
+#tab-cart #cartBadge:not([hidden]){
+  background:var(--premium-gold)!important;color:#fff!important;
+  font:800 10px/1 var(--premium-font)!important;letter-spacing:0!important;
+  min-width:18px!important;height:18px!important;border:0!important;
+  border-radius:99px!important;padding:0 3px!important;
+  box-shadow:none!important;text-shadow:none!important
+}
+
 </style>
 <link rel="preload" as="image" fetchpriority="high" href="https://imagedelivery.net/32oxijRdypCO4dk5WrGLwg/c2726925-9313-4bc7-9733-83f5d9429600/public">
 </head>
@@ -3218,16 +3268,16 @@ function closeShopDetail() {
     if (!isFinite(duration) || duration < 0) duration = 0;
     if (!isFinite(time) || time < 0) time = 0;
     slide.seek.value = duration ? String(Math.round(Math.min(time / duration, 1) * 1000)) : '0';
+    slide.seek.style.setProperty('--seek-progress', (Number(slide.seek.value) / 10) + '%');
     slide.seek.disabled = !duration;
     if (slide.timeLabel) slide.timeLabel.textContent = v246Clock(time) + ' / ' + v246Clock(duration);
     slide.seek.setAttribute('aria-valuetext', v246Clock(time) + ' of ' + v246Clock(duration));
   }
   function v246ShowTimeline(slide) {
-    slide.node.classList.add('v246-show-scrub');
+    // Only horizontal drag gestures may display the single translucent progress line.
     if (slide.scrubTimer) clearTimeout(slide.scrubTimer);
-    slide.scrubTimer = setTimeout(function () {
-      if (!slide.seekDragging && !slide.userPaused) slide.node.classList.remove('v246-show-scrub');
-    }, 3000);
+    slide.node.classList.remove('v246-show-scrub');
+    if (!slide.seekDragging) slide.node.classList.remove('v247-scrubbing');
   }
   function v246SetupVideoInteraction(slide) {
     // A transparent div avoids large browser-native button tap highlights / circular flashes.
@@ -3250,6 +3300,7 @@ function closeShopDetail() {
       var safe = Math.max(0, Math.min(duration, target));
       queuedTime = safe;
       slide.seek.value = String(Math.round(safe / duration * 1000));
+      slide.seek.style.setProperty('--seek-progress', (Number(slide.seek.value) / 10) + '%');
       slide.seek.setAttribute('aria-valuetext', v246Clock(safe) + ' of ' + v246Clock(duration));
       if (slide.timeLabel) slide.timeLabel.textContent = v246Clock(safe) + ' / ' + v246Clock(duration);
       if (!seekFrame) {
@@ -3275,6 +3326,7 @@ function closeShopDetail() {
         slide.node.classList.remove('v247-scrubbing');
         v246UpdateTimeline(slide);
         v246ShowTimeline(slide);
+        if (!slide.userPaused) syncAll();
       } else if (!cancelled && !wasVertical) {
         var moved = Math.hypot(e.clientX - contact.x, e.clientY - contact.y);
         if (moved < 12) { togglePlay(slide); v246ShowTimeline(slide); }
@@ -3328,6 +3380,7 @@ function closeShopDetail() {
     seek.setAttribute('aria-label', 'Seek through video');
     seek.min = '0'; seek.max = '1000'; seek.step = '1'; seek.value = '0';
     seek.disabled = true;
+    seek.tabIndex = -1; // Hidden gesture-only line; keyboard playback remains on overlay.
     var time = document.createElement('span');
     time.className = 'v246-time';
     time.textContent = '0:00 / 0:00';
@@ -3364,8 +3417,15 @@ function closeShopDetail() {
         player.addEventListener(event, function () { v246UpdateTimeline(slide); });
       });
       player.addEventListener('play', function () { v246UpdateTimeline(slide); });
-      player.addEventListener('playing', function () { v246MarkFirstFrame(slide); });
-      player.addEventListener('pause', function () { v246UpdateTimeline(slide); });
+      player.addEventListener('playing', function () {
+        slide.streamPlayRequested = true;
+        slide.blocked = false;
+        v246MarkFirstFrame(slide);
+      });
+      player.addEventListener('pause', function () {
+        slide.streamPlayRequested = false;
+        v246UpdateTimeline(slide);
+      });
       v246UpdateTimeline(slide);
       syncAll();
     }).catch(function () {
@@ -3449,7 +3509,7 @@ function closeShopDetail() {
     if (!slide.video && !slide.iframe) return;
     var player = v246Player(slide);
     var currentlyPaused = slide.userPaused || (player ? !!player.paused : false);
-    if (currentlyPaused) { slide.userPaused = false; slide.userPlay = true; }
+    if (currentlyPaused) { slide.userPaused = false; slide.userPlay = true; slide.blocked = false; slide.mutedRetry = false; }
     else { slide.userPaused = true; slide.userPlay = false; }
     syncAll();
     v246ShowTimeline(slide);
@@ -3644,6 +3704,51 @@ function closeShopDetail() {
     });
   }
 
+
+  function v247TryPlay(slide, ctrl, postIndex, player) {
+    if (slide.playPending || slide.blocked || slide.userPaused || !player) return;
+    var token = (slide.playAttemptToken || 0) + 1;
+    slide.playAttemptToken = token;
+    slide.playPending = true;
+    if (slide.iframe) slide.streamPlayRequested = true;
+    function stillCurrent() {
+      return live() && activeIdx === postIndex && ctrl.slides[ctrl.index] === slide && !slide.userPaused;
+    }
+    function failed() {
+      if (token !== slide.playAttemptToken) return;
+      slide.playPending = false;
+      slide.streamPlayRequested = false;
+      if (!stillCurrent()) return;
+      if (!slide.mutedRetry && player.muted === false) {
+        // A scrolling gesture does not always authorize sound on iOS.
+        // Preserve autoplay by falling back to muted playback.
+        slide.mutedRetry = true;
+        soundOn = false;
+        autoSoundScrollHandled = true;
+        applyMuteState();
+        v247TryPlay(slide, ctrl, postIndex, player);
+        return;
+      }
+      slide.blocked = true;
+      updatePlayBtn(slide, ctrl, postIndex);
+    }
+    try {
+      var action = player.play();
+      Promise.resolve(action).then(function () {
+        if (token !== slide.playAttemptToken) return;
+        slide.playPending = false;
+        if (!stillCurrent()) {
+          slide.streamPlayRequested = false;
+          try { player.pause(); } catch (ignored) {}
+          return;
+        }
+        slide.blocked = false;
+        if (slide.iframe) slide.streamPlayRequested = true;
+        updatePlayBtn(slide, ctrl, postIndex);
+      }, failed);
+    } catch (err) { failed(); }
+  }
+
   /* ---- playback control: only the active slide of the active post plays ---- */
 
   function live() { return tabId === 'discover' && !document.hidden; }
@@ -3655,28 +3760,33 @@ function closeShopDetail() {
       var active = on && i === activeIdx;
       c.slides.forEach(function (s, si) {
         if (s.failed) return;
+        var wantPlay = active && si === c.index && (reduced() ? s.userPlay : !s.userPaused);
         if (s.iframe) {
-          // Buffer up to three next and two previous posts while only the active one plays.
           var near = on && i >= activeIdx - 2 && i <= activeIdx + 3 && si === c.index;
-          var wantIframe = active && si === c.index && (reduced() ? s.userPlay : !s.userPaused);
           if (near) ensureSrc(s);
           if (s.stream) {
-            if (wantIframe && !s.streamPlayRequested) {
-              s.streamPlayRequested = true;
-              try {
-                var playing = s.stream.play();
-                if (playing && typeof playing.catch === 'function') playing.catch(function () {
-                  s.streamPlayRequested = false; s.userPaused = true; updatePlayBtn(s, c, i);
-                });
-              } catch (ignored) { s.streamPlayRequested = false; s.userPaused = true; }
-            } else if (!wantIframe && s.streamPlayRequested) {
-              s.streamPlayRequested = false;
-              try { s.stream.pause(); } catch (ignored) {}
+            if (wantPlay) {
+              // Cloudflare can pause a buffered player without clearing the old request flag.
+              if ((!s.streamPlayRequested || s.stream.paused === true) && !s.playPending && !s.blocked) {
+                v247TryPlay(s, c, i, s.stream);
+              }
+            } else {
+              if (s.streamPlayRequested || s.stream.paused === false || s.playPending) {
+                s.playAttemptToken = (s.playAttemptToken || 0) + 1;
+                s.playPending = false;
+                s.streamPlayRequested = false;
+                try { s.stream.pause(); } catch (ignored) {}
+              }
+              s.blocked = false;
+              s.mutedRetry = false;
             }
           }
           if (on && Math.abs(i - activeIdx) > 5 && s.iframe.getAttribute('src')) {
             if (s.stream) { try { s.stream.pause(); } catch (ignored) {} }
-            s.stream = null; s.streamPlayRequested = false;
+            s.playAttemptToken = (s.playAttemptToken || 0) + 1;
+            s.playPending = false;
+            s.stream = null;
+            s.streamPlayRequested = false;
             s.iframe.removeAttribute('src');
           }
           updatePlayBtn(s, c, i);
@@ -3684,17 +3794,18 @@ function closeShopDetail() {
         }
         var v = s.video;
         if (!v) return;
-        var wantPlay = active && si === c.index && (reduced() ? s.userPlay : !s.userPaused);
         if (active && si === c.index) ensureSrc(s);
         else if (on && i >= activeIdx - 2 && i <= activeIdx + 3 && si === 0) ensureSrc(s);
         if (wantPlay) {
-          s.blocked = false;
-          var pr = v.play();
-          if (pr && typeof pr.catch === 'function') {
-            pr.catch(function () { s.blocked = true; updatePlayBtn(s, c, i); });
+          if (v.paused && !s.playPending && !s.blocked) v247TryPlay(s, c, i, v);
+        } else {
+          if (s.playPending) {
+            s.playAttemptToken = (s.playAttemptToken || 0) + 1;
+            s.playPending = false;
           }
-        } else if (!v.paused) {
-          v.pause();
+          if (!v.paused) v.pause();
+          s.blocked = false;
+          s.mutedRetry = false;
         }
         updatePlayBtn(s, c, i);
       });
@@ -3705,7 +3816,7 @@ function closeShopDetail() {
     if (!s.playBtn) return;
     var isCurrent = i === activeIdx && c.slides.indexOf(s) === c.index;
     if (s.iframe) {
-      s.playBtn.hidden = !(isCurrent && s.userPaused);
+      s.playBtn.hidden = !(isCurrent && (s.userPaused || s.blocked));
       s.node.classList.toggle('v246-paused', isCurrent && !!s.userPaused);
       return;
     }
@@ -3720,6 +3831,10 @@ function closeShopDetail() {
         if (s.video && !s.video.paused) s.video.pause();
         if (s.stream) { try { s.stream.pause(); } catch (ignored) {} }
         s.streamPlayRequested = false;
+        if (s.playPending) {
+          s.playAttemptToken = (s.playAttemptToken || 0) + 1;
+          s.playPending = false;
+        }
       });
     });
   }
@@ -3776,17 +3891,7 @@ function closeShopDetail() {
       feedEl.scrollTop = targetIndex * (feedEl.clientHeight || 1);
       feedEl.style.scrollBehavior = previousBehavior;
     }
-    if ('IntersectionObserver' in window) {
-      io = new IntersectionObserver(function (entries) {
-        entries.forEach(function (e) {
-          if (e.isIntersecting && e.intersectionRatio >= 0.6) {
-            var i = Number(e.target.getAttribute('data-idx'));
-            if (i !== activeIdx) { activeIdx = i; syncAll(); }
-          }
-        });
-      }, { root: feedEl, threshold: [0.6] });
-      posts.forEach(function (c) { io.observe(c.root); });
-    }
+    // Scroll position, not a delayed intersection callback, is the playback authority.
     syncAll();
   }
 
@@ -3848,13 +3953,18 @@ function closeShopDetail() {
   });
   var scrollRaf = 0;
   feedEl.addEventListener('scroll', function () {
-    if (io || scrollRaf) return;
+    if (scrollRaf) return;
     scrollRaf = window.requestAnimationFrame(function () {
       scrollRaf = 0;
       var before = activeIdx;
       computeActiveFromScroll();
       if (before !== activeIdx) syncAll();
     });
+  }, { passive: true });
+  feedEl.addEventListener('scrollend', function () {
+    var before = activeIdx;
+    computeActiveFromScroll();
+    if (before !== activeIdx) syncAll();
   }, { passive: true });
 
   feedEl.addEventListener('keydown', function (e) {
