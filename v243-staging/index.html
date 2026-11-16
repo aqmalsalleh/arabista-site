@@ -3417,12 +3417,25 @@ function attachSheetResizeHandle(handle,sheet,apply,ratio){
     $('btnExecute').disabled = true;
     call('arabistaDevMultilineCheckoutExecute', intent(), function (x) {
       busy('cartBusy', false);
+      if (!x || x.ok !== true) {
+        // The server may have saved the order before a later Sheets read failed.
+        // Never overwrite a known good order or offer a blind second checkout.
+        var unknownOutcome = !x || x.reason === 'rpc_threw'
+          || x.outcome === 'AMBIGUOUS_REQUIRES_RECONCILIATION'
+          || /quota exceeded|read requests per minute/i.test(String(x.message || ''));
+        $('btnExecute').disabled = unknownOutcome || lines().length < 2;
+        render('result', x || { ok: false, reason: 'checkout_response_missing' });
+        $('quoteNotice').textContent = unknownOutcome
+          ? 'Checkout outcome unconfirmed; your order may already exist. Do NOT place another order or start payment. Keep this browser session and ask staff to verify the order.'
+          : accessStatusMessage(x);
+        return;
+      }
       $('btnExecute').disabled = lines().length < 2;
       state.last = x;
       applyCheckoutAccess(x);
       render('result', x);
       showOrderSummary(null);
-      if (x && x.ok) setCheckoutStep(3);
+      setCheckoutStep(3);
       $('quoteNotice').textContent = accessStatusMessage(x);
       $('result').closest('details').open = false;
       $('grant').textContent = state.grant
@@ -3433,9 +3446,9 @@ function attachSheetResizeHandle(handle,sheet,apply,ratio){
       renderProfile();
     }, function (failure) {
       busy('cartBusy', false);
-      $('btnExecute').disabled = lines().length < 2;
+      $('btnExecute').disabled = true;
       render('result', failure);
-      $('quoteNotice').textContent = 'TEST_ONLY order could not be saved.';
+      $('quoteNotice').textContent = 'Checkout response unavailable; the order may already have been saved. Do NOT retry or start payment until staff verifies it.';
     });
   });
 
