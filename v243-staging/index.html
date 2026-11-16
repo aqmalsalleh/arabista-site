@@ -2960,9 +2960,9 @@ function closeShopDetail() {
   }
 
   function fingerprintPosts(list) {
-    return (list || []).map(function (p) {
-      return String(p.id || '') + ':' + String(p.type || '');
-    }).join('|');
+    // Full normalized-content fingerprint: a live caption, association, media or
+    // visibility correction must replace the instantly rendered older snapshot.
+    return JSON.stringify(list || []);
   }
 
   function validatePublicDiscoverSnapshot(raw) {
