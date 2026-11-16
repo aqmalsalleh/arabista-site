@@ -2766,7 +2766,16 @@ function closeShopDetail() {
   var feedStatusEl = $('feedStatus');
   var posts = [];          // controllers
   var activeIdx = -1;
-  var soundOn = false;     // autoplay is always muted; user may unmute by gesture
+  var soundOn = false;     // Entry always starts muted. First deliberate feed scroll may enable sound.
+  var soundChoiceIsManual = false;
+  var autoSoundScrollHandled = false;
+  var soundTouchStartY = null;
+  var requestedDiscoverPost = (function () {
+    try {
+      var id = new URLSearchParams(window.location.search).get('post') || '';
+      return /^[A-Za-z0-9_-]{1,100}$/.test(id) ? id : '';
+    } catch (ignored) { return ''; }
+  }());
   var io = null;
   var sheetState = null;
   var lastFocus = null;
@@ -3142,6 +3151,7 @@ function closeShopDetail() {
     slide.seek.value = duration ? String(Math.round(Math.min(time / duration, 1) * 1000)) : '0';
     slide.seek.disabled = !duration;
     if (slide.timeLabel) slide.timeLabel.textContent = v246Clock(time) + ' / ' + v246Clock(duration);
+    slide.seek.setAttribute('aria-valuetext', v246Clock(time) + ' of ' + v246Clock(duration));
   }
   function v246ShowTimeline(slide) {
     slide.node.classList.add('v246-show-scrub');
@@ -3177,6 +3187,7 @@ function closeShopDetail() {
       if (isFinite(duration) && duration > 0) {
         try { player.currentTime = duration * Number(seek.value) / 1000; } catch (ignored) {}
         time.textContent = v246Clock(duration * Number(seek.value) / 1000) + ' / ' + v246Clock(duration);
+        seek.setAttribute('aria-valuetext', v246Clock(duration * Number(seek.value) / 1000) + ' of ' + v246Clock(duration));
       }
       v246ShowTimeline(slide);
     });
@@ -3243,7 +3254,8 @@ function closeShopDetail() {
       frame.title = post.caption ? post.caption.slice(0, 120) : 'Discover video';
       frame.allow = 'autoplay; encrypted-media';
       frame.removeAttribute('allowfullscreen');
-      frame.loading = 'lazy';
+      // src is still assigned only to the active/nearby posts.
+      frame.loading = 'eager';
       frame.referrerPolicy = 'no-referrer';
       frame.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;border:0;background:#000';
       frame.dataset.src = spec.embed + (spec.embed.indexOf('?') < 0 ? '?' : '&') + 'controls=false&loop=true&muted=true';
@@ -3403,6 +3415,8 @@ function closeShopDetail() {
       mute.setAttribute('aria-label', soundOn ? 'Mute video' : 'Unmute video');
       mute.setAttribute('aria-pressed', soundOn ? 'true' : 'false');
       mute.addEventListener('click', function () {
+        soundChoiceIsManual = true;
+        autoSoundScrollHandled = true;
         soundOn = !soundOn;
         applyMuteState();
       });
@@ -3491,7 +3505,8 @@ function closeShopDetail() {
       c.slides.forEach(function (s, si) {
         if (s.failed) return;
         if (s.iframe) {
-          var near = on && Math.abs(i - activeIdx) <= 1 && si === c.index;
+          // Buffer up to three next and two previous posts while only the active one plays.
+          var near = on && i >= activeIdx - 2 && i <= activeIdx + 3 && si === c.index;
           var wantIframe = active && si === c.index && (reduced() ? s.userPlay : !s.userPaused);
           if (near) ensureSrc(s);
           if (s.stream) {
@@ -3508,7 +3523,7 @@ function closeShopDetail() {
               try { s.stream.pause(); } catch (ignored) {}
             }
           }
-          if (on && Math.abs(i - activeIdx) > 2 && s.iframe.getAttribute('src')) {
+          if (on && Math.abs(i - activeIdx) > 5 && s.iframe.getAttribute('src')) {
             if (s.stream) { try { s.stream.pause(); } catch (ignored) {} }
             s.stream = null; s.streamPlayRequested = false;
             s.iframe.removeAttribute('src');
@@ -3520,7 +3535,7 @@ function closeShopDetail() {
         if (!v) return;
         var wantPlay = active && si === c.index && (reduced() ? s.userPlay : !s.userPaused);
         if (active && si === c.index) ensureSrc(s);
-        else if (on && Math.abs(i - activeIdx) === 1 && si === 0) ensureSrc(s);
+        else if (on && i >= activeIdx - 2 && i <= activeIdx + 3 && si === 0) ensureSrc(s);
         if (wantPlay) {
           s.blocked = false;
           var pr = v.play();
@@ -3571,7 +3586,17 @@ function closeShopDetail() {
     posts.forEach(function (c) { feedEl.appendChild(c.root); });
     feedStatusEl.hidden = true;
     feedEl.hidden = false;
-    activeIdx = 0;
+    var targetIndex = requestedDiscoverPost
+      ? posts.findIndex(function (p) { return p.data && p.data.id === requestedDiscoverPost; })
+      : -1;
+    activeIdx = targetIndex >= 0 ? targetIndex : 0;
+    if (targetIndex >= 0) {
+      // Deep-link directly to the specific published post without replaying earlier media.
+      var previousBehavior = feedEl.style.scrollBehavior;
+      feedEl.style.scrollBehavior = 'auto';
+      feedEl.scrollTop = targetIndex * (feedEl.clientHeight || 1);
+      feedEl.style.scrollBehavior = previousBehavior;
+    }
     if ('IntersectionObserver' in window) {
       io = new IntersectionObserver(function (entries) {
         entries.forEach(function (e) {
@@ -3600,6 +3625,29 @@ function closeShopDetail() {
     v246LastMarkedIdx = -2;
   }
 
+
+  function enableSoundAfterScroll() {
+    if (autoSoundScrollHandled || soundChoiceIsManual || !live()) return;
+    autoSoundScrollHandled = true;
+    soundOn = true;
+    applyMuteState();
+    // Autoplay restrictions vary by iOS/browser: the explicit sound button remains available.
+  }
+  feedEl.addEventListener('touchstart', function (e) {
+    if (e.touches && e.touches.length === 1) soundTouchStartY = e.touches[0].clientY;
+  }, { passive: true });
+  feedEl.addEventListener('touchend', function (e) {
+    if (soundTouchStartY == null) return;
+    var endY = e.changedTouches && e.changedTouches[0] ? e.changedTouches[0].clientY : soundTouchStartY;
+    if (Math.abs(endY - soundTouchStartY) > 24) enableSoundAfterScroll();
+    soundTouchStartY = null;
+  }, { passive: true });
+  feedEl.addEventListener('wheel', function (e) {
+    if (Math.abs(e.deltaY) > 3) enableSoundAfterScroll();
+  }, { passive: true });
+  feedEl.addEventListener('keydown', function (e) {
+    if (['ArrowDown','ArrowUp','PageDown','PageUp'].indexOf(e.key) >= 0) enableSoundAfterScroll();
+  });
   var scrollRaf = 0;
   feedEl.addEventListener('scroll', function () {
     if (io || scrollRaf) return;
