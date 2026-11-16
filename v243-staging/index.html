@@ -3631,7 +3631,25 @@ function closeShopDetail() {
     autoSoundScrollHandled = true;
     soundOn = true;
     applyMuteState();
-    // Autoplay restrictions vary by iOS/browser: the explicit sound button remains available.
+    // Some browsers stop playback when audio is enabled without a suitable gesture.
+    // Recover muted playback rather than leave the current post frozen.
+    var ctrl = posts[activeIdx];
+    var slide = ctrl && ctrl.slides[ctrl.index];
+    var player = slide ? v246Player(slide) : null;
+    if (!player || typeof player.play !== 'function') return;
+    function recoverMuted() {
+      if (soundChoiceIsManual) return;
+      soundOn = false;
+      applyMuteState();
+      try {
+        var retry = player.play();
+        if (retry && typeof retry.catch === 'function') retry.catch(function () {});
+      } catch (ignored) {}
+    }
+    try {
+      var attempt = player.play();
+      if (attempt && typeof attempt.catch === 'function') attempt.catch(recoverMuted);
+    } catch (ignored) { recoverMuted(); }
   }
   feedEl.addEventListener('touchstart', function (e) {
     if (e.touches && e.touches.length === 1) soundTouchStartY = e.touches[0].clientY;
