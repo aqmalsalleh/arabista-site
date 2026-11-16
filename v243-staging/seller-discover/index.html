@@ -87,26 +87,143 @@
       body{max-width:480px;margin:0 auto;border-left:1px solid var(--line);border-right:1px solid var(--line)}
       .dock{max-width:480px;left:50%;transform:translateX(-50%)}
     }
+
+    /* v2.46 Create Post — owner-requested clean media picker and quiet header, UI-only */
+    .topbar{
+      display:grid;grid-template-columns:64px minmax(0,1fr) 64px;align-items:center;
+      min-height:64px;padding:9px var(--pad);border-bottom:1px solid var(--line)
+    }
+    .top-title{font-size:16px;font-weight:650;letter-spacing:-.025em}
+    .top-back{width:42px;height:42px;display:grid;place-items:center;color:#3b352f;
+      border-radius:50%;background:#f8f7f5;border:1px solid #f1efeb;text-decoration:none}
+    .top-back:active{background:#eeebe6}
+    .top-posts{justify-self:end;padding:0 1px;min-height:42px;font-size:13px;font-weight:650;color:#74695f;white-space:nowrap}
+    .top-back:focus-visible,.top-posts:focus-visible,
+    .media-empty:focus-within,.media-replace:focus-visible{outline:2px solid #9c8060;outline-offset:3px}
+    .media-section{margin:21px var(--pad) 0;padding:18px;border:1px solid #e9e5df;
+      border-radius:19px;background:#fff;box-shadow:0 8px 25px rgba(45,35,25,.035)}
+    .media-section [hidden]{display:none!important}
+    .media-heading{display:flex;justify-content:space-between;align-items:flex-end;gap:10px;margin:0 0 17px}
+    .media-eyebrow{display:block;font-size:10px;letter-spacing:.18em;font-weight:750;color:#a18c75;margin:0 0 5px}
+    .media-heading h2{font:400 23px/1.2 Georgia,"Times New Roman",serif;letter-spacing:-.035em;margin:0}
+    .media-count{font:600 11px/1.4 -apple-system,BlinkMacSystemFont,sans-serif;
+      color:#91877b;background:#f7f5f2;border-radius:99px;padding:6px 9px;white-space:nowrap}
+    .media-file-input{position:absolute;width:1px;height:1px;opacity:0;overflow:hidden;clip-path:inset(50%)}
+    .media-empty{min-height:273px;padding:24px 14px 19px;border-radius:15px;
+      border:1.5px dashed #d5cdc2;background:linear-gradient(145deg,#fcfbf9,#f7f4f0);
+      display:flex;flex-direction:column;align-items:center;justify-content:center;
+      text-align:center;cursor:pointer}
+    .media-empty:active{background:#f2eee8}
+    .media-icon{position:relative;display:grid;place-items:center;width:77px;height:77px;
+      border-radius:22px;background:#fff;color:#776856;margin-bottom:17px;
+      border:1px solid #eee9e1;box-shadow:0 6px 16px rgba(47,37,25,.035)}
+    .media-icon-plus{position:absolute;right:-6px;bottom:-6px;display:grid;place-items:center;
+      width:28px;height:28px;border-radius:50%;background:#28231e;color:#fff;
+      font:400 24px/1 Arial,sans-serif;border:3px solid #f8f6f2}
+    .media-empty strong{font:650 17px/1.35 -apple-system,BlinkMacSystemFont,sans-serif;letter-spacing:-.025em;color:#2a251f}
+    .media-description{font:400 13px/1.5 -apple-system,BlinkMacSystemFont,sans-serif;color:#81786e;margin-top:5px}
+    .media-choose{margin-top:18px;display:inline-flex;align-items:center;gap:14px;
+      padding:11px 16px;border-radius:10px;background:#28231e;color:#fff;
+      font:650 13px/1 -apple-system,BlinkMacSystemFont,sans-serif}
+    .media-choose span{font-size:20px;line-height:12px}
+    .media-empty small{font:500 11px/1.4 -apple-system,BlinkMacSystemFont,sans-serif;color:#a49a8f;margin-top:13px}
+    .media-selected{min-width:0}
+    .media-preview{display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x proximity;
+      padding:3px 1px 8px;-webkit-overflow-scrolling:touch;scrollbar-width:thin}
+    .media-preview .tile{flex:none;width:114px;height:157px;border-radius:11px;scroll-snap-align:start;
+      margin:0;background:#181614;border:1px solid #ece7df;box-shadow:0 2px 6px rgba(0,0,0,.03)}
+    .media-preview .tile video{object-fit:contain}
+    .media-preview .tile .ord{left:8px;top:8px;width:22px;height:22px;padding:0;
+      line-height:22px;background:rgba(20,17,14,.7)}
+    .media-selected.is-single .media-preview{justify-content:center;overflow:hidden}
+    .media-selected.is-single .tile{width:min(70%,230px);height:252px}
+    .media-selected-actions{display:flex;justify-content:space-between;align-items:center;
+      gap:10px;border-top:1px solid var(--line);margin-top:8px;padding-top:13px}
+    #mediaSelectedHint{font:500 12px/1.5 -apple-system,BlinkMacSystemFont,sans-serif;color:#8d8276}
+    .media-replace{display:inline-flex;align-items:center;justify-content:center;gap:6px;
+      padding:10px 12px;min-height:42px;border-radius:10px;background:#f5f2ed;
+      color:#52483d;cursor:pointer;font:650 12px/1 -apple-system,BlinkMacSystemFont,sans-serif;white-space:nowrap}
+    .media-existing{display:flex;align-items:center;gap:12px;padding:16px 12px;border:1px solid #e6e1da;
+      border-radius:12px;background:#faf8f5}
+    .media-existing-check{display:grid;place-items:center;flex:none;width:35px;height:35px;
+      border-radius:50%;color:#326a40;background:#e5f0e5;font-size:20px}
+    .media-existing>div{flex:1;min-width:0}
+    .media-existing strong,.media-existing>div span{display:block}
+    .media-existing strong{font-size:13px;line-height:1.5}
+    .media-existing>div span{font-size:11px;line-height:1.45;color:#85796d}
+    .media-section .progress-wrap{padding:16px 0 0}
+    .media-section .progress-track{height:4px}
+    .media-section .progress-label{margin-top:9px;font-size:12px;font-weight:600}
+    @media(max-width:360px){
+      .media-section{margin:16px 12px 0;padding:14px}
+      .media-empty{min-height:245px}
+      .media-count{font-size:10px}
+      .media-selected-actions{flex-wrap:wrap}
+    }
+
   </style>
 </head>
 <body>
   <header class="topbar">
-    <a class="top-link" href="../">Discover</a>
-    <div class="top-title">New post</div>
-    <button type="button" class="top-link" id="btnOpenPosts">Posts</button>
+    <a class="top-back" href="../" aria-label="Back to Discover" title="Back to Discover">
+      <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M15 18l-6-6 6-6"/>
+      </svg>
+    </a>
+    <div class="top-title">Create post</div>
+    <button type="button" class="top-link top-posts" id="btnOpenPosts">My posts</button>
   </header>
 
-  <div class="media-row">
-    <div id="preview" style="display:contents"></div>
-    <label class="add-tile">
-      <strong>+</strong><span>Add</span>
-      <input id="mediaFiles" type="file" accept="video/*,image/*" multiple>
+  <section class="media-section" aria-labelledby="mediaTitle">
+    <div class="media-heading">
+      <div>
+        <span class="media-eyebrow">YOUR CONTENT</span>
+        <h2 id="mediaTitle">Photos &amp; video</h2>
+      </div>
+      <span class="media-count" id="mediaCount">Nothing added</span>
+    </div>
+    <input id="mediaFiles" class="media-file-input" type="file" accept="video/*,image/*" multiple aria-label="Choose photos or a video">
+
+    <label class="media-empty" id="mediaEmpty" for="mediaFiles">
+      <span class="media-icon" aria-hidden="true">
+        <svg viewBox="0 0 48 48" width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="6.5" y="10.5" width="35" height="28" rx="6"/>
+          <circle cx="17" cy="20" r="3.25"/>
+          <path d="m10 34 9-9 7.5 7.5 6-6L39 33"/>
+        </svg>
+        <span class="media-icon-plus">+</span>
+      </span>
+      <strong>Add photos or a video</strong>
+      <span class="media-description">Choose something from your phone</span>
+      <span class="media-choose">Choose media <span aria-hidden="true">›</span></span>
+      <small>One video, one photo, or up to 10 photos</small>
     </label>
-  </div>
-  <div class="progress-wrap">
-    <div class="progress-track"><div class="progress-bar" id="progressBar"></div></div>
-    <div class="progress-label" id="progressLabel">Add photos or a video</div>
-  </div>
+
+    <div class="media-selected" id="mediaSelected" hidden>
+      <div class="media-preview" id="preview" aria-label="Selected media"></div>
+      <div class="media-selected-actions">
+        <span id="mediaSelectedHint">Your selection</span>
+        <label class="media-replace" for="mediaFiles">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true">
+            <path d="M20 7v5h-5M4 17v-5h5"/>
+            <path d="M6.3 9A7 7 0 0 1 18 6.5l2 5.5M4 12l2 5.5A7 7 0 0 0 18 15"/>
+          </svg>
+          Change media
+        </label>
+      </div>
+    </div>
+
+    <div class="media-existing" id="mediaExisting" hidden>
+      <span class="media-existing-check" aria-hidden="true">✓</span>
+      <div><strong>Media already added</strong><span>Your post's media is saved and ready.</span></div>
+      <label class="media-replace" for="mediaFiles">Change</label>
+    </div>
+
+    <div class="progress-wrap" id="progressWrap" hidden>
+      <div class="progress-track"><div class="progress-bar" id="progressBar"></div></div>
+      <div class="progress-label" id="progressLabel" role="status">Add photos or a video</div>
+    </div>
+  </section>
   <div class="caption-block">
     <textarea id="caption" maxlength="2200" rows="5" placeholder="Write a caption for your post"></textarea>
     <div class="caption-meta"><span id="captionCount">0 / 2200</span></div>
@@ -196,10 +313,24 @@
   function selectedProducts() {
     return catalog.filter(function (p) { return !!selectedIds[p.product_id]; });
   }
+  function syncMediaPicker() {
+    var count = selectedFiles.length;
+    var savedCount = count ? 0 : st.assets.length;
+    $('mediaEmpty').hidden = count > 0 || savedCount > 0;
+    $('mediaSelected').hidden = !count;
+    $('mediaExisting').hidden = !!count || !savedCount;
+    $('mediaSelected').classList.toggle('is-single', count === 1);
+    $('mediaCount').textContent = count
+      ? (count === 1 ? (kindOf(selectedFiles[0]) === 'VIDEO' ? '1 video' : '1 photo') : count + ' photos')
+      : (savedCount ? savedCount + ' saved' : 'Nothing added');
+    $('mediaSelectedHint').textContent = count === 1 ? '1 item selected' : count + ' photos selected';
+    $('progressWrap').hidden = !(count || savedCount || st.uploadProgress > 0);
+  }
   function setPhase(pct, label) {
     st.uploadProgress = Math.max(0, Math.min(100, Number(pct) || 0));
     $('progressBar').style.width = st.uploadProgress + '%';
     $('progressLabel').textContent = label || '';
+    syncMediaPicker();
   }
   function setBusy(v) {
     st.busy = !!v;
@@ -236,6 +367,7 @@
       fig.appendChild(ord);
       $('preview').appendChild(fig);
     });
+    syncMediaPicker();
   }
 
   function renderPicker(q) {
