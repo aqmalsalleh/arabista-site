@@ -57,6 +57,23 @@
     iframe.referrerPolicy = 'no-referrer';
     iframe.style.cssText = 'position:fixed;width:1px;height:1px;left:-9999px;top:0;opacity:0;border:0;pointer-events:none;';
     iframe.src = bridgeUrl;
+    iframe.addEventListener('load', function () {
+      // Re-request readiness in case the bridge announced before the parent listener attached.
+      var pings = 0;
+      var pingTimer = setInterval(function () {
+        if (ready || pings > 20) {
+          clearInterval(pingTimer);
+          return;
+        }
+        pings += 1;
+        try {
+          iframe.contentWindow.postMessage({
+            channel: 'arabista-v243',
+            type: 'bridge-ping'
+          }, '*');
+        } catch (e) {}
+      }, 500);
+    });
     document.body.appendChild(iframe);
     return whenReady();
   }
