@@ -1338,7 +1338,18 @@ body.is-discover #feed .post.has-video .meta{
 }
 @media(prefers-reduced-motion:reduce){#feed .slide .play-btn{transition:none!important}}
 
+
+/* v2.46 cold-start: verified public poster, visible before any RPC or JS feed hydration */
+#discover{position:relative!important}
+#discoverFirstArt{position:absolute;inset:0;z-index:0;overflow:hidden;background:#171513;pointer-events:none}
+#discoverFirstArt[hidden]{display:none!important}
+#discoverFirstArt img{display:block;width:100%;height:100%;object-fit:cover;object-position:center}
+#discoverFirstArt:after{content:"";position:absolute;inset:45% 0 0;background:linear-gradient(transparent,#0e0d0c33)}
+#feedStatus:not(:empty){position:relative;z-index:1;background:rgba(9,9,9,.45)}
+#feed{position:relative;z-index:1}
+
 </style>
+<link rel="preload" as="image" fetchpriority="high" href="https://imagedelivery.net/32oxijRdypCO4dk5WrGLwg/c2726925-9313-4bc7-9733-83f5d9429600/public">
 </head>
 <body>
 <div id="globalBusy" class="premium-loader" role="status" aria-live="polite" aria-label="Loading DEV service" hidden>
@@ -1373,6 +1384,7 @@ body.is-discover #feed .post.has-video .meta{
       <button type="button" data-go-tab="shop" data-shop-products="true" aria-label="Find products"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="7.5"/><path d="m16.4 16.4 5 5"/></svg></button>
       <button id="fypCart" class="fyp-cart" type="button" data-go-tab="cart" aria-label="Open Cart"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 4h2l2.1 11h11.7L21 7H6"/><circle cx="9" cy="20" r="1"/><circle cx="18" cy="20" r="1"/></svg><span id="fypCartCount" class="cart-count" hidden>0</span></button>
     </div>
+    <div id="discoverFirstArt" aria-hidden="true"><img src="https://imagedelivery.net/32oxijRdypCO4dk5WrGLwg/c2726925-9313-4bc7-9733-83f5d9429600/public" alt="" fetchpriority="high"></div>
     <div id="feedStatus" class="feed-status" role="status" aria-live="polite"></div>
     <div id="feed" tabindex="0" aria-label="Discover posts. Scroll vertically between posts." hidden></div>
   </section>
@@ -1621,6 +1633,7 @@ body.is-discover #feed .post.has-video .meta{
 <div id="backdrop" class="backdrop" hidden></div>
 <div id="sheet" class="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle" hidden></div>
 <div id="toast" role="status" aria-live="polite"></div>
+<script type="application/json" id="discoverInstantSnapshot">{"schema":"arabista-v243-discover-public-snapshot/v1","generated_at_utc":"2026-11-16T08:51:47.283Z","max_age_seconds":21600,"environment":"DEV_SANDBOX","source_outcome":"DEV_DISCOVER_FEED_V227","count":3,"posts":[{"video_id":"syn-post-69edabe986","post_type":"IMAGE","caption":"DEV test image","sort_position":0,"media":{"projected":true,"placeholder":false,"reason":null,"post_type":"IMAGE","slides":[{"media_id":"syn-media-3ba59dab6173","media_kind":"IMAGE","provider":"CLOUDFLARE_IMAGES","delivery_ref":"https://imagedelivery.net/32oxijRdypCO4dk5WrGLwg/c2726925-9313-4bc7-9733-83f5d9429600/public","embed_ref":"","playback_mode":"progressive","poster_ref":"https://imagedelivery.net/32oxijRdypCO4dk5WrGLwg/c2726925-9313-4bc7-9733-83f5d9429600/public","orientation":"","position":0}]},"products":[{"product_id":"syn-tx-prod-001","title":"Synthetic TX Scarf","association":"product_level","offers":[{"sku_id":"syn-tx-sku-001","sku_code":"SYN-TX-OLIVE","price_sen":4500}]}]},{"video_id":"syn-post-a7516d5118","post_type":"VIDEO","caption":"DEV test video","sort_position":1,"media":{"projected":true,"placeholder":false,"reason":null,"post_type":"VIDEO","slides":[{"media_id":"syn-media-daa6929bfa64","media_kind":"VIDEO","provider":"CLOUDFLARE_STREAM","delivery_ref":"https://customer-zd71a4adbpris15b.cloudflarestream.com/d8b90bacdbaef6121514ab0ef8bd53fe/manifest/video.m3u8","embed_ref":"https://customer-zd71a4adbpris15b.cloudflarestream.com/d8b90bacdbaef6121514ab0ef8bd53fe/iframe","playback_mode":"stream_iframe","poster_ref":"https://customer-zd71a4adbpris15b.cloudflarestream.com/d8b90bacdbaef6121514ab0ef8bd53fe/thumbnails/thumbnail.jpg","orientation":"PORTRAIT","position":0}]},"products":[{"product_id":"syn-tx-prod-001","title":"Synthetic TX Scarf","association":"product_level","offers":[{"sku_id":"syn-tx-sku-001","sku_code":"SYN-TX-OLIVE","price_sen":4500}]}]},{"video_id":"syn-post-2959de7aba","post_type":"CAROUSEL","caption":"DEV test carousel","sort_position":2,"media":{"projected":true,"placeholder":false,"reason":null,"post_type":"CAROUSEL","slides":[{"media_id":"syn-media-ff854b6dd3ac","media_kind":"IMAGE","provider":"CLOUDFLARE_IMAGES","delivery_ref":"https://imagedelivery.net/32oxijRdypCO4dk5WrGLwg/4386c759-782b-4a8e-913e-5c039f141700/public","embed_ref":"","playback_mode":"progressive","poster_ref":"https://imagedelivery.net/32oxijRdypCO4dk5WrGLwg/4386c759-782b-4a8e-913e-5c039f141700/public","orientation":"","position":0},{"media_id":"syn-media-68505e562910","media_kind":"IMAGE","provider":"CLOUDFLARE_IMAGES","delivery_ref":"https://imagedelivery.net/32oxijRdypCO4dk5WrGLwg/b98dc63e-2b2d-42b0-6c27-fe093de67a00/public","embed_ref":"","playback_mode":"progressive","poster_ref":"https://imagedelivery.net/32oxijRdypCO4dk5WrGLwg/b98dc63e-2b2d-42b0-6c27-fe093de67a00/public","orientation":"","position":1},{"media_id":"syn-media-29e34c7c3a11","media_kind":"IMAGE","provider":"CLOUDFLARE_IMAGES","delivery_ref":"https://imagedelivery.net/32oxijRdypCO4dk5WrGLwg/eadee072-6291-4d73-adff-f9dc58f91700/public","embed_ref":"","playback_mode":"progressive","poster_ref":"https://imagedelivery.net/32oxijRdypCO4dk5WrGLwg/eadee072-6291-4d73-adff-f9dc58f91700/public","orientation":"","position":2},{"media_id":"syn-media-52f49f825d63","media_kind":"IMAGE","provider":"CLOUDFLARE_IMAGES","delivery_ref":"https://imagedelivery.net/32oxijRdypCO4dk5WrGLwg/52ce7e70-c953-4e0b-f9ab-7f53b7126000/public","embed_ref":"","playback_mode":"progressive","poster_ref":"https://imagedelivery.net/32oxijRdypCO4dk5WrGLwg/52ce7e70-c953-4e0b-f9ab-7f53b7126000/public","orientation":"","position":3}]},"products":[{"product_id":"syn-tx-prod-001","title":"Synthetic TX Scarf","association":"product_level","offers":[{"sku_id":"syn-tx-sku-001","sku_code":"SYN-TX-OLIVE","price_sen":4500}]}]}]}</script>
 <script>
 (function () {
   'use strict';
@@ -2970,7 +2983,24 @@ function closeShopDetail() {
     return true;
   }
 
+  function inlineDiscoverBootstrap() {
+    // A previously public staging snapshot, never an authorization source.
+    // Show existing public media immediately, then refresh asynchronously.
+    try {
+      var tag = $('discoverInstantSnapshot');
+      var raw = tag ? JSON.parse(tag.textContent || 'null') : null;
+      if (!raw || raw.schema !== DISCOVER_SNAPSHOT_SCHEMA || !Array.isArray(raw.posts)) return false;
+      var generated = Date.parse(String(raw.generated_at_utc || ''));
+      if (!Number.isFinite(generated) || Date.now() - generated > 30 * 86400000
+          || generated - Date.now() > 86400000) return false;
+      var check = validatePublicDiscoverSnapshot(raw);
+      if (!check.ok && check.reason !== 'snapshot_expired') return false;
+      return applyDiscoverPosts(raw.posts, 'last_verified_public_snapshot');
+    } catch (ignored) { return false; }
+  }
+
   function loadPublicDiscoverSnapshot() {
+    var showedInstant = inlineDiscoverBootstrap();
     var cached = readDiscoverCache();
     var cachedCheck = validatePublicDiscoverSnapshot(cached);
     if (cachedCheck.ok) {
@@ -2978,6 +3008,7 @@ function closeShopDetail() {
       markPerf('discover_snapshot_cache');
       return Promise.resolve(true);
     }
+    if (showedInstant) return Promise.resolve(true);
     return fetch('./discover-feed-snapshot.json', { cache: 'default' })
       .then(function (response) {
         if (!response.ok) throw new Error('snapshot_http_' + response.status);
@@ -3586,6 +3617,7 @@ function closeShopDetail() {
     posts.forEach(function (c) { feedEl.appendChild(c.root); });
     feedStatusEl.hidden = true;
     feedEl.hidden = false;
+    if ($('discoverFirstArt')) $('discoverFirstArt').hidden = true;
     var targetIndex = requestedDiscoverPost
       ? posts.findIndex(function (p) { return p.data && p.data.id === requestedDiscoverPost; })
       : -1;
