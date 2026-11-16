@@ -1,0 +1,646 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+  <meta name="color-scheme" content="light">
+  <meta name="referrer" content="no-referrer">
+  <title>Arabista — Create post</title>
+  <style>
+    :root{
+      --ink:#161411;--muted:#8a8278;--line:#ebe7e1;--bg:#fff;--soft:#f6f4f0;
+      --accent:#1c1915;--good:#166534;--bad:#b42318;--dock-h:76px;--pad:16px;--tap:48px;
+    }
+    *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+    html,body{margin:0;width:100%;background:var(--bg);color:var(--ink)}
+    body{
+      min-height:100dvh;padding:0 0 calc(var(--dock-h) + env(safe-area-inset-bottom));
+      font:16px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+      -webkit-text-size-adjust:100%;
+    }
+    /* iOS: never zoom on focus — keep controls at ≥16px */
+    button,input,textarea,select{font:16px/1.45 inherit;color:inherit}
+    button{appearance:none;-webkit-appearance:none;border:0;background:none;cursor:pointer}
+    button:disabled{opacity:.38}
+    input,textarea,select{width:100%;border:0;outline:0;background:transparent;border-radius:0;font-size:16px!important}
+    .topbar{
+      position:sticky;top:0;z-index:20;display:flex;align-items:center;justify-content:space-between;
+      min-height:52px;padding:8px var(--pad);padding-top:max(8px,env(safe-area-inset-top));
+      background:rgba(255,255,255,.94);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+    }
+    .top-title{flex:1;text-align:center;font:700 17px/1.2 -apple-system,sans-serif}
+    .top-link{min-height:var(--tap);padding:0 8px;font:600 15px/1 -apple-system,sans-serif;color:var(--ink)}
+    .media-row{display:flex;gap:10px;overflow-x:auto;padding:8px var(--pad);scrollbar-width:none;-webkit-overflow-scrolling:touch}
+    .media-row::-webkit-scrollbar{display:none}
+    .add-tile,.tile{position:relative;flex:none;width:92px;height:122px;border-radius:12px;overflow:hidden;background:var(--soft)}
+    .add-tile{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;border:1px dashed #cfc7bb;color:#6f675e}
+    .add-tile strong{font:400 28px/1 Arial,sans-serif}
+    .add-tile span{font:600 11px/1 -apple-system,sans-serif}
+    .add-tile input{position:absolute;inset:0;opacity:0}
+    .tile img,.tile video{width:100%;height:100%;object-fit:cover;display:block;background:#111}
+    .tile .ord{position:absolute;left:6px;top:6px;min-width:20px;height:20px;padding:0 6px;border-radius:999px;background:rgba(0,0,0,.55);color:#fff;font:700 11px/20px sans-serif;text-align:center}
+    .progress-wrap{padding:10px var(--pad) 0}
+    .progress-track{height:3px;border-radius:99px;background:#eee9e2;overflow:hidden}
+    .progress-bar{height:100%;width:0;background:var(--accent);transition:width .18s ease}
+    .progress-label{margin-top:8px;font:600 13px/1.35 -apple-system,sans-serif;color:var(--muted)}
+    .caption-block{padding:18px var(--pad) 8px}
+    #caption{min-height:120px;resize:none;font:400 17px/1.45 -apple-system,sans-serif!important}
+    #caption::placeholder{color:#b0a89e}
+    .caption-meta{display:flex;justify-content:flex-end;margin-top:6px;font:500 12px/1 sans-serif;color:#b0a89e}
+    .rows{margin-top:8px;border-top:1px solid var(--line)}
+    .row{width:100%;display:flex;align-items:center;gap:14px;min-height:56px;padding:14px var(--pad);border-bottom:1px solid var(--line);text-align:left}
+    .row-title{display:block;font:600 15px/1.25 -apple-system,sans-serif}
+    .row-sub{display:block;margin-top:3px;font:400 13px/1.3 -apple-system,sans-serif;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .chev{margin-left:auto;color:#b3aaa0;font:500 22px/1 Georgia,serif}
+    .panel{display:none;padding:0 var(--pad) 16px;border-bottom:1px solid var(--line)}
+    .panel.open{display:block}
+    .panel label{display:block;margin-top:12px;font:600 13px/1.3 -apple-system,sans-serif;color:#6a635a}
+    .panel input[type=search]{margin-top:8px;min-height:48px;padding:12px 14px;border-radius:12px;background:var(--soft)}
+    .picker{list-style:none;margin:10px 0 0;padding:0;max-height:42vh;overflow:auto;-webkit-overflow-scrolling:touch}
+    .picker li{border-bottom:1px solid var(--line)}
+    .picker label{
+      display:flex;align-items:center;gap:12px;min-height:52px;margin:0;padding:10px 0;font:500 15px/1.3 -apple-system,sans-serif;color:var(--ink);cursor:pointer;
+    }
+    .picker input[type=checkbox]{width:22px;height:22px;flex:none;accent-color:var(--accent)}
+    .picker .meta{margin-left:auto;font:600 12px/1 -apple-system,sans-serif;color:var(--muted)}
+    .selected-wrap{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+    .chip{display:inline-flex;align-items:center;gap:8px;padding:8px 10px;border-radius:999px;background:var(--soft);font:600 13px/1 -apple-system,sans-serif}
+    .chip button{min-width:28px;min-height:28px;border-radius:999px;background:#fff;border:1px solid var(--line);font-size:14px}
+    #statusLine{min-height:18px;margin:0;padding:10px var(--pad) 0;font:600 13px/1.4 -apple-system,sans-serif}
+    #statusLine.bad{color:var(--bad)}#statusLine.good{color:var(--good)}
+    .dock{
+      position:fixed;left:0;right:0;bottom:0;z-index:30;display:grid;grid-template-columns:1fr 1.2fr;gap:10px;
+      padding:10px var(--pad) calc(10px + env(safe-area-inset-bottom));background:rgba(255,255,255,.96);border-top:1px solid var(--line);
+    }
+    .dock button{min-height:48px;border-radius:12px;font:700 16px/1 -apple-system,sans-serif}
+    #btnDraft{background:var(--soft)}
+    #btnPublish{background:var(--accent);color:#fff}
+    .sheet-head{display:flex;align-items:center;justify-content:space-between;padding-top:14px}
+    .sheet-head h2{margin:0;font:700 16px/1.2 -apple-system,sans-serif}
+    .sheet-head button,#library button{min-height:40px;padding:0 12px;border-radius:10px;background:var(--soft);font:600 13px/1 sans-serif}
+    #library{list-style:none;margin:8px 0 0;padding:0}
+    #library li{display:flex;justify-content:space-between;gap:12px;align-items:center;min-height:52px;border-bottom:1px solid var(--line)}
+    .badge{display:inline-block;margin-left:6px;padding:2px 8px;border-radius:999px;background:#eee;font-size:11px}
+    .badge.PUBLISHED{background:#d7efdc}.badge.DRAFT{background:#ece7da}
+    .note{color:var(--muted);font-size:13px}
+    @media(min-width:760px){
+      body{max-width:480px;margin:0 auto;border-left:1px solid var(--line);border-right:1px solid var(--line)}
+      .dock{max-width:480px;left:50%;transform:translateX(-50%)}
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <a class="top-link" href="../">Discover</a>
+    <div class="top-title">New post</div>
+    <button type="button" class="top-link" id="btnOpenPosts">Posts</button>
+  </header>
+
+  <div class="media-row">
+    <div id="preview" style="display:contents"></div>
+    <label class="add-tile">
+      <strong>+</strong><span>Add</span>
+      <input id="mediaFiles" type="file" accept="video/*,image/*" multiple>
+    </label>
+  </div>
+  <div class="progress-wrap">
+    <div class="progress-track"><div class="progress-bar" id="progressBar"></div></div>
+    <div class="progress-label" id="progressLabel">Add photos or a video</div>
+  </div>
+  <div class="caption-block">
+    <textarea id="caption" maxlength="2200" rows="5" placeholder="Write a caption for your post"></textarea>
+    <div class="caption-meta"><span id="captionCount">0 / 2200</span></div>
+  </div>
+
+  <div class="rows">
+    <button type="button" class="row" id="btnTagProducts" aria-expanded="false">
+      <span>
+        <span class="row-title">Tag products</span>
+        <span class="row-sub" id="productRowSub">Choose one or more products</span>
+      </span>
+      <span class="chev">›</span>
+    </button>
+    <div class="panel" id="productPanel">
+      <label>Search products
+        <input id="productSearch" type="search" maxlength="100" placeholder="Name or code" autocomplete="off" enterkeyhint="search">
+      </label>
+      <ul class="picker" id="productPicker" aria-label="Product list"></ul>
+      <div class="selected-wrap" id="selectedChips"></div>
+    </div>
+    <button type="button" class="row" id="btnOpenPostsRow">
+      <span>
+        <span class="row-title">Your posts</span>
+        <span class="row-sub">Edit drafts or continue an earlier post</span>
+      </span>
+      <span class="chev">›</span>
+    </button>
+  </div>
+  <p id="statusLine" role="status"></p>
+
+  <div class="panel" id="postsPanel">
+    <div class="sheet-head">
+      <h2>Your posts</h2>
+      <button type="button" id="btnNew">New post</button>
+    </div>
+    <label>Find a draft
+      <input id="libQ" type="search" maxlength="80" placeholder="Search caption" enterkeyhint="search">
+    </label>
+    <ul id="library"></ul>
+  </div>
+
+  <div class="dock">
+    <button type="button" id="btnDraft">Save draft</button>
+    <button type="button" id="btnPublish">Publish</button>
+  </div>
+
+  <script src="../bridge-client.js?v=246seller1"></script>
+  <script>
+(function () {
+  var $ = function (id) { return document.getElementById(id); };
+  var objectUrls = [];
+  var catalog = [];
+  var selectedIds = {};
+  var selectedFiles = [];
+  var st = { assets: [], video_id: '', updated_at_utc: '', post_type: '', busy: false, uploadProgress: 0 };
+
+  function say(msg, bad) {
+    $('statusLine').textContent = msg || '';
+    $('statusLine').className = bad ? 'bad' : (msg ? 'good' : '');
+  }
+  function friendly(r) {
+    if (!r) return 'Something went wrong. Please try again.';
+    var map = {
+      cloudflare_permission_denied: 'Media upload is not available yet.',
+      cloudflare_credentials_missing: 'Media upload is not available yet.',
+      video_requires_tus_over_200mb: 'Please choose a video under 200 MB.',
+      image_too_large: 'Please choose an image under 20 MB.',
+      staff_not_authorized: 'Publishing is not available in this workspace yet.',
+      staff_email_unavailable: 'Publishing is not available in this workspace yet.',
+      rpc_not_allowlisted: 'Create Post is not enabled on the live connection yet.',
+      publication_not_ready: 'Tag products and wait for media to finish preparing.'
+    };
+    return r.message || map[r.reason] || map[r.outcome] || 'Something went wrong. Please try again.';
+  }
+  function rpc(name, args, timeoutMs) {
+    return window.ArabistaV243Bridge.call(name, args, { timeoutMs: timeoutMs || 30000 });
+  }
+  function kindOf(file) { return /^video\//i.test(file.type) ? 'VIDEO' : (/^image\//i.test(file.type) ? 'IMAGE' : ''); }
+  function detectPostType(files) {
+    var videos = files.filter(function (f) { return kindOf(f) === 'VIDEO'; });
+    var images = files.filter(function (f) { return kindOf(f) === 'IMAGE'; });
+    if (videos.length === 1 && !images.length) return 'VIDEO';
+    if (images.length === 1 && !videos.length) return 'IMAGE';
+    if (images.length >= 2 && images.length <= 10 && !videos.length) return 'CAROUSEL';
+    return '';
+  }
+  function selectedProducts() {
+    return catalog.filter(function (p) { return !!selectedIds[p.product_id]; });
+  }
+  function setPhase(pct, label) {
+    st.uploadProgress = Math.max(0, Math.min(100, Number(pct) || 0));
+    $('progressBar').style.width = st.uploadProgress + '%';
+    $('progressLabel').textContent = label || '';
+  }
+  function setBusy(v) {
+    st.busy = !!v;
+    $('btnDraft').disabled = st.busy;
+    $('btnPublish').disabled = st.busy;
+    $('mediaFiles').disabled = st.busy;
+  }
+  function updateProductRow() {
+    var n = selectedProducts().length;
+    $('productRowSub').textContent = n ? (n + ' product' + (n === 1 ? '' : 's') + ' tagged') : 'Choose one or more products';
+  }
+  function updateCaptionCount() {
+    $('captionCount').textContent = String(($('caption').value || '').length) + ' / 2200';
+  }
+
+  function renderPreview() {
+    objectUrls.forEach(function (u) { try { URL.revokeObjectURL(u); } catch (e) {} });
+    objectUrls = [];
+    $('preview').textContent = '';
+    selectedFiles.forEach(function (file, idx) {
+      var fig = document.createElement('figure');
+      fig.className = 'tile';
+      var kind = kindOf(file);
+      var media = document.createElement(kind === 'VIDEO' ? 'video' : 'img');
+      var url = URL.createObjectURL(file);
+      objectUrls.push(url);
+      media.src = url;
+      if (kind === 'VIDEO') { media.muted = true; media.playsInline = true; media.setAttribute('playsinline', ''); media.preload = 'metadata'; }
+      else media.alt = 'Selected photo';
+      fig.appendChild(media);
+      var ord = document.createElement('span');
+      ord.className = 'ord';
+      ord.textContent = String(idx + 1);
+      fig.appendChild(ord);
+      $('preview').appendChild(fig);
+    });
+  }
+
+  function renderPicker(q) {
+    var host = $('productPicker');
+    host.textContent = '';
+    var needle = String(q || '').trim().toLowerCase();
+    var list = catalog.filter(function (p) {
+      if (!needle) return true;
+      return ((p.title || '') + ' ' + (p.product_code || '')).toLowerCase().indexOf(needle) >= 0;
+    }).slice(0, 80);
+    if (!list.length) {
+      var empty = document.createElement('li');
+      empty.className = 'note';
+      empty.textContent = catalog.length ? 'No matching products' : 'Loading products…';
+      host.appendChild(empty);
+      return;
+    }
+    list.forEach(function (p) {
+      var li = document.createElement('li');
+      var lab = document.createElement('label');
+      var cb = document.createElement('input');
+      cb.type = 'checkbox';
+      cb.checked = !!selectedIds[p.product_id];
+      cb.addEventListener('change', function () {
+        if (cb.checked) selectedIds[p.product_id] = true;
+        else delete selectedIds[p.product_id];
+        renderChips();
+        updateProductRow();
+      });
+      var title = document.createElement('span');
+      title.textContent = p.title || p.product_code || 'Product';
+      var meta = document.createElement('span');
+      meta.className = 'meta';
+      meta.textContent = p.product_code || '';
+      lab.appendChild(cb);
+      lab.appendChild(title);
+      lab.appendChild(meta);
+      li.appendChild(lab);
+      host.appendChild(li);
+    });
+  }
+
+  function renderChips() {
+    var host = $('selectedChips');
+    host.textContent = '';
+    selectedProducts().forEach(function (p) {
+      var chip = document.createElement('span');
+      chip.className = 'chip';
+      chip.appendChild(document.createTextNode(p.title || 'Product'));
+      var rm = document.createElement('button');
+      rm.type = 'button';
+      rm.textContent = '×';
+      rm.addEventListener('click', function () {
+        delete selectedIds[p.product_id];
+        renderPicker($('productSearch').value);
+        renderChips();
+        updateProductRow();
+      });
+      chip.appendChild(rm);
+      host.appendChild(chip);
+    });
+  }
+
+  function postMultipartFile(url, file, onProgress) {
+    return new Promise(function (resolve, reject) {
+      var boundary = '----ArabistaFormBoundary' + Date.now() + Math.floor(Math.random() * 1e6);
+      var filename = String(file.name || 'upload.bin').replace(/[\r\n"]/g, '_');
+      var head = '--' + boundary + '\r\nContent-Disposition: form-data; name="file"; filename="' + filename + '"\r\nContent-Type: ' + (file.type || 'application/octet-stream') + '\r\n\r\n';
+      var tail = '\r\n--' + boundary + '--\r\n';
+      var body = new Blob([head, file, tail]);
+      var xhr = new XMLHttpRequest();
+      xhr.open('POST', url, true);
+      xhr.setRequestHeader('Content-Type', 'multipart/form-data; boundary=' + boundary);
+      if (xhr.upload) xhr.upload.onprogress = function (ev) {
+        if (ev.lengthComputable && onProgress) onProgress(ev.loaded / ev.total);
+      };
+      xhr.onload = function () {
+        if (xhr.status >= 200 && xhr.status < 300) resolve();
+        else reject(new Error('Upload could not be completed. Check your connection and retry.'));
+      };
+      xhr.onerror = function () { reject(new Error('Upload interrupted. Check your connection and retry.')); };
+      xhr.send(body);
+    });
+  }
+
+  function tusUploadFile(url, file, onProgress) {
+    var chunkSize = 5 * 1024 * 1024;
+    return new Promise(function (resolve, reject) {
+      function patch(offset) {
+        if (offset >= file.size) { resolve(); return; }
+        var end = Math.min(file.size, offset + chunkSize);
+        var xhr = new XMLHttpRequest();
+        xhr.open('PATCH', url, true);
+        xhr.setRequestHeader('Tus-Resumable', '1.0.0');
+        xhr.setRequestHeader('Upload-Offset', String(offset));
+        xhr.setRequestHeader('Content-Type', 'application/offset+octet-stream');
+        xhr.onload = function () {
+          if (xhr.status === 204 || (xhr.status >= 200 && xhr.status < 300)) {
+            var next = Number(xhr.getResponseHeader('Upload-Offset') || end);
+            if (onProgress) onProgress(Math.min(1, next / file.size));
+            patch(next);
+          } else if (offset === 0) {
+            postMultipartFile(url, file, onProgress).then(resolve).catch(reject);
+          } else reject(new Error('Upload could not continue. Please retry.'));
+        };
+        xhr.onerror = function () { reject(new Error('Upload interrupted. Check your connection and retry.')); };
+        xhr.send(file.slice(offset, end));
+      }
+      patch(0);
+    });
+  }
+
+  async function uploadOne(type, file, pos, base, span) {
+    var created = await rpc('arabistaDevMediaCreateDirectUpload', {
+      post_type: type,
+      media_kind: kindOf(file),
+      filename: file.name,
+      content_type: file.type,
+      size_bytes: file.size,
+      position: pos,
+      upload_mode: (kindOf(file) === 'VIDEO' && file.size >= 32 * 1024 * 1024) ? 'tus' : undefined
+    }, 60000);
+    if (!created || !created.ok || !created.upload_url) throw new Error(friendly(created));
+    var onProgress = function (ratio) {
+      setPhase(base + span * ratio, 'Uploading… ' + Math.round(base + span * ratio) + '%');
+    };
+    if (String(created.upload_mode || created.upload_method || '').toLowerCase().indexOf('tus') >= 0) {
+      await tusUploadFile(created.upload_url, file, onProgress);
+    } else {
+      await postMultipartFile(created.upload_url, file, onProgress);
+    }
+    return { asset_id: String(created.asset_id), media_kind: kindOf(file), position: pos, verified: false };
+  }
+
+  async function verifyAll(type) {
+    for (var i = 0; i < st.assets.length; i += 1) {
+      var asset = st.assets[i];
+      if (asset.verified) continue;
+      setPhase(88, 'Preparing your media…');
+      var tries = 0;
+      while (tries < 8 && !asset.verified) {
+        tries += 1;
+        var r = await rpc('arabistaDevMediaVerifyAsset', {
+          asset_id: asset.asset_id, post_type: type, media_kind: asset.media_kind
+        }, 30000);
+        if (r && r.ok && (r.ready === true || String(r.outcome || '').indexOf('READY') >= 0 || String(r.status || '').toUpperCase() === 'READY')) {
+          asset.verified = true;
+          break;
+        }
+        await new Promise(function (res) { setTimeout(res, 1500); });
+      }
+      if (!asset.verified) throw new Error('Your media is still preparing. Save as draft and try again in a moment.');
+    }
+  }
+
+  var uploadGen = 0;
+  async function runUpload() {
+    var gen = ++uploadGen;
+    var type = detectPostType(selectedFiles);
+    st.post_type = type;
+    if (!type) throw new Error('Choose one video, one photo, or 2–10 photos.');
+    setBusy(true);
+    try {
+      st.assets = [];
+      setPhase(4, 'Uploading…');
+      for (var i = 0; i < selectedFiles.length; i += 1) {
+        if (gen !== uploadGen) return;
+        var base = (i / selectedFiles.length) * 75;
+        var span = 75 / selectedFiles.length;
+        st.assets.push(await uploadOne(type, selectedFiles[i], i, base, span));
+      }
+      await verifyAll(type);
+      if (gen !== uploadGen) return;
+      setPhase(100, 'Ready');
+      say('Media is ready. Add a caption, tag products, then publish.');
+    } catch (e) {
+      setPhase(st.uploadProgress || 8, 'Upload needs attention');
+      say(e.message || 'Upload failed.', true);
+      throw e;
+    } finally {
+      if (gen === uploadGen) setBusy(false);
+    }
+  }
+
+  async function ensureReady() {
+    if (!st.assets.length) await runUpload();
+    if (!st.assets.every(function (a) { return a.verified; })) await verifyAll(st.post_type);
+    if (!st.assets.every(function (a) { return a.verified; })) throw new Error('Your media is still preparing.');
+  }
+
+  async function savePost() {
+    setBusy(true);
+    try {
+      await ensureReady();
+      setPhase(96, 'Saving…');
+      var r = await rpc('arabistaDevDiscoverPostSaveV227', {
+        video_id: st.video_id || undefined,
+        expected_updated_at_utc: st.updated_at_utc || undefined,
+        post_type: st.post_type,
+        caption: $('caption').value,
+        slides: st.assets.map(function (a, i) {
+          return { asset_id: a.asset_id, media_kind: a.media_kind, position: a.position != null ? a.position : i };
+        })
+      }, 60000);
+      if (!r || !r.ok) throw new Error(friendly(r));
+      st.video_id = String(r.video_id || st.video_id || '');
+      st.updated_at_utc = String(r.updated_at_utc || st.updated_at_utc || '');
+      var products = selectedProducts();
+      for (var i = 0; i < products.length; i += 1) {
+        var link = await rpc('arabistaDevDiscoverAssociationUpsert', {
+          video_id: st.video_id,
+          product_id: products[i].product_id,
+          sku_id: '',
+          position: i,
+          expected_updated_at_utc: st.updated_at_utc
+        }, 30000);
+        if (!link || !link.ok) throw new Error(friendly(link));
+        if (link.updated_at_utc) st.updated_at_utc = String(link.updated_at_utc);
+      }
+      return r;
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function doSaveDraft() {
+    try {
+      await savePost();
+      setPhase(100, 'Draft saved');
+      say('Draft saved.');
+      loadLibrary();
+    } catch (e) { say(e.message || 'Could not save draft.', true); }
+  }
+
+  async function doPublish() {
+    try {
+      if (!selectedProducts().length) {
+        openProducts(true);
+        say('Tag at least one product before publishing.', true);
+        return;
+      }
+      if (!String($('caption').value || '').trim()) {
+        say('Add a short caption before publishing.', true);
+        $('caption').focus();
+        return;
+      }
+      await savePost();
+      setBusy(true);
+      setPhase(98, 'Publishing…');
+      var pub = await rpc('arabistaDevDiscoverPublish', {
+        video_id: st.video_id,
+        publish_status: 'PUBLISHED',
+        expected_updated_at_utc: st.updated_at_utc || undefined
+      }, 60000);
+      if (!pub || !pub.ok) throw new Error(friendly(pub));
+      setPhase(100, 'Published');
+      say('Published. Open Discover to view it.');
+      loadLibrary();
+    } catch (e) {
+      say(e.message || 'Could not publish yet.', true);
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  function openProducts(open) {
+    $('productPanel').classList.toggle('open', !!open);
+    $('btnTagProducts').setAttribute('aria-expanded', open ? 'true' : 'false');
+    if (open) {
+      renderPicker($('productSearch').value);
+      $('productSearch').focus();
+    }
+  }
+  function openPosts(open) {
+    $('postsPanel').classList.toggle('open', !!open);
+    if (open) loadLibrary();
+  }
+
+  async function loadCatalog() {
+    var r = await rpc('arabistaDevDiscoverCatalogSearchV246', { limit: 80 }, 30000);
+    if (!r || !r.ok) throw new Error(friendly(r));
+    catalog = r.products || [];
+    renderPicker($('productSearch').value);
+  }
+
+  async function loadLibrary() {
+    var host = $('library');
+    try {
+      var r = await rpc('arabistaDevMediaLibraryListV228', { q: $('libQ').value.trim() }, 30000);
+      host.textContent = '';
+      if (!r || !r.ok) { host.textContent = friendly(r); return; }
+      (r.posts || []).slice(0, 40).forEach(function (p) {
+        var li = document.createElement('li');
+        var left = document.createElement('div');
+        left.innerHTML = '';
+        var title = document.createElement('div');
+        title.textContent = (p.caption || 'Untitled post').slice(0, 72);
+        var meta = document.createElement('div');
+        meta.className = 'note';
+        meta.textContent = (p.post_type === 'VIDEO' ? 'Video' : (p.post_type === 'CAROUSEL' ? 'Carousel' : 'Photo')) + ' · ';
+        var badge = document.createElement('span');
+        badge.className = 'badge ' + (p.publish_status || '');
+        badge.textContent = p.publish_status === 'PUBLISHED' ? 'Published' : 'Draft';
+        meta.appendChild(badge);
+        left.appendChild(title); left.appendChild(meta);
+        var btn = document.createElement('button');
+        btn.type = 'button';
+        btn.textContent = 'Edit';
+        btn.addEventListener('click', function () { loadPost(p.video_id); openPosts(false); });
+        li.appendChild(left); li.appendChild(btn);
+        host.appendChild(li);
+      });
+      if (!(r.posts || []).length) {
+        var empty = document.createElement('li');
+        empty.className = 'note';
+        empty.textContent = 'No posts yet.';
+        host.appendChild(empty);
+      }
+    } catch (e) {
+      host.textContent = e.message;
+    }
+  }
+
+  async function loadPost(videoId) {
+    setBusy(true);
+    try {
+      var r = await rpc('arabistaDevMediaPostGetV228', { video_id: videoId }, 30000);
+      if (!r || !r.ok || !r.post) throw new Error(friendly(r));
+      var p = r.post;
+      selectedFiles = [];
+      $('mediaFiles').value = '';
+      renderPreview();
+      st.video_id = p.video_id;
+      st.updated_at_utc = p.updated_at_utc || '';
+      st.post_type = p.post_type || 'IMAGE';
+      st.assets = (p.media || []).map(function (m, i) {
+        return { asset_id: m.media_id || m.asset_id, media_kind: m.media_kind || 'IMAGE', position: i, verified: true };
+      });
+      $('caption').value = p.caption || '';
+      selectedIds = {};
+      (p.associations || []).forEach(function (a) { selectedIds[a.product_id] = true; });
+      updateCaptionCount();
+      renderPicker('');
+      renderChips();
+      updateProductRow();
+      setPhase(100, 'Draft loaded');
+      say('Editing existing post.');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } catch (e) {
+      say(e.message, true);
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  function reset() {
+    st = { assets: [], video_id: '', updated_at_utc: '', post_type: '', busy: false, uploadProgress: 0 };
+    selectedFiles = [];
+    selectedIds = {};
+    $('mediaFiles').value = '';
+    $('caption').value = '';
+    renderPreview();
+    renderChips();
+    updateCaptionCount();
+    updateProductRow();
+    setPhase(0, 'Add photos or a video');
+    say('');
+  }
+
+  $('mediaFiles').addEventListener('change', function () {
+    selectedFiles = Array.prototype.slice.call($('mediaFiles').files || []).slice(0, 10);
+    st.assets = [];
+    renderPreview();
+    if (!detectPostType(selectedFiles)) {
+      say('Choose one video, one photo, or 2–10 photos.', true);
+      return;
+    }
+    setPhase(2, 'Uploading…');
+    runUpload().catch(function () {});
+  });
+  $('caption').addEventListener('input', updateCaptionCount);
+  $('productSearch').addEventListener('input', function () { renderPicker($('productSearch').value); });
+  $('btnTagProducts').addEventListener('click', function () {
+    openProducts(!$('productPanel').classList.contains('open'));
+  });
+  $('btnOpenPosts').addEventListener('click', function () { openPosts(true); });
+  $('btnOpenPostsRow').addEventListener('click', function () { openPosts(true); });
+  $('btnDraft').addEventListener('click', doSaveDraft);
+  $('btnPublish').addEventListener('click', doPublish);
+  $('btnNew').addEventListener('click', reset);
+  $('libQ').addEventListener('change', loadLibrary);
+  $('libQ').addEventListener('keydown', function (e) {
+    if (e.key === 'Enter') { e.preventDefault(); loadLibrary(); }
+  });
+
+  fetch('../connection.json', { cache: 'no-store' })
+    .then(function (r) { return r.json(); })
+    .then(function (cfg) {
+      var url = (cfg && (cfg.publicCustomerFacadeUrl || cfg.devAppsScriptWebAppUrl)) || '';
+      return ArabistaV243Bridge.mount(url);
+    })
+    .then(function () { return loadCatalog(); })
+    .then(function () { setPhase(0, 'Add photos or a video'); })
+    .catch(function (e) { say(e.message || 'Could not connect Create Post.', true); });
+})();
+  </script>
+</body>
+</html>
