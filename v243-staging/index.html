@@ -1507,11 +1507,12 @@ body.discover-product-expanded.is-discover #feed .post .stage{
       <div id="identityPasswordBlock">
         <label class="fine-print" for="identityPassword">Password</label>
         <input id="identityPassword" type="password" autocomplete="current-password" style="display:block;width:100%;margin:6px 0 10px;padding:10px;border:1px solid #e5e0d8;border-radius:10px" />
+        <button type="button" id="identityForgotPassword" class="fine-print" style="display:inline-block;margin:0 0 10px;padding:0;border:0;background:none;color:#8b7a65;text-decoration:underline;cursor:pointer;font:inherit">Forgot password?</button>
       </div>
       <div id="identityOtpBlock" hidden>
         <label class="fine-print" for="identityOtp">WhatsApp code</label>
         <input id="identityOtp" inputmode="numeric" autocomplete="one-time-code" maxlength="6" style="display:block;width:100%;margin:6px 0 10px;padding:10px;border:1px solid #e5e0d8;border-radius:10px" />
-        <label class="fine-print" for="identityNewPassword">Create password</label>
+        <label class="fine-print" for="identityNewPassword" id="identityNewPasswordLabel">Create password</label>
         <input id="identityNewPassword" type="password" autocomplete="new-password" style="display:block;width:100%;margin:6px 0 10px;padding:10px;border:1px solid #e5e0d8;border-radius:10px" />
       </div>
       <p id="identityModalNotice" class="fine-print" role="status" aria-live="polite" style="color:#666;min-height:1.2em"></p>
@@ -1943,6 +1944,8 @@ body.discover-product-expanded.is-discover #feed .post .stage{
     var eyebrow = $('identityModalEyebrow');
     var otpBlock = $('identityOtpBlock');
     var passwordBlock = $('identityPasswordBlock');
+    var forgot = $('identityForgotPassword');
+    var newPasswordLabel = $('identityNewPasswordLabel');
     var notice = $('identityModalNotice');
     var primary = $('identityModalPrimary');
     if (notice) notice.textContent = '';
@@ -1953,6 +1956,7 @@ body.discover-product-expanded.is-discover #feed .post .stage{
       if (copy) copy.textContent = 'This link identifies your invoice. Sign in or activate with the checkout mobile number to open private details — the invoice alone never unlocks them.';
       if (otpBlock) otpBlock.hidden = true;
       if (passwordBlock) passwordBlock.hidden = false;
+      if (forgot) forgot.hidden = false;
       if (primary) primary.textContent = 'Sign in';
     } else if (mode === 'activate') {
       if (eyebrow) eyebrow.textContent = 'Activate account';
@@ -1960,13 +1964,26 @@ body.discover-product-expanded.is-discover #feed .post .stage{
       if (copy) copy.textContent = 'Enter the WhatsApp code (when authorized) and create a password. Ordinary later visits use phone + password only.';
       if (otpBlock) otpBlock.hidden = false;
       if (passwordBlock) passwordBlock.hidden = true;
+      if (forgot) forgot.hidden = true;
+      if (newPasswordLabel) newPasswordLabel.textContent = 'Create password';
       if (primary) primary.textContent = 'Request / verify code';
+    } else if (mode === 'recover') {
+      if (eyebrow) eyebrow.textContent = 'Password recovery';
+      if (title) title.textContent = 'Reset password';
+      if (copy) copy.textContent = 'Enter your mobile number. When WhatsApp verification is authorized, we send a code, then you choose a new password and are signed in.';
+      if (otpBlock) otpBlock.hidden = false;
+      if (passwordBlock) passwordBlock.hidden = true;
+      if (forgot) forgot.hidden = true;
+      if (newPasswordLabel) newPasswordLabel.textContent = 'New password';
+      if (primary) primary.textContent = 'Request / verify code';
+      state.identityChallengeId = null;
     } else {
       if (eyebrow) eyebrow.textContent = 'Account';
       if (title) title.textContent = 'Sign in';
       if (copy) copy.textContent = 'Use your mobile number and password. New customers activate once with WhatsApp OTP after checkout.';
       if (otpBlock) otpBlock.hidden = true;
       if (passwordBlock) passwordBlock.hidden = false;
+      if (forgot) forgot.hidden = false;
       if (primary) primary.textContent = 'Sign in';
     }
   }
@@ -4233,11 +4250,73 @@ function attachSheetResizeHandle(handle,sheet,apply,ratio){
       renderProfile();
     });
   }
+  if ($('identityForgotPassword')) {
+    $('identityForgotPassword').addEventListener('click', function () {
+      var phone = $('identityPhone') && $('identityPhone').value;
+      openIdentityModal('recover', { phone: phone });
+    });
+  }
   if ($('identityModalPrimary')) {
     $('identityModalPrimary').addEventListener('click', function () {
       var mode = state.identityModalMode || 'login';
       var phone = $('identityPhone') && $('identityPhone').value;
       var notice = $('identityModalNotice');
+      if (mode === 'recover') {
+        var recoverOtp = $('identityOtp') && $('identityOtp').value;
+        var recoverPassword = $('identityNewPassword') && $('identityNewPassword').value;
+        if (!state.identityChallengeId) {
+          call('arabistaDevCustomerIdentityRequestPasswordRecoveryOtpV245', {
+            phone_e164: phone
+          }, function (x) {
+            render('order', x);
+            if (!(x && (x.ok || x.accepted))) {
+              if (notice) notice.textContent = 'Could not start recovery: ' + String((x && x.reason) || 'refused');
+              return;
+            }
+            state.identityChallengeId = x.challenge_id || null;
+            if (notice) {
+              notice.textContent = x.whatsapp_otp_executable
+                ? 'Code sent by WhatsApp. Enter it with your new password.'
+                : ('Recovery code send blocked (' + String(x.dispatch_state || x.reason || 'BLOCKED')
+                  + '). Meta auth template approval and owner authorization are still required.');
+            }
+          });
+          return;
+        }
+        call('arabistaDevCustomerIdentityCompletePasswordRecoveryV245', {
+          phone_e164: phone,
+          challenge_id: state.identityChallengeId,
+          otp_code: recoverOtp,
+          new_password: recoverPassword
+        }, function (x) {
+          render('order', x);
+          if (!(x && x.ok && x.password_changed)) {
+            if (notice) notice.textContent = 'Recovery failed: ' + String((x && x.reason) || 'refused');
+            return;
+          }
+          if (x.access_token) applyIdentitySession(x);
+          state.identityChallengeId = null;
+          closeIdentityModal();
+          renderProfile();
+          call('arabistaDevCustomerIdentityOpenOwnedOrderV244', {
+            access_token: state.identityAccessToken,
+            invoice_no: state.pendingInvoiceLocator || undefined,
+            order_id: state.pendingInvoiceLocator ? undefined : (state.last && state.last.order_id)
+          }, function (owned) {
+            render('order', owned);
+            if (owned && owned.access_grant_token) {
+              state.grant = owned.access_grant_token;
+              if (owned.order_id) {
+                state.last = state.last || {};
+                state.last.order_id = owned.order_id;
+              }
+              persistPurchaseSession();
+              showOrderSummary(owned);
+            }
+          });
+        });
+        return;
+      }
       if (mode === 'activate') {
         var otp = $('identityOtp') && $('identityOtp').value;
         var newPassword = $('identityNewPassword') && $('identityNewPassword').value;
@@ -4281,8 +4360,8 @@ function attachSheetResizeHandle(handle,sheet,apply,ratio){
           if (state.pendingInvoiceLocator || (state.last && state.last.order_id)) {
             call('arabistaDevCustomerIdentityOpenOwnedOrderV244', {
               access_token: state.identityAccessToken,
-              order_id: state.last && state.last.order_id,
-              invoice_no: state.pendingInvoiceLocator || undefined
+              invoice_no: state.pendingInvoiceLocator || undefined,
+              order_id: state.pendingInvoiceLocator ? undefined : (state.last && state.last.order_id)
             }, function (owned) {
               render('order', owned);
               if (owned && owned.access_grant_token) {
@@ -4315,8 +4394,9 @@ function attachSheetResizeHandle(handle,sheet,apply,ratio){
         renderProfile();
         call('arabistaDevCustomerIdentityOpenOwnedOrderV244', {
           access_token: state.identityAccessToken,
-          order_id: state.last && state.last.order_id,
-          invoice_no: state.pendingInvoiceLocator || undefined
+          // Prefer WhatsApp invoice locator over any leftover session order_id.
+          invoice_no: state.pendingInvoiceLocator || undefined,
+          order_id: state.pendingInvoiceLocator ? undefined : (state.last && state.last.order_id)
         }, function (owned) {
           render('order', owned);
           if (owned && owned.access_grant_token) {
