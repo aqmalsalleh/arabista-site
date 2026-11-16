@@ -1,106 +1,66 @@
 /**
- * Arabista v2.43 — GitHub Pages → Apps Script public bridge client.
- * Loads a hidden HtmlService iframe and relays RPC via postMessage.
- * No Google sign-in, no URL paste, no credentials in the browser.
+ * Arabista v2.43 — GitHub Pages → Apps Script public facade client.
+ * Uses JSONP against the Anyone-anonymous /exec deployment because nested
+ * Google HtmlService iframes cannot reliably receive parent postMessage.
  */
 (function (global) {
   'use strict';
 
-  var pending = Object.create(null);
   var seq = 0;
-  var ready = false;
-  var readyWaiters = [];
-  var iframe = null;
-  var bridgeOrigin = 'https://n-script.googleusercontent.com'; // tightened after first message
   var bridgeUrl = '';
+  var ready = false;
 
-  function whenReady() {
-    if (ready) return Promise.resolve();
-    return new Promise(function (resolve, reject) {
-      var timer = setTimeout(function () {
-        reject(new Error('bridge_ready_timeout'));
-      }, 20000);
-      readyWaiters.push(function () {
-        clearTimeout(timer);
-        resolve();
-      });
-    });
-  }
-
-  function onMessage(event) {
-    var data = event.data;
-    if (!data || data.channel !== 'arabista-v243') return;
-    if (data.type === 'bridge-ready') {
-      ready = true;
-      bridgeOrigin = event.origin;
-      var waiters = readyWaiters.splice(0);
-      for (var i = 0; i < waiters.length; i += 1) waiters[i]();
-      return;
+  function validExecUrl(url) {
+    try {
+      var u = new URL(url);
+      return u.origin === 'https://script.google.com'
+        && /^\/macros\/s\/[A-Za-z0-9_-]+\/exec\/?$/.test(u.pathname)
+        && !u.username && !u.password;
+    } catch (e) {
+      return false;
     }
-    if (data.type !== 'rpc-result') return;
-    var entry = pending[data.id];
-    if (!entry) return;
-    delete pending[data.id];
-    if (data.ok) entry.resolve(data.result);
-    else entry.reject(new Error(data.error || 'rpc_failed'));
   }
 
   function mount(url) {
     bridgeUrl = String(url || '').trim();
-    if (!bridgeUrl) return Promise.reject(new Error('bridge_url_missing'));
-    if (iframe) return whenReady();
-    window.addEventListener('message', onMessage);
-    iframe = document.createElement('iframe');
-    iframe.id = 'arabistaV243BridgeFrame';
-    iframe.title = 'Arabista secure staging bridge';
-    iframe.setAttribute('aria-hidden', 'true');
-    iframe.referrerPolicy = 'no-referrer';
-    iframe.style.cssText = 'position:fixed;width:1px;height:1px;left:-9999px;top:0;opacity:0;border:0;pointer-events:none;';
-    iframe.src = bridgeUrl;
-    iframe.addEventListener('load', function () {
-      // Re-request readiness in case the bridge announced before the parent listener attached.
-      var pings = 0;
-      var pingTimer = setInterval(function () {
-        if (ready || pings > 20) {
-          clearInterval(pingTimer);
-          return;
-        }
-        pings += 1;
-        try {
-          iframe.contentWindow.postMessage({
-            channel: 'arabista-v243',
-            type: 'bridge-ping'
-          }, '*');
-        } catch (e) {}
-      }, 500);
+    if (!validExecUrl(bridgeUrl)) {
+      return Promise.reject(new Error('bridge_url_invalid'));
+    }
+    return call('arabistaV243PublicFacadeCapabilities', null).then(function (caps) {
+      if (!caps || caps.ok !== true) {
+        throw new Error((caps && caps.reason) || 'facade_unavailable');
+      }
+      ready = true;
+      return caps;
     });
-    document.body.appendChild(iframe);
-    return whenReady();
   }
 
   function call(name, args) {
-    return whenReady().then(function () {
-      return new Promise(function (resolve, reject) {
-        var id = 'rpc_' + String(++seq) + '_' + Date.now();
-        pending[id] = { resolve: resolve, reject: reject };
-        try {
-          iframe.contentWindow.postMessage({
-            channel: 'arabista-v243',
-            type: 'rpc',
-            id: id,
-            name: name,
-            args: args === undefined ? null : args
-          }, '*');
-        } catch (err) {
-          delete pending[id];
-          reject(err);
-        }
-        setTimeout(function () {
-          if (!pending[id]) return;
-          delete pending[id];
-          reject(new Error('rpc_timeout'));
-        }, 60000);
-      });
+    if (!bridgeUrl) return Promise.reject(new Error('bridge_url_missing'));
+    return new Promise(function (resolve, reject) {
+      var cb = 'arabistaV243Cb_' + String(++seq) + '_' + Date.now();
+      var settled = false;
+      function finish(fn, value) {
+        if (settled) return;
+        settled = true;
+        try { delete global[cb]; } catch (e) {}
+        if (script && script.parentNode) script.parentNode.removeChild(script);
+        fn(value);
+      }
+      global[cb] = function (result) { finish(resolve, result); };
+      var script = document.createElement('script');
+      var params = new URLSearchParams();
+      params.set('format', 'jsonp');
+      params.set('rpc', String(name || ''));
+      params.set('callback', cb);
+      if (args !== undefined) params.set('args', JSON.stringify(args === undefined ? null : args));
+      script.src = bridgeUrl + (bridgeUrl.indexOf('?') >= 0 ? '&' : '?') + params.toString();
+      script.async = true;
+      script.onerror = function () { finish(reject, new Error('jsonp_transport_failed')); };
+      setTimeout(function () {
+        finish(reject, new Error('rpc_timeout'));
+      }, 60000);
+      document.head.appendChild(script);
     });
   }
 
