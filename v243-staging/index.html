@@ -1580,7 +1580,10 @@ body.discover-product-expanded.is-discover #feed .post .stage{
 
   function syncDokuButtons(dokuCaps) {
     var createReady = !!(dokuCaps && dokuCaps.ok && dokuCaps.readiness && dokuCaps.readiness.create_enabled);
-    if ($('btnDokuCreate')) $('btnDokuCreate').disabled = !(createReady && state.last && state.last.order_id);
+    // GitHub Pages public prepare issues the one-tx then creates; do not require
+    // create_enabled beforehand or Start DOKU stays permanently gated.
+    var publicBridge = !!(window.ArabistaV243Bridge && typeof window.ArabistaV243Bridge.call === 'function');
+    if ($('btnDokuCreate')) $('btnDokuCreate').disabled = !((createReady || publicBridge) && state.last && state.last.order_id);
     if ($('btnDokuReconcile')) $('btnDokuReconcile').disabled = !(state.grant && state.last && state.last.order_id);
   }
 
