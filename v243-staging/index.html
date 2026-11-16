@@ -3471,7 +3471,10 @@ function closeShopDetail() {
       try { if (mediaOpts.eager) img.fetchPriority = 'high'; } catch (fpErr) {}
       img.referrerPolicy = 'no-referrer';
       img.addEventListener('error', function () { unavailable('Image unavailable'); });
-      img.src = spec.src;
+      // Defer non-visible images until the shared preload scheduler selects them.
+      img.dataset.src = spec.src;
+      slide.image = img;
+      if(mediaOpts.eager) img.src = spec.src;
       slide.node.appendChild(img);
       return slide;
     }
@@ -3534,6 +3537,13 @@ function closeShopDetail() {
   }
 
   function ensureSrc(slide) {
+    if(slide.image){
+      if(!slide.image.getAttribute('src') && slide.image.dataset.src){
+        slide.image.loading='eager';
+        slide.image.src=slide.image.dataset.src;
+      }
+      return;
+    }
     if (slide.iframe) {
       if (!slide.iframe.getAttribute('src') && slide.iframe.dataset.src) slide.iframe.src = slide.iframe.dataset.src;
       v246InitStream(slide);
@@ -3794,14 +3804,123 @@ function closeShopDetail() {
     return selected;
   }
 
+
+  /* v2.46 hybrid warmup: first three upcoming posts and first three upcoming
+     VIDEO posts (regardless of intervening photos), plus two previous videos. */
+  var v249WarmQueue = [];
+  var v249WarmRunning = {video:0,image:0};
+  var v249WarmLimits = {video:2,image:2};
+
+  function v249WarmPlan(anchor, videos) {
+    var positions=[], seenPosts=new Set(), seenSlides=new Set(), result=[];
+    if(anchor<0 || anchor>=posts.length) return result;
+    var forward=Array.from(videos).filter(function(i){return i>anchor;}).sort(function(a,b){return a-b;});
+    var backward=Array.from(videos).filter(function(i){return i<anchor;}).sort(function(a,b){return b-a;});
+    function add(i) {
+      if(i>=0 && i<posts.length && !seenPosts.has(i)){seenPosts.add(i);positions.push(i);}
+    }
+    // Immediate next post and nearest video have first priority.
+    add(anchor);add(anchor+1);
+    if(forward.length)add(forward[0]);
+    add(anchor+2);add(anchor+3);
+    forward.forEach(add);backward.forEach(add);
+    function addSlide(slide,priority){
+      if(!slide || slide.failed || seenSlides.has(slide))return;
+      seenSlides.add(slide);
+      var kind=(slide.video||slide.iframe)?'video':(slide.image?'image':null);
+      if(kind)result.push({slide:slide,kind:kind,priority:priority});
+    }
+    positions.forEach(function(i,rank){
+      var post=posts[i];
+      if(!post || !post.slides.length)return;
+      if(post.track){
+        var start=i===anchor?post.index:0;
+        addSlide(post.slides[start],rank*3);
+        // Two carousel frames are enough initially; do not fetch all ten.
+        if(start+1<post.slides.length)addSlide(post.slides[start+1],rank*3+1);
+      }else{
+        addSlide(post.slides[post.index],rank*3);
+      }
+    });
+    return result;
+  }
+
+  function v249NeedsWarm(slide){
+    if(!slide || slide.failed || slide.v249WarmPending)return false;
+    if(slide.image)return !slide.v249DecodeAttempted;
+    if(slide.iframe)return !slide.iframe.getAttribute('src');
+    if(slide.video)return !slide.video.getAttribute('src');
+    return false;
+  }
+
+  function v249WarmOne(slide){
+    var target=slide.image||slide.iframe||slide.video;
+    if(!target)return Promise.resolve();
+    if(slide.image){
+      slide.v249DecodeAttempted=true;
+      slide.image.loading='eager';
+    }
+    return new Promise(function(resolve){
+      var done=false,timer=null;
+      function finish(){
+        if(done)return;
+        done=true;clearTimeout(timer);
+        ['load','loadedmetadata','error'].forEach(function(e){target.removeEventListener(e,finish);});
+        resolve();
+      }
+      timer=setTimeout(finish,4000);
+      ['load','loadedmetadata','error'].forEach(function(e){target.addEventListener(e,finish);});
+      ensureSrc(slide);
+      if(slide.image && slide.image.complete && slide.image.naturalWidth>0)finish();
+      if(slide.video && slide.video.readyState>=1)finish();
+    }).then(function(){
+      if(!slide.image || typeof slide.image.decode!=='function')return;
+      return Promise.race([
+        Promise.resolve().then(function(){return slide.image.decode();}).catch(function(){}),
+        new Promise(function(resolve){setTimeout(resolve,1500);})
+      ]);
+    });
+  }
+
+  function v249DrainWarmQueue(){
+    for(;;){
+      var index=v249WarmQueue.findIndex(function(job){
+        return v249WarmRunning[job.kind]<v249WarmLimits[job.kind];
+      });
+      if(index<0)return;
+      var job=v249WarmQueue.splice(index,1)[0],slide=job.slide;
+      if(!v249NeedsWarm(slide))continue;
+      slide.v249WarmPending=true;
+      v249WarmRunning[job.kind]++;
+      (function(kind,item){
+        Promise.resolve().then(function(){return v249WarmOne(item);})
+          .catch(function(){/* Keep visible-media fallback unchanged. */})
+          .then(function(){
+            item.v249WarmPending=false;
+            v249WarmRunning[kind]=Math.max(0,v249WarmRunning[kind]-1);
+            v249DrainWarmQueue();
+          });
+      })(job.kind,slide);
+    }
+  }
+
+  function v249PreloadHybrid(anchor,videos,on){
+    if(!on || anchor<0){v249WarmQueue=[];return;}
+    v249WarmQueue=v249WarmPlan(anchor,videos)
+      .filter(function(job){return v249NeedsWarm(job.slide);})
+      .sort(function(a,b){return a.priority-b.priority;});
+    v249DrainWarmQueue();
+  }
+
   function syncAll() {
     var on = live();
     var warmVideos = on ? v248WarmVideoIndices(activeIdx) : new Set();
-    // The visible video has priority over background player creation.
+    // The active post loads immediately, before any queued background media.
     if (on && posts[activeIdx]) {
       var focused = posts[activeIdx].slides[posts[activeIdx].index];
-      if (focused && (focused.video || focused.iframe)) ensureSrc(focused);
+      if(focused) ensureSrc(focused);
     }
+    v249PreloadHybrid(activeIdx,warmVideos,on);
     if (on && activeIdx >= 0) v246MarkTransition(activeIdx);
     posts.forEach(function (c, i) {
       var active = on && i === activeIdx;
@@ -3810,7 +3929,6 @@ function closeShopDetail() {
         var wantPlay = active && si === c.index && (reduced() ? s.userPlay : !s.userPaused);
         if (s.iframe) {
           var near = on && warmVideos.has(i) && si === c.index;
-          if (near) ensureSrc(s);
           if (s.stream) {
             if (wantPlay) {
               // Cloudflare can pause a buffered player without clearing the old request flag.
@@ -3842,7 +3960,6 @@ function closeShopDetail() {
         var v = s.video;
         if (!v) return;
         if (active && si === c.index) ensureSrc(s);
-        else if (on && warmVideos.has(i) && si === c.index) ensureSrc(s);
         if (wantPlay) {
           if (v.paused && !s.playPending && !s.blocked) v247TryPlay(s, c, i, v);
         } else {
@@ -3918,6 +4035,7 @@ function closeShopDetail() {
 
   function teardownFeed() {
     if (io) { io.disconnect(); io = null; }
+    v249WarmQueue=[];
     pauseAll();
     posts.forEach(function (c) {
       c.slides.forEach(function (s) {
