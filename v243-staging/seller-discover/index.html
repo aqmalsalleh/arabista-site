@@ -179,6 +179,27 @@
 @keyframes publish-card-in{from{opacity:0;transform:translateY(16px) scale(.96)}to{opacity:1;transform:none}}
 @keyframes publish-check-in{to{stroke-dashoffset:0}}
 @media(prefers-reduced-motion:reduce){.publish-card,.publish-seal svg{animation:none!important}.publish-seal svg{stroke-dashoffset:0!important}}
+
+/* v2.46 refinement: minimal success sheet, delicate hand-drawn motion */
+.publish-overlay{background:rgba(18,16,14,.38)!important;backdrop-filter:blur(7px)!important;-webkit-backdrop-filter:blur(7px)!important}
+.publish-card{width:min(100%,350px)!important;padding:37px 23px 22px!important;border:1px solid rgba(222,213,201,.72);
+  border-radius:22px!important;background:#fdfcf9!important;box-shadow:0 24px 64px #19140f32!important;
+  animation:publish-minimal-enter .38s cubic-bezier(.18,.86,.26,1) both!important}
+.publish-seal{width:64px!important;height:64px!important;margin-bottom:18px!important;
+  border:none!important;background:transparent!important;box-shadow:none!important;color:#a88759!important}
+.publish-seal svg{width:64px!important;height:64px!important;animation:none!important;stroke:none!important}
+.publish-seal-ring{stroke:#ddceb8;stroke-width:1.2;stroke-dasharray:176;stroke-dashoffset:176;animation:publish-ring-draw .52s ease-out forwards}
+.publish-seal-tick{stroke:#987548;stroke-width:3;stroke-dasharray:46;stroke-dashoffset:46;animation:publish-tick-draw .38s .32s cubic-bezier(.2,.7,.2,1) forwards}
+.publish-card h2{font:400 29px/1.2 Georgia,serif!important;letter-spacing:-.035em!important;margin:0!important;color:#29231e!important}
+.publish-card p{font:400 12px/1.5 -apple-system,BlinkMacSystemFont,sans-serif!important;
+  letter-spacing:.025em;margin:7px auto 24px!important;color:#8c8174!important}
+.publish-view{min-height:48px!important;border-radius:11px!important;font-size:13px!important}
+.publish-another{font-size:12px!important;margin-top:5px!important;color:#8c7b65!important}
+@keyframes publish-minimal-enter{from{opacity:0;transform:translateY(12px) scale(.975)}to{opacity:1;transform:none}}
+@keyframes publish-ring-draw{to{stroke-dashoffset:0}}
+@keyframes publish-tick-draw{to{stroke-dashoffset:0}}
+@media(prefers-reduced-motion:reduce){.publish-card,.publish-seal-ring,.publish-seal-tick{animation:none!important;stroke-dashoffset:0!important}}
+
   </style>
 </head>
 <body>
@@ -290,12 +311,16 @@
   <div class="publish-overlay" id="publishOverlay" hidden>
     <section class="publish-card" role="dialog" aria-modal="true" aria-labelledby="publishTitle" aria-describedby="publishDescription">
       <button type="button" class="publish-close" id="publishClose" aria-label="Close confirmation">×</button>
-      <div class="publish-seal" aria-hidden="true"><svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 25l8 8 16-18"/></svg></div>
-      <span class="publish-kicker">ARABISTA DISCOVER</span>
-      <h2 id="publishTitle">Beautifully published.</h2>
-      <p id="publishDescription">Your post is live on Discover and ready to be viewed.</p>
-      <a class="publish-view" id="publishView" href="../" target="_blank" rel="noopener noreferrer">View your post <span aria-hidden="true">↗</span></a>
-      <button type="button" class="publish-another" id="publishAnother">Create another post</button>
+      <div class="publish-seal" aria-hidden="true">
+        <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round">
+          <circle class="publish-seal-ring" cx="32" cy="32" r="28"/>
+          <path class="publish-seal-tick" d="M19.5 32.5 28 41l17-18"/>
+        </svg>
+      </div>
+      <h2 id="publishTitle">Published</h2>
+      <p id="publishDescription">Live on Discover</p>
+      <a class="publish-view" id="publishView" href="../" target="_blank" rel="noopener noreferrer">View post <span aria-hidden="true">↗</span></a>
+      <button type="button" class="publish-another" id="publishAnother">New post</button>
     </section>
   </div>
 
