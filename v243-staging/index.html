@@ -1477,8 +1477,9 @@ body.discover-product-expanded.is-discover #feed .post .stage{
       render('result', response);
     }
     try {
-      // GitHub Pages staging: postMessage → hidden Apps Script bridge (no Google login).
-      if (window.ArabistaV243Bridge && typeof window.ArabistaV243Bridge.call === 'function') {
+      // GitHub Pages staging: JSONP public facade bridge (no Google login).
+      if (window.ArabistaV243Bridge && typeof window.ArabistaV243Bridge.call === 'function'
+          && (!window.ArabistaV243Bridge.isReady || window.ArabistaV243Bridge.isReady())) {
         window.ArabistaV243Bridge.call(name, arg).then(function (result) {
           ok(result);
         }).catch(function (error) {
@@ -1878,27 +1879,26 @@ function closeShopDetail() {
     closeShopDetail();
   }
 
-  var activeBusyRequests = new Set();
+  // Local module busy only (shop/cart/order). Startup never uses a full-screen overlay.
   function busy(id, active, label) {
-    var global = id === 'entryBusy';
+    if (id === 'entryBusy') return; // startup overlays removed for mobile first-load
     var host = $(id);
     if (host) {
-      host.hidden = global ? true : !active;
+      host.hidden = !active;
       host.setAttribute('aria-busy', active ? 'true' : 'false');
       if (label) {
         var copy = host.querySelector('.coin-copy');
         if (copy) copy.textContent = label;
       }
     }
-    if (global) {
-      if (active) activeBusyRequests.add(id); else activeBusyRequests.delete(id);
-      var overlay = $('globalBusy');
-      if (overlay) {
-        overlay.hidden = activeBusyRequests.size === 0;
-        overlay.setAttribute('aria-busy', activeBusyRequests.size ? 'true' : 'false');
-        if (label) $('globalBusyText').textContent = label;
+  }
+
+  function markPerf(name) {
+    try {
+      if (window.performance && typeof performance.mark === 'function') {
+        performance.mark('arabista_' + name);
       }
-    }
+    } catch (e) { /* diagnostics only */ }
   }
 
   function pulseCart() {
@@ -2387,6 +2387,12 @@ function closeShopDetail() {
     };
   }
 
+  var DISCOVER_SNAPSHOT_SCHEMA = 'arabista-v243-discover-public-snapshot/v1';
+  var DISCOVER_CACHE_KEY = 'arabista-v243-discover-public-cache';
+  var feedFingerprint = '';
+  var feedSource = 'none';
+  var discoverLiveRequested = false;
+
   function setStatus(title, detail, retry) {
     clear(feedStatusEl);
     feedEl.hidden = true;
@@ -2396,14 +2402,15 @@ function closeShopDetail() {
     if (retry) {
       var b = el('button', 'Try again');
       b.type = 'button';
-      b.addEventListener('click', loadFeed);
+      b.addEventListener('click', function () { loadFeed({ forceLive: true }); });
       feedStatusEl.appendChild(b);
     }
   }
 
   function runFeed(name, cb) {
     try {
-      if (window.ArabistaV243Bridge && typeof window.ArabistaV243Bridge.call === 'function') {
+      if (window.ArabistaV243Bridge && typeof window.ArabistaV243Bridge.call === 'function'
+          && window.ArabistaV243Bridge.isReady && window.ArabistaV243Bridge.isReady()) {
         window.ArabistaV243Bridge.call(name, { limit: 20 }).then(function (out) { cb(out, null); })
           .catch(function (e) { cb(null, String(e && e.message || e)); });
         return;
@@ -2427,34 +2434,196 @@ function closeShopDetail() {
     return [];
   }
 
-  function loadFeed() {
-    setStatus('Loading Discover…');
-    runFeed('arabistaDevDiscoverFeedV227', function (out, err) {
-      if (out && out.ok !== false) { onFeed(out); return; }
-      var firstReason = err || (out && (out.reason || out.message)) || 'feed_refused';
-      runFeed('arabistaDevSandboxDiscoverFeed', function (out2, err2) {
-        if (out2 && out2.ok !== false) { onFeed(out2); return; }
-        var reason = err2 || (out2 && (out2.reason || out2.message)) || firstReason;
-        busy('entryBusy', false);
-        setStatus('Discover is unavailable', String(reason).slice(0, 160), true);
+  function fingerprintPosts(list) {
+    return (list || []).map(function (p) {
+      return String(p.id || '') + ':' + String(p.type || '');
+    }).join('|');
+  }
+
+  function validatePublicDiscoverSnapshot(raw) {
+    if (!raw || typeof raw !== 'object') return { ok: false, reason: 'snapshot_missing' };
+    if (String(raw.schema || '') !== DISCOVER_SNAPSHOT_SCHEMA) {
+      return { ok: false, reason: 'snapshot_schema_mismatch' };
+    }
+    var generated = Date.parse(String(raw.generated_at_utc || ''));
+    var maxAgeSec = Number(raw.max_age_seconds);
+    if (!Number.isFinite(generated) || !Number.isFinite(maxAgeSec) || maxAgeSec <= 0 || maxAgeSec > 86400) {
+      return { ok: false, reason: 'snapshot_age_policy_invalid' };
+    }
+    if ((Date.now() - generated) > (maxAgeSec * 1000)) {
+      return { ok: false, reason: 'snapshot_expired' };
+    }
+    if (!Array.isArray(raw.posts)) return { ok: false, reason: 'snapshot_posts_invalid' };
+    return { ok: true, posts: raw.posts };
+  }
+
+  function rememberDiscoverCache(raw) {
+    try {
+      sessionStorage.setItem(DISCOVER_CACHE_KEY, JSON.stringify({
+        stored_at_utc: new Date().toISOString(),
+        snapshot: raw
+      }));
+    } catch (e) { /* private mode */ }
+  }
+
+  function readDiscoverCache() {
+    try {
+      var wrapped = JSON.parse(sessionStorage.getItem(DISCOVER_CACHE_KEY) || 'null');
+      if (!wrapped || !wrapped.snapshot) return null;
+      return wrapped.snapshot;
+    } catch (e) { return null; }
+  }
+
+  function applyDiscoverPosts(list, source) {
+    var normalised = Array.isArray(list) ? list.map(normalisePost).filter(function (p) {
+      return p && (p.projected || p.caption);
+    }) : [];
+    if (!normalised.length) {
+      if (source === 'live' || feedSource === 'none') {
+        setStatus('No published posts yet', 'Nothing is invented here. Posts appear once a seller publishes them.', true);
+      }
+      return false;
+    }
+    var fp = fingerprintPosts(normalised);
+    if (fp === feedFingerprint && posts.length) {
+      feedSource = source;
+      return true;
+    }
+    feedFingerprint = fp;
+    feedSource = source;
+    buildFeed(normalised);
+    markPerf('first_discover_content');
+    return true;
+  }
+
+  function loadPublicDiscoverSnapshot() {
+    var cached = readDiscoverCache();
+    var cachedCheck = validatePublicDiscoverSnapshot(cached);
+    if (cachedCheck.ok) {
+      applyDiscoverPosts(cachedCheck.posts, 'snapshot_cache');
+      markPerf('discover_snapshot_cache');
+      return Promise.resolve(true);
+    }
+    return fetch('./discover-feed-snapshot.json', { cache: 'default' })
+      .then(function (response) {
+        if (!response.ok) throw new Error('snapshot_http_' + response.status);
+        return response.json();
+      })
+      .then(function (raw) {
+        var check = validatePublicDiscoverSnapshot(raw);
+        if (!check.ok) throw new Error(check.reason || 'snapshot_invalid');
+        rememberDiscoverCache(raw);
+        applyDiscoverPosts(check.posts, 'snapshot');
+        markPerf('discover_snapshot_file');
+        return true;
+      })
+      .catch(function () { return false; });
+  }
+
+  function loadFeed(opts) {
+    opts = opts || {};
+    var forceLive = opts.forceLive === true;
+    if (!forceLive && !posts.length && feedSource === 'none') {
+      setStatus('Loading Discover…');
+    }
+    function requestLive() {
+      if (discoverLiveRequested && !forceLive) return;
+      discoverLiveRequested = true;
+      runFeed('arabistaDevDiscoverFeedV227', function (out, err) {
+        if (out && out.ok !== false) {
+          onFeed(out, 'live');
+          return;
+        }
+        var firstReason = err || (out && (out.reason || out.message)) || 'feed_refused';
+        runFeed('arabistaDevSandboxDiscoverFeed', function (out2, err2) {
+          if (out2 && out2.ok !== false) { onFeed(out2, 'live'); return; }
+          var reason = err2 || (out2 && (out2.reason || out2.message)) || firstReason;
+          if (!posts.length) {
+            setStatus('Discover is unavailable', String(reason).slice(0, 160), true);
+          }
+          discoverLiveRequested = false;
+        });
       });
+    }
+    if (forceLive) {
+      discoverLiveRequested = false;
+      requestLive();
+      return;
+    }
+    if (window.ArabistaV243Bridge && window.ArabistaV243Bridge.isReady && window.ArabistaV243Bridge.isReady()) {
+      requestLive();
+      return;
+    }
+    if (window.google && google.script && google.script.run) {
+      requestLive();
+    }
+  }
+
+  function scrubPostsForPublicCache(posts) {
+    return (Array.isArray(posts) ? posts : []).map(function (p) {
+      p = p || {};
+      var media = p.media || {};
+      return {
+        video_id: p.video_id,
+        post_type: p.post_type,
+        caption: p.caption,
+        sort_position: p.sort_position,
+        media: {
+          projected: media.projected === true,
+          placeholder: false,
+          reason: null,
+          post_type: media.post_type || p.post_type,
+          slides: Array.isArray(media.slides) ? media.slides.map(function (s) {
+            s = s || {};
+            return {
+              media_id: s.media_id,
+              media_kind: s.media_kind,
+              provider: s.provider,
+              delivery_ref: s.delivery_ref,
+              embed_ref: s.embed_ref || '',
+              playback_mode: s.playback_mode || '',
+              poster_ref: s.poster_ref || '',
+              orientation: s.orientation || '',
+              position: s.position
+            };
+          }) : []
+        },
+        products: Array.isArray(p.products) ? p.products.map(function (pr) {
+          pr = pr || {};
+          return {
+            product_id: pr.product_id,
+            title: pr.title,
+            association: pr.association || 'product_level',
+            offers: Array.isArray(pr.offers) ? pr.offers.map(function (o) {
+              o = o || {};
+              return { sku_id: o.sku_id, sku_code: o.sku_code, price_sen: o.price_sen };
+            }) : []
+          };
+        }) : []
+      };
     });
   }
 
-  function onFeed(out) {
-    busy('entryBusy', false);
+  function onFeed(out, source) {
     var list = extractList(out);
-    var normalised = Array.isArray(list) ? list.map(normalisePost) : [];
-    if (!normalised.length) {
-      setStatus('No published posts yet', 'Nothing is invented here. Posts appear once a seller publishes them.', true);
-      return;
+    if (!applyDiscoverPosts(list, source || 'live')) return;
+    if (out && typeof out === 'object' && Array.isArray(out.posts)) {
+      rememberDiscoverCache({
+        schema: DISCOVER_SNAPSHOT_SCHEMA,
+        generated_at_utc: new Date().toISOString(),
+        max_age_seconds: 21600,
+        environment: String(out.environment || 'DEV_SANDBOX'),
+        source_outcome: String(out.outcome || 'live_feed'),
+        count: out.posts.length,
+        posts: scrubPostsForPublicCache(out.posts)
+      });
     }
-    buildFeed(normalised);
   }
 
   /* ---- slide builders ---- */
 
-  function buildSlide(post, spec, ctrl) {
+  function buildSlide(post, spec, ctrl, mediaOpts) {
+    mediaOpts = mediaOpts || {};
     var slide = { video: null, userPaused: false, userPlay: false, failed: false, playBtn: null, node: el('div', null, 'slide' + (spec.landscape ? ' landscape' : '')) };
     function unavailable(msg) {
       slide.failed = true;
@@ -2466,7 +2635,8 @@ function closeShopDetail() {
       var img = document.createElement('img');
       img.alt = post.caption ? post.caption.slice(0, 120) : 'Discover post image';
       img.decoding = 'async';
-      img.loading = 'lazy';
+      img.loading = mediaOpts.eager ? 'eager' : 'lazy';
+      try { if (mediaOpts.eager) img.fetchPriority = 'high'; } catch (fpErr) {}
       img.referrerPolicy = 'no-referrer';
       img.addEventListener('error', function () { unavailable('Image unavailable'); });
       img.src = spec.src;
@@ -2560,6 +2730,7 @@ function closeShopDetail() {
     var stage = el('div', null, 'stage');
     var media = el('div', null, 'media');
     stage.appendChild(media);
+    var preferEager = idx === 0;
 
     var placeholder = !p.projected;
     if (placeholder) {
@@ -2570,8 +2741,8 @@ function closeShopDetail() {
       track.setAttribute('aria-roledescription', 'carousel');
       track.setAttribute('aria-label', 'Carousel, swipe sideways');
       track.tabIndex = 0;
-      p.slides.forEach(function (spec) {
-        var s = buildSlide(p, spec, ctrl);
+      p.slides.forEach(function (spec, slideIdx) {
+        var s = buildSlide(p, spec, ctrl, { eager: preferEager && slideIdx === 0 && spec.kind === 'IMAGE' });
         ctrl.slides.push(s);
         track.appendChild(s.node);
       });
@@ -2613,7 +2784,10 @@ function closeShopDetail() {
       });
       updateDots(ctrl);
     } else {
-      var one = buildSlide(p, p.slides[0] || {}, ctrl);
+      var firstSpec = p.slides[0] || {};
+      var one = buildSlide(p, firstSpec, ctrl, {
+        eager: preferEager && firstSpec.kind === 'IMAGE'
+      });
       ctrl.slides.push(one);
       media.appendChild(one.node);
     }
@@ -3542,65 +3716,86 @@ function attachSheetResizeHandle(handle,sheet,apply,ratio){
     return true;
   }
 
-  function startConnectedCustomerApp() {
+  function startShellImmediately() {
+    markPerf('shell_start');
     restorePurchaseSession();
-    load();
     drawBasket();
     setCheckoutStep(0);
-    loadJourneyCapabilities();
     if (!handleDokuReturnLanding()) show('discover');
-    busy('entryBusy', true, 'Opening Arabista…');
-    // The initial brand transition is bounded even if DEV Sheets/Apps Script is slow or unavailable.
-    window.setTimeout(function () { busy('entryBusy', false); }, 4500);
-    loadFeed();
     if (typeof syncDokuButtons === 'function') syncDokuButtons();
+    markPerf('shell_ready');
+  }
+
+  function startBackendModules() {
+    markPerf('bridge_ready');
+    // Independent modules — Discover and Shop do not wait on each other.
+    loadFeed({ forceLive: true });
+    load();
+    // Nonessential capabilities after transport is callable.
+    window.setTimeout(function () {
+      try { loadJourneyCapabilities(); } catch (e) {}
+    }, 0);
   }
 
   function bootPagesBridgeIfNeeded() {
     var host = String(location.hostname || '');
     var onPages = host === 'www.arabistaofficial.com' || host === 'aqmalsalleh.github.io' || /\.github\.io$/i.test(host);
-    if (!onPages) return Promise.resolve();
-    if (window.google && google.script && google.script.run) return Promise.resolve();
+    if (!onPages) return Promise.resolve({ mode: 'apps_script_host' });
+    if (window.google && google.script && google.script.run) {
+      return Promise.resolve({ mode: 'google_script_run' });
+    }
     function ensureClient() {
       if (window.ArabistaV243Bridge && typeof window.ArabistaV243Bridge.mount === 'function') {
         return Promise.resolve();
       }
       return new Promise(function (resolve, reject) {
         var s = document.createElement('script');
-        s.src = './bridge-client.js?v=243jsonp1';
+        s.src = './bridge-client.js?v=243perf1';
         s.async = true;
         s.onload = function () { resolve(); };
         s.onerror = function () { reject(new Error('bridge_client_missing')); };
         document.head.appendChild(s);
       });
     }
-    return ensureClient()
-      .then(function () {
-        return fetch('./connection.json', { cache: 'no-store' });
-      })
-      .then(function (response) {
+    function loadConnection() {
+      return fetch('./connection.json', { cache: 'no-store' }).then(function (response) {
         if (!response.ok) throw new Error('connection_unavailable');
         return response.json();
-      })
-      .then(function (cfg) {
-        var url = String((cfg && (cfg.publicCustomerFacadeUrl || cfg.devAppsScriptWebAppUrl)) || '').trim();
-        if (!url) throw new Error('facade_url_missing');
-        return window.ArabistaV243Bridge.mount(url);
       });
+    }
+    // Load client + connection concurrently; mount must not wait on capabilities RPC.
+    return Promise.all([ensureClient(), loadConnection()]).then(function (pair) {
+      var cfg = pair[1] || {};
+      var url = String(cfg.publicCustomerFacadeUrl || cfg.devAppsScriptWebAppUrl || '').trim();
+      if (!url) throw new Error('facade_url_missing');
+      if (window.ArabistaV243Bridge.validExecUrl && !window.ArabistaV243Bridge.validExecUrl(url)) {
+        throw new Error('bridge_url_invalid');
+      }
+      markPerf('bridge_config_ready');
+      return window.ArabistaV243Bridge.mount(url);
+    });
   }
 
-  busy('entryBusy', true, 'Connecting Arabista…');
+  // A — paint approved shell immediately; backend work is asynchronous.
+  startShellImmediately();
+  loadPublicDiscoverSnapshot().then(function (hadSnapshot) {
+    if (!hadSnapshot && !posts.length) setStatus('Loading Discover…');
+  });
   bootPagesBridgeIfNeeded()
-    .then(function () { startConnectedCustomerApp(); })
+    .then(function () { startBackendModules(); })
     .catch(function (err) {
-      busy('entryBusy', false);
       if ($('quoteNotice')) {
         $('quoteNotice').textContent = 'Staging backend unavailable: '
           + String(err && err.message || err || 'bridge_failed')
-          + '. Shopping stays offline until the Apps Script facade is reachable.';
+          + '. Navigation stays available; quotation and checkout need the Apps Script facade.';
       }
-      show('discover');
-      drawBasket();
+      if (!posts.length) {
+        setStatus(
+          'Discover is unavailable',
+          String(err && err.message || err || 'bridge_failed').slice(0, 160),
+          true
+        );
+      }
     });
 }());
 </script>
