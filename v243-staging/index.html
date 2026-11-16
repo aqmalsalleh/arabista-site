@@ -1394,6 +1394,39 @@ body.discover-product-expanded.is-discover #feed .post .stage{
     settlementIdempotencyKey: null
   };
 
+  var PURCHASE_SESSION_KEY = 'arabista-v243-purchase-session';
+
+  function persistPurchaseSession() {
+    try {
+      if (!state.grant && !state.last) return;
+      sessionStorage.setItem(PURCHASE_SESSION_KEY, JSON.stringify({
+        grant: state.grant || null,
+        buyerSessionSecret: state.buyerSessionSecret || null,
+        idempotencyKey: state.idempotencyKey || null,
+        last: state.last || null
+      }));
+    } catch (e) { /* sessionStorage may be unavailable */ }
+  }
+
+  function restorePurchaseSession() {
+    try {
+      var raw = sessionStorage.getItem(PURCHASE_SESSION_KEY);
+      if (!raw) return;
+      var saved = JSON.parse(raw);
+      if (!saved || typeof saved !== 'object') return;
+      if (saved.grant && !state.grant) state.grant = String(saved.grant);
+      if (saved.buyerSessionSecret && !state.buyerSessionSecret) {
+        state.buyerSessionSecret = String(saved.buyerSessionSecret);
+      }
+      if (saved.idempotencyKey && !state.idempotencyKey) {
+        state.idempotencyKey = String(saved.idempotencyKey);
+      }
+      if (saved.last && typeof saved.last === 'object' && !state.last) {
+        state.last = saved.last;
+      }
+    } catch (e) { /* ignore corrupt session */ }
+  }
+
   function money(sen) {
     var n = Number(sen || 0);
     return 'RM ' + (n / 100).toFixed(2);
@@ -1682,6 +1715,14 @@ body.discover-product-expanded.is-discover #feed .post .stage{
     if (!x) return;
     if (x.buyer_session_secret) state.buyerSessionSecret = x.buyer_session_secret;
     if (x.access_grant_token) state.grant = x.access_grant_token;
+    if (x.order_id || x.checkout_id) {
+      state.last = state.last || {};
+      if (x.order_id) state.last.order_id = x.order_id;
+      if (x.checkout_id) state.last.checkout_id = x.checkout_id;
+      if (x.order_number) state.last.order_number = x.order_number;
+      if (x.payable_sen != null) state.last.payable_sen = x.payable_sen;
+    }
+    persistPurchaseSession();
   }
 
   function accessStatusMessage(x) {
@@ -3483,6 +3524,7 @@ function attachSheetResizeHandle(handle,sheet,apply,ratio){
   });
 
   function startConnectedCustomerApp() {
+    restorePurchaseSession();
     load();
     drawBasket();
     setCheckoutStep(0);
@@ -3492,6 +3534,7 @@ function attachSheetResizeHandle(handle,sheet,apply,ratio){
     // The initial brand transition is bounded even if DEV Sheets/Apps Script is slow or unavailable.
     window.setTimeout(function () { busy('entryBusy', false); }, 4500);
     loadFeed();
+    if (typeof syncDokuButtons === 'function') syncDokuButtons();
   }
 
   function bootPagesBridgeIfNeeded() {
