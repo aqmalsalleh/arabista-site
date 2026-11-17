@@ -434,7 +434,7 @@
 (function () {
   'use strict';
   var $ = function (id) { return document.getElementById(id); };
-  var state = {view:'list', products:[], categories:[], selected:null, editor:null, skus:[], filter:'ALL', busy:false, dirty:false, metaDirty:false, imageFiles:[], videoFile:null, mediaPreviews:[], mediaOrder:[], mediaBusy:false, requestSerial:0, remoteRevision:null, priceBackTarget:'list', uploadedRefs:new WeakMap(), variantFiles:{}, sizeChartFile:null, sizeGuideIndex:0, supplementPreviewUrls:[], variantPreviewUrl:null, chartPreviewUrl:null};
+  var state = {view:'list', products:[], categories:[], selected:null, editor:null, skus:[], filter:'ALL', busy:false, dirty:false, metaDirty:false, imageFiles:[], videoFile:null, mediaPreviews:[], mediaOrder:[], variationDirty:false, mediaBusy:false, requestSerial:0, remoteRevision:null, priceBackTarget:'list', uploadedRefs:new WeakMap(), variantFiles:{}, sizeChartFile:null, sizeGuideIndex:0, supplementPreviewUrls:[], variantPreviewUrl:null, chartPreviewUrl:null};
   var el = {
     list:$('listView'),editor:$('editorView'),price:$('priceView'),
     listActions:$('listActions'),editorActions:$('editorActions'),priceActions:$('priceActions')
@@ -665,6 +665,7 @@
     return group&&option?JSON.stringify([group,option]):'';
   }
   function refreshOptionPhoto(card,row){
+    if(row.__photoBlobUrl){try{URL.revokeObjectURL(row.__photoBlobUrl);}catch(e){}row.__photoBlobUrl=null;}
     var key=optionKey(card,row),old=row.dataset.photoKey||'';
     if(old&&key&&old!==key){
       if(state.variantFiles[old]){if(!state.variantFiles[key])state.variantFiles[key]=state.variantFiles[old];delete state.variantFiles[old];}
@@ -675,7 +676,7 @@
     Array.from(slot.children).forEach(function(c){if(c!==file)c.remove();});
     var pending=key&&state.variantFiles[key],saved=key&&(state.editor.variant_media||[]).find(function(m){return m.option_key===key;});
     var src=pending?URL.createObjectURL(pending):saved?httpsUrl(saved.delivery_url):'';
-    if(pending)state.supplementPreviewUrls.push(src);
+    if(pending){row.__photoBlobUrl=src;state.supplementPreviewUrls.push(src);}
     if(src){var img=node('img');img.src=src;img.alt='Variation photo';slot.insertBefore(img,file);}
     else slot.insertBefore(node('span','', '＋ Photo'),file);
     file.disabled=!key;
@@ -684,7 +685,7 @@
     var rows=Array.from(card.querySelectorAll('.variation-option-row'));
     card.querySelector('.variation-options').value=rows.map(function(r){return r.querySelector('.variation-option-name').value.trim();}).filter(Boolean).join(', ');
     rows.forEach(function(r){refreshOptionPhoto(card,r);});
-    state.dirty=true;state.metaDirty=true;renderVariationPhotoSelect();
+    state.dirty=true;state.metaDirty=true;state.variationDirty=true;renderVariationPhotoSelect();
   }
   function appendOptionRow(card,value){
     var list=card.querySelector('.variation-option-list'),row=node('div','variation-option-row');
@@ -726,7 +727,7 @@
     var top=node('div','group-top'),label=node('input','field variation-label');label.placeholder='Variation name, e.g. Size or Length';label.maxLength=80;label.setAttribute('aria-label','Variation name');label.value=g&&g.label||'';
     var remove=node('button','', 'Remove');remove.type='button';remove.addEventListener('click',function(){
       card.querySelectorAll('.variation-option-row').forEach(function(r){var key=optionKey(card,r);delete state.variantFiles[key];state.editor.variant_media=(state.editor.variant_media||[]).filter(function(m){return m.option_key!==key;});});
-      card.remove();state.dirty=true;state.metaDirty=true;renderVariationPhotoSelect();
+      card.remove();state.dirty=true;state.metaDirty=true;state.variationDirty=true;renderVariationPhotoSelect();
       if(!state.selected)try{newSkusFromGroups();}catch(e){}
     });
     top.appendChild(label);top.appendChild(remove);card.appendChild(top);
@@ -782,8 +783,8 @@
       return old?Object.assign({},old,{label:c.label}):{client_key:c.key,label:c.label,regular_price_sen:null,stock_available_qty:0,revision:null};
     });
     $('newSkuSummary').hidden=false;
-    text($('newSkuSummary'),state.skus.length+' SKU combination'+(state.skus.length===1?'':'s')+' ready for pricing.');
-    state.dirty=true;state.metaDirty=true;renderInlineSkus();
+    text($('newSkuSummary'),state.skus.length+' SKU combination'+(state.skus.length===1?'':'s')+' ready for price and stock editing below.');
+    state.variationDirty=false;state.dirty=true;state.metaDirty=true;renderInlineSkus();
   }
   function supplementalPreviewCleanup() {
     state.supplementPreviewUrls.forEach(function(url){try{URL.revokeObjectURL(url);}catch(e){}});
@@ -954,7 +955,7 @@
     $('shortDescription').value=d.short_description||'';
     $('variationGroups').replaceChildren();
     (d.variation_groups||[]).forEach(addGroup);
-    state.imageFiles=[];state.videoFile=null;state.variantFiles={};state.sizeChartFile=null;state.sizeGuideIndex=0;
+    state.imageFiles=[];state.videoFile=null;state.variantFiles={};state.sizeChartFile=null;state.sizeGuideIndex=0;state.variationDirty=false;
     state.mediaOrder=(d.media||[]).filter(function(m){return String(m.kind||m.media_kind||'').toLowerCase()!=='video';}).map(function(m){return {type:'saved',media:m};});
     supplementalPreviewCleanup();renderMedia();
     $('customerPreviewLink').hidden=true;
@@ -992,6 +993,7 @@
     if(!title)throw new Error('Enter a product name.');
     if(!category)throw new Error('Choose a category.');
     if(!description)throw new Error('Add a product description.');
+    if(state.variationDirty)throw new Error('Variation options changed. Tap Refresh variation list before saving, to keep SKU prices and stock aligned.');
     var groups=readGroups();
     if(groups.length>2)throw new Error('Use at most two variation groups.');
     combinations(groups);
@@ -1372,7 +1374,7 @@
   });
   $('addGroup').addEventListener('click',function(){
     if($('variationGroups').children.length>=2){notice('You can add up to two variation groups.','error');return;}
-    addGroup();state.dirty=true;state.metaDirty=true;renderVariationPhotoSelect();
+    addGroup();state.dirty=true;state.metaDirty=true;state.variationDirty=true;renderVariationPhotoSelect();
   });
   $('generateSkus').addEventListener('click',function(){
     try{newSkusFromGroups();notice(state.skus.length+' variations ready. Edit price and stock in the list below.');}catch(e){notice(e.message,'error');}
