@@ -82,6 +82,21 @@
     .media-item .media-drag-handle{top:auto;bottom:5px;left:5px;right:auto;border-radius:7px;width:32px;height:30px;font-size:21px;font-weight:700;cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none}
     .media-item .cover-indicator{position:absolute;left:0;right:0;top:0;font-size:10px;padding:3px 0;text-align:center;background:rgba(22,20,17,.64);color:#fff;pointer-events:none}
     .media-pending{font-size:11px;position:absolute;bottom:0;left:0;right:0;color:#fff;background:rgba(0,0,0,.7);padding:4px;text-align:center}
+    .variation-option-list{display:grid;gap:10px;margin:12px 0}
+    .variation-option-row{display:grid;grid-template-columns:26px minmax(0,1fr) 58px 29px;gap:7px;align-items:center;min-height:58px}
+    .variation-option-row .field{min-width:0;padding:10px;height:47px}
+    .option-drag{height:42px;font-size:20px;color:var(--muted);touch-action:none;cursor:grab;font-weight:700}
+    .option-photo{position:relative;display:grid;place-items:center;width:56px;height:56px;border:1px dashed #c8bfb5;border-radius:10px;background:var(--soft);overflow:hidden;font-size:12px;text-align:center;color:var(--muted)}
+    .option-photo img{width:100%;height:100%;object-fit:cover}
+    .option-photo input{position:absolute;inset:0;opacity:0;width:100%;height:100%;cursor:pointer}
+    .option-remove{height:37px;border-radius:8px;font-size:19px;color:var(--muted)}
+    .option-photo-note{font-size:11px;color:var(--muted);margin:4px 0 8px 35px}
+    .sku-inline{margin-top:16px;border-top:1px solid var(--line);padding-top:14px}
+    .sku-inline-row{padding:12px 0;border-bottom:1px solid var(--line)}
+    .sku-inline-row strong{display:block;font-size:13px;margin-bottom:8px}
+    .sku-inline-inputs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+    .sku-inline-inputs label{font-size:11px;font-weight:650;color:var(--muted)}
+    .sku-inline-inputs input{margin-top:5px;height:43px;padding:9px}
     .group-card{padding:14px 0;border-bottom:1px solid var(--line)}
     .group-card:last-child{border-bottom:0}
     .group-top{display:flex;gap:8px;align-items:center}
@@ -327,17 +342,20 @@
       <div id="variationGroups"></div>
       <button type="button" class="plain-action" id="addGroup">+ Add variation</button>
       <p class="helper">Changing options on an existing product may require confirmation; products already ordered cannot lose their SKU history.</p>
-      <button type="button" class="plain-action" id="generateSkus">Review SKU combinations</button>
+      <button type="button" class="plain-action" id="generateSkus">Refresh variation list</button>
       <div id="newSkuSummary" class="empty-block" style="margin-top:12px" hidden></div>
-      <h3 class="section-title" style="font-size:16px;margin-top:22px">Variation photos</h3>
-      <p class="helper">Optional. Assign a photo to one variation option, such as a colour or style. Sizes can share the main product gallery.</p>
-      <label class="form-label" for="variationPhotoOption">Variation option</label>
-      <select id="variationPhotoOption" class="field"><option value="">Choose an option</option></select>
-      <label class="form-label" for="variationPhotoFile">Photo for selected option</label>
-      <input id="variationPhotoFile" class="field" type="file" accept="image/jpeg,image/png,image/webp">
-      <div id="variationPhotoStatus" class="pending-note" role="status"></div>
-      <img id="variationPhotoPreview" class="upload-preview" hidden alt="Variation photo preview">
-      <button id="removeVariationPhoto" class="mini-action" type="button">Remove selected photo</button>
+      <div class="sku-inline" id="skuInlinePanel">
+        <h3 class="section-title" style="font-size:16px">Variation list <span class="mini" id="skuInlineCount"></span></h3>
+        <p class="helper">Edit price and stock for each SKU combination here. Refresh the list after changing variation options on an existing product.</p>
+        <div id="skuInlineRows"></div>
+      </div>
+      <div id="legacyVariationPhotoControls" hidden>
+        <select id="variationPhotoOption" class="field"><option value="">Choose an option</option></select>
+        <input id="variationPhotoFile" class="field" type="file" accept="image/jpeg,image/png,image/webp">
+        <div id="variationPhotoStatus" class="pending-note" role="status"></div>
+        <img id="variationPhotoPreview" class="upload-preview" hidden alt="Variation photo preview">
+        <button id="removeVariationPhoto" class="mini-action" type="button">Remove selected photo</button>
+      </div>
     </section>
     <section class="form-section">
       <h2 class="section-title">Size guide</h2>
