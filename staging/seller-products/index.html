@@ -1576,7 +1576,10 @@
       };
       var prev=await rpc('arabistaDevSellerProductsV247PreviewPriceStock',{intent:intent});
       if(!prev.confirmation_token)throw new Error('Price/stock confirmation is unavailable. No changes were saved.');
-      await rpc('arabistaDevSellerProductsV247ConfirmPriceStock',{confirmation_token:prev.confirmation_token});
+      var committed=await rpc('arabistaDevSellerProductsV247ConfirmPriceStock',{confirmation_token:prev.confirmation_token});
+      // A confirmed database write is never retried because the customer display
+      // cache was unavailable. Surface this separately from durable readback.
+      var shopCacheBusted=committed.customer_catalog_cache_invalidated===true;
       var read=await rpc('arabistaDevSellerProductsV247Read',{product_id:state.selected});
       if(!read.product||!Array.isArray(read.skus))throw new Error('Confirmation may have succeeded, but readback failed. Refresh before retrying.');
       intent.skus.forEach(function(want){
@@ -1584,8 +1587,11 @@
         if(!got || (want.regular_price_sen==null ? got.regular_price_sen!=null : Number(got.regular_price_sen)!==Number(want.regular_price_sen)) || (want.desired_available_qty!=null && Number(got.stock_available_qty)!==Number(want.desired_available_qty)))throw new Error('Price or stock readback did not match the confirmed edit. Refresh before retrying.');
       });
       state.editor=read.product;state.skus=read.skus;state.remoteRevision=read.product.revision;state.dirty=false;state.metaDirty=false;
-      renderSkuCards();notice('Prices and stock were saved and verified.','success');
-      await loadList();notice('Prices and stock were saved and verified.','success');show('list');
+      var confirmedNotice=shopCacheBusted
+        ? 'Prices and stock saved and verified. Customer Shop cache refreshed.'
+        : 'Prices and stock saved and verified. Customer Shop cache refresh is unverified; allow up to 45 seconds and refresh. Do NOT Save again.';
+      renderSkuCards();notice(confirmedNotice,shopCacheBusted?'success':'error');
+      await loadList();notice(confirmedNotice,shopCacheBusted?'success':'error');show('list');
     }catch(e){notice(errorText(e),'error');}
     finally{setBusy(false);}
   }
