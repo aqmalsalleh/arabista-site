@@ -354,7 +354,7 @@
     </section>
     <section class="form-section">
       <h2 class="section-title">Variations</h2>
-      <p class="helper">Add sizes, colours or styles. Each combination has its own price and stock.</p>
+      <p class="helper">Add up to three variations, such as Size, Length and Color. Each combination has its own price and stock.</p>
       <div id="variationGroups"></div>
       <button type="button" class="plain-action" id="addGroup">+ Add variation</button>
       <p class="helper">Changing options on an existing product may require confirmation; products already ordered cannot lose their SKU history.</p>
@@ -374,14 +374,14 @@
       </div>
     </section>
     <section class="form-section">
-      <h2 class="section-title">Size guide</h2>
-      <p class="helper">Edit measurements from the <strong>Measurements</strong> control beside each variation option above. Keep a shared size-chart image here, or open advanced options for unlinked legacy sets.</p>
+      <h2 class="section-title">Size chart</h2>
+      <p class="helper">Upload your size-chart image as the customer reference. There is no need to enter individual measurements.</p>
       <label class="form-label" for="sizeChartFile">Size-chart image (optional)</label>
       <input class="field" id="sizeChartFile" type="file" accept="image/jpeg,image/png,image/webp">
       <img id="sizeChartPreview" class="upload-preview" hidden alt="Selected size-chart image">
       <button id="removeSizeChart" class="mini-action" type="button">Remove size-chart image</button>
-      <details class="legacy-measurements" id="legacyMeasurements"><summary>Other measurement sets (advanced / legacy)</summary>
-      <p class="helper">Existing unlinked sets are preserved. Link one explicitly from a variation option's Measurements control—no automatic guessing.</p>
+      <div id="legacyMeasurements" hidden aria-hidden="true">
+      <p class="helper">Historical measurement metadata preserved in the DEV workbook.</p>
       <label class="form-label" for="sizeGuideSet">Measurement set</label>
       <select id="sizeGuideSet" class="field"></select>
       <label class="form-label" for="sizeGuideSetName">Set name</label>
@@ -395,7 +395,7 @@
         <tbody id="sizeMeasureRows"></tbody>
       </table></div>
       <button id="addSizeRow" class="mini-action" type="button">+ Add size row</button>
-      </details>
+      </div>
     </section>
     <section class="form-section">
       <h2 class="section-title">Parcel details</h2>
@@ -453,7 +453,7 @@
 (function () {
   'use strict';
   var $ = function (id) { return document.getElementById(id); };
-  var state = {view:'list', products:[], categories:[], selected:null, editor:null, skus:[], filter:'ALL', busy:false, dirty:false, metaDirty:false, imageFiles:[], videoFile:null, mediaPreviews:[], mediaOrder:[], variationDirty:false, mediaBusy:false, requestSerial:0, remoteRevision:null, priceBackTarget:'list', uploadedRefs:new WeakMap(), variantFiles:{}, sizeChartFile:null, sizeGuideIndex:0, supplementPreviewUrls:[], variantPreviewUrl:null, chartPreviewUrl:null};
+  var state = {view:'list', products:[], categories:[], selected:null, editor:null, skus:[], filter:'ALL', busy:false, dirty:false, metaDirty:false, imageFiles:[], videoFile:null, mediaPreviews:[], mediaOrder:[], variationDirty:false, backendMaxVariationGroups:2, mediaBusy:false, requestSerial:0, remoteRevision:null, priceBackTarget:'list', uploadedRefs:new WeakMap(), variantFiles:{}, sizeChartFile:null, sizeGuideIndex:0, supplementPreviewUrls:[], variantPreviewUrl:null, chartPreviewUrl:null};
   var el = {
     list:$('listView'),editor:$('editorView'),price:$('priceView'),
     listActions:$('listActions'),editorActions:$('editorActions'),priceActions:$('priceActions')
@@ -575,6 +575,8 @@
       if(serial!==state.requestSerial)return;
       if(!Array.isArray(r.products))throw new Error('Product list unavailable');
       state.products=r.products;state.categories=Array.isArray(r.categories)?r.categories:[];
+      // Older GAS deployments silently truncate variation group three. Refuse save until upgraded.
+      state.backendMaxVariationGroups=Number(r.max_variation_groups)===3?3:2;
       renderList();
     }catch(e){
       if(serial!==state.requestSerial)return;
@@ -875,18 +877,10 @@
     var del=node('button','option-remove','×');del.type='button';del.setAttribute('aria-label','Remove option');
     var clear=node('button','option-photo-clear','×');clear.type='button';clear.hidden=true;
     clear.setAttribute('aria-label','Remove photo from this option');clear.title='Remove option photo only';
-    var measures=node('button','option-measure-trigger','＋ Measurements');measures.type='button';measures.setAttribute('aria-expanded','false');
-    measures.setAttribute('aria-label','Edit measurements for this variation option');
-    var panel=node('div','option-measure-panel');panel.hidden=true;
     row.appendChild(grip);row.appendChild(name);row.appendChild(pick);row.appendChild(del);row.appendChild(clear);
-    row.appendChild(measures);row.appendChild(panel);list.appendChild(row);
+    list.appendChild(row);
     row.dataset.measureKey=optionKey(card,row);row.__measureSet=measurementSetForRow(card,row);
     refreshOptionPhoto(card,row);syncLinkedMeasurementOption(card,row);
-    measures.addEventListener('click',function(){
-      panel.hidden=!panel.hidden;
-      measures.setAttribute('aria-expanded',String(!panel.hidden));
-      if(!panel.hidden)renderOptionMeasurements(card,row);
-    });
     clear.addEventListener('click',function(){
       var key=optionKey(card,row);if(!key)return;
       delete state.variantFiles[key];state.editor.variant_media=(state.editor.variant_media||[]).filter(function(m){return m.option_key!==key;});
@@ -903,7 +897,12 @@
       notice('Photo selected for '+name.value+'. Save to upload.');
     });
     del.addEventListener('click',function(){
-      if(measurementSetForRow(card,row)){notice('Unlink the measurements before removing this variation option.','error');return;}
+      var oldSet=measurementSetForRow(card,row);
+      if(oldSet){
+        if(!window.confirm('This option has a historical measurement set. Remove the option and preserve its measurement data as unlinked?'))return;
+        ['option_id','group_id','option_key','group_label','option_label'].forEach(function(k){delete oldSet[k];});
+        row.__measureSet=null;
+      }
       var key=optionKey(card,row);
       delete state.variantFiles[key];state.editor.variant_media=(state.editor.variant_media||[]).filter(function(m){return m.option_key!==key;});
       row.remove();updateOptionValues(card);if(!state.selected)try{newSkusFromGroups();}catch(e){}
@@ -925,8 +924,10 @@
     var card=node('div','group-card');card.dataset.groupId=g&&g.group_id||'';
     var top=node('div','group-top'),label=node('input','field variation-label');label.placeholder='Variation name, e.g. Size or Length';label.maxLength=80;label.setAttribute('aria-label','Variation name');label.value=g&&g.label||'';
     var remove=node('button','', 'Remove');remove.type='button';remove.addEventListener('click',function(){
-      if(Array.from(card.querySelectorAll('.variation-option-row')).some(function(row){return !!measurementSetForRow(card,row);})){
-        notice('Unlink measurement sets from this variation before removing the whole variation.','error');return;
+      var linkedSets=Array.from(card.querySelectorAll('.variation-option-row')).map(function(row){return measurementSetForRow(card,row);}).filter(Boolean);
+      if(linkedSets.length){
+        if(!window.confirm('This variation has historical measurement data. Remove the variation and preserve its measurement sets as unlinked?'))return;
+        linkedSets.forEach(function(set){['option_id','group_id','option_key','group_label','option_label'].forEach(function(k){delete set[k];});});
       }
       card.querySelectorAll('.variation-option-row').forEach(function(r){var key=optionKey(card,r);delete state.variantFiles[key];state.editor.variant_media=(state.editor.variant_media||[]).filter(function(m){return m.option_key!==key;});});
       card.remove();state.dirty=true;state.metaDirty=true;state.variationDirty=true;renderVariationPhotoSelect();
@@ -948,7 +949,7 @@
     $('variationGroups').appendChild(card);
   }
   function combinations(groups) {
-    if(groups.length>2)throw new Error('Up to two variation groups are supported in this editor.');
+    if(groups.length>3)throw new Error('Use at most three variation groups.');
     var combos=[{key:'',label:'Default'}];
     groups.forEach(function(g){
       if(!g.label || !g.options.length)throw new Error('Give each variation a name and at least one option.');
@@ -1205,7 +1206,7 @@
     if(!description)throw new Error('Add a product description.');
     if(state.variationDirty)throw new Error('Variation options changed. Tap Refresh variation list before saving, to keep SKU prices and stock aligned.');
     var groups=readGroups();
-    if(groups.length>2)throw new Error('Use at most two variation groups.');
+    if(groups.length>3)throw new Error('Use at most three variation groups.');
     combinations(groups);
     d.title=title;d.category_id=category;d.long_description=description;d.short_description=$('shortDescription').value.trim();
     d.variation_groups=groups;
@@ -1380,6 +1381,9 @@
     var request;
     try{
       request=collectEditor();
+      if(request.variation_groups.length>state.backendMaxVariationGroups){
+        throw new Error('Three variations are supported in this editor, but the DEV backend is not updated yet. Do not save until Cursor deploys the three-variation service.');
+      }
       if(!state.skus.length)newSkusFromGroups();
       if(status==='ACTIVE'){
         if(!state.imageFiles.length && !mediaIntent().some(function(m){return String(m.kind||'').toLowerCase()!=='video';})){
@@ -1598,7 +1602,7 @@
     }catch(e){notice(errorText(e),'error');}
   });
   $('addGroup').addEventListener('click',function(){
-    if($('variationGroups').children.length>=2){notice('You can add up to two variation groups.','error');return;}
+    if($('variationGroups').children.length>=3){notice('You can add up to three variation groups.','error');return;}
     addGroup();state.dirty=true;state.metaDirty=true;state.variationDirty=true;renderVariationPhotoSelect();
   });
   $('generateSkus').addEventListener('click',function(){
