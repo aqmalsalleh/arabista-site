@@ -727,7 +727,7 @@
     if(!size)return [];
     var labels=size.label===card.querySelector('.variation-label').value.trim()
       ?[row.querySelector('.variation-option-name').value.trim()]:size.options;
-    return labels.filter(Boolean).slice(0,30).map(function(value){
+    return labels.filter(function(value){return !!value&&String(value).length<=20;}).slice(0,30).map(function(value){
       return {size:value,height_cm:'',length_in:'',bust_cm:''};
     });
   }
@@ -744,7 +744,7 @@
       var create=node('button','mini-action','＋ Create measurements for this option');create.type='button';
       create.addEventListener('click',function(){
         var sets=ensureGuide().sets;if(sets.length>=4){notice('The product already has four measurement sets. Reuse an unlinked set or remove an unused set first.','error');return;}
-        var fresh=newSizeSet(JSON.parse(key)[1]);fresh.rows=suggestedMeasurementRows(card,row);
+        var fresh=newSizeSet(String(JSON.parse(key)[1]).slice(0,40));fresh.rows=suggestedMeasurementRows(card,row);
         bindMeasurementSetToRow(fresh,card,row);sets.push(fresh);renderSizeSetSelector();renderOptionMeasurements(card,row);
         notice('Measurement set linked to '+label+'. Save the product to retain it.');
       });
@@ -875,7 +875,7 @@
     var del=node('button','option-remove','×');del.type='button';del.setAttribute('aria-label','Remove option');
     var clear=node('button','option-photo-clear','×');clear.type='button';clear.hidden=true;
     clear.setAttribute('aria-label','Remove photo from this option');clear.title='Remove option photo only';
-    var measures=node('button','option-measure-trigger','＋ Measurements');measures.type='button';
+    var measures=node('button','option-measure-trigger','＋ Measurements');measures.type='button';measures.setAttribute('aria-expanded','false');
     measures.setAttribute('aria-label','Edit measurements for this variation option');
     var panel=node('div','option-measure-panel');panel.hidden=true;
     row.appendChild(grip);row.appendChild(name);row.appendChild(pick);row.appendChild(del);row.appendChild(clear);
