@@ -2989,14 +2989,23 @@ function closeShopDetail() {
         }
         return;
       }
+      var refuseMsg = String((shopOut && (shopOut.message || shopOut.reason || shopOut.outcome)) || 'unavailable');
+      var quotaHint = /quota|rate.?limit|read requests per minute/i.test(refuseMsg)
+        ? ' Wait about one minute before refreshing — repeated refreshes worsen read-quota exhaustion.'
+        : '';
       showShopCatalogError(
         'Shop catalog refused: '
-        + String((shopOut && (shopOut.message || shopOut.reason || shopOut.outcome)) || 'unavailable')
+        + refuseMsg
         + '. No fabricated availability was shown.'
+        + quotaHint
       );
     }, function (failure) {
-      showShopCatalogError('Shop service unavailable: ' + String(failure.reason || 'read_failed')
-        + '. No sellable products were substituted.');
+      var failReason = String(failure.reason || failure.message || 'read_failed');
+      var quotaHint = /quota|rate.?limit|read requests per minute/i.test(failReason)
+        ? ' Wait about one minute before refreshing — repeated refreshes worsen read-quota exhaustion.'
+        : '';
+      showShopCatalogError('Shop service unavailable: ' + failReason
+        + '. No sellable products were substituted.' + quotaHint);
     });
   }
 
