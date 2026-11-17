@@ -346,6 +346,10 @@
       <span class="char-count" id="descriptionCount">0 / 5000</span>
       <label class="form-label" for="shortDescription">Short description</label>
       <input class="field" id="shortDescription" maxlength="300" placeholder="A brief summary for shoppers">
+      <label class="form-label" for="productHighlights">Product selling points <span class="mini">(optional)</span></label>
+      <textarea class="field" id="productHighlights" rows="3" maxlength="600" placeholder="Premium Nidha Dubai&#10;Nursing-friendly zip&#10;Free shawl"></textarea>
+      <p class="helper">Add up to six product highlights, one per line. They appear as premium selling points above the size selector. Only your own wording is shown; do not enter dummy claims.</p>
+      <span class="char-count" id="highlightsCount">0 / 6 highlights</span>
       <label class="form-label">Video <span class="mini">(optional)</span></label>
       <div class="upload-row" id="videoRow">
         <label class="upload-tile"><strong style="font-size:27px;font-weight:400">＋</strong><span>Add video</span><input type="file" id="video" accept="video/mp4,video/quicktime,video/webm" aria-label="Add product video"></label>
@@ -1174,6 +1178,8 @@
     $('category').value=String(d.category_id||'');
     $('description').value=d.long_description||d.description||'';
     $('shortDescription').value=d.short_description||'';
+    $('productHighlights').value=(Array.isArray(d.product_highlights)?d.product_highlights:[]).join('\n');
+    $('highlightsCount').textContent=(Array.isArray(d.product_highlights)?d.product_highlights.length:0)+' / 6 highlights';
     $('variationGroups').replaceChildren();
     (d.variation_groups||[]).forEach(addGroup);updateVariationButton();
     state.imageFiles=[];state.videoFile=null;state.variantFiles={};state.sizeChartFile=null;state.sizeGuideIndex=0;state.variationDirty=false;
@@ -1191,7 +1197,7 @@
     $('saveDraft').textContent=state.selected?'Save changes':'Save draft';
   }
   function resetEditor() {
-    return {title:'',category_id:'',short_description:'',long_description:'',media:[],variation_groups:[],variant_media:[],size_guide:{sets:[],image_media_id:null},parcel:null,revision:null,publication_status:'DRAFT'};
+    return {title:'',category_id:'',short_description:'',long_description:'',product_highlights:[],media:[],variation_groups:[],variant_media:[],size_guide:{sets:[],image_media_id:null},parcel:null,revision:null,publication_status:'DRAFT'};
   }
   async function openProduct(id,view) {
     if(state.busy)return;
@@ -1219,6 +1225,10 @@
     if(groups.length>3)throw new Error('Use at most three variation groups.');
     combinations(groups);
     d.title=title;d.category_id=category;d.long_description=description;d.short_description=$('shortDescription').value.trim();
+    var highlights=$('productHighlights').value.split(/\r?\n/).map(function(x){return x.trim();}).filter(Boolean);
+    if(highlights.length>6)throw new Error('Use no more than six product selling points.');
+    if(highlights.some(function(x){return x.length>80;}))throw new Error('Each selling point must be 80 characters or fewer.');
+    d.product_highlights=highlights;
     d.variation_groups=groups;
     d.size_guide=validateSizeGuide();
     d.parcel=readParcel();
@@ -1338,6 +1348,8 @@
        || String(p.publication_status||'').toUpperCase()!==String(intent.publication_status||'').toUpperCase()) {
       throw new Error('Saved product values or publication status did not match confirmation. Check the database before retrying.');
     }
+    if(JSON.stringify(p.product_highlights||[])!==JSON.stringify(intent.product_highlights||[]))
+      throw new Error('Product selling points did not match saved readback.');
     var media=Array.isArray(p.media)?p.media:[];
     if(intent.parcel){
       var savedParcel=p.parcel||{};
@@ -1482,6 +1494,7 @@
         product_id:state.selected||null,expected_revision:state.remoteRevision,
         title:request.title,category_id:request.category_id,
         short_description:request.short_description,long_description:request.long_description,
+        product_highlights:request.product_highlights,
         variation_groups:request.variation_groups,media:media,
         variant_media:supplemental.variant_media,size_guide:supplemental.size_guide,
         parcel:request.parcel,
@@ -1643,6 +1656,11 @@
     if(willShow)renderDescriptionPreview();
   });
   $('description').addEventListener('input',function(){if(!$('formattedPreview').hidden)renderDescriptionPreview();});
+  $('productHighlights').addEventListener('input',function(){
+    var current=this.value.split(/\r?\n/).map(function(x){return x.trim();}).filter(Boolean);
+    $('highlightsCount').textContent=current.length+' / 6 highlights';
+    state.dirty=true;state.metaDirty=true;
+  });
   $('variationGroups').addEventListener('input',renderVariationPhotoSelect);
   $('variationPhotoOption').addEventListener('change',renderVariationPhotoStatus);
   $('variationPhotoFile').addEventListener('change',function(e){

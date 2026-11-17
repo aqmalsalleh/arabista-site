@@ -1710,6 +1710,218 @@ body.is-discover .site-tabs{z-index:45!important}
   #shopDetail *,#cart .ab-cart-card{scroll-behavior:auto!important;animation:none!important;transition:none!important}
 }
 
+
+/* ARABISTA v247 OWNER PREMIUM REFINE — from attached fyp-staging.html
+   Scoped to customer Product Sheet/Cart, visual-only demo sections labelled.
+   Motion respects reduced-motion; media loader is tied to actual image events. */
+#shopDetail{background:#fff!important;border-radius:20px 20px 0 0!important;
+  box-shadow:0 -12px 50px rgba(10,10,10,.12)!important;}
+#shopDetail .detail-head{min-height:50px!important;position:relative;touch-action:pan-y}
+#shopDetail .shop-sheet-drag{
+  position:absolute!important;left:50%!important;top:0!important;
+  transform:translateX(-50%);width:110px!important;height:45px!important;
+  min-height:45px!important;border:0!important;border-radius:0!important;
+  padding:0!important;background:transparent!important;z-index:2;
+  cursor:grab;touch-action:none;-webkit-tap-highlight-color:transparent;
+}
+#shopDetail .shop-sheet-drag::after{
+  content:"";display:block;position:absolute;left:50%;top:7px;
+  transform:translateX(-50%);width:41px;height:4px;border-radius:8px;
+  background:#d6d6d6;pointer-events:none
+}
+#shopDetail .shop-sheet-drag:active{cursor:grabbing}
+#shopDetail .shop-detail-scroll{scroll-behavior:auto;overflow-anchor:none}
+#shopDetail .ab-tabs{height:45px;grid-template-columns:repeat(3,minmax(0,1fr))}
+#shopDetail .ab-tabs button{height:44px;min-height:44px!important;color:#8c8c8c!important}
+#shopDetail .ab-tabs button[aria-selected="true"]{color:#272727!important}
+#shopDetail .ab-tabs button[aria-selected="true"]::after{
+  background:#a88a54!important;transition:transform .34s cubic-bezier(.2,.8,.2,1)
+}
+#shopDetail .ab-gallery{scroll-margin-top:45px;isolation:isolate;background:#f6f6f5}
+#shopDetail .ab-gallery-track{scroll-behavior:smooth;touch-action:pan-x pan-y;background:#f6f6f5}
+#shopDetail .ab-slide{
+  height:clamp(315px,52svh,560px)!important;
+  min-width:100%;background:#f6f6f5!important;overflow:hidden
+}
+#shopDetail .ab-slide img{
+  display:block;width:100%;height:100%;object-fit:contain!important;
+  object-position:center;opacity:1;transition:opacity .38s ease;
+}
+#shopDetail .ab-slide.ab-media-pending img{opacity:0}
+#shopDetail .ab-gallery-count{
+  bottom:14px;right:14px;background:#ffffffdf!important;color:#454545;
+  font-size:11px;font-weight:600;border:1px solid #0000000b;
+  box-shadow:0 2px 10px #0000000a
+}
+#shopDetail .ab-gallery-zoom{
+  bottom:14px;left:14px;min-height:36px!important;
+  padding:7px 12px!important;border-color:#e7ddcd;
+}
+#shopDetail .ab-media-loader{
+  position:absolute;inset:0;z-index:2;display:grid;place-items:center;
+  pointer-events:none;background:linear-gradient(110deg,#f6f4f0,#fcfaf6 50%,#f6f4f0);
+}
+#shopDetail .ab-coin-loader{width:56px;height:56px;display:grid;place-items:center;
+  border-radius:50%;border:1px solid #d6c2a0;
+  background:radial-gradient(circle at 25% 22%,#fff9e9,#dec6a1 62%,#b08b58);
+  box-shadow:0 9px 23px #6e553120;
+  font:600 28px/1 "Cormorant Garamond",Georgia,serif;color:#765731;
+  animation:ab-coin-spin 1.5s ease-in-out infinite;
+}
+#shopDetail .ab-coin-loader::after{content:"A";text-shadow:0 2px #fffaee}
+@keyframes ab-coin-spin{0%{transform:rotateY(0)}100%{transform:rotateY(360deg)}}
+#shopDetail .ab-content{padding:18px 19px 12px}
+#shopDetail .ab-content .ab-eyebrow{font-size:10px;letter-spacing:.16em;margin:0 0 8px}
+#shopDetail .ab-price{font-size:29px;line-height:1.2;margin-bottom:7px;color:#252525}
+#shopDetail .ab-title{font-size:15px;line-height:1.55;letter-spacing:-.02em;margin:10px 0 6px}
+#shopDetail .ab-highlights{
+  display:flex;align-items:center;flex-wrap:wrap;gap:0 9px;
+  padding:11px 0;border-top:1px solid #ececec;border-bottom:1px solid #ececec;
+  margin:15px 0 5px;font-size:11px;line-height:1.55;font-weight:500;color:#6a6a6a
+}
+#shopDetail .ab-highlights span:not(:last-child)::after{
+  content:"·";padding-left:9px;color:#a88a54
+}
+#shopDetail .ab-select-line{
+  display:grid!important;grid-template-columns:minmax(0,1fr) auto!important;
+  gap:9px!important;min-height:59px!important;width:100%!important;
+  margin:0!important;padding:10px 0!important;border-top:0!important;
+  border-bottom:1px solid #ececec!important;background:#fff!important;
+}
+#shopDetail .ab-select-left{display:flex!important;align-items:baseline;
+  flex-wrap:wrap;gap:5px 10px;min-width:0;max-width:100%;}
+#shopDetail .ab-select-left strong{font:700 13px/1.4 "DM Sans",sans-serif;
+  white-space:nowrap!important;flex:none}
+#shopDetail .ab-select-left small{display:inline-block!important;min-width:0;max-width:100%;
+  font-size:12px!important;color:#888!important;overflow:hidden;
+  text-overflow:ellipsis;white-space:nowrap;line-height:1.4}
+#shopDetail .ab-select-action{display:inline-flex;align-items:center;gap:5px;
+  font-size:12px;font-weight:700;color:#a88a54;white-space:nowrap}
+#shopDetail .ab-select-action b{font-size:20px;line-height:1;font-weight:400}
+#shopDetail .ab-stock{font-size:11px;min-height:23px;margin:8px 0}
+#shopDetail .ab-section{scroll-margin-top:54px;border-bottom:7px solid #f7f7f7}
+#shopDetail .ab-description{font-size:12.5px;line-height:1.75;color:#636363}
+#shopDetail .ab-description ul,#shopDetail .ab-description ol{padding-left:18px}
+#shopDetail .ab-variant-panel{
+  max-height:calc(100% - 16px)!important;border-radius:17px 17px 0 0!important;
+  transition:transform .34s cubic-bezier(.22,1,.36,1);
+}
+#shopDetail .ab-variant-overlay{animation:ab-scrim-in .25s ease both}
+@keyframes ab-scrim-in{from{background:#0000}to{background:#0007}}
+#shopDetail .ab-choose-header{
+  flex:0 0 54px;position:relative;display:grid;
+  grid-template-columns:44px 1fr 44px;align-items:center;
+  border-bottom:1px solid #f0f0f0;padding:6px 14px 3px;
+}
+#shopDetail .ab-choose-header h3{text-align:center;font-size:14px;font-weight:700;
+  letter-spacing:-.025em;margin:0}
+#shopDetail .ab-choose-cart{position:relative;width:36px;height:36px;background:transparent!important}
+#shopDetail .ab-choose-cart-count{position:absolute;top:-3px;right:-4px;
+  font-size:9px;font-weight:700;color:#fff;background:#b39257;
+  border-radius:9px;min-width:17px;text-align:center;padding:2px}
+#shopDetail .ab-size-guide-bar{
+  min-height:43px;padding:0 17px;display:flex;justify-content:flex-end;align-items:center;
+  border-bottom:1px solid #f3f1ef;background:#fff}
+#shopDetail .ab-size-guide-link{display:flex;align-items:center;gap:8px;
+  min-height:39px;background:transparent!important;border:0!important;
+  padding:8px 2px!important;color:#a88a54!important;
+  font-size:12px;font-weight:700}
+#shopDetail .ab-size-guide-link svg{width:16px;height:16px}
+#shopDetail .ab-picker-head{padding:16px 17px!important;border-bottom:0!important}
+#shopDetail .ab-picker-image{width:88px;height:118px;border-radius:9px;background:#f5f3ef;
+  object-fit:contain!important}
+#shopDetail .ab-picker-price{font-size:25px;color:#a78548}
+#shopDetail .ab-picker-scroll{padding:0 17px 12px}
+#shopDetail .ab-picker-group{margin:13px 0 20px}
+#shopDetail .ab-picker-group h4{font-size:14px;line-height:1.4}
+#shopDetail .ab-chips{gap:8px}
+#shopDetail .ab-chip{min-height:45px;border-radius:8px!important}
+#shopDetail .ab-picker-foot{display:flex;align-items:center;gap:11px;
+  padding:12px 15px calc(13px + env(safe-area-inset-bottom,0px))}
+#shopDetail .ab-stepper{border-radius:10px!important;background:#f3f3f3;border:0}
+#shopDetail .ab-stepper button{background:transparent!important;width:44px;height:45px}
+#shopDetail .ab-picker-confirm{min-height:49px;border-radius:26px!important}
+#shopDetail .ab-lightbox{
+  background:#050505;animation:ab-lightbox-in .22s ease-out both;
+}
+@keyframes ab-lightbox-in{from{opacity:0;transform:translateY(9px)}to{opacity:1;transform:none}}
+#shopDetail .ab-lightbox-head{flex:0 0 auto;min-height:57px;padding:12px 16px}
+#shopDetail .ab-lightbox-track{
+  flex:1;min-height:0;display:flex;overflow-x:auto;overflow-y:hidden;
+  scroll-snap-type:x mandatory;scroll-behavior:smooth;scrollbar-width:none;
+  touch-action:pan-x;overscroll-behavior-x:contain
+}
+#shopDetail .ab-lightbox-track::-webkit-scrollbar{display:none}
+#shopDetail .ab-lightbox-frame{flex:0 0 100%;min-width:100%;
+  display:flex;align-items:center;justify-content:center;padding:8px 12px;
+  scroll-snap-align:center;overflow:hidden}
+#shopDetail .ab-lightbox-frame img{max-width:100%;max-height:100%;
+  width:auto;height:auto;object-fit:contain}
+#shopDetail .ab-demo-block{padding:20px 19px 22px;border-bottom:7px solid #f7f7f7}
+#shopDetail .ab-demo-head{display:flex;align-items:center;
+  justify-content:space-between;gap:10px;margin-bottom:13px}
+#shopDetail .ab-demo-head h3{margin:0;font-size:15px;font-weight:700}
+#shopDetail .ab-demo-tag{display:inline-block;padding:4px 7px;
+  border-radius:4px;color:#8e7043;background:#f7f3ea;
+  font-size:9px;font-weight:800;letter-spacing:.07em;white-space:nowrap}
+#shopDetail .ab-demo-note{color:#978b7e;font-size:10px;line-height:1.5;margin:10px 0 0}
+#shopDetail .ab-deal-teaser{display:grid;grid-template-columns:63px minmax(0,1fr) auto;
+  gap:11px;align-items:center;width:100%;min-height:85px;padding:10px 12px 10px 0;
+  border:1px solid #e7dbca!important;border-radius:12px!important;
+  background:linear-gradient(110deg,#fbf9f4,#f7f1e7)!important;text-align:left;color:#272727!important}
+#shopDetail .ab-deal-rail{display:grid;place-items:center;height:63px;
+  border-right:1px dashed #d5c6ad;font-size:23px;color:#a88a54}
+#shopDetail .ab-deal-copy{display:flex;flex-direction:column;gap:5px;min-width:0}
+#shopDetail .ab-deal-copy strong{color:#866737;font-size:18px;letter-spacing:-.04em}
+#shopDetail .ab-deal-copy small{font-size:11px;color:#857b6d}
+#shopDetail .ab-deal-view{font-size:11px;color:#a18450;white-space:nowrap;font-weight:700}
+#shopDetail .ab-demo-review{padding:10px 0 5px;border-top:1px solid #f0ece7;
+  color:#666;font-size:12px;line-height:1.65}
+#shopDetail .ab-demo-modal{position:absolute;inset:0;z-index:19;
+  background:#fff;color:#292929;display:flex;flex-direction:column;
+  animation:ab-lightbox-in .32s cubic-bezier(.22,1,.36,1)}
+#shopDetail .ab-demo-modal-head{flex:0 0 58px;display:grid;
+  grid-template-columns:44px 1fr 44px;align-items:center;
+  padding:0 14px;border-bottom:1px solid #efefef}
+#shopDetail .ab-demo-modal-head h3{font-size:16px;text-align:center;margin:0}
+#shopDetail .ab-demo-modal-scroll{overflow-y:auto;min-height:0;flex:1;
+  padding:25px 18px calc(30px + env(safe-area-inset-bottom,0px))}
+#shopDetail .ab-deal-ticket{display:grid;grid-template-columns:74px minmax(0,1fr) 70px;
+  min-height:123px;border:1px solid #e8dfd1;border-radius:13px;
+  margin:0 0 12px;overflow:hidden;background:#fcfaf6}
+#shopDetail .ab-ticket-rail{display:grid;place-items:center;background:#f4ede1;
+  border-right:1px dashed #cdbb9c;color:#987747;font-size:12px;font-weight:700}
+#shopDetail .ab-ticket-info{padding:15px 9px;min-width:0}
+#shopDetail .ab-ticket-info small{display:block;color:#a78c5e;font-size:9px;font-weight:800}
+#shopDetail .ab-ticket-info strong{display:block;color:#77582d;
+  font-size:20px;letter-spacing:-.04em;line-height:1.35;margin:5px 0}
+#shopDetail .ab-ticket-info span{color:#666;font-size:10px;line-height:1.5}
+#shopDetail .ab-ticket-action{display:grid;place-items:center;padding:7px}
+#shopDetail .ab-ticket-action button{
+  min-height:38px;width:100%;border:1px solid #bda782!important;border-radius:99px!important;
+  background:#f8f3eb!important;color:#8b744f!important;font-size:10px!important;font-weight:700!important;
+}
+#shopDetail .ab-sheet-reveal{animation:ab-sheet-reveal .45s cubic-bezier(.2,.8,.2,1) both}
+@keyframes ab-sheet-reveal{from{opacity:.7;transform:translateY(8px)}to{opacity:1;transform:none}}
+#cart .ab-cart-card{animation:ab-sheet-reveal .36s cubic-bezier(.2,.8,.2,1) both}
+@media(max-width:380px){
+  #shopDetail .ab-slide{height:clamp(300px,48svh,510px)!important}
+  #shopDetail .ab-select-line{grid-template-columns:minmax(0,1fr) auto!important}
+  #shopDetail .ab-picker-image{width:72px;height:98px}
+  #shopDetail .ab-demo-block{padding-left:15px;padding-right:15px}
+  #shopDetail .ab-deal-teaser{grid-template-columns:50px minmax(0,1fr) auto;gap:8px}
+}
+@media(prefers-reduced-motion:reduce){
+  #shopDetail .ab-coin-loader,#shopDetail .ab-lightbox,
+  #shopDetail .ab-sheet-reveal,#shopDetail .ab-variant-overlay,
+  #shopDetail .ab-demo-modal,#cart .ab-cart-card{animation:none!important}
+  #shopDetail .ab-gallery-track,#shopDetail .ab-lightbox-track{scroll-behavior:auto!important}
+}
+
+
+#shopDetail .ab-coin-loader::after{display:none!important}
+#shopDetail .ab-coin-loader img{display:block;width:90%;height:90%;object-fit:cover;
+  border-radius:50%;background:#f7ecda;pointer-events:none}
 </style>
 <link rel="preload" as="image" fetchpriority="high" href="https://imagedelivery.net/32oxijRdypCO4dk5WrGLwg/c2726925-9313-4bc7-9733-83f5d9429600/public">
 </head>
@@ -2777,9 +2989,17 @@ function closeShopDetail() {
     var pickerQty = null, pickerMinus = null, pickerPlus = null, pickerConfirm = null;
     var amount = null, stock = null, selectedCopy = null, footerStatus = null;
     var galleryTrack = null, galleryCount = null;
-    var galleryItems = [], currentGallery = [], activeIndex = 0;
+    var galleryItems = [], currentGallery = [], activeIndex = 0, variantWasChosen = false;
     var regular = [];
-    (Array.isArray(product.images) ? product.images : []).forEach(function (m) { regular.push(m); });
+    // Seller-set cover/ordered gallery is always the initial image; variants never usurp it.
+    var cover = product.primary_image || null;
+    if (cover && (cover.delivery_ref || cover.delivery_url)) regular.push(cover);
+    (Array.isArray(product.images) ? product.images : []).forEach(function (m) {
+      if (!regular.some(function (x) {
+        return String(x.media_id || x.delivery_ref || x.delivery_url) ===
+          String(m.media_id || m.delivery_ref || m.delivery_url);
+      })) regular.push(m);
+    });
     (Array.isArray(product.videos) ? product.videos : []).forEach(function (m) { regular.push(m); });
     function button(label, cls) {
       var b = el('button', label, cls);
@@ -2903,13 +3123,22 @@ function closeShopDetail() {
       return media;
     }
     function effectiveGallery(sku) {
+      // The original gallery order must stay stable and start with Seller Products cover.
+      // Add a variant photo only as an extra, inspectable slide (never replace cover).
+      var out = regular.slice();
       var vm = variantImage(sku);
-      if (!vm) return regular.slice();
-      var out = [vm];
-      regular.forEach(function (m) { if (safeMediaUrl(m) !== safeMediaUrl(vm)) out.push(m); });
+      if (vm && !out.some(function (m) { return safeMediaUrl(m) === safeMediaUrl(vm); })) out.push(vm);
       return out;
     }
-    function showLightbox() {
+    function variantGalleryIndex(sku, list) {
+      var vm = variantImage(sku);
+      if (!vm) return 0;
+      for (var i = 0; i < list.length; i++) {
+        if (safeMediaUrl(list[i]) === safeMediaUrl(vm)) return i;
+      }
+      return 0;
+    }
+    function showLightbox(imageUrl) {
       if (!currentGallery.length) return;
       var valid = currentGallery.filter(function (m) {
         return safeMediaUrl(m) && String(m.media_kind || m.kind || 'IMAGE').toUpperCase() !== 'VIDEO';
@@ -2918,40 +3147,71 @@ function closeShopDetail() {
       var overlay = el('div', null, 'ab-lightbox');
       overlay.setAttribute('role', 'dialog');
       overlay.setAttribute('aria-modal', 'true');
-      overlay.setAttribute('aria-label', 'Full-screen product photos');
+      overlay.setAttribute('aria-label', 'Fullscreen product image gallery');
       var top = el('div', null, 'ab-lightbox-head');
-      top.appendChild(el('span', 'PRODUCT PHOTOS'));
+      top.appendChild(el('span', 'ARABISTA · PHOTOS'));
       var x = iconButton(closeSvg, 'Close full-screen photos');
       top.appendChild(x);
-      var area = el('div', null, 'ab-lightbox-photo');
-      var pic = document.createElement('img');
-      pic.src = safeMediaUrl(valid[0]);
-      pic.alt = product.title;
-      area.appendChild(pic);
-      var actions = el('div', null, 'ab-lightbox-head');
-      var prev = button('Previous', 'ab-round');
+      var track = el('div', null, 'ab-lightbox-track');
+      track.setAttribute('role', 'region');
+      track.setAttribute('aria-label', 'Swipe product photos');
+      valid.forEach(function (m) {
+        var slide = el('div', null, 'ab-lightbox-frame');
+        var pic = document.createElement('img');
+        pic.src = safeMediaUrl(m);
+        pic.alt = m.alt_text || product.title || 'Product photo';
+        slide.appendChild(pic);
+        track.appendChild(slide);
+      });
+      var controls = el('div', null, 'ab-lightbox-head');
+      var prev = button('‹', 'ab-round');
+      prev.setAttribute('aria-label', 'Previous product photo');
       var counter = el('span');
-      var next = button('Next', 'ab-round');
-      var pos = Math.min(activeIndex, valid.length - 1);
+      counter.setAttribute('aria-live', 'polite');
+      var next = button('›', 'ab-round');
+      next.setAttribute('aria-label', 'Next product photo');
+      var imagePosition = valid.findIndex(function(m){return safeMediaUrl(m)===String(imageUrl||'');});
+      var pos = imagePosition >= 0 ? imagePosition : Math.min(activeIndex, valid.length - 1);
       function repaint() {
-        pic.src = safeMediaUrl(valid[pos]);
         counter.textContent = (pos + 1) + ' / ' + valid.length;
         prev.disabled = pos < 1;
         next.disabled = pos >= valid.length - 1;
       }
-      prev.addEventListener('click', function () { if (pos > 0) { pos--; repaint(); } });
-      next.addEventListener('click', function () { if (pos < valid.length - 1) { pos++; repaint(); } });
-      actions.appendChild(prev); actions.appendChild(counter); actions.appendChild(next);
-      overlay.appendChild(top); overlay.appendChild(area); overlay.appendChild(actions);
+      function goto(i,immediate) {
+        pos = Math.max(0,Math.min(valid.length - 1,i));
+        track.scrollTo({left:pos * track.clientWidth,behavior:immediate?'instant':'smooth'});
+        repaint();
+      }
+      prev.addEventListener('click',function(){goto(pos-1,false);});
+      next.addEventListener('click',function(){goto(pos+1,false);});
+      track.addEventListener('scroll',function(){
+        pos = Math.max(0,Math.min(valid.length-1,Math.round(track.scrollLeft / (track.clientWidth || 1))));
+        repaint();
+      },{passive:true});
+      controls.appendChild(prev);controls.appendChild(counter);controls.appendChild(next);
+      overlay.appendChild(top);overlay.appendChild(track);overlay.appendChild(controls);
       host.appendChild(overlay);
-      function close() { if (overlay.isConnected) overlay.remove(); }
-      x.addEventListener('click', close);
-      overlay.addEventListener('keydown', function (e) {
-        if (e.key === 'Escape') close();
-        if (e.key === 'ArrowRight' && pos < valid.length - 1) { pos++; repaint(); }
-        if (e.key === 'ArrowLeft' && pos > 0) { pos--; repaint(); }
+      var previousFocus = document.activeElement;
+      function close() {
+        if (!overlay.isConnected) return;
+        overlay.remove();
+        if (previousFocus && previousFocus.focus) previousFocus.focus();
+      }
+      x.addEventListener('click',close);
+      overlay.addEventListener('keydown',function(e){
+        if(e.key==='Escape'){e.preventDefault();close();}
+        if(e.key==='ArrowRight')goto(pos+1,false);
+        if(e.key==='ArrowLeft')goto(pos-1,false);
+        if(e.key==='Tab'){
+          var focusables=[x,prev,next].filter(function(n){return !n.disabled;});
+          if(!focusables.length)return;
+          if(e.shiftKey && document.activeElement===focusables[0]){e.preventDefault();focusables[focusables.length-1].focus();}
+          else if(!e.shiftKey && document.activeElement===focusables[focusables.length-1]){e.preventDefault();focusables[0].focus();}
+        }
       });
-      repaint(); x.focus();
+      repaint();
+      x.focus();
+      requestAnimationFrame(function(){if(overlay.isConnected)goto(pos,true);});
     }
     function paintGallery(sku) {
       if (!galleryTrack) return;
@@ -2961,7 +3221,7 @@ function closeShopDetail() {
       galleryItems = [];
       currentGallery.forEach(function (m) {
         var slide = el('div', null, 'ab-slide');
-        var src = safeMediaUrl(m);
+        var url = safeMediaUrl(m);
         var kind = String(m.media_kind || m.kind || 'IMAGE').toUpperCase();
         if (kind === 'VIDEO') {
           var emb = String(m.embed_ref || '');
@@ -2975,25 +3235,47 @@ function closeShopDetail() {
             slide.appendChild(frame);
           } else {
             var vid = document.createElement('video');
-            vid.src = src; vid.controls = true; vid.playsInline = true;
+            vid.src = url; vid.controls = true; vid.playsInline = true;
             vid.preload = 'metadata'; vid.setAttribute('playsinline', '');
             slide.appendChild(vid);
           }
         } else {
+          slide.classList.add('ab-media-pending');
+          var spinner = el('div',null,'ab-media-loader');
+          spinner.setAttribute('aria-label','Loading product photo');
+          var coin = el('span',null,'ab-coin-loader');
+          var logo = document.createElement('img');
+          logo.src = 'https://www.arabistaofficial.com/images/logo.webp';
+          logo.alt = '';
+          logo.decoding = 'async';
+          coin.appendChild(logo);
+          spinner.appendChild(coin);
+          slide.appendChild(spinner);
           var img = document.createElement('img');
-          img.src = src; img.alt = m.alt_text || product.title || 'Product photo';
+          img.alt = m.alt_text || product.title || 'Product photo';
           img.loading = 'lazy';
-          img.addEventListener('click', showLightbox);
+          function done(ok) {
+            slide.classList.remove('ab-media-pending');
+            if (spinner.isConnected) spinner.remove();
+            if (!ok) img.alt = 'Photo unavailable';
+          }
+          img.addEventListener('load',function(){done(true);},{once:true});
+          img.addEventListener('error',function(){done(false);},{once:true});
+          img.addEventListener('click',function(){showLightbox(url);});
           slide.appendChild(img);
+          img.src = url;
+          if(img.complete)done(img.naturalWidth > 0);
         }
         galleryTrack.appendChild(slide);
         galleryItems.push(slide);
       });
-      if (!galleryItems.length) galleryTrack.appendChild(el('div', 'No product photos available.', 'ab-slide'));
-      activeIndex = 0;
-      galleryTrack.scrollLeft = 0;
+      if (!galleryItems.length) galleryTrack.appendChild(el('div','No product photos available.','ab-slide'));
+      // Default show owner-set cover; after explicit variant selection show corresponding photo.
+      var desired = variantWasChosen ? variantGalleryIndex(sku,currentGallery) : 0;
+      activeIndex = desired;
+      galleryTrack.scrollLeft = desired * (galleryTrack.clientWidth || 1);
       if (galleryCount) galleryCount.textContent = currentGallery.length ?
-        ('1 / ' + currentGallery.length) : 'No media';
+        ((desired + 1) + ' / ' + currentGallery.length) : 'No media';
     }
     function updateGalleryCounter() {
       if (!galleryTrack || !galleryItems.length || !galleryCount) return;
@@ -3031,6 +3313,7 @@ function closeShopDetail() {
       body.appendChild(note);
     }
     var gallery = el('div', null, 'ab-gallery');
+    gallery.id = 'ab-gallery';
     galleryTrack = el('div', null, 'ab-gallery-track');
     galleryTrack.id = 'product-gallery-track';
     galleryTrack.setAttribute('aria-label', 'Product media');
@@ -3049,46 +3332,172 @@ function closeShopDetail() {
     intro.appendChild(el('p', 'THE ARABISTA EDIT', 'ab-eyebrow'));
     amount = el('div', null, 'ab-price'); intro.appendChild(amount);
     intro.appendChild(el('h3', product.title || 'Product', 'ab-title'));
-    if (product.description) intro.appendChild(el('p', product.description, 'ab-lede'));
+    var highlights = Array.isArray(product.product_highlights) ? product.product_highlights : [];
+    if (highlights.length) {
+      var featureStrip = el('div',null,'ab-highlights');
+      featureStrip.setAttribute('aria-label','Product selling points');
+      highlights.filter(function (v) { return String(v).trim(); }).slice(0,6).forEach(function (v) {
+        featureStrip.appendChild(el('span',String(v)));
+      });
+      if(featureStrip.children.length)intro.appendChild(featureStrip);
+    }
     var optionButton = button(null, 'ab-select-line');
     optionButton.setAttribute('aria-label', 'Select product variations');
-    var optionText = el('span');
-    optionText.appendChild(el('strong', 'Select your options'));
+    var optionText = el('span',null,'ab-select-left');
+    optionText.appendChild(el('strong', groups.some(function (g) {
+      return /size/i.test(g.label);
+    }) ? 'Select size' : 'Select options'));
     selectedCopy = el('small');
+    selectedCopy.setAttribute('aria-live','polite');
     optionText.appendChild(selectedCopy);
     optionButton.appendChild(optionText);
-    optionButton.appendChild(el('span', '›', 'ab-chevron'));
+    var choose = el('span',null,'ab-select-action');
+    choose.appendChild(el('span','Choose'));
+    choose.appendChild(el('b','›'));
+    optionButton.appendChild(choose);
     optionButton.addEventListener('click', openPicker);
     intro.appendChild(optionButton);
     stock = el('p', null, 'ab-stock'); intro.appendChild(stock);
+    intro.classList.add('ab-sheet-reveal');
     body.appendChild(intro);
     var tabs = el('div', null, 'ab-tabs');
     tabs.setAttribute('role', 'tablist');
     function sectionLink(text, target) {
       var tab = button(text);
       tab.setAttribute('role', 'tab');
-      tab.setAttribute('aria-selected', target === 'ab-summary' ? 'true' : 'false');
+      tab.setAttribute('aria-selected', target === 'ab-gallery' ? 'true' : 'false');
       tab.addEventListener('click', function () {
-        [].forEach.call(tabs.children, function (x) { x.setAttribute('aria-selected', 'false'); });
-        tab.setAttribute('aria-selected', 'true');
-        var targetEl = document.getElementById(target);
-        if (targetEl) body.scrollTop = targetEl.offsetTop - tabs.offsetHeight;
+        [].forEach.call(tabs.children, function (x) { x.setAttribute('aria-selected','false'); });
+        tab.setAttribute('aria-selected','true');
+        if (target === 'ab-gallery') {
+          body.scrollTo({top:0,behavior:window.matchMedia &&
+            window.matchMedia('(prefers-reduced-motion:reduce)').matches?'auto':'smooth'});
+          return;
+        }
+        var targetEl = host.querySelector('#' + target);
+        if (!targetEl) return;
+        // offsetTop is relative to an offsetParent, not the scroller; use bounding rectangles.
+        var top = Math.max(0, body.scrollTop +
+          targetEl.getBoundingClientRect().top - body.getBoundingClientRect().top -
+          tabs.getBoundingClientRect().height - 6);
+        body.scrollTo({top:top,behavior:window.matchMedia &&
+          window.matchMedia('(prefers-reduced-motion:reduce)').matches?'auto':'smooth'});
       });
       tabs.appendChild(tab);
     }
-    sectionLink('Overview', 'ab-summary');
+    sectionLink('Overview', 'ab-gallery');
     sectionLink('Size guide', 'ab-size');
     sectionLink('Details', 'ab-details');
-    body.appendChild(tabs);
-    var overview = el('section', null, 'ab-section'); overview.id = 'ab-summary';
-    overview.appendChild(el('h3', 'Product overview'));
-    var rich = el('div', null, 'ab-description');
-    if (product.description_html) rich.innerHTML = String(product.description_html);
-    else if (product.long_description) rich.textContent = product.long_description;
-    else if (product.description) rich.textContent = product.description;
-    else rich.textContent = 'Explore the gallery and available variations.';
-    overview.appendChild(rich);
-    body.appendChild(overview);
+    body.insertBefore(tabs, body.firstChild);
+    // Explicitly mock-only components are visible solely on DEV staging/draft previews.
+    // Never project these claims to real catalog prices, reviews, promotion APIs or checkout.
+    if(preview || /\/staging(?:\/|$)/.test(String(window.location.pathname || ''))){
+      var dealBox = el('section',null,'ab-demo-block');
+      dealBox.setAttribute('aria-label','Deals and vouchers design preview only');
+      var dealHeading = el('div',null,'ab-demo-head');
+      dealHeading.appendChild(el('h3','Deals & vouchers'));
+      dealHeading.appendChild(el('span','DEMO · NOT ACTIVE','ab-demo-tag'));
+      dealBox.appendChild(dealHeading);
+      var teaser = button(null,'ab-deal-teaser');
+      teaser.setAttribute('aria-label','Explore demonstration-only vouchers');
+      teaser.setAttribute('aria-haspopup','dialog');
+      teaser.appendChild(el('span','▧','ab-deal-rail'));
+      var teaserCopy=el('span',null,'ab-deal-copy');
+      teaserCopy.appendChild(el('strong','RM8 OFF'));
+      teaserCopy.appendChild(el('small','Sample voucher · Min. RM120'));
+      teaser.appendChild(teaserCopy);
+      teaser.appendChild(el('span','Explore ›','ab-deal-view'));
+      dealBox.appendChild(teaser);
+      dealBox.appendChild(el('p','Design preview only. No discounts are active.','ab-demo-note'));
+      function showDemoDeals(){
+        var modal=el('div',null,'ab-demo-modal');
+        modal.setAttribute('role','dialog');
+        modal.setAttribute('aria-modal','true');
+        modal.setAttribute('aria-label','Sample deals and vouchers — not available to claim');
+        var hd=el('header',null,'ab-demo-modal-head');
+        hd.appendChild(el('span'));
+        hd.appendChild(el('h3','Deals & vouchers'));
+        var dismiss=iconButton(closeSvg,'Close sample deals','ab-round');
+        hd.appendChild(dismiss);modal.appendChild(hd);
+        var sc=el('div',null,'ab-demo-modal-scroll');
+        sc.appendChild(el('p','ARABISTA REWARDS','ab-eyebrow'));
+        sc.appendChild(el('h3','Enjoy a little extra with every purchase.'));
+        sc.appendChild(el('p','Sample offers for interface preview only.','ab-demo-note'));
+        sc.appendChild(el('h3','Available vouchers'));
+        var tickets=[
+          {amount:'RM10 OFF',minimum:'Min. spend RM150',detail:'Sample shipping promotion',icon:'SHIPPING'},
+          {amount:'RM8 OFF',minimum:'Min. spend RM120',detail:'Sample shipping promotion',icon:'SHIPPING'},
+          {amount:'RM15 OFF',minimum:'Min. spend RM200',detail:'Sample order promotion',icon:'REWARD'}
+        ];
+        var extra=null;
+        tickets.forEach(function(entry,idx){
+          var ticket=el('article',null,'ab-deal-ticket');
+          var rail=el('div',null,'ab-ticket-rail');
+          rail.appendChild(el('span','▧'));
+          rail.appendChild(el('span',entry.icon));
+          ticket.appendChild(rail);
+          var info=el('div',null,'ab-ticket-info');
+          info.appendChild(el('small','DEMO VOUCHER'));
+          info.appendChild(el('strong',entry.amount));
+          info.appendChild(el('span',entry.minimum));
+          info.appendChild(el('p',entry.detail,'ab-demo-note'));
+          ticket.appendChild(info);
+          var action=el('div',null,'ab-ticket-action');
+          var claim=button('Claim','ab-demo-claim');
+          claim.addEventListener('click',function(){
+            claim.textContent=claim.textContent==='Claim'?'Previewed':'Claim';
+            claim.setAttribute('aria-pressed',claim.textContent==='Previewed'?'true':'false');
+            status.textContent='Demo only. No voucher was claimed or applied to Cart.';
+          });
+          action.appendChild(claim);ticket.appendChild(action);
+          if(idx===2){extra=ticket;ticket.hidden=true;}
+          sc.appendChild(ticket);
+        });
+        var more=button('Show more  ⌄','ab-deal-view');
+        more.addEventListener('click',function(){
+          if(extra){extra.hidden=!extra.hidden;more.textContent=extra.hidden?'Show more  ⌄':'Show less  ⌃';}
+        });
+        sc.appendChild(more);
+        var status=el('p','Demo only. No voucher was claimed or applied to Cart.','ab-demo-note');
+        status.setAttribute('role','status');
+        sc.appendChild(status);
+        var disclaimer=el('p','DEMO ONLY — These vouchers do not exist in the promotions service and cannot reduce item, delivery or checkout totals.','ab-demo-note');
+        sc.appendChild(disclaimer);
+        modal.appendChild(sc);host.appendChild(modal);
+        var oldFocus=document.activeElement;
+        function closeModal(){if(modal.isConnected)modal.remove();if(oldFocus&&oldFocus.focus)oldFocus.focus();}
+        dismiss.addEventListener('click',closeModal);
+        modal.addEventListener('keydown',function(e){
+          if(e.key==='Escape'){e.preventDefault();closeModal();}
+          if(e.key==='Tab'){
+            var focusable=[dismiss].concat(Array.prototype.slice.call(modal.querySelectorAll('button:not([disabled])')));
+            focusable=focusable.filter(function(n,i){return focusable.indexOf(n)===i&&!n.closest('[hidden]');});
+            if(!focusable.length)return;
+            if(e.shiftKey&&document.activeElement===focusable[0]){e.preventDefault();focusable[focusable.length-1].focus();}
+            else if(!e.shiftKey&&document.activeElement===focusable[focusable.length-1]){e.preventDefault();focusable[0].focus();}
+          }
+        });
+        dismiss.focus();
+      }
+      teaser.addEventListener('click',showDemoDeals);
+      body.appendChild(dealBox);
+      var reviews=el('section',null,'ab-demo-block');
+      reviews.setAttribute('aria-label','Demo customer review layout');
+      var reviewHeading=el('div',null,'ab-demo-head');
+      reviewHeading.appendChild(el('h3','Customer reviews'));
+      reviewHeading.appendChild(el('span','DEMO · NOT VERIFIED','ab-demo-tag'));
+      reviews.appendChild(reviewHeading);
+      var reviewSummary=el('div',null,'ab-demo-review');
+      reviewSummary.appendChild(el('strong','★★★★★  4.8 / 5 · SAMPLE RATING'));
+      reviewSummary.appendChild(el('p','Example layout only — no authenticated customer ratings are available here.','ab-demo-note'));
+      reviews.appendChild(reviewSummary);
+      var reviewSample=el('div',null,'ab-demo-review');
+      reviewSample.appendChild(el('strong','Sample customer · Demo review'));
+      reviewSample.appendChild(el('div','★★★★★','ab-eyebrow'));
+      reviewSample.appendChild(el('p','Sample review text for the visual layout. Not a real purchase or customer testimonial.'));
+      reviews.appendChild(reviewSample);
+      body.appendChild(reviews);
+    }
     var size = el('section', null, 'ab-section'); size.id = 'ab-size';
     size.appendChild(el('h3', 'Size guide'));
     var guideUrl = String(product.size_guide && product.size_guide.image_delivery_url || '');
@@ -3103,6 +3512,13 @@ function closeShopDetail() {
     body.appendChild(size);
     var details = el('section', null, 'ab-section'); details.id = 'ab-details';
     details.appendChild(el('h3', 'Product details'));
+    // Seller-authored long description belongs inside Details, not above the options row.
+    var rich = el('div', null, 'ab-description');
+    if (product.description_html) rich.innerHTML = String(product.description_html);
+    else if (product.long_description) rich.textContent = product.long_description;
+    else if (product.description) rich.textContent = product.description;
+    else rich.textContent = 'Product information is not available.';
+    details.appendChild(rich);
     if (product.size_fit_note) {
       var fit = el('div', null, 'ab-detail-row');
       fit.appendChild(el('span', 'Fit note'));
@@ -3202,6 +3618,61 @@ function closeShopDetail() {
       overlay.setAttribute('aria-modal', 'true');
       overlay.setAttribute('aria-label', 'Choose product variations');
       var panel = el('div', null, 'ab-variant-panel');
+      var guideUrl = String(product.size_guide && product.size_guide.image_delivery_url || '');
+      var header = el('header',null,'ab-choose-header');
+      var cartShortcut = iconButton(cartSvg,'View basket','ab-round ab-choose-cart');
+      var currentCartCount = lines().reduce(function(n,item){return n+item.quantity;},0);
+      if(currentCartCount){
+        cartShortcut.appendChild(el('span',String(currentCartCount),'ab-choose-cart-count'));
+      }
+      cartShortcut.addEventListener('click',function(){
+        dismiss();
+        closeShopDetail();
+        show('cart');
+      });
+      header.appendChild(cartShortcut);
+      header.appendChild(el('h3','Choose options'));
+      var x = iconButton(closeSvg,'Close shopping options','ab-round');
+      function dismiss() {
+        if (overlay.isConnected) overlay.remove();
+        variantPanel = null;
+        selectBtn.focus();
+      }
+      x.addEventListener('click',dismiss);
+      header.appendChild(x);
+      panel.appendChild(header);
+      if(/^https:\/\/[^<>\s]+$/i.test(guideUrl)){
+        var guideBar = el('div',null,'ab-size-guide-bar');
+        var guideButton = iconButton(
+          '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h10M4 17h16M8 7v3M14 17v-3M18 12v3"/></svg>',
+          'Open uploaded size chart','ab-size-guide-link');
+        guideButton.appendChild(el('span','Size guide'));
+        guideButton.addEventListener('click',function(){
+          var guideView = el('div',null,'ab-demo-modal ab-picker-guide');
+          guideView.setAttribute('role','dialog');
+          guideView.setAttribute('aria-modal','true');
+          guideView.setAttribute('aria-label','Product size chart image');
+          var gh = el('div',null,'ab-demo-modal-head');
+          var back = button('‹','ab-round');
+          back.setAttribute('aria-label','Back to options');
+          gh.appendChild(back);
+          gh.appendChild(el('h3','Size guide'));
+          gh.appendChild(el('span'));
+          var scroller = el('div',null,'ab-demo-modal-scroll');
+          var chart = document.createElement('img');
+          chart.src=guideUrl;chart.alt='Owner-uploaded product size chart';
+          chart.className='ab-size-img';
+          scroller.appendChild(chart);
+          guideView.appendChild(gh);guideView.appendChild(scroller);
+          overlay.appendChild(guideView);
+          function closeGuide(){if(guideView.isConnected)guideView.remove();guideButton.focus();}
+          back.addEventListener('click',closeGuide);
+          guideView.addEventListener('keydown',function(e){if(e.key==='Escape'){e.preventDefault();closeGuide();}});
+          back.focus();
+        });
+        guideBar.appendChild(guideButton);
+        panel.appendChild(guideBar);
+      }
       var top = el('div', null, 'ab-picker-head');
       var overviewRow = el('div', null, 'ab-picker-summary');
       pickerImage = document.createElement('img');
@@ -3211,17 +3682,11 @@ function closeShopDetail() {
       pickerInfo.appendChild(el('h3', product.title || 'Product'));
       pickerPrice = el('div', null, 'ab-picker-price');
       pickerStatus = el('p', null, 'ab-picker-copy');
-      pickerInfo.appendChild(pickerPrice); pickerInfo.appendChild(pickerStatus);
-      overviewRow.appendChild(pickerImage); overviewRow.appendChild(pickerInfo);
+      pickerInfo.appendChild(pickerPrice);
+      pickerInfo.appendChild(pickerStatus);
+      overviewRow.appendChild(pickerImage);
+      overviewRow.appendChild(pickerInfo);
       top.appendChild(overviewRow);
-      var x = iconButton(closeSvg, 'Close variation selection');
-      function dismiss() {
-        if (overlay.isConnected) overlay.remove();
-        variantPanel = null;
-        selectBtn.focus();
-      }
-      x.addEventListener('click', dismiss);
-      top.appendChild(x);
       panel.appendChild(top);
       pickerScroll = el('div', null, 'ab-picker-scroll');
       function paintGroups() {
@@ -3245,6 +3710,7 @@ function closeShopDetail() {
             chip.disabled = !exists;
             chip.addEventListener('click', function () {
               chosen[i] = o.key;
+              variantWasChosen = true;
               quantity = 1;
               paintGroups();
               refreshSelected();
@@ -5694,6 +6160,7 @@ function attachSheetResizeHandle(handle,sheet,apply,ratio){
         description: p.description || '',
         description_html: p.description_html || '',
         long_description: p.long_description || '',
+        product_highlights: Array.isArray(p.product_highlights) ? p.product_highlights : [],
         publication_status: p.publication_status || 'DRAFT',
         preview_only: true,
         customer_purchasable: false,
