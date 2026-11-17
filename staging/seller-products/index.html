@@ -128,7 +128,7 @@
     @media(min-width:780px){body{max-width:500px;margin:0 auto;border-left:1px solid var(--line);border-right:1px solid var(--line)}.fixed-actions{width:500px;left:50%;right:auto;transform:translateX(-50%)}}
     @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
   </style>
-<script src="../bridge-client.js?v=247products1"></script>
+<script src="../bridge-client.js?v=247products2"></script>
 <script>
 (function(){
   'use strict';
@@ -143,10 +143,11 @@
     var products = /^arabistaDevSellerProductsV247/.test(name);
     var media = name === 'arabistaDevMediaCreateDirectUpload' || name === 'arabistaDevMediaVerifyAsset';
     if (products || media) {
+      var long = /Confirm|PreviewSave|Bootstrap|CreateDirectUpload|Verify/i.test(name);
       return window.ArabistaV243Bridge.call('arabistaV247StaffProductsInvoke', {
         name: name,
         args: payload == null ? {} : payload
-      }, { timeoutMs: /Confirm|PreviewSave|CreateDirectUpload|Verify/i.test(name) ? 60000 : 30000 });
+      }, { timeoutMs: long ? 60000 : 30000 });
     }
     return Promise.reject(new Error('That staff action is not available on the public-domain Products connection.'));
   }
@@ -1225,7 +1226,14 @@
   window.addEventListener('pagehide',function(){previewCleanup();supplementalPreviewCleanup();});
   show('list');
   if (window.__ARABISTA_SELLER_PRODUCTS_PAGES__) {
-    window.addEventListener('arabista-v247-pages-ready', function () { loadList(); }, { once: true });
+    function startPagesList_() {
+      loadList().catch(function () { /* loadList already surfaces errors */ });
+    }
+    if (window.ArabistaV243Bridge && ArabistaV243Bridge.isReady && ArabistaV243Bridge.isReady()) {
+      startPagesList_();
+    } else {
+      window.addEventListener('arabista-v247-pages-ready', startPagesList_, { once: true });
+    }
   } else {
     loadList();
   }
