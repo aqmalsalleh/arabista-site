@@ -2560,81 +2560,30 @@ function closeShopDetail() {
       host.appendChild(el('p', product.description, 'muted'));
     }
     if (product.size_fit_note) host.appendChild(el('p', 'Size/fit: ' + product.size_fit_note, 'muted'));
-    function resolveSizeGuideSetsForSku_(sku) {
-      var all = (product.size_guide && Array.isArray(product.size_guide.sets)) ? product.size_guide.sets : [];
-      if (!all.length) return [];
-      var linked = all.filter(function (set) {
-        return !!(set && (set.option_id || set.option_key || set.option_label));
-      });
-      var unlinked = all.filter(function (set) {
-        return !(set && (set.option_id || set.option_key || set.option_label));
-      });
-      if (!linked.length) return all;
-      var optionIds = (sku && Array.isArray(sku.option_ids)) ? sku.option_ids.map(String) : [];
-      var label = String((sku && (sku.options || sku.label || sku.sku_code)) || '');
-      var matched = linked.filter(function (set) {
-        if (set.option_id && optionIds.indexOf(String(set.option_id)) >= 0) return true;
-        var optLabel = String(set.option_label || '');
-        if (!optLabel && set.option_key) {
-          try {
-            var parts = JSON.parse(String(set.option_key));
-            if (Array.isArray(parts)) optLabel = String(parts[1] || '');
-          } catch (e) { /* ignore */ }
-        }
-        return !!(optLabel && label.indexOf(optLabel) >= 0);
-      });
-      // Prefer the matching linked set(s); never invent a guess when none match.
-      return matched.length ? matched.concat(unlinked) : unlinked;
-    }
+    // Owner decision v2.47: customer Size guide is an uploaded image only.
+    // Historical structured measurement rows remain stored in DEV but are not rendered.
     function paintSizeGuide_(sku) {
-      var existing = host.querySelector('#product-size-guides') || (host._shopDetailBody && host._shopDetailBody.querySelector('#product-size-guides'));
-      var sets = resolveSizeGuideSetsForSku_(sku);
-      if (!product.size_guide || (!sets.length && !(product.size_guide.image_delivery_url))) {
+      var existing = host.querySelector('#product-size-guides') ||
+        (host._shopDetailBody && host._shopDetailBody.querySelector('#product-size-guides'));
+      var src = String((product.size_guide && product.size_guide.image_delivery_url) || '');
+      if (!/^https:\/\//i.test(src)) {
         if (existing) existing.remove();
+        host._paintSizeGuide = paintSizeGuide_;
         return;
       }
-      var guideWrap = existing || document.createElement('section');
-      guideWrap.id = 'product-size-guides';
-      guideWrap.setAttribute('aria-label', 'Size guide');
-      clear(guideWrap);
-      guideWrap.appendChild(el('h3', 'Size guide'));
-      if (product.size_guide.image_delivery_url && /^https:\/\//i.test(product.size_guide.image_delivery_url)) {
-        var chart = document.createElement('img');
-        chart.src = product.size_guide.image_delivery_url;
-        chart.alt = 'Size chart';
-        chart.loading = 'lazy';
-        chart.style.maxWidth = '100%';
-        guideWrap.appendChild(chart);
-      }
-      sets.forEach(function (set) {
-        guideWrap.appendChild(el('h4', String(set.name || set.option_label || 'Measurements')));
-        var table = document.createElement('table');
-        table.style.width = '100%';
-        table.style.borderCollapse = 'collapse';
-        table.style.fontSize = '13px';
-        var head = document.createElement('tr');
-        ['Size', 'Height (cm)', 'Length (in)', 'Bust (cm)'].forEach(function (h) {
-          var th = document.createElement('th');
-          th.textContent = h;
-          th.style.textAlign = 'left';
-          th.style.borderBottom = '1px solid #ddd';
-          th.style.padding = '4px';
-          head.appendChild(th);
-        });
-        table.appendChild(head);
-        (set.rows || []).forEach(function (row) {
-          var tr = document.createElement('tr');
-          [row.size, row.height_cm, row.length_in, row.bust_cm].forEach(function (v) {
-            var td = document.createElement('td');
-            td.textContent = v === '' || v == null ? '—' : String(v);
-            td.style.padding = '4px';
-            tr.appendChild(td);
-          });
-          table.appendChild(tr);
-        });
-        guideWrap.appendChild(table);
-      });
-      if (!existing) host.appendChild(guideWrap);
+      var wrap = existing || document.createElement('section');
+      wrap.id = 'product-size-guides';
+      wrap.setAttribute('aria-label', 'Size chart');
+      clear(wrap);
+      wrap.appendChild(el('h3', 'Size chart'));
+      var chart = document.createElement('img');
+      chart.src = src;
+      chart.alt = 'Product size chart';
+      chart.loading = 'lazy';
+      chart.style.maxWidth = '100%';
+      chart.style.height = 'auto';
+      wrap.appendChild(chart);
+      if (!existing) host.appendChild(wrap);
       host._paintSizeGuide = paintSizeGuide_;
     }
     paintSizeGuide_(null);
