@@ -91,6 +91,21 @@
     .option-photo input{position:absolute;inset:0;opacity:0;width:100%;height:100%;cursor:pointer}
     .option-photo-clear{position:absolute;right:31px;top:0;width:23px;height:23px;border-radius:50%;background:#201b18;color:#fff;font-size:16px;z-index:2}
     .option-remove{height:37px;border-radius:8px;font-size:19px;color:var(--muted)}
+    .option-measure-trigger{grid-column:2/-1;justify-self:start;min-height:35px;min-width:115px;padding:7px 12px;border-radius:9px;background:#f4f0e9;border:1px solid #e2d9ce;font-size:12px;font-weight:700;text-align:left}
+    .option-measure-panel{grid-column:1/-1;background:#faf9f7;border:1px solid #e8e3dc;border-radius:12px;padding:14px 12px;margin:2px 0 8px;min-width:0}
+    .option-measure-panel h4{font-size:14px;margin:0 0 9px;font-weight:750}
+    .option-measure-panel .helper{margin:0 0 10px}
+    .option-measure-panel .field{background:#fff;height:44px;font-size:16px}
+    .option-measure-panel .measure-scroll{margin:10px 0 2px}
+    .option-measure-panel .measure-table{min-width:370px}
+    .option-measure-panel .measure-table input{height:40px}
+    .option-measure-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+    .option-measure-actions button{flex:1;min-height:38px;border:1px solid #ddd5cb;background:#fff;border-radius:9px;padding:8px;font-size:12px;font-weight:700}
+    .option-measure-actions .danger-text{color:#9b2620}
+    .option-measure-set-name{display:block;font-size:12px;font-weight:700;color:var(--muted)}
+    .option-measure-set-name input{margin-top:6px}
+    .legacy-measurements{border-top:1px solid var(--line);padding-top:12px;margin-top:18px}
+    .legacy-measurements summary{font-size:13px;font-weight:700;cursor:pointer;min-height:40px;padding:10px 0}
     .option-photo-note{font-size:11px;color:var(--muted);margin:4px 0 8px 35px}
     .sku-inline{margin-top:16px;border-top:1px solid var(--line);padding-top:14px}
     .sku-inline-row{padding:12px 0;border-bottom:1px solid var(--line)}
@@ -360,11 +375,13 @@
     </section>
     <section class="form-section">
       <h2 class="section-title">Size guide</h2>
-      <p class="helper">Build an editable size measurement table and optionally attach your own size-chart image. These feed the established customer Size guide section.</p>
+      <p class="helper">Edit measurements from the <strong>Measurements</strong> control beside each variation option above. Keep a shared size-chart image here, or open advanced options for unlinked legacy sets.</p>
       <label class="form-label" for="sizeChartFile">Size-chart image (optional)</label>
       <input class="field" id="sizeChartFile" type="file" accept="image/jpeg,image/png,image/webp">
       <img id="sizeChartPreview" class="upload-preview" hidden alt="Selected size-chart image">
       <button id="removeSizeChart" class="mini-action" type="button">Remove size-chart image</button>
+      <details class="legacy-measurements" id="legacyMeasurements"><summary>Other measurement sets (advanced / legacy)</summary>
+      <p class="helper">Existing unlinked sets are preserved. Link one explicitly from a variation option's Measurements control—no automatic guessing.</p>
       <label class="form-label" for="sizeGuideSet">Measurement set</label>
       <select id="sizeGuideSet" class="field"></select>
       <label class="form-label" for="sizeGuideSetName">Set name</label>
@@ -378,6 +395,7 @@
         <tbody id="sizeMeasureRows"></tbody>
       </table></div>
       <button id="addSizeRow" class="mini-action" type="button">+ Add size row</button>
+      </details>
     </section>
     <section class="form-section">
       <h2 class="section-title">Parcel details</h2>
@@ -1146,8 +1164,17 @@
       throw new Error('Variation-photo associations did not match saved readback.');
     if(intent.size_guide){
       var gotGuide=p.size_guide||{};
-      if(JSON.stringify(gotGuide.sets||[])!==JSON.stringify(intent.size_guide.sets||[]))
-        throw new Error('Size-guide measurements were not retained after save.');
+      var wantedSets=intent.size_guide.sets||[],savedSets=gotGuide.sets||[];
+      if(savedSets.length!==wantedSets.length)throw new Error('Size-guide set count did not match saved readback.');
+      wantedSets.forEach(function(want,i){
+        var got=savedSets[i]||{},key=String(want.option_key||''),id=String(want.option_id||'');
+        if(String(got.name||'')!==String(want.name||'')||JSON.stringify(got.rows||[])!==JSON.stringify(want.rows||[]))
+          throw new Error('Size-guide measurements were not retained after save.');
+        if(key&&String(got.option_key||'')!==key)throw new Error('Measurement-to-variation option link was not retained.');
+        if(id&&String(got.option_id||'')!==id)throw new Error('The canonical measurement option ID changed unexpectedly.');
+        if((key||id)&&!String(got.option_id||''))throw new Error('The measurement set did not resolve to a canonical option.');
+        if(!key&&!id&&(got.option_key||got.option_id))throw new Error('An unlinked legacy measurement set was unexpectedly associated.');
+      });
       if(String(gotGuide.image_media_id||'')!==String(intent.size_guide.image_media_id||''))
         throw new Error('Size-chart image association was not retained after save.');
     }
