@@ -685,6 +685,24 @@
     if(combos.length>80)throw new Error('Too many SKU combinations. Limit the product to 80 variants.');
     return combos;
   }
+  function renderInlineSkus() {
+    var host=$('skuInlineRows');host.replaceChildren();
+    text($('skuInlineCount'),state.skus.length+' combinations');
+    if(!state.skus.length){host.appendChild(node('p','helper','Add variation options, then refresh the variation list to enter prices and stock.'));return;}
+    state.skus.forEach(function(s,i) {
+      var row=node('div','sku-inline-row');
+      row.appendChild(node('strong','',s.label||s.variation_summary||'Default variant'));
+      var fields=node('div','sku-inline-inputs');
+      [['Retail price (RM)','price_draft',senInput(s.regular_price_sen),'decimal'],['Available stock','stock_draft',String(s.stock_available_qty==null?0:s.stock_available_qty),'numeric']].forEach(function(config){
+        var label=node('label','',config[0]),input=node('input','field');
+        input.type='text';input.inputMode=config[3];input.value=s[config[1]]!=null?s[config[1]]:config[2];
+        input.setAttribute('aria-label',config[0]+' for '+(s.label||'SKU '+(i+1)));
+        input.addEventListener('input',function(){s[config[1]]=input.value;state.dirty=true;});
+        label.appendChild(input);fields.appendChild(label);
+      });
+      row.appendChild(fields);host.appendChild(row);
+    });
+  }
   function newSkusFromGroups() {
     var groups=readGroups(), combos=combinations(groups);
     var byLabel={};(state.skus||[]).forEach(function(s){byLabel[String(s.label||s.variation_summary||'').toLowerCase()]=s;});
@@ -694,7 +712,7 @@
     });
     $('newSkuSummary').hidden=false;
     text($('newSkuSummary'),state.skus.length+' SKU combination'+(state.skus.length===1?'':'s')+' ready for pricing.');
-    state.dirty=true;state.metaDirty=true;
+    state.dirty=true;state.metaDirty=true;renderInlineSkus();
   }
   function supplementalPreviewCleanup() {
     state.supplementPreviewUrls.forEach(function(url){try{URL.revokeObjectURL(url);}catch(e){}});
@@ -875,7 +893,7 @@
       var v=parcel[pair[1]];$((pair[0])).value=v==null?'':String(pair[0]==='parcelWeight'?v:Number(v)/10);
     });
     $('formattedPreview').hidden=true;renderDescriptionPreview();
-    $('newSkuSummary').hidden=true;
+    $('newSkuSummary').hidden=true;renderInlineSkus();
     ['productName','description'].forEach(function(id){$(id).dispatchEvent(new Event('input'));});
     $('saveDraft').textContent=state.selected?'Save changes':'Save draft';
   }
@@ -1175,7 +1193,7 @@
   });
   $('back').addEventListener('click',function(){
     if(state.busy)return;
-    if(state.view==='price' && state.priceBackTarget==='editor'){notice('');show('editor');return;}
+    if(state.view==='price' && state.priceBackTarget==='editor'){renderInlineSkus();notice('');show('editor');return;}
     if(!changeGuard())return;
     state.dirty=false;state.metaDirty=false;notice('');show('list');loadList();
   });
@@ -1286,7 +1304,7 @@
     addGroup();state.dirty=true;state.metaDirty=true;renderVariationPhotoSelect();
   });
   $('generateSkus').addEventListener('click',function(){
-    try{newSkusFromGroups();notice(state.skus.length+' variants ready. Set their prices and stock next.');}catch(e){notice(e.message,'error');}
+    try{newSkusFromGroups();notice(state.skus.length+' variations ready. Edit price and stock in the list below.');}catch(e){notice(e.message,'error');}
   });
   $('nextToPricing').addEventListener('click',function(){
     try{
