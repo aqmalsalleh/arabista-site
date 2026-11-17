@@ -5046,6 +5046,9 @@ function attachSheetResizeHandle(handle,sheet,apply,ratio){
     return true;
   }
 
+  /** Seller Center Stage C preview — wait for Apps Script / Pages bridge transport. */
+  var staffPreviewBootState_ = { pending: false, inFlight: false, done: false };
+
   function startShellImmediately() {
     markPerf('shell_start');
     restorePurchaseSession();
@@ -5055,7 +5058,9 @@ function attachSheetResizeHandle(handle,sheet,apply,ratio){
     if (!handleDokuReturnLanding()) show('discover');
     if (typeof syncDokuButtons === 'function') syncDokuButtons();
     markPerf('shell_ready');
-    bootStaffProductPreview_();
+    // Mark URL/token preview intent only. Resolve after customer transport is ready
+    // (Pages JSONP bridge mount or native google.script.run) — never race the bridge.
+    if (readProductPreviewMeta_()) staffPreviewBootState_.pending = true;
   }
 
   /** Seller Center Stage C: open canonical Product Sheet for a draft/live preview token. */
@@ -5073,17 +5078,48 @@ function attachSheetResizeHandle(handle,sheet,apply,ratio){
     } catch (e) { /* ignore */ }
     return null;
   }
+  function customerTransportReady_() {
+    if (window.ArabistaV243Bridge && typeof window.ArabistaV243Bridge.call === 'function'
+        && (!window.ArabistaV243Bridge.isReady || window.ArabistaV243Bridge.isReady())) {
+      return true;
+    }
+    return !!(window.google && google.script && google.script.run);
+  }
+  function formatStaffPreviewError_(err) {
+    var reason = String((err && (err.reason || err.message || err.outcome)) || '').trim();
+    if (!reason) return 'Product preview failed.';
+    if (/apps_script_runtime_unavailable|bridge|facade|transport|connection_unavailable|facade_url_missing|bridge_url_invalid|bridge_client_missing|bridge_failed/i.test(reason)) {
+      return 'Product preview transport unavailable (' + reason
+        + '). Wait for the Shop backend to connect, then reopen the preview from Seller Products.';
+    }
+    if (/preview_token_expired|token.?expired/i.test(reason)) {
+      return 'Product preview token expired. Generate a fresh preview from Seller Products.';
+    }
+    if (/preview_token_invalid|token.?invalid|preview_unavailable/i.test(reason)) {
+      return 'Product preview token invalid. Generate a fresh preview from Seller Products.';
+    }
+    return 'Product preview refused: ' + reason;
+  }
   function bootStaffProductPreview_() {
     var meta = readProductPreviewMeta_();
     if (!meta || !meta.product_id || !meta.preview_token) return;
+    if (staffPreviewBootState_.done || staffPreviewBootState_.inFlight) return;
+    if (!customerTransportReady_()) {
+      staffPreviewBootState_.pending = true;
+      return;
+    }
+    staffPreviewBootState_.pending = false;
+    staffPreviewBootState_.inFlight = true;
     call('arabistaDevSellerProductsV247ResolvePreview', {
       product_id: meta.product_id,
       preview_token: meta.preview_token
     }, function (r) {
+      staffPreviewBootState_.inFlight = false;
       if (!r || !r.ok || !r.product) {
-        toast((r && (r.message || r.reason)) || 'Product preview unavailable');
+        toast(formatStaffPreviewError_(r || { reason: 'preview_unavailable' }));
         return;
       }
+      staffPreviewBootState_.done = true;
       var p = r.product;
       var shopProduct = {
         product_id: p.product_id,
@@ -5116,7 +5152,8 @@ function attachSheetResizeHandle(handle,sheet,apply,ratio){
       show('shop');
       renderShopDetail(shopProduct.product_id);
     }, function (err) {
-      toast((err && err.message) || 'Product preview failed');
+      staffPreviewBootState_.inFlight = false;
+      toast(formatStaffPreviewError_(err));
     });
   }
 
@@ -5389,6 +5426,10 @@ function attachSheetResizeHandle(handle,sheet,apply,ratio){
     // Independent modules — Discover and Shop do not wait on each other.
     loadFeed({ forceLive: true });
     load();
+    // Staff Product Sheet preview resolves only after transport is ready.
+    if (staffPreviewBootState_.pending || readProductPreviewMeta_()) {
+      bootStaffProductPreview_();
+    }
     // Nonessential capabilities after transport is callable.
     window.setTimeout(function () {
       try { loadJourneyCapabilities(); } catch (e) {}
@@ -5443,17 +5484,22 @@ function attachSheetResizeHandle(handle,sheet,apply,ratio){
   bootPagesBridgeIfNeeded()
     .then(function () { startBackendModules(); })
     .catch(function (err) {
+      var bridgeReason = String(err && err.message || err || 'bridge_failed');
       if ($('quoteNotice')) {
         $('quoteNotice').textContent = 'Staging backend unavailable: '
-          + String(err && err.message || err || 'bridge_failed')
+          + bridgeReason
           + '. Navigation stays available; quotation and checkout need the Apps Script facade.';
       }
       if (!posts.length) {
         setStatus(
           'Discover is unavailable',
-          String(err && err.message || err || 'bridge_failed').slice(0, 160),
+          bridgeReason.slice(0, 160),
           true
         );
+      }
+      if (staffPreviewBootState_.pending || readProductPreviewMeta_()) {
+        staffPreviewBootState_.pending = false;
+        toast(formatStaffPreviewError_({ reason: bridgeReason }));
       }
     });
 }());
