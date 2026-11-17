@@ -1522,7 +1522,14 @@
         notice('SAVE OUTCOME UNKNOWN: The save confirmation connection failed. Do not press Save again. The DEV write journal and product catalog must be inspected before any retry. Phase: confirm_save; error: '+code,'error');
       }else if(transportLost && savePhase==='readback'){
         state.saveRecoveryRequired=true;
+        if(confirmedId){state.selected=confirmedId;}
         notice('Save confirmation returned product ID '+confirmedId+', but verification readback failed. Do not submit again; check the existing DEV record. Error: '+code,'error');
+      }else if(savePhase==='readback' && confirmedId){
+        // ConfirmSave already committed. Deterministic verifyReadback mismatches (e.g. J&T parcel)
+        // must not allow blind Save retries that would duplicate stock mutations.
+        state.saveRecoveryRequired=true;
+        state.selected=confirmedId;
+        notice('SAVE READBACK MISMATCH: Product '+confirmedId+' was already committed. Do not press Save again. Staff must reconcile the existing DEV record (parcel links, media, SKUs) before any retry. Error: '+code,'error');
       }else if(ambiguous){
         state.saveRecoveryRequired=true;
         notice('SAVE OUTCOME UNKNOWN: DEV journal recovery is required before retry. Error: '+code,'error');
