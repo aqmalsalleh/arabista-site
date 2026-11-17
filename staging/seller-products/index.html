@@ -177,7 +177,7 @@
     var products = /^arabistaDevSellerProductsV247/.test(name);
     var media = name === 'arabistaDevMediaCreateDirectUpload' || name === 'arabistaDevMediaVerifyAsset';
     if (products || media) {
-      var long = /Confirm|PreviewSave|Bootstrap|CreateDirectUpload|Verify/i.test(name);
+      var long = /Confirm|PreviewSave|Bootstrap|CreateDirectUpload|Verify|IntentUpload|IntentChunk/i.test(name);
       return window.ArabistaV243Bridge.call('arabistaV247StaffProductsInvoke', {
         name: name,
         args: payload == null ? {} : payload
@@ -453,7 +453,7 @@
 (function () {
   'use strict';
   var $ = function (id) { return document.getElementById(id); };
-  var state = {view:'list', products:[], categories:[], selected:null, editor:null, skus:[], filter:'ALL', busy:false, dirty:false, metaDirty:false, imageFiles:[], videoFile:null, mediaPreviews:[], mediaOrder:[], variationDirty:false, backendMaxVariationGroups:2, saveRecoveryRequired:false, mediaBusy:false, requestSerial:0, remoteRevision:null, priceBackTarget:'list', uploadedRefs:new WeakMap(), variantFiles:{}, sizeChartFile:null, sizeGuideIndex:0, supplementPreviewUrls:[], variantPreviewUrl:null, chartPreviewUrl:null};
+  var state = {view:'list', products:[], categories:[], selected:null, editor:null, skus:[], filter:'ALL', busy:false, dirty:false, metaDirty:false, imageFiles:[], videoFile:null, mediaPreviews:[], mediaOrder:[], variationDirty:false, backendMaxVariationGroups:2, chunkedIntentSupported:false, jsonpSafeChars:3500, intentChunkMaxChars:1500, saveRecoveryRequired:false, mediaBusy:false, requestSerial:0, remoteRevision:null, priceBackTarget:'list', uploadedRefs:new WeakMap(), variantFiles:{}, sizeChartFile:null, sizeGuideIndex:0, supplementPreviewUrls:[], variantPreviewUrl:null, chartPreviewUrl:null};
   var el = {
     list:$('listView'),editor:$('editorView'),price:$('priceView'),
     listActions:$('listActions'),editorActions:$('editorActions'),priceActions:$('priceActions')
@@ -577,6 +577,9 @@
       state.products=r.products;state.categories=Array.isArray(r.categories)?r.categories:[];
       // Older GAS deployments silently truncate variation group three. Refuse save until upgraded.
       state.backendMaxVariationGroups=Number(r.max_variation_groups)===3?3:2;
+      state.chunkedIntentSupported=r.chunked_intent_supported===true;
+      state.jsonpSafeChars=Number(r.jsonp_safe_chars)>1000?Number(r.jsonp_safe_chars):3500;
+      state.intentChunkMaxChars=Number(r.intent_chunk_max_chars)>200?Number(r.intent_chunk_max_chars):1500;
       renderList();
     }catch(e){
       if(serial!==state.requestSerial)return;
@@ -1383,6 +1386,60 @@
     });
     if(received.length!==intent.skus.length)throw new Error('SKU readback count differed from the confirmed product.');
   }
+    function sha256Hex(text) {
+    if (!window.crypto || !crypto.subtle || typeof TextEncoder === 'undefined') {
+      return Promise.reject(new Error('This browser cannot verify large save packages. Use an updated browser or shorten the save.'));
+    }
+    return crypto.subtle.digest('SHA-256', new TextEncoder().encode(String(text || ''))).then(function (buf) {
+      return Array.prototype.map.call(new Uint8Array(buf), function (b) {
+        return (b < 16 ? '0' : '') + b.toString(16);
+      }).join('');
+    });
+  }
+  function shouldUseChunkedIntent(urlCharacters) {
+    if (!window.__ARABISTA_SELLER_PRODUCTS_PAGES__) return false;
+    return Number(urlCharacters || 0) > Number(state.jsonpSafeChars || 3500);
+  }
+  async function previewSaveIntent(intent) {
+    var directPayload = { intent: intent };
+    var previewUrlCharacters = estimatedJsonpCharacters('arabistaDevSellerProductsV247PreviewSave', directPayload);
+    if (!shouldUseChunkedIntent(previewUrlCharacters)) {
+      return rpc('arabistaDevSellerProductsV247PreviewSave', directPayload);
+    }
+    if (!state.chunkedIntentSupported) {
+      throw new Error('This save is too large for the current JSONP connection (' + previewUrlCharacters + ' characters). Refresh after the chunked transport update is deployed. Uploaded media were preserved.');
+    }
+    var packageJson = JSON.stringify(directPayload);
+    var digest = await sha256Hex(packageJson);
+    var chunkMax = Number(state.intentChunkMaxChars || 1500);
+    if (!Number.isFinite(chunkMax) || chunkMax < 200) chunkMax = 1500;
+    var total = Math.ceil(packageJson.length / chunkMax) || 1;
+    notice('Sending save package in ' + total + ' fragments…');
+    var begun = await rpc('arabistaDevSellerProductsV247BeginIntentUpload', {
+      kind: 'save',
+      total_chunks: total,
+      byte_length: packageJson.length,
+      sha256_hex: digest
+    });
+    if (!begun || !begun.upload_id) throw new Error('Could not start the large save package. Nothing was saved.');
+    for (var i = 0; i < total; i += 1) {
+      var piece = packageJson.slice(i * chunkMax, (i + 1) * chunkMax);
+      var stored = await rpc('arabistaDevSellerProductsV247AppendIntentChunk', {
+        upload_id: begun.upload_id,
+        index: i,
+        chunk: piece
+      });
+      if (!stored || stored.ok === false) throw new Error('Save package fragment ' + (i + 1) + ' failed. Nothing was saved.');
+    }
+    notice('Validating your changes…');
+    var finalized = await rpc('arabistaDevSellerProductsV247FinalizeIntentUpload', {
+      upload_id: begun.upload_id,
+      sha256_hex: digest
+    });
+    if (finalized && typeof finalized === 'object') finalized._preview_url_characters = previewUrlCharacters;
+    return finalized;
+  }
+
   // JSONP is GET-based; capture request-size diagnostics without exposing product content.
   function estimatedJsonpCharacters(rpcName,payload) {
     var envelope={name:rpcName,args:payload||{}};
@@ -1439,7 +1496,8 @@
       previewUrlCharacters=estimatedJsonpCharacters('arabistaDevSellerProductsV247PreviewSave',{intent:intent});
       savePhase='preview_save';
       notice('Validating your changes…');
-      var prev=await rpc('arabistaDevSellerProductsV247PreviewSave',{intent:intent});
+      var prev=await previewSaveIntent(intent);
+      if(prev && prev._preview_url_characters!=null) previewUrlCharacters=prev._preview_url_characters;
       if(!prev.confirmation_token)throw new Error('Server confirmation is unavailable. Nothing was saved.');
       savePhase='confirm_save';
       var conf=await rpc('arabistaDevSellerProductsV247ConfirmSave',{confirmation_token:prev.confirmation_token});
