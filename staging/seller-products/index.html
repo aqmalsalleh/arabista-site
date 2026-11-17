@@ -659,18 +659,89 @@
       };
     }).filter(function(g){return g.label||g.options.length;});
   }
+  function optionKey(card,row){
+    var group=card.querySelector('.variation-label').value.trim();
+    var option=row.querySelector('.variation-option-name').value.trim();
+    return group&&option?JSON.stringify([group,option]):'';
+  }
+  function refreshOptionPhoto(card,row){
+    var key=optionKey(card,row),old=row.dataset.photoKey||'';
+    if(old&&key&&old!==key){
+      if(state.variantFiles[old]){if(!state.variantFiles[key])state.variantFiles[key]=state.variantFiles[old];delete state.variantFiles[old];}
+      (state.editor.variant_media||[]).forEach(function(m){if(m.option_key===old)m.option_key=key;});
+    }
+    row.dataset.photoKey=key;
+    var slot=row.querySelector('.option-photo'),file=slot.querySelector('input');
+    Array.from(slot.children).forEach(function(c){if(c!==file)c.remove();});
+    var pending=key&&state.variantFiles[key],saved=key&&(state.editor.variant_media||[]).find(function(m){return m.option_key===key;});
+    var src=pending?URL.createObjectURL(pending):saved?httpsUrl(saved.delivery_url):'';
+    if(pending)state.supplementPreviewUrls.push(src);
+    if(src){var img=node('img');img.src=src;img.alt='Variation photo';slot.insertBefore(img,file);}
+    else slot.insertBefore(node('span','', '＋ Photo'),file);
+    file.disabled=!key;
+  }
+  function updateOptionValues(card){
+    var rows=Array.from(card.querySelectorAll('.variation-option-row'));
+    card.querySelector('.variation-options').value=rows.map(function(r){return r.querySelector('.variation-option-name').value.trim();}).filter(Boolean).join(', ');
+    rows.forEach(function(r){refreshOptionPhoto(card,r);});
+    state.dirty=true;state.metaDirty=true;renderVariationPhotoSelect();
+  }
+  function appendOptionRow(card,value){
+    var list=card.querySelector('.variation-option-list'),row=node('div','variation-option-row');
+    var grip=node('button','option-drag','⋮⋮');grip.type='button';grip.setAttribute('aria-label','Drag option to reorder or press up/down arrows');
+    var name=node('input','field variation-option-name');name.type='text';name.maxLength=50;name.placeholder='Enter option';name.value=value||'';name.setAttribute('aria-label','Variation option');
+    var pick=node('label','option-photo'),file=node('input');file.type='file';file.accept='image/jpeg,image/png,image/webp';file.setAttribute('aria-label','Variation option photo');pick.appendChild(file);
+    var del=node('button','option-remove','×');del.type='button';del.setAttribute('aria-label','Remove option');
+    row.appendChild(grip);row.appendChild(name);row.appendChild(pick);row.appendChild(del);list.appendChild(row);refreshOptionPhoto(card,row);
+    name.addEventListener('input',function(){updateOptionValues(card);});
+    name.addEventListener('change',function(){if(!state.selected)try{newSkusFromGroups();}catch(e){}});
+    file.addEventListener('change',function(){
+      var chosen=file.files&&file.files[0],key=optionKey(card,row);
+      if(!key){notice('Enter the variation name and option first.','error');file.value='';return;}
+      if(!chosen)return;
+      if(!/^image\/(jpeg|png|webp)$/.test(chosen.type)||chosen.size>20*1024*1024){notice('Use JPG, PNG or WebP photos under 20 MB.','error');file.value='';return;}
+      state.variantFiles[key]=chosen;state.dirty=true;state.metaDirty=true;refreshOptionPhoto(card,row);file.value='';
+      notice('Photo selected for '+name.value+'. Save to upload.');
+    });
+    del.addEventListener('click',function(){
+      var key=optionKey(card,row);
+      delete state.variantFiles[key];state.editor.variant_media=(state.editor.variant_media||[]).filter(function(m){return m.option_key!==key;});
+      row.remove();updateOptionValues(card);if(!state.selected)try{newSkusFromGroups();}catch(e){}
+    });
+    grip.addEventListener('keydown',function(e){
+      if(e.key!=='ArrowUp'&&e.key!=='ArrowDown')return;
+      e.preventDefault();var near=e.key==='ArrowUp'?row.previousElementSibling:row.nextElementSibling;
+      if(!near)return;
+      list.insertBefore(e.key==='ArrowUp'?row:near,e.key==='ArrowUp'?near:row);
+      updateOptionValues(card);grip.focus();
+    });
+    var drag=false,target=null;
+    grip.addEventListener('pointerdown',function(e){if(e.pointerType==='mouse'&&e.button!==0)return;e.preventDefault();drag=true;target=row;try{grip.setPointerCapture(e.pointerId);}catch(err){}});
+    grip.addEventListener('pointermove',function(e){if(!drag)return;var hit=document.elementFromPoint(e.clientX,e.clientY),candidate=hit&&hit.closest&&hit.closest('.variation-option-row');if(candidate&&candidate.parentElement===list)target=candidate;});
+    grip.addEventListener('pointerup',function(){if(!drag)return;drag=false;if(target&&target!==row){var i=Array.from(list.children).indexOf(row),j=Array.from(list.children).indexOf(target);list.insertBefore(row,i<j?target.nextElementSibling:target);updateOptionValues(card);}});
+    grip.addEventListener('pointercancel',function(){drag=false;target=null;});
+  }
   function addGroup(g) {
-    var wrap=node('div','group-card');wrap.dataset.groupId=g&&g.group_id||'';
-    var row=node('div','group-top');
-    var label=node('input','field variation-label');label.placeholder='Option name, e.g. Size';label.maxLength=80;label.setAttribute('aria-label','Variation name');label.value=g&&g.label||'';
-    var remove=node('button','', 'Remove');remove.type='button';remove.addEventListener('click',function(){wrap.remove();state.dirty=true;state.metaDirty=true;renderVariationPhotoSelect();});
-    row.appendChild(label);row.appendChild(remove);wrap.appendChild(row);
-    var input=node('input','field variation-options');input.placeholder='XS, S, M, L';input.maxLength=300;input.style.marginTop='9px';input.setAttribute('aria-label','Comma-separated variation options');
-    input.value=g?(g.options||[]).map(function(x){return typeof x==='string'?x:x.label||x.value_label||'';}).join(', '):'';
-    wrap.appendChild(input);
-    var hint=node('p','helper','Separate options with commas, e.g. Black, Beige, Navy.');wrap.appendChild(hint);
-    [label,input].forEach(function(el){el.addEventListener('input',function(){state.dirty=true;state.metaDirty=true;});});
-    $('variationGroups').appendChild(wrap);
+    var card=node('div','group-card');card.dataset.groupId=g&&g.group_id||'';
+    var top=node('div','group-top'),label=node('input','field variation-label');label.placeholder='Variation name, e.g. Size or Length';label.maxLength=80;label.setAttribute('aria-label','Variation name');label.value=g&&g.label||'';
+    var remove=node('button','', 'Remove');remove.type='button';remove.addEventListener('click',function(){
+      card.querySelectorAll('.variation-option-row').forEach(function(r){var key=optionKey(card,r);delete state.variantFiles[key];state.editor.variant_media=(state.editor.variant_media||[]).filter(function(m){return m.option_key!==key;});});
+      card.remove();state.dirty=true;state.metaDirty=true;renderVariationPhotoSelect();
+      if(!state.selected)try{newSkusFromGroups();}catch(e){}
+    });
+    top.appendChild(label);top.appendChild(remove);card.appendChild(top);
+    var hidden=node('input','variation-options');hidden.type='hidden';card.appendChild(hidden);
+    card.appendChild(node('div','variation-option-list'));
+    var options=(g&&g.options||[]).map(function(o){return typeof o==='string'?o:String(o.label||o.value_label||'');});
+    (options.length?options:['']).forEach(function(o){appendOptionRow(card,o);});hidden.value=options.join(', ');
+    var add=node('button','mini-action','+ Add option');add.type='button';
+    add.addEventListener('click',function(){if(card.querySelectorAll('.variation-option-row').length>=30){notice('Use up to 30 options per variation.','error');return;}
+      appendOptionRow(card,'');updateOptionValues(card);card.querySelector('.variation-option-row:last-child .variation-option-name').focus();
+    });
+    card.appendChild(add);card.appendChild(node('p','option-photo-note','Attach one photo beside an option; all matching SKU combinations share it.'));
+    label.addEventListener('input',function(){updateOptionValues(card);});
+    label.addEventListener('change',function(){if(!state.selected)try{newSkusFromGroups();}catch(e){}});
+    $('variationGroups').appendChild(card);
   }
   function combinations(groups) {
     if(groups.length>2)throw new Error('Up to two variation groups are supported in this editor.');
