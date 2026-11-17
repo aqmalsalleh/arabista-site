@@ -862,18 +862,31 @@
   function updateOptionValues(card){
     var rows=Array.from(card.querySelectorAll('.variation-option-row'));
     card.querySelector('.variation-options').value=rows.map(function(r){return r.querySelector('.variation-option-name').value.trim();}).filter(Boolean).join(', ');
-    rows.forEach(function(r){refreshOptionPhoto(card,r);});
+    rows.forEach(function(r){refreshOptionPhoto(card,r);syncLinkedMeasurementOption(card,r);});
     state.dirty=true;state.metaDirty=true;state.variationDirty=true;renderVariationPhotoSelect();
   }
   function appendOptionRow(card,value){
     var list=card.querySelector('.variation-option-list'),row=node('div','variation-option-row');
+    var initial=value&&typeof value==='object'?value:null;
+    if(initial&&initial.option_id)row.dataset.optionId=String(initial.option_id);
     var grip=node('button','option-drag','⋮⋮');grip.type='button';grip.setAttribute('aria-label','Drag option to reorder or press up/down arrows');
-    var name=node('input','field variation-option-name');name.type='text';name.maxLength=50;name.placeholder='Enter option';name.value=value||'';name.setAttribute('aria-label','Variation option');
+    var name=node('input','field variation-option-name');name.type='text';name.maxLength=50;name.placeholder='Enter option';name.value=initial?String(initial.label||initial.value_label||''):(value||'');name.setAttribute('aria-label','Variation option');
     var pick=node('label','option-photo'),file=node('input');file.type='file';file.accept='image/jpeg,image/png,image/webp';file.setAttribute('aria-label','Variation option photo');pick.appendChild(file);
     var del=node('button','option-remove','×');del.type='button';del.setAttribute('aria-label','Remove option');
     var clear=node('button','option-photo-clear','×');clear.type='button';clear.hidden=true;
     clear.setAttribute('aria-label','Remove photo from this option');clear.title='Remove option photo only';
-    row.appendChild(grip);row.appendChild(name);row.appendChild(pick);row.appendChild(del);row.appendChild(clear);list.appendChild(row);refreshOptionPhoto(card,row);
+    var measures=node('button','option-measure-trigger','＋ Measurements');measures.type='button';
+    measures.setAttribute('aria-label','Edit measurements for this variation option');
+    var panel=node('div','option-measure-panel');panel.hidden=true;
+    row.appendChild(grip);row.appendChild(name);row.appendChild(pick);row.appendChild(del);row.appendChild(clear);
+    row.appendChild(measures);row.appendChild(panel);list.appendChild(row);
+    row.dataset.measureKey=optionKey(card,row);row.__measureSet=measurementSetForRow(card,row);
+    refreshOptionPhoto(card,row);syncLinkedMeasurementOption(card,row);
+    measures.addEventListener('click',function(){
+      panel.hidden=!panel.hidden;
+      measures.setAttribute('aria-expanded',String(!panel.hidden));
+      if(!panel.hidden)renderOptionMeasurements(card,row);
+    });
     clear.addEventListener('click',function(){
       var key=optionKey(card,row);if(!key)return;
       delete state.variantFiles[key];state.editor.variant_media=(state.editor.variant_media||[]).filter(function(m){return m.option_key!==key;});
@@ -890,6 +903,7 @@
       notice('Photo selected for '+name.value+'. Save to upload.');
     });
     del.addEventListener('click',function(){
+      if(measurementSetForRow(card,row)){notice('Unlink the measurements before removing this variation option.','error');return;}
       var key=optionKey(card,row);
       delete state.variantFiles[key];state.editor.variant_media=(state.editor.variant_media||[]).filter(function(m){return m.option_key!==key;});
       row.remove();updateOptionValues(card);if(!state.selected)try{newSkusFromGroups();}catch(e){}
@@ -911,6 +925,9 @@
     var card=node('div','group-card');card.dataset.groupId=g&&g.group_id||'';
     var top=node('div','group-top'),label=node('input','field variation-label');label.placeholder='Variation name, e.g. Size or Length';label.maxLength=80;label.setAttribute('aria-label','Variation name');label.value=g&&g.label||'';
     var remove=node('button','', 'Remove');remove.type='button';remove.addEventListener('click',function(){
+      if(Array.from(card.querySelectorAll('.variation-option-row')).some(function(row){return !!measurementSetForRow(card,row);})){
+        notice('Unlink measurement sets from this variation before removing the whole variation.','error');return;
+      }
       card.querySelectorAll('.variation-option-row').forEach(function(r){var key=optionKey(card,r);delete state.variantFiles[key];state.editor.variant_media=(state.editor.variant_media||[]).filter(function(m){return m.option_key!==key;});});
       card.remove();state.dirty=true;state.metaDirty=true;state.variationDirty=true;renderVariationPhotoSelect();
       if(!state.selected)try{newSkusFromGroups();}catch(e){}
@@ -918,8 +935,9 @@
     top.appendChild(label);top.appendChild(remove);card.appendChild(top);
     var hidden=node('input','variation-options');hidden.type='hidden';card.appendChild(hidden);
     card.appendChild(node('div','variation-option-list'));
-    var options=(g&&g.options||[]).map(function(o){return typeof o==='string'?o:String(o.label||o.value_label||'');});
-    (options.length?options:['']).forEach(function(o){appendOptionRow(card,o);});hidden.value=options.join(', ');
+    var options=(g&&g.options||[]).map(function(o){return typeof o==='string'?o:{label:String(o.label||o.value_label||''),option_id:String(o.option_id||'')};});
+    (options.length?options:['']).forEach(function(o){appendOptionRow(card,o);});
+    hidden.value=options.map(function(o){return typeof o==='string'?o:o.label;}).join(', ');
     var add=node('button','mini-action','+ Add option');add.type='button';
     add.addEventListener('click',function(){if(card.querySelectorAll('.variation-option-row').length>=30){notice('Use up to 30 options per variation.','error');return;}
       appendOptionRow(card,'');updateOptionValues(card);card.querySelector('.variation-option-row:last-child .variation-option-name').focus();
@@ -1024,7 +1042,7 @@
     select.value=sets.length?String(state.sizeGuideIndex):'';
     var active=currentSizeSet();$('sizeGuideSetName').value=active?active.name:'';
     $('sizeGuideSetName').disabled=!active;
-    renderSizeRows();
+    renderSizeRows();refreshMeasurementControls();
   }
   function renderSizeRows() {
     var host=$('sizeMeasureRows');host.replaceChildren();
@@ -1541,6 +1559,7 @@
     var set=currentSizeSet();if(!set)return;
     set.name=this.value;state.dirty=true;state.metaDirty=true;
     var o=$('sizeGuideSet').options[state.sizeGuideIndex];if(o)o.textContent=this.value||'Unnamed set';
+    refreshMeasurementControls();
   });
   $('addSizeSet').addEventListener('click',function(){
     var sets=ensureGuide().sets;
@@ -1550,6 +1569,7 @@
   });
   $('removeSizeSet').addEventListener('click',function(){
     var sets=ensureGuide().sets;if(!sets.length)return;
+    if(hasMeasurementLink(sets[state.sizeGuideIndex])&&!window.confirm('Remove this variation-linked measurement set permanently? This cannot be undone after saving.'))return;
     sets.splice(state.sizeGuideIndex,1);state.sizeGuideIndex=Math.max(0,state.sizeGuideIndex-1);
     state.dirty=true;state.metaDirty=true;renderSizeSetSelector();
   });
