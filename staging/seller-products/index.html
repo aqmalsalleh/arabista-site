@@ -1139,6 +1139,10 @@
       if(!media.some(function(m){return String(m.media_id||m.asset_id)===String(want.media_id);}))
         throw new Error('A product media association was missing from saved readback. Refresh before retrying.');
     });
+    var intendedOrder=(intent.media||[]).map(function(m){return String(m.media_id||'');});
+    var savedOrder=media.map(function(m){return String(m.media_id||m.asset_id||'');});
+    if(JSON.stringify(intendedOrder)!==JSON.stringify(savedOrder))
+      throw new Error('The saved photo and video order did not match. Refresh before retrying.');
     var received=read.skus||[];
     intent.skus.forEach(function(want){
       var got=received.find(function(s){
