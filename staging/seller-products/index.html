@@ -920,6 +920,13 @@
     grip.addEventListener('pointerup',function(){if(!drag)return;drag=false;if(target&&target!==row){var i=Array.from(list.children).indexOf(row),j=Array.from(list.children).indexOf(target);list.insertBefore(row,i<j?target.nextElementSibling:target);updateOptionValues(card);}});
     grip.addEventListener('pointercancel',function(){drag=false;target=null;});
   }
+  function updateVariationButton() {
+    var count=$('variationGroups').querySelectorAll('.group-card').length;
+    var button=$('addGroup');
+    button.disabled=count>=3;
+    button.textContent=count>=3?'Maximum 3 variations':'+ Add variation';
+    button.setAttribute('aria-label',count>=3?'Maximum three variation groups reached':'Add variation group');
+  }
   function addGroup(g) {
     var card=node('div','group-card');card.dataset.groupId=g&&g.group_id||'';
     var top=node('div','group-top'),label=node('input','field variation-label');label.placeholder='Variation name, e.g. Size or Length';label.maxLength=80;label.setAttribute('aria-label','Variation name');label.value=g&&g.label||'';
@@ -930,7 +937,7 @@
         linkedSets.forEach(function(set){['option_id','group_id','option_key','group_label','option_label'].forEach(function(k){delete set[k];});});
       }
       card.querySelectorAll('.variation-option-row').forEach(function(r){var key=optionKey(card,r);delete state.variantFiles[key];state.editor.variant_media=(state.editor.variant_media||[]).filter(function(m){return m.option_key!==key;});});
-      card.remove();state.dirty=true;state.metaDirty=true;state.variationDirty=true;renderVariationPhotoSelect();
+      card.remove();state.dirty=true;state.metaDirty=true;state.variationDirty=true;renderVariationPhotoSelect();updateVariationButton();
       if(!state.selected)try{newSkusFromGroups();}catch(e){}
     });
     top.appendChild(label);top.appendChild(remove);card.appendChild(top);
@@ -946,7 +953,7 @@
     card.appendChild(add);card.appendChild(node('p','option-photo-note','Attach one photo beside an option; all matching SKU combinations share it.'));
     label.addEventListener('input',function(){updateOptionValues(card);});
     label.addEventListener('change',function(){if(!state.selected)try{newSkusFromGroups();}catch(e){}});
-    $('variationGroups').appendChild(card);
+    $('variationGroups').appendChild(card);updateVariationButton();
   }
   function combinations(groups) {
     if(groups.length>3)throw new Error('Use at most three variation groups.');
@@ -1165,7 +1172,7 @@
     $('description').value=d.long_description||d.description||'';
     $('shortDescription').value=d.short_description||'';
     $('variationGroups').replaceChildren();
-    (d.variation_groups||[]).forEach(addGroup);
+    (d.variation_groups||[]).forEach(addGroup);updateVariationButton();
     state.imageFiles=[];state.videoFile=null;state.variantFiles={};state.sizeChartFile=null;state.sizeGuideIndex=0;state.variationDirty=false;
     state.mediaOrder=(d.media||[]).filter(function(m){return String(m.kind||m.media_kind||'').toLowerCase()!=='video';}).map(function(m){return {type:'saved',media:m};});
     supplementalPreviewCleanup();renderMedia();
