@@ -678,6 +678,164 @@
       };
     }).filter(function(g){return g.label||g.options.length;});
   }
+  // Measurement sets are metadata bound to a variation option, never a third SKU dimension.
+  function hasMeasurementLink(set) {
+    return !!(set&&(set.option_id||set.option_key||(set.group_label&&set.option_label)));
+  }
+  function measurementSetForRow(card,row) {
+    var sets=ensureGuide().sets;
+    if(row.__measureSet&&sets.indexOf(row.__measureSet)>=0)return row.__measureSet;
+    var id=String(row.dataset.optionId||''),key=optionKey(card,row);
+    var matches=sets.filter(function(set){
+      return (id&&String(set.option_id||'')===id)||(key&&String(set.option_key||'')===key);
+    });
+    if(matches.length>1){notice('Multiple measurement sets are linked to one option. Review the saved product before editing.','error');return null;}
+    return matches[0]||null;
+  }
+  function bindMeasurementSetToRow(set,card,row) {
+    var key=optionKey(card,row);
+    if(!key)throw new Error('Name the variation and option before linking measurements.');
+    var parts=JSON.parse(key);
+    set.option_key=key;set.group_label=parts[0];set.option_label=parts[1];
+    if(row.dataset.optionId)set.option_id=String(row.dataset.optionId);
+    else delete set.option_id;
+    if(card.dataset.groupId)set.group_id=String(card.dataset.groupId);
+    else delete set.group_id;
+    row.__measureSet=set;row.dataset.measureKey=key;
+    state.dirty=true;state.metaDirty=true;
+  }
+  function syncLinkedMeasurementOption(card,row) {
+    var key=optionKey(card,row),previous=row.dataset.measureKey||'';
+    var set=measurementSetForRow(card,row);
+    if(set&&previous&&key&&previous!==key){
+      var parts=JSON.parse(key);
+      set.option_key=key;set.group_label=parts[0];set.option_label=parts[1];
+      // A renamed option can be reconciled to a new canonical ID; request a fresh link.
+      delete set.option_id;delete set.group_id;row.dataset.optionId='';
+      row.__measureSet=set;state.dirty=true;state.metaDirty=true;
+    }
+    row.dataset.measureKey=key;
+    var btn=row.querySelector('.option-measure-trigger');
+    if(btn){var current=measurementSetForRow(card,row);
+      btn.textContent=current?'Measurements ('+(current.rows||[]).length+' sizes)':'＋ Measurements';
+    }
+    var panel=row.querySelector('.option-measure-panel');
+    if(panel&&!panel.hidden)renderOptionMeasurements(card,row);
+  }
+  function suggestedMeasurementRows(card,row) {
+    var size=readGroups().find(function(g){return /^(size|saiz)$/i.test(g.label);});
+    if(!size)return [];
+    var labels=size.label===card.querySelector('.variation-label').value.trim()
+      ?[row.querySelector('.variation-option-name').value.trim()]:size.options;
+    return labels.filter(Boolean).slice(0,30).map(function(value){
+      return {size:value,height_cm:'',length_in:'',bust_cm:''};
+    });
+  }
+  function renderOptionMeasurements(card,row) {
+    var panel=row.querySelector('.option-measure-panel');
+    if(!panel||panel.hidden)return;
+    panel.replaceChildren();
+    var key=optionKey(card,row),set=measurementSetForRow(card,row);
+    if(!key){panel.appendChild(node('p','helper','Enter both the variation name and this option before linking measurements.'));return;}
+    var label=JSON.parse(key).join(' · ');
+    panel.appendChild(node('h4','', 'Measurements · '+label));
+    if(!set){
+      panel.appendChild(node('p','helper','No measurements linked to this option. Create a set or explicitly link an existing unlinked set.'));
+      var create=node('button','mini-action','＋ Create measurements for this option');create.type='button';
+      create.addEventListener('click',function(){
+        var sets=ensureGuide().sets;if(sets.length>=4){notice('The product already has four measurement sets. Reuse an unlinked set or remove an unused set first.','error');return;}
+        var fresh=newSizeSet(JSON.parse(key)[1]);fresh.rows=suggestedMeasurementRows(card,row);
+        bindMeasurementSetToRow(fresh,card,row);sets.push(fresh);renderSizeSetSelector();renderOptionMeasurements(card,row);
+        notice('Measurement set linked to '+label+'. Save the product to retain it.');
+      });
+      panel.appendChild(create);
+      var available=ensureGuide().sets.map(function(x,i){return {set:x,index:i};}).filter(function(x){return !hasMeasurementLink(x.set);});
+      if(available.length){
+        var note=node('p','helper','Or link an existing unlinked measurement set:');note.style.marginTop='12px';panel.appendChild(note);
+        var select=node('select','field');select.setAttribute('aria-label','Existing unlinked measurement set');
+        available.forEach(function(x){var o=node('option','',x.set.name||('Set '+(x.index+1)));o.value=String(x.index);select.appendChild(o);});
+        var link=node('button','mini-action','Link selected set');link.type='button';
+        link.addEventListener('click',function(){
+          var chosen=ensureGuide().sets[Number(select.value)];
+          if(!chosen||hasMeasurementLink(chosen)){notice('This measurement set is already linked or unavailable.','error');return;}
+          bindMeasurementSetToRow(chosen,card,row);renderSizeSetSelector();renderOptionMeasurements(card,row);
+          notice('Existing measurement set linked to '+label+'. Save to confirm.');
+        });
+        panel.appendChild(select);panel.appendChild(link);
+      }
+      return;
+    }
+    row.__measureSet=set;
+    var nameLabel=node('label','option-measure-set-name','Measurement set name');
+    var name=node('input','field');name.type='text';name.maxLength=40;name.value=set.name||'';
+    name.setAttribute('aria-label','Measurement set name for '+label);
+    name.addEventListener('input',function(){
+      set.name=name.value;state.dirty=true;state.metaDirty=true;
+      var idx=ensureGuide().sets.indexOf(set),o=$('sizeGuideSet').options[idx];if(o)o.textContent=name.value||'Unnamed set';
+      if(state.sizeGuideIndex===idx)$('sizeGuideSetName').value=name.value;
+    });
+    nameLabel.appendChild(name);panel.appendChild(nameLabel);
+    panel.appendChild(node('p','helper','Edit size measurements for this specific option. Values appear in the customer Size guide when this option is selected.'));
+    var scroll=node('div','measure-scroll'),table=node('table','measure-table');
+    table.setAttribute('aria-label','Measurements for '+label);
+    var thead=node('thead'),headRow=node('tr');
+    ['Size','Height cm','Length in','Bust cm','Remove'].forEach(function(title){headRow.appendChild(node('th','',title));});
+    thead.appendChild(headRow);table.appendChild(thead);
+    var tbody=node('tbody');
+    if(!Array.isArray(set.rows))set.rows=[];
+    set.rows.forEach(function(data,index){
+      var tr=node('tr');
+      [{field:'size',label:'Size'},{field:'height_cm',label:'Height cm'},{field:'length_in',label:'Length in'},{field:'bust_cm',label:'Bust cm'}].forEach(function(column){
+        var td=node('td'),input=node('input');input.type='text';input.inputMode=column.field==='size'?'text':'decimal';
+        if(column.field==='size')input.maxLength=20;
+        input.value=data[column.field]==null?'':String(data[column.field]);
+        input.setAttribute('aria-label',column.label+' for '+label+' row '+(index+1));
+        input.addEventListener('input',function(){data[column.field]=input.value;state.dirty=true;state.metaDirty=true;renderSizeRows();});
+        td.appendChild(input);tr.appendChild(td);
+      });
+      var td=node('td'),del=node('button','measure-remove','×');del.type='button';del.setAttribute('aria-label','Remove measurement row '+(index+1));
+      del.addEventListener('click',function(){set.rows.splice(index,1);state.dirty=true;state.metaDirty=true;renderSizeRows();renderOptionMeasurements(card,row);syncLinkedMeasurementOption(card,row);});
+      td.appendChild(del);tr.appendChild(td);tbody.appendChild(tr);
+    });
+    table.appendChild(tbody);scroll.appendChild(table);panel.appendChild(scroll);
+    if(!set.rows.length)panel.appendChild(node('p','helper','No measurement rows yet. Add a size or import sizes from the Size variation.'));
+    var actions=node('div','option-measure-actions');
+    var add=node('button','', '＋ Add size row');add.type='button';
+    add.addEventListener('click',function(){
+      if(set.rows.length>=30){notice('Use up to 30 rows per measurement set.','error');return;}
+      set.rows.push({size:'',height_cm:'',length_in:'',bust_cm:''});state.dirty=true;state.metaDirty=true;
+      renderSizeRows();renderOptionMeasurements(card,row);syncLinkedMeasurementOption(card,row);
+    });actions.appendChild(add);
+    var importSizes=node('button','', 'Add sizes from variation');importSizes.type='button';
+    importSizes.addEventListener('click',function(){
+      var suggested=suggestedMeasurementRows(card,row),added=0;
+      suggested.forEach(function(item){
+        if(set.rows.length>=30)return;
+        if(!set.rows.some(function(existing){return String(existing.size||'').toLowerCase()===String(item.size).toLowerCase();})){
+          set.rows.push(item);added++;
+        }
+      });
+      if(!added){notice('No new size options were available to add.');return;}
+      state.dirty=true;state.metaDirty=true;renderSizeRows();renderOptionMeasurements(card,row);syncLinkedMeasurementOption(card,row);
+    });actions.appendChild(importSizes);
+    var unlink=node('button','danger-text','Unlink set');unlink.type='button';
+    unlink.addEventListener('click',function(){
+      if(!window.confirm('Unlink this measurement set from '+label+'? The measurement values will be preserved as an unlinked set.'))return;
+      ['option_id','group_id','option_key','group_label','option_label'].forEach(function(k){delete set[k];});
+      row.__measureSet=null;state.dirty=true;state.metaDirty=true;
+      renderSizeSetSelector();renderOptionMeasurements(card,row);syncLinkedMeasurementOption(card,row);
+      notice('Measurement set unlinked but preserved. Save to confirm.');
+    });actions.appendChild(unlink);panel.appendChild(actions);
+  }
+  function refreshMeasurementControls() {
+    Array.from($('variationGroups').querySelectorAll('.variation-option-row')).forEach(function(row){
+      var card=row.closest('.group-card'),set=measurementSetForRow(card,row);
+      var btn=row.querySelector('.option-measure-trigger');
+      if(btn)btn.textContent=set?'Measurements ('+(set.rows||[]).length+' sizes)':'＋ Measurements';
+      var panel=row.querySelector('.option-measure-panel');
+      if(panel&&!panel.hidden)renderOptionMeasurements(card,row);
+    });
+  }
   function optionKey(card,row){
     var group=card.querySelector('.variation-label').value.trim();
     var option=row.querySelector('.variation-option-name').value.trim();
