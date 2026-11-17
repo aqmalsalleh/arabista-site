@@ -453,7 +453,7 @@
 (function () {
   'use strict';
   var $ = function (id) { return document.getElementById(id); };
-  var state = {view:'list', products:[], categories:[], selected:null, editor:null, skus:[], filter:'ALL', busy:false, dirty:false, metaDirty:false, imageFiles:[], videoFile:null, mediaPreviews:[], mediaOrder:[], variationDirty:false, backendMaxVariationGroups:2, mediaBusy:false, requestSerial:0, remoteRevision:null, priceBackTarget:'list', uploadedRefs:new WeakMap(), variantFiles:{}, sizeChartFile:null, sizeGuideIndex:0, supplementPreviewUrls:[], variantPreviewUrl:null, chartPreviewUrl:null};
+  var state = {view:'list', products:[], categories:[], selected:null, editor:null, skus:[], filter:'ALL', busy:false, dirty:false, metaDirty:false, imageFiles:[], videoFile:null, mediaPreviews:[], mediaOrder:[], variationDirty:false, backendMaxVariationGroups:2, saveRecoveryRequired:false, mediaBusy:false, requestSerial:0, remoteRevision:null, priceBackTarget:'list', uploadedRefs:new WeakMap(), variantFiles:{}, sizeChartFile:null, sizeGuideIndex:0, supplementPreviewUrls:[], variantPreviewUrl:null, chartPreviewUrl:null};
   var el = {
     list:$('listView'),editor:$('editorView'),price:$('priceView'),
     listActions:$('listActions'),editorActions:$('editorActions'),priceActions:$('priceActions')
@@ -1383,9 +1383,23 @@
     });
     if(received.length!==intent.skus.length)throw new Error('SKU readback count differed from the confirmed product.');
   }
+  // JSONP is GET-based; capture request-size diagnostics without exposing product content.
+  function estimatedJsonpCharacters(rpcName,payload) {
+    var envelope={name:rpcName,args:payload||{}};
+    var params=new URLSearchParams();
+    params.set('format','jsonp');
+    params.set('rpc','arabistaV247StaffProductsInvoke');
+    params.set('callback','arabistaV243Cb_0000_0000000000000');
+    params.set('args',JSON.stringify(envelope));
+    return params.toString().length+200; // Includes a conservative facade URL allowance.
+  }
   async function persistProduct(status) {
     if(state.busy)return;
-    var request;
+    if(state.saveRecoveryRequired){
+      notice('Previous save outcome needs staff reconciliation. Do not submit Save again or create a duplicate until the DEV record and write journal are checked.','error');
+      return;
+    }
+    var request,savePhase='validate_input',previewUrlCharacters=null,confirmedId=null;
     try{
       request=collectEditor();
       if(request.variation_groups.length>state.backendMaxVariationGroups){
@@ -1403,7 +1417,9 @@
     }catch(e){notice(e.message,'error');return;}
     setBusy(true);
     try{
+      savePhase='upload_product_media';
       var media=await uploadSelectedMedia(state.selected);
+      savePhase='upload_variation_media_and_size_chart';
       var supplemental=await collectSupplementalMedia(state.selected);
       var intent={
         product_id:state.selected||null,expected_revision:state.remoteRevision,
@@ -1420,11 +1436,16 @@
           desired_available_qty:s.stock_draft==null?s.stock_available_qty:parseStock(s.stock_draft)
         };})
       };
+      previewUrlCharacters=estimatedJsonpCharacters('arabistaDevSellerProductsV247PreviewSave',{intent:intent});
+      savePhase='preview_save';
       notice('Validating your changes…');
       var prev=await rpc('arabistaDevSellerProductsV247PreviewSave',{intent:intent});
       if(!prev.confirmation_token)throw new Error('Server confirmation is unavailable. Nothing was saved.');
+      savePhase='confirm_save';
       var conf=await rpc('arabistaDevSellerProductsV247ConfirmSave',{confirmation_token:prev.confirmation_token});
       if(!conf.product_id)throw new Error('The save response was incomplete. Refresh to check before retrying.');
+      confirmedId=String(conf.product_id);
+      savePhase='readback';
       var fresh=await rpc('arabistaDevSellerProductsV247Read',{product_id:conf.product_id});
       if(!fresh.product || !Array.isArray(fresh.skus))throw new Error('Save response received, but readback is unavailable. Do not retry until the result is checked.');
       verifyReadback(intent,fresh);
@@ -1432,7 +1453,25 @@
       state.skus=fresh.skus;state.uploadedRefs=new WeakMap();renderEditor();state.dirty=false;state.metaDirty=false;
       notice(status==='DRAFT'?'Draft saved and verified.':'Product saved and verified.','success');
       await loadList();notice(status==='DRAFT'?'Draft saved and verified.':'Product saved and verified.','success');show('list');
-    }catch(e){notice(errorText(e),'error');}
+    }catch(e){
+      var code=String((e&&((e.reason||e.message)||e.outcome))||e||'');
+      var transportLost=/jsonp_transport_failed|rpc_timeout/i.test(code);
+      var ambiguous=/save_recovery_required|SAVE_AMBIGUOUS|save may be incomplete/i.test(code);
+      if(transportLost && savePhase==='preview_save'){
+        notice('Save validation could not be delivered via the JSONP connection. No product save was confirmed. Uploaded media may exist, but do not retry until the transport is repaired. Estimated save GET URL: '+previewUrlCharacters+' characters. Error: '+code,'error');
+      }else if((transportLost||ambiguous) && savePhase==='confirm_save'){
+        state.saveRecoveryRequired=true;
+        notice('SAVE OUTCOME UNKNOWN: The save confirmation connection failed. Do not press Save again. The DEV write journal and product catalog must be inspected before any retry. Phase: confirm_save; error: '+code,'error');
+      }else if(transportLost && savePhase==='readback'){
+        state.saveRecoveryRequired=true;
+        notice('Save confirmation returned product ID '+confirmedId+', but verification readback failed. Do not submit again; check the existing DEV record. Error: '+code,'error');
+      }else if(ambiguous){
+        state.saveRecoveryRequired=true;
+        notice('SAVE OUTCOME UNKNOWN: DEV journal recovery is required before retry. Error: '+code,'error');
+      }else{
+        notice('Save step '+savePhase+' failed: '+errorText(e),'error');
+      }
+    }
     finally{setBusy(false);}
   }
   async function persistPrices() {
