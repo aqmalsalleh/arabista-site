@@ -1,0 +1,39 @@
+﻿<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+  <meta name="referrer" content="no-referrer">
+  <title>Arabista — Seller Center Products</title>
+  <style>
+    :root{--ink:#161411;--muted:#8a8278;--line:#ebe7e1;--bg:#fff;--soft:#f6f4f0;--accent:#1c1915}
+    *{box-sizing:border-box}
+    body{margin:0;min-height:100dvh;font:16px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:var(--bg);color:var(--ink);padding:24px 18px calc(24px + env(safe-area-inset-bottom))}
+    h1{margin:0 0 8px;font:700 22px/1.2 -apple-system,sans-serif}
+    p{margin:0 0 14px;color:var(--muted)}
+    .card{padding:18px;border:1px solid var(--line);border-radius:14px;background:var(--soft)}
+    a.btn{display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:0 18px;border-radius:12px;background:var(--accent);color:#fff;text-decoration:none;font:700 16px/1 -apple-system,sans-serif}
+    .links{display:flex;flex-direction:column;gap:10px;margin-top:18px}
+    a.secondary{color:var(--ink);font:600 15px/1.3 -apple-system,sans-serif}
+  </style>
+</head>
+<body>
+  <h1>Seller Center Products</h1>
+  <p>Open the authenticated staff Products workspace. Google sign-in with the allowlisted Seller Center account is required.</p>
+  <div class="card">
+    <p style="margin-bottom:16px;color:var(--ink)">Live DEV Products list, create/edit, media, price and stock.</p>
+    <a class="btn" id="openProducts" rel="noopener">Open Products</a>
+  </div>
+  <div class="links">
+    <a class="secondary" href="../">Customer staging shop</a>
+    <a class="secondary" href="../seller-discover/">Seller Discover Create Post</a>
+  </div>
+  <script>
+  (function () {
+    // Prefer multi-account-safe /a/*/macros path when already in a Google session host.
+    var staff = 'https://script.google.com/macros/s/AKfycbyoR8tuh7cezpcvM8ZPbm7NS6Z48edkliS1n9OL4nbGnkhYmbgaEzjldR_uyuHSjexS/exec?view=products';
+    document.getElementById('openProducts').href = staff;
+  })();
+  </script>
+</body>
+</html>
