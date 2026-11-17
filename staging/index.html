@@ -2560,10 +2560,43 @@ function closeShopDetail() {
       host.appendChild(el('p', product.description, 'muted'));
     }
     if (product.size_fit_note) host.appendChild(el('p', 'Size/fit: ' + product.size_fit_note, 'muted'));
-    if (product.size_guide && Array.isArray(product.size_guide.sets) && product.size_guide.sets.length) {
-      var guideWrap = document.createElement('section');
+    function resolveSizeGuideSetsForSku_(sku) {
+      var all = (product.size_guide && Array.isArray(product.size_guide.sets)) ? product.size_guide.sets : [];
+      if (!all.length) return [];
+      var linked = all.filter(function (set) {
+        return !!(set && (set.option_id || set.option_key || set.option_label));
+      });
+      var unlinked = all.filter(function (set) {
+        return !(set && (set.option_id || set.option_key || set.option_label));
+      });
+      if (!linked.length) return all;
+      var optionIds = (sku && Array.isArray(sku.option_ids)) ? sku.option_ids.map(String) : [];
+      var label = String((sku && (sku.options || sku.label || sku.sku_code)) || '');
+      var matched = linked.filter(function (set) {
+        if (set.option_id && optionIds.indexOf(String(set.option_id)) >= 0) return true;
+        var optLabel = String(set.option_label || '');
+        if (!optLabel && set.option_key) {
+          try {
+            var parts = JSON.parse(String(set.option_key));
+            if (Array.isArray(parts)) optLabel = String(parts[1] || '');
+          } catch (e) { /* ignore */ }
+        }
+        return !!(optLabel && label.indexOf(optLabel) >= 0);
+      });
+      // Prefer the matching linked set(s); never invent a guess when none match.
+      return matched.length ? matched.concat(unlinked) : unlinked;
+    }
+    function paintSizeGuide_(sku) {
+      var existing = host.querySelector('#product-size-guides') || (host._shopDetailBody && host._shopDetailBody.querySelector('#product-size-guides'));
+      var sets = resolveSizeGuideSetsForSku_(sku);
+      if (!product.size_guide || (!sets.length && !(product.size_guide.image_delivery_url))) {
+        if (existing) existing.remove();
+        return;
+      }
+      var guideWrap = existing || document.createElement('section');
       guideWrap.id = 'product-size-guides';
       guideWrap.setAttribute('aria-label', 'Size guide');
+      clear(guideWrap);
       guideWrap.appendChild(el('h3', 'Size guide'));
       if (product.size_guide.image_delivery_url && /^https:\/\//i.test(product.size_guide.image_delivery_url)) {
         var chart = document.createElement('img');
@@ -2573,8 +2606,8 @@ function closeShopDetail() {
         chart.style.maxWidth = '100%';
         guideWrap.appendChild(chart);
       }
-      product.size_guide.sets.forEach(function (set) {
-        guideWrap.appendChild(el('h4', String(set.name || 'Measurements')));
+      sets.forEach(function (set) {
+        guideWrap.appendChild(el('h4', String(set.name || set.option_label || 'Measurements')));
         var table = document.createElement('table');
         table.style.width = '100%';
         table.style.borderCollapse = 'collapse';
@@ -2601,8 +2634,10 @@ function closeShopDetail() {
         });
         guideWrap.appendChild(table);
       });
-      host.appendChild(guideWrap);
+      if (!existing) host.appendChild(guideWrap);
+      host._paintSizeGuide = paintSizeGuide_;
     }
+    paintSizeGuide_(null);
     var baseGallery = [];
     (Array.isArray(product.images) ? product.images : []).forEach(function (im) {
       baseGallery.push(im);
@@ -2692,10 +2727,15 @@ function closeShopDetail() {
     qty.disabled = add.disabled;
     var msg = el('p', add.disabled ? (product.preview_only ? 'Preview only — cart is disabled.' : 'No READY product variation is available for purchase.') : '', 'muted');
     msg.setAttribute('role', 'status');
-    select.addEventListener('change', function () {
-      if (!host._paintGallery || !host._baseImages) return;
+    function selectedSku_() {
       var sku = null;
       product.skus.forEach(function (s) { if (s.sku_id === select.value) sku = s; });
+      return sku;
+    }
+    select.addEventListener('change', function () {
+      var sku = selectedSku_();
+      if (host._paintSizeGuide) host._paintSizeGuide(sku);
+      if (!host._paintGallery || !host._baseImages) return;
       var label = String((sku && (sku.options || sku.label || sku.sku_code)) || '');
       var match = null;
       (host._variantMedia || []).forEach(function (vm) {
@@ -2711,6 +2751,7 @@ function closeShopDetail() {
         host._paintGallery(host._baseImages);
       }
     });
+    if (host._paintSizeGuide) host._paintSizeGuide(selectedSku_());
       add.addEventListener('click', function () {
       var skuId = select.value;
       var found = null;

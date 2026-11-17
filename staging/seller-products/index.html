@@ -900,19 +900,26 @@
     });
     // Match the server's numeric normalization before exact saved readback.
     // Input fields are strings; Sheets stores validated measures as numbers.
+    // Preserve optional variation-option association fields for ChatGPT Measurements wiring.
     var normalized=JSON.parse(JSON.stringify(g));
     normalized.sets=normalized.sets.map(function(set){
-      return {
+      var next={
         name:String(set.name||'').trim(),
         rows:(set.rows||[]).map(function(row){
-          var next={size:String(row.size||'').trim()};
+          var measure={size:String(row.size||'').trim()};
           ['height_cm','length_in','bust_cm'].forEach(function(k){
             var value=String(row[k]==null?'':row[k]).trim();
-            next[k]=value===''?'':Number(value);
+            measure[k]=value===''?'':Number(value);
           });
-          return next;
+          return measure;
         })
       };
+      if(set.option_id)next.option_id=String(set.option_id);
+      if(set.group_id)next.group_id=String(set.group_id);
+      if(set.option_key)next.option_key=String(set.option_key);
+      if(set.group_label)next.group_label=String(set.group_label);
+      if(set.option_label)next.option_label=String(set.option_label);
+      return next;
     });
     return normalized;
   }
