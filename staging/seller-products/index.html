@@ -83,12 +83,13 @@
     .media-item .cover-indicator{position:absolute;left:0;right:0;top:0;font-size:10px;padding:3px 0;text-align:center;background:rgba(22,20,17,.64);color:#fff;pointer-events:none}
     .media-pending{font-size:11px;position:absolute;bottom:0;left:0;right:0;color:#fff;background:rgba(0,0,0,.7);padding:4px;text-align:center}
     .variation-option-list{display:grid;gap:10px;margin:12px 0}
-    .variation-option-row{display:grid;grid-template-columns:26px minmax(0,1fr) 58px 29px;gap:7px;align-items:center;min-height:58px}
+    .variation-option-row{position:relative;display:grid;grid-template-columns:26px minmax(0,1fr) 58px 29px;gap:7px;align-items:center;min-height:58px}
     .variation-option-row .field{min-width:0;padding:10px;height:47px}
     .option-drag{height:42px;font-size:20px;color:var(--muted);touch-action:none;cursor:grab;font-weight:700}
     .option-photo{position:relative;display:grid;place-items:center;width:56px;height:56px;border:1px dashed #c8bfb5;border-radius:10px;background:var(--soft);overflow:hidden;font-size:12px;text-align:center;color:var(--muted)}
     .option-photo img{width:100%;height:100%;object-fit:cover}
     .option-photo input{position:absolute;inset:0;opacity:0;width:100%;height:100%;cursor:pointer}
+    .option-photo-clear{position:absolute;right:31px;top:0;width:23px;height:23px;border-radius:50%;background:#201b18;color:#fff;font-size:16px;z-index:2}
     .option-remove{height:37px;border-radius:8px;font-size:19px;color:var(--muted)}
     .option-photo-note{font-size:11px;color:var(--muted);margin:4px 0 8px 35px}
     .sku-inline{margin-top:16px;border-top:1px solid var(--line);padding-top:14px}
@@ -680,6 +681,7 @@
     if(src){var img=node('img');img.src=src;img.alt='Variation photo';slot.insertBefore(img,file);}
     else slot.insertBefore(node('span','', '＋ Photo'),file);
     file.disabled=!key;
+    var clear=row.querySelector('.option-photo-clear');if(clear)clear.hidden=!(pending||saved);
   }
   function updateOptionValues(card){
     var rows=Array.from(card.querySelectorAll('.variation-option-row'));
@@ -693,7 +695,14 @@
     var name=node('input','field variation-option-name');name.type='text';name.maxLength=50;name.placeholder='Enter option';name.value=value||'';name.setAttribute('aria-label','Variation option');
     var pick=node('label','option-photo'),file=node('input');file.type='file';file.accept='image/jpeg,image/png,image/webp';file.setAttribute('aria-label','Variation option photo');pick.appendChild(file);
     var del=node('button','option-remove','×');del.type='button';del.setAttribute('aria-label','Remove option');
-    row.appendChild(grip);row.appendChild(name);row.appendChild(pick);row.appendChild(del);list.appendChild(row);refreshOptionPhoto(card,row);
+    var clear=node('button','option-photo-clear','×');clear.type='button';clear.hidden=true;
+    clear.setAttribute('aria-label','Remove photo from this option');clear.title='Remove option photo only';
+    row.appendChild(grip);row.appendChild(name);row.appendChild(pick);row.appendChild(del);row.appendChild(clear);list.appendChild(row);refreshOptionPhoto(card,row);
+    clear.addEventListener('click',function(){
+      var key=optionKey(card,row);if(!key)return;
+      delete state.variantFiles[key];state.editor.variant_media=(state.editor.variant_media||[]).filter(function(m){return m.option_key!==key;});
+      state.dirty=true;state.metaDirty=true;refreshOptionPhoto(card,row);
+    });
     name.addEventListener('input',function(){updateOptionValues(card);});
     name.addEventListener('change',function(){if(!state.selected)try{newSkusFromGroups();}catch(e){}});
     file.addEventListener('change',function(){
