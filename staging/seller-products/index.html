@@ -703,7 +703,7 @@
       delete state.variantFiles[key];state.editor.variant_media=(state.editor.variant_media||[]).filter(function(m){return m.option_key!==key;});
       state.dirty=true;state.metaDirty=true;refreshOptionPhoto(card,row);
     });
-    name.addEventListener('input',function(){updateOptionValues(card);});
+    name.addEventListener('input',function(){if(name.value.indexOf(',')>=0){name.value=name.value.replace(/,/g,' ');notice('Commas are not supported inside variation options.','error');}updateOptionValues(card);});
     name.addEventListener('change',function(){if(!state.selected)try{newSkusFromGroups();}catch(e){}});
     file.addEventListener('change',function(){
       var chosen=file.files&&file.files[0],key=optionKey(card,row);
