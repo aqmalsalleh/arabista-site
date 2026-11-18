@@ -2,6 +2,20 @@
 <html lang="en" class="scroll-smooth">
 <head>
   <meta charset="utf-8" />
+  <script>
+  // Meta's approved CTA is /my-order?invoice={{1}} (no trailing slash). GitHub Pages
+  // serves this root my-order.html for that exact path; keep the same DEV invoice
+  // locator route as my-order/index.html without granting access from the invoice.
+  (function () {
+    try {
+      var args = new URLSearchParams(window.location.search || '');
+      var invoice = String(args.get('invoice') || args.get('invoice_no') || '').trim();
+      if (/^INV[0-9]{14}$/.test(invoice)) {
+        window.location.replace('/v251-staging/?invoice=' + encodeURIComponent(invoice));
+      }
+    } catch (e) { /* fall back to verification-only screen */ }
+  })();
+  </script>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Arabista — My Order</title>
   <meta name="description" content="Secure Arabista My Order entry. An invoice link identifies your order but does not unlock private details by itself." />
@@ -124,6 +138,17 @@
   var invoiceEl = document.getElementById('invoice-value');
   var banner = document.getElementById('state-banner');
   var message = document.getElementById('message');
+
+  // Mirror my-order/index.html: DEV INV+14-digit locators enter five-tab My Order.
+  if (/^INV[0-9]{14}$/.test(invoice)) {
+    var target = '/v251-staging/?invoice=' + encodeURIComponent(invoice);
+    try {
+      window.location.replace(target);
+    } catch (e) {
+      window.location.href = target;
+    }
+    return;
+  }
 
   if (invoice) {
     invoiceEl.textContent = invoice;
