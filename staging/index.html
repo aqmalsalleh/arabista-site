@@ -14224,6 +14224,28 @@ function attachSheetResizeHandle(handle,sheet,apply,ratio){
 
   /* ================= tabs ================= */
 
+  // Use ?tab=shop (or #shop) for livestream links; keep ordinary Discover.
+  function initialLandingTab_() {
+    try {
+      var url = new URL(window.location.href);
+      return String(url.searchParams.get('tab') || '').toLowerCase() === 'shop' ||
+        String(url.hash || '').toLowerCase() === '#shop' ? 'shop' : 'discover';
+    } catch (e) { return 'discover'; }
+  }
+
+  // Load the static Discover preview only if the customer visits its tab.
+  var discoverSnapshotPromise_ = null;
+  function ensureDiscoverSnapshot_() {
+    if (!discoverSnapshotPromise_) {
+      discoverSnapshotPromise_ = loadPublicDiscoverSnapshot().then(function (hadSnapshot) {
+        if (!hadSnapshot && !posts.length && tabId === 'discover')
+          setStatus('Loading Discover…');
+        return hadSnapshot;
+      });
+    }
+    return discoverSnapshotPromise_;
+  }
+
   function show(id, opts) {
     opts = opts || {};
     if (id === 'cart' && tabId !== 'cart') {
@@ -14247,8 +14269,11 @@ function attachSheetResizeHandle(handle,sheet,apply,ratio){
     if (id !== 'shop') closeShopDetail();
     if (sheetState && id !== 'discover') closeSheet();
     if (id === 'discover') {
+      ensureDiscoverSnapshot_();
       if (posts.length) computeActiveFromScroll();
       syncAll();
+      // Avoid a seven-table live read until the visitor opens Discover.
+      if (customerTransportReady_()) loadFeed();
     } else {
       pauseAll();
     }
@@ -14760,7 +14785,7 @@ function attachSheetResizeHandle(handle,sheet,apply,ratio){
     restoreIdentitySession();
     drawBasket();
     setCheckoutStep(0);
-    if (!handleDokuReturnLanding()) show('discover');
+    if (!handleDokuReturnLanding()) show(initialLandingTab_());
     if (typeof syncDokuButtons === 'function') syncDokuButtons();
     markPerf('shell_ready');
     // Mark URL/token preview intent only. Resolve after customer transport is ready
@@ -15133,8 +15158,8 @@ function attachSheetResizeHandle(handle,sheet,apply,ratio){
 
   function startBackendModules() {
     markPerf('bridge_ready');
-    // Independent modules — Discover and Shop do not wait on each other.
-    loadFeed({ forceLive: true });
+    // Shop loads once; Discover remains idle until its tab is visible.
+    if (tabId === 'discover') loadFeed();
     load();
     // Staff Product Sheet preview resolves only after transport is ready.
     if (staffPreviewBootState_.pending || readProductPreviewMeta_()) {
@@ -15188,9 +15213,7 @@ function attachSheetResizeHandle(handle,sheet,apply,ratio){
   window.addEventListener('arabista-v247-preview-ready', bootStaffProductPreview_);
   // A — paint approved shell immediately; backend work is asynchronous.
   startShellImmediately();
-  loadPublicDiscoverSnapshot().then(function (hadSnapshot) {
-    if (!hadSnapshot && !posts.length) setStatus('Loading Discover…');
-  });
+  // Shop-first visits skip Discover snapshot/media work until needed.
   bootPagesBridgeIfNeeded()
     .then(function () { startBackendModules(); })
     .catch(function (err) {
