@@ -1,0 +1,1841 @@
+﻿<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="robots" content="noindex,nofollow">
+  <meta name="color-scheme" content="light">
+  <title>Arabista Seller Center · Products</title>
+  <style>
+    :root{--ink:#161411;--muted:#817970;--line:#ebe7e1;--soft:#f6f4f0;--paper:#fff;--accent:#1c1915;--good:#166534;--bad:#b42318;--gold:#9a846c;--tap:48px;--pad:16px;--bar:84px}
+    *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+    html{-webkit-text-size-adjust:100%;scroll-behavior:smooth}
+    body{margin:0;background:#fff;color:var(--ink);font:16px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;-webkit-font-smoothing:antialiased;min-height:100vh;min-height:100dvh}
+    button,input,textarea,select{font:inherit;color:inherit}
+    button{cursor:pointer;border:0;background:transparent;-webkit-appearance:none}
+    button:disabled{opacity:.4;cursor:not-allowed}
+    input,textarea,select{font-size:16px!important}
+    :focus-visible{outline:2px solid #9a846c;outline-offset:3px}
+    [hidden]{display:none!important}
+    .page{min-height:100dvh;padding-bottom:calc(var(--bar) + env(safe-area-inset-bottom) + 12px)}
+    .topbar{position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:8px;padding:max(8px,env(safe-area-inset-top)) var(--pad) 8px;background:rgba(255,255,255,.96);border-bottom:1px solid var(--line);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);min-height:62px}
+    .topbar h1{flex:1;text-align:center;font-size:18px;font-weight:700;letter-spacing:-.025em;margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .topbar .spacer{width:44px;flex:none}
+    .icon-btn{height:44px;width:44px;flex:none;display:grid;place-items:center;border-radius:12px}
+    .icon-btn svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+    .module-menu{padding:8px var(--pad) 14px;background:#fff;border-bottom:1px solid var(--line)}
+    .module-menu nav{display:flex;gap:8px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+    .module-menu button{flex:none;min-height:40px;padding:0 13px;border:1px solid var(--line);border-radius:999px;background:var(--soft);font-size:13px;font-weight:600}
+    .module-menu [aria-current=page]{color:#fff;background:var(--ink)}
+    .section-pad{padding:18px var(--pad)}
+    .eyebrow{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);font-weight:750}
+    .section-title{font-weight:720;font-size:19px;letter-spacing:-.025em;margin:0 0 6px}
+    .helper{font-size:13px;color:var(--muted);margin:6px 0 0;line-height:1.4}
+    .toolbar{display:flex;gap:10px;align-items:center;margin:12px var(--pad)}
+    .search{position:relative;flex:1;min-width:0}
+    .search input{height:46px;width:100%;border:1px solid var(--line);border-radius:13px;background:var(--soft);padding:0 14px 0 40px;outline:0}
+    .search svg{position:absolute;left:13px;top:12px;width:20px;height:20px;fill:none;stroke:var(--muted);stroke-width:1.8}
+    .outline-btn{height:46px;padding:0 14px;white-space:nowrap;border:1px solid var(--line);border-radius:12px;font-size:13px;font-weight:700}
+    .tabs{display:flex;gap:21px;overflow-x:auto;white-space:nowrap;padding:0 var(--pad);border-bottom:1px solid var(--line);scrollbar-width:none}
+    .tabs button{position:relative;min-height:50px;padding:8px 0;color:var(--muted);font-size:14px;font-weight:600}
+    .tabs button[aria-selected=true]{color:var(--ink)}
+    .tabs button[aria-selected=true]:after{content:"";position:absolute;left:0;right:0;bottom:0;height:3px;border-radius:3px;background:var(--ink)}
+    .list{list-style:none;margin:0;padding:12px var(--pad) 24px;background:var(--soft);display:grid;gap:11px}
+    .product-card{padding:14px 13px;background:#fff;border:1px solid #f0ede9;border-radius:15px;box-shadow:0 3px 15px rgba(20,20,20,.025)}
+    .card-main{display:flex;gap:12px;min-width:0}
+    .thumb{width:92px;height:116px;flex:none;display:grid;place-items:center;border-radius:10px;overflow:hidden;background:#f0ede9;color:#a1988d}
+    .thumb img{width:100%;height:100%;object-fit:cover}
+    .thumb svg{width:26px;height:26px;stroke:currentColor;fill:none}
+    .product-body{min-width:0;flex:1}
+    .product-name{font-size:15px;font-weight:650;line-height:1.3;margin:1px 0 6px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+    .price{font-size:15px;font-weight:720;margin:0}
+    .stock-line{font-size:13px;color:var(--muted);margin:8px 0 0}
+    .stock-warning{font-size:12px;color:var(--bad);margin-top:4px;font-weight:650}
+    .card-actions{display:flex;gap:9px;justify-content:flex-end;margin-top:12px;border-top:1px solid var(--line);padding-top:12px}
+    .card-actions button{padding:0 15px;min-height:40px;border-radius:10px;font-size:13px;font-weight:700;background:var(--soft)}
+    .card-actions button.primary-quiet{background:#ede9e3;color:#211b17}
+    .state{padding:38px 20px;text-align:center;color:var(--muted);font-size:14px}
+    .state strong{display:block;color:var(--ink);font-size:16px;margin-bottom:6px}
+    .state button{margin-top:16px;min-height:44px;padding:0 18px;border-radius:12px;background:var(--ink);color:#fff;font-weight:650}
+    .fixed-actions{position:fixed;bottom:0;left:0;right:0;z-index:30;background:#fff;border-top:1px solid var(--line);padding:10px var(--pad) calc(10px + env(safe-area-inset-bottom));display:flex;gap:10px}
+    .fixed-actions button{min-height:50px;flex:1;border-radius:12px;font-weight:700;font-size:15px}
+    .cta{background:var(--accent)!important;color:#fff!important}
+    .secondary{background:var(--soft)!important;color:var(--ink)!important;border:1px solid var(--line)!important}
+    .form-section{padding:22px var(--pad);border-bottom:9px solid var(--soft)}
+    .form-section:last-of-type{border-bottom:0}
+    .form-label{display:block;margin:20px 0 9px;font-size:14px;font-weight:700}
+    .required{color:var(--bad)}
+    .field{display:block;width:100%;height:50px;padding:12px 14px;border-radius:12px;border:1px solid #dbd6cf;background:#fff;outline:0}
+    textarea.field{height:auto;min-height:126px;resize:vertical}
+    .field:focus{border-color:var(--gold)}
+    .field-row{display:flex;gap:9px}
+    .field-row>*{flex:1;min-width:0}
+    .char-count{display:block;text-align:right;color:#aba298;font-size:12px;margin-top:4px}
+    .upload-row{display:flex;gap:9px;overflow-x:auto;padding:2px 0 5px;scrollbar-width:none}
+    .upload-tile{width:92px;height:112px;flex:none;border-radius:12px;background:var(--soft);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:6px;border:1px dashed #cec7bf;position:relative;color:#817970}
+    .upload-tile input{position:absolute;inset:0;opacity:0;width:100%;height:100%;cursor:pointer}
+    .upload-tile span{font-size:12px;font-weight:650}
+    .media-item{width:92px;height:112px;flex:none;position:relative;border-radius:12px;background:var(--soft);overflow:hidden}
+    .media-item img,.media-item video{height:100%;width:100%;object-fit:cover}
+    .media-item button{position:absolute;top:5px;right:5px;width:29px;height:29px;border-radius:50%;background:rgba(20,20,20,.75);color:#fff;font-size:18px;line-height:1}
+    .media-item.drag-over{outline:3px solid var(--gold);outline-offset:-3px}
+    .media-item .media-drag-handle{top:auto;bottom:5px;left:5px;right:auto;border-radius:7px;width:32px;height:30px;font-size:21px;font-weight:700;cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none}
+    .media-item .cover-indicator{position:absolute;left:0;right:0;top:0;font-size:10px;padding:3px 0;text-align:center;background:rgba(22,20,17,.64);color:#fff;pointer-events:none}
+    .media-pending{font-size:11px;position:absolute;bottom:0;left:0;right:0;color:#fff;background:rgba(0,0,0,.7);padding:4px;text-align:center}
+    .variation-option-list{display:grid;gap:10px;margin:12px 0}
+    .variation-option-row{position:relative;display:grid;grid-template-columns:26px minmax(0,1fr) 58px 29px;gap:7px;align-items:center;min-height:58px}
+    .variation-option-row .field{min-width:0;padding:10px;height:47px}
+    .option-drag{height:42px;font-size:20px;color:var(--muted);touch-action:none;cursor:grab;font-weight:700}
+    .option-photo{position:relative;display:grid;place-items:center;width:56px;height:56px;border:1px dashed #c8bfb5;border-radius:10px;background:var(--soft);overflow:hidden;font-size:12px;text-align:center;color:var(--muted)}
+    .option-photo img{width:100%;height:100%;object-fit:cover}
+    .option-photo input{position:absolute;inset:0;opacity:0;width:100%;height:100%;cursor:pointer}
+    .option-photo-clear{position:absolute;right:31px;top:0;width:23px;height:23px;border-radius:50%;background:#201b18;color:#fff;font-size:16px;z-index:2}
+    .option-remove{height:37px;border-radius:8px;font-size:19px;color:var(--muted)}
+    .option-measure-trigger{grid-column:2/-1;justify-self:start;min-height:35px;min-width:115px;padding:7px 12px;border-radius:9px;background:#f4f0e9;border:1px solid #e2d9ce;font-size:12px;font-weight:700;text-align:left}
+    .option-measure-panel{grid-column:1/-1;background:#faf9f7;border:1px solid #e8e3dc;border-radius:12px;padding:14px 12px;margin:2px 0 8px;min-width:0}
+    .option-measure-panel h4{font-size:14px;margin:0 0 9px;font-weight:750}
+    .option-measure-panel .helper{margin:0 0 10px}
+    .option-measure-panel .field{background:#fff;height:44px;font-size:16px}
+    .option-measure-panel .measure-scroll{margin:10px 0 2px}
+    .option-measure-panel .measure-table{min-width:370px}
+    .option-measure-panel .measure-table input{height:40px}
+    .option-measure-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+    .option-measure-actions button{flex:1;min-height:38px;border:1px solid #ddd5cb;background:#fff;border-radius:9px;padding:8px;font-size:12px;font-weight:700}
+    .option-measure-actions .danger-text{color:#9b2620}
+    .option-measure-set-name{display:block;font-size:12px;font-weight:700;color:var(--muted)}
+    .option-measure-set-name input{margin-top:6px}
+    .legacy-measurements{border-top:1px solid var(--line);padding-top:12px;margin-top:18px}
+    .legacy-measurements summary{font-size:13px;font-weight:700;cursor:pointer;min-height:40px;padding:10px 0}
+    .option-photo-note{font-size:11px;color:var(--muted);margin:4px 0 8px 35px}
+    .sku-inline{margin-top:16px;border-top:1px solid var(--line);padding-top:14px}
+    .sku-inline-row{padding:12px 0;border-bottom:1px solid var(--line)}
+    .sku-inline-row strong{display:block;font-size:13px;margin-bottom:8px}
+    .sku-inline-inputs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+    .sku-inline-inputs label{font-size:11px;font-weight:650;color:var(--muted)}
+    .sku-inline-inputs input{margin-top:5px;height:43px;padding:9px}
+    .group-card{padding:14px 0;border-bottom:1px solid var(--line)}
+    .group-card:last-child{border-bottom:0}
+    .group-top{display:flex;gap:8px;align-items:center}
+    .group-top .field{flex:1;min-width:0}
+    .group-top button{border:1px solid var(--line);border-radius:10px;height:42px;padding:0 12px;font-size:13px}
+    .mini{font-size:12px;color:var(--muted)}
+    .plain-action{margin:14px 0 0;display:inline-flex;align-items:center;min-height:42px;padding:0 15px;border:1px solid #d9d2c9;border-radius:11px;font-size:14px;font-weight:700}
+    .sku-card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:16px;margin:12px var(--pad)}
+    .sku-name{margin:0 0 16px;font-weight:720;font-size:15px}
+    .sku-inputs{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .sku-inputs label{display:block;font-size:12px;font-weight:650}
+    .sku-inputs input{margin-top:7px}
+    .subtle-chip{display:inline-block;padding:4px 9px;margin-top:11px;border-radius:7px;background:#fcebea;color:var(--bad);font-size:12px;font-weight:700}
+    .good-chip{background:#eff5ef;color:var(--good)}
+    .total-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:18px var(--pad) 3px}
+    .total-row h2{font-size:18px;margin:0}
+    .total-row span{font-size:13px;color:var(--muted)}
+    .batch-panel{margin:12px var(--pad);padding:16px;border:1px solid #d9d2c9;border-radius:14px;background:var(--soft)}
+    .batch-panel h3{font-size:16px;margin:0 0 10px}
+    .batch-panel .field{background:#fff}
+    .batch-actions{display:flex;gap:8px;margin-top:14px}
+    .batch-actions button{flex:1;min-height:45px;border-radius:10px;font-size:13px;font-weight:700}
+    .notice{margin:12px var(--pad);padding:12px 14px;border-radius:12px;background:var(--soft);font-size:13px;color:#615a50}
+    .notice.error{background:#fdf0ee;color:#9b2620}
+    .notice.success{background:#eff6ef;color:#166534}
+    .notice[role=alert]{scroll-margin-top:85px}
+    .format-tools{display:flex;gap:6px;flex-wrap:wrap;padding:8px;border:1px solid var(--line);border-bottom:0;border-radius:12px 12px 0 0;background:#faf9f7}
+    .format-tools button{min-width:39px;min-height:36px;border-radius:8px;background:#fff;border:1px solid var(--line);font-size:13px;font-weight:700}
+    .format-tools+.field{border-radius:0 0 12px 12px}
+    .editor-preview{padding:13px;border:1px solid var(--line);border-radius:10px;margin-top:9px;line-height:1.65;font-size:13px;white-space:pre-wrap;overflow-wrap:anywhere}
+    .editor-preview h4{margin:8px 0;font-size:15px}.editor-preview p{margin:6px 0}.editor-preview ul{padding-left:22px}
+    .measure-table{width:100%;border-collapse:collapse;min-width:390px}.measure-table th{font-size:11px;text-align:left;color:var(--muted)}
+    .measure-table td,.measure-table th{padding:6px 4px;border-bottom:1px solid var(--line)}
+    .measure-table input{width:100%;min-width:62px;height:43px;padding:8px;border:1px solid #d9d5ce;border-radius:8px}
+    .measure-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;margin-top:10px}
+    .measure-remove{font-size:12px;color:var(--bad);padding:6px}
+    .field-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+    .field-grid label{font-size:12px;font-weight:650}
+    .field-grid label input{margin-top:7px}
+    .mini-action{min-height:38px;padding:7px 12px;border-radius:9px;border:1px solid var(--line);font-size:12px;font-weight:700;margin-top:10px}
+    .upload-preview{max-width:115px;max-height:145px;object-fit:contain;border:1px solid var(--line);border-radius:10px;margin:10px 0}
+    .pending-note{font-size:12px;color:#8c7048;margin-top:6px}
+    .action-pair{display:flex;gap:8px;flex-wrap:wrap}.action-pair button{flex:1}
+    
+    .pill{font-size:11px;border-radius:8px;background:var(--soft);padding:5px 9px;color:var(--muted);font-weight:700}
+    .empty-block{padding:18px;border:1px dashed #d7cec3;border-radius:12px;text-align:center;color:var(--muted);font-size:13px}
+    @media(min-width:780px){body{max-width:500px;margin:0 auto;border-left:1px solid var(--line);border-right:1px solid var(--line)}.fixed-actions{width:500px;left:50%;right:auto;transform:translateX(-50%)}}
+    @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+  </style>
+<script src="../bridge-client.js?v=247products2"></script>
+<!-- v2.48 Stage B: isolated size-chart importer under /v248-staging/, never permanent
+     /staging/. Missing script fails closed in importSizeChartJson (no invented measures). -->
+<script src="/v248-staging/seller-products/v248-size-chart-import.js"></script>
+<script>
+(function(){
+  'use strict';
+  window.__ARABISTA_V248_ASSET_BASE__ = '/v248-staging';
+  window.__ARABISTA_SELLER_PRODUCTS_MOBILE__ = true;
+  window.__ARABISTA_SELLER_PRODUCTS_PAGES__ = true;
+
+  function routeRpc(name, payload) {
+    name = String(name || '');
+    if (!window.ArabistaV243Bridge || !ArabistaV243Bridge.isReady || !ArabistaV243Bridge.isReady()) {
+      return Promise.reject(new Error('Seller Center connection is still starting. Wait a moment and try again.'));
+    }
+    var products = /^arabistaDevSellerProductsV247/.test(name);
+    var media = name === 'arabistaDevMediaCreateDirectUpload' || name === 'arabistaDevMediaVerifyAsset';
+    if (products || media) {
+      var long = /Confirm|PreviewSave|Bootstrap|CreateDirectUpload|Verify|IntentUpload|IntentChunk/i.test(name);
+      return window.ArabistaV243Bridge.call('arabistaV247StaffProductsInvoke', {
+        name: name,
+        args: payload == null ? {} : payload
+      }, { timeoutMs: long ? 60000 : 30000 });
+    }
+    return Promise.reject(new Error('That staff action is not available on the public-domain Products connection.'));
+  }
+
+  window.google = window.google || {};
+  google.script = google.script || {};
+  google.script.run = {
+    withSuccessHandler: function (ok) {
+      return {
+        withFailureHandler: function (fail) {
+          return new Proxy({}, {
+            get: function (_t, prop) {
+              if (prop === 'withSuccessHandler' || prop === 'withFailureHandler') return google.script.run[prop];
+              return function (payload) {
+                routeRpc(String(prop), payload).then(function (r) {
+                  try { ok(r); } catch (e) { if (typeof fail === 'function') fail(e); }
+                }).catch(function (err) {
+                  if (typeof fail === 'function') fail(err);
+                });
+              };
+            }
+          });
+        }
+      };
+    }
+  };
+
+  function postMultipart(url,file){return new Promise(function(resolve,reject){
+    var boundary="----ArabistaFormBoundary"+Date.now()+Math.floor(Math.random()*1e6);
+    var filename=String(file.name||"upload.bin").replace(/[\r\n"]/g,"_");
+    var mime=String(file.type||"application/octet-stream");
+    var head="--"+boundary+"\r\nContent-Disposition: form-data; name=\"file\"; filename=\""+filename+"\"\r\nContent-Type: "+mime+"\r\n\r\n";
+    var tail="\r\n--"+boundary+"--\r\n";
+    var body;try{body=new Blob([head,file,tail]);}catch(e){reject(new Error("Could not prepare the upload"));return;}
+    var xhr=new XMLHttpRequest();xhr.open("POST",url,true);
+    xhr.setRequestHeader("Content-Type","multipart/form-data; boundary="+boundary);
+    xhr.onload=function(){if(xhr.status>=200&&xhr.status<300)resolve();else reject(new Error("Upload rejected"));};
+    xhr.onerror=function(){reject(new Error("Upload network error"));};xhr.send(body);});}
+  function tusUpload(url,file){var chunk=5*1024*1024;return new Promise(function(resolve,reject){
+    function patch(offset){if(offset>=file.size){resolve();return;}var end=Math.min(file.size,offset+chunk);
+    var xhr=new XMLHttpRequest();xhr.open("PATCH",url,true);xhr.setRequestHeader("Tus-Resumable","1.0.0");
+    xhr.setRequestHeader("Upload-Offset",String(offset));xhr.setRequestHeader("Content-Type","application/offset+octet-stream");
+    xhr.onload=function(){if(xhr.status===204||(xhr.status>=200&&xhr.status<300)){patch(Number(xhr.getResponseHeader("Upload-Offset")||end));return;}
+    if(offset===0){postMultipart(url,file).then(resolve).catch(reject);return;}reject(new Error("Upload could not continue"));};
+    xhr.onerror=function(){reject(new Error("Upload interrupted"));};xhr.send(file.slice(offset,end));}
+    patch(0);});}
+  function verifyReady(assetId,kind,tries){return new Promise(function(resolve,reject){
+    routeRpc('arabistaDevMediaVerifyAsset',{asset_id:assetId,media_kind:kind}).then(function(r){
+      var ready=r&&r.ok&&(r.ready===true||String(r.upload_status||r.status||"").toUpperCase()==="READY"||String(r.outcome||"").indexOf("READY")>=0);
+      if(ready){resolve({verified:true,media_id:String(assetId),kind:kind==="VIDEO"?"video":"image"});return;}
+      if(tries>=8){reject(new Error("Media is still preparing. Try again shortly."));return;}
+      setTimeout(function(){verifyReady(assetId,kind,tries+1).then(resolve).catch(reject);},1500);
+    }).catch(function(e){reject(new Error(e&&e.message||"Verify failed"));});
+  });}
+  window.ArabistaSellerProductsV247Media={upload:function(file,opts){opts=opts||{};
+    return new Promise(function(resolve,reject){
+      var kind=/^video\//i.test(file.type)?"VIDEO":"IMAGE";
+      var preferTus=kind==="VIDEO"&&file.size>=32*1024*1024;
+      routeRpc('arabistaDevMediaCreateDirectUpload',{post_type:"IMAGE",media_kind:kind,filename:file.name,content_type:file.type,size_bytes:file.size,position:0,purpose:"product_v247",upload_mode:preferTus?"tus":undefined}).then(function(created){
+        if(!created||!created.ok||!created.upload_url||!created.asset_id){reject(new Error((created&&(created.message||created.reason))||"Upload could not start"));return;}
+        var url=String(created.upload_url);
+        var send=preferTus||String(created.upload_mode||created.upload_method||"").toLowerCase().indexOf("tus")>=0?tusUpload:postMultipart;
+        send(url,file).then(function(){return verifyReady(created.asset_id,kind,0);}).then(resolve).catch(reject);
+      }).catch(function(e){reject(new Error(e&&e.message||"Upload create failed"));});
+    });}};
+
+  function boot(){
+    fetch('../connection.json',{cache:'no-store'}).then(function(r){return r.json();}).then(function(cfg){
+      var url=(cfg&&(cfg.publicCustomerFacadeUrl||cfg.devAppsScriptWebAppUrl))||'';
+      return ArabistaV243Bridge.mount(url);
+    }).then(function(){
+      window.dispatchEvent(new Event('arabista-v247-pages-ready'));
+    }).catch(function(err){
+      var msg=document.getElementById('message');
+      if(msg){msg.hidden=false;msg.className='notice error';msg.setAttribute('role','alert');msg.textContent=String(err&&err.message||err||'Could not connect Seller Products.');}
+    });
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();
+})();
+</script>
+</head>
+<body>
+<div class="page" id="app">
+  <header class="topbar">
+    <button class="icon-btn" type="button" id="back" aria-label="Back" hidden>
+      <svg viewBox="0 0 24 24"><path d="M15 18 9 12l6-6"/></svg>
+    </button>
+    <button class="icon-btn" type="button" id="menu" aria-label="Seller Center menu" aria-expanded="false">
+      <svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+    </button>
+    <h1 id="pageTitle">Products</h1>
+    <button class="icon-btn" type="button" id="refresh" aria-label="Refresh products">
+      <svg viewBox="0 0 24 24"><path d="M20 7v5h-5M4 17v-5h5"/><path d="M5 10a8 8 0 0 1 14-3l1 5M4 12l1 5a8 8 0 0 0 14-3"/></svg>
+    </button>
+  </header>
+  <div class="module-menu" id="moduleMenu" hidden>
+    <nav aria-label="Seller Center sections" id="moduleNav">
+      <button type="button" data-module="overview">Overview</button>
+      <button type="button" data-module="products" aria-current="page">Products</button>
+      <button type="button" data-module="orders">Orders</button>
+      <button type="button" data-module="shipping">Shipping</button>
+      <button type="button" data-module="promotions">Promotions</button>
+      <button type="button" data-module="reviews">Reviews</button>
+      <button type="button" data-module="discover">Discover</button>
+      <button type="button" data-module="chat">Chat</button>
+    </nav>
+  </div>
+  <div id="message" class="notice" role="status" hidden></div>
+
+  <main id="listView">
+    <div class="section-pad">
+      <div class="eyebrow">Seller Center</div>
+      <h2 class="section-title" style="margin-top:5px">Your products</h2>
+      <p class="helper">Manage your listings, prices and available stock.</p>
+    </div>
+    <div class="toolbar">
+      <label class="search">
+        <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m16 16 5 5"/></svg>
+        <input type="search" id="search" placeholder="Search products" aria-label="Search products" autocomplete="off">
+      </label>
+      <button type="button" class="outline-btn" id="listReload">Refresh</button>
+    </div>
+    <div class="tabs" id="filterTabs" role="tablist" aria-label="Filter products">
+      <button type="button" role="tab" data-filter="ALL" aria-selected="true">All</button>
+      <button type="button" role="tab" data-filter="ACTIVE" aria-selected="false">Live</button>
+      <button type="button" role="tab" data-filter="LOW_STOCK" aria-selected="false">Low stock</button>
+      <button type="button" role="tab" data-filter="DRAFT" aria-selected="false">Draft</button>
+      <button type="button" role="tab" data-filter="INACTIVE" aria-selected="false">Inactive</button>
+    </div>
+    <div id="loading" class="state"><strong>Loading products…</strong>Connecting to Seller Center.</div>
+    <ul id="productList" class="list" aria-label="Products" hidden></ul>
+    <div id="empty" class="state" hidden><strong>No matching products</strong>Try another search or filter.</div>
+  </main>
+
+  <main id="editorView" hidden>
+    <section class="form-section">
+      <h2 class="section-title">Basic information</h2>
+      <label class="form-label">Images <span class="required">*</span></label>
+      <div class="upload-row" id="imageRow">
+        <label class="upload-tile"><strong style="font-size:27px;font-weight:400">＋</strong><span>Add photos</span><input type="file" id="images" accept="image/jpeg,image/png,image/webp" multiple aria-label="Add product photos"></label>
+      </div>
+      <p class="helper">Add at least one clear product photo. Drag the ≡ handle to reorder photos (or use arrow keys). The first photo is the product cover. Uploads must finish before publishing.</p>
+      <label class="form-label" for="productName">Product name <span class="required">*</span></label>
+      <input class="field" id="productName" maxlength="255" placeholder="e.g. Arabista Dahlia Abaya" autocomplete="off">
+      <span class="char-count" id="nameCount">0 / 255</span>
+      <label class="form-label" for="category">Category <span class="required">*</span></label>
+      <select class="field" id="category"><option value="">Choose a category</option></select>
+    </section>
+    <section class="form-section">
+      <h2 class="section-title">Product details</h2>
+      <label class="form-label" for="description">Description <span class="required">*</span></label>
+      <div class="format-tools" id="descriptionTools" aria-label="Description formatting">
+        <button type="button" data-format="bold" aria-label="Bold selection">B</button>
+        <button type="button" data-format="italic" aria-label="Italic selection"><em>I</em></button>
+        <button type="button" data-format="heading" aria-label="Add heading">H</button>
+        <button type="button" data-format="bullet" aria-label="Bulleted list">• List</button>
+        <button type="button" data-format="number" aria-label="Numbered list">1. List</button>
+      </div>
+      <textarea class="field" id="description" maxlength="5000" placeholder="Describe the product. Use the formatting tools for headings, bold text and lists."></textarea>
+      <button type="button" class="mini-action" id="formatPreviewToggle">Preview formatted description</button>
+      <div id="formattedPreview" class="editor-preview" hidden aria-label="Formatted product description preview"></div>
+      <span class="char-count" id="descriptionCount">0 / 5000</span>
+      <label class="form-label" for="shortDescription">Short description</label>
+      <input class="field" id="shortDescription" maxlength="300" placeholder="A brief summary for shoppers">
+      <label class="form-label" for="productHighlights">Product selling points <span class="mini">(optional)</span></label>
+      <textarea class="field" id="productHighlights" rows="3" maxlength="600" placeholder="Premium Nidha Dubai&#10;Nursing-friendly zip&#10;Free shawl"></textarea>
+      <p class="helper">Add up to six product highlights, one per line. They appear as premium selling points above the size selector. Only your own wording is shown; do not enter dummy claims.</p>
+      <span class="char-count" id="highlightsCount">0 / 6 highlights</span>
+      <label class="form-label">Video <span class="mini">(optional)</span></label>
+      <div class="upload-row" id="videoRow">
+        <label class="upload-tile"><strong style="font-size:27px;font-weight:400">＋</strong><span>Add video</span><input type="file" id="video" accept="video/mp4,video/quicktime,video/webm" aria-label="Add product video"></label>
+      </div>
+      <p class="helper">Your uploaded video can appear on the customer-facing product sheet once ready.</p>
+    </section>
+    <section class="form-section">
+      <h2 class="section-title">Variations</h2>
+      <p class="helper">Add up to three variations, such as Size, Length and Color. Each combination has its own price and stock.</p>
+      <div id="variationGroups"></div>
+      <button type="button" class="plain-action" id="addGroup">+ Add variation</button>
+      <p class="helper">Changing options on an existing product may require confirmation; products already ordered cannot lose their SKU history.</p>
+      <button type="button" class="plain-action" id="generateSkus">Refresh variation list</button>
+      <div id="newSkuSummary" class="empty-block" style="margin-top:12px" hidden></div>
+      <div class="sku-inline" id="skuInlinePanel">
+        <h3 class="section-title" style="font-size:16px">Variation list <span class="mini" id="skuInlineCount"></span></h3>
+        <p class="helper">Edit price and stock for each SKU combination here. Refresh the list after changing variation options on an existing product.</p>
+        <div id="skuInlineRows"></div>
+      </div>
+      <div id="legacyVariationPhotoControls" hidden>
+        <select id="variationPhotoOption" class="field"><option value="">Choose an option</option></select>
+        <input id="variationPhotoFile" class="field" type="file" accept="image/jpeg,image/png,image/webp">
+        <div id="variationPhotoStatus" class="pending-note" role="status"></div>
+        <img id="variationPhotoPreview" class="upload-preview" hidden alt="Variation photo preview">
+        <button id="removeVariationPhoto" class="mini-action" type="button">Remove selected photo</button>
+      </div>
+    </section>
+    <section class="form-section">
+      <h2 class="section-title">Size chart</h2>
+      <p class="helper">Upload your size-chart image as the customer reference. There is no need to enter individual measurements.</p>
+      <label class="form-label" for="sizeChartFile">Size-chart image (optional)</label>
+      <input class="field" id="sizeChartFile" type="file" accept="image/jpeg,image/png,image/webp">
+      <img id="sizeChartPreview" class="upload-preview" hidden alt="Selected size-chart image">
+      <button id="removeSizeChart" class="mini-action" type="button">Remove size-chart image</button>
+      <label class="form-label" for="sizeChartJson">Structured size-chart measurements · ChatGPT JSON</label>
+      <textarea id="sizeChartJson" class="field" rows="5" maxlength="42000" spellcheck="false" placeholder='{"schema_version":1,"length_sets":[...],"uncertainties":[]}'></textarea>
+      <p class="helper">Check extracted measurements against your chart first. Import is a local preview; normal Seller Save persists the table.</p>
+      <button id="importSizeChartJson" class="mini-action" type="button">Preview & import table</button>
+      <p id="sizeChartImportStatus" class="helper" role="status" aria-live="polite"></p>
+      <div id="sizeChartTablePreview" class="measure-scroll" hidden></div>
+      <div id="legacyMeasurements" hidden aria-hidden="true">
+      <p class="helper">Historical measurement metadata preserved in the DEV workbook.</p>
+      <label class="form-label" for="sizeGuideSet">Measurement set</label>
+      <select id="sizeGuideSet" class="field"></select>
+      <label class="form-label" for="sizeGuideSetName">Set name</label>
+      <input id="sizeGuideSetName" class="field" maxlength="40" placeholder="e.g. Set 1 — Standard">
+      <div class="action-pair">
+        <button id="addSizeSet" class="mini-action" type="button">+ Add length set</button>
+        <button id="removeSizeSet" class="mini-action" type="button">Remove set</button>
+      </div>
+      <div class="measure-scroll"><table class="measure-table" aria-label="Editable size measurements">
+        <thead><tr><th>Size</th><th>Height cm</th><th>Length in</th><th>Bust cm</th><th>Remove</th></tr></thead>
+        <tbody id="sizeMeasureRows"></tbody>
+      </table></div>
+      <button id="addSizeRow" class="mini-action" type="button">+ Add size row</button>
+      </div>
+    </section>
+    <section class="form-section">
+      <h2 class="section-title">Parcel details</h2>
+      <p class="helper">Package measurements for J&amp;T. Courier selection is unnecessary because J&amp;T is our only carrier.</p>
+      <div class="field-grid">
+        <label>Weight (g)<input id="parcelWeight" class="field" type="text" inputmode="decimal" placeholder="e.g. 750"></label>
+        <label>Length (cm)<input id="parcelLength" class="field" type="text" inputmode="decimal" placeholder="e.g. 30"></label>
+        <label>Width (cm)<input id="parcelWidth" class="field" type="text" inputmode="decimal" placeholder="e.g. 25"></label>
+        <label>Height (cm)<input id="parcelHeight" class="field" type="text" inputmode="decimal" placeholder="e.g. 5"></label>
+      </div>
+      <p class="helper">Dimensions are saved with the product for J&amp;T booking/quotes, not displayed as customer product specifications.</p>
+      <button id="previewProductSheet" class="plain-action" type="button">Preview customer product sheet</button>
+      <div id="customerPreviewLink" class="pending-note" hidden></div>
+      <p class="helper">Preview the saved product using the same layout and content as the approved customer <code>fyp-staging.html</code> Product Sheet. Save first to include recent changes.</p>
+      <button type="button" class="plain-action" id="publishProduct">Publish product</button>
+      <p class="helper">Publish after completing product photos, price and stock. The server will check that your listing is ready.</p>
+    </section>
+  </main>
+
+  <main id="priceView" hidden>
+    <div class="total-row"><h2 id="priceHeading">Price &amp; stock</h2><span id="skuCount"></span></div>
+    <p class="helper" style="padding:0 var(--pad) 12px;margin:0">Edit a variant, or use Batch Edit to apply the same change to all variants.</p>
+    <div id="batchPanel" class="batch-panel" hidden>
+      <h3>Batch Edit</h3>
+      <label class="form-label" for="batchField" style="margin-top:5px">Change</label>
+      <select id="batchField" class="field">
+        <option value="price">Retail price (RM)</option>
+        <option value="stock">Available stock</option>
+      </select>
+      <label class="form-label" for="batchValue">New value</label>
+      <input class="field" id="batchValue" inputmode="decimal" placeholder="Enter value">
+      <div class="batch-actions">
+        <button class="secondary" type="button" id="cancelBatch">Cancel</button>
+        <button class="cta" type="button" id="applyBatch">Apply to all</button>
+      </div>
+      <p class="helper">Changes stay on this page until you confirm. Stock represents the available quantity, not a direct adjustment to reserved orders.</p>
+    </div>
+    <div id="skuCards"></div>
+    <div id="noSkus" class="state" hidden><strong>No variants yet</strong>Go back to the product form and add variations.</div>
+  </main>
+
+  <div class="fixed-actions" id="listActions">
+    <button class="cta" type="button" id="addProduct">+ Add product</button>
+  </div>
+  <div class="fixed-actions" id="editorActions" hidden>
+    <button class="secondary" type="button" id="saveDraft">Save draft</button>
+    <button class="cta" type="button" id="nextToPricing">Price &amp; stock</button>
+  </div>
+  <div class="fixed-actions" id="priceActions" hidden>
+    <button class="secondary" type="button" id="showBatch">Batch Edit</button>
+    <button class="cta" type="button" id="confirm">Confirm</button>
+  </div>
+</div>
+<script>
+(function () {
+  'use strict';
+  var $ = function (id) { return document.getElementById(id); };
+  var state = {view:'list', products:[], categories:[], selected:null, editor:null, skus:[], filter:'ALL', busy:false, dirty:false, metaDirty:false, imageFiles:[], videoFile:null, mediaPreviews:[], mediaOrder:[], variationDirty:false, backendMaxVariationGroups:2, chunkedIntentSupported:false, jsonpSafeChars:3500, intentChunkMaxChars:1500, saveRecoveryRequired:false, mediaBusy:false, requestSerial:0, remoteRevision:null, priceBackTarget:'list', uploadedRefs:new WeakMap(), variantFiles:{}, sizeChartFile:null, sizeGuideIndex:0, supplementPreviewUrls:[], variantPreviewUrl:null, chartPreviewUrl:null};
+  var el = {
+    list:$('listView'),editor:$('editorView'),price:$('priceView'),
+    listActions:$('listActions'),editorActions:$('editorActions'),priceActions:$('priceActions')
+  };
+  function errorText(x) {
+    if (!x) return 'The request could not be completed. Please try again.';
+    var r = String(x.message || x.reason || x.failure || x.outcome || x);
+    if (/revision|stale|conflict/i.test(r)) return 'This product changed since you opened it. Refresh the product before editing again.';
+    if (/staff|auth|identity|permission/i.test(r)) return 'Please sign in with the authorized Seller Center account.';
+    if (/not_available|not_implemented|missing|unavailable|not_supported/i.test(r)) return 'This feature is not connected yet. Your changes were not saved.';
+    return r.replace(/_/g, ' ').slice(0,240);
+  }
+  function notice(text, kind) {
+    var box = $('message');
+    box.hidden = !text;
+    if (!text) return;
+    box.className = 'notice' + (kind ? ' ' + kind : '');
+    box.setAttribute('role',kind === 'error' ? 'alert' : 'status');
+    box.textContent = text;
+  }
+  function rpc(name, payload) {
+    return new Promise(function (resolve, reject) {
+      if (!window.google || !google.script || !google.script.run) {
+        reject(new Error('Seller Center connection unavailable. Open the authenticated staff link.'));
+        return;
+      }
+      try {
+        google.script.run.withSuccessHandler(function (result) {
+          if (!result || result.ok !== true) reject(result || new Error('No server response'));
+          else resolve(result);
+        }).withFailureHandler(function (e) {reject(new Error(errorText(e)));})[name](payload);
+      } catch(e) { reject(e); }
+    });
+  }
+  function setBusy(v) {
+    state.busy = !!v;
+    ['addProduct','saveDraft','nextToPricing','confirm','showBatch','generateSkus','listReload','refresh','publishProduct'].forEach(function(id){$(id).disabled=state.busy;});
+  }
+  function text(node, value) {node.textContent=value==null?'':String(value);}
+  function node(tag, cls, value) {
+    var n=document.createElement(tag);if(cls)n.className=cls;if(value!==undefined)text(n,value);return n;
+  }
+  function httpsUrl(src) {
+    try {var u=new URL(String(src||''));return u.protocol==='https:' ? u.href : '';} catch(e){return '';}
+  }
+  function senText(sen) {
+    if(sen == null || sen === '') return '—';
+    if(!Number.isSafeInteger(Number(sen))) return '—';
+    return 'RM '+(Number(sen)/100).toFixed(2);
+  }
+  function senInput(sen) {
+    return sen==null || sen==='' ? '' : (Number(sen)/100).toFixed(2);
+  }
+  function parsePrice(value) {
+    var v=String(value==null?'':value).trim();
+    if(v==='')return null;
+    if(!/^(0|[1-9]\d*)(\.\d{1,2})?$/.test(v)) throw new Error('Enter a valid RM price with up to two decimal places.');
+    var a=v.split('.');
+    var n=Number(a[0])*100+Number((a[1]||'').padEnd(2,'0'));
+    if(!Number.isSafeInteger(n)||n<0)throw new Error('Price is outside the supported range.');
+    return n;
+  }
+  function parseStock(value) {
+    var v=String(value==null?'':value).trim();
+    if(!/^(0|[1-9]\d*)$/.test(v)||!Number.isSafeInteger(Number(v)))throw new Error('Stock must be a whole number of zero or more.');
+    return Number(v);
+  }
+  function show(view) {
+    state.view=view;
+    ['list','editor','price'].forEach(function(k){el[k].hidden=k!==view;el[k+'Actions'].hidden=k!==view;});
+    $('back').hidden=view==='list';$('menu').hidden=view!=='list';$('refresh').hidden=view!=='list';
+    $('pageTitle').textContent=view==='list'?'Products':view==='editor'?(state.selected?'Edit product':'Add product'):'Set price and stock';
+    $('moduleMenu').hidden=true;$('menu').setAttribute('aria-expanded','false');
+    window.scrollTo(0,0);
+  }
+  function changeGuard() {
+    return !state.dirty || window.confirm('Discard unsaved changes?');
+  }
+  function card(p) {
+    var li=node('li','product-card'),main=node('div','card-main'),thumb=node('div','thumb');
+    var image=httpsUrl(p.primary_media_url || p.image_url);
+    if(image){var img=node('img');img.src=image;img.alt='';img.loading='lazy';thumb.appendChild(img);}
+    else {thumb.textContent='Photo';thumb.style.fontSize='12px';}
+    var body=node('div','product-body');
+    body.appendChild(node('p','product-name',p.title||'Untitled product'));
+    var prices=p.price_display||senText(p.min_price_sen==null?p.regular_price_sen:p.min_price_sen);
+    body.appendChild(node('p','price',prices));
+    body.appendChild(node('p','stock-line','Stock: '+(Number.isFinite(Number(p.available_qty))?Number(p.available_qty):'—')));
+    if(Number(p.sold_out_sku_count)>0)body.appendChild(node('p','stock-warning',p.sold_out_sku_count+' SKU'+(p.sold_out_sku_count===1?'':'s')+' sold out'));
+    main.appendChild(thumb);main.appendChild(body);li.appendChild(main);
+    var actions=node('div','card-actions');
+    var edit=node('button','', 'Edit product');edit.type='button';edit.addEventListener('click',function(){openProduct(String(p.product_id),'editor');});
+    var stock=node('button','primary-quiet','Price / Stock');stock.type='button';stock.addEventListener('click',function(){openProduct(String(p.product_id),'price');});
+    actions.appendChild(edit);actions.appendChild(stock);li.appendChild(actions);
+    return li;
+  }
+  function renderList() {
+    var q=$('search').value.trim().toLocaleLowerCase(),list=$('productList');
+    list.replaceChildren();
+    var matches=state.products.filter(function(p){
+      var s=String(p.publication_status||p.status||'DRAFT').toUpperCase();
+      var low=Number(p.low_stock_sku_count||0)>0 || (p.low_stock===true);
+      if(state.filter==='ACTIVE' && s!=='ACTIVE' && s!=='PUBLISHED')return false;
+      if(state.filter==='DRAFT' && s!=='DRAFT')return false;
+      if(state.filter==='INACTIVE' && !['INACTIVE','ARCHIVED','HIDDEN'].includes(s))return false;
+      if(state.filter==='LOW_STOCK' && !low)return false;
+      return !q || (String(p.title||'')+' '+String(p.product_code||'')).toLocaleLowerCase().includes(q);
+    });
+    matches.forEach(function(p){list.appendChild(card(p));});
+    $('loading').hidden=true;list.hidden=!matches.length;$('empty').hidden=!!matches.length;
+  }
+  async function loadList() {
+    var serial=++state.requestSerial;
+    $('loading').hidden=false;$('empty').hidden=true;$('productList').hidden=true;
+    $('loading').innerHTML='<strong>Loading products…</strong>Reading your catalog.';
+    notice('');
+    try{
+      var r=await rpc('arabistaDevSellerProductsV247Bootstrap',{});
+      if(serial!==state.requestSerial)return;
+      if(!Array.isArray(r.products))throw new Error('Product list unavailable');
+      state.products=r.products;state.categories=Array.isArray(r.categories)?r.categories:[];
+      // Older GAS deployments silently truncate variation group three. Refuse save until upgraded.
+      state.backendMaxVariationGroups=Number(r.max_variation_groups)===3?3:2;
+      state.chunkedIntentSupported=r.chunked_intent_supported===true;
+      state.jsonpSafeChars=Number(r.jsonp_safe_chars)>1000?Number(r.jsonp_safe_chars):3500;
+      state.intentChunkMaxChars=Number(r.intent_chunk_max_chars)>200?Number(r.intent_chunk_max_chars):1500;
+      renderList();
+    }catch(e){
+      if(serial!==state.requestSerial)return;
+      $('loading').innerHTML='';
+      $('loading').appendChild(node('strong','', 'Products could not be loaded'));
+      $('loading').appendChild(node('p','',errorText(e)));
+      $('loading').appendChild(node('button','', 'Retry'));
+      $('loading').querySelector('button').addEventListener('click',loadList);
+      notice('Your products have not been loaded. No sample catalog has been substituted.','error');
+    }
+  }
+  function previewCleanup() {
+    state.mediaPreviews.forEach(function(u){try{URL.revokeObjectURL(u);}catch(e){}});
+    state.mediaPreviews=[];
+  }
+  function mediaTile(src,kind,remove) {
+    var wrap=node('div','media-item'),v;
+    if(kind==='video'){v=node('video');v.muted=true;v.playsInline=true;v.preload='metadata';}
+    else {v=node('img');v.alt='Product photo';}
+    v.src=src;wrap.appendChild(v);
+    var b=node('button','', '×');b.type='button';b.setAttribute('aria-label','Remove '+kind);b.addEventListener('click',remove);
+    wrap.appendChild(b);return wrap;
+  }
+  function moveProductPhoto(from,to) {
+    var order=state.mediaOrder||[];
+    if(!Number.isInteger(from)||!Number.isInteger(to)||from<0||to<0||from>=order.length||to>=order.length||from===to)return;
+    var entry=order.splice(from,1)[0];order.splice(to,0,entry);
+    state.dirty=true;state.metaDirty=true;renderMedia();
+  }
+  function makePhotoSortable(tile,index) {
+    tile.dataset.mediaIndex=String(index);tile.draggable=true;
+    var handle=node('button','media-drag-handle','≡');handle.type='button';
+    handle.setAttribute('aria-label','Reorder photo '+(index+1)+'. Drag or press left/right arrow keys.');
+    handle.style.zIndex='2';tile.appendChild(handle);
+    handle.addEventListener('keydown',function(e){
+      if(e.key==='ArrowLeft'||e.key==='ArrowRight'){e.preventDefault();moveProductPhoto(index,index+(e.key==='ArrowLeft'?-1:1));}
+    });
+    tile.addEventListener('dragstart',function(e){state.dragPhotoIndex=index;if(e.dataTransfer){e.dataTransfer.effectAllowed='move';e.dataTransfer.setData('text/plain',String(index));}});
+    tile.addEventListener('dragover',function(e){e.preventDefault();tile.classList.add('drag-over');});
+    tile.addEventListener('dragleave',function(){tile.classList.remove('drag-over');});
+    tile.addEventListener('drop',function(e){e.preventDefault();tile.classList.remove('drag-over');moveProductPhoto(state.dragPhotoIndex,index);state.dragPhotoIndex=null;});
+    tile.addEventListener('dragend',function(){state.dragPhotoIndex=null;tile.classList.remove('drag-over');});
+    var hover=-1,dragging=false;
+    handle.addEventListener('pointerdown',function(e){
+      if(e.pointerType==='mouse'&&e.button!==0)return;
+      e.preventDefault();dragging=true;hover=index;
+      try{handle.setPointerCapture(e.pointerId);}catch(err){}
+    });
+    handle.addEventListener('pointermove',function(e){
+      if(!dragging)return;
+      var hit=document.elementFromPoint(e.clientX,e.clientY),target=hit&&hit.closest&&hit.closest('#imageRow .media-item');
+      Array.from($('imageRow').querySelectorAll('.media-item')).forEach(function(n){n.classList.remove('drag-over');});
+      if(target){hover=Number(target.dataset.mediaIndex);target.classList.add('drag-over');}
+    });
+    handle.addEventListener('pointerup',function(){
+      if(!dragging)return;dragging=false;
+      var target=hover;
+      Array.from($('imageRow').querySelectorAll('.media-item')).forEach(function(n){n.classList.remove('drag-over');});
+      moveProductPhoto(index,target);
+    });
+    handle.addEventListener('pointercancel',function(){dragging=false;hover=-1;});
+  }
+  function renderMedia() {
+    previewCleanup();
+    ['imageRow','videoRow'].forEach(function(id) {
+      var row=$(id);Array.prototype.slice.call(row.querySelectorAll('.media-item')).forEach(function(n){n.remove();});
+    });
+    var imageRow=$('imageRow'),videoRow=$('videoRow');
+    (state.mediaOrder||[]).forEach(function(entry,index){
+      var isFile=entry.type==='file',src='';
+      if(isFile){src=URL.createObjectURL(entry.file);state.mediaPreviews.push(src);}
+      else src=httpsUrl(entry.media.delivery_url||entry.media.url);
+      if(!src)return;
+      var tile=mediaTile(src,'image',function(){
+        if(isFile)state.imageFiles=state.imageFiles.filter(function(f){return f!==entry.file;});
+        else state.editor.media=state.editor.media.filter(function(m){return m!==entry.media;});
+        state.mediaOrder=state.mediaOrder.filter(function(x){return x!==entry;});
+        state.dirty=true;state.metaDirty=true;renderMedia();
+      });
+      makePhotoSortable(tile,index);
+      if(index===0){var cover=node('span','cover-indicator','Cover');tile.appendChild(cover);}
+      imageRow.insertBefore(tile,imageRow.querySelector('.upload-tile'));
+    });
+    var oldVideo=(state.editor.media||[]).filter(function(m){return String(m.kind||m.media_kind||'').toLowerCase()==='video';})[0];
+    if(oldVideo && httpsUrl(oldVideo.delivery_url||oldVideo.url)){
+      videoRow.insertBefore(mediaTile(httpsUrl(oldVideo.delivery_url||oldVideo.url),'video',function(){
+        state.editor.media=state.editor.media.filter(function(a){return a!==oldVideo;});state.dirty=true;state.metaDirty=true;renderMedia();
+      }),videoRow.firstChild);
+    }
+    if(state.videoFile){
+      var v=URL.createObjectURL(state.videoFile);state.mediaPreviews.push(v);
+      videoRow.insertBefore(mediaTile(v,'video',function(){state.videoFile=null;state.dirty=true;state.metaDirty=true;renderMedia();}),videoRow.firstChild);
+    }
+  }
+  function readGroups() {
+    return Array.from($('variationGroups').querySelectorAll('.group-card')).map(function(card){
+      return {
+        group_id:card.dataset.groupId||null,
+        label:card.querySelector('.variation-label').value.trim(),
+        options:card.querySelector('.variation-options').value.split(',').map(function(s){return s.trim();}).filter(Boolean)
+      };
+    }).filter(function(g){return g.label||g.options.length;});
+  }
+  // Measurement sets are metadata bound to a variation option, never a third SKU dimension.
+  function hasMeasurementLink(set) {
+    return !!(set&&(set.option_id||set.option_key||(set.group_label&&set.option_label)));
+  }
+  function measurementSetForRow(card,row) {
+    var sets=ensureGuide().sets;
+    if(row.__measureSet&&sets.indexOf(row.__measureSet)>=0)return row.__measureSet;
+    var id=String(row.dataset.optionId||''),key=optionKey(card,row);
+    var matches=sets.filter(function(set){
+      return (id&&String(set.option_id||'')===id)||(key&&String(set.option_key||'')===key);
+    });
+    if(matches.length>1){notice('Multiple measurement sets are linked to one option. Review the saved product before editing.','error');return null;}
+    return matches[0]||null;
+  }
+  function bindMeasurementSetToRow(set,card,row) {
+    var key=optionKey(card,row);
+    if(!key)throw new Error('Name the variation and option before linking measurements.');
+    var parts=JSON.parse(key);
+    set.option_key=key;set.group_label=parts[0];set.option_label=parts[1];
+    if(row.dataset.optionId)set.option_id=String(row.dataset.optionId);
+    else delete set.option_id;
+    if(card.dataset.groupId)set.group_id=String(card.dataset.groupId);
+    else delete set.group_id;
+    row.__measureSet=set;row.dataset.measureKey=key;
+    state.dirty=true;state.metaDirty=true;
+  }
+  function syncLinkedMeasurementOption(card,row) {
+    var key=optionKey(card,row),previous=row.dataset.measureKey||'';
+    var set=measurementSetForRow(card,row);
+    if(set&&previous&&key&&previous!==key){
+      var parts=JSON.parse(key);
+      set.option_key=key;set.group_label=parts[0];set.option_label=parts[1];
+      // A renamed option can be reconciled to a new canonical ID; request a fresh link.
+      delete set.option_id;delete set.group_id;row.dataset.optionId='';
+      row.__measureSet=set;state.dirty=true;state.metaDirty=true;
+    }
+    row.dataset.measureKey=key;
+    var btn=row.querySelector('.option-measure-trigger');
+    if(btn){var current=measurementSetForRow(card,row);
+      btn.textContent=current?'Measurements ('+(current.rows||[]).length+' sizes)':'＋ Measurements';
+    }
+    var panel=row.querySelector('.option-measure-panel');
+    if(panel&&!panel.hidden)renderOptionMeasurements(card,row);
+  }
+  function suggestedMeasurementRows(card,row) {
+    var size=readGroups().find(function(g){return /^(size|saiz)$/i.test(g.label);});
+    if(!size)return [];
+    var labels=size.label===card.querySelector('.variation-label').value.trim()
+      ?[row.querySelector('.variation-option-name').value.trim()]:size.options;
+    return labels.filter(function(value){return !!value&&String(value).length<=20;}).slice(0,30).map(function(value){
+      return {size:value,height_cm:'',length_in:'',bust_cm:''};
+    });
+  }
+  function renderOptionMeasurements(card,row) {
+    var panel=row.querySelector('.option-measure-panel');
+    if(!panel||panel.hidden)return;
+    panel.replaceChildren();
+    var key=optionKey(card,row),set=measurementSetForRow(card,row);
+    if(!key){panel.appendChild(node('p','helper','Enter both the variation name and this option before linking measurements.'));return;}
+    var label=JSON.parse(key).join(' · ');
+    panel.appendChild(node('h4','', 'Measurements · '+label));
+    if(!set){
+      panel.appendChild(node('p','helper','No measurements linked to this option. Create a set or explicitly link an existing unlinked set.'));
+      var create=node('button','mini-action','＋ Create measurements for this option');create.type='button';
+      create.addEventListener('click',function(){
+        var sets=ensureGuide().sets;if(sets.length>=4){notice('The product already has four measurement sets. Reuse an unlinked set or remove an unused set first.','error');return;}
+        var fresh=newSizeSet(String(JSON.parse(key)[1]).slice(0,40));fresh.rows=suggestedMeasurementRows(card,row);
+        bindMeasurementSetToRow(fresh,card,row);sets.push(fresh);renderSizeSetSelector();renderOptionMeasurements(card,row);
+        notice('Measurement set linked to '+label+'. Save the product to retain it.');
+      });
+      panel.appendChild(create);
+      var available=ensureGuide().sets.map(function(x,i){return {set:x,index:i};}).filter(function(x){return !hasMeasurementLink(x.set);});
+      if(available.length){
+        var note=node('p','helper','Or link an existing unlinked measurement set:');note.style.marginTop='12px';panel.appendChild(note);
+        var select=node('select','field');select.setAttribute('aria-label','Existing unlinked measurement set');
+        available.forEach(function(x){var o=node('option','',x.set.name||('Set '+(x.index+1)));o.value=String(x.index);select.appendChild(o);});
+        var link=node('button','mini-action','Link selected set');link.type='button';
+        link.addEventListener('click',function(){
+          var chosen=ensureGuide().sets[Number(select.value)];
+          if(!chosen||hasMeasurementLink(chosen)){notice('This measurement set is already linked or unavailable.','error');return;}
+          bindMeasurementSetToRow(chosen,card,row);renderSizeSetSelector();renderOptionMeasurements(card,row);
+          notice('Existing measurement set linked to '+label+'. Save to confirm.');
+        });
+        panel.appendChild(select);panel.appendChild(link);
+      }
+      return;
+    }
+    row.__measureSet=set;
+    var nameLabel=node('label','option-measure-set-name','Measurement set name');
+    var name=node('input','field');name.type='text';name.maxLength=40;name.value=set.name||'';
+    name.setAttribute('aria-label','Measurement set name for '+label);
+    name.addEventListener('input',function(){
+      set.name=name.value;state.dirty=true;state.metaDirty=true;
+      var idx=ensureGuide().sets.indexOf(set),o=$('sizeGuideSet').options[idx];if(o)o.textContent=name.value||'Unnamed set';
+      if(state.sizeGuideIndex===idx)$('sizeGuideSetName').value=name.value;
+    });
+    nameLabel.appendChild(name);panel.appendChild(nameLabel);
+    panel.appendChild(node('p','helper','Edit size measurements for this specific option. Values appear in the customer Size guide when this option is selected.'));
+    var scroll=node('div','measure-scroll'),table=node('table','measure-table');
+    table.setAttribute('aria-label','Measurements for '+label);
+    var thead=node('thead'),headRow=node('tr');
+    ['Size','Height cm','Length in','Bust cm','Remove'].forEach(function(title){headRow.appendChild(node('th','',title));});
+    thead.appendChild(headRow);table.appendChild(thead);
+    var tbody=node('tbody');
+    if(!Array.isArray(set.rows))set.rows=[];
+    set.rows.forEach(function(data,index){
+      var tr=node('tr');
+      [{field:'size',label:'Size'},{field:'height_cm',label:'Height cm'},{field:'length_in',label:'Length in'},{field:'bust_cm',label:'Bust cm'}].forEach(function(column){
+        var td=node('td'),input=node('input');input.type='text';input.inputMode=column.field==='size'?'text':'decimal';
+        if(column.field==='size')input.maxLength=20;
+        input.value=data[column.field]==null?'':String(data[column.field]);
+        input.setAttribute('aria-label',column.label+' for '+label+' row '+(index+1));
+        input.addEventListener('input',function(){data[column.field]=input.value;state.dirty=true;state.metaDirty=true;renderSizeRows();});
+        td.appendChild(input);tr.appendChild(td);
+      });
+      var td=node('td'),del=node('button','measure-remove','×');del.type='button';del.setAttribute('aria-label','Remove measurement row '+(index+1));
+      del.addEventListener('click',function(){set.rows.splice(index,1);state.dirty=true;state.metaDirty=true;renderSizeRows();renderOptionMeasurements(card,row);syncLinkedMeasurementOption(card,row);});
+      td.appendChild(del);tr.appendChild(td);tbody.appendChild(tr);
+    });
+    table.appendChild(tbody);scroll.appendChild(table);panel.appendChild(scroll);
+    if(!set.rows.length)panel.appendChild(node('p','helper','No measurement rows yet. Add a size or import sizes from the Size variation.'));
+    var actions=node('div','option-measure-actions');
+    var add=node('button','', '＋ Add size row');add.type='button';
+    add.addEventListener('click',function(){
+      if(set.rows.length>=30){notice('Use up to 30 rows per measurement set.','error');return;}
+      set.rows.push({size:'',height_cm:'',length_in:'',bust_cm:''});state.dirty=true;state.metaDirty=true;
+      renderSizeRows();renderOptionMeasurements(card,row);syncLinkedMeasurementOption(card,row);
+    });actions.appendChild(add);
+    var importSizes=node('button','', 'Add sizes from variation');importSizes.type='button';
+    importSizes.addEventListener('click',function(){
+      var suggested=suggestedMeasurementRows(card,row),added=0;
+      suggested.forEach(function(item){
+        if(set.rows.length>=30)return;
+        if(!set.rows.some(function(existing){return String(existing.size||'').toLowerCase()===String(item.size).toLowerCase();})){
+          set.rows.push(item);added++;
+        }
+      });
+      if(!added){notice('No new size options were available to add.');return;}
+      state.dirty=true;state.metaDirty=true;renderSizeRows();renderOptionMeasurements(card,row);syncLinkedMeasurementOption(card,row);
+    });actions.appendChild(importSizes);
+    var unlink=node('button','danger-text','Unlink set');unlink.type='button';
+    unlink.addEventListener('click',function(){
+      if(!window.confirm('Unlink this measurement set from '+label+'? The measurement values will be preserved as an unlinked set.'))return;
+      ['option_id','group_id','option_key','group_label','option_label'].forEach(function(k){delete set[k];});
+      row.__measureSet=null;state.dirty=true;state.metaDirty=true;
+      renderSizeSetSelector();renderOptionMeasurements(card,row);syncLinkedMeasurementOption(card,row);
+      notice('Measurement set unlinked but preserved. Save to confirm.');
+    });actions.appendChild(unlink);panel.appendChild(actions);
+  }
+  function refreshMeasurementControls() {
+    Array.from($('variationGroups').querySelectorAll('.variation-option-row')).forEach(function(row){
+      var card=row.closest('.group-card'),set=measurementSetForRow(card,row);
+      var btn=row.querySelector('.option-measure-trigger');
+      if(btn)btn.textContent=set?'Measurements ('+(set.rows||[]).length+' sizes)':'＋ Measurements';
+      var panel=row.querySelector('.option-measure-panel');
+      if(panel&&!panel.hidden)renderOptionMeasurements(card,row);
+    });
+  }
+  function optionKey(card,row){
+    var group=card.querySelector('.variation-label').value.trim();
+    var option=row.querySelector('.variation-option-name').value.trim();
+    return group&&option?JSON.stringify([group,option]):'';
+  }
+  function refreshOptionPhoto(card,row){
+    if(row.__photoBlobUrl){try{URL.revokeObjectURL(row.__photoBlobUrl);}catch(e){}row.__photoBlobUrl=null;}
+    var key=optionKey(card,row),old=row.dataset.photoKey||'';
+    if(old&&key&&old!==key){
+      if(state.variantFiles[old]){if(!state.variantFiles[key])state.variantFiles[key]=state.variantFiles[old];delete state.variantFiles[old];}
+      (state.editor.variant_media||[]).forEach(function(m){if(m.option_key===old)m.option_key=key;});
+    }
+    row.dataset.photoKey=key;
+    var slot=row.querySelector('.option-photo'),file=slot.querySelector('input');
+    Array.from(slot.children).forEach(function(c){if(c!==file)c.remove();});
+    var pending=key&&state.variantFiles[key],saved=key&&(state.editor.variant_media||[]).find(function(m){return m.option_key===key;});
+    var src=pending?URL.createObjectURL(pending):saved?httpsUrl(saved.delivery_url):'';
+    if(pending){row.__photoBlobUrl=src;state.supplementPreviewUrls.push(src);}
+    if(src){var img=node('img');img.src=src;img.alt='Variation photo';slot.insertBefore(img,file);}
+    else slot.insertBefore(node('span','', '＋ Photo'),file);
+    file.disabled=!key;
+    var clear=row.querySelector('.option-photo-clear');if(clear)clear.hidden=!(pending||saved);
+  }
+  function updateOptionValues(card){
+    var rows=Array.from(card.querySelectorAll('.variation-option-row'));
+    card.querySelector('.variation-options').value=rows.map(function(r){return r.querySelector('.variation-option-name').value.trim();}).filter(Boolean).join(', ');
+    rows.forEach(function(r){refreshOptionPhoto(card,r);syncLinkedMeasurementOption(card,r);});
+    state.dirty=true;state.metaDirty=true;state.variationDirty=true;renderVariationPhotoSelect();
+  }
+  function appendOptionRow(card,value){
+    var list=card.querySelector('.variation-option-list'),row=node('div','variation-option-row');
+    var initial=value&&typeof value==='object'?value:null;
+    if(initial&&initial.option_id)row.dataset.optionId=String(initial.option_id);
+    var grip=node('button','option-drag','⋮⋮');grip.type='button';grip.setAttribute('aria-label','Drag option to reorder or press up/down arrows');
+    var name=node('input','field variation-option-name');name.type='text';name.maxLength=50;name.placeholder='Enter option';name.value=initial?String(initial.label||initial.value_label||''):(value||'');name.setAttribute('aria-label','Variation option');
+    var pick=node('label','option-photo'),file=node('input');file.type='file';file.accept='image/jpeg,image/png,image/webp';file.setAttribute('aria-label','Variation option photo');pick.appendChild(file);
+    var del=node('button','option-remove','×');del.type='button';del.setAttribute('aria-label','Remove option');
+    var clear=node('button','option-photo-clear','×');clear.type='button';clear.hidden=true;
+    clear.setAttribute('aria-label','Remove photo from this option');clear.title='Remove option photo only';
+    row.appendChild(grip);row.appendChild(name);row.appendChild(pick);row.appendChild(del);row.appendChild(clear);
+    list.appendChild(row);
+    row.dataset.measureKey=optionKey(card,row);row.__measureSet=measurementSetForRow(card,row);
+    refreshOptionPhoto(card,row);syncLinkedMeasurementOption(card,row);
+    clear.addEventListener('click',function(){
+      var key=optionKey(card,row);if(!key)return;
+      delete state.variantFiles[key];state.editor.variant_media=(state.editor.variant_media||[]).filter(function(m){return m.option_key!==key;});
+      state.dirty=true;state.metaDirty=true;refreshOptionPhoto(card,row);
+    });
+    name.addEventListener('input',function(){if(name.value.indexOf(',')>=0){name.value=name.value.replace(/,/g,' ');notice('Commas are not supported inside variation options.','error');}updateOptionValues(card);});
+    name.addEventListener('change',function(){if(!state.selected)try{newSkusFromGroups();}catch(e){}});
+    file.addEventListener('change',function(){
+      var chosen=file.files&&file.files[0],key=optionKey(card,row);
+      if(!key){notice('Enter the variation name and option first.','error');file.value='';return;}
+      if(!chosen)return;
+      if(!/^image\/(jpeg|png|webp)$/.test(chosen.type)||chosen.size>20*1024*1024){notice('Use JPG, PNG or WebP photos under 20 MB.','error');file.value='';return;}
+      state.variantFiles[key]=chosen;state.dirty=true;state.metaDirty=true;refreshOptionPhoto(card,row);file.value='';
+      notice('Photo selected for '+name.value+'. Save to upload.');
+    });
+    del.addEventListener('click',function(){
+      var oldSet=measurementSetForRow(card,row);
+      if(oldSet){
+        if(!window.confirm('This option has a historical measurement set. Remove the option and preserve its measurement data as unlinked?'))return;
+        ['option_id','group_id','option_key','group_label','option_label'].forEach(function(k){delete oldSet[k];});
+        row.__measureSet=null;
+      }
+      var key=optionKey(card,row);
+      delete state.variantFiles[key];state.editor.variant_media=(state.editor.variant_media||[]).filter(function(m){return m.option_key!==key;});
+      row.remove();updateOptionValues(card);if(!state.selected)try{newSkusFromGroups();}catch(e){}
+    });
+    grip.addEventListener('keydown',function(e){
+      if(e.key!=='ArrowUp'&&e.key!=='ArrowDown')return;
+      e.preventDefault();var near=e.key==='ArrowUp'?row.previousElementSibling:row.nextElementSibling;
+      if(!near)return;
+      list.insertBefore(e.key==='ArrowUp'?row:near,e.key==='ArrowUp'?near:row);
+      updateOptionValues(card);grip.focus();
+    });
+    var drag=false,target=null;
+    grip.addEventListener('pointerdown',function(e){if(e.pointerType==='mouse'&&e.button!==0)return;e.preventDefault();drag=true;target=row;try{grip.setPointerCapture(e.pointerId);}catch(err){}});
+    grip.addEventListener('pointermove',function(e){if(!drag)return;var hit=document.elementFromPoint(e.clientX,e.clientY),candidate=hit&&hit.closest&&hit.closest('.variation-option-row');if(candidate&&candidate.parentElement===list)target=candidate;});
+    grip.addEventListener('pointerup',function(){if(!drag)return;drag=false;if(target&&target!==row){var i=Array.from(list.children).indexOf(row),j=Array.from(list.children).indexOf(target);list.insertBefore(row,i<j?target.nextElementSibling:target);updateOptionValues(card);}});
+    grip.addEventListener('pointercancel',function(){drag=false;target=null;});
+  }
+  function updateVariationButton() {
+    var count=$('variationGroups').querySelectorAll('.group-card').length;
+    var button=$('addGroup');
+    button.disabled=count>=3;
+    button.textContent=count>=3?'Maximum 3 variations':'+ Add variation';
+    button.setAttribute('aria-label',count>=3?'Maximum three variation groups reached':'Add variation group');
+  }
+  function addGroup(g) {
+    var card=node('div','group-card');card.dataset.groupId=g&&g.group_id||'';
+    var top=node('div','group-top'),label=node('input','field variation-label');label.placeholder='Variation name, e.g. Size or Length';label.maxLength=80;label.setAttribute('aria-label','Variation name');label.value=g&&g.label||'';
+    var remove=node('button','', 'Remove');remove.type='button';remove.addEventListener('click',function(){
+      var linkedSets=Array.from(card.querySelectorAll('.variation-option-row')).map(function(row){return measurementSetForRow(card,row);}).filter(Boolean);
+      if(linkedSets.length){
+        if(!window.confirm('This variation has historical measurement data. Remove the variation and preserve its measurement sets as unlinked?'))return;
+        linkedSets.forEach(function(set){['option_id','group_id','option_key','group_label','option_label'].forEach(function(k){delete set[k];});});
+      }
+      card.querySelectorAll('.variation-option-row').forEach(function(r){var key=optionKey(card,r);delete state.variantFiles[key];state.editor.variant_media=(state.editor.variant_media||[]).filter(function(m){return m.option_key!==key;});});
+      card.remove();state.dirty=true;state.metaDirty=true;state.variationDirty=true;renderVariationPhotoSelect();updateVariationButton();
+      if(!state.selected)try{newSkusFromGroups();}catch(e){}
+    });
+    top.appendChild(label);top.appendChild(remove);card.appendChild(top);
+    var hidden=node('input','variation-options');hidden.type='hidden';card.appendChild(hidden);
+    card.appendChild(node('div','variation-option-list'));
+    var options=(g&&g.options||[]).map(function(o){return typeof o==='string'?o:{label:String(o.label||o.value_label||''),option_id:String(o.option_id||'')};});
+    (options.length?options:['']).forEach(function(o){appendOptionRow(card,o);});
+    hidden.value=options.map(function(o){return typeof o==='string'?o:o.label;}).join(', ');
+    var add=node('button','mini-action','+ Add option');add.type='button';
+    add.addEventListener('click',function(){if(card.querySelectorAll('.variation-option-row').length>=30){notice('Use up to 30 options per variation.','error');return;}
+      appendOptionRow(card,'');updateOptionValues(card);card.querySelector('.variation-option-row:last-child .variation-option-name').focus();
+    });
+    card.appendChild(add);card.appendChild(node('p','option-photo-note','Attach one photo beside an option; all matching SKU combinations share it.'));
+    label.addEventListener('input',function(){updateOptionValues(card);});
+    label.addEventListener('change',function(){if(!state.selected)try{newSkusFromGroups();}catch(e){}});
+    $('variationGroups').appendChild(card);updateVariationButton();
+  }
+  function combinations(groups) {
+    if(groups.length>3)throw new Error('Use at most three variation groups.');
+    var combos=[{key:'',label:'Default'}];
+    groups.forEach(function(g){
+      if(!g.label || !g.options.length)throw new Error('Give each variation a name and at least one option.');
+      var seen={};g.options.forEach(function(s){if(seen[s.toLowerCase()])throw new Error('Remove duplicate options for '+g.label+'.');seen[s.toLowerCase()]=true;});
+      var arr=[];
+      combos.forEach(function(c){g.options.forEach(function(s){arr.push({key:c.key?c.key+' / '+s:s,label:c.label==='Default'?s:c.label+' / '+s});});});
+      combos=arr;
+    });
+    if(combos.length>80)throw new Error('Too many SKU combinations. Limit the product to 80 variants.');
+    return combos;
+  }
+  function renderInlineSkus() {
+    var host=$('skuInlineRows');host.replaceChildren();
+    text($('skuInlineCount'),state.skus.length+' combinations');
+    if(!state.skus.length){host.appendChild(node('p','helper','Add variation options, then refresh the variation list to enter prices and stock.'));return;}
+    state.skus.forEach(function(s,i) {
+      var row=node('div','sku-inline-row');
+      row.appendChild(node('strong','',s.label||s.variation_summary||'Default variant'));
+      var fields=node('div','sku-inline-inputs');
+      [['Retail price (RM)','price_draft',senInput(s.regular_price_sen),'decimal'],['Available stock','stock_draft',String(s.stock_available_qty==null?0:s.stock_available_qty),'numeric']].forEach(function(config){
+        var label=node('label','',config[0]),input=node('input','field');
+        input.type='text';input.inputMode=config[3];input.value=s[config[1]]!=null?s[config[1]]:config[2];
+        input.setAttribute('aria-label',config[0]+' for '+(s.label||'SKU '+(i+1)));
+        input.addEventListener('input',function(){s[config[1]]=input.value;state.dirty=true;});
+        label.appendChild(input);fields.appendChild(label);
+      });
+      row.appendChild(fields);host.appendChild(row);
+    });
+  }
+  function newSkusFromGroups() {
+    var groups=readGroups(), combos=combinations(groups);
+    var byLabel={};(state.skus||[]).forEach(function(s){byLabel[String(s.label||s.variation_summary||'').toLowerCase()]=s;});
+    state.skus=combos.map(function(c){
+      var old=byLabel[c.label.toLowerCase()];
+      return old?Object.assign({},old,{label:c.label}):{client_key:c.key,label:c.label,regular_price_sen:null,stock_available_qty:0,revision:null};
+    });
+    $('newSkuSummary').hidden=false;
+    text($('newSkuSummary'),state.skus.length+' SKU combination'+(state.skus.length===1?'':'s')+' ready for price and stock editing below.');
+    state.variationDirty=false;state.dirty=true;state.metaDirty=true;renderInlineSkus();
+  }
+  function supplementalPreviewCleanup() {
+    state.supplementPreviewUrls.forEach(function(url){try{URL.revokeObjectURL(url);}catch(e){}});
+    state.supplementPreviewUrls=[];
+    ['variantPreviewUrl','chartPreviewUrl'].forEach(function(key){
+      if(state[key]){try{URL.revokeObjectURL(state[key]);}catch(e){}state[key]=null;}
+    });
+  }
+  function readVariationGroupsForPhotos() {
+    var groups=readGroups(),result=[];
+    groups.forEach(function(g){g.options.forEach(function(o){
+      result.push({key:JSON.stringify([g.label,o]),label:g.label+' · '+o});
+    });});
+    return result;
+  }
+  function renderVariationPhotoSelect() {
+    var target=$('variationPhotoOption'),selected=target.value;
+    target.replaceChildren();
+    var first=node('option','', 'Choose a variation option');first.value='';target.appendChild(first);
+    readVariationGroupsForPhotos().forEach(function(x){
+      var o=node('option','',x.label);o.value=x.key;target.appendChild(o);
+    });
+    target.value=Array.from(target.options).some(function(o){return o.value===selected;})?selected:'';
+    renderVariationPhotoStatus();
+  }
+  function renderVariationPhotoStatus() {
+    var key=$('variationPhotoOption').value;
+    var pending=state.variantFiles[key],saved=(state.editor.variant_media||[]).find(function(m){return m.option_key===key;});
+    $('variationPhotoStatus').textContent=!key?'Choose an option to attach its photo.':pending?'New photo selected; save to upload.':saved?'Photo attached to this option.':'No option photo selected.';
+    $('variationPhotoPreview').hidden=true;
+    if(state.variantPreviewUrl){try{URL.revokeObjectURL(state.variantPreviewUrl);}catch(e){}state.variantPreviewUrl=null;}
+    if(pending){
+      var url=URL.createObjectURL(pending);state.variantPreviewUrl=url;
+      $('variationPhotoPreview').src=url;$('variationPhotoPreview').hidden=false;
+    }else if(saved && httpsUrl(saved.delivery_url)){
+      $('variationPhotoPreview').src=httpsUrl(saved.delivery_url);$('variationPhotoPreview').hidden=false;
+    }
+  }
+  function ensureGuide() {
+    if(!state.editor.size_guide)state.editor.size_guide={image_media_id:null,sets:[]};
+    if(!Array.isArray(state.editor.size_guide.sets))state.editor.size_guide.sets=[];
+    return state.editor.size_guide;
+  }
+  function currentSizeSet() {return ensureGuide().sets[state.sizeGuideIndex]||null;}
+  function newSizeSet(label) {
+    return {name:label||'Standard',rows:[]};
+  }
+  function renderSizeSetSelector() {
+    var sets=ensureGuide().sets,select=$('sizeGuideSet');select.replaceChildren();
+    sets.forEach(function(x,i){var o=node('option','',x.name||('Set '+(i+1)));o.value=String(i);select.appendChild(o);});
+    if(state.sizeGuideIndex>=sets.length)state.sizeGuideIndex=Math.max(0,sets.length-1);
+    select.value=sets.length?String(state.sizeGuideIndex):'';
+    var active=currentSizeSet();$('sizeGuideSetName').value=active?active.name:'';
+    $('sizeGuideSetName').disabled=!active;
+    renderSizeRows();refreshMeasurementControls();
+  }
+  function renderSizeRows() {
+    var host=$('sizeMeasureRows');host.replaceChildren();
+    var set=currentSizeSet();
+    if(!set)return;
+    if(!Array.isArray(set.rows))set.rows=[];
+    set.rows.forEach(function(r,i){
+      var tr=node('tr');
+      [{field:'size',label:'Size'},{field:'height_cm',label:'Height in centimetres'},
+        {field:'length_in',label:'Abaya length in inches'},{field:'bust_cm',label:'Bust in centimetres'}].forEach(function(c){
+        var td=node('td'),input=node('input');input.type='text';if(c.field==='size')input.maxLength=20;input.value=r[c.field]==null?'':String(r[c.field]);
+        input.setAttribute('aria-label',c.label+' for row '+(i+1));
+        input.addEventListener('input',function(){r[c.field]=input.value;state.dirty=true;state.metaDirty=true;});
+        td.appendChild(input);tr.appendChild(td);
+      });
+      var td=node('td'),remove=node('button','measure-remove','×');remove.type='button';remove.setAttribute('aria-label','Remove size row '+(i+1));
+      remove.addEventListener('click',function(){set.rows.splice(i,1);state.dirty=true;state.metaDirty=true;renderSizeRows();});
+      td.appendChild(remove);tr.appendChild(td);host.appendChild(tr);
+    });
+  }
+  function renderChartMedia() {
+    var guide=ensureGuide(),img=$('sizeChartPreview');img.hidden=true;
+    if(state.chartPreviewUrl){try{URL.revokeObjectURL(state.chartPreviewUrl);}catch(e){}state.chartPreviewUrl=null;}
+    if(state.sizeChartFile){
+      var url=URL.createObjectURL(state.sizeChartFile);state.chartPreviewUrl=url;
+      img.src=url;img.hidden=false;
+    }else if(httpsUrl(guide.image_delivery_url)){img.src=httpsUrl(guide.image_delivery_url);img.hidden=false;}
+  }
+  function readParcel() {
+    var values=['parcelWeight','parcelLength','parcelWidth','parcelHeight'].map(function(id){return $(id).value.trim();});
+    if(values.every(function(v){return v==='';}))return null;
+    if(values.some(function(v){return v==='';}))throw new Error('Complete all four J&T parcel measurements, or leave all four blank.');
+    var weight=values[0],dims=values.slice(1);
+    if(!/^[1-9]\d{0,7}$/.test(weight))throw new Error('Weight must be a positive whole number of grams.');
+    dims.forEach(function(v){if(!/^(?:0|[1-9]\d{0,5})(?:\.\d)?$/.test(v)||Number(v)<=0)throw new Error('Parcel dimensions must be positive centimetres, with at most one decimal place.');});
+    return {parcel_weight_g:Number(weight),length_mm:Math.round(Number(dims[0])*10),width_mm:Math.round(Number(dims[1])*10),height_mm:Math.round(Number(dims[2])*10),carrier:'JT'};
+  }
+  function validateSizeGuide() {
+    var g=ensureGuide();
+    g.sets.forEach(function(set){
+      if(!String(set.name||'').trim())throw new Error('Enter a name for each measurement set.');
+      (set.rows||[]).forEach(function(row){
+        if(!String(row.size||'').trim())throw new Error('Enter a size label for each measurement row.');
+        ['height_cm','length_in','bust_cm','shoulder_in','bust_in','sleeve_in','height_min_cm','height_max_cm'].forEach(function(k){
+          var v=String(row[k]||'').trim();
+          if(v && (!/^(?:0|[1-9]\d*)(?:\.\d{1,2})?$/.test(v)||Number(v)<=0))throw new Error('Size measurements must be valid positive numbers.');
+        });
+      });
+    });
+    // Match the server's numeric normalization before exact saved readback.
+    // Input fields are strings; Sheets stores validated measures as numbers.
+    // Preserve optional variation-option association fields for ChatGPT Measurements wiring.
+    var normalized=JSON.parse(JSON.stringify(g));
+    normalized.sets=normalized.sets.map(function(set){
+      var next={
+        name:String(set.name||'').trim(),
+        rows:(set.rows||[]).map(function(row){
+          var measure={size:String(row.size||'').trim()};
+          ['height_cm','length_in','bust_cm'].forEach(function(k){
+            var value=String(row[k]==null?'':row[k]).trim();
+            measure[k]=value===''?'':Number(value);
+          });
+          ['shoulder_in','bust_in','sleeve_in','height_min_cm','height_max_cm'].forEach(function(k){
+            if(Object.prototype.hasOwnProperty.call(row,k)){
+              var value=String(row[k]==null?'':row[k]).trim();
+              measure[k]=value===''?'':Number(value);
+            }
+          });
+          return measure;
+        })
+      };
+      if(set.option_id)next.option_id=String(set.option_id);
+      if(set.group_id)next.group_id=String(set.group_id);
+      if(set.option_key)next.option_key=String(set.option_key);
+      if(set.group_label)next.group_label=String(set.group_label);
+      if(set.option_label)next.option_label=String(set.option_label);
+      return next;
+    });
+    return normalized;
+  }
+  function formatDescriptionSelection(kind) {
+    var field=$('description'),from=field.selectionStart,to=field.selectionEnd,raw=field.value;
+    var selected=raw.slice(from,to),prefix='',suffix='';
+    if(kind==='bold'){prefix='**';suffix='**';}
+    else if(kind==='italic'){prefix='*';suffix='*';}
+    else if(kind==='heading'){prefix='## ';}
+    else if(kind==='bullet'){prefix='- ';}
+    else if(kind==='number'){prefix='1. ';}
+    var updated=raw.slice(0,from)+prefix+selected+suffix+raw.slice(to);
+    if(updated.length>field.maxLength){notice('Description is limited to 5000 characters.','error');return;}
+    field.value=updated;field.focus();field.setSelectionRange(from+prefix.length,from+prefix.length+selected.length);
+    field.dispatchEvent(new Event('input',{bubbles:true}));renderDescriptionPreview();
+  }
+  function appendFormattedText(host,line) {
+    var re=/(\*\*([^*]+)\*\*|\*([^*]+)\*)/g,last=0,match;
+    while((match=re.exec(line))){
+      if(match.index>last)host.appendChild(document.createTextNode(line.slice(last,match.index)));
+      var strong=node(match[2]?'strong':'em','',match[2]||match[3]);host.appendChild(strong);last=re.lastIndex;
+    }
+    if(last<line.length)host.appendChild(document.createTextNode(line.slice(last)));
+  }
+  function renderDescriptionPreview() {
+    var host=$('formattedPreview');host.replaceChildren();
+    var list=null;
+    $('description').value.split(/\r?\n/).forEach(function(line){
+      var ul=/^\s*[-*]\s+(.+)/.exec(line),num=/^\s*\d+\.\s+(.+)/.exec(line);
+      if(ul||num){
+        var tag=ul?'ul':'ol';
+        if(!list||list.tagName.toLowerCase()!==tag){list=node(tag);host.appendChild(list);}
+        var li=node('li');appendFormattedText(li,(ul||num)[1]);list.appendChild(li);
+      }else{
+        list=null;var heading=/^##\s+(.+)/.exec(line);
+        var block=node(heading?'h4':'p');
+        appendFormattedText(block,heading?heading[1]:line||' ');
+        host.appendChild(block);
+      }
+    });
+  }
+  function renderEditor() {
+    var d=state.editor;
+    $('productName').value=d.title||'';$('category').replaceChildren();
+    var empty=node('option','', 'Choose a category');empty.value='';$('category').appendChild(empty);
+    state.categories.forEach(function(c){var o=node('option','',c.label||c.name||c.category_name);o.value=String(c.category_id||c.id||'');$('category').appendChild(o);});
+    $('category').value=String(d.category_id||'');
+    $('description').value=d.long_description||d.description||'';
+    $('shortDescription').value=d.short_description||'';
+    $('productHighlights').value=(Array.isArray(d.product_highlights)?d.product_highlights:[]).join('\n');
+    $('highlightsCount').textContent=(Array.isArray(d.product_highlights)?d.product_highlights.length:0)+' / 6 highlights';
+    $('variationGroups').replaceChildren();
+    (d.variation_groups||[]).forEach(addGroup);updateVariationButton();
+    state.imageFiles=[];state.videoFile=null;state.variantFiles={};state.sizeChartFile=null;state.sizeGuideIndex=0;state.variationDirty=false;
+    state.mediaOrder=(d.media||[]).filter(function(m){return String(m.kind||m.media_kind||'').toLowerCase()!=='video';}).map(function(m){return {type:'saved',media:m};});
+    supplementalPreviewCleanup();renderMedia();
+    $('sizeChartJson').value='';
+    var savedTables=d.size_guide&&Array.isArray(d.size_guide.sets)?d.size_guide.sets:[];
+    $('sizeChartImportStatus').textContent=savedTables.length
+      ? savedTables.length+' saved measurement tables; import only to replace.' : 'No measurement table saved.';
+    v248DrawChartPreview(savedTables);
+    $('customerPreviewLink').hidden=true;
+    renderVariationPhotoSelect();ensureGuide();renderSizeSetSelector();renderChartMedia();
+    var parcel=d.parcel||{};
+    [['parcelWeight','parcel_weight_g'],['parcelLength','length_mm'],['parcelWidth','width_mm'],['parcelHeight','height_mm']].forEach(function(pair){
+      var v=parcel[pair[1]];$((pair[0])).value=v==null?'':String(pair[0]==='parcelWeight'?v:Number(v)/10);
+    });
+    $('formattedPreview').hidden=true;renderDescriptionPreview();
+    $('newSkuSummary').hidden=true;renderInlineSkus();
+    ['productName','description'].forEach(function(id){$(id).dispatchEvent(new Event('input'));});
+    $('saveDraft').textContent=state.selected?'Save changes':'Save draft';
+  }
+  function v248DrawChartPreview(sets) {
+    var host=$('sizeChartTablePreview');host.replaceChildren();
+    (sets||[]).forEach(function(set){
+      host.appendChild(node('h4','',set.name));
+      var table=node('table','measure-table'),head=node('thead'),tr=node('tr');
+      ['Size','Shoulder (in)','Bust (in)','Sleeve (in)','Length (in)','Height (cm)'].forEach(function(label){tr.appendChild(node('th','',label));});
+      head.appendChild(tr);table.appendChild(head);
+      var body=node('tbody');
+      (set.rows||[]).forEach(function(r){
+        var line=node('tr');
+        var height=r.height_min_cm!=null&&r.height_min_cm!==''&&r.height_max_cm!=null&&r.height_max_cm!==''
+          ? r.height_min_cm+'–'+r.height_max_cm:'—';
+        [r.size,r.shoulder_in,r.bust_in,r.sleeve_in,r.length_in,height].forEach(function(v){
+          line.appendChild(node('td','',v==null||v===''?'—':String(v)));
+        });body.appendChild(line);
+      });
+      table.appendChild(body);host.appendChild(table);
+    });host.hidden=!(sets&&sets.length);
+  }
+  $('importSizeChartJson').addEventListener('click',function(){
+    try{
+      if(!globalThis.ArabistaSizeChartImportV248)throw new Error('Size-chart importer not deployed. No data changed.');
+      var sets=globalThis.ArabistaSizeChartImportV248.parse($('sizeChartJson').value,readGroups());
+      ensureGuide().sets=sets;state.sizeGuideIndex=0;state.dirty=true;state.metaDirty=true;
+      v248DrawChartPreview(sets);
+      $('sizeChartImportStatus').textContent='Preview ready: '+sets.length+' length sets. Normal Seller Save commits this table.';
+    }catch(e){$('sizeChartImportStatus').textContent='Import blocked: '+e.message;notice(e.message,'error');}
+  });
+  function resetEditor() {
+    return {title:'',category_id:'',short_description:'',long_description:'',product_highlights:[],media:[],variation_groups:[],variant_media:[],size_guide:{sets:[],image_media_id:null},parcel:null,revision:null,publication_status:'DRAFT'};
+  }
+  async function openProduct(id,view) {
+    if(state.busy)return;
+    setBusy(true);notice('');
+    try{
+      var r=await rpc('arabistaDevSellerProductsV247Read',{product_id:id});
+      if(!r.product||!Array.isArray(r.skus))throw new Error('Product data is incomplete.');
+      state.selected=id;state.editor=r.product;state.skus=r.skus.map(function(s){return Object.assign({},s);});
+      state.remoteRevision=r.product.revision;renderEditor();state.dirty=false;state.metaDirty=false;
+      state.priceBackTarget='list';show(view);if(view==='price')renderSkuCards();
+    }catch(e){notice(errorText(e),'error');}
+    finally{setBusy(false);}
+  }
+  function newProduct() {
+    state.selected=null;state.editor=resetEditor();state.skus=[];state.remoteRevision=null;state.uploadedRefs=new WeakMap();
+    renderEditor();state.dirty=false;state.metaDirty=false;show('editor');
+  }
+  function collectEditor() {
+    var d=state.editor, title=$('productName').value.trim(),category=$('category').value,description=$('description').value.trim();
+    if(!title)throw new Error('Enter a product name.');
+    if(!category)throw new Error('Choose a category.');
+    if(!description)throw new Error('Add a product description.');
+    if(state.variationDirty)throw new Error('Variation options changed. Tap Refresh variation list before saving, to keep SKU prices and stock aligned.');
+    var groups=readGroups();
+    if(groups.length>3)throw new Error('Use at most three variation groups.');
+    combinations(groups);
+    d.title=title;d.category_id=category;d.long_description=description;d.short_description=$('shortDescription').value.trim();
+    var highlights=$('productHighlights').value.split(/\r?\n/).map(function(x){return x.trim();}).filter(Boolean);
+    if(highlights.length>6)throw new Error('Use no more than six product selling points.');
+    if(highlights.some(function(x){return x.length>80;}))throw new Error('Each selling point must be 80 characters or fewer.');
+    d.product_highlights=highlights;
+    d.variation_groups=groups;
+    d.size_guide=validateSizeGuide();
+    d.parcel=readParcel();
+    return d;
+  }
+  function renderSkuCards() {
+    var list=$('skuCards');list.replaceChildren();
+    text($('skuCount'),state.skus.length+' SKU'+(state.skus.length===1?'':'s'));
+    $('noSkus').hidden=!!state.skus.length;
+    state.skus.forEach(function(s,i){
+      var wrap=node('article','sku-card');
+      wrap.appendChild(node('h3','sku-name',s.label||s.variation_summary||s.sku_code||'Default variant'));
+      var fields=node('div','sku-inputs');
+      var priceBox=node('label','', 'Retail price (RM)');
+      var price=node('input','field');price.type='text';price.inputMode='decimal';price.value=s.price_draft!=null?s.price_draft:senInput(s.regular_price_sen);price.placeholder='0.00';price.setAttribute('aria-label','Retail price for '+(s.label||'SKU '+(i+1)));
+      price.addEventListener('input',function(){s.price_draft=price.value;state.dirty=true;});
+      priceBox.appendChild(price);
+      var stockBox=node('label','', 'Available stock');
+      var stock=node('input','field');stock.type='text';stock.inputMode='numeric';stock.value=s.stock_draft!=null?s.stock_draft:String(s.stock_available_qty==null?0:s.stock_available_qty);
+      stock.setAttribute('aria-label','Stock for '+(s.label||'SKU '+(i+1)));
+      stock.addEventListener('input',function(){
+        s.stock_draft=stock.value;state.dirty=true;
+        if(chip){var ready=/^(0|[1-9]\d*)$/.test(stock.value)&&Number(stock.value)>0;chip.className='subtle-chip'+(ready?' good-chip':'');chip.textContent=ready?'Available':'Sold out';}
+      });
+      stockBox.appendChild(stock);
+      fields.appendChild(priceBox);fields.appendChild(stockBox);wrap.appendChild(fields);
+      var qty=s.stock_draft!=null?s.stock_draft:s.stock_available_qty;
+      var chip=node('span','subtle-chip'+(Number(qty)>0?' good-chip':''),Number(qty)>0?'Available':'Sold out');
+      wrap.appendChild(chip);list.appendChild(wrap);
+    });
+  }
+  function mediaIntent() {
+    var images=(state.mediaOrder||[]).filter(function(entry){return entry.type==='saved';}).map(function(entry){
+      var m=entry.media;return {media_id:m.media_id||m.asset_id,role:'additional',kind:m.kind||m.media_kind};
+    });
+    var videos=(state.editor.media||[]).filter(function(m){return String(m.kind||m.media_kind||'').toLowerCase()==='video';}).map(function(m){
+      return {media_id:m.media_id||m.asset_id,role:'additional',kind:'video'};
+    });
+    if(images.length)images[0].role='primary';
+    return images.concat(videos);
+  }
+  async function uploadSelectedMedia(productId) {
+    var transport=window.ArabistaSellerProductsV247Media;
+    var refs=[],total=(state.mediaOrder||[]).filter(function(entry){return entry.type==='file';}).length+(state.videoFile?1:0);
+    var counter=0,seenImage=false;
+    state.mediaBusy=true;
+    try{
+      for(var i=0;i<(state.mediaOrder||[]).length;i++){
+        var entry=state.mediaOrder[i],m=null;
+        if(entry.type==='saved'){
+          m={media_id:entry.media.media_id||entry.media.asset_id,kind:entry.media.kind||entry.media.media_kind};
+        }else{
+          if(!transport||typeof transport.upload!=='function')throw new Error('Product photo upload is not connected.');
+          var f=entry.file;notice('Uploading media '+(++counter)+' of '+total+'…');
+          var uploaded=state.uploadedRefs.get(f);
+          if(!uploaded){uploaded=await transport.upload(f,{product_id:productId||null,kind:'image'});
+            if(uploaded&&uploaded.verified&&uploaded.media_id)state.uploadedRefs.set(f,uploaded);}
+          if(!uploaded||!uploaded.verified||!uploaded.media_id)throw new Error('Product photo upload was not verified by the server.');
+          m={media_id:String(uploaded.media_id),kind:'image'};
+        }
+        if(m&&m.media_id){refs.push({media_id:m.media_id,role:seenImage?'additional':'primary',kind:m.kind});seenImage=true;}
+      }
+      (state.editor.media||[]).filter(function(m){return String(m.kind||m.media_kind||'').toLowerCase()==='video';}).forEach(function(m){
+        refs.push({media_id:m.media_id||m.asset_id,role:'additional',kind:'video'});
+      });
+      if(state.videoFile){
+        if(!transport||typeof transport.upload!=='function')throw new Error('Video upload is not connected.');
+        var video=state.videoFile;notice('Uploading media '+(++counter)+' of '+total+'…');
+        var videoRef=state.uploadedRefs.get(video);
+        if(!videoRef){videoRef=await transport.upload(video,{product_id:productId||null,kind:'video'});
+          if(videoRef&&videoRef.verified&&videoRef.media_id)state.uploadedRefs.set(video,videoRef);}
+        if(!videoRef||!videoRef.verified||!videoRef.media_id)throw new Error('Product video upload was not verified by the server.');
+        refs.push({media_id:String(videoRef.media_id),role:'additional',kind:'video'});
+      }
+    }finally{state.mediaBusy=false;}
+    return refs;
+  }
+  async function uploadSupplementalImage(file, productId) {
+    var transport=window.ArabistaSellerProductsV247Media;
+    if(!transport||typeof transport.upload!=='function')throw new Error('Product media upload is not connected.');
+    var uploaded=state.uploadedRefs.get(file);
+    if(!uploaded){
+      uploaded=await transport.upload(file,{product_id:productId||null,kind:'image'});
+      if(uploaded&&uploaded.verified&&uploaded.media_id)state.uploadedRefs.set(file,uploaded);
+    }
+    if(!uploaded||!uploaded.verified||!uploaded.media_id)throw new Error('Supplemental image upload could not be verified.');
+    return String(uploaded.media_id);
+  }
+  async function collectSupplementalMedia(productId) {
+    var variants=(state.editor.variant_media||[]).filter(function(m){return !state.variantFiles[m.option_key];}).map(function(m){
+      return {option_key:String(m.option_key),media_id:String(m.media_id)};
+    });
+    var keys=Object.keys(state.variantFiles);
+    var validKeys=readVariationGroupsForPhotos().map(function(x){return x.key;});
+    (state.editor.variant_media||[]).forEach(function(m){
+      if(validKeys.indexOf(String(m.option_key))<0)throw new Error('A saved variation photo no longer matches the current options. Remove or restore its option before saving.');
+    });
+    keys.forEach(function(k){
+      if(validKeys.indexOf(k)<0)throw new Error('An unsaved variation photo no longer matches the current options. Select the correct option again.');
+    });
+    for(var i=0;i<keys.length;i++){
+      notice('Uploading variation photo '+(i+1)+' of '+keys.length+'…');
+      variants.push({option_key:keys[i],media_id:await uploadSupplementalImage(state.variantFiles[keys[i]],productId)});
+    }
+    var guide=validateSizeGuide();
+    if(state.sizeChartFile){
+      notice('Uploading size-chart image…');
+      guide.image_media_id=await uploadSupplementalImage(state.sizeChartFile,productId);
+    }
+    return {variant_media:variants,size_guide:guide};
+  }
+  function verifyReadback(intent, read) {
+    var p=read.product||{};
+    if(String(p.title||'')!==intent.title || String(p.category_id||'')!==String(intent.category_id)
+       || String(p.long_description||p.description||'')!==intent.long_description
+       || String(p.short_description||'')!==intent.short_description
+       || String(p.publication_status||'').toUpperCase()!==String(intent.publication_status||'').toUpperCase()) {
+      throw new Error('Saved product values or publication status did not match confirmation. Check the database before retrying.');
+    }
+    if(JSON.stringify(p.product_highlights||[])!==JSON.stringify(intent.product_highlights||[]))
+      throw new Error('Product selling points did not match saved readback.');
+    var media=Array.isArray(p.media)?p.media:[];
+    if(intent.parcel){
+      var savedParcel=p.parcel||{};
+      ['parcel_weight_g','length_mm','width_mm','height_mm'].forEach(function(k){
+        if(Number(savedParcel[k])!==Number(intent.parcel[k]))throw new Error('J&T parcel details were not retained after save.');
+      });
+    }
+    var wantedVariantMedia=(intent.variant_media||[]).map(function(m){return String(m.option_key)+'|'+String(m.media_id);}).sort();
+    var gotVariantMedia=(p.variant_media||[]).map(function(m){return String(m.option_key)+'|'+String(m.media_id);}).sort();
+    if(JSON.stringify(wantedVariantMedia)!==JSON.stringify(gotVariantMedia))
+      throw new Error('Variation-photo associations did not match saved readback.');
+    if(intent.size_guide){
+      var gotGuide=p.size_guide||{};
+      var wantedSets=intent.size_guide.sets||[],savedSets=gotGuide.sets||[];
+      if(savedSets.length!==wantedSets.length)throw new Error('Size-guide set count did not match saved readback.');
+      wantedSets.forEach(function(want,i){
+        var got=savedSets[i]||{},key=String(want.option_key||''),id=String(want.option_id||'');
+        if(String(got.name||'')!==String(want.name||'')||JSON.stringify(got.rows||[])!==JSON.stringify(want.rows||[]))
+          throw new Error('Size-guide measurements were not retained after save.');
+        if(key&&String(got.option_key||'')!==key)throw new Error('Measurement-to-variation option link was not retained.');
+        if(id&&String(got.option_id||'')!==id)throw new Error('The canonical measurement option ID changed unexpectedly.');
+        if((key||id)&&!String(got.option_id||''))throw new Error('The measurement set did not resolve to a canonical option.');
+        if(!key&&!id&&(got.option_key||got.option_id))throw new Error('An unlinked legacy measurement set was unexpectedly associated.');
+      });
+      if(String(gotGuide.image_media_id||'')!==String(intent.size_guide.image_media_id||''))
+        throw new Error('Size-chart image association was not retained after save.');
+    }
+    (intent.media||[]).forEach(function(want){
+      if(!media.some(function(m){return String(m.media_id||m.asset_id)===String(want.media_id);}))
+        throw new Error('A product media association was missing from saved readback. Refresh before retrying.');
+    });
+    var intendedOrder=(intent.media||[]).map(function(m){return String(m.media_id||'');});
+    var savedOrder=media.map(function(m){return String(m.media_id||m.asset_id||'');});
+    if(JSON.stringify(intendedOrder)!==JSON.stringify(savedOrder))
+      throw new Error('The saved photo and video order did not match. Refresh before retrying.');
+    var received=read.skus||[];
+    intent.skus.forEach(function(want){
+      var got=received.find(function(s){
+        if(want.sku_id)return String(s.sku_id)===String(want.sku_id);
+        return (want.client_key && String(s.client_key||'')===String(want.client_key))
+          || String(s.label||s.variation_summary||'')===String(want.label);
+      });
+      if(!got)throw new Error('One saved SKU could not be matched during readback. Refresh before retrying.');
+      if((want.regular_price_sen==null ? got.regular_price_sen!=null : Number(got.regular_price_sen)!==Number(want.regular_price_sen)))throw new Error('The saved SKU price did not match. Refresh before retrying.');
+      if(want.desired_available_qty!=null && Number(got.stock_available_qty)!==Number(want.desired_available_qty))throw new Error('The saved stock did not match. Refresh before retrying.');
+    });
+    if(received.length!==intent.skus.length)throw new Error('SKU readback count differed from the confirmed product.');
+  }
+    function sha256Hex(text) {
+    if (!window.crypto || !crypto.subtle || typeof TextEncoder === 'undefined') {
+      return Promise.reject(new Error('This browser cannot verify large save packages. Use an updated browser or shorten the save.'));
+    }
+    return crypto.subtle.digest('SHA-256', new TextEncoder().encode(String(text || ''))).then(function (buf) {
+      return Array.prototype.map.call(new Uint8Array(buf), function (b) {
+        return (b < 16 ? '0' : '') + b.toString(16);
+      }).join('');
+    });
+  }
+  function shouldUseChunkedIntent(urlCharacters) {
+    if (!window.__ARABISTA_SELLER_PRODUCTS_PAGES__) return false;
+    return Number(urlCharacters || 0) > Number(state.jsonpSafeChars || 3500);
+  }
+  async function previewSaveIntent(intent) {
+    var directPayload = { intent: intent };
+    var previewUrlCharacters = estimatedJsonpCharacters('arabistaDevSellerProductsV247PreviewSave', directPayload);
+    if (!shouldUseChunkedIntent(previewUrlCharacters)) {
+      return rpc('arabistaDevSellerProductsV247PreviewSave', directPayload);
+    }
+    if (!state.chunkedIntentSupported) {
+      throw new Error('This save is too large for the current JSONP connection (' + previewUrlCharacters + ' characters). Refresh after the chunked transport update is deployed. Uploaded media were preserved.');
+    }
+    var packageJson = JSON.stringify(directPayload);
+    var digest = await sha256Hex(packageJson);
+    var chunkMax = Number(state.intentChunkMaxChars || 1500);
+    if (!Number.isFinite(chunkMax) || chunkMax < 200) chunkMax = 1500;
+    var total = Math.ceil(packageJson.length / chunkMax) || 1;
+    notice('Sending save package in ' + total + ' fragments…');
+    var begun = await rpc('arabistaDevSellerProductsV247BeginIntentUpload', {
+      kind: 'save',
+      total_chunks: total,
+      byte_length: packageJson.length,
+      sha256_hex: digest
+    });
+    if (!begun || !begun.upload_id) throw new Error('Could not start the large save package. Nothing was saved.');
+    for (var i = 0; i < total; i += 1) {
+      var piece = packageJson.slice(i * chunkMax, (i + 1) * chunkMax);
+      var stored = await rpc('arabistaDevSellerProductsV247AppendIntentChunk', {
+        upload_id: begun.upload_id,
+        index: i,
+        chunk: piece
+      });
+      if (!stored || stored.ok === false) throw new Error('Save package fragment ' + (i + 1) + ' failed. Nothing was saved.');
+    }
+    notice('Validating your changes…');
+    var finalized = await rpc('arabistaDevSellerProductsV247FinalizeIntentUpload', {
+      upload_id: begun.upload_id,
+      sha256_hex: digest
+    });
+    if (finalized && typeof finalized === 'object') finalized._preview_url_characters = previewUrlCharacters;
+    return finalized;
+  }
+
+  // JSONP is GET-based; capture request-size diagnostics without exposing product content.
+  function estimatedJsonpCharacters(rpcName,payload) {
+    var envelope={name:rpcName,args:payload||{}};
+    var params=new URLSearchParams();
+    params.set('format','jsonp');
+    params.set('rpc','arabistaV247StaffProductsInvoke');
+    params.set('callback','arabistaV243Cb_0000_0000000000000');
+    params.set('args',JSON.stringify(envelope));
+    return params.toString().length+200; // Includes a conservative facade URL allowance.
+  }
+  async function persistProduct(status) {
+    if(state.busy)return;
+    if(state.saveRecoveryRequired){
+      notice('Previous save outcome needs staff reconciliation. Do not submit Save again or create a duplicate until the DEV record and write journal are checked.','error');
+      return;
+    }
+    var request,savePhase='validate_input',previewUrlCharacters=null,confirmedId=null;
+    try{
+      request=collectEditor();
+      if(request.variation_groups.length>state.backendMaxVariationGroups){
+        throw new Error('Three variations are supported in this editor, but the DEV backend is not updated yet. Do not save until Cursor deploys the three-variation service.');
+      }
+      if(!state.skus.length)newSkusFromGroups();
+      if(status==='ACTIVE'){
+        if(!state.imageFiles.length && !mediaIntent().some(function(m){return String(m.kind||'').toLowerCase()!=='video';})){
+          throw new Error('Add at least one product photo before publishing.');
+        }
+        if(!state.skus.length || state.skus.some(function(s){return (s.price_draft!=null?parsePrice(s.price_draft):s.regular_price_sen)==null;})){
+          throw new Error('Set a price for every SKU before publishing.');
+        }
+      }
+    }catch(e){notice(e.message,'error');return;}
+    setBusy(true);
+    try{
+      savePhase='upload_product_media';
+      var media=await uploadSelectedMedia(state.selected);
+      savePhase='upload_variation_media_and_size_chart';
+      var supplemental=await collectSupplementalMedia(state.selected);
+      var intent={
+        product_id:state.selected||null,expected_revision:state.remoteRevision,
+        title:request.title,category_id:request.category_id,
+        short_description:request.short_description,long_description:request.long_description,
+        product_highlights:request.product_highlights,
+        variation_groups:request.variation_groups,media:media,
+        variant_media:supplemental.variant_media,size_guide:supplemental.size_guide,
+        parcel:request.parcel,
+        publication_status:status==='KEEP'?(request.publication_status||'DRAFT'):status,
+        skus:state.skus.map(function(s){return {
+          sku_id:s.sku_id||null,client_key:s.client_key||null,
+          label:s.label||s.variation_summary||'',expected_revision:s.revision==null?null:s.revision,
+          regular_price_sen:s.price_draft==null?s.regular_price_sen:parsePrice(s.price_draft),
+          desired_available_qty:s.stock_draft==null?s.stock_available_qty:parseStock(s.stock_draft)
+        };})
+      };
+      previewUrlCharacters=estimatedJsonpCharacters('arabistaDevSellerProductsV247PreviewSave',{intent:intent});
+      savePhase='preview_save';
+      notice('Validating your changes…');
+      var prev=await previewSaveIntent(intent);
+      if(prev && prev._preview_url_characters!=null) previewUrlCharacters=prev._preview_url_characters;
+      if(!prev.confirmation_token)throw new Error('Server confirmation is unavailable. Nothing was saved.');
+      savePhase='confirm_save';
+      var conf=await rpc('arabistaDevSellerProductsV247ConfirmSave',{confirmation_token:prev.confirmation_token});
+      if(!conf.product_id)throw new Error('The save response was incomplete. Refresh to check before retrying.');
+      confirmedId=String(conf.product_id);
+      savePhase='readback';
+      var fresh=await rpc('arabistaDevSellerProductsV247Read',{product_id:conf.product_id});
+      if(!fresh.product || !Array.isArray(fresh.skus))throw new Error('Save response received, but readback is unavailable. Do not retry until the result is checked.');
+      verifyReadback(intent,fresh);
+      state.selected=String(conf.product_id);state.remoteRevision=fresh.product.revision;state.editor=fresh.product;
+      state.skus=fresh.skus;state.uploadedRefs=new WeakMap();renderEditor();state.dirty=false;state.metaDirty=false;
+      notice(status==='DRAFT'?'Draft saved and verified.':'Product saved and verified.','success');
+      await loadList();notice(status==='DRAFT'?'Draft saved and verified.':'Product saved and verified.','success');show('list');
+    }catch(e){
+      var code=String((e&&((e.reason||e.message)||e.outcome))||e||'');
+      var transportLost=/jsonp_transport_failed|rpc_timeout/i.test(code);
+      var ambiguous=/save_recovery_required|SAVE_AMBIGUOUS|save may be incomplete/i.test(code);
+      if(transportLost && savePhase==='preview_save'){
+        notice('Save validation could not be delivered via the JSONP connection. No product save was confirmed. Uploaded media may exist, but do not retry until the transport is repaired. Estimated save GET URL: '+previewUrlCharacters+' characters. Error: '+code,'error');
+      }else if((transportLost||ambiguous) && savePhase==='confirm_save'){
+        state.saveRecoveryRequired=true;
+        notice('SAVE OUTCOME UNKNOWN: The save confirmation connection failed. Do not press Save again. The DEV write journal and product catalog must be inspected before any retry. Phase: confirm_save; error: '+code,'error');
+      }else if(transportLost && savePhase==='readback'){
+        state.saveRecoveryRequired=true;
+        if(confirmedId){state.selected=confirmedId;}
+        notice('Save confirmation returned product ID '+confirmedId+', but verification readback failed. Do not submit again; check the existing DEV record. Error: '+code,'error');
+      }else if(savePhase==='readback' && confirmedId){
+        // ConfirmSave already committed. Deterministic verifyReadback mismatches (e.g. J&T parcel)
+        // must not allow blind Save retries that would duplicate stock mutations.
+        state.saveRecoveryRequired=true;
+        state.selected=confirmedId;
+        notice('SAVE READBACK MISMATCH: Product '+confirmedId+' was already committed. Do not press Save again. Staff must reconcile the existing DEV record (parcel links, media, SKUs) before any retry. Error: '+code,'error');
+      }else if(ambiguous){
+        state.saveRecoveryRequired=true;
+        notice('SAVE OUTCOME UNKNOWN: DEV journal recovery is required before retry. Error: '+code,'error');
+      }else{
+        notice('Save step '+savePhase+' failed: '+errorText(e),'error');
+      }
+    }
+    finally{setBusy(false);}
+  }
+  async function persistPrices() {
+    if(state.busy)return;
+    if(state.selected && state.metaDirty){await persistProduct('KEEP');return;}
+    try{
+      state.skus.forEach(function(s){
+        if(s.price_draft!=null)parsePrice(s.price_draft);
+        if(s.stock_draft!=null)parseStock(s.stock_draft);
+      });
+      if(!state.selected){
+        collectEditor();
+        await persistProduct('DRAFT');
+        return;
+      }
+      setBusy(true);notice('Checking SKU prices and stock…');
+      var intent={
+        product_id:state.selected,expected_product_revision:state.remoteRevision,
+        skus:state.skus.map(function(s){return{
+          sku_id:s.sku_id,expected_revision:s.revision,
+          regular_price_sen:s.price_draft==null?s.regular_price_sen:parsePrice(s.price_draft),
+          desired_available_qty:s.stock_draft==null?s.stock_available_qty:parseStock(s.stock_draft)
+        };})
+      };
+      var prev=await rpc('arabistaDevSellerProductsV247PreviewPriceStock',{intent:intent});
+      if(!prev.confirmation_token)throw new Error('Price/stock confirmation is unavailable. No changes were saved.');
+      var committed=await rpc('arabistaDevSellerProductsV247ConfirmPriceStock',{confirmation_token:prev.confirmation_token});
+      // A confirmed database write is never retried because the customer display
+      // cache was unavailable. Surface this separately from durable readback.
+      var shopCacheBusted=committed.customer_catalog_cache_invalidated===true;
+      var read=await rpc('arabistaDevSellerProductsV247Read',{product_id:state.selected});
+      if(!read.product||!Array.isArray(read.skus))throw new Error('Confirmation may have succeeded, but readback failed. Refresh before retrying.');
+      intent.skus.forEach(function(want){
+        var got=read.skus.find(function(s){return String(s.sku_id)===String(want.sku_id);});
+        if(!got || (want.regular_price_sen==null ? got.regular_price_sen!=null : Number(got.regular_price_sen)!==Number(want.regular_price_sen)) || (want.desired_available_qty!=null && Number(got.stock_available_qty)!==Number(want.desired_available_qty)))throw new Error('Price or stock readback did not match the confirmed edit. Refresh before retrying.');
+      });
+      state.editor=read.product;state.skus=read.skus;state.remoteRevision=read.product.revision;state.dirty=false;state.metaDirty=false;
+      var confirmedNotice=shopCacheBusted
+        ? 'Prices and stock saved and verified. Customer Shop cache refreshed.'
+        : 'Prices and stock saved and verified. Customer Shop cache refresh is unverified; allow up to 45 seconds and refresh. Do NOT Save again.';
+      renderSkuCards();notice(confirmedNotice,shopCacheBusted?'success':'error');
+      await loadList();notice(confirmedNotice,shopCacheBusted?'success':'error');show('list');
+    }catch(e){notice(errorText(e),'error');}
+    finally{setBusy(false);}
+  }
+  // Wired controls
+  $('menu').addEventListener('click',function(){
+    var open=$('moduleMenu').hidden;$('moduleMenu').hidden=!open;$('menu').setAttribute('aria-expanded',String(open));
+  });
+  $('moduleNav').addEventListener('click',function(e){
+    var btn=e.target.closest('[data-module]');if(!btn)return;
+    var target=btn.dataset.module;if(target==='products'){$('moduleMenu').hidden=true;return;}
+    if(state.busy)return;
+    // Pages-hosted Seller Products: only package-local destinations navigate.
+    // Unsupported Seller modules stay in-package with a clear message (no silent
+    // hop onto permanent /staging/ or the customer root).
+    if(window.__ARABISTA_SELLER_PRODUCTS_PAGES__){
+      var pagesMap={discover:'../seller-discover/',products:'./'};
+      if(pagesMap[target]){window.location.href=pagesMap[target];return;}
+      $('moduleMenu').hidden=true;
+      notice('Seller '+String(target||'module')+' is not included in this isolated /v248-staging/ package. Products and Discover remain available here.','error');
+      return;
+    }
+    // Web-app HTTPS shells navigate by view=…; spreadsheet dialogs keep google.script.run nav.
+    var webViews={orders:'orders',discover:'discover',products:'products'};
+    if(window.__ARABISTA_SELLER_PRODUCTS_MOBILE__ && webViews[target] && window.top && window.top.location){
+      try{
+        var u=new URL(window.top.location.href);
+        u.searchParams.set('view', webViews[target]);
+        window.top.location.href=u.toString();
+        return;
+      }catch(navErr){/* fall through */}
+    }
+    btn.disabled=true;
+    rpc('arabistaDevSellerNavigate',target).then(function(r){if(!r.ok)btn.disabled=false;}).catch(function(e){btn.disabled=false;notice(errorText(e),'error');});
+  });
+  $('back').addEventListener('click',function(){
+    if(state.busy)return;
+    if(state.view==='price' && state.priceBackTarget==='editor'){renderInlineSkus();notice('');show('editor');return;}
+    if(!changeGuard())return;
+    state.dirty=false;state.metaDirty=false;notice('');show('list');loadList();
+  });
+  $('refresh').addEventListener('click',loadList);
+  $('listReload').addEventListener('click',loadList);
+  $('search').addEventListener('input',renderList);
+  $('filterTabs').addEventListener('click',function(e){
+    var tab=e.target.closest('[data-filter]');if(!tab)return;
+    state.filter=tab.dataset.filter;
+    Array.from($('filterTabs').querySelectorAll('[data-filter]')).forEach(function(n){n.setAttribute('aria-selected',String(n===tab));});
+    renderList();
+  });
+  $('addProduct').addEventListener('click',newProduct);
+  ['productName','description','shortDescription','category'].forEach(function(id){
+    $(id).addEventListener('input',function(){
+      state.dirty=true;state.metaDirty=true;
+      if(id==='productName'||id==='description')text($(id==='productName'?'nameCount':'descriptionCount'),$(id).value.length+' / '+$(id).maxLength);
+    });
+  });
+  $('images').addEventListener('change',function(e){
+    var files=Array.from(e.target.files||[]);
+    if(state.imageFiles.length+files.length+(state.editor.media||[]).filter(function(m){return m.kind!=='video';}).length>10){notice('Use up to 10 product photos.','error');return;}
+    for(var i=0;i<files.length;i++){var f=files[i];if(!/^image\/(jpeg|png|webp)$/.test(f.type)||f.size>20*1024*1024){notice('Use JPG, PNG or WebP photos under 20 MB.','error');return;}}
+    state.imageFiles=state.imageFiles.concat(files);files.forEach(function(f){state.mediaOrder.push({type:'file',file:f});});state.dirty=true;state.metaDirty=true;renderMedia();e.target.value='';
+  });
+  $('video').addEventListener('change',function(e){
+    var f=e.target.files&&e.target.files[0];if(!f)return;
+    if(!/^video\/(mp4|quicktime|webm)$/.test(f.type)||f.size>200*1024*1024){notice('Use MP4, MOV or WebM video under 200 MB.','error');return;}
+    state.videoFile=f;state.dirty=true;state.metaDirty=true;renderMedia();e.target.value='';
+  });
+  $('descriptionTools').addEventListener('click',function(e){
+    var b=e.target.closest('[data-format]');if(b)formatDescriptionSelection(b.dataset.format);
+  });
+  $('formatPreviewToggle').addEventListener('click',function(){
+    var willShow=$('formattedPreview').hidden;$('formattedPreview').hidden=!willShow;
+    if(willShow)renderDescriptionPreview();
+  });
+  $('description').addEventListener('input',function(){if(!$('formattedPreview').hidden)renderDescriptionPreview();});
+  $('productHighlights').addEventListener('input',function(){
+    var current=this.value.split(/\r?\n/).map(function(x){return x.trim();}).filter(Boolean);
+    $('highlightsCount').textContent=current.length+' / 6 highlights';
+    state.dirty=true;state.metaDirty=true;
+  });
+  $('variationGroups').addEventListener('input',renderVariationPhotoSelect);
+  $('variationPhotoOption').addEventListener('change',renderVariationPhotoStatus);
+  $('variationPhotoFile').addEventListener('change',function(e){
+    var file=e.target.files&&e.target.files[0],key=$('variationPhotoOption').value;
+    if(!key){notice('Choose a variation option first.','error');e.target.value='';return;}
+    if(!file)return;
+    if(!/^image\/(jpeg|png|webp)$/.test(file.type)||file.size>20*1024*1024){notice('Use JPG, PNG or WebP under 20 MB.','error');e.target.value='';return;}
+    state.variantFiles[key]=file;state.dirty=true;state.metaDirty=true;renderVariationPhotoStatus();e.target.value='';
+  });
+  $('removeVariationPhoto').addEventListener('click',function(){
+    var key=$('variationPhotoOption').value;if(!key)return;
+    delete state.variantFiles[key];
+    state.editor.variant_media=(state.editor.variant_media||[]).filter(function(x){return x.option_key!==key;});
+    state.dirty=true;state.metaDirty=true;renderVariationPhotoStatus();
+  });
+  $('sizeChartFile').addEventListener('change',function(e){
+    var file=e.target.files&&e.target.files[0];if(!file)return;
+    if(!/^image\/(jpeg|png|webp)$/.test(file.type)||file.size>20*1024*1024){notice('Use JPG, PNG or WebP under 20 MB.','error');e.target.value='';return;}
+    state.sizeChartFile=file;state.dirty=true;state.metaDirty=true;renderChartMedia();e.target.value='';
+  });
+  $('removeSizeChart').addEventListener('click',function(){
+    state.sizeChartFile=null;var guide=ensureGuide();guide.image_media_id=null;guide.image_delivery_url='';
+    state.dirty=true;state.metaDirty=true;renderChartMedia();
+  });
+  $('sizeGuideSet').addEventListener('change',function(){
+    state.sizeGuideIndex=Number(this.value)||0;renderSizeSetSelector();
+  });
+  $('sizeGuideSetName').addEventListener('input',function(){
+    var set=currentSizeSet();if(!set)return;
+    set.name=this.value;state.dirty=true;state.metaDirty=true;
+    var o=$('sizeGuideSet').options[state.sizeGuideIndex];if(o)o.textContent=this.value||'Unnamed set';
+    refreshMeasurementControls();
+  });
+  $('addSizeSet').addEventListener('click',function(){
+    var sets=ensureGuide().sets;
+    if(sets.length>=4){notice('Use up to four measurement sets.','error');return;}
+    sets.push(newSizeSet(sets.length===0?'Set 1 — Standard':sets.length===1?'Set 2 — Long':'Set '+(sets.length+1)));
+    state.sizeGuideIndex=sets.length-1;state.dirty=true;state.metaDirty=true;renderSizeSetSelector();
+  });
+  $('removeSizeSet').addEventListener('click',function(){
+    var sets=ensureGuide().sets;if(!sets.length)return;
+    if(hasMeasurementLink(sets[state.sizeGuideIndex])&&!window.confirm('Remove this variation-linked measurement set permanently? This cannot be undone after saving.'))return;
+    sets.splice(state.sizeGuideIndex,1);state.sizeGuideIndex=Math.max(0,state.sizeGuideIndex-1);
+    state.dirty=true;state.metaDirty=true;renderSizeSetSelector();
+  });
+  $('addSizeRow').addEventListener('click',function(){
+    var set=currentSizeSet();
+    if(!set){notice('Add a measurement set first.','error');return;}
+    if((set.rows||[]).length>=30){notice('Use up to 30 sizes per measurement set.','error');return;}
+    set.rows.push({size:'',height_cm:'',length_in:'',bust_cm:''});
+    state.dirty=true;state.metaDirty=true;renderSizeRows();
+  });
+  ['parcelWeight','parcelLength','parcelWidth','parcelHeight'].forEach(function(id){
+    $(id).addEventListener('input',function(){state.dirty=true;state.metaDirty=true;});
+  });
+  $('previewProductSheet').addEventListener('click',async function(){
+    if(!state.selected){notice('Save the product as a draft before previewing the customer sheet.','error');return;}
+    if(state.dirty){notice('Save changes before previewing the customer sheet.','error');return;}
+    $('customerPreviewLink').hidden=true;
+    try{
+      var response=await rpc('arabistaDevSellerProductsV247CustomerPreview',{product_id:state.selected,expected_revision:state.remoteRevision});
+      var url=httpsUrl(response.preview_url);
+      if(!url)throw new Error('The customer preview URL was not verified.');
+      var link=node('a','', 'Open customer product-sheet preview');
+      link.href=url;link.target='_blank';link.rel='noopener noreferrer';
+      $('customerPreviewLink').replaceChildren(link);$('customerPreviewLink').hidden=false;
+      notice('Customer preview is ready. Open the link below.','success');
+    }catch(e){notice(errorText(e),'error');}
+  });
+  $('addGroup').addEventListener('click',function(){
+    if($('variationGroups').children.length>=3){notice('You can add up to three variation groups.','error');return;}
+    addGroup();state.dirty=true;state.metaDirty=true;state.variationDirty=true;renderVariationPhotoSelect();
+  });
+  $('generateSkus').addEventListener('click',function(){
+    try{newSkusFromGroups();notice(state.skus.length+' variations ready. Edit price and stock in the list below.');}catch(e){notice(e.message,'error');}
+  });
+  $('nextToPricing').addEventListener('click',function(){
+    try{
+      collectEditor();
+      if(!state.skus.length)newSkusFromGroups();
+      state.priceBackTarget='editor';renderSkuCards();notice('');show('price');
+    }catch(e){notice(e.message,'error');}
+  });
+  $('saveDraft').addEventListener('click',function(){persistProduct(state.selected?'KEEP':'DRAFT');});
+  $('publishProduct').addEventListener('click',function(){persistProduct('ACTIVE');});
+  $('showBatch').addEventListener('click',function(){$('batchPanel').hidden=!$('batchPanel').hidden;});
+  $('cancelBatch').addEventListener('click',function(){$('batchPanel').hidden=true;});
+  $('applyBatch').addEventListener('click',function(){
+    try{
+      var field=$('batchField').value,v=$('batchValue').value;
+      if(field==='price')parsePrice(v);else parseStock(v);
+      state.skus.forEach(function(s){if(field==='price')s.price_draft=v;else s.stock_draft=v;});
+      state.dirty=true;renderSkuCards();$('batchPanel').hidden=true;notice('Batch changes applied. Tap Confirm to save.');
+    }catch(e){notice(e.message,'error');}
+  });
+  $('confirm').addEventListener('click',persistPrices);
+  window.addEventListener('beforeunload',function(e){
+    if(state.dirty){e.preventDefault();e.returnValue='';}
+  });
+  window.addEventListener('pagehide',function(){previewCleanup();supplementalPreviewCleanup();});
+  show('list');
+  if (window.__ARABISTA_SELLER_PRODUCTS_PAGES__) {
+    function startPagesList_() {
+      loadList().catch(function () { /* loadList already surfaces errors */ });
+    }
+    if (window.ArabistaV243Bridge && ArabistaV243Bridge.isReady && ArabistaV243Bridge.isReady()) {
+      startPagesList_();
+    } else {
+      window.addEventListener('arabista-v247-pages-ready', startPagesList_, { once: true });
+    }
+  } else {
+    loadList();
+  }
+}());
+</script>
+</body>
+</html>
+
