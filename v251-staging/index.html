@@ -9724,11 +9724,13 @@ body.is-discover .site-tabs{z-index:45!important}
     if (mode === 'view_your_order') {
       if (eyebrow) eyebrow.textContent = 'WhatsApp order link';
       if (title) title.textContent = 'View your order';
-      if (copy) copy.textContent = 'This link identifies your invoice. Sign in or activate with the checkout mobile number to open private details — the invoice alone never unlocks them.';
+      if (copy) copy.textContent = 'Enter the mobile number used at checkout. New customers verify by WhatsApp and create a password; returning customers sign in with their password.';
+      // Phone first for a WhatsApp invoice locator; never treat it as access proof.
+      state.identityChallengeId = null;
       if (otpBlock) otpBlock.hidden = true;
-      if (passwordBlock) passwordBlock.hidden = false;
-      if (forgot) forgot.hidden = false;
-      if (primary) primary.textContent = 'Sign in';
+      if (passwordBlock) passwordBlock.hidden = true;
+      if (forgot) forgot.hidden = true;
+      if (primary) primary.textContent = 'Continue';
     } else if (mode === 'activate') {
       if (eyebrow) eyebrow.textContent = 'Activate account';
       if (title) title.textContent = 'Verify your mobile';
@@ -9737,7 +9739,7 @@ body.is-discover .site-tabs{z-index:45!important}
       if (passwordBlock) passwordBlock.hidden = true;
       if (forgot) forgot.hidden = true;
       if (newPasswordLabel) newPasswordLabel.textContent = 'Create password';
-      if (primary) primary.textContent = 'Request / verify code';
+      if (primary) primary.textContent = state.identityChallengeId ? 'Verify code' : 'Request WhatsApp code';
     } else if (mode === 'recover') {
       if (eyebrow) eyebrow.textContent = 'Password recovery';
       if (title) title.textContent = 'Reset password';
@@ -15314,6 +15316,45 @@ function attachSheetResizeHandle(handle,sheet,apply,ratio){
       var mode = state.identityModalMode || 'login';
       var phone = $('identityPhone') && $('identityPhone').value;
       var notice = $('identityModalNotice');
+      if (mode === 'view_your_order') {
+        // Public customer RPC checks whether this number is pending or active.
+        // Never unlock invoice details until verified identity + ownership.
+        if (!String(phone || '').trim()) {
+          if (notice) notice.textContent = 'Enter the mobile number used at checkout.';
+          return;
+        }
+        var continueButton = $('identityModalPrimary');
+        if (continueButton.disabled) return;
+        continueButton.disabled = true; // avoid duplicate code sends
+        if (notice) notice.textContent = 'Checking your mobile number…';
+        call('arabistaDevCustomerIdentityRequestActivationOtpV244', {
+          phone_e164: phone
+        }, function (x) {
+          continueButton.disabled = false;
+          if (state.identityModalMode !== 'view_your_order') return;
+          if (x && x.reason === 'already_activated_use_password_login') {
+            openIdentityModal('login', { phone: phone });
+            if (notice) notice.textContent = 'Account found. Enter your password to continue.';
+            return;
+          }
+          if (x && x.ok && x.challenge_id && x.whatsapp_otp_executable) {
+            openIdentityModal('activate', { phone: phone });
+            state.identityChallengeId = x.challenge_id;
+            if ($('identityModalPrimary')) $('identityModalPrimary').textContent = 'Verify code';
+            if (notice) notice.textContent = 'WhatsApp code sent. Enter it and create your password.';
+            return;
+          }
+          state.identityChallengeId = null;
+          if (notice) {
+            notice.textContent = x && x.reason === 'pending_identity_required_before_activation'
+              ? 'We could not verify this checkout mobile number. Check the number or contact support.'
+              : (x && x.challenge_id && !x.whatsapp_otp_executable)
+                ? 'WhatsApp verification is unavailable. No code was confirmed sent; please try later.'
+                : 'Could not start verification: ' + String((x && x.reason) || 'unavailable');
+          }
+        });
+        return;
+      }
       if (mode === 'recover') {
         var recoverOtp = $('identityOtp') && $('identityOtp').value;
         var recoverPassword = $('identityNewPassword') && $('identityNewPassword').value;
