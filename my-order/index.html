@@ -2,6 +2,20 @@
 <html lang="en" class="scroll-smooth">
 <head>
   <meta charset="utf-8" />
+  <script>
+  // Route a DEV payment invoice into the accepted five-tab customer experience
+  // before loading styles/scripts; Meta's approved URL button is fixed at /my-order.
+  // Invoice is a locator only, never an authorization credential.
+  (function () {
+    try {
+      var args = new URLSearchParams(window.location.search || '');
+      var invoice = String(args.get('invoice') || args.get('invoice_no') || '').trim();
+      if (/^INV[0-9]{14}$/.test(invoice)) {
+        window.location.replace('/v251-staging/?invoice=' + encodeURIComponent(invoice));
+      }
+    } catch (e) { /* fall back to verification-only screen */ }
+  })();
+  </script>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Arabista — My Order</title>
   <meta name="description" content="Secure Arabista My Order entry. An invoice link identifies your order but does not unlock private details by itself." />
