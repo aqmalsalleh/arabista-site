@@ -8898,40 +8898,19 @@ body.is-discover .site-tabs{z-index:45!important}
 
             <div class="checkout-divider"></div>
 
-            <section class="checkout-section" id="checkout-delivery">
-              <h3>Delivery</h3>
-
-              <div class="checkout-row">
-                <span>Standard delivery</span>
-                <strong id="checkout-delivery-status">Pending shipping</strong>
-              </div>
-
-              <div class="checkout-row" id="checkout-shipping-rate-row" hidden>
-                <span>Shipping</span>
-                <span id="checkout-shipping-rate" class="checkout-shipping-rate">
-                  <del id="checkout-shipping-gross" hidden></del>
-                  <strong id="checkout-shipping-effective"></strong>
+            <section class="checkout-section checkout-vouchers" id="checkout-vouchers">
+              <h3>Deals &amp; vouchers</h3>
+              <button class="checkout-voucher-pick" type="button" disabled
+                      aria-label="Choose voucher, no vouchers available yet">
+                <span class="checkout-voucher-icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24"><path d="M5 5h14v5a2 2 0 0 0 0 4v5H5v-5a2 2 0 0 0 0-4V5z"/><path d="M12 7.5v1.5m0 3v1.5m0 3v.5"/></svg>
                 </span>
-              </div>
-
-              <p id="checkout-shipping-promo"
-                 class="checkout-muted"
-                 hidden></p>
-
-              <p id="checkout-shipping-error"
-                 class="commerce-line-warning"
-                 hidden></p>
-
-              <button id="checkout-shipping-retry"
-                      class="catalog-retry"
-                      type="button"
-                      hidden>
-                Retry
+                <span class="checkout-voucher-copy">
+                  <strong>Choose voucher</strong>
+                  <small>No vouchers available yet</small>
+                </span>
+                <span class="checkout-voucher-chevron" aria-hidden="true">›</span>
               </button>
-
-              <p class="checkout-muted">
-                Delivery charges are confirmed with your order total.
-              </p>
             </section>
 
             <div class="checkout-divider"></div>
@@ -8957,6 +8936,20 @@ body.is-discover .site-tabs{z-index:45!important}
               <div class="checkout-row checkout-total-row">
                 <span>Total</span>
                 <strong id="checkout-estimated-total">Pending shipping</strong>
+              </div>
+
+              <!-- Keep authoritative quote feedback beside Order summary, not as a delivery card. -->
+              <div id="checkout-delivery" class="checkout-quote-feedback">
+                <div class="checkout-row" id="checkout-shipping-rate-row" hidden>
+                  <span>Shipping</span>
+                  <span id="checkout-shipping-rate" class="checkout-shipping-rate">
+                    <del id="checkout-shipping-gross" hidden></del>
+                    <strong id="checkout-shipping-effective"></strong>
+                  </span>
+                </div>
+                <p id="checkout-shipping-promo" class="checkout-muted" hidden></p>
+                <p id="checkout-shipping-error" class="commerce-line-warning" hidden></p>
+                <button id="checkout-shipping-retry" class="catalog-retry" type="button" hidden>Retry</button>
               </div>
             </section>
 
@@ -10082,6 +10075,15 @@ function closeShopDetail() {
       '#product-sheet .product-gallery-slide:not(.is-ready)::after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(100deg,transparent 28%,rgba(190,164,116,.20) 50%,transparent 72%);transform:translateX(-100%);animation:v251-sheen 1.9s ease-in-out infinite;}',
       '#commerce-basket-items img.v251-image-loading,#checkout-item-list img.v251-image-loading{background:#f3efe8;opacity:.46;animation:v251-soft-pulse 1.35s ease-in-out infinite;}',
       '#commerce-basket-items img,#checkout-item-list img{transition:opacity .22s ease;}',
+      '#checkout-view-main .checkout-vouchers{padding-top:16px;padding-bottom:16px;}',
+      '#checkout-view-main .checkout-voucher-pick{display:flex;align-items:center;gap:13px;width:100%;min-height:76px;padding:13px 15px;text-align:left;border:1px solid #eae0cf;border-radius:15px;background:linear-gradient(125deg,#f9f5ec 0%,#fffefd 80%);color:#3d3529;box-shadow:0 3px 13px rgba(95,72,39,.045);cursor:default;}',
+      '#checkout-view-main .checkout-voucher-pick:disabled{opacity:1!important;}',
+      '#checkout-view-main .checkout-voucher-icon{display:grid;place-items:center;flex:0 0 42px;width:42px;height:42px;border-radius:12px;color:#9b7942;background:#efe5d2;}',
+      '#checkout-view-main .checkout-voucher-icon svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.65;stroke-linecap:round;stroke-linejoin:round;}',
+      '#checkout-view-main .checkout-voucher-copy{display:flex;flex:1;min-width:0;flex-direction:column;gap:4px;}',
+      '#checkout-view-main .checkout-voucher-copy strong{font-size:13px;font-weight:700;letter-spacing:.005em;color:#453a2b;}',
+      '#checkout-view-main .checkout-voucher-copy small{font-size:11px;font-weight:500;line-height:1.45;color:#8b8277;}',
+      '#checkout-view-main .checkout-voucher-chevron{font-size:25px;font-weight:300;color:#b3a289;line-height:1;}',
       '.v251-quote-wait{display:flex;align-items:center;gap:11px;margin:12px 0;padding:13px 14px;border:1px solid #ebe1cd;border-radius:14px;background:linear-gradient(135deg,#faf7f0,#fffdfa);color:#6d5734;font:600 12px/1.4 "DM Sans",Inter,system-ui,sans-serif;}',
       '.v251-quote-wait[hidden]{display:none!important;}',
       '.v251-quote-spinner{display:block;flex:0 0 23px;width:23px;height:23px;border:2px solid rgba(179,146,87,.22);border-top-color:#af8b53;border-radius:50%;animation:v251-spin 1.15s linear infinite;}',
