@@ -10914,7 +10914,7 @@ function closeShopDetail() {
       // Completing a three-digit height advances focus, but never calculates.
       if(height&&weight&&!height.dataset.autoNextBound){
         height.addEventListener('input',function(){
-          if(/^\\d{3}$/.test(height.value.trim())&&!weight.disabled)
+          if(/^\d{3}$/.test(height.value.trim())&&!weight.disabled)
             weight.focus({preventScroll:true});
         });
         height.dataset.autoNextBound='yes';
