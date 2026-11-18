@@ -10012,7 +10012,7 @@ function closeShopDetail() {
      Checkout structure/CSS are transplanted unchanged from fyp-staging.html.
      Only data and events below replace reference D06 mock behavior. */
   var v248Exact = {host:null, shadow:null, ctx:null, selected:[], quantity:1,
-    quote:null, quoteError:'', quoting:false, current:'closed', previous:'shop',galleryMedia:[],galleryOpener:null,manualHeight:null,manualCandidate:null};
+    quote:null, quoteError:'', quoting:false, current:'closed', previous:'shop',galleryMedia:[],galleryOpener:null,manualHeight:null,manualCandidate:null,guideSelectionTouched:false};
   function v248X(id){return v248Exact.shadow && v248Exact.shadow.getElementById(id);}
   function v248XValidImage(x){return /^https:\/\/[^<>\s"'\\]+$/i.test(String(x||''));}
   function v248XElement(tag,cls,txt){
@@ -10504,13 +10504,8 @@ function closeShopDetail() {
     v248X('commerce-panel').dataset.view=view==='basket'?'basket':'variant';
     var app=x.shadow.querySelector('.app');
     if(app)app.classList.toggle('is-product-peek',prod);
-    if(prod){
-      var product=v248X('product-sheet');
-      product.classList.remove('is-expanded','is-dragging');
-      product.style.height='';
-      v248X('product-scroll').scrollTop=0;
-      product.focus({preventScroll:true});
-    }
+    // Returning from options or basket must preserve expanded height and scroll.
+    if(prod)v248X('product-sheet').focus({preventScroll:true});
     if(view==='variant'){v248XPaintVariant();v248X('commerce-close').focus({preventScroll:true});}
     if(view==='basket'){v248XRenderBasket();v248X('commerce-close').focus({preventScroll:true});}
     if(checkout){v248XRenderCheckout();var b=x.shadow.querySelector('#checkout-screen .checkout-header button');if(b)b.focus({preventScroll:true});}
@@ -10671,7 +10666,7 @@ function closeShopDetail() {
       var si=ctx.groups.indexOf(size),li=ctx.groups.indexOf(length);
       var currentLength=length.options.filter(function(o){
         return o.key===v248Exact.selected[li];})[0];
-      if(v248Exact.selected[si]===option.key&&currentLength&&
+      if(v248Exact.guideSelectionTouched&&v248Exact.selected[si]===option.key&&currentLength&&
         v248XSetCode(currentLength.label)===chosenSet)tr.classList.add('is-size-selected');
       var height=row&&row.height_min_cm!==null&&row.height_min_cm!==undefined&&
         row.height_min_cm!==''&&row.height_max_cm!==null&&
@@ -10687,7 +10682,7 @@ function closeShopDetail() {
         })[0];
         if(!lengthOption)return;
         v248Exact.selected[si]=option.key;v248Exact.selected[li]=lengthOption.key;
-        v248Exact.quantity=1;
+        v248Exact.guideSelectionTouched=true;v248Exact.quantity=1;
         if(v248Exact.current==='variant')v248XPaintVariant();
         v248XRefreshTables();
       }
@@ -10984,6 +10979,10 @@ function closeShopDetail() {
     v248Exact.ctx=ctx;
     v248Exact.quantity=1;
     v248Exact.fitRecommendation=null;v248Exact.chartSet='S1';
+    v248Exact.guideSelectionTouched=false;
+    var freshSheet=v248X('product-sheet'),freshScroll=v248X('product-scroll');
+    if(freshSheet){freshSheet.classList.remove('is-expanded','is-dragging');freshSheet.style.height='';}
+    if(freshScroll)freshScroll.scrollTop=0;
     v248Exact.manualHeight=null;v248Exact.manualCandidate=null;
     v248Exact.manualBaseSize=null;v250HideFloatingFit();
     v248Exact.fitRules=v248XW06Rules(ctx);
@@ -11130,7 +11129,9 @@ function closeShopDetail() {
             n.title='Suggested by Size Finder';
           }
           n.addEventListener('click',function(){
-            v248Exact.selected[i]=o.key;v248Exact.quantity=1;v248XPaintVariant();
+            v248Exact.selected[i]=o.key;
+            if(/^size$|^length$/i.test(String(g.label||'').trim()))v248Exact.guideSelectionTouched=true;
+            v248Exact.quantity=1;v248XPaintVariant();
           });
           options.appendChild(n);
         });
