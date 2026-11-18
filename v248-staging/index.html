@@ -2035,6 +2035,300 @@ body.is-discover .site-tabs{z-index:45!important}
 #shopDetail .ab-compare-placeholder{display:flex;align-items:baseline;gap:10px;margin:5px 0 10px;font-size:11px;color:#a0a0a0}
 #shopDetail .ab-compare-placeholder del{color:#989898;font-size:13px}
 #shopDetail .ab-compare-placeholder small{font-size:10px;color:#a88a54}
+
+/* v2.48 Stage D — ChatGPT-authored connected interpretation of the EXACT
+   fyp-staging.html product-grab, product-scroll, commerce basket and checkout.
+   Reference visuals only: all commerce truth remains in the existing DEV code. */
+#shopDetail .detail-head.v248-reference-grab {
+  position:relative;min-height:42px!important;flex:0 0 42px!important;
+  padding:8px 14px 3px!important;align-items:center!important;
+  border-bottom:1px solid #f0f0f0!important;background:#fff!important;
+}
+#shopDetail .v248-reference-grab .shop-sheet-drag {
+  position:absolute;top:0!important;left:50%;transform:translateX(-50%);
+  width:68px;min-height:32px!important;padding:0!important;border:0!important;
+  background:transparent!important;cursor:grab;touch-action:none;
+}
+#shopDetail .v248-reference-grab .shop-sheet-drag:active{cursor:grabbing}
+#shopDetail .v248-reference-handle{
+  display:block;margin:4px auto 0;width:38px;height:4px;border-radius:100px;background:#d6d6d6;
+}
+#shopDetail .v248-reference-grab-label {
+  margin:6px 0 0 0!important;padding:0;max-width:55%;
+  font:700 10px/1.3 "Inter",sans-serif!important;letter-spacing:.13em!important;
+  color:#272727!important;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+#shopDetail .v248-reference-grab .ab-head-actions{gap:6px}
+#shopDetail .v248-reference-grab .ab-round{
+  width:36px!important;height:36px!important;background:transparent!important;
+  color:#5c4630!important;border-radius:50%!important;
+}
+#shopDetail .v248-reference-grab .ab-round:focus-visible,
+#cart .v248-reference-bag-head button:focus-visible,
+.v248-checkout-header button:focus-visible{outline:2px solid #ad905a;outline-offset:2px}
+#shopDetail .ab-tabs {
+  height:44px!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;
+  border-bottom:1px solid #f0f0f0!important;background:rgba(255,255,255,.97)!important;
+  backdrop-filter:blur(14px);
+}
+#shopDetail .ab-tabs button{
+  height:43px!important;min-height:43px!important;padding:0 2px!important;
+  font:600 12px/1.2 "Inter",sans-serif!important;color:#8b8b8b!important;
+}
+#shopDetail .ab-tabs button[aria-selected="true"]{color:#1f1f1f!important}
+#shopDetail .ab-tabs button[aria-selected="true"]:after{
+  left:27%;right:27%;height:2px;background:#ad905a;
+}
+#shopDetail .shop-detail-scroll{background:#fff!important}
+#shopDetail .ab-gallery{background:#fff!important}
+#shopDetail .ab-slide{height:clamp(245px,42dvh,430px)!important;background:#fff!important}
+#shopDetail .ab-slide img{object-fit:contain!important}
+#shopDetail .ab-gallery-count{
+  bottom:12px;right:12px;border:0!important;background:#ffffffec!important;
+  border-radius:999px!important;box-shadow:0 1px 10px #0000000a;
+}
+#shopDetail .ab-content.v248-reference-overview{
+  background:white!important;padding:20px 19px 16px!important;
+}
+#shopDetail .ab-content.v248-reference-overview .ab-eyebrow{display:none}
+#shopDetail .ab-price{gap:9px!important;margin:0 0 8px!important;
+  font-size:25px!important;letter-spacing:-.04em!important;color:#a88648!important}
+#shopDetail .ab-title{margin:11px 0 8px!important;font:600 15px/1.5 "DM Sans",sans-serif!important;
+  letter-spacing:-.023em!important;color:#252525!important}
+#shopDetail .ab-select-line{
+  min-height:56px!important;margin:12px 0 8px!important;padding:9px 0!important;
+  border-top:0!important;border-bottom:1px solid #ededed!important;
+}
+#shopDetail .v248-reference-shipping{
+  display:flex;align-items:center;gap:9px;margin:12px 0 4px;padding:10px 0;
+  color:#75716b;font:500 11px/1.5 "Inter",sans-serif;
+}
+#shopDetail .v248-reference-shipping svg{width:19px;height:19px;flex:none;
+  fill:none;stroke:#8b7855;stroke-width:1.65;stroke-linecap:round;stroke-linejoin:round}
+#shopDetail .ab-footer-buttons{grid-template-columns:1fr 1.45fr!important;gap:9px}
+#shopDetail .ab-footer-buttons button{border-radius:25px!important;min-height:49px!important}
+#shopDetail .ab-footer-add{background:#b39257!important;color:white!important}
+#cart.v248-reference-bag{color:#161823;background:#fff}
+#cart .v248-reference-bag-head{
+  position:relative;display:flex;align-items:center;justify-content:space-between;
+  min-height:55px;padding:16px 0 8px;border-bottom:1px solid #eee;
+}
+#cart .v248-reference-bag-head::before{
+  content:'';position:absolute;width:38px;height:4px;border-radius:99px;
+  background:#d6d6d6;left:50%;top:5px;transform:translateX(-50%);
+}
+#cart .v248-reference-bag-head h2{margin:0;font:700 15px/1.4 "DM Sans",sans-serif;color:#242424}
+#cart .v248-reference-bag-head button{
+  border:0;background:transparent;color:#6c5840;min-height:44px;
+  padding:8px 0 8px 12px;font:600 12px/1.3 "Inter",sans-serif;
+}
+#cart.v248-reference-bag>.page-head{display:none!important}
+#cart .cart-items,#cart .cart-side{background:#fff;color:#242424}
+#cart .cart-items .section-row{border-bottom:1px solid #f1f1f1;padding:12px 0}
+#cart .cart-items .section-title{font:600 13px/1.45 "DM Sans",sans-serif;color:#45413b}
+#cart .ab-cart-card{grid-template-columns:82px minmax(0,1fr)!important;gap:13px!important;
+  padding:16px 0!important;border-bottom:1px solid #eee!important;background:white!important}
+#cart .ab-cart-photo{width:82px!important;height:105px!important;border-radius:9px!important;
+  object-fit:contain!important;background:#f5f4f1!important}
+#cart .ab-cart-title{font-size:14px!important;font-weight:650!important;color:#222!important}
+#cart .ab-cart-options{font-size:12px!important;color:#777!important}
+#cart .ab-cart-price{font-size:16px!important;color:#a78548!important}
+#cart .ab-cart-stepper{border:1px solid #efe6d8!important;background:#f3f1ed!important;border-radius:999px!important}
+#cart .ab-cart-stepper button{background:transparent!important;color:#8b6e38!important}
+#cart .cart-side>h3{font:700 15px/1.4 "DM Sans",sans-serif;color:#292929}
+#cart .cart-side .summary-line{font-size:13px;color:#5d5954}
+#cart #v248CheckoutOpen{background:#b39257!important;color:#fff!important;
+  border-radius:25px!important;min-height:49px!important;font-size:15px!important}
+#cart .cart-actions{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+#cart #v248CheckoutOpen{grid-column:1/-1;order:0}
+#cart #btnQuote{order:1}
+#cart #btnClear{order:2}
+#cart #btnExecute,#cart #btnDokuAuthorize,#cart #btnDokuCreate{
+  display:none!important;visibility:hidden!important
+}
+.v248-checkout-header{display:flex!important;align-items:center;justify-content:space-between;
+  min-height:56px!important;padding:10px 12px!important}
+.v248-checkout-header h2{font:700 16px/1.3 "DM Sans",sans-serif!important;text-align:center}
+.v248-checkout-header button{flex:0 0 44px;width:44px;min-height:44px;
+  border:0!important;background:transparent!important;color:#222!important}
+.v248-checkout-header #v248CheckoutExit{font-size:24px;font-weight:400}
+.v248-checkout-address{padding:15px!important}
+.v248-checkout-address .v248-checkout-heading{min-height:44px}
+.v248-checkout-address #v248CheckoutAddressText{
+  display:block;padding:13px 12px;border:1px solid #f0ece5;border-radius:10px;
+  background:#fffdf9;line-height:1.5;color:#555;
+}
+.v248-checkout-payment-options label{min-height:64px!important;padding:12px!important;
+  border-radius:12px!important;border:1px solid #eee!important}
+.v248-checkout-payment-options input:disabled{opacity:.45}
+.v248-checkout-footer{
+  border-top:1px solid #eee!important;padding:12px 14px calc(12px + env(safe-area-inset-bottom,0px))!important;
+  box-shadow:0 -3px 14px #00000008;
+}
+.v248-checkout-footer .v248-reference-payment-status{
+  display:flex;justify-content:space-between;gap:10px;margin:0 0 10px;
+  color:#6d675e;font:600 12px/1.4 "Inter",sans-serif;
+}
+.v248-checkout-footer .v248-reference-payment-status strong{color:#a78548;font-size:12px}
+@media(max-width:760px){
+  #cart.v248-reference-bag{margin:-20px -16px 0;padding:0 16px 16px;
+    border-radius:20px 20px 0 0;min-height:calc(100dvh - 136px)}
+  #cart .cart-layout{display:flex;flex-direction:column;gap:0!important}
+  #cart .cart-side{margin-top:12px;padding:14px 0 10px;border-top:8px solid #f6f5f2}
+  #cart .cart-actions{padding-bottom:24px;margin-bottom:20px}
+  #v248CheckoutOpen{scroll-margin-bottom:calc(96px + env(safe-area-inset-bottom,0px))!important}
+  #shopDetail .ab-slide{height:clamp(245px,42dvh,405px)!important}
+}
+@media(prefers-reduced-motion:reduce){
+  #shopDetail .ab-gallery-track,.v248-checkout-screen{scroll-behavior:auto!important;animation:none!important}
+}
+
+
+/* Reference commerce-panel variation layout, with canonical SKU options. */
+#shopDetail .ab-choose-header{background:#fff!important;border-bottom:1px solid #efefef!important;
+  min-height:55px!important;align-items:center!important}
+#shopDetail .ab-choose-header h3{color:#242424!important;font:700 14px/1.3 "DM Sans",sans-serif!important}
+#shopDetail .ab-variant-panel{border-radius:17px 17px 0 0!important;max-height:calc(100% - 16px)}
+#shopDetail .ab-picker-head{padding:15px 16px 14px!important;border-bottom:0!important}
+#shopDetail .ab-picker-summary{gap:13px!important}
+#shopDetail .ab-picker-image{width:76px!important;height:92px!important;border-radius:8px!important}
+#shopDetail .ab-picker-price{color:#a78548!important;font-size:23px!important}
+#shopDetail .ab-picker-scroll{padding:4px 16px 18px!important}
+#shopDetail .ab-picker-group{margin:13px 0 22px!important}
+#shopDetail .ab-picker-group h4{font:700 13px/1.4 "DM Sans",sans-serif!important}
+#shopDetail .ab-picker-group.ab-picker-size .ab-chips{
+  display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px!important;
+}
+#shopDetail .ab-picker-group.ab-picker-length .ab-chips{
+  display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px!important;
+}
+#shopDetail .ab-picker-group.ab-picker-size .ab-chip{
+  min-width:0!important;padding:9px 4px!important;min-height:48px!important;
+  border:1px solid #e9e9e9!important;border-radius:8px!important;
+}
+#shopDetail .ab-picker-group.ab-picker-length .ab-chip{
+  min-width:0!important;padding:9px 5px!important;min-height:52px!important;
+  font-size:11px!important;line-height:1.35!important;overflow-wrap:anywhere;
+}
+#shopDetail .ab-picker-group .ab-chip[aria-pressed="true"]{
+  color:#856638!important;border-color:#b39257!important;
+  background:#faf6ec!important;box-shadow:inset 0 0 0 1px #b39257!important;
+}
+#shopDetail .ab-picker-foot{padding:12px 15px calc(12px + env(safe-area-inset-bottom,0px))!important;
+  border-top:1px solid #eee!important}
+@media(max-width:380px){
+  #shopDetail .ab-picker-group.ab-picker-size .ab-chips,
+  #shopDetail .ab-picker-group.ab-picker-length .ab-chips{gap:7px!important}
+}
+
+
+/* Stage D.2 owner-reference Product Sheet actions: Shop / Chat / Bag / Buy now.
+   Chat is visibly unavailable pending the real module; Buy now ONLY opens the
+   authoritative existing SKU picker and does not submit an order/payment. */
+#shopDetail .ab-footer-buttons.v248-reference-footer-actions{
+  display:grid!important;grid-template-columns:40px 40px 48px minmax(0,1fr)!important;
+  align-items:center!important;gap:9px!important;
+}
+#shopDetail .v248-reference-footer-actions button{min-width:0!important}
+#shopDetail .v248-reference-footer-actions .ab-ref-small{
+  display:flex!important;flex-direction:column;justify-content:center;align-items:center;gap:3px;
+  min-height:46px!important;padding:2px!important;border:0!important;
+  background:transparent!important;color:#555!important;border-radius:0!important;
+  font:500 10px/1.2 "Inter",sans-serif!important;
+}
+#shopDetail .v248-reference-footer-actions .ab-ref-small svg{
+  width:21px;height:21px;fill:none;stroke:currentColor;stroke-width:1.7;
+  stroke-linecap:round;stroke-linejoin:round;
+}
+#shopDetail .v248-reference-footer-actions .ab-ref-chat:disabled{
+  opacity:.38!important;cursor:not-allowed!important;
+}
+#shopDetail .v248-reference-footer-actions .ab-ref-cart{
+  display:grid;place-items:center;min-height:46px!important;height:46px!important;
+  padding:0!important;border:1px solid #e4d7c2!important;
+  border-radius:16px!important;background:#fff!important;color:#876a3c!important;
+}
+#shopDetail .v248-reference-footer-actions .ab-ref-cart svg{
+  width:23px;height:23px;fill:none;stroke:currentColor;stroke-width:1.65;
+}
+#shopDetail .v248-reference-footer-actions .ab-ref-buy{
+  min-height:46px!important;border-radius:23px!important;
+  background:#b39257!important;color:#fff!important;font:700 13px/1.2 "Inter",sans-serif!important;
+}
+#shopDetail .v248-reference-footer-actions .ab-ref-buy:disabled{
+  background:#d8ccba!important;color:#fff!important;
+}
+#shopDetail .v248-reference-picker-guide{
+  margin:0 0 14px;padding:12px;border:1px solid #eee8de;border-radius:12px;
+  background:#fbfaf7;color:#4c463d;
+}
+#shopDetail .v248-reference-picker-guide strong{display:block;font:700 13px/1.4 "Inter",sans-serif}
+#shopDetail .v248-reference-picker-guide p{margin:5px 0 0;font:500 11px/1.5 "Inter",sans-serif;color:#847d71}
+#cart .journey-steps,#cart #journeyCapabilityNote,
+#cart .data-disclosure,#cart #grant{display:none!important}
+#cart .cart-side>h3{font-size:15px!important;margin-bottom:12px!important}
+#cart .cart-side .summary-line{border:0!important}
+#cart .cart-side .fine-print{font-size:11px;line-height:1.55;color:#777}
+@media(max-width:380px){
+  #shopDetail .ab-footer-buttons.v248-reference-footer-actions{
+    grid-template-columns:37px 37px 45px minmax(0,1fr)!important;gap:5px!important;
+  }
+}
+
+
+/* Stage D.3: reference commerce-basket bottom-sheet over existing safe basket/quote. */
+#cart .v248-bag-backdrop{display:none}
+#cart .v248-bag-panel{width:100%}
+#cart .v248-bag-close{display:grid;place-items:center;width:44px;min-height:44px;border:0;
+  background:transparent;color:#262626;font-size:27px}
+#cart .v248-bag-continue{display:block;width:100%;min-height:44px;border:0;
+  background:transparent;color:#8b6e38;text-align:center;
+  font:600 12px/1.3 "Inter",sans-serif}
+#cart .v248-bag-close:focus-visible,#cart .v248-bag-continue:focus-visible{
+  outline:2px solid #ad905a;outline-offset:2px}
+#cart .v248-reference-bag-head{min-height:57px}
+#cart .v248-reference-bag-head h2{font-size:14px!important}
+#cart .v248-bag-optional{margin:10px 0 12px;border-top:1px solid #efefef;
+  border-bottom:1px solid #efefef;padding:8px 0 12px}
+#cart .v248-bag-optional summary{cursor:pointer;min-height:36px;
+  display:flex;align-items:center;color:#7b674a;font:600 12px/1.4 "Inter",sans-serif}
+#cart .v248-bag-optional[open] summary{margin-bottom:9px}
+#cart .v248-bag-optional input{width:100%;max-width:100%;min-height:43px;
+  padding:9px 11px;border:1px solid #e6e3de;border-radius:8px;background:white;color:#252525}
+@media(max-width:760px){
+  #cart.tab.on.v248-reference-bag{display:block!important;position:fixed!important;
+    inset:0!important;z-index:9000!important;margin:0!important;padding:0!important;
+    background:transparent!important;animation:none!important;overflow:hidden!important;
+    isolation:isolate!important}
+  #cart .v248-bag-backdrop{display:block;position:absolute;inset:0;z-index:0;
+    width:100%;height:100%;border:0;padding:0;background:rgba(0,0,0,.47)}
+  #cart .v248-bag-panel{position:absolute;left:50%;bottom:0;z-index:1;
+    transform:translateX(-50%);display:flex;flex-direction:column;width:min(100%,540px);
+    min-height:min(360px,68dvh);max-height:calc(91dvh - env(safe-area-inset-top,0px));
+    overflow:hidden;background:#fff;border-radius:18px 18px 0 0;
+    box-shadow:0 -8px 28px #0003}
+  #cart .v248-reference-bag-head{padding:11px 16px 6px;min-height:57px;
+    flex:0 0 auto;border-bottom:1px solid #eee;background:white}
+  #cart .v248-bag-panel>.page-head{display:none!important}
+  #cart .v248-bag-panel>.page-content.cart-layout{display:flex!important;
+    flex-direction:column!important;flex:1 1 auto;min-height:0;max-width:none;width:100%;
+    margin:0!important;padding:4px 15px 20px!important;
+    overflow-y:auto!important;overflow-x:hidden!important;
+    overscroll-behavior:contain;-webkit-overflow-scrolling:touch;
+    gap:0!important;background:white}
+  #cart .cart-side{display:block;margin:14px 0 0!important;
+    padding:17px 0 8px!important;border-top:8px solid #f5f5f5;
+    background:white;box-shadow:none!important}
+  #cart .cart-side .cart-actions{position:relative;bottom:auto;
+    padding:12px 0 0!important;margin:8px 0 0!important;background:#fff}
+  #cart #v248CheckoutOpen{width:100%;min-height:49px;
+    scroll-margin-bottom:calc(90px + env(safe-area-inset-bottom,0px))}
+  #cart .v248-bag-continue{margin:4px auto 0}
+  body.v248-bag-active{overscroll-behavior:contain}
+}
+@media(min-width:761px){#cart .v248-bag-panel{max-width:960px;margin:auto}}
+@media(prefers-reduced-motion:reduce){#cart .v248-bag-panel{transition:none!important}}
+
 </style>
 <link rel="preload" as="image" fetchpriority="high" href="https://imagedelivery.net/32oxijRdypCO4dk5WrGLwg/c2726925-9313-4bc7-9733-83f5d9429600/public">
 </head>
@@ -2109,25 +2403,34 @@ body.is-discover .site-tabs{z-index:45!important}
     
   </section>
 
-  <section id="cart" class="tab" role="tabpanel" aria-labelledby="tab-cart">
+  <section id="cart" class="tab v248-reference-bag" role="tabpanel" aria-labelledby="tab-cart">
+    <button type="button" id="v248BagBackdrop" class="v248-bag-backdrop" tabindex="-1" aria-label="Close shopping bag"></button>
+    <div id="v248BagPanel" class="v248-bag-panel" role="dialog" aria-modal="true" aria-labelledby="v248BagHeading">
+      <header class="v248-reference-bag-head">
+        <h2 id="v248BagHeading">Shopping bag</h2>
+        <button type="button" id="v248BagClose" class="v248-bag-close" aria-label="Close shopping bag">×</button>
+      </header>
     <div class="page-head"><h1 class="page-title">Cart</h1></div>
     <div class="page-content cart-layout">
       <div class="cart-items"><div class="section-row"><h2 class="section-title">Your items</h2><span id="cartCount" class="fine-print">0 items</span></div><div id="basket"></div></div>
       <aside class="cart-side" aria-label="Checkout summary">
-        <h3>Order summary</h3>
+        <h3>Bag summary</h3>
         <div class="journey-steps" id="checkoutSteps" aria-label="Checkout journey">
-          <span class="current">1. Bag</span><span>2. Quote</span><span>3. TEST_ONLY save</span><span>4. My Order</span>
+          <span class="current">Bag</span><span>Quote</span><span>Checkout preview</span>
         </div>
         <p id="journeyCapabilityNote" class="fine-print" role="status">Loading connected journey capabilities…</p>
         <div class="summary-line"><span>Items</span><strong id="cartSummaryCount">0</strong></div>
         <div class="summary-line"><span>Total</span><strong>Check at quote</strong></div>
         <p class="fine-print">Final amount is confirmed by the DEV server. A payment redirect is never proof of settlement.</p>
+        <details class="v248-bag-optional">
+          <summary>Contact and promo details</summary>
         <label class="fine-print" for="checkoutPhone">Mobile (WhatsApp)</label>
         <input id="checkoutPhone" type="tel" inputmode="tel" autocomplete="tel" placeholder="+60…" style="display:block;width:100%;margin-top:8px" />
         <p class="fine-print">Guest checkout stays available. This number binds the order for later My Order activation — it never unlocks private details by itself.</p>
         <label class="fine-print" for="promo">Promo code</label>
         <input id="promo" autocomplete="off" placeholder="Enter code" style="display:block;width:100%;margin-top:8px" />
         <p id="promoNote" class="fine-print"></p>
+        </details>
         <div class="cart-actions">
           <button type="button" class="action-primary" id="v248CheckoutOpen">Checkout <span aria-hidden="true">›</span></button>
           <button type="button" class="action-primary" id="btnQuote">Check total</button>
@@ -2136,6 +2439,7 @@ body.is-discover .site-tabs{z-index:45!important}
           <button type="button" class="action-secondary" id="btnDokuCreate" disabled title="Requires issued DEV multiline DOKU one-tx authorization">Start DOKU sandbox</button>
           <button type="button" class="action-quiet" id="btnClear">Clear</button>
     </div>
+        <button type="button" class="v248-bag-continue" data-go-tab="shop" aria-label="Continue shopping">Continue shopping</button>
         <div id="cartBusy" class="coin-busy" role="status" aria-live="polite" hidden>
   <span class="coin-loader" aria-hidden="true"><span class="coin-halo"></span><span class="coin-inner"><span class="coin-face"></span><span class="coin-face coin-back"></span></span></span>
   <span class="coin-copy">Checking your total…</span>
@@ -2146,6 +2450,7 @@ body.is-discover .site-tabs{z-index:45!important}
         <div id="grant" class="fine-print" aria-live="polite"></div>
       </aside>
     </div>
+    </div>
   </section>
 
   <!-- v2.48: owner-reference full-screen Checkout, connected to existing basket and quote. -->
@@ -2155,7 +2460,7 @@ body.is-discover .site-tabs{z-index:45!important}
       <header class="v248-checkout-header">
         <button id="v248CheckoutBack" type="button" aria-label="Back to Cart">‹</button>
         <h2>Checkout</h2>
-        <span aria-hidden="true" class="v248-checkout-header-space"></span>
+        <button id="v248CheckoutExit" type="button" aria-label="Close checkout">×</button>
       </header>
       <div class="v248-checkout-scroll">
         <p class="v248-checkout-banner">DEV staging · Check totals without placing an order or making a payment.</p>
@@ -2189,6 +2494,7 @@ body.is-discover .site-tabs{z-index:45!important}
         </section>
       </div>
       <footer class="v248-checkout-footer">
+        <div class="v248-reference-payment-status"><span>Estimated total</span><strong>Check total with DEV</strong></div>
         <p id="v248CheckoutFooterStatus" role="status">Quote-only preview · Payment not initiated</p>
         <button id="v248CheckoutContinue" type="button" disabled>Continue to payment</button>
       </footer>
@@ -2460,6 +2766,7 @@ body.is-discover .site-tabs{z-index:45!important}
   }
 
   var tabId = 'discover';
+  var v248BagReturnTab = 'shop';
 
   function $(id) { return document.getElementById(id); }
 
@@ -3448,13 +3755,18 @@ function closeShopDetail() {
       activeIndex = Math.max(0, Math.min(galleryItems.length - 1, Math.round(galleryTrack.scrollLeft / w)));
       galleryCount.textContent = (activeIndex + 1) + ' / ' + currentGallery.length;
     }
-    var head = el('div', null, 'detail-head');
+    var head = el('div', null, 'detail-head v248-reference-grab');
     var drag = iconButton('', 'Resize product sheet', 'shop-sheet-drag');
+    drag.appendChild(el('span', null, 'v248-reference-handle'));
     attachSheetResizeHandle(drag, host, function (h) {
       document.body.style.setProperty('--shop-sheet-height', Math.round(h) + 'px');
     }, .88);
     head.appendChild(drag);
-    head.appendChild(el('h2', 'ARABISTA · COLLECTION'));
+    var referenceCode = String(product.product_code || product.code || product.sku_code || '').trim().toUpperCase();
+    var titleCode = String(product.title || '').toUpperCase().match(/\b[A-Z]{1,3}[0-9]{2,4}\b/);
+    var refCollection = (referenceCode && /^[A-Z0-9_-]{2,20}$/.test(referenceCode)
+      ? referenceCode : titleCode ? titleCode[0] : 'COLLECTION');
+    head.appendChild(el('h2', 'ARABISTA · ' + refCollection, 'v248-reference-grab-label'));
     var headActions = el('div', null, 'ab-head-actions');
     var cartButton = iconButton(cartSvg, 'Open Cart', 'shop-sheet-cart ab-round');
     cartButton.id = 'shopSheetCart';
@@ -3492,7 +3804,7 @@ function closeShopDetail() {
     gallery.appendChild(galleryCount);
     body.appendChild(gallery);
 
-    var intro = el('section', null, 'ab-content');
+    var intro = el('section', null, 'ab-content v248-reference-overview');
     intro.id = 'ab-product-overview';
     intro.appendChild(el('p', 'THE ARABISTA EDIT', 'ab-eyebrow'));
     amount = el('div', null, 'ab-price'); intro.appendChild(amount);
@@ -3530,6 +3842,10 @@ function closeShopDetail() {
     optionButton.appendChild(choose);
     optionButton.addEventListener('click', openPicker);
     intro.appendChild(optionButton);
+    var refShipping = el('p', null, 'v248-reference-shipping');
+    refShipping.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h11v10H3zM14 10h4l3 3v3h-7z"/><circle cx="7.5" cy="18" r="1.6"/><circle cx="17.5" cy="18" r="1.6"/></svg>';
+    refShipping.appendChild(el('span', 'Delivery options and total are confirmed by the DEV quote.'));
+    intro.appendChild(refShipping);
     stock = el('p', null, 'ab-stock'); intro.appendChild(stock);
     intro.classList.add('ab-sheet-reveal');
     body.appendChild(intro);
@@ -3862,12 +4178,24 @@ function closeShopDetail() {
     host.appendChild(body);
     body.scrollTop = 0;
     var footer = el('div', null, 'shop-detail-footer');
-    var footerBtns = el('div', null, 'ab-footer-buttons');
-    var selectBtn = button('Choose options', 'ab-footer-view');
-    var addBtn = button('Add to cart', 'ab-footer-add');
-    selectBtn.addEventListener('click', openPicker);
+    var footerBtns = el('div', null, 'ab-footer-buttons v248-reference-footer-actions');
+    var selectBtn = iconButton(
+      '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8 12 4l8 4v12H4z"/><path d="M9 20v-7h6v7"/></svg>',
+      'Return to Shop', 'ab-ref-small ab-ref-shop');
+    selectBtn.appendChild(el('span', 'Shop'));
+    selectBtn.addEventListener('click', function () { closeShopDetail(); show('shop'); });
+    var chatBtn = iconButton(
+      '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v11H8l-4 4z"/></svg>',
+      'Chat is not yet available', 'ab-ref-small ab-ref-chat');
+    chatBtn.appendChild(el('span', 'Chat')); chatBtn.disabled = true;
+    chatBtn.title = 'Chat will be available when Seller Chat is connected.';
+    var footerCart = iconButton(cartSvg, 'Open shopping bag', 'ab-ref-cart');
+    footerCart.addEventListener('click', function () { closeShopDetail(); show('cart'); });
+    var addBtn = button('Buy now', 'ab-footer-add ab-ref-buy');
+    // The reference CTA opens canonical options, not a transaction.
     addBtn.addEventListener('click', openPicker);
-    footerBtns.appendChild(selectBtn); footerBtns.appendChild(addBtn);
+    footerBtns.appendChild(selectBtn); footerBtns.appendChild(chatBtn);
+    footerBtns.appendChild(footerCart); footerBtns.appendChild(addBtn);
     footer.appendChild(footerBtns);
     footerStatus = el('p', null, 'ab-footer-status');
     footerStatus.setAttribute('role', 'status');
@@ -3963,7 +4291,7 @@ function closeShopDetail() {
       function dismiss() {
         if (overlay.isConnected) overlay.remove();
         variantPanel = null;
-        selectBtn.focus();
+        addBtn.focus();
       }
       x.addEventListener('click',dismiss);
       header.appendChild(x);
@@ -4016,14 +4344,22 @@ function closeShopDetail() {
       top.appendChild(overviewRow);
       panel.appendChild(top);
       pickerScroll = el('div', null, 'ab-picker-scroll');
+      if (/\bW06\b/i.test(String(product.product_code || product.code || '') + ' ' + String(product.title || ''))) {
+        var fitPreview = el('div', null, 'v248-reference-picker-guide');
+        fitPreview.appendChild(el('strong', 'Find my size'));
+        fitPreview.appendChild(el('p', 'Size suggestions are available after verified measurements are saved. Select Size, Length and Color manually for now.'));
+      }
       function paintGroups() {
         var offset = pickerScroll.scrollTop;
         clear(pickerScroll);
+        if (fitPreview) pickerScroll.appendChild(fitPreview);
         if (!groups.length) {
           pickerScroll.appendChild(el('p', 'Standard product · No variation choices.', 'ab-picker-copy'));
         }
         groups.forEach(function (g, i) {
-          var group = el('section', null, 'ab-picker-group');
+          var group = el('section', null, 'ab-picker-group' +
+            (/^size$/i.test(g.label) ? ' ab-picker-size' :
+             /^length$/i.test(g.label) ? ' ab-picker-length' : ' ab-picker-color'));
           var heading = el('h4');
           heading.appendChild(el('span', g.label));
           var current = g.options.filter(function (o) { return o.key === chosen[i]; })[0];
@@ -4097,7 +4433,8 @@ function closeShopDetail() {
     if ($('cartSummaryCount')) $('cartSummaryCount').textContent = String(count);
     if ($('btnQuote')) $('btnQuote').disabled = count < 1;
     if ($('v248CheckoutOpen')) $('v248CheckoutOpen').disabled = count < 1;
-    if ($('btnExecute')) $('btnExecute').disabled = ls.length < 2;
+    if ($('btnExecute')) $('btnExecute').disabled =
+      window.__ARABISTA_V248_ASSET_BASE__ === '/v248-staging' || ls.length < 2;
     if ($('btnClear')) $('btnClear').disabled = count < 1;
     function cartBtn(name, label, cls) {
       var n = el('button', name, cls); n.type = 'button'; n.setAttribute('aria-label', label);
@@ -4225,6 +4562,7 @@ function closeShopDetail() {
   }
   $('v248CheckoutOpen').addEventListener('click',v248OpenCheckout);
   $('v248CheckoutBack').addEventListener('click',v248CloseCheckout);
+  $('v248CheckoutExit').addEventListener('click',v248CloseCheckout);
   $('v248CheckoutManageAddress').addEventListener('click',function(){
     v248CloseCheckout();
     show('profile');
@@ -5974,7 +6312,11 @@ function attachSheetResizeHandle(handle,sheet,apply,ratio){
 
   function show(id, opts) {
     opts = opts || {};
+    if (id === 'cart' && tabId !== 'cart') {
+      v248BagReturnTab = ['discover','shop','orders','profile'].indexOf(tabId) >= 0 ? tabId : 'shop';
+    }
     tabId = id;
+    document.body.classList.toggle('v248-bag-active', id === 'cart');
     document.querySelectorAll('.tab').forEach(function (el2) { el2.classList.remove('on'); });
     var tab = $(id);
     if (tab) tab.classList.add('on');
@@ -6009,8 +6351,31 @@ function attachSheetResizeHandle(handle,sheet,apply,ratio){
       openIdentityModal('login');
     }
     renderProfile();
+    if(id === 'cart' && window.matchMedia && window.matchMedia('(max-width:760px)').matches){
+      $('v248BagClose').focus({preventScroll:true});
+    }
   }
 
+  function v248CloseBag(){
+    if (tabId !== 'cart') return;
+    var back = v248BagReturnTab;
+    show(back);
+    var nav = document.querySelector('.site-tabs button[data-tab="' + back + '"]');
+    if (nav) nav.focus({preventScroll:true});
+  }
+  $('v248BagClose').addEventListener('click', v248CloseBag);
+  $('v248BagBackdrop').addEventListener('click', v248CloseBag);
+  $('v248BagPanel').addEventListener('keydown', function(e){
+    if(e.key === 'Escape'){e.preventDefault();v248CloseBag();return;}
+    if(e.key !== 'Tab')return;
+    var nodes = Array.prototype.slice.call(
+      $('v248BagPanel').querySelectorAll('button:not(:disabled),input:not(:disabled),[href],[tabindex="0"]')
+    ).filter(function(n){return n.offsetParent !== null;});
+    if(!nodes.length)return;
+    var first = nodes[0], last = nodes[nodes.length - 1];
+    if(e.shiftKey && document.activeElement === first){e.preventDefault();last.focus();}
+    else if(!e.shiftKey && document.activeElement === last){e.preventDefault();first.focus();}
+  });
   document.querySelectorAll('nav button[data-tab]').forEach(function (btn) {
     btn.addEventListener('click', function () { show(btn.getAttribute('data-tab')); });
   });
