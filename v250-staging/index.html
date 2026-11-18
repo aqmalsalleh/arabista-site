@@ -10075,7 +10075,7 @@ function closeShopDetail() {
       '#product-size-guides .v250-manual-fit-note{margin:10px 0 6px;color:#70614a;font-size:11px;line-height:1.5;}',
       '@keyframes v250-cta-enter{from{opacity:0;transform:translate(-50%,8px)}to{opacity:1;transform:translate(-50%,0)}}',
       '@keyframes v250-cta-nudge{0%,72%,100%{transform:translateX(0)}80%{transform:translateX(3px)}88%{transform:translateX(0)}95%{transform:translateX(3px)}}',
-      '#product-sheet.sheet--product{transition:height .38s cubic-bezier(.22,1,.36,1),transform .32s cubic-bezier(.22,1,.36,1)!important;}',
+      '#product-sheet.sheet--product{transition:transform .32s cubic-bezier(.22,1,.36,1)!important;}',
       '#product-sheet.sheet--product.is-expanded{height:96%;}',
       '#product-sheet.sheet--product.is-dragging{transition:none!important;}',
       '#product-sheet .product-gallery-slide:not(.is-ready){position:relative;overflow:hidden;background:#f6f3ed;}',
@@ -10346,33 +10346,79 @@ function closeShopDetail() {
       else if(!e.shiftKey&&root.activeElement===nodes[nodes.length-1]){e.preventDefault();nodes[0].focus();}
     });
 
-    // Preserve the initial 72% peek; a genuine downward content scroll expands
-    // the sheet once to 96%. Drag and keyboard controls retain their behavior.
+    // The first downward-content swipe expands the 72% peek before native scroll
+    // begins; no height animation runs during momentum scrolling.
     var grab=v248X('product-grab'),productSheet=v248X('product-sheet');
     if(grab&&productSheet){
-      var sheetGesture=null;
+      var sheetGesture=null,sheetAnimation=null;
+      function setExpanded(expand){
+        if(sheetAnimation){sheetAnimation.cancel();sheetAnimation=null;}
+        var before=productSheet.getBoundingClientRect().top;
+        productSheet.classList.remove('is-dragging');
+        productSheet.classList.toggle('is-expanded',expand);
+        productSheet.style.height='';
+        var after=productSheet.getBoundingClientRect().top;
+        var delta=before-after;
+        var reduced=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        // Animate only a compositor transform: no per-frame sheet reflow.
+        if(!reduced&&Math.abs(delta)>1&&typeof productSheet.animate==='function'){
+          sheetAnimation=productSheet.animate([
+            {transform:'translate3d(0,'+delta+'px,0)'},
+            {transform:'translate3d(0,0,0)'}
+          ],{duration:480,easing:'cubic-bezier(.22,1,.36,1)'});
+          var current=sheetAnimation;
+          current.onfinish=function(){if(sheetAnimation===current)sheetAnimation=null;};
+        }
+      }
       function sheetSnap(height){
         var vh=window.innerHeight||800;
         var ratio=height/vh;
         if(ratio<.40){v248XCloseAll();return;}
-        var expand=ratio>.82;
-        productSheet.classList.remove('is-dragging');
-        // Establish the current dragged pixel height before smoothly snapping.
-        void productSheet.offsetHeight;
-        productSheet.classList.toggle('is-expanded',expand);
-        productSheet.style.height='';
+        setExpanded(ratio>.82);
       }
-      var contentScroll=v248X('product-scroll');
-      if(contentScroll)contentScroll.addEventListener('scroll',function(){
-        if(v248Exact.current==='product'&&!productSheet.classList.contains('is-expanded')&&
-           !productSheet.classList.contains('is-dragging')&&contentScroll.scrollTop>32){
-          productSheet.style.height='';
-          productSheet.classList.add('is-expanded');
-        }
-      },{passive:true});
+      var contentScroll=v248X('product-scroll'),peekTouch=null;
+      if(contentScroll){
+        contentScroll.addEventListener('touchstart',function(e){
+          peekTouch=null;
+          if(v248Exact.current!=='product'||productSheet.classList.contains('is-expanded')||
+             contentScroll.scrollTop>1||e.touches.length!==1||
+             e.target.closest('input,textarea,select,[contenteditable="true"]'))return;
+          var t=e.touches[0];
+          peekTouch={x:t.clientX,y:t.clientY,captured:false};
+        },{passive:true});
+        contentScroll.addEventListener('touchmove',function(e){
+          if(!peekTouch||v248Exact.current!=='product')return;
+          if(peekTouch.captured){if(e.cancelable)e.preventDefault();return;}
+          var t=e.touches[0];if(!t)return;
+          var dy=t.clientY-peekTouch.y,dx=t.clientX-peekTouch.x;
+          if(dy < -4&&-dy>Math.abs(dx)*1.2){
+            if(e.cancelable)e.preventDefault();
+            if(dy < -14){
+              peekTouch.captured=true;
+              setExpanded(true);
+            }
+          }else if(dy>18||Math.abs(dx)>20)peekTouch=null;
+        },{passive:false});
+        ['touchend','touchcancel'].forEach(function(type){
+          contentScroll.addEventListener(type,function(){peekTouch=null;},{passive:true});
+        });
+        // Mouse wheels and trackpads get the same one-time expand-first behavior.
+        contentScroll.addEventListener('wheel',function(e){
+          if(v248Exact.current!=='product'||productSheet.classList.contains('is-expanded')||
+             contentScroll.scrollTop>1||e.deltaY<=0)return;
+          if(e.cancelable)e.preventDefault();
+          setExpanded(true);
+        },{passive:false});
+        contentScroll.addEventListener('keydown',function(e){
+          if(v248Exact.current!=='product'||productSheet.classList.contains('is-expanded')||
+             contentScroll.scrollTop>1||!['ArrowDown','PageDown'].includes(e.key)||
+             e.target.closest('input,textarea,select,[contenteditable="true"]'))return;
+          e.preventDefault();setExpanded(true);
+        });
+      }
       grab.addEventListener('pointerdown',function(e){
-        if(e.target.closest('button'))return;
-        if(e.button!==0)return;
+        if(e.target.closest('button')||e.button!==0)return;
+        if(sheetAnimation){sheetAnimation.cancel();sheetAnimation=null;}
         sheetGesture={pointer:e.pointerId,y:e.clientY,h:productSheet.getBoundingClientRect().height,moved:false};
         productSheet.classList.add('is-dragging');
         if(grab.setPointerCapture)grab.setPointerCapture(e.pointerId);
@@ -10390,16 +10436,13 @@ function closeShopDetail() {
       function endGrab(e){
         if(!sheetGesture||e.pointerId!==sheetGesture.pointer)return;
         var height=productSheet.getBoundingClientRect().height;
-        sheetGesture=null;
-        sheetSnap(height);
+        sheetGesture=null;sheetSnap(height);
       }
       grab.addEventListener('pointerup',endGrab);
       grab.addEventListener('pointercancel',endGrab);
       grab.addEventListener('keydown',function(e){
         if(e.key!=='ArrowUp'&&e.key!=='ArrowDown')return;
-        e.preventDefault();
-        productSheet.style.height='';
-        productSheet.classList.toggle('is-expanded',e.key==='ArrowUp');
+        e.preventDefault();setExpanded(e.key==='ArrowUp');
       });
     }
     // Reference commerce-header dismissal by downward pan; no data writes.
@@ -10665,8 +10708,6 @@ function closeShopDetail() {
     else if(availableRows<size.options.length)
       host.appendChild(v248XElement('p','product-reference-note',
         'Some garment measurements are not available yet.'));
-    if(chosenSet==='S3')host.appendChild(v248XElement('p','product-reference-note',
-      'Set 3 garment length is 60 inches. Its recommended height range varies by Size, as shown in the table.'));
   }
   function v248XRefreshTables(){
     v248XRenderGuideInto(v248X('product-size-guides'));
@@ -10869,6 +10910,14 @@ function closeShopDetail() {
         fields.insertBefore(height.closest('label'),weight.closest('label'));
         height.setAttribute('enterkeyhint','next');
         weight.setAttribute('enterkeyhint','go');
+      }
+      // Completing a three-digit height advances focus, but never calculates.
+      if(height&&weight&&!height.dataset.autoNextBound){
+        height.addEventListener('input',function(){
+          if(/^\\d{3}$/.test(height.value.trim())&&!weight.disabled)
+            weight.focus({preventScroll:true});
+        });
+        height.dataset.autoNextBound='yes';
       }
       form.querySelectorAll('input').forEach(function(input){
         input.disabled=!v248Exact.fitRules;input.value='';
