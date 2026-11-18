@@ -10348,7 +10348,9 @@ function closeShopDetail() {
     root.querySelectorAll('#checkout-payment-methods input').forEach(function(n){n.disabled=true;});
     var place=v248X('checkout-place-order');if(place){place.disabled=true;place.textContent='Proceed to Secure Payment';}
     var notice=root.querySelector('#checkout-payment .checkout-payment-assurance');
-    if(notice)notice.textContent='Payment methods are temporarily unavailable.';
+    if(notice)notice.textContent=window.__ARABISTA_V251_SANDBOX_CHECKOUT__===true
+      ?'Your payment continues securely with DOKU after total confirmation.'
+      :'Payment methods are temporarily unavailable.';
     var disclaimer=root.querySelector('#checkout-delivery>.checkout-muted');
     if(disclaimer)disclaimer.textContent='Delivery charges are confirmed with your order total.';
     var refNote=root.querySelector('#commerce-basket-footer .commerce-basket-note');
@@ -11466,9 +11468,9 @@ function closeShopDetail() {
     var submittedLines=JSON.stringify(lines()),submittedRevision=quoteRevision;
     var submittedAmount=Number(v248Exact.quote.payable_sen);
     if(!Number.isSafeInteger(submittedAmount)||submittedAmount<=0)return;
-    // Reserve the payment tab in the original click, before async RPC.
+    // Keep DOKU in this tab: purchase-bound sessionStorage is populated only
+    // after order persistence, so a pre-opened tab can lack the access grant.
     var paymentTab=null;
-    try{paymentTab=window.open('about:blank','_blank');if(paymentTab)paymentTab.opener=null;}catch(e){}
     v251PurchaseBusy=true;
     v251SetPurchaseMessage('Securely preparing your order. Please do not submit again.');
     var request=intent();
@@ -11505,7 +11507,6 @@ function closeShopDetail() {
           v251SetPurchaseMessage('Order saved; payment could not be started. No payment success is assumed. Contact staff to reconcile this order.');
           return;
         }
-        try{if(paymentTab&&!paymentTab.closed)paymentTab.location.replace(url);}catch(e){}
         var footer=v248X('checkout-footer'),link=v248X('v251-payment-link');
         if(footer&&!link){
           link=v248XElement('a');link.id='v251-payment-link';
@@ -11514,6 +11515,10 @@ function closeShopDetail() {
         }
         if(link)link.href=url;
         v251SetPurchaseMessage('Payment initiated. Only verified DOKU settlement confirms your order; the payment return alone is not proof.');
+        // Navigate in-place so the DOKU return keeps the buyer's session proof.
+        try{window.location.assign(url);}catch(navigationErr){
+          v251SetPurchaseMessage('Use Open secure DOKU payment to continue; returning from DOKU still requires verified settlement.');
+        }
       },function(){
         try{if(paymentTab&&!paymentTab.closed)paymentTab.close();}catch(e){}
         v251SetPurchaseMessage('Order saved; payment response is uncertain. Please contact staff. Do not submit another order.');
@@ -14948,7 +14953,13 @@ function attachSheetResizeHandle(handle,sheet,apply,ratio){
   function v251ReconcileAfterReturn_() {
     if (v251ReconcileBusy) return;
     if (!(window.__ARABISTA_V251_SANDBOX_CHECKOUT__ === true)) return;
-    if (!(state.grant && state.last && state.last.order_id && state.last.checkout_id)) return;
+    if (!(state.grant && state.last && state.last.order_id && state.last.checkout_id)) {
+      v251ShowCheckoutOutcome_({
+        paid:false,title:'Verify your order',orderText:'',
+        message:'This return cannot confirm payment without the original purchase session. Sign in through My Order or contact staff for verification. Do not submit another order.'
+      });
+      return;
+    }
     if (!(window.ArabistaV243Bridge && typeof window.ArabistaV243Bridge.call === 'function')) return;
     v251ReconcileBusy = true;
     v251ShowCheckoutOutcome_({
@@ -14964,11 +14975,11 @@ function attachSheetResizeHandle(handle,sheet,apply,ratio){
       buyer_session_secret: state.buyerSessionSecret || undefined
     }, function (result) {
       v251ReconcileBusy = false;
-      var paid = !!(result && result.ok === true && (
-        String(result.payment_status || '').toUpperCase() === 'PAID' ||
-        String(result.order_status || '').toUpperCase() === 'PAID' ||
-        result.settled === true
-      ));
+      var paid = !!(result && result.ok === true &&
+        result.provider_settlement_verified === true &&
+        result.order_paid === true &&
+        result.stock_committed === true &&
+        result.display_state === 'PAYMENT_VERIFIED_SETTLED');
       if (paid) {
         state.last = Object.assign({}, state.last, result, {
           order_id: state.last.order_id,
@@ -15018,8 +15029,13 @@ function attachSheetResizeHandle(handle,sheet,apply,ratio){
     if (!dokuReturn && !invoice) return false;
     if (invoice) state.pendingInvoiceLocator = invoice;
     if (dokuReturn && window.__ARABISTA_V251_SANDBOX_CHECKOUT__ === true) {
-      if (typeof syncDokuButtons === 'function') syncDokuButtons();
-      v251ReconcileAfterReturn_();
+      // The Pages bridge is still connecting at this stage. Render a neutral
+      // state now; perform authoritative Retrieve after bridge mount succeeds.
+      v251ShowCheckoutOutcome_({
+        paid:false,title:'Checking payment',
+        orderText:state.last&&state.last.order_number?'Order '+state.last.order_number:'',
+        message:'Connecting securely to verify your DOKU payment. The browser return is not proof of payment.'
+      });
       return true;
     }
     show('orders', {
@@ -15440,6 +15456,15 @@ function attachSheetResizeHandle(handle,sheet,apply,ratio){
 
   function startBackendModules() {
     markPerf('bridge_ready');
+    // Reconcile once the authenticated, allowlisted DEV transport is mounted.
+    // Never infer Paid from the redirect or attempt a second checkout.
+    if (window.__ARABISTA_V251_SANDBOX_CHECKOUT__ === true) {
+      try {
+        var returnParams = new URLSearchParams(location.search || '');
+        if (returnParams.get('doku_return') === '1' || returnParams.get('doku_return') === 'true')
+          v251ReconcileAfterReturn_();
+      } catch (returnParseErr) { /* no redirect proof */ }
+    }
     // Shop loads once; Discover remains idle until its tab is visible.
     if (tabId === 'discover') loadFeed();
     load();

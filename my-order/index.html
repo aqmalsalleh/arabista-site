@@ -125,6 +125,19 @@
   var banner = document.getElementById('state-banner');
   var message = document.getElementById('message');
 
+  // DEV/sandbox order numbers are INV + 14 digits (yyyyMMddHHmmss). Meta's fixed
+  // WhatsApp CTA lands on /my-order?invoice={{1}}; route that locator into the
+  // isolated five-tab My Order host without granting access from the invoice alone.
+  if (/^INV[0-9]{14}$/.test(invoice)) {
+    var target = '/v251-staging/?invoice=' + encodeURIComponent(invoice);
+    try {
+      window.location.replace(target);
+      return;
+    } catch (navErr) {
+      // Fall through to verification-only messaging if navigation is blocked.
+    }
+  }
+
   if (invoice) {
     invoiceEl.textContent = invoice;
     banner.textContent = 'Verification required';
