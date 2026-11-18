@@ -8167,7 +8167,7 @@ body.is-discover .site-tabs{z-index:45!important}
       <button type="button" id="modern-set-standard" class="modern-length-tab is-active" aria-pressed="true">Set 1 · Standard</button>
       <button type="button" id="modern-set-long" class="modern-length-tab" aria-pressed="false">Set 2 · Long</button>
     </div>
-    <p class="product-reference-note" id="product-size-status">Size measurements are loading…</p>
+    <p class="product-reference-note" id="product-size-status" hidden></p>
     <div id="product-size-guides"></div>
     <div id="product-size-unavailable" hidden>
       <p class="product-reference-note">Size guide is currently unavailable.</p>
@@ -10029,6 +10029,12 @@ function closeShopDetail() {
     return n;
   }
   function v248XEmpty(n){if(n)n.replaceChildren();}
+  function v251MarkImagePending(img){
+    img.classList.add('v251-image-loading');
+    function done(){img.classList.remove('v251-image-loading');}
+    img.addEventListener('load',done,{once:true});
+    img.addEventListener('error',function(){done();img.hidden=true;},{once:true});
+  }
   function v248XInit(){
     if(v248Exact.shadow)return true;
     var host=$('v248ExactRefHost'),tpl=$('v248ExactReferenceTemplate');
@@ -10053,7 +10059,11 @@ function closeShopDetail() {
     var premiumStyle=document.createElement('style');
     premiumStyle.textContent=[
       '#product-fit .fit-result,#commerce-fit .fit-result{position:absolute!important;width:1px!important;height:1px!important;overflow:hidden!important;clip:rect(0,0,0,0)!important;white-space:nowrap!important;padding:0!important;margin:-1px!important;border:0!important;}',
-      '#product-fit .v250-fit-actions,#commerce-fit .v250-fit-actions{display:flex;justify-content:flex-end;align-items:center;margin:11px 0 0;}',
+      '#product-fit .fit-fields,#commerce-fit .fit-fields{display:grid!important;grid-template-columns:minmax(0,1fr) minmax(0,1fr) 44px!important;gap:8px!important;align-items:end;}',
+      '#product-fit .fit-fields>label,#commerce-fit .fit-fields>label{min-width:0;}',
+      '#product-fit .fit-fields>label input,#commerce-fit .fit-fields>label input{box-sizing:border-box;min-width:0;width:100%;}',
+      '#product-fit .v250-fit-actions,#commerce-fit .v250-fit-actions{display:flex;justify-content:flex-end;align-items:end;margin:0;min-width:0;}',
+      '#product-fit .v250-fit-arrow,#commerce-fit .v250-fit-arrow{width:44px;height:44px;min-width:44px;}',
       '#product-fit .v250-fit-arrow,#commerce-fit .v250-fit-arrow{display:grid;place-items:center;width:46px;height:42px;border:1px solid #c8b187;border-radius:14px;background:linear-gradient(135deg,#f7f3eb,#e8dcc8);color:#635037;box-shadow:0 5px 15px rgba(92,71,43,.1);transition:transform .18s ease,box-shadow .18s ease,background .18s ease;}',
       '#product-fit .v250-fit-arrow svg,#commerce-fit .v250-fit-arrow svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}',
       '#product-fit .v250-fit-arrow:active,#commerce-fit .v250-fit-arrow:active{transform:scale(.95);box-shadow:0 2px 8px rgba(92,71,43,.12);}',
@@ -10065,7 +10075,25 @@ function closeShopDetail() {
       '#product-size-guides .v250-manual-fit-note{margin:10px 0 6px;color:#70614a;font-size:11px;line-height:1.5;}',
       '@keyframes v250-cta-enter{from{opacity:0;transform:translate(-50%,8px)}to{opacity:1;transform:translate(-50%,0)}}',
       '@keyframes v250-cta-nudge{0%,72%,100%{transform:translateX(0)}80%{transform:translateX(3px)}88%{transform:translateX(0)}95%{transform:translateX(3px)}}',
-      '@media(prefers-reduced-motion:reduce){.v250-size-cta,.v250-size-cta .v250-size-cta-arrow{animation:none!important;}#product-fit .v250-fit-arrow,#commerce-fit .v250-fit-arrow{transition:none!important;}}'
+      '#product-sheet.sheet--product{transition:height .38s cubic-bezier(.22,1,.36,1),transform .32s cubic-bezier(.22,1,.36,1)!important;}',
+      '#product-sheet.sheet--product.is-expanded{height:96%;}',
+      '#product-sheet.sheet--product.is-dragging{transition:none!important;}',
+      '#product-sheet .product-gallery-slide:not(.is-ready){position:relative;overflow:hidden;background:#f6f3ed;}',
+      '#product-sheet .product-gallery-slide:not(.is-ready)::after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(100deg,transparent 28%,rgba(190,164,116,.20) 50%,transparent 72%);transform:translateX(-100%);animation:v251-sheen 1.9s ease-in-out infinite;}',
+      '#commerce-basket-items img.v251-image-loading,#checkout-item-list img.v251-image-loading{background:#f3efe8;opacity:.46;animation:v251-soft-pulse 1.35s ease-in-out infinite;}',
+      '#commerce-basket-items img,#checkout-item-list img{transition:opacity .22s ease;}',
+      '.v251-quote-wait{display:flex;align-items:center;gap:11px;margin:12px 0;padding:13px 14px;border:1px solid #ebe1cd;border-radius:14px;background:linear-gradient(135deg,#faf7f0,#fffdfa);color:#6d5734;font:600 12px/1.4 "DM Sans",Inter,system-ui,sans-serif;}',
+      '.v251-quote-wait[hidden]{display:none!important;}',
+      '.v251-quote-spinner{display:block;flex:0 0 23px;width:23px;height:23px;border:2px solid rgba(179,146,87,.22);border-top-color:#af8b53;border-radius:50%;animation:v251-spin 1.15s linear infinite;}',
+      '.v251-quote-text{flex:1;min-width:0;}',
+      '.v251-quote-dots{display:flex;gap:4px;align-items:center;}',
+      '.v251-quote-dots i{display:block;width:4px;height:4px;border-radius:50%;background:#b39257;animation:v251-dot 1.3s ease-in-out infinite;}',
+      '.v251-quote-dots i:nth-child(2){animation-delay:.15s;}.v251-quote-dots i:nth-child(3){animation-delay:.3s;}',
+      '@keyframes v251-sheen{to{transform:translateX(100%)}}',
+      '@keyframes v251-soft-pulse{50%{opacity:.75}}',
+      '@keyframes v251-spin{to{transform:rotate(360deg)}}',
+      '@keyframes v251-dot{0%,75%,100%{opacity:.25;transform:translateY(0)}35%{opacity:1;transform:translateY(-3px)}}',
+      '@media(prefers-reduced-motion:reduce){.v250-size-cta,.v250-size-cta .v250-size-cta-arrow,.v251-quote-spinner,.v251-quote-dots i,#product-sheet .product-gallery-slide:not(.is-ready)::after,#commerce-basket-items img.v251-image-loading,#checkout-item-list img.v251-image-loading{animation:none!important;}#product-sheet.sheet--product{transition:none!important;}#product-fit .v250-fit-arrow,#commerce-fit .v250-fit-arrow{transition:none!important;}}'
     ].join('\n');
     root.appendChild(premiumStyle);
     var productPanel=v248X('product-sheet');
@@ -10243,6 +10271,17 @@ function closeShopDetail() {
     });
     click('product-lightbox-close',v248XCloseLightbox);
     click('checkout-place-order',function(e){e.preventDefault();});
+    // Quiet, inline loading state for the authoritative delivery quotation.
+    var delivery=v248X('checkout-delivery'),shippingError=v248X('checkout-shipping-error');
+    if(delivery&&shippingError){
+      var checking=v248XElement('div','v251-quote-wait');
+      checking.id='v251-quote-wait';checking.hidden=true;
+      checking.setAttribute('role','status');checking.setAttribute('aria-live','polite');
+      checking.innerHTML='<span class="v251-quote-spinner" aria-hidden="true"></span>'+
+        '<span class="v251-quote-text">Confirming delivery and total</span>'+
+        '<span class="v251-quote-dots" aria-hidden="true"><i></i><i></i><i></i></span>';
+      delivery.insertBefore(checking,shippingError);
+    }
     click('checkout-shipping-retry',v248XRequestQuote);
     click('checkout-address-entry',function(){v248XGoProfile();});
     click('checkout-address-compact',function(){v248XGoProfile();});
@@ -10307,7 +10346,8 @@ function closeShopDetail() {
       else if(!e.shiftKey&&root.activeElement===nodes[nodes.length-1]){e.preventDefault();nodes[0].focus();}
     });
 
-    // Reference Product Sheet grab/expand/collapse gesture.
+    // Preserve the initial 72% peek; a genuine downward content scroll expands
+    // the sheet once to 96%. Drag and keyboard controls retain their behavior.
     var grab=v248X('product-grab'),productSheet=v248X('product-sheet');
     if(grab&&productSheet){
       var sheetGesture=null;
@@ -10315,12 +10355,26 @@ function closeShopDetail() {
         var vh=window.innerHeight||800;
         var ratio=height/vh;
         if(ratio<.40){v248XCloseAll();return;}
-        productSheet.style.height=(ratio>.82?'96%':'72%');
+        var expand=ratio>.82;
+        productSheet.classList.remove('is-dragging');
+        // Establish the current dragged pixel height before smoothly snapping.
+        void productSheet.offsetHeight;
+        productSheet.classList.toggle('is-expanded',expand);
+        productSheet.style.height='';
       }
+      var contentScroll=v248X('product-scroll');
+      if(contentScroll)contentScroll.addEventListener('scroll',function(){
+        if(v248Exact.current==='product'&&!productSheet.classList.contains('is-expanded')&&
+           !productSheet.classList.contains('is-dragging')&&contentScroll.scrollTop>32){
+          productSheet.style.height='';
+          productSheet.classList.add('is-expanded');
+        }
+      },{passive:true});
       grab.addEventListener('pointerdown',function(e){
         if(e.target.closest('button'))return;
         if(e.button!==0)return;
         sheetGesture={pointer:e.pointerId,y:e.clientY,h:productSheet.getBoundingClientRect().height,moved:false};
+        productSheet.classList.add('is-dragging');
         if(grab.setPointerCapture)grab.setPointerCapture(e.pointerId);
       });
       grab.addEventListener('pointermove',function(e){
@@ -10335,14 +10389,17 @@ function closeShopDetail() {
       });
       function endGrab(e){
         if(!sheetGesture||e.pointerId!==sheetGesture.pointer)return;
-        if(sheetGesture.moved)sheetSnap(productSheet.getBoundingClientRect().height);
+        var height=productSheet.getBoundingClientRect().height;
         sheetGesture=null;
+        sheetSnap(height);
       }
       grab.addEventListener('pointerup',endGrab);
       grab.addEventListener('pointercancel',endGrab);
       grab.addEventListener('keydown',function(e){
         if(e.key!=='ArrowUp'&&e.key!=='ArrowDown')return;
-        e.preventDefault();productSheet.style.height=e.key==='ArrowUp'?'96%':'72%';
+        e.preventDefault();
+        productSheet.style.height='';
+        productSheet.classList.toggle('is-expanded',e.key==='ArrowUp');
       });
     }
     // Reference commerce-header dismissal by downward pan; no data writes.
@@ -10402,7 +10459,13 @@ function closeShopDetail() {
     v248X('commerce-panel').dataset.view=view==='basket'?'basket':'variant';
     var app=x.shadow.querySelector('.app');
     if(app)app.classList.toggle('is-product-peek',prod);
-    if(prod){v248X('product-scroll').scrollTop=0;v248X('product-sheet').focus({preventScroll:true});}
+    if(prod){
+      var product=v248X('product-sheet');
+      product.classList.remove('is-expanded','is-dragging');
+      product.style.height='';
+      v248X('product-scroll').scrollTop=0;
+      product.focus({preventScroll:true});
+    }
     if(view==='variant'){v248XPaintVariant();v248X('commerce-close').focus({preventScroll:true});}
     if(view==='basket'){v248XRenderBasket();v248X('commerce-close').focus({preventScroll:true});}
     if(checkout){v248XRenderCheckout();var b=x.shadow.querySelector('#checkout-screen .checkout-header button');if(b)b.focus({preventScroll:true});}
@@ -10679,9 +10742,10 @@ function closeShopDetail() {
     else scroll.scrollTop=top;
   }
   function v250ScrollProductGuide(){
-    var table=v248Exact.shadow&&v248Exact.shadow.querySelector(
-      '#product-size-guides .product-size-table-wrap');
-    v250ScrollWithin(v248X('product-scroll'),table||v248X('product-size-guides'),66);
+    // Keep the Set 1 / Set 2 / Set 3 tabs in view above the measurement table.
+    var tabs=v248Exact.shadow&&v248Exact.shadow.querySelector(
+      '#product-size-guides .modern-length-tabs');
+    v250ScrollWithin(v248X('product-scroll'),tabs||v248X('product-size-guides'),66);
   }
   function v250ScrollVariantOptions(){
     var group=v248Exact.shadow&&v248Exact.shadow.querySelector(
@@ -10819,7 +10883,9 @@ function closeShopDetail() {
         submit.title='Find my size';
         submit.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true">'+
           '<path d="M4.5 12h15m-6-6 6 6-6 6"/></svg>';
-        actions.appendChild(submit);form.appendChild(actions);
+        actions.appendChild(submit);
+        // Same row as Height and Weight, after the second input.
+        (fields||form).appendChild(actions);
       }
       if(!form.dataset.connected){
         // Input changes invalidate previous suggestions; only explicit
@@ -10953,7 +11019,8 @@ function closeShopDetail() {
     // Use only the seller-verified structured sets; no D06 sample measurements.
     var unavailable=v248X('product-size-unavailable');
     if(unavailable)unavailable.hidden=true;
-    v248XText('product-size-status','Size Finder and garment measurements');
+    var sizeStatus=v248X('product-size-status');
+    if(sizeStatus){sizeStatus.textContent='';sizeStatus.hidden=true;}
     v248XBindFit();v248XRefreshTables();
     v248XShow('product');
   }
@@ -11053,7 +11120,7 @@ function closeShopDetail() {
       var card=v248XElement('article','commerce-basket-item');
       var img=v248XElement('img');
       var image=String(meta.image||product&&product.primary_image&&(product.primary_image.delivery_ref||product.primary_image.delivery_url)||'');
-      if(v248XValidImage(image))img.src=image;else img.hidden=true;
+      if(v248XValidImage(image)){v251MarkImagePending(img);img.src=image;}else img.hidden=true;
       img.alt=product&&product.title||meta.title||'Product';card.appendChild(img);
       var body=v248XElement('div');
       body.appendChild(v248XElement('strong','commerce-product-name',product&&product.title||meta.title||'Product'));
@@ -11129,7 +11196,7 @@ function closeShopDetail() {
       var img=v248XElement('img');
       var url=String(meta.image||row.product&&row.product.primary_image&&
        (row.product.primary_image.delivery_ref||row.product.primary_image.delivery_url)||'');
-      if(v248XValidImage(url))img.src=url;else img.hidden=true;
+      if(v248XValidImage(url)){v251MarkImagePending(img);img.src=url;}else img.hidden=true;
       img.alt=row.product&&row.product.title||meta.title||'Product';
       card.appendChild(img);
       var info=v248XElement('div','checkout-item-info');
@@ -11140,6 +11207,8 @@ function closeShopDetail() {
       if(row.price==null)complete=false;else subtotal+=row.price*item.quantity;
     });
     var quote=v248Exact.quote;
+    var pending=v248X('v251-quote-wait');
+    if(pending)pending.hidden=!v248Exact.quoting;
     v248XText('checkout-subtotal',quote&&quote.subtotal_sen!=null?money(quote.subtotal_sen):
       complete?money(subtotal):'Pending');
     v248XText('checkout-shipping-subtotal',quote?money(quote.shipping_sen):
