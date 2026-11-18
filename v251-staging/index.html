@@ -7922,8 +7922,9 @@ body.is-discover .site-tabs{z-index:45!important}
 .sheet-layer,.commerce-layer,.checkout-layer{position:absolute;inset:0}
 #product-sheet{min-height:0}
 #product-deals,#product-reviews,#product-review-panel,#review-viewer,#product-deal-modal,
-#commerce-chat,#checkout-view-complete,#checkout-view-addresses,#checkout-view-address-form,
-#checkout-email{display:none!important}
+#commerce-chat,#checkout-email{display:none!important}
+/* v2.51 working checkout screens stay in DOM and hide only when inactive. */
+#checkout-view-complete[hidden],#checkout-view-addresses[hidden],#checkout-view-address-form[hidden]{display:none!important}
 #commerce-basket-items .commerce-basket-item img,#checkout-item-list .checkout-item img{object-fit:contain}
 #commerce-price-note,#commerce-variant .commerce-set-note,#product-sheet .product-preview-label{display:none!important}
 #checkout-view>.checkout-disclaimer,#checkout-payment-confirm,#checkout-new-attempt,
@@ -9162,6 +9163,22 @@ body.is-discover .site-tabs{z-index:45!important}
                         id="checkout-address-state"
                         required>
                   <option value="">Select state</option>
+                  <option value="Johor">Johor</option>
+                  <option value="Kedah">Kedah</option>
+                  <option value="Kelantan">Kelantan</option>
+                  <option value="Kuala Lumpur">Kuala Lumpur</option>
+                  <option value="Labuan">Labuan</option>
+                  <option value="Melaka">Melaka</option>
+                  <option value="Negeri Sembilan">Negeri Sembilan</option>
+                  <option value="Pahang">Pahang</option>
+                  <option value="Perak">Perak</option>
+                  <option value="Perlis">Perlis</option>
+                  <option value="Pulau Pinang">Pulau Pinang</option>
+                  <option value="Putrajaya">Putrajaya</option>
+                  <option value="Sabah">Sabah</option>
+                  <option value="Sarawak">Sarawak</option>
+                  <option value="Selangor">Selangor</option>
+                  <option value="Terengganu">Terengganu</option>
                 </select>
               </label>
 
@@ -9178,15 +9195,14 @@ body.is-discover .site-tabs{z-index:45!important}
 
               <button class="checkout-primary"
                       type="submit">
-                Save address · Preview
+                Save address
               </button>
 
             </form>
 
             <p class="checkout-muted">
-              Use your delivery details. Saved addresses will appear when available.
-              City and state suggestions come from the Malaysia Open
-              Data postcode list (CC BY 4.0).
+              Enter your delivery details for this order. Your address is checked
+              with the final order total before payment.
             </p>
 
           </section>
@@ -10161,10 +10177,11 @@ function closeShopDetail() {
     // Keep owner-reference Deals/Reviews sections, but never display their
     // unconnected D06 sample ratings, discounts or orders to real shoppers.
     ['product-review-panel','review-viewer','product-deal-modal',
-     'checkout-view-complete','checkout-view-addresses',
-     'checkout-view-address-form','checkout-email'].forEach(function(id){
+     'checkout-email'].forEach(function(id){
       var n=v248X(id);if(n){n.hidden=true;if(id!=='checkout-email')n.replaceChildren();}
     });
+    // Address form, address list and verified-payment confirmation must remain
+    // available; v248XShowCheckoutView_ controls their [hidden] attributes.
     var deals=v248X('product-deals');
     if(deals){
       deals.replaceChildren();
