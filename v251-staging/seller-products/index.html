@@ -333,7 +333,23 @@
       <span class="char-count" id="nameCount">0 / 255</span>
       <label class="form-label" for="category">Category <span class="required">*</span></label>
       <select class="field" id="category"><option value="">Choose a category</option></select>
+      <div class="cart-actions" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">
+        <button type="button" class="mini-action" id="btnAddCategory">Add category</button>
+        <button type="button" class="mini-action" id="btnManageCategories">Manage categories</button>
+      </div>
+      <p class="helper">Categories load from your catalog. Renaming keeps product links; disabling hides a category from new picks without changing existing products.</p>
+      <label class="form-label" for="styleCode">Style code</label>
+      <input class="field" id="styleCode" maxlength="32" placeholder="e.g. W06" autocomplete="off" spellcheck="false">
+      <p class="helper">Seller-defined product code for order summaries. Unique across products. Not derived from category.</p>
+      <label class="form-label" for="orderDisplayName">Order display name</label>
+      <input class="field" id="orderDisplayName" maxlength="120" placeholder="e.g. Nidha Premium Dubai" autocomplete="off">
+      <p class="helper">Concise name for WhatsApp, My Order and receipts. Leave blank to keep using the full product name.</p>
     </section>
+    <div id="categoryManagePanel" class="form-section" hidden>
+      <h2 class="section-title">Manage categories</h2>
+      <div id="categoryManageList" aria-live="polite"></div>
+      <button type="button" class="mini-action" id="btnCloseCategoryManage">Done</button>
+    </div>
     <section class="form-section">
       <h2 class="section-title">Product details</h2>
       <label class="form-label" for="description">Description <span class="required">*</span></label>
@@ -589,6 +605,9 @@
       if(serial!==state.requestSerial)return;
       if(!Array.isArray(r.products))throw new Error('Product list unavailable');
       state.products=r.products;state.categories=Array.isArray(r.categories)?r.categories:[];
+      state.categoriesManage=Array.isArray(r.categories_manage)?r.categories_manage:state.categories.map(function(c){
+        return {category_id:c.category_id,label:c.label,is_enabled:true,position:0};
+      });
       // Older GAS deployments silently truncate variation group three. Refuse save until upgraded.
       state.backendMaxVariationGroups=Number(r.max_variation_groups)===3?3:2;
       state.chunkedIntentSupported=r.chunked_intent_supported===true;
@@ -1186,12 +1205,63 @@
       }
     });
   }
+  function fillCategorySelect(selectedId) {
+    var select=$('category');
+    select.replaceChildren();
+    var empty=node('option','', 'Choose a category');empty.value='';select.appendChild(empty);
+    var seen={};
+    (state.categories||[]).forEach(function(c){
+      var id=String(c.category_id||c.id||'');
+      if(!id||seen[id])return;
+      seen[id]=true;
+      var o=node('option','',c.label||c.name||c.category_name||id);o.value=id;select.appendChild(o);
+    });
+    selectedId=String(selectedId||'');
+    if(selectedId && !seen[selectedId]){
+      var manage=(state.categoriesManage||[]).filter(function(c){return String(c.category_id)===selectedId;})[0];
+      var o=node('option','',(manage&&manage.label?manage.label:selectedId)+(manage&&manage.is_enabled===false?' (disabled)':''));
+      o.value=selectedId;select.appendChild(o);
+    }
+    select.value=selectedId;
+  }
+  function renderCategoryManage() {
+    var host=$('categoryManageList');
+    if(!host)return;
+    host.replaceChildren();
+    (state.categoriesManage||[]).forEach(function(c){
+      var row=node('div');row.style.cssText='display:flex;gap:8px;align-items:center;margin:8px 0;flex-wrap:wrap';
+      var input=node('input','field');input.value=String(c.label||'');input.setAttribute('aria-label','Category name');input.style.flex='1';
+      var save=node('button','mini-action','Rename');save.type='button';
+      save.addEventListener('click',async function(){
+        try{
+          setBusy(true);notice('Updating category…');
+          var r=await rpc('arabistaDevSellerProductsV247UpdateCategory',{category_id:c.category_id,label:input.value});
+          if(!(r&&r.ok&&r.category))throw new Error((r&&(r.message||r.reason))||'Category update failed');
+          await loadList();fillCategorySelect($('category').value);renderCategoryManage();
+          notice('Category updated.','success');
+        }catch(e){notice(errorText(e),'error');}
+        finally{setBusy(false);}
+      });
+      var toggle=node('button','mini-action',c.is_enabled===false?'Enable':'Disable');toggle.type='button';
+      toggle.addEventListener('click',async function(){
+        try{
+          setBusy(true);notice('Updating category…');
+          var r=await rpc('arabistaDevSellerProductsV247UpdateCategory',{category_id:c.category_id,is_enabled:c.is_enabled===false});
+          if(!(r&&r.ok&&r.category))throw new Error((r&&(r.message||r.reason))||'Category update failed');
+          await loadList();fillCategorySelect($('category').value);renderCategoryManage();
+          notice(c.is_enabled===false?'Category enabled.':'Category disabled. Existing product links are kept.','success');
+        }catch(e){notice(errorText(e),'error');}
+        finally{setBusy(false);}
+      });
+      row.appendChild(input);row.appendChild(save);row.appendChild(toggle);host.appendChild(row);
+    });
+  }
   function renderEditor() {
     var d=state.editor;
-    $('productName').value=d.title||'';$('category').replaceChildren();
-    var empty=node('option','', 'Choose a category');empty.value='';$('category').appendChild(empty);
-    state.categories.forEach(function(c){var o=node('option','',c.label||c.name||c.category_name);o.value=String(c.category_id||c.id||'');$('category').appendChild(o);});
-    $('category').value=String(d.category_id||'');
+    $('productName').value=d.title||'';
+    fillCategorySelect(d.category_id||'');
+    if($('styleCode'))$('styleCode').value=d.style_code||'';
+    if($('orderDisplayName'))$('orderDisplayName').value=d.order_display_name||'';
     $('description').value=d.long_description||d.description||'';
     $('shortDescription').value=d.short_description||'';
     $('productHighlights').value=(Array.isArray(d.product_highlights)?d.product_highlights:[]).join('\n');
@@ -1251,7 +1321,7 @@
     }catch(e){$('sizeChartImportStatus').textContent='Import blocked: '+e.message;notice(e.message,'error');}
   });
   function resetEditor() {
-    return {title:'',category_id:'',short_description:'',long_description:'',product_highlights:[],media:[],variation_groups:[],variant_media:[],size_guide:{sets:[],image_media_id:null},parcel:null,revision:null,publication_status:'DRAFT'};
+    return {title:'',category_id:'',style_code:'',order_display_name:'',short_description:'',long_description:'',product_highlights:[],media:[],variation_groups:[],variant_media:[],size_guide:{sets:[],image_media_id:null},parcel:null,revision:null,publication_status:'DRAFT'};
   }
   async function openProduct(id,view) {
     if(state.busy)return;
@@ -1279,6 +1349,8 @@
     if(groups.length>3)throw new Error('Use at most three variation groups.');
     combinations(groups);
     d.title=title;d.category_id=category;d.long_description=description;d.short_description=$('shortDescription').value.trim();
+    d.style_code=$('styleCode')?$('styleCode').value.trim():'';
+    d.order_display_name=$('orderDisplayName')?$('orderDisplayName').value.trim():'';
     var highlights=$('productHighlights').value.split(/\r?\n/).map(function(x){return x.trim();}).filter(Boolean);
     if(highlights.length>6)throw new Error('Use no more than six product selling points.');
     if(highlights.some(function(x){return x.length>80;}))throw new Error('Each selling point must be 80 characters or fewer.');
@@ -1399,6 +1471,8 @@
     if(String(p.title||'')!==intent.title || String(p.category_id||'')!==String(intent.category_id)
        || String(p.long_description||p.description||'')!==intent.long_description
        || String(p.short_description||'')!==intent.short_description
+       || String(p.style_code||'')!==String(intent.style_code||'')
+       || String(p.order_display_name||'')!==String(intent.order_display_name||'')
        || String(p.publication_status||'').toUpperCase()!==String(intent.publication_status||'').toUpperCase()) {
       throw new Error('Saved product values or publication status did not match confirmation. Check the database before retrying.');
     }
@@ -1547,6 +1621,7 @@
       var intent={
         product_id:state.selected||null,expected_revision:state.remoteRevision,
         title:request.title,category_id:request.category_id,
+        style_code:request.style_code||'',order_display_name:request.order_display_name||'',
         short_description:request.short_description,long_description:request.long_description,
         product_highlights:request.product_highlights,
         variation_groups:request.variation_groups,media:media,
@@ -1696,11 +1771,35 @@
     renderList();
   });
   $('addProduct').addEventListener('click',newProduct);
-  ['productName','description','shortDescription','category'].forEach(function(id){
+  ['productName','description','shortDescription','category','styleCode','orderDisplayName'].forEach(function(id){
+    if(!$(id))return;
     $(id).addEventListener('input',function(){
       state.dirty=true;state.metaDirty=true;
       if(id==='productName'||id==='description')text($(id==='productName'?'nameCount':'descriptionCount'),$(id).value.length+' / '+$(id).maxLength);
     });
+    if(id==='category')$(id).addEventListener('change',function(){state.dirty=true;state.metaDirty=true;});
+  });
+  if($('btnAddCategory'))$('btnAddCategory').addEventListener('click',async function(){
+    var label=window.prompt('New category name');
+    if(label==null)return;
+    label=String(label||'').trim();
+    if(!label){notice('Enter a category name.','error');return;}
+    try{
+      setBusy(true);notice('Creating category…');
+      var r=await rpc('arabistaDevSellerProductsV247CreateCategory',{label:label});
+      if(!(r&&r.ok&&r.category&&r.category.category_id))throw new Error((r&&(r.message||r.reason))||'Category create failed');
+      await loadList();
+      fillCategorySelect(r.category.category_id);
+      state.dirty=true;state.metaDirty=true;
+      notice('Category added and selected.','success');
+    }catch(e){notice(errorText(e),'error');}
+    finally{setBusy(false);}
+  });
+  if($('btnManageCategories'))$('btnManageCategories').addEventListener('click',function(){
+    if($('categoryManagePanel')){$('categoryManagePanel').hidden=false;renderCategoryManage();}
+  });
+  if($('btnCloseCategoryManage'))$('btnCloseCategoryManage').addEventListener('click',function(){
+    if($('categoryManagePanel'))$('categoryManagePanel').hidden=true;
   });
   $('images').addEventListener('change',function(e){
     var files=Array.from(e.target.files||[]);
