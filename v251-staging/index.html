@@ -2540,7 +2540,7 @@ body.is-discover .site-tabs{z-index:45!important}
           <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="10" width="14" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
           Your order history is private.
         </div>
-        <details class="data-disclosure"><summary>DEV diagnostics (redacted)</summary><pre id="order"></pre></details>
+        <pre id="order" hidden aria-hidden="true"></pre>
       </div>
     </div>
   </section>
@@ -9421,6 +9421,84 @@ body.is-discover .site-tabs{z-index:45!important}
     $(id).textContent = redactedDevJson(value);
   }
 
+  function scrollOrderSummaryIntoView_() {
+    var host = $('orderSummary');
+    if (!host || host.hidden) return;
+    try {
+      host.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    } catch (scrollErr) {
+      try { host.scrollIntoView(true); } catch (legacyErr) {}
+    }
+  }
+
+  function applyOwnedOrderSuccess_(owned, fallbackOrderId, fallbackCheckoutId, noticeText) {
+    if (!(owned && owned.ok && owned.order)) {
+      if ($('orderNotice')) {
+        $('orderNotice').textContent = (owned && (owned.message || owned.reason || owned.outcome))
+          ? String(owned.message || owned.reason || owned.outcome)
+          : 'This linked order could not be opened. Sign in again or try another order.';
+      }
+      showOrderSummary(null);
+      return false;
+    }
+    if (owned.access_grant_token) state.grant = owned.access_grant_token;
+    state.last = state.last || {};
+    state.last.order_id = owned.order_id || owned.order.order_id || fallbackOrderId || state.last.order_id;
+    state.last.checkout_id = owned.checkout_id
+      || (owned.order && owned.order.checkout_id)
+      || fallbackCheckoutId
+      || state.last.checkout_id;
+    if (owned.order.invoice_no || owned.order.order_number) {
+      state.last.order_number = owned.order.invoice_no || owned.order.order_number;
+    }
+    persistPurchaseSession();
+    showOrderSummary(owned);
+    scrollOrderSummaryIntoView_();
+    if ($('orderNotice')) {
+      $('orderNotice').textContent = noticeText || 'Opened one of your linked orders.';
+    }
+    try { setCheckoutStep(3); } catch (stepErr) {}
+    renderProfile();
+    return true;
+  }
+
+  function openOwnedLinkedOrder_(orderId, checkoutId, noticeText) {
+    if (!isIdentitySignedIn()) {
+      if ($('orderNotice')) {
+        $('orderNotice').textContent = 'Sign in to open an account-linked order.';
+      }
+      return;
+    }
+    if (!orderId) {
+      if ($('orderNotice')) {
+        $('orderNotice').textContent = 'Choose a linked order to open.';
+      }
+      return;
+    }
+    if ($('orderNotice')) $('orderNotice').textContent = '';
+    busy('orderBusy', true, 'Opening your order…');
+    call('arabistaDevCustomerIdentityOpenOwnedOrderV244', {
+      access_token: state.identityAccessToken,
+      order_id: orderId
+    }, function (owned) {
+      busy('orderBusy', false);
+      render('order', owned);
+      applyOwnedOrderSuccess_(owned, orderId, checkoutId, noticeText);
+      var orderPre = $('order');
+      if (orderPre && orderPre.closest) {
+        var details = orderPre.closest('details');
+        if (details) details.open = false;
+      }
+    }, function (failure) {
+      busy('orderBusy', false);
+      render('order', failure);
+      showOrderSummary(null);
+      if ($('orderNotice')) {
+        $('orderNotice').textContent = 'Order status unavailable. Try again.';
+      }
+    });
+  }
+
   function showOrderSummary(payload) {
     var host = $('orderSummary');
     clear(host);
@@ -12572,7 +12650,7 @@ function closeShopDetail() {
     if ($('btnQuote')) $('btnQuote').disabled = count < 1;
     if ($('v248CheckoutOpen')) $('v248CheckoutOpen').disabled = count < 1;
     if ($('btnExecute')) $('btnExecute').disabled =
-      window.__ARABISTA_V248_ASSET_BASE__ === '/v251-staging' || ls.length < 2;
+      window.__ARABISTA_V248_ASSET_BASE__ === '/v248-staging' || ls.length < 2;
     if ($('btnClear')) $('btnClear').disabled = count < 1;
     function cartBtn(name, label, cls) {
       var n = el('button', name, cls); n.type = 'button'; n.setAttribute('aria-label', label);
@@ -12782,24 +12860,16 @@ function closeShopDetail() {
         label.textContent = String(link.external_order_id || '') + ' · ' + String(link.link_state || '');
         var btn = document.createElement('button');
         btn.type = 'button';
-        btn.className = 'action-secondary';
+        btn.className = 'action-secondary linked-order-open';
         btn.textContent = 'Open';
+        btn.setAttribute('data-order-id', String(link.external_order_id || ''));
+        btn.setAttribute('data-checkout-id', String(link.external_checkout_id || ''));
         btn.addEventListener('click', function () {
-          call('arabistaDevCustomerIdentityOpenOwnedOrderV244', {
-            access_token: state.identityAccessToken,
-            order_id: link.external_order_id
-          }, function (owned) {
-            render('order', owned);
-            if (owned && owned.access_grant_token) {
-              state.grant = owned.access_grant_token;
-              state.last = state.last || {};
-              state.last.order_id = owned.order_id || link.external_order_id;
-              state.last.checkout_id = owned.checkout_id || link.external_checkout_id;
-              persistPurchaseSession();
-              showOrderSummary(owned);
-              if ($('orderNotice')) $('orderNotice').textContent = 'Opened one of your linked orders.';
-            }
-          });
+          openOwnedLinkedOrder_(
+            link.external_order_id,
+            link.external_checkout_id,
+            'Opened one of your linked orders.'
+          );
         });
         row.appendChild(label);
         row.appendChild(btn);
@@ -12808,14 +12878,30 @@ function closeShopDetail() {
     });
   }
 
+  function applyCustomerSurfaceControls_() {
+    var customerSurface = window.__ARABISTA_V251_SANDBOX_CHECKOUT__ === true;
+    [
+      'btnSellerDetail',
+      'btnSettle',
+      'btnDokuReconcile',
+      'btnRecoverAccess',
+      'btnDokuAuthorize'
+    ].forEach(function (id) {
+      var node = $(id);
+      if (node) node.hidden = customerSurface;
+    });
+  }
+
   function renderProfile() {
-    if ($('btnOpenOrder')) $('btnOpenOrder').disabled = !state.grant;
+    var identitySignedIn = isIdentitySignedIn();
+    var canOpen = !!(state.grant || identitySignedIn);
+    if ($('btnOpenOrder')) $('btnOpenOrder').disabled = !canOpen;
     if ($('btnSettle')) $('btnSettle').disabled = !(state.last && state.last.order_id);
     if ($('btnSellerDetail')) $('btnSellerDetail').disabled = !(state.last && state.last.order_id);
     if ($('btnDokuReconcile')) $('btnDokuReconcile').disabled = !(state.grant && state.last && state.last.order_id);
     if ($('btnDokuAuthorize')) $('btnDokuAuthorize').disabled = !(state.last && state.last.order_id && state.last.checkout_id);
     // btnDokuCreate remains capability-gated via syncDokuButtons.
-    var identitySignedIn = isIdentitySignedIn();
+    applyCustomerSurfaceControls_();
     if ($('profileSignedOut')) $('profileSignedOut').hidden = identitySignedIn;
     if ($('profileSignedIn')) $('profileSignedIn').hidden = !identitySignedIn;
     if ($('profilePhoneNumber') && identitySignedIn && $('profilePhoneNumber').value !== (state.identityPhone || '')) {
@@ -14922,39 +15008,63 @@ function attachSheetResizeHandle(handle,sheet,apply,ratio){
   }
 
   $('btnOpenOrder').addEventListener('click', function () {
-    if (!state.grant) {
-      $('orderNotice').textContent = 'A purchase-bound grant is required to view this order.';
-      showOrderSummary(null);
-      render('order', { ok: false, reason: 'purchase_grant_required' });
-      return;
-    }
     if ($('btnOpenOrder').disabled) return;
     showOrderSummary(null);
-    $('orderNotice').textContent = '';
-    busy('orderBusy', true, 'Checking order…');
-    $('btnOpenOrder').disabled = true;
-    call('arabistaDevMyOrderGetByGrant', {
-      order_id: state.last && state.last.order_id,
-      access_grant_token: state.grant
-    }, function (x) {
-      busy('orderBusy', false);
-      $('btnOpenOrder').disabled = !state.grant;
-      render('order', x);
-      showOrderSummary(x);
-      if (x && x.ok) setCheckoutStep(3);
-      $('orderNotice').textContent = x && x.ok
-        ? 'Purchase-bound My Order details loaded from DEV.'
-        : 'Purchase-bound access not verified. Review the service result.';
-      // Order summary is the default customer view; technical JSON stays collapsed.
-      $('order').closest('details').open = false;
-    }, function (failure) {
-      busy('orderBusy', false);
-      $('btnOpenOrder').disabled = !state.grant;
-      showOrderSummary(null);
-      render('order', failure);
-      $('orderNotice').textContent = 'Order status unavailable. Try again.';
-      $('order').closest('details').open = false;
-    });
+    if (state.grant) {
+      $('orderNotice').textContent = '';
+      busy('orderBusy', true, 'Checking order…');
+      $('btnOpenOrder').disabled = true;
+      call('arabistaDevMyOrderGetByGrant', {
+        order_id: state.last && state.last.order_id,
+        access_grant_token: state.grant
+      }, function (x) {
+        busy('orderBusy', false);
+        render('order', x);
+        if (x && x.ok && x.order) {
+          showOrderSummary(x);
+          scrollOrderSummaryIntoView_();
+          try { setCheckoutStep(3); } catch (stepErr) {}
+          $('orderNotice').textContent = 'Your order details are ready.';
+        } else {
+          showOrderSummary(null);
+          $('orderNotice').textContent = (x && (x.message || x.reason || x.outcome))
+            ? String(x.message || x.reason || x.outcome)
+            : 'Order access could not be verified.';
+        }
+        renderProfile();
+      }, function (failure) {
+        busy('orderBusy', false);
+        showOrderSummary(null);
+        render('order', failure);
+        $('orderNotice').textContent = 'Order status unavailable. Try again.';
+        renderProfile();
+      });
+      return;
+    }
+    if (isIdentitySignedIn()) {
+      var linkedOrderId = state.last && state.last.order_id;
+      var linkedCheckoutId = state.last && state.last.checkout_id;
+      var panel = $('linkedOrdersList');
+      if (!linkedOrderId && panel) {
+        var firstBtn = panel.querySelector('button.linked-order-open');
+        if (firstBtn) {
+          linkedOrderId = firstBtn.getAttribute('data-order-id') || '';
+          linkedCheckoutId = firstBtn.getAttribute('data-checkout-id') || '';
+        }
+      }
+      if (linkedOrderId) {
+        openOwnedLinkedOrder_(
+          linkedOrderId,
+          linkedCheckoutId,
+          'Opened your account-linked order.'
+        );
+        return;
+      }
+      $('orderNotice').textContent = 'Open a linked order from Account orders below, or complete a purchase in this session.';
+      return;
+    }
+    $('orderNotice').textContent = 'Sign in or use the original purchase session to view your order.';
+    render('order', { ok: false, reason: 'purchase_grant_or_sign_in_required' });
   });
 
   $('btnSellerDetail').addEventListener('click', function () {
@@ -15075,15 +15185,7 @@ function attachSheetResizeHandle(handle,sheet,apply,ratio){
         invoice_no: invoice || undefined
       }, function (x) {
         render('order', x);
-        if (x && x.access_grant_token) {
-          state.grant = x.access_grant_token;
-          if (x.order_id) {
-            state.last = state.last || {};
-            state.last.order_id = x.order_id;
-          }
-          persistPurchaseSession();
-          showOrderSummary(x);
-        }
+        applyOwnedOrderSuccess_(x, null, null, 'Opened your account-linked order.');
       });
     }
     return true;
@@ -15398,15 +15500,7 @@ function attachSheetResizeHandle(handle,sheet,apply,ratio){
             order_id: state.pendingInvoiceLocator ? undefined : (state.last && state.last.order_id)
           }, function (owned) {
             render('order', owned);
-            if (owned && owned.access_grant_token) {
-              state.grant = owned.access_grant_token;
-              if (owned.order_id) {
-                state.last = state.last || {};
-                state.last.order_id = owned.order_id;
-              }
-              persistPurchaseSession();
-              showOrderSummary(owned);
-            }
+            applyOwnedOrderSuccess_(owned, null, null, 'Opened your account-linked order.');
           });
         });
         return;
@@ -15458,11 +15552,7 @@ function attachSheetResizeHandle(handle,sheet,apply,ratio){
               order_id: state.pendingInvoiceLocator ? undefined : (state.last && state.last.order_id)
             }, function (owned) {
               render('order', owned);
-              if (owned && owned.access_grant_token) {
-                state.grant = owned.access_grant_token;
-                persistPurchaseSession();
-                showOrderSummary(owned);
-              }
+              applyOwnedOrderSuccess_(owned, null, null, 'Account activated. Your linked order is ready.');
             });
           }
         });
@@ -15493,18 +15583,12 @@ function attachSheetResizeHandle(handle,sheet,apply,ratio){
           order_id: state.pendingInvoiceLocator ? undefined : (state.last && state.last.order_id)
         }, function (owned) {
           render('order', owned);
-          if (owned && owned.access_grant_token) {
-            state.grant = owned.access_grant_token;
-            if (owned.order_id) {
-              state.last = state.last || {};
-              state.last.order_id = owned.order_id;
-            }
-            persistPurchaseSession();
-            showOrderSummary(owned);
-            if ($('orderNotice')) {
-              $('orderNotice').textContent = 'Signed-in ownership verified. Private order details loaded.';
-            }
-          } else if ($('orderNotice')) {
+          if (!applyOwnedOrderSuccess_(
+            owned,
+            null,
+            null,
+            'Signed-in ownership verified. Private order details loaded.'
+          ) && $('orderNotice') && !(owned && owned.ok && owned.order)) {
             $('orderNotice').textContent = 'Signed in. No linked order opened yet — complete checkout or use a WhatsApp locator after activation.';
           }
         });
