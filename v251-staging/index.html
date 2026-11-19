@@ -285,7 +285,6 @@
     .info-item{border-top:1px solid var(--a-line);padding-top:14px}
     .info-item strong{display:block;font:400 17px/1.4 var(--a-serif)}
     .muted{color:var(--a-muted)}
-    #profileState{max-width:620px;line-height:1.8;color:var(--a-muted)}
     .stage{box-shadow:0 0 38px rgba(0,0,0,.18)}
     .caption{font-size:clamp(14px,1.5vw,16px)}
     .type-tag{border-radius:2px}
@@ -511,7 +510,6 @@
     .order-status-grid strong {font:700 15px/1.3 var(--v231-ui);color:#252525}
     .info-item {border-color:var(--v231-line)}
     .info-item strong {font:700 13px/1.4 var(--v231-ui);color:#333}
-    #profileState {color:#666;font-size:13px}
     .coin-busy {display:flex;align-items:center;gap:11px;font-size:12px;font-weight:600;
       color:#806437;padding:10px 0}
     .coin-busy[hidden] {display:none}
@@ -2329,163 +2327,94 @@ body.is-discover .site-tabs{z-index:45!important}
 @media(min-width:761px){#cart .v248-bag-panel{max-width:960px;margin:auto}}
 @media(prefers-reduced-motion:reduce){#cart .v248-bag-panel{transition:none!important}}
 
-/* v2.51 · Premium My Orders / Profile — source-authored, bounded to these two tabs. */
-#main.v251-account-main{padding:0!important;background:#faf9f6!important;scrollbar-color:#d9d0c2 transparent}
-#orders.v251-orders{background:#faf9f6!important;color:#24211e!important;min-height:100%;font-family:"DM Sans","Inter",sans-serif!important}
-#orders.v251-orders [hidden]{display:none!important}
-.v251-account-container,.v251-orders .v251-account-container{max-width:1040px;margin:0 auto;padding:clamp(32px,5vw,70px) clamp(20px,5.5vw,58px) calc(115px + env(safe-area-inset-bottom,0px))}
-.v251-overline{font:700 10px/1.4 "DM Sans",sans-serif!important;letter-spacing:.23em;color:#9e8866!important;text-transform:uppercase}
-.v251-account-heading{border-bottom:1px solid #e8e2d9;padding-bottom:36px;margin-bottom:35px}
-.v251-account-heading h1{font:500 clamp(46px,7vw,74px)/.99 "Cormorant Garamond",Georgia,serif!important;letter-spacing:-.045em;color:#25211e;margin:14px 0 10px}
-.v251-heading-period{color:#b59871}
-.v251-account-heading p{font:400 14px/1.7 "DM Sans",sans-serif!important;color:#807970;max-width:480px;margin:0}
-.v251-section-heading{display:flex;align-items:end;justify-content:space-between;gap:18px;margin-bottom:18px}
-.v251-section-heading h2{font:500 30px/1.1 "Cormorant Garamond",Georgia,serif!important;letter-spacing:-.025em;color:#292522;margin:7px 0 0}
-.v251-order-count{font:600 11px "DM Sans",sans-serif;color:#928674}
-.v251-order-list{display:grid;gap:14px}
-.v251-order-card{width:100%;display:block;text-align:left;border:1px solid #e9e3da;background:#fff;border-radius:18px;padding:22px 24px;color:#292522;cursor:pointer;box-shadow:0 7px 24px rgba(43,32,21,.035);transition:border-color .22s,transform .22s,box-shadow .22s}
-.v251-order-card:hover{border-color:#c5b090;box-shadow:0 13px 28px rgba(43,32,21,.065);transform:translateY(-2px)}
-.v251-order-card:focus-visible,.v251-order-back:focus-visible{outline:2px solid #bca37e;outline-offset:3px}
-.v251-order-card-top,.v251-order-card-bottom{display:flex;align-items:center;justify-content:space-between;gap:16px}
-.v251-order-card-top{padding-bottom:20px;border-bottom:1px solid #f0ede8}
-.v251-order-card-ref{display:flex;flex-direction:column;gap:6px;min-width:0}
-.v251-order-card-ref strong{font:600 14px/1.35 "DM Sans",sans-serif;color:#322c25;overflow-wrap:anywhere}
-.v251-order-card-ref small{font:400 11px/1.4 "DM Sans",sans-serif;color:#968d82}
-.v251-order-pill{white-space:nowrap;flex:none;border:1px solid #dfd6c7;background:#faf7f0;color:#7f6543;border-radius:100px;padding:7px 12px;font:600 10px/1.25 "DM Sans",sans-serif;letter-spacing:.02em}
-.v251-order-card-body{display:flex;align-items:center;gap:18px;padding:18px 0}
-.v251-order-cover,.v251-item-cover{width:72px;height:83px;border-radius:10px;background:#eee8dc;display:grid;place-items:center;flex:none;overflow:hidden;color:#9b886d;font:500 26px "Cormorant Garamond",serif}
-.v251-order-cover img,.v251-item-cover img{width:100%;height:100%;object-fit:cover}
-.v251-order-card-description{display:grid;gap:5px;min-width:0}
-.v251-order-card-description strong{font:600 14px/1.35 "DM Sans",sans-serif;color:#342e27}
-.v251-order-card-description small{font:400 12px/1.55 "DM Sans",sans-serif;color:#8a8176}
-.v251-order-card-bottom{padding-top:15px;border-top:1px solid #f0ede8}
-.v251-order-card-bottom span{font:500 12px "DM Sans",sans-serif;color:#7a7369}
-.v251-order-card-bottom b{font:600 12px "DM Sans",sans-serif;color:#7e6547}
-.v251-orders-empty{border:1px solid #e8e2d8;background:#fff;border-radius:18px;padding:clamp(34px,6vw,62px) 22px;text-align:center}
-.v251-empty-mark{display:grid;place-items:center;margin:0 auto 16px;width:58px;height:58px;border-radius:50%;background:#f2ede5;color:#9b805b;font:500 28px "Cormorant Garamond",serif}
-.v251-orders-empty h3{font:500 31px/1.15 "Cormorant Garamond",Georgia,serif;color:#302a25;margin:0}
-.v251-orders-empty p{color:#8b8175;max-width:340px;margin:12px auto 18px;font:400 13px/1.65 "DM Sans",sans-serif}
-.v251-dark-button{display:inline-flex;align-items:center;justify-content:center;gap:14px;border:1px solid #272421;background:#272421;color:white;border-radius:9px;padding:13px 19px;font:600 12px "DM Sans",sans-serif;min-height:45px;cursor:pointer}
-.v251-dark-button:hover{background:#544435}
-.v251-quiet-link{padding:8px 0;border:0;background:transparent;color:#8a6d47;text-decoration:none;font:600 12px "DM Sans",sans-serif;cursor:pointer}
-.v251-order-session{margin-top:18px;padding:23px;border:1px solid #e8e2d9;background:#fff;border-radius:17px}
-.v251-order-session-inner{display:flex;align-items:center;justify-content:space-between;gap:18px;margin:9px 0}
-.v251-order-session strong{font:600 15px "DM Sans",sans-serif}
-.v251-order-session p{color:#888077;font:400 12px/1.5 "DM Sans",sans-serif;margin:6px 0 0}
-.v251-order-notice:empty{display:none}
-.v251-order-notice{font:400 12px/1.65 "DM Sans",sans-serif;color:#71665b;margin:9px 0}
-.v251-privacy-note{text-align:center;margin:28px auto 0;font:400 11px/1.5 "DM Sans",sans-serif;color:#9c9186}
-.v251-privacy-note span{color:#b79a70;padding-right:6px}
-.v251-order-detail-layer{position:fixed;inset:0;z-index:120;background:rgba(25,23,21,.64);display:flex;justify-content:center;align-items:stretch;animation:v251FadeIn .24s ease both}
-.v251-order-detail-frame{display:flex;flex-direction:column;width:min(100%,920px);height:100%;max-height:100dvh;background:#faf9f6;overflow:hidden;box-shadow:0 14px 70px #0003}
-.v251-order-detail-head{flex:none;display:flex;align-items:center;justify-content:space-between;gap:12px;background:#fff;border-bottom:1px solid #eee7dc;padding:calc(16px + env(safe-area-inset-top,0px)) clamp(20px,4vw,38px) 17px}
-.v251-order-back{background:transparent;border:0;padding:8px 0;display:inline-flex;align-items:center;gap:10px;color:#544a3e;font:600 12px "DM Sans",sans-serif;cursor:pointer}
-.v251-order-back span{font-size:22px;font-weight:400}
-.v251-detail-brand{color:#302820;font:700 11px "DM Sans",sans-serif;letter-spacing:.17em;white-space:nowrap}
-.v251-detail-brand span{color:#b69a72}
-.v251-order-head-spacer{width:70px}
-.v251-order-detail-scroll{min-height:0;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;padding:clamp(24px,5vw,55px) clamp(20px,6vw,65px) calc(60px + env(safe-area-inset-bottom,0px))}
-.v251-order-summary{border:0!important;padding:0!important;margin:0!important;background:transparent!important;box-shadow:none!important;color:#302b25}
-.v251-order-summary .v251-detail-kicker{font:700 10px "DM Sans",sans-serif;letter-spacing:.24em;color:#a28b6d;margin-bottom:11px}
-.v251-order-summary .v251-detail-title{font:500 clamp(43px,7vw,68px)/.97 "Cormorant Garamond",Georgia,serif;margin:0;color:#292520;letter-spacing:-.035em}
-.v251-order-summary .v251-detail-invoice{margin:11px 0 24px;color:#81776a;font:400 12px "DM Sans",sans-serif;overflow-wrap:anywhere}
-.v251-order-summary .v251-detail-hero{padding:25px;background:#292622;border-radius:17px;color:#fff;margin:0 0 30px;display:flex;align-items:center;justify-content:space-between;gap:20px}
-.v251-order-summary .v251-detail-hero strong{display:block;font:500 26px "Cormorant Garamond",Georgia,serif;color:#fff}
-.v251-order-summary .v251-detail-hero small{font:400 11px "DM Sans",sans-serif;color:#d1c4b5;display:block;margin-bottom:7px}
-.v251-order-summary .v251-detail-total{font:600 24px "DM Sans",sans-serif;white-space:nowrap;color:#ecd5af}
-.v251-order-summary .v251-detail-section{border-top:1px solid #e7dfd4;padding:24px 0}
-.v251-order-summary .v251-detail-section h3{font:500 29px "Cormorant Garamond",Georgia,serif;color:#2b2620;margin:0 0 15px}
-.v251-order-summary .v251-detail-item{display:flex;align-items:center;gap:17px;padding:14px 0;border-bottom:1px solid #eee7df}
-.v251-order-summary .v251-detail-item:last-child{border-bottom:0}
-.v251-order-summary .v251-detail-item-copy{min-width:0;flex:1}
-.v251-order-summary .v251-detail-item-copy strong{display:block;font:600 13px/1.5 "DM Sans",sans-serif;color:#302a24}
-.v251-order-summary .v251-detail-item-copy small{display:block;margin-top:7px;font:400 11px "DM Sans",sans-serif;color:#84796d}
-.v251-order-summary .v251-detail-item-price{white-space:nowrap;font:600 13px "DM Sans",sans-serif;color:#2e2821}
-.v251-order-summary .v251-detail-sums{display:grid;gap:12px;padding-top:16px}
-.v251-order-summary .v251-detail-sum{display:flex;justify-content:space-between;gap:18px;font:400 12px "DM Sans",sans-serif;color:#7a7064}
-.v251-order-summary .v251-detail-sum strong{font-weight:600;color:#342d27}
-.v251-order-summary .v251-detail-sum:last-child{padding-top:14px;border-top:1px solid #e9e1d6;font-weight:600;color:#2e2924;font-size:14px}
-.v251-order-summary .v251-detail-timeline{display:grid;gap:0}
-.v251-order-summary .v251-detail-moment{border-left:1px solid #dacbbb;margin-left:6px;padding:0 0 22px 22px;position:relative}
-.v251-order-summary .v251-detail-moment:last-child{border-left-color:transparent;padding-bottom:0}
-.v251-order-summary .v251-detail-moment:before{position:absolute;content:"";left:-5px;top:1px;width:9px;height:9px;border:2px solid #b79d79;border-radius:50%;background:#faf9f6}
-.v251-order-summary .v251-detail-moment strong{font:600 12px "DM Sans",sans-serif;display:block;color:#373026}
-.v251-order-summary .v251-detail-moment p{font:400 12px/1.6 "DM Sans",sans-serif;margin:5px 0 0;color:#85796c}
-@keyframes v251FadeIn{from{opacity:0}to{opacity:1}}
-@media(max-width:620px){
-  .v251-account-container{padding-top:28px!important}
-  .v251-account-heading{padding-bottom:25px;margin-bottom:24px}
-  .v251-section-heading h2{font-size:27px!important}
-  .v251-order-card{padding:17px 17px 16px;border-radius:14px}
-  .v251-order-card-body{gap:13px}
-  .v251-order-cover{width:62px;height:76px}
-  .v251-order-session-inner{align-items:stretch;flex-direction:column}
-  .v251-order-detail-frame{width:100%}
-  .v251-order-detail-head{padding:calc(12px + env(safe-area-inset-top,0px)) 20px 12px}
-  .v251-order-detail-scroll{padding-top:32px}
-  .v251-order-summary .v251-detail-hero{align-items:start;flex-direction:column;padding:22px}
-  .v251-order-summary .v251-detail-total{font-size:22px}
-}
-@media(prefers-reduced-motion:reduce){.v251-order-detail-layer{animation:none}.v251-order-card{transition:none}}
 
-/* v2.51 Profile reset — native, minimal, reference-led. No former editorial Profile UI. */
-#profile.tab {
-  --v251p-ink:#161823; --v251p-muted:#858585; --v251p-line:#eeeeee; --v251p-gold:#b39257;
-  background:#fff!important; color:var(--v251p-ink)!important; color-scheme:light;
-  min-height:100%; font-family:"DM Sans",Inter,system-ui,sans-serif!important;
-}
-#profile.tab [hidden]{display:none!important}
-#profile .v251p-shell{width:min(100%,620px);margin:0 auto;min-height:100%;padding:0 0 calc(105px + env(safe-area-inset-bottom,0px));}
-#profile .v251p-header{display:flex;align-items:center;height:60px;padding:0 21px;border-bottom:1px solid var(--v251p-line);}
-#profile .v251p-header h1{margin:0;font:700 18px/1.3 "DM Sans",sans-serif;letter-spacing:-.025em;color:var(--v251p-ink)}
-#profile .v251p-member{display:flex;align-items:center;gap:15px;padding:31px 21px 29px;border-bottom:8px solid #f7f7f7}
-#profile .v251p-avatar{display:grid;place-items:center;flex:0 0 58px;width:58px;height:58px;background:#1c1c1c;border:1px solid #323232;border-radius:50%;color:#d3b37d;font:600 23px/1 "DM Sans",sans-serif}
-#profile .v251p-member-copy{display:flex;flex-direction:column;gap:5px;min-width:0}
-#profile .v251p-member-copy strong{font:700 19px/1.25 "DM Sans",sans-serif;color:#171717;letter-spacing:-.035em;overflow-wrap:anywhere}
-#profile .v251p-member-copy>span{color:#838383;font:400 12px/1.4 "DM Sans",sans-serif;overflow-wrap:anywhere}
-#profile .v251p-group{padding:26px 21px 0}
-#profile .v251p-group h2{margin:0 0 12px;color:#8b8b8b;font:700 10px/1.3 "DM Sans",sans-serif;letter-spacing:.09em}
-#profile .v251p-menu{border-top:1px solid var(--v251p-line)}
-#profile .v251p-menu-row{display:flex;align-items:center;gap:16px;width:100%;min-height:67px;padding:12px 0;border:0;border-bottom:1px solid var(--v251p-line);background:#fff;color:#202020;text-align:left;cursor:pointer;font:600 14px/1.3 "DM Sans",sans-serif;letter-spacing:-.012em;transition:background .15s ease}
-#profile .v251p-menu-row>span{flex:1;min-width:0}
-#profile .v251p-menu-row small{display:block;font:400 11px/1.35 "DM Sans",sans-serif;color:#939393;margin-top:4px;overflow-wrap:anywhere}
-#profile .v251p-row-icon,#profile .v251p-chevron,#profile .v251p-back svg,#profile .v251p-signedout svg{display:block;fill:none;stroke:currentColor;stroke-width:1.75;stroke-linejoin:round;stroke-linecap:round}
-#profile .v251p-row-icon{width:21px;height:21px;color:#595959;flex:0 0 21px}
-#profile .v251p-chevron{width:17px;height:17px;color:#a2a2a2;flex:0 0 17px}
-#profile .v251p-signout{margin:26px 21px 0;padding:11px 0;border:0;background:none;color:#777;font:600 13px "DM Sans",sans-serif}
-#profile .v251p-subhead{display:grid;grid-template-columns:44px minmax(0,1fr) 44px;align-items:center;min-height:60px;padding:0 12px;border-bottom:1px solid var(--v251p-line)}
-#profile .v251p-subhead h2{text-align:center;margin:0;font:700 16px/1.3 "DM Sans",sans-serif;color:#171717;letter-spacing:-.022em}
-#profile .v251p-back{display:grid;place-items:center;width:44px;height:44px;border:0;background:#fff;color:#222;padding:0}
-#profile .v251p-back svg{width:23px;height:23px}
-#profile .v251p-form{padding:25px 21px 0}
-#profile .v251p-field{display:flex;flex-direction:column;gap:8px;margin:0 0 22px;color:#393939;font:600 12px/1.4 "DM Sans",sans-serif}
-#profile .v251p-field input{display:block;width:100%;height:51px;min-height:51px;border:1px solid #e5e5e5;border-radius:10px;background:#f8f8f8;color:#232323;padding:11px 14px;outline:0;font:400 16px/1.4 "DM Sans",sans-serif;letter-spacing:0;-webkit-appearance:none}
-#profile .v251p-field input:focus{border-color:#bca16f;box-shadow:0 0 0 2px rgba(188,161,111,.12);background:#fff}
-#profile .v251p-field input[readonly]{color:#878787;background:#f5f5f5}
-#profile .v251p-field input::placeholder{color:#a3a3a3}
-#profile .v251p-field-pair{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-#profile .v251p-hint{margin:-13px 0 23px;color:#909090;font:400 11px/1.5 "DM Sans",sans-serif}
-#profile .v251p-optional{font-weight:400;color:#aaa}
-#profile .v251p-form-actions{padding:8px 0 16px}
-#profile .v251p-form-actions>p,#profile .v251p-settings-form>p{min-height:16px;color:#7b746a;font:400 12px/1.4 "DM Sans",sans-serif;margin:0 0 12px;overflow-wrap:anywhere}
-#profile .v251p-primary{display:flex;align-items:center;justify-content:center;gap:9px;width:100%;min-height:49px;padding:12px 19px;border:0;border-radius:999px;background:#191919;color:#fff;font:700 13px/1.3 "DM Sans",sans-serif;transition:transform .15s ease,background .15s ease}
-#profile .v251p-primary:active{transform:scale(.985)}
-#profile .v251p-primary span{font-size:19px;font-weight:400}
-#profile .v251p-secondary{min-height:44px;padding:10px 17px;margin:0 0 20px;border:1px solid #d7c6a7;border-radius:999px;background:#fff;color:#8f7448;font:700 12px "DM Sans",sans-serif}
-#profile .v251p-security{padding:16px 21px 12px}
-#profile .v251p-security-trigger:first-of-type{border-top:1px solid var(--v251p-line)}
-#profile .v251p-settings-form{padding:21px 2px 9px;border-bottom:1px solid var(--v251p-line)}
-#profile .v251p-security-trigger[aria-expanded="true"] .v251p-chevron{transform:rotate(90deg)}
-#profile .v251p-sr-only{position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
-#profile .v251p-signedout{max-width:400px;margin:0 auto;padding:85px 28px 28px;display:flex;flex-direction:column;align-items:center;text-align:center}
-#profile .v251p-signedout-mark{display:grid;place-items:center;width:70px;height:70px;border-radius:50%;background:#f5f5f5;color:#a48c65}
-#profile .v251p-signedout svg{width:30px;height:30px}
-#profile .v251p-signedout h2{font:700 21px/1.3 "DM Sans",sans-serif;letter-spacing:-.035em;margin:24px 0 5px}
-#profile .v251p-signedout p{font:400 13px/1.5 "DM Sans",sans-serif;color:#888;margin:0 0 27px}
-#profile button:focus-visible{outline:2px solid #b39257;outline-offset:3px}
-@media(hover:hover){#profile .v251p-menu-row:hover{background:#fafafa}}
-@media(max-width:370px){#profile .v251p-field-pair{gap:9px}#profile .v251p-header{padding:0 16px}#profile .v251p-member{padding-left:17px;padding-right:17px}#profile .v251p-group,#profile .v251p-form,#profile .v251p-security{padding-left:17px;padding-right:17px}}
-@media(prefers-reduced-motion:reduce){#profile .v251p-menu-row,#profile .v251p-primary{transition:none}}
+/* v2.51 owner Profile — exact owner values from arabista-profile-staging.html, selectors re-scoped #profile → #profile. */
+#profile .profile-screen { background:#faf9f6; }
+#profile .profile-head { flex:0 0 auto; padding:calc(24px + env(safe-area-inset-top,0px)) 22px 0; background:#fff; border-bottom:1px solid #eeeae4; }
+#profile .profile-headline { display:flex; align-items:center; justify-content:space-between; gap:12px; }
+#profile .profile-wordmark { font:600 12px/1 'DM Sans',Inter,sans-serif; letter-spacing:.15em; color:#9b7d51; }
+#profile .profile-preview { font-size:10px; font-weight:600; color:#a39c92; }
+#profile .profile-head h1 { margin:22px 0 6px; font:600 38px/1.06 'Cormorant Garamond',Georgia,serif; letter-spacing:-.025em; color:#292722; }
+#profile .profile-head p { margin:0 0 22px; color:#8e887e; font-size:12px; line-height:1.6; }
+#profile .profile-tabs { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); align-items:stretch; gap:5px; }
+#profile .profile-tab { display:flex; align-items:center; justify-content:center; min-width:0; min-height:55px; padding:7px 3px 11px; border:0; border-bottom:2px solid transparent; background:transparent; color:#99958d; font-size:11px; line-height:1.32; font-weight:600; text-align:center; transition:color .2s, border-color .2s; }
+#profile .profile-tab[aria-selected="true"] { color:#5d4930; border-bottom-color:#ad8957; }
+#profile .profile-tab:hover { color:#614c32; }
+#profile .profile-scroll { flex:1 1 auto; min-height:0; overflow-y:auto; padding:24px 20px calc(90px + env(safe-area-inset-bottom,0px)); overscroll-behavior:contain; scrollbar-width:none; -webkit-overflow-scrolling:touch; }
+#profile .profile-scroll::-webkit-scrollbar { display:none; }
+#profile .profile-pane[hidden], #profile .address-editor[hidden], #profile .profile-feedback[hidden] { display:none !important; }
+#profile .profile-section-head { display:flex; gap:13px; align-items:flex-start; justify-content:space-between; margin:0 0 18px; }
+#profile .profile-section-head h2 { font-size:17px; font-weight:700; letter-spacing:-.025em; line-height:1.3; margin:0 0 5px; color:#272520; }
+#profile .profile-section-head p { margin:0; font-size:11px; line-height:1.55; color:#958e84; }
+#profile .profile-panel { padding:20px 18px; border:1px solid #e9e3da; border-radius:14px; background:#fff; box-shadow:0 12px 36px rgba(90,68,38,.035); }
+#profile .profile-panel + .profile-panel { margin-top:14px; }
+#profile .profile-panel h3 { margin:0 0 5px; font-size:14px; font-weight:700; letter-spacing:-.01em; }
+#profile .profile-panel .profile-help { margin:0 0 18px; font-size:11px; color:#918b82; line-height:1.6; }
+#profile .profile-form { display:grid; gap:16px; }
+#profile .profile-field { min-width:0; }
+#profile .profile-field label { display:block; font-size:11px; font-weight:700; line-height:1.45; color:#5c574f; margin-bottom:7px; }
+#profile .profile-field input, #profile .profile-field select, #profile .profile-field textarea { display:block; width:100%; min-width:0; min-height:47px; border:1px solid #e0d9cf; border-radius:9px; background:#fff; padding:12px 13px; outline:0; color:#282622; font:400 16px/1.35 'DM Sans',Inter,sans-serif; -webkit-appearance:none; appearance:none; transition:border-color .15s, box-shadow .15s; }
+#profile .profile-field textarea { min-height:76px; resize:vertical; }
+#profile .profile-field input::placeholder, #profile .profile-field textarea::placeholder { color:#b3ada5; }
+#profile .profile-field input:focus, #profile .profile-field select:focus, #profile .profile-field textarea:focus { border-color:#b99a70; box-shadow:0 0 0 3px rgba(185,154,112,.12); }
+#profile .profile-field select { padding-right:30px; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%238b8173' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-size:16px; background-position:right 11px center; }
+#profile .profile-field-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+#profile .profile-primary, #profile .profile-secondary { display:flex; justify-content:center; align-items:center; min-height:46px; padding:11px 16px; border-radius:999px; border:1px solid #272521; font-size:12px; font-weight:700; transition:background .2s, transform .2s; }
+#profile .profile-primary { width:100%; background:#292722; color:#fff; }
+#profile .profile-secondary { background:#fff; color:#655034; border-color:#d9cbbb; }
+#profile .profile-primary:active, #profile .profile-secondary:active { transform:scale(.985); }
+#profile .profile-small-button { padding:8px 10px; border:1px solid #d9cbbb; border-radius:99px; font-size:10px; font-weight:700; color:#7d623d; background:#fff; white-space:nowrap; }
+#profile .profile-small-button:focus-visible { outline:2px solid #ad8957; outline-offset:2px; }
+#profile .profile-feedback { padding:10px 12px; border:1px solid #e5dcca; border-radius:8px; background:#faf7f0; color:#715c3b; font-size:11px; line-height:1.5; margin:0; }
+#profile .profile-feedback.is-error { background:#fff5f2; border-color:#efd3cd; color:#9c4e43; }
+#profile .profile-feedback.is-success { background:#f1f7f1; border-color:#d8e6d5; color:#46704d; }
+#profile .profile-add { margin-top:2px; }
+#profile .profile-empty { padding:36px 18px; border:1px dashed #d9cfc0; border-radius:13px; text-align:center; background:#fff; }
+#profile .profile-empty .profile-empty-icon { width:42px; height:42px; display:grid; place-items:center; border-radius:50%; margin:0 auto 12px; background:#f5efe6; color:#95774c; }
+#profile .profile-empty-icon svg { width:20px; height:20px; }
+#profile .profile-empty strong { display:block; color:#302d29; font-size:13px; margin-bottom:6px; }
+#profile .profile-empty p { margin:0; color:#979088; font-size:11px; line-height:1.6; }
+#profile .profile-address-list { display:grid; gap:12px; }
+#profile .profile-address-card { padding:18px; background:#fff; border:1px solid #e9e3da; border-radius:13px; }
+#profile .profile-address-card.is-default { border-color:#bfa985; }
+#profile .profile-address-head { display:flex; align-items:center; gap:9px; flex-wrap:wrap; margin-bottom:10px; }
+#profile .profile-address-head strong { font-size:13px; color:#292722; }
+#profile .profile-default-tag { display:inline-flex; align-items:center; padding:4px 8px; border-radius:999px; background:#f4ecde; color:#87663c; font-size:10px; font-weight:700; }
+#profile .profile-address-card .address-recipient { font-size:12px; color:#35312c; font-weight:700; margin:0 0 5px; }
+#profile .profile-address-card .address-lines { white-space:pre-line; overflow-wrap:anywhere; margin:0; color:#777167; font-size:11px; line-height:1.7; }
+#profile .profile-address-actions { display:flex; align-items:center; flex-wrap:wrap; gap:8px; border-top:1px solid #f0ebe5; padding-top:13px; margin-top:14px; }
+#profile .profile-address-actions button { border:0; background:none; color:#8a6c42; font-size:11px; font-weight:700; padding:4px 6px; }
+#profile .profile-address-actions button.is-destructive { margin-left:auto; color:#9b7771; }
+#profile .profile-address-actions button:disabled { color:#a7a095; cursor:default; }
+#profile .address-editor { margin-top:14px; }
+#profile .profile-editor-head { display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:17px; }
+#profile .profile-editor-head h3 { margin:0; }
+#profile .profile-checkrow { display:flex; align-items:center; gap:9px; font-size:11px; color:#555047; font-weight:600; }
+#profile .profile-checkrow input { width:16px; height:16px; accent-color:#a18152; }
+#profile .profile-actions-row { display:flex; gap:9px; align-items:center; }
+#profile .profile-actions-row button { min-width:0; flex:1; }
+#profile .profile-divider { height:1px; background:#eee9e2; margin:4px 0; }
+#profile .profile-phone-row { display:grid; grid-template-columns:minmax(0,1fr) 92px; gap:8px; }
+#profile .profile-phone-row input { width:100%; }
+#profile .profile-code-send { min-height:47px; padding:7px 9px; background:#f6f0e7; color:#805e34; border:1px solid #e8dac4; border-radius:9px; font-size:11px; font-weight:700; }
+#profile .profile-code-send:disabled { opacity:.5; }
+#profile .profile-caption { margin:10px 0 0; font-size:10px; color:#979088; line-height:1.65; }
+#profile .profile-security-label { display:block; margin:0 0 3px; color:#9b958b; font-size:10px; }
+#profile .profile-security-value { color:#4f4a42; font-size:12px; font-weight:600; }
+#profile .profile-page-note { color:#9a9286; font-size:10px; line-height:1.7; margin:20px 2px 2px; }
+#profile .profile-tab:focus-visible { outline:2px solid #ad8957; outline-offset:-3px; }
+@media (max-width:370px) { #profile .profile-tab { font-size:10px; } #profile .profile-scroll { padding-left:14px; padding-right:14px; } #profile .profile-panel { padding:16px 14px; } #profile .profile-head { padding-left:17px; padding-right:17px; } }
+@media (prefers-reduced-motion: reduce) { #profile .profile-tab, #profile .profile-field input, #profile .profile-field select, #profile .profile-field textarea, #profile .profile-primary, #profile .profile-secondary { transition:none; } }
+
+/* Connected-app mount for owner Profile: layout only (no owner visual value is changed). */
+#main.v251-profile-main{padding:0!important;background:#faf9f6!important}
+#profile.profile-owner{background:#faf9f6;color:#282622;min-height:100%;font-family:'DM Sans',Inter,sans-serif}
+#profile.profile-owner.on{display:flex;flex-direction:column}
+#profile.profile-owner [hidden]{display:none!important}
+#profile .profile-screen{flex:1 1 auto;display:flex;flex-direction:column;min-width:0}
+#profile button{font-family:inherit;cursor:pointer}
+#profile .profile-empty-icon svg{fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+#profile .profile-signout{width:100%;margin-top:16px}
 
 
 /* Profile-only authentication sheet; all other entry points retain existing appearance. */
@@ -2671,200 +2600,142 @@ body.is-discover .site-tabs{z-index:45!important}
     </div>
   </div>
 
-  <section id="orders" class="tab reference-orders v251-orders" role="tabpanel" aria-labelledby="tab-orders">
-    <div class="v251-account-container">
-      <header class="v251-account-heading">
-        <span class="v251-overline">THE ARABISTA EDITION <span aria-hidden="true">/</span> YOUR PURCHASES</span>
-        <h1>My orders<span class="v251-heading-period">.</span></h1>
-        <p>A thoughtful place for every order, from the moment it's placed to the day it arrives.</p>
-      </header>
-      <div class="v251-orders-main">
-        <div class="v251-section-heading">
-          <div><span class="v251-overline">ORDER HISTORY</span><h2>Your purchases</h2></div>
-          <span class="v251-order-count" id="v251OrderCount" aria-live="polite"></span>
+  <section id="orders" class="tab reference-orders" role="tabpanel" aria-labelledby="tab-orders">
+    <header class="reference-orders-head">
+      <div class="reference-eyebrow">Your Arabista journey</div>
+      <h1>My Order</h1>
+      <p>Every beautiful detail, from checkout to delivery.</p>
+    </header>
+    <div class="reference-orders-body">
+      <div class="order-panel reference-lookup">
+        <div class="reference-eyebrow">Private order access</div>
+        <h2>Find your orders.</h2>
+        <p class="reference-intro">Access the order linked to this private purchase session. Orders cannot be opened by guessing an order number or entering someone else's details.</p>
+        <div class="reference-access-state" role="note">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="10" width="14" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
+          <span>Order access</span>
         </div>
-        <div id="linkedOrdersPanel" class="v251-order-collection" hidden>
-          <div id="linkedOrdersList" class="v251-order-list" aria-live="polite"></div>
+        <div class="cart-actions reference-order-actions">
+          <button type="button" id="btnOpenOrder" class="action-primary reference-continue">View my order <span aria-hidden="true">→</span></button>
+          <button type="button" id="btnRecoverAccess" class="action-secondary">Recover access</button>
+          <button type="button" id="btnPaymentStatus" class="action-secondary">Check payment status</button>
+          <button type="button" id="btnDokuReconcile" class="action-secondary" disabled title="Grant-bound DOKU retrieve; redirect is never confirmation">Reconcile DOKU</button>
+          <button type="button" id="btnSettle" class="action-secondary">Unavailable</button>
+          <button type="button" id="btnSellerDetail" class="action-quiet">Details</button>
         </div>
-        <div id="v251OrdersEmpty" class="v251-orders-empty" role="status">
-          <span class="v251-empty-mark" aria-hidden="true">A</span>
-          <h3>Your story starts here.</h3>
-          <p id="v251OrdersEmptyCopy">Your orders will be shown here when you sign in.</p>
-          <button type="button" id="v251OrderSignIn" class="v251-quiet-link">Sign in to your account <span aria-hidden="true">↗</span></button>
-          <button type="button" id="v251OrdersRetry" class="v251-quiet-link" hidden>Try again <span aria-hidden="true">↗</span></button>
+        <p id="paymentStatusNotice" class="fine-print" role="status" aria-live="polite"></p>
+        <div id="orderBusy" class="coin-busy" role="status" aria-live="polite" hidden>
+          <span class="coin-loader" aria-hidden="true"><span class="coin-inner"><span class="coin-face"></span><span class="coin-face coin-back"></span></span></span>
+          <span class="coin-copy">Checking order…</span>
         </div>
-        <div id="v251OrderAccess" class="v251-order-session" hidden>
-          <span class="v251-overline">CURRENT PURCHASE</span>
-          <div class="v251-order-session-inner">
-            <div><strong>Your recent purchase</strong><p>Open the order linked to this checkout session.</p></div>
-            <button type="button" id="btnOpenOrder" class="v251-dark-button">View order <span aria-hidden="true">↗</span></button>
-          </div>
-          <button type="button" id="btnPaymentStatus" class="v251-quiet-link">Check payment status</button>
+        <p id="orderNotice" class="quote-notice" role="status" aria-live="polite"></p>
+        <div id="orderSummary" class="order-summary" aria-label="Verified purchase details" aria-live="polite" hidden></div>
+        <div id="linkedOrdersPanel" class="order-panel" hidden style="margin-top:18px">
+          <div class="reference-eyebrow">Your linked orders</div>
+          <h2 style="font:600 22px/1.2 Georgia,serif;margin:6px 0 10px">Account orders</h2>
+          <div id="linkedOrdersList" aria-live="polite"></div>
         </div>
-        <div class="v251-order-access-aux" aria-live="polite">
-          <div id="orderBusy" class="coin-busy" role="status" aria-live="polite" hidden>
-            <span class="coin-loader" aria-hidden="true"><span class="coin-inner"><span class="coin-face"></span><span class="coin-face coin-back"></span></span></span>
-            <span class="coin-copy">Opening your order…</span>
-          </div>
-          <p id="orderNotice" class="v251-order-notice" role="status" aria-live="polite"></p>
-          <p id="paymentStatusNotice" class="v251-order-notice" role="status" aria-live="polite"></p>
-          <div hidden aria-hidden="true">
-            <button type="button" id="btnRecoverAccess">Recover access</button>
-            <button type="button" id="btnDokuReconcile">Reconcile</button>
-            <button type="button" id="btnSettle">Unavailable</button>
-            <button type="button" id="btnSellerDetail">Details</button>
-          </div>
-          <details hidden><summary>Internal information</summary><pre id="order" hidden aria-hidden="true"></pre></details>
+        <div class="reference-secure">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="10" width="14" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
+          Your order history is private.
         </div>
-        <p class="v251-privacy-note"><span aria-hidden="true">✧</span> Your orders are visible only to your verified account.</p>
-      </div>
-    </div>
-    <div id="v251OrderDetailLayer" class="v251-order-detail-layer" role="dialog" aria-modal="true" aria-labelledby="v251OrderDetailTitle" hidden>
-      <div class="v251-order-detail-frame">
-        <header class="v251-order-detail-head">
-          <button type="button" id="v251OrderDetailBack" class="v251-order-back" aria-label="Back to your orders">
-            <span aria-hidden="true">←</span><span>All orders</span>
-          </button>
-          <span class="v251-detail-brand" id="v251OrderDetailTitle">ARABISTA <span aria-hidden="true">✧</span></span>
-          <span class="v251-order-head-spacer" aria-hidden="true"></span>
-        </header>
-        <div class="v251-order-detail-scroll" id="v251OrderDetailScroll">
-          <div id="orderSummary" class="order-summary v251-order-summary" aria-label="Verified order details" aria-live="polite" hidden></div>
-        </div>
+        <pre id="order" hidden aria-hidden="true"></pre>
       </div>
     </div>
   </section>
 
-    <section id="profile" class="tab v251-profile" role="tabpanel" aria-labelledby="tab-profile">
-      <div class="v251p-shell">
-        <header id="v251ProfileHeader" class="v251p-header">
-          <h1 id="v251ProfileHomeTitle">Profile</h1>
+    <section id="profile" class="tab profile-owner" role="tabpanel" aria-labelledby="tab-profile">
+      <div id="profileSignedOut" class="profile-screen">
+        <header class="profile-head">
+          <div class="profile-headline"><span class="profile-wordmark">ARABISTA</span><span class="profile-preview">ACCOUNT</span></div>
+          <h1>Profile</h1>
+          <p>Sign in to manage your information, addresses and login details.</p>
         </header>
-
-        <div id="profileSignedOut" class="v251p-signedout">
-          <span class="v251p-signedout-mark" aria-hidden="true">
-            <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.6"/><path d="M4.5 20c.5-4.1 3.3-6 7.5-6s7 1.9 7.5 6"/></svg>
-          </span>
-          <h2>Your account</h2>
-          <p>Sign in to manage your details.</p>
-          <button type="button" id="btnIdentityLogin" class="v251p-primary">Sign in <span aria-hidden="true">→</span></button>
-        </div>
-
-        <div id="profileSignedIn" hidden>
-          <div id="v251ProfileHub" class="v251p-home">
-            <div class="v251p-member">
-              <span id="v251ProfileAvatar" class="v251p-avatar" aria-hidden="true">A</span>
-              <div class="v251p-member-copy">
-                <strong id="v251ProfileName">Your Arabista account</strong>
-                <span id="v251ProfilePhone">Your registered number</span>
-              </div>
-            </div>
-            <p id="profileState" role="status" aria-live="polite" hidden></p>
-
-            <div class="v251p-group">
-              <h2>ACCOUNT</h2>
-              <div class="v251p-menu" role="group" aria-label="Account options">
-                <button type="button" class="v251p-menu-row" data-v251-profile-panel="personal">
-                  <svg class="v251p-row-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="7.5" r="3.5"/><path d="M4.5 20c.5-4.2 3.2-6.4 7.5-6.4s7 2.2 7.5 6.4"/></svg>
-                  <span>Personal information</span><svg class="v251p-chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg>
-                </button>
-                <button type="button" class="v251p-menu-row" data-v251-profile-panel="address">
-                  <svg class="v251p-row-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M19 10c0 5-7 11-7 11S5 15 5 10a7 7 0 1 1 14 0Z"/><circle cx="12" cy="10" r="2.2"/></svg>
-                  <span>Delivery address <small id="v251ProfileAddressPreview"></small></span><svg class="v251p-chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg>
-                </button>
-                <button type="button" class="v251p-menu-row" data-v251-profile-panel="security">
-                  <svg class="v251p-row-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="10" width="14" height="11" rx="2"/><path d="M8.5 10V7a3.5 3.5 0 0 1 7 0v3"/></svg>
-                  <span>Account settings</span><svg class="v251p-chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg>
-                </button>
-              </div>
-            </div>
-
-            <button type="button" id="btnIdentityLogout" class="v251p-signout">Sign out</button>
+        <div class="profile-scroll">
+          <div class="profile-empty">
+            <div class="profile-empty-icon" aria-hidden="true"><svg><use href="#i-user"></use></svg></div>
+            <strong>Your account</strong><p>Sign in with your WhatsApp number to manage your details.</p>
+            <button type="button" id="btnIdentityLogin" class="profile-primary" style="margin-top:18px">Sign in</button>
           </div>
-
-          <header id="v251ProfileSubhead" class="v251p-subhead" hidden>
-            <button type="button" id="v251ProfileBack" class="v251p-back" aria-label="Back to Profile">
-              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 5-7 7 7 7"/></svg>
-            </button>
-            <h2 id="v251ProfilePanelTitle">Personal information</h2>
-            <span class="v251p-head-spacer" aria-hidden="true"></span>
-          </header>
-
-          <form id="profileDetailsForm" class="v251p-form" autocomplete="on" hidden>
-            <div id="v251ProfilePersonalFields">
-              <label class="v251p-field">Full name
-                <input id="profileFullName" name="full_name" autocomplete="name" maxlength="120" placeholder="Full name" />
-              </label>
-              <label class="v251p-field">WhatsApp number
-                <input id="profilePhoneNumber" name="phone_e164" type="tel" readonly aria-describedby="profilePhoneNote" />
-              </label>
-              <p class="v251p-hint" id="profilePhoneNote">Change this in Account settings.</p>
-            </div>
-
-            <div id="v251ProfileAddressFields" hidden>
-              <label class="v251p-field">Address line 1
-                <input id="profileAddressLine1" name="address_line_1" autocomplete="address-line1" maxlength="180" placeholder="Street address" />
-              </label>
-              <label class="v251p-field">Address line 2 <span class="v251p-optional">Optional</span>
-                <input id="profileAddressLine2" name="address_line_2" autocomplete="address-line2" maxlength="180" placeholder="Unit / building" />
-              </label>
-              <div class="v251p-field-pair">
-                <label class="v251p-field">Postcode
-                  <input id="profilePostcode" name="postal_code" autocomplete="postal-code" inputmode="numeric" maxlength="12" placeholder="Postcode" />
-                </label>
-                <label class="v251p-field">City
-                  <input id="profileCity" name="city" autocomplete="address-level2" maxlength="100" placeholder="City" />
-                </label>
-              </div>
-              <div class="v251p-field-pair">
-                <label class="v251p-field">State
-                  <input id="profileStateRegion" name="state" autocomplete="address-level1" maxlength="100" placeholder="State" />
-                </label>
-                <label class="v251p-field">Country
-                  <input id="profileCountry" name="country" autocomplete="country-name" value="Malaysia" readonly />
-                </label>
-              </div>
-            </div>
-
-            <div class="v251p-form-actions">
-              <p id="profileDetailsNotice" role="status" aria-live="polite"></p>
-              <button type="submit" id="profileSaveButton" class="v251p-primary">Save changes</button>
-            </div>
-          </form>
-
-          <section id="v251ProfileSecurityPanel" class="v251p-security" aria-labelledby="profileSettingsTitle" hidden>
-            <h3 id="profileSettingsTitle" class="v251p-sr-only">Account settings</h3>
-            <button type="button" id="profileChangePasswordBtn" class="v251p-menu-row v251p-security-trigger" aria-expanded="false" aria-controls="profileChangePasswordForm">
-              <svg class="v251p-row-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
-              <span>Change password</span><svg class="v251p-chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg>
-            </button>
-            <form id="profileChangePasswordForm" class="v251p-settings-form" hidden>
-              <label class="v251p-field">Current password
-                <input id="profileCurrentPassword" type="password" autocomplete="current-password" />
-              </label>
-              <label class="v251p-field">New password
-                <input id="profileNewPassword" type="password" autocomplete="new-password" />
-              </label>
-              <p id="profilePasswordNotice" role="status" aria-live="polite"></p>
-              <button class="v251p-primary" type="submit">Update password</button>
+        </div>
+      </div>
+      <div id="profileSignedIn" class="profile-screen" hidden>
+      <header class="profile-head">
+        <div class="profile-headline"><span class="profile-wordmark">ARABISTA</span><span class="profile-preview">ACCOUNT</span></div>
+        <h1>Profile</h1>
+        <p>Manage your information, addresses and login details.</p>
+        <div class="profile-tabs" role="tablist" aria-label="Profile sections">
+          <button id="profile-tab-personal" class="profile-tab" type="button" role="tab" aria-selected="true" aria-controls="profile-panel-personal" tabindex="0">Personal<br>Information</button>
+          <button id="profile-tab-addresses" class="profile-tab" type="button" role="tab" aria-selected="false" aria-controls="profile-panel-addresses" tabindex="-1">Delivery<br>Address</button>
+          <button id="profile-tab-settings" class="profile-tab" type="button" role="tab" aria-selected="false" aria-controls="profile-panel-settings" tabindex="-1">Account<br>Setting</button>
+        </div>
+      </header>
+      <div class="profile-scroll" id="profile-scroll">
+        <section class="profile-pane" id="profile-panel-personal" role="tabpanel" aria-labelledby="profile-tab-personal" tabindex="0">
+          <div class="profile-section-head"><div><h2>Personal Information</h2><p>Keep your contact details up to date.</p></div></div>
+          <div class="profile-panel">
+            <form class="profile-form" id="profile-personal-form">
+              <div class="profile-field"><label for="profile-name">Name</label><input id="profile-name" name="name" type="text" maxlength="100" autocomplete="name" placeholder="Full name" required></div>
+              <div class="profile-field"><label for="profile-telephone">Telephone No.</label><input id="profile-telephone" name="telephone" type="tel" maxlength="20" autocomplete="tel" placeholder="012 345 6789" required></div>
+              <div class="profile-field"><label for="profile-email">Email</label><input id="profile-email" name="email" type="email" maxlength="160" autocomplete="email" placeholder="name@example.com" required></div>
+              <p id="profile-personal-status" class="profile-feedback" role="status" aria-live="polite" hidden></p>
+              <button class="profile-primary" type="submit">Save Changes</button>
             </form>
-            <button type="button" id="profileChangePhoneBtn" class="v251p-menu-row v251p-security-trigger" aria-expanded="false" aria-controls="profileChangePhoneForm">
-              <svg class="v251p-row-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="7" y="2" width="10" height="20" rx="2"/><path d="M11 18h2"/></svg>
-              <span>WhatsApp number</span><svg class="v251p-chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg>
-            </button>
-            <form id="profileChangePhoneForm" class="v251p-settings-form" hidden>
-              <label class="v251p-field">New WhatsApp number
-                <input id="profileNewPhone" type="tel" autocomplete="tel" placeholder="+60" />
-              </label>
-              <button id="profileRequestPhoneCodeBtn" class="v251p-secondary" type="button">Send code</button>
-              <label class="v251p-field">Verification code
-                <input id="profileNewPhoneOtp" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="6-digit code" />
-              </label>
-              <p id="profilePhoneChangeNotice" role="status" aria-live="polite"></p>
-              <button class="v251p-primary" type="submit">Confirm number</button>
+          </div>
+          <p class="profile-page-note">Saved to your Arabista account.</p>
+        </section>
+        <section class="profile-pane" id="profile-panel-addresses" role="tabpanel" aria-labelledby="profile-tab-addresses" tabindex="0" hidden>
+          <div class="profile-section-head"><div><h2>Delivery Address</h2><p>Save multiple addresses and choose a default.</p></div><button id="profile-add-address" class="profile-small-button profile-add" type="button">+ Add Address</button></div>
+          <div id="profile-address-list" class="profile-address-list" aria-live="polite"></div>
+          <div id="profile-address-empty" class="profile-empty">
+            <div class="profile-empty-icon" aria-hidden="true"><svg><use href="#i-home"></use></svg></div>
+            <strong>No addresses saved</strong><p>Add an address for future deliveries.</p>
+          </div>
+          <section id="profile-address-editor" class="profile-panel address-editor" hidden aria-label="Address form">
+            <div class="profile-editor-head"><h3 id="profile-address-editor-title">Add Address</h3><button id="profile-address-close" class="profile-small-button" type="button">Close</button></div>
+            <form class="profile-form" id="profile-address-form">
+              <div class="profile-field"><label for="address-label">Label</label><select id="address-label" name="label" required><option value="Home">Home</option><option value="Work">Work</option><option value="Other">Other</option></select></div>
+              <div class="profile-field"><label for="address-name">Recipient Name</label><input id="address-name" name="recipient" type="text" maxlength="100" autocomplete="shipping name" placeholder="Full name" required></div>
+              <div class="profile-field"><label for="address-phone">Telephone No.</label><input id="address-phone" name="phone" type="tel" maxlength="20" autocomplete="shipping tel" placeholder="012 345 6789" required></div>
+              <div class="profile-field"><label for="address-line1">Address Line 1</label><input id="address-line1" name="line1" type="text" maxlength="160" autocomplete="shipping address-line1" placeholder="House / unit, street" required></div>
+              <div class="profile-field"><label for="address-line2">Address Line 2 <span style="color:#a09a91;font-weight:400">(Optional)</span></label><input id="address-line2" name="line2" type="text" maxlength="160" autocomplete="shipping address-line2" placeholder="Building / area"></div>
+              <div class="profile-field-grid"><div class="profile-field"><label for="address-postcode">Postcode</label><input id="address-postcode" name="postcode" type="text" inputmode="numeric" maxlength="5" pattern="[0-9]{5}" autocomplete="shipping postal-code" placeholder="43000" required></div><div class="profile-field"><label for="address-city">City</label><input id="address-city" name="city" type="text" maxlength="80" autocomplete="shipping address-level2" placeholder="City" required></div></div>
+              <div class="profile-field"><label for="address-state">State</label><select id="address-state" name="state" autocomplete="shipping address-level1" required><option value="" disabled selected>Select state</option><option>Johor</option><option>Kedah</option><option>Kelantan</option><option>Melaka</option><option>Negeri Sembilan</option><option>Pahang</option><option>Perak</option><option>Perlis</option><option>Pulau Pinang</option><option>Sabah</option><option>Sarawak</option><option>Selangor</option><option>Terengganu</option><option>Wilayah Persekutuan Kuala Lumpur</option><option>Wilayah Persekutuan Labuan</option><option>Wilayah Persekutuan Putrajaya</option></select></div>
+              <label class="profile-checkrow"><input id="address-default" name="default" type="checkbox">Set as default address</label>
+              <p id="profile-address-status" class="profile-feedback" role="status" aria-live="polite" hidden></p>
+              <div class="profile-actions-row"><button id="profile-address-cancel" class="profile-secondary" type="button">Cancel</button><button class="profile-primary" type="submit">Save Address</button></div>
             </form>
           </section>
-        </div>
+          <p class="profile-page-note">Addresses are saved to your Arabista account. Your default address is used at checkout.</p>
+        </section>
+        <section class="profile-pane" id="profile-panel-settings" role="tabpanel" aria-labelledby="profile-tab-settings" tabindex="0" hidden>
+          <div class="profile-section-head"><div><h2>Account Setting</h2><p>Manage your password and WhatsApp login number.</p></div></div>
+          <div class="profile-panel">
+            <h3>Change Password</h3>
+            <p class="profile-help">Use your current password to set a new one.</p>
+            <form class="profile-form" id="profile-password-form">
+              <div class="profile-field"><label for="profile-current-password">Current Password</label><input id="profile-current-password" type="password" autocomplete="current-password" placeholder="Enter current password" required></div>
+              <div class="profile-field"><label for="profile-new-password">New Password</label><input id="profile-new-password" type="password" autocomplete="new-password" minlength="8" placeholder="At least 8 characters" required></div>
+              <div class="profile-field"><label for="profile-confirm-password">Confirm New Password</label><input id="profile-confirm-password" type="password" autocomplete="new-password" placeholder="Re-enter new password" required></div>
+              <p id="profile-password-status" class="profile-feedback" role="status" aria-live="polite" hidden></p>
+              <button class="profile-primary" type="submit">Change Password</button>
+            </form>
+          </div>
+          <div class="profile-panel">
+            <h3>WhatsApp Number</h3>
+            <p class="profile-help">Your WhatsApp number and password are used to log in.</p>
+            <div style="padding:1px 0 17px"><span class="profile-security-label">Current WhatsApp No.</span><span id="profile-current-whatsapp" class="profile-security-value">—</span></div>
+            <form class="profile-form" id="profile-whatsapp-form">
+              <div class="profile-field"><label for="profile-new-whatsapp">New WhatsApp No.</label><div class="profile-phone-row"><input id="profile-new-whatsapp" type="tel" inputmode="tel" maxlength="20" autocomplete="off" placeholder="012 345 6789" required><button class="profile-code-send" id="profile-send-code" type="button">Send Code</button></div></div>
+              <div class="profile-field"><label for="profile-verification-code">Verification Code</label><input id="profile-verification-code" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="6" pattern="[0-9]{6}" placeholder="6-digit code" required></div>
+              <p id="profile-whatsapp-status" class="profile-feedback" role="status" aria-live="polite" hidden></p>
+              <button class="profile-primary" type="submit">Verify &amp; Update Number</button>
+            </form>
+          </div>
+          <p class="profile-page-note">WhatsApp number changes require a verification code. Password changes require your current password.</p>
+          <button type="button" id="btnIdentityLogout" class="profile-secondary profile-signout">Sign out</button>
+        </section>
+      </div>
       </div>
     </section>
 
@@ -9515,6 +9386,7 @@ body.is-discover .site-tabs{z-index:45!important}
     identityCustomerId: null,
     identityPhone: null,
     identityProfile: null,
+    deliveryAddresses: [],
     identityChallengeId: null,
     identityModalMode: null,
     pendingInvoiceLocator: null
@@ -9647,119 +9519,311 @@ body.is-discover .site-tabs{z-index:45!important}
     $(id).textContent = redactedDevJson(value);
   }
 
-/* v2.51 account presentation: visual state only; all ownership, order and profile RPCs stay authoritative. */
-  var v251OrderReturnFocus_ = null;
-  var v251ProfilePanel_ = 'home';
-  var v251LinkedOrdersCache_ = { token: null, links: null, pending: false, failed: false };
-
-  function v251PrettyDate_(raw) {
-    if (!raw) return '';
-    var date = new Date(raw);
-    if (isNaN(date.getTime())) return '';
-    try { return date.toLocaleDateString('en-MY', { day:'numeric', month:'short', year:'numeric' }); }
-    catch (dateErr) { return ''; }
-  }
-  function v251VerifiedPhoto_(raw) {
-    var value = String(raw || '').trim();
-    return /^https:\/\/[a-z0-9.-]+\/[^<>"'\s]+$/i.test(value) ? value : '';
-  }
-  function v251OrderCover_(url, cls) {
-    var cover = el('span', null, cls || 'v251-order-cover');
-    var safe = v251VerifiedPhoto_(url);
-    if (!safe) {
-      cover.textContent = 'A';
-    } else {
-      var img = document.createElement('img');
-      img.src = safe;
-      img.alt = '';
-      img.loading = 'lazy';
-      img.decoding = 'async';
-      img.referrerPolicy = 'no-referrer';
-      img.onerror = function () { img.remove(); cover.textContent = 'A'; };
-      cover.appendChild(img);
-    }
-    return cover;
-  }
-  function v251OrderText_(source) {
-    var v = String(source || '').trim();
-    return v && !/^(?:syn[-_]|v247[-_]|sku[-_]|ord_ml_)/i.test(v) ? v : '';
-  }
-  function v251CloseOrderDetail_(returnFocus) {
-    var layer = $('v251OrderDetailLayer');
-    if (!layer || layer.hidden) return;
-    layer.hidden = true;
-    document.body.classList.remove('v251-order-open');
-    if (returnFocus !== false) {
-      var target = v251OrderReturnFocus_ && document.contains(v251OrderReturnFocus_)
-        ? v251OrderReturnFocus_ : document.querySelector('#linkedOrdersList button.linked-order-open');
-      if (!target && $('btnOpenOrder') && !$('btnOpenOrder').disabled) target = $('btnOpenOrder');
-      if (target && target.focus) {
-        try { target.focus({preventScroll:true}); } catch (e) {}
-      }
-    }
-  }
-  function v251PresentOrderDetail_() {
-    var layer = $('v251OrderDetailLayer');
-    var host = $('orderSummary');
-    if (!layer || !host || host.hidden) return;
-    if (layer.hidden) {
-      v251OrderReturnFocus_ = document.activeElement;
-      layer.hidden = false;
-      document.body.classList.add('v251-order-open');
-      try { $('v251OrderDetailBack').focus({preventScroll:true}); } catch (e) {}
-    }
-    if ($('v251OrderDetailScroll')) $('v251OrderDetailScroll').scrollTop = 0;
-  }
-  function v251SyncProfileSummary_() {
-    var profile = state.identityProfile || {};
-    var name = String(profile.full_name || '').trim();
-    var phone = String(profile.phone_e164 || state.identityPhone || '').trim();
-    var greeting = $('v251ProfileName');
-    if (greeting) greeting.textContent = name || 'Your Arabista account';
-    var phoneHost = $('v251ProfilePhone');
-    if (phoneHost) phoneHost.textContent = phone || 'Your registered number';
-    var avatar = $('v251ProfileAvatar');
-    if (avatar) avatar.textContent = name ? name.charAt(0).toLocaleUpperCase() : 'A';
-    var addr = $('v251ProfileAddressPreview');
-    if (addr) {
-      var location = [profile.city, profile.state_region].filter(Boolean).join(', ');
-      addr.textContent = location || (profile.address_line_1 ? 'Saved address' : '');
-    }
-  }
-  function v251ShowProfilePanel_(which, focus) {
-    var panel = ['personal','address','security'].indexOf(which) >= 0 ? which : 'home';
-    if (panel !== 'home' && !isIdentitySignedIn()) return;
-    v251ProfilePanel_ = panel;
-    var home = $('v251ProfileHub'), subhead = $('v251ProfileSubhead'), header = $('v251ProfileHeader');
-    var form = $('profileDetailsForm'), security = $('v251ProfileSecurityPanel');
-    var personal = $('v251ProfilePersonalFields'), address = $('v251ProfileAddressFields');
-    if (home) home.hidden = panel !== 'home';
-    if (header) header.hidden = panel !== 'home';
-    if (subhead) subhead.hidden = panel === 'home';
-    if (form) form.hidden = panel !== 'personal' && panel !== 'address';
-    if (security) security.hidden = panel !== 'security';
-    if (personal) personal.hidden = panel !== 'personal';
-    if (address) address.hidden = panel !== 'address';
-    if ($('v251ProfilePanelTitle')) {
-      $('v251ProfilePanelTitle').textContent =
-        panel === 'address' ? 'Delivery address' : panel === 'security' ? 'Account settings' : 'Personal information';
-    }
-    if ($('profileDetailsNotice') && panel !== 'home') $('profileDetailsNotice').textContent = '';
-    var shell = document.querySelector('#profile .v251p-shell');
-    if (shell && shell.scrollIntoView) shell.scrollIntoView({block:'start',behavior:'instant'});
-    if (focus !== false) {
-      var target = panel === 'home' ? $('v251ProfileHomeTitle') : $('v251ProfileBack');
-      if (target && target.focus) {
-        if (panel === 'home') target.setAttribute('tabindex','-1');
-        try { target.focus({preventScroll:true}); } catch(e) {}
-      }
-    }
-  }
-
   function scrollOrderSummaryIntoView_() {
-    if (!$('orderSummary') || $('orderSummary').hidden) return;
-    v251PresentOrderDetail_();
-    if ($('v251OrderDetailScroll')) $('v251OrderDetailScroll').scrollTop = 0;
+    var summaryNode = $('orderSummary');
+    if (!summaryNode || summaryNode.hidden) return;
+    try {
+      summaryNode.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    } catch (scrollErr) {
+      try { summaryNode.scrollIntoView(true); } catch (legacyErr) {}
+    }
+  }
+
+  /* v2.51 owner Profile: Personal Information / Delivery Address / Account Setting.
+     Visual/interaction parity with the owner reference; every save goes through authenticated identity RPCs. */
+  var OWNER_PROFILE_TABS_ = ['personal', 'addresses', 'settings'];
+  var ownerEditingAddressId_ = null;
+  var ownerProfileLoading_ = false;
+  var ownerBusy_ = {};
+
+  function ownerFeedback_(id, message, kind) {
+    var node = $(id);
+    if (!node) return;
+    node.textContent = message || '';
+    node.className = 'profile-feedback' + (kind ? ' is-' + kind : '');
+    node.hidden = !message;
+  }
+
+  function ownerPhoneLooksValid_(value) {
+    var digits = String(value || '').replace(/[^0-9]/g, '');
+    return digits.length >= 9 && digits.length <= 15;
+  }
+
+  function ownerPhoneKey_(value) {
+    var digits = String(value || '').replace(/[^0-9]/g, '');
+    if (/^0\d{8,10}$/.test(digits)) digits = '60' + digits.slice(1);
+    return digits;
+  }
+
+  function ownerPhoneToE164_(value) {
+    var raw = String(value || '').trim().replace(/[^\d+]/g, '');
+    if (/^01\d{8,9}$/.test(raw)) return '+60' + raw.slice(1);
+    if (/^60\d{8,11}$/.test(raw)) return '+' + raw;
+    return raw;
+  }
+
+  function ownerReasonText_(reason, fallback) {
+    var map = {
+      contact_email_invalid: 'Enter a valid email address.',
+      contact_email_too_long: 'That email address is too long.',
+      full_name_too_long: 'That name is too long.',
+      address_label_invalid: 'Choose Home, Work or Other.',
+      recipient_name_invalid: 'Enter a valid recipient name.',
+      address_phone_invalid: 'Enter a valid telephone number.',
+      address_line_1_invalid: 'Enter a valid Address Line 1.',
+      address_line_2_invalid: 'Address Line 2 is too long.',
+      postcode_invalid: 'Enter a 5-digit Malaysian postcode.',
+      city_invalid: 'Enter a valid city.',
+      state_region_invalid: 'Choose a state.',
+      address_not_found: 'That address could not be found. Refresh and try again.',
+      current_password_invalid: 'Your current password is incorrect.',
+      current_password_required: 'Enter your current password.',
+      phone_unchanged: 'That is already your WhatsApp number.',
+      phone_already_registered: 'That number is already registered to another account.',
+      phone_e164_invalid: 'Enter a valid WhatsApp number.',
+      activation_required: 'Please sign in again.',
+      customer_profile_missing: 'Please sign in again.',
+      otp_challenge_or_code_invalid: 'Enter the 6-digit code we sent you.'
+    };
+    var key = String(reason || '');
+    if (map[key]) return map[key];
+    if (/password_policy|weak_password|password_too/i.test(key)) return 'Choose a stronger password (at least 8 characters).';
+    return fallback;
+  }
+
+  function ownerRpc_(name, payload, done) {
+    var body = payload || {};
+    body.access_token = state.identityAccessToken;
+    call(name, body, function (x) { done(x); }, function (x) { done(x || { ok: false }); });
+  }
+
+  function selectOwnerProfileTab_(tab, focus) {
+    if (OWNER_PROFILE_TABS_.indexOf(tab) < 0) tab = 'personal';
+    OWNER_PROFILE_TABS_.forEach(function (name) {
+      var button = $('profile-tab-' + name), pane = $('profile-panel-' + name);
+      if (!button || !pane) return;
+      var active = tab === name;
+      button.setAttribute('aria-selected', active ? 'true' : 'false');
+      button.tabIndex = active ? 0 : -1;
+      pane.hidden = !active;
+    });
+    var scroller = $('profile-scroll');
+    if (scroller) scroller.scrollTop = 0;
+    var main = $('main');
+    if (main) main.scrollTop = 0;
+    if (focus && $('profile-tab-' + tab)) {
+      try { $('profile-tab-' + tab).focus(); } catch (focusErr) {}
+    }
+  }
+
+  function ownerFillPersonal_(force) {
+    var form = $('profile-personal-form');
+    if (!form) return;
+    var profile = state.identityProfile || {};
+    if ($('profile-current-whatsapp')) {
+      $('profile-current-whatsapp').textContent = profile.phone_e164 || state.identityPhone || '—';
+    }
+    var active = document.activeElement;
+    if (!force && active && form.contains(active)) return;
+    if ($('profile-name')) $('profile-name').value = profile.full_name || '';
+    if ($('profile-telephone')) $('profile-telephone').value = profile.phone_e164 || state.identityPhone || '';
+    if ($('profile-email')) $('profile-email').value = profile.contact_email || '';
+  }
+
+  function ownerAddresses_() {
+    return Array.isArray(state.deliveryAddresses) ? state.deliveryAddresses : [];
+  }
+
+  function setOwnerAddresses_(list) {
+    if (!Array.isArray(list)) return;
+    state.deliveryAddresses = list;
+    renderOwnerAddresses_();
+  }
+
+  function defaultDeliveryAddress_() {
+    if (!isIdentitySignedIn()) return null;
+    var list = ownerAddresses_();
+    var found = null;
+    for (var i = 0; i < list.length; i += 1) {
+      if (list[i] && list[i].is_default) { found = list[i]; break; }
+    }
+    if (!found && list.length) found = list[0];
+    if (!found || !found.address_line_1) return null;
+    return {
+      recipient_name: found.recipient_name || '',
+      phone: found.phone || '',
+      phone_e164: ownerPhoneToE164_(found.phone),
+      address_line_1: found.address_line_1 || '',
+      address_line_2: found.address_line_2 || '',
+      postcode: found.postcode || '',
+      city: found.city || '',
+      state_region: found.state_region || '',
+      state: found.state_region || ''
+    };
+  }
+
+  function ownerMakeButton_(label, action, cls) {
+    var button = document.createElement('button');
+    button.type = 'button';
+    button.textContent = label;
+    if (cls) button.className = cls;
+    button.addEventListener('click', action);
+    return button;
+  }
+
+  function renderOwnerAddresses_() {
+    var list = $('profile-address-list'), empty = $('profile-address-empty');
+    if (!list || !empty) return;
+    var rows = ownerAddresses_();
+    list.replaceChildren();
+    empty.hidden = rows.length > 0;
+    rows.forEach(function (address) {
+      var card = document.createElement('article');
+      card.className = 'profile-address-card' + (address.is_default ? ' is-default' : '');
+      var head = document.createElement('div');
+      head.className = 'profile-address-head';
+      var title = document.createElement('strong');
+      title.textContent = address.label || 'Address';
+      head.appendChild(title);
+      if (address.is_default) {
+        var tag = document.createElement('span');
+        tag.className = 'profile-default-tag';
+        tag.textContent = 'Default';
+        head.appendChild(tag);
+      }
+      card.appendChild(head);
+      var recipient = document.createElement('p');
+      recipient.className = 'address-recipient';
+      recipient.textContent = (address.recipient_name || '') + ' · ' + (address.phone || '');
+      card.appendChild(recipient);
+      var detail = document.createElement('p');
+      detail.className = 'address-lines';
+      detail.textContent = [
+        address.address_line_1,
+        address.address_line_2,
+        [address.postcode, address.city].filter(Boolean).join(' '),
+        address.state_region,
+        'Malaysia'
+      ].filter(Boolean).join('\n');
+      card.appendChild(detail);
+      var actions = document.createElement('div');
+      actions.className = 'profile-address-actions';
+      if (!address.is_default) {
+        actions.appendChild(ownerMakeButton_('Set as Default', function () { ownerSetDefaultAddress_(address.address_id); }));
+      }
+      actions.appendChild(ownerMakeButton_('Edit', function () { openOwnerAddressEditor_(address.address_id); }));
+      actions.appendChild(ownerMakeButton_('Remove', function () { ownerRemoveAddress_(address.address_id); }, 'is-destructive'));
+      card.appendChild(actions);
+      list.appendChild(card);
+    });
+  }
+
+  function ownerApplyAddressResult_(x, allowEmpty) {
+    if (x && x.profile) {
+      var keep = state.deliveryAddresses;
+      applyProfileToForm(x.profile);
+      state.deliveryAddresses = keep;
+    }
+    if (x && Array.isArray(x.addresses) && (x.addresses.length || allowEmpty)) {
+      setOwnerAddresses_(x.addresses);
+    } else {
+      loadIdentityProfile(true);
+    }
+  }
+
+  function ownerSetDefaultAddress_(addressId) {
+    if (!isIdentitySignedIn() || !addressId || ownerBusy_.defaultAddress) return;
+    ownerBusy_.defaultAddress = true;
+    ownerRpc_('arabistaDevCustomerIdentitySetDefaultAddressV251', { address_id: addressId }, function (x) {
+      ownerBusy_.defaultAddress = false;
+      if (x && x.ok === true) {
+        ownerApplyAddressResult_(x, false);
+        toast('Default address updated.');
+      } else {
+        toast(ownerReasonText_(x && x.reason, 'Could not update your default address. Please try again.'));
+      }
+    });
+  }
+
+  function ownerRemoveAddress_(addressId) {
+    if (!isIdentitySignedIn() || !addressId || ownerBusy_.removeAddress) return;
+    if (!window.confirm('Remove this address?')) return;
+    ownerBusy_.removeAddress = true;
+    ownerRpc_('arabistaDevCustomerIdentityDeleteAddressV251', { address_id: addressId }, function (x) {
+      ownerBusy_.removeAddress = false;
+      if (x && x.ok === true) {
+        if (ownerEditingAddressId_ === addressId) closeOwnerAddressEditor_();
+        ownerApplyAddressResult_(x, true);
+        toast('Address removed.');
+      } else {
+        toast(ownerReasonText_(x && x.reason, 'Could not remove this address. Please try again.'));
+      }
+    });
+  }
+
+  function closeOwnerAddressEditor_() {
+    var editor = $('profile-address-editor'), form = $('profile-address-form');
+    if (editor) editor.hidden = true;
+    ownerEditingAddressId_ = null;
+    if (form) form.reset();
+    ownerFeedback_('profile-address-status', '');
+  }
+
+  function openOwnerAddressEditor_(id) {
+    var editor = $('profile-address-editor'), form = $('profile-address-form');
+    if (!editor || !form) return;
+    ownerEditingAddressId_ = id || null;
+    form.reset();
+    ownerFeedback_('profile-address-status', '');
+    if ($('profile-address-editor-title')) $('profile-address-editor-title').textContent = id ? 'Edit Address' : 'Add Address';
+    if (id) {
+      var address = null;
+      ownerAddresses_().forEach(function (row) { if (row && row.address_id === id) address = row; });
+      if (!address) { ownerEditingAddressId_ = null; return; }
+      var mapped = {
+        label: address.label, recipient: address.recipient_name, phone: address.phone,
+        line1: address.address_line_1, line2: address.address_line_2, postcode: address.postcode,
+        city: address.city, state: address.state_region
+      };
+      Object.keys(mapped).forEach(function (key) {
+        var field = form.elements.namedItem(key);
+        if (!field) return;
+        var value = String(mapped[key] || '');
+        if (field.tagName === 'SELECT' && value) {
+          var found = false;
+          Array.prototype.forEach.call(field.options, function (option) { if (option.value === value || option.text === value) found = true; });
+          if (!found) { var extra = document.createElement('option'); extra.textContent = value; field.appendChild(extra); }
+        }
+        field.value = value;
+      });
+      if ($('address-default')) $('address-default').checked = !!address.is_default;
+    } else if ($('address-default')) {
+      $('address-default').checked = ownerAddresses_().length === 0;
+    }
+    editor.hidden = false;
+    window.requestAnimationFrame(function () {
+      try {
+        editor.scrollIntoView({
+          block: 'start',
+          behavior: window.matchMedia && window.matchMedia('(prefers-reduced-motion:reduce)').matches ? 'instant' : 'smooth'
+        });
+      } catch (scrollErr) {}
+    });
+  }
+
+  function ownerResetProfile_() {
+    state.deliveryAddresses = [];
+    ownerEditingAddressId_ = null;
+    ['profile-personal-form', 'profile-address-form', 'profile-password-form', 'profile-whatsapp-form'].forEach(function (id) {
+      var form = $(id);
+      if (form) form.reset();
+    });
+    ['profile-personal-status', 'profile-address-status', 'profile-password-status', 'profile-whatsapp-status'].forEach(function (id) {
+      ownerFeedback_(id, '');
+    });
+    if ($('profile-address-editor')) $('profile-address-editor').hidden = true;
+    if ($('profile-current-whatsapp')) $('profile-current-whatsapp').textContent = '—';
+    renderOwnerAddresses_();
   }
 
   function applyOwnedOrderSuccess_(owned, fallbackOrderId, fallbackCheckoutId, noticeText) {
@@ -9834,134 +9898,87 @@ body.is-discover .site-tabs{z-index:45!important}
     var host = $('orderSummary');
     clear(host);
     host.hidden = true;
-    if (!payload || payload.ok !== true || payload.allowed === false || !payload.order) {
-      v251CloseOrderDetail_(false);
-      return;
-    }
+    if (!payload || payload.ok !== true || payload.allowed === false || !payload.order) return;
     var order = payload.order;
+    host.hidden = false;
+    var number = String(order.invoice_no || order.order_number || order.order_id || '');
+    var heading = el('h3', number ? 'Order ' + number : 'Verified order', 'section-title');
+    host.appendChild(heading);
     var payment = order.payment || {};
     var shipping = order.shipping || {};
-    var moneyData = order.money || {};
     var progression = order.progression || order.surface || {};
     var payStatus = String(payment.status || '');
-    var verifiedPayment = (payStatus === 'PAID' || payStatus === 'SETTLED' || payStatus === 'PAYMENT_VERIFIED_SETTLED')
-      && payment.evidence_class === 'PROVIDER_CONFIRMED' && payment.provider_confirmed === true;
-    var invoice = v251OrderText_(order.invoice_no || order.order_number);
-    var total = Number(moneyData.total_sen);
-    var totalValid = moneyData.total_sen != null && isFinite(total) && total >= 0;
-    var tracking = !!(shipping.carrier_tracking_available && (shipping.awb || shipping.awb_number));
-    var awb = tracking ? String(shipping.awb || shipping.awb_number || '') : '';
-    host.hidden = false;
-
-    host.appendChild(el('div', 'ORDER DETAILS', 'v251-detail-kicker'));
-    host.appendChild(el('h2', 'Your order.', 'v251-detail-title'));
-    host.appendChild(el('p', invoice ? ('Order reference ' + invoice
-      + (v251PrettyDate_(order.created_at) ? '  ·  ' + v251PrettyDate_(order.created_at) : ''))
-      : 'Your verified order details', 'v251-detail-invoice'));
-
-    var hero = el('div', null, 'v251-detail-hero');
-    var heroText = el('div');
-    heroText.appendChild(el('small', verifiedPayment ? 'PAYMENT CONFIRMED' : 'PAYMENT STATUS'));
-    heroText.appendChild(el('strong', verifiedPayment ? 'Thank you for your order.' : 'Your order is being reviewed.'));
-    hero.appendChild(heroText);
-    hero.appendChild(el('span', totalValid ? money(total) : 'Amount unavailable', 'v251-detail-total'));
-    host.appendChild(hero);
-
-    var itemsSection = el('section', null, 'v251-detail-section');
-    itemsSection.appendChild(el('h3','Your pieces'));
-    var items = Array.isArray(order.items) ? order.items : [];
-    if (!items.length) {
-      itemsSection.appendChild(el('p', 'Purchased item details are not available at the moment.', 'v251-order-notice'));
+    var paid = payStatus === 'SETTLED' || payStatus === 'PAID' || payStatus === 'PAYMENT_VERIFIED_SETTLED';
+    var simulatedPayment = payment.evidence_class === 'TEST_ONLY_SIMULATED';
+    var verifiedPayment = paid && payment.evidence_class === 'PROVIDER_CONFIRMED'
+      && payment.provider_confirmed === true;
+    var prepared = !!(shipping.booking_state || shipping.status || shipping.present);
+    var tracked = !!(shipping.carrier_tracking_available && (shipping.awb || shipping.awb_number));
+    var timeline = el('div', null, 'order-timeline');
+    function moment(title, detail) {
+      var m = el('div', null, 'moment');
+      m.appendChild(el('h4', title));
+      m.appendChild(el('p', detail));
+      timeline.appendChild(m);
     }
-    items.forEach(function (item) {
-      var row = el('div', null, 'v251-detail-item');
-      var details = el('div', null, 'v251-detail-item-copy');
-      var orderIdentity = item.order_identity || {};
-      var name = typeof orderIdentity === 'string' ? orderIdentity
-        : (orderIdentity.label || orderIdentity.display_name || '');
-      name = v251OrderText_(name) || v251OrderText_(item.title || item.product_title || item.product_title_snapshot)
-        || 'Arabista piece';
-      var rawVariant = item.variant_label || item.variation_label || item.selected_variants || '';
-      var variant = typeof rawVariant === 'string' ? rawVariant : '';
-      if (!variant && item.variation_snapshot_json) {
-        try {
-          var snapshot = typeof item.variation_snapshot_json === 'string'
-            ? JSON.parse(item.variation_snapshot_json) : item.variation_snapshot_json;
-          variant = String(snapshot.variant_label || snapshot.selected_variants_label
-            || snapshot.combination_key || '');
-        } catch (variantError) {}
-      }
-      var qty = Number(item.qty == null ? item.quantity : item.qty);
-      details.appendChild(el('strong',name));
-      if (variant) details.appendChild(el('small',variant.replace(/\s+\/\s+/g,' · ')));
-      if (Number.isInteger(qty) && qty > 0) details.appendChild(el('small','Quantity ' + qty));
-      row.appendChild(v251OrderCover_(item.image_url || item.primary_media_url,'v251-item-cover'));
-      row.appendChild(details);
+    moment('Order received', number ? 'Order ' + number + ' linked to this purchase-bound session.' : 'Pending authoritative server confirmation.');
+    moment(verifiedPayment ? 'Payment verified' : (simulatedPayment && paid ? 'TEST_ONLY settlement' : 'Payment status'),
+      verifiedPayment
+        ? ('Provider-confirmed evidence for ' + payStatus + '. Redirect alone is never confirmation.')
+        : (simulatedPayment && paid
+          ? 'Simulated DEV payment only. No DOKU settlement or customer notification.'
+          : (payStatus ? ('Current status: ' + payStatus + '. Provider settlement not verified.')
+            : 'Only after provider-authenticated settlement.')));
+    moment('Preparing shipment', prepared
+      ? String(progression.customer_label || shipping.booking_state || shipping.status || 'Seller fulfilment recorded')
+      : 'Awaiting seller-confirmed fulfilment state.');
+    moment('Tracking available', tracked
+      ? ('AWB ' + (shipping.awb || shipping.awb_number) + ' · verified carrier evidence only')
+      : 'Waybill / carrier events appear only when verified. J&T booking remains gated.');
+    host.appendChild(timeline);
+    var statuses = el('div', null, 'order-status-grid');
+    function status(label, value) {
+      var cell = el('div', null, 'info-item');
+      cell.appendChild(el('span', label, 'eyebrow'));
+      cell.appendChild(el('strong', value || 'Not available'));
+      statuses.appendChild(cell);
+    }
+    status('Payment', payStatus || 'Not available');
+    status('Fulfilment', String(
+      (progression.customer_label || progression.label || order.fulfilment_status || 'Not available')
+    ));
+    var shipLabel = 'Not available';
+    if (shipping.booking_state === 'PREPARED_NOT_BOOKED' || shipping.status === 'QUEUED') {
+      shipLabel = 'Prepared — not carrier-booked';
+    } else if (tracked) {
+      shipLabel = String(shipping.status || 'Tracked') + ' · AWB ' + (shipping.awb || shipping.awb_number);
+    } else if (shipping.present) {
+      shipLabel = String(shipping.note || shipping.status || 'Shipment recorded — tracking unavailable');
+    } else if (shipping.note) {
+      shipLabel = String(shipping.note);
+    }
+    status('Shipping', shipLabel);
+    var amount = Number(order.money && order.money.total_sen);
+    status('Order total', order.money && isFinite(amount) && amount >= 0 ? money(amount) : 'Not available');
+    host.appendChild(statuses);
+    var rows = Array.isArray(order.items) ? order.items : [];
+    var section = el('div', null, 'order-lines');
+    section.appendChild(el('h4', 'Items in this order'));
+    if (!rows.length) section.appendChild(el('p', 'Item detail was not returned by the DEV service.', 'fine-print'));
+    rows.forEach(function (item) {
+      var row = el('div', null, 'summary-line');
+      var name = String(item.title || item.product_title || item.sku_code || item.sku || 'Product');
+      var qty = Number(item.quantity == null ? item.qty : item.quantity);
+      row.appendChild(el('span', name + (Number.isInteger(qty) && qty > 0 ? ' · Qty ' + qty : '')));
       var line = Number(item.line_total_sen);
-      row.appendChild(el('span', item.line_total_sen != null && isFinite(line) && line >= 0
-        ? money(line) : '—','v251-detail-item-price'));
-      itemsSection.appendChild(row);
+      row.appendChild(el('strong', item.line_total_sen != null && isFinite(line) && line >= 0 ? money(line) : ''));
+      section.appendChild(row);
     });
-    var sums = el('div', null, 'v251-detail-sums');
-    function sumRow(label, amount) {
-      if (amount == null || !isFinite(Number(amount)) || Number(amount) < 0) return;
-      var row = el('div', null, 'v251-detail-sum');
-      row.appendChild(el('span', label));
-      row.appendChild(el('strong', money(Number(amount))));
-      sums.appendChild(row);
-    }
-    sumRow('Items subtotal', moneyData.merchandise_sen);
-    sumRow('Delivery', moneyData.shipping_sen);
-    sumRow('Order total', moneyData.total_sen);
-    itemsSection.appendChild(sums);
-    host.appendChild(itemsSection);
-
-    var trackingSection = el('section', null, 'v251-detail-section');
-    trackingSection.appendChild(el('h3', 'Delivery & tracking'));
-    var deliveryHeadline = el('p', tracking ? 'Tracking number assigned' :
-      (shipping.present ? 'Your shipment is being prepared' : 'Awaiting fulfilment'), 'v251-order-notice');
-    trackingSection.appendChild(deliveryHeadline);
-    if (tracking) {
-      var awbRow = el('div', null, 'v251-detail-sum');
-      awbRow.appendChild(el('span', 'Waybill number'));
-      awbRow.appendChild(el('strong', awb));
-      trackingSection.appendChild(awbRow);
-      if (shipping.carrier) {
-        var carrierRow = el('div', null, 'v251-detail-sum');
-        carrierRow.appendChild(el('span','Carrier'));
-        carrierRow.appendChild(el('strong',String(shipping.carrier)));
-        trackingSection.appendChild(carrierRow);
-      }
-    }
-    if (shipping.status === 'AWB_READY') trackingSection.appendChild(el('p',
-      'A waybill has been created. Courier collection and delivery are not yet confirmed.','v251-order-notice'));
-    if (!shipping.present) trackingSection.appendChild(el('p',
-      'Tracking will appear when the seller has prepared a shipment.','v251-order-notice'));
-    host.appendChild(trackingSection);
-
-    var timelineSection = el('section', null, 'v251-detail-section');
-    timelineSection.appendChild(el('h3','Order journey'));
-    var timeline = el('div', null, 'v251-detail-timeline');
-    function milestone(label, explanation) {
-      var node = el('div',null,'v251-detail-moment');
-      node.appendChild(el('strong',label));
-      node.appendChild(el('p',explanation));
-      timeline.appendChild(node);
-    }
-    milestone('Order placed',v251PrettyDate_(order.created_at) || 'Order received');
-    milestone(verifiedPayment ? 'Payment confirmed' : 'Payment verification',
-      verifiedPayment ? (v251PrettyDate_(order.paid_at) || 'Your payment has been verified.')
-        : (payStatus ? 'Current status: ' + payStatus : 'No confirmed payment yet.'));
-    if (shipping.present) milestone('Shipment prepared',
-      String(progression.customer_label || shipping.status || 'Fulfilment in progress'));
-    if (tracking) milestone('Tracking reference ready',
-      'Waybill ' + awb + '. Courier updates will appear when available.');
-    timelineSection.appendChild(timeline);
-    host.appendChild(timelineSection);
-    v251PresentOrderDetail_();
+    host.appendChild(section);
+    host.appendChild(el('p', 'Purchase-bound DEV order response. TEST_ONLY settlement is not real DOKU payment; WhatsApp order_confirm requires PAYMENT_VERIFIED_SETTLED.', 'fine-print'));
   }
 
-    function setCheckoutStep(step) {
+  function setCheckoutStep(step) {
     var host = $('checkoutSteps');
     if (!host) return;
     var nodes = host.querySelectorAll('span');
@@ -10065,7 +10082,8 @@ body.is-discover .site-tabs{z-index:45!important}
   function checkoutDeliveryFields_() {
     var profile = isIdentitySignedIn() ? state.identityProfile : null;
     var guest = state.checkoutDelivery || null;
-    var source = (profile && profile.address_line_1) ? profile : guest;
+    var defaultAddress = isIdentitySignedIn() ? defaultDeliveryAddress_() : null;
+    var source = defaultAddress || ((profile && profile.address_line_1) ? profile : guest);
     if (!source) return null;
     return {
       recipient_name: String(source.full_name || source.recipient_name || source.recipient || '').trim(),
@@ -10133,6 +10151,7 @@ body.is-discover .site-tabs{z-index:45!important}
     state.identityCustomerId = null;
     state.identityPhone = null;
     state.identityProfile = null;
+    state.deliveryAddresses = [];
     state.identityChallengeId = null;
     persistIdentitySession();
   }
@@ -13143,7 +13162,13 @@ function closeShopDetail() {
     v248MoveAuthoritativeNode($('verifiedQuote'),quoteHost);
     v248MoveAuthoritativeNode($('quoteNotice'),quoteHost);
     var profile=isIdentitySignedIn()&&state.identityProfile?state.identityProfile:null;
-    if(profile&&profile.address_line_1){
+    var defaultAddress=defaultDeliveryAddress_();
+    if(defaultAddress){
+      $('v248CheckoutAddressText').textContent=[
+        defaultAddress.recipient_name,defaultAddress.address_line_1,defaultAddress.address_line_2,
+        defaultAddress.postcode,defaultAddress.city,defaultAddress.state_region
+      ].filter(Boolean).join(' · ');
+    }else if(profile&&profile.address_line_1){
       $('v248CheckoutAddressText').textContent=[
         profile.full_name,profile.address_line_1,profile.address_line_2,
         profile.postcode,profile.city,profile.state_region
@@ -13161,7 +13186,7 @@ function closeShopDetail() {
   $('v248CheckoutManageAddress').addEventListener('click',function(){
     v248CloseCheckout();
     show('profile');
-    v251ShowProfilePanel_('address', false);
+    selectOwnerProfileTab_('addresses');
   });
   $('v248CheckoutQuote').addEventListener('click',function(){
     if(!lines().length)return;
@@ -13184,137 +13209,78 @@ function closeShopDetail() {
     state.identityProfile = profile;
     state.identityPhone = profile.phone_e164 || state.identityPhone;
     state.identityCustomerId = profile.customer_id || state.identityCustomerId;
-    v251SyncProfileSummary_();
-    if ($('profileFullName')) $('profileFullName').value = profile.full_name || '';
-    if ($('profilePhoneNumber')) $('profilePhoneNumber').value = profile.phone_e164 || '';
-    if ($('profileAddressLine1')) $('profileAddressLine1').value = profile.address_line_1 || '';
-    if ($('profileAddressLine2')) $('profileAddressLine2').value = profile.address_line_2 || '';
-    if ($('profilePostcode')) $('profilePostcode').value = profile.postcode || '';
-    if ($('profileCity')) $('profileCity').value = profile.city || '';
-    if ($('profileStateRegion')) $('profileStateRegion').value = profile.state_region || '';
+    ownerFillPersonal_(false);
     if ($('checkoutPhone') && profile.phone_e164 && !$('checkoutPhone').value) {
       $('checkoutPhone').value = profile.phone_e164;
     }
   }
 
-  function loadIdentityProfile() {
+  function loadIdentityProfile(force) {
     if (!isIdentitySignedIn()) return;
+    if (ownerProfileLoading_ && !force) return;
+    var token = state.identityAccessToken;
+    ownerProfileLoading_ = true;
     call('arabistaDevCustomerIdentityGetProfileV245', {
-      access_token: state.identityAccessToken
+      access_token: token
     }, function (x) {
+      ownerProfileLoading_ = false;
+      if (token !== state.identityAccessToken || !isIdentitySignedIn()) return;
       if (x && x.ok && x.profile) {
         applyProfileToForm(x.profile);
-        if ($('profileState')) {
-          $('profileState').textContent = (x.profile.full_name
-            ? (x.profile.full_name + ' · ')
-            : '') + (x.profile.phone_e164 || 'Signed in');
-        }
+        if (Array.isArray(x.addresses)) setOwnerAddresses_(x.addresses);
       }
+    }, function () {
+      ownerProfileLoading_ = false;
     });
   }
 
-  function loadLinkedOrders(force) {
-    var panel = $('linkedOrdersPanel'), list = $('linkedOrdersList');
-    var empty = $('v251OrdersEmpty'), emptyText = $('v251OrdersEmptyCopy');
-    var count = $('v251OrderCount');
+  function loadLinkedOrders() {
+    var panel = $('linkedOrdersPanel');
+    var list = $('linkedOrdersList');
     if (!panel || !list) return;
     if (!isIdentitySignedIn()) {
       panel.hidden = true;
-      list.replaceChildren();
-      if ($('v251OrdersRetry')) $('v251OrdersRetry').hidden = true;
-      if (empty) empty.hidden = false;
-      if (emptyText) emptyText.textContent = 'Sign in to see your purchases and delivery updates.';
-      if (count) count.textContent = '';
-      v251LinkedOrdersCache_ = { token:null, links:null, pending:false, failed:false };
+      list.innerHTML = '';
       return;
     }
-    var token = state.identityAccessToken;
-    if ($('v251OrdersRetry')) $('v251OrdersRetry').hidden = true;
-    function renderLinks(links) {
-      var rows = Array.isArray(links) ? links : [];
-      list.replaceChildren();
-      panel.hidden = !rows.length;
-      if ($('v251OrdersRetry')) $('v251OrdersRetry').hidden = true;
-      if ($('v251OrderAccess')) $('v251OrderAccess').hidden = !!rows.length || !state.grant;
-      if (empty) empty.hidden = !!rows.length;
-      if (emptyText) emptyText.textContent = 'No purchases are linked to this account yet.';
-      if (count) count.textContent = rows.length === 1 ? '1 ORDER' : rows.length ? rows.length + ' ORDERS' : '';
-      rows.forEach(function (link) {
-        var summary = link.order_summary || link.summary || {};
-        var ref = v251OrderText_(summary.invoice_no || summary.order_number || link.invoice_no || link.order_number);
-        var name = v251OrderText_(summary.product_name || summary.first_item_name || summary.order_display_name) || 'Arabista purchase';
-        var status = v251OrderText_(summary.payment_label || summary.customer_status_label) || 'Linked to your account';
-        var amount = Number(summary.total_sen);
-        var amountValid = summary.total_sen != null && isFinite(amount) && amount >= 0;
-        var card = document.createElement('button');
-        card.type = 'button';
-        card.className = 'v251-order-card linked-order-open';
-        card.setAttribute('aria-label', (ref ? 'View order ' + ref : 'View your Arabista order'));
-        card.setAttribute('data-order-id',String(link.external_order_id || ''));
-        card.setAttribute('data-checkout-id',String(link.external_checkout_id || ''));
-        var top = el('div',null,'v251-order-card-top');
-        var textBox = el('span',null,'v251-order-card-ref');
-        textBox.appendChild(el('strong',ref ? 'Order ' + ref : 'Your Arabista order'));
-        var date = v251PrettyDate_(summary.created_at || link.created_at_utc);
-        if (date) textBox.appendChild(el('small',date));
-        top.appendChild(textBox);
-        top.appendChild(el('span',status,'v251-order-pill'));
-        card.appendChild(top);
-        var body = el('div',null,'v251-order-card-body');
-        body.appendChild(v251OrderCover_(summary.image_url || summary.primary_media_url,'v251-order-cover'));
-        var description = el('div',null,'v251-order-card-description');
-        description.appendChild(el('strong',name));
-        description.appendChild(el('small',summary.variant_label || 'Tap to view your purchase details'));
-        if (amountValid) description.appendChild(el('strong',money(amount)));
-        body.appendChild(description);
-        card.appendChild(body);
-        var bottom = el('div',null,'v251-order-card-bottom');
-        bottom.appendChild(el('span','Your order details'));
-        bottom.appendChild(el('b','View order ↗'));
-        card.appendChild(bottom);
-        card.addEventListener('click',function(){
-          if (!link.external_order_id) return;
-          openOwnedLinkedOrder_(link.external_order_id,link.external_checkout_id,
-            'Your order details are ready.');
-        });
-        list.appendChild(card);
-      });
-    }
-    if (!force && v251LinkedOrdersCache_.token === token) {
-      if (v251LinkedOrdersCache_.links) {
-        if (list.children.length !== v251LinkedOrdersCache_.links.length) renderLinks(v251LinkedOrdersCache_.links);
-        return;
-      }
-      if (v251LinkedOrdersCache_.pending || v251LinkedOrdersCache_.failed) return;
-    }
-    v251LinkedOrdersCache_ = { token:token, links:null, pending:true, failed:false };
-    if (empty) empty.hidden = false;
-    if (emptyText) emptyText.textContent = 'Finding your orders…';
     call('arabistaDevCustomerIdentityListLinkedOrdersV244', {
-      access_token: token
-    }, function (response) {
-      if (state.identityAccessToken !== token || !isIdentitySignedIn()) return;
-      if (!(response && response.ok && Array.isArray(response.links))) {
-        v251LinkedOrdersCache_ = { token:token, links:null, pending:false, failed:true };
+      access_token: state.identityAccessToken
+    }, function (x) {
+      if (!(x && x.ok && Array.isArray(x.links) && x.links.length)) {
         panel.hidden = true;
-        if (empty) empty.hidden = false;
-        if (emptyText) emptyText.textContent = 'Your orders could not be loaded. Please try again.';
-        if ($('v251OrdersRetry')) $('v251OrdersRetry').hidden = false;
+        list.innerHTML = '';
         return;
       }
-      v251LinkedOrdersCache_ = { token:token, links:response.links, pending:false, failed:false };
-      renderLinks(response.links);
-    }, function () {
-      if (state.identityAccessToken !== token || !isIdentitySignedIn()) return;
-      v251LinkedOrdersCache_ = { token:token, links:null, pending:false, failed:true };
-      panel.hidden = true;
-      if (empty) empty.hidden = false;
-      if (emptyText) emptyText.textContent = 'Your orders could not be loaded. Please try again.';
-      if ($('v251OrdersRetry')) $('v251OrdersRetry').hidden = false;
+      panel.hidden = false;
+      list.innerHTML = '';
+      x.links.forEach(function (link) {
+        var row = document.createElement('div');
+        row.className = 'cart-actions';
+        row.style.marginBottom = '8px';
+        var label = document.createElement('span');
+        label.className = 'fine-print';
+        label.textContent = String(link.external_order_id || '') + ' · ' + String(link.link_state || '');
+        var btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'action-secondary linked-order-open';
+        btn.textContent = 'Open';
+        btn.setAttribute('data-order-id', String(link.external_order_id || ''));
+        btn.setAttribute('data-checkout-id', String(link.external_checkout_id || ''));
+        btn.addEventListener('click', function () {
+          openOwnedLinkedOrder_(
+            link.external_order_id,
+            link.external_checkout_id,
+            'Opened one of your linked orders.'
+          );
+        });
+        row.appendChild(label);
+        row.appendChild(btn);
+        list.appendChild(row);
+      });
     });
   }
 
-    function applyCustomerSurfaceControls_() {
+  function applyCustomerSurfaceControls_() {
     var customerSurface = window.__ARABISTA_V251_SANDBOX_CHECKOUT__ === true;
     [
       'btnSellerDetail',
@@ -13340,16 +13306,8 @@ function closeShopDetail() {
     applyCustomerSurfaceControls_();
     if ($('profileSignedOut')) $('profileSignedOut').hidden = identitySignedIn;
     if ($('profileSignedIn')) $('profileSignedIn').hidden = !identitySignedIn;
-    if ($('v251OrderAccess')) $('v251OrderAccess').hidden = !state.grant
-      || (identitySignedIn && $('linkedOrdersPanel') && !$('linkedOrdersPanel').hidden);
-    if ($('v251OrderSignIn')) $('v251OrderSignIn').hidden = identitySignedIn;
-    if (!identitySignedIn) v251ShowProfilePanel_('home', false);
-    else v251SyncProfileSummary_();
-    if ($('profilePhoneNumber') && identitySignedIn && $('profilePhoneNumber').value !== (state.identityPhone || '')) {
-      $('profilePhoneNumber').value = state.identityPhone || '';
-    }
-    if ($('profileState')) $('profileState').textContent =
-      identitySignedIn ? (state.identityPhone || 'Signed in') : '';
+    if (!identitySignedIn) ownerResetProfile_();
+    else ownerFillPersonal_(false);
     if (identitySignedIn) {
       loadIdentityProfile();
       loadLinkedOrders();
@@ -15012,9 +14970,7 @@ function attachSheetResizeHandle(handle,sheet,apply,ratio){
     }
     var previousTab = tabId;
     tabId = id;
-    if (id === 'profile' && previousTab !== 'profile') v251ShowProfilePanel_('home', false);
-    // Refresh the linked-order summaries on a fresh visit; retain cached list between ordinary rerenders.
-    if (id === 'orders' && previousTab !== 'orders' && isIdentitySignedIn()) loadLinkedOrders(true);
+    if (id === 'profile' && previousTab !== 'profile') selectOwnerProfileTab_('personal', false);
     document.body.classList.toggle('v248-bag-active', id === 'cart');
     document.querySelectorAll('.tab').forEach(function (el2) { el2.classList.remove('on'); });
     var tab = $(id);
@@ -15027,8 +14983,7 @@ function attachSheetResizeHandle(handle,sheet,apply,ratio){
     document.querySelectorAll('main .tab').forEach(function (panel) {
       panel.setAttribute('aria-hidden', panel.id === id ? 'false' : 'true');
     });
-    $('main').className = id === 'discover' ? 'discover-mode' : (id === 'orders' || id === 'profile' ? 'v251-account-main' : '');
-    if (id !== 'orders') v251CloseOrderDetail_(false);
+    $('main').className = id === 'discover' ? 'discover-mode' : (id === 'profile' ? 'v251-profile-main' : '');
     document.body.classList.toggle('is-discover', id === 'discover');
     if (id !== 'shop') closeShopDetail();
     if (sheetState && id !== 'discover') closeSheet();
@@ -15767,115 +15722,228 @@ function attachSheetResizeHandle(handle,sheet,apply,ratio){
     });
   }
 
-  // My Orders: real account linkage and order detail stay on existing RPCs.
-  if ($('v251OrderSignIn')) $('v251OrderSignIn').addEventListener('click',function(){
-    openIdentityModal('login');
-  });
-  if ($('v251OrdersRetry')) $('v251OrdersRetry').addEventListener('click',function(){
-    loadLinkedOrders(true);
-  });
-  if ($('v251OrderDetailBack')) $('v251OrderDetailBack').addEventListener('click',function(){
-    v251CloseOrderDetail_(true);
-  });
-  if ($('v251OrderDetailLayer')) $('v251OrderDetailLayer').addEventListener('keydown',function(e){
-    if (e.key === 'Escape') { e.preventDefault(); v251CloseOrderDetail_(true); return; }
-    if (e.key !== 'Tab') return;
-    var nodes = Array.prototype.slice.call(this.querySelectorAll('button:not(:disabled),a[href],[tabindex="0"]'))
-      .filter(function(node){return node.getClientRects().length > 0;});
-    if (!nodes.length) return;
-    var first=nodes[0],last=nodes[nodes.length-1];
-    if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
-    else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
-  });
-  // Profile: focused views reuse every existing Save, password, OTP and sign-out handler.
-  Array.prototype.forEach.call(document.querySelectorAll('[data-v251-profile-panel]'),function(btn){
-    btn.addEventListener('click',function(){
-      v251ShowProfilePanel_(btn.getAttribute('data-v251-profile-panel'), true);
+  // Owner Profile: tabs, Personal Information, Delivery Address, Account Setting.
+  OWNER_PROFILE_TABS_.forEach(function (name, index) {
+    var button = $('profile-tab-' + name);
+    if (!button) return;
+    button.addEventListener('click', function () { selectOwnerProfileTab_(name, false); });
+    button.addEventListener('keydown', function (event) {
+      var next = -1;
+      if (event.key === 'ArrowRight') next = (index + 1) % OWNER_PROFILE_TABS_.length;
+      else if (event.key === 'ArrowLeft') next = (index + OWNER_PROFILE_TABS_.length - 1) % OWNER_PROFILE_TABS_.length;
+      else if (event.key === 'Home') next = 0;
+      else if (event.key === 'End') next = OWNER_PROFILE_TABS_.length - 1;
+      if (next >= 0) { event.preventDefault(); selectOwnerProfileTab_(OWNER_PROFILE_TABS_[next], true); }
     });
-  });
-  if ($('v251ProfileBack')) $('v251ProfileBack').addEventListener('click',function(){
-    v251ShowProfilePanel_('home',true);
   });
 
-  [['profileChangePasswordBtn','profileChangePasswordForm'],
-   ['profileChangePhoneBtn','profileChangePhoneForm']].forEach(function (pair) {
-    var trigger = $(pair[0]), panel = $(pair[1]);
-    if (!trigger || !panel) return;
-    trigger.addEventListener('click', function () {
-      panel.hidden = !panel.hidden;
-      trigger.setAttribute('aria-expanded', panel.hidden ? 'false' : 'true');
-    });
-  });
-  if ($('profileDetailsForm')) $('profileDetailsForm').addEventListener('submit', function (e) {
-    e.preventDefault();
+  if ($('profile-personal-form')) $('profile-personal-form').addEventListener('submit', function (event) {
+    event.preventDefault();
+    var form = event.currentTarget;
     if (!isIdentitySignedIn()) {
-      $('profileDetailsNotice').textContent = 'Sign in to save your details.';
+      ownerFeedback_('profile-personal-status', 'Sign in to save your details.', 'error');
       return;
     }
-    $('profileDetailsNotice').textContent = 'Saving…';
-    call('arabistaDevCustomerIdentitySaveProfileV245', {
-      access_token: state.identityAccessToken,
-      full_name: $('profileFullName') && $('profileFullName').value,
-      address_line_1: $('profileAddressLine1') && $('profileAddressLine1').value,
-      address_line_2: $('profileAddressLine2') && $('profileAddressLine2').value,
-      postcode: $('profilePostcode') && $('profilePostcode').value,
-      city: $('profileCity') && $('profileCity').value,
-      state_region: $('profileStateRegion') && $('profileStateRegion').value,
-      country_code: 'MY'
+    if (!form.reportValidity()) return;
+    if (ownerBusy_.personal) return;
+    var profile = state.identityProfile || {};
+    var loginPhone = profile.phone_e164 || state.identityPhone || '';
+    var phoneChanged = ownerPhoneKey_($('profile-telephone').value) !== ownerPhoneKey_(loginPhone);
+    ownerBusy_.personal = true;
+    ownerFeedback_('profile-personal-status', 'Saving…');
+    // Name + email only; the saved address fields are preserved server-side and the login phone is never edited here.
+    ownerRpc_('arabistaDevCustomerIdentitySaveProfileV245', {
+      full_name: $('profile-name').value.trim(),
+      contact_email: $('profile-email').value.trim()
     }, function (x) {
-      if (x && x.ok && x.profile) {
+      ownerBusy_.personal = false;
+      if (x && x.ok === true && x.profile) {
         applyProfileToForm(x.profile);
-        $('profileDetailsNotice').textContent = 'Details saved.';
+        if (Array.isArray(x.addresses)) setOwnerAddresses_(x.addresses);
+        ownerFillPersonal_(true);
+        if (phoneChanged) {
+          ownerFeedback_('profile-personal-status',
+            'Name and email saved. Your telephone number is your WhatsApp login number; to change it, use Account Setting › WhatsApp Number.',
+            'success');
+        } else {
+          ownerFeedback_('profile-personal-status', 'Saved to your Arabista account.', 'success');
+        }
       } else {
-        $('profileDetailsNotice').textContent = 'Could not save: ' + String((x && x.reason) || 'refused');
+        ownerFeedback_('profile-personal-status',
+          ownerReasonText_(x && x.reason, 'Could not save your details. Please try again.'), 'error');
       }
     });
   });
-  if ($('profileChangePasswordForm')) $('profileChangePasswordForm').addEventListener('submit', function (e) {
-    e.preventDefault();
-    if (!isIdentitySignedIn()) return;
-    $('profilePasswordNotice').textContent = 'Updating password…';
-    call('arabistaDevCustomerIdentityChangePasswordV245', {
-      access_token: state.identityAccessToken,
-      current_password: $('profileCurrentPassword') && $('profileCurrentPassword').value,
-      new_password: $('profileNewPassword') && $('profileNewPassword').value
-    }, function (x) {
-      $('profilePasswordNotice').textContent = (x && x.ok)
-        ? 'Password updated.'
-        : ('Password change failed: ' + String((x && x.reason) || 'refused'));
+
+  if ($('profile-add-address')) $('profile-add-address').addEventListener('click', function () { openOwnerAddressEditor_(null); });
+  if ($('profile-address-close')) $('profile-address-close').addEventListener('click', closeOwnerAddressEditor_);
+  if ($('profile-address-cancel')) $('profile-address-cancel').addEventListener('click', closeOwnerAddressEditor_);
+  if ($('profile-address-form')) $('profile-address-form').addEventListener('submit', function (event) {
+    event.preventDefault();
+    var form = event.currentTarget;
+    if (!isIdentitySignedIn()) {
+      ownerFeedback_('profile-address-status', 'Sign in to save an address.', 'error');
+      return;
+    }
+    if (!form.reportValidity()) return;
+    if (!ownerPhoneLooksValid_($('address-phone').value)) {
+      ownerFeedback_('profile-address-status', 'Please enter a valid telephone number.', 'error');
+      $('address-phone').focus();
+      return;
+    }
+    var values = {};
+    ['label', 'recipient', 'phone', 'line1', 'line2', 'postcode', 'city', 'state'].forEach(function (key) {
+      values[key] = String(form.elements.namedItem(key).value || '').trim();
+    });
+    if (!/^\d{5}$/.test(values.postcode)) {
+      ownerFeedback_('profile-address-status', 'Enter a 5-digit Malaysian postcode.', 'error');
+      $('address-postcode').focus();
+      return;
+    }
+    if (ownerBusy_.address) return;
+    ownerBusy_.address = true;
+    var submit = form.querySelector('button[type="submit"]');
+    if (submit) submit.disabled = true;
+    ownerFeedback_('profile-address-status', 'Saving address…');
+    var payload = {
+      label: values.label,
+      recipient_name: values.recipient,
+      phone: values.phone,
+      address_line_1: values.line1,
+      address_line_2: values.line2,
+      postcode: values.postcode,
+      city: values.city,
+      state_region: values.state,
+      country_code: 'MY',
+      is_default: $('address-default').checked || ownerAddresses_().length === 0
+    };
+    if (ownerEditingAddressId_) payload.address_id = ownerEditingAddressId_;
+    ownerRpc_('arabistaDevCustomerIdentityUpsertAddressV251', payload, function (x) {
+      ownerBusy_.address = false;
+      if (submit) submit.disabled = false;
+      if (x && x.ok === true) {
+        closeOwnerAddressEditor_();
+        ownerApplyAddressResult_(x, false);
+        var scroller = $('profile-scroll');
+        if (scroller) scroller.scrollTop = 0;
+        toast('Address saved.');
+      } else {
+        ownerFeedback_('profile-address-status',
+          ownerReasonText_(x && x.reason, 'Could not save this address. Please try again.'), 'error');
+      }
     });
   });
-  if ($('profileRequestPhoneCodeBtn')) $('profileRequestPhoneCodeBtn').addEventListener('click', function () {
-    if (!isIdentitySignedIn()) return;
-    $('profilePhoneChangeNotice').textContent = 'Requesting WhatsApp code…';
-    call('arabistaDevCustomerIdentityRequestPhoneChangeOtpV245', {
-      access_token: state.identityAccessToken,
-      new_phone_e164: $('profileNewPhone') && $('profileNewPhone').value
+
+  if ($('profile-password-form')) $('profile-password-form').addEventListener('submit', function (event) {
+    event.preventDefault();
+    var form = event.currentTarget;
+    if (!isIdentitySignedIn()) {
+      ownerFeedback_('profile-password-status', 'Sign in to change your password.', 'error');
+      return;
+    }
+    var current = $('profile-current-password').value;
+    var next = $('profile-new-password').value;
+    var confirmValue = $('profile-confirm-password').value;
+    if (!current || next.length < 8) {
+      ownerFeedback_('profile-password-status', 'Enter your current password and a new password of at least 8 characters.', 'error');
+      return;
+    }
+    if (next !== confirmValue) {
+      ownerFeedback_('profile-password-status', 'New passwords do not match.', 'error');
+      return;
+    }
+    if (ownerBusy_.password) return;
+    ownerBusy_.password = true;
+    ownerFeedback_('profile-password-status', 'Updating password…');
+    ownerRpc_('arabistaDevCustomerIdentityChangePasswordV245', {
+      current_password: current,
+      new_password: next
     }, function (x) {
+      ownerBusy_.password = false;
+      if (x && x.ok === true) {
+        form.reset();
+        ownerFeedback_('profile-password-status', 'Password updated.', 'success');
+      } else {
+        ownerFeedback_('profile-password-status',
+          ownerReasonText_(x && x.reason, 'Could not change your password. Please try again.'), 'error');
+      }
+    });
+  });
+
+  if ($('profile-send-code')) $('profile-send-code').addEventListener('click', function () {
+    if (!isIdentitySignedIn()) {
+      ownerFeedback_('profile-whatsapp-status', 'Sign in to change your WhatsApp number.', 'error');
+      return;
+    }
+    if (!ownerPhoneLooksValid_($('profile-new-whatsapp').value)) {
+      ownerFeedback_('profile-whatsapp-status', 'Enter a valid new WhatsApp number.', 'error');
+      $('profile-new-whatsapp').focus();
+      return;
+    }
+    if (ownerBusy_.sendCode) return;
+    ownerBusy_.sendCode = true;
+    var button = $('profile-send-code');
+    button.disabled = true;
+    ownerFeedback_('profile-whatsapp-status', 'Requesting verification code…');
+    ownerRpc_('arabistaDevCustomerIdentityRequestPhoneChangeOtpV245', {
+      new_phone_e164: $('profile-new-whatsapp').value
+    }, function (x) {
+      ownerBusy_.sendCode = false;
+      button.disabled = false;
       state.identityChallengeId = x && x.challenge_id ? x.challenge_id : null;
-      $('profilePhoneChangeNotice').textContent = (x && x.ok)
-        ? (x.whatsapp_otp_executable
-          ? 'Code sent. Enter it below to confirm the new number.'
-          : ('Code send blocked (' + String(x.dispatch_state || 'BLOCKED') + '). Meta auth template approval still required.'))
-        : ('Could not start phone change: ' + String((x && x.reason) || 'refused'));
+      if (x && x.ok === true && x.whatsapp_otp_executable) {
+        ownerFeedback_('profile-whatsapp-status', 'Verification code sent to your new WhatsApp number.', 'success');
+      } else if (x && x.ok === true) {
+        state.identityChallengeId = null;
+        ownerFeedback_('profile-whatsapp-status',
+          'WhatsApp code delivery is unavailable right now. No code was sent. Please try again later.', 'error');
+      } else {
+        state.identityChallengeId = null;
+        ownerFeedback_('profile-whatsapp-status',
+          ownerReasonText_(x && x.reason, 'Could not start the number change. Please try again.'), 'error');
+      }
     });
   });
-  if ($('profileChangePhoneForm')) $('profileChangePhoneForm').addEventListener('submit', function (e) {
-    e.preventDefault();
-    if (!isIdentitySignedIn()) return;
-    $('profilePhoneChangeNotice').textContent = 'Verifying…';
-    call('arabistaDevCustomerIdentityCompletePhoneChangeV245', {
-      access_token: state.identityAccessToken,
-      new_phone_e164: $('profileNewPhone') && $('profileNewPhone').value,
+
+  if ($('profile-whatsapp-form')) $('profile-whatsapp-form').addEventListener('submit', function (event) {
+    event.preventDefault();
+    var form = event.currentTarget;
+    if (!isIdentitySignedIn()) {
+      ownerFeedback_('profile-whatsapp-status', 'Sign in to change your WhatsApp number.', 'error');
+      return;
+    }
+    if (!ownerPhoneLooksValid_($('profile-new-whatsapp').value)) {
+      ownerFeedback_('profile-whatsapp-status', 'Enter a valid new WhatsApp number.', 'error');
+      return;
+    }
+    var code = $('profile-verification-code').value.trim();
+    if (!/^\d{6}$/.test(code)) {
+      ownerFeedback_('profile-whatsapp-status', 'Enter a 6-digit verification code.', 'error');
+      return;
+    }
+    if (!state.identityChallengeId) {
+      ownerFeedback_('profile-whatsapp-status', 'Request a verification code first.', 'error');
+      return;
+    }
+    if (ownerBusy_.completePhone) return;
+    ownerBusy_.completePhone = true;
+    ownerFeedback_('profile-whatsapp-status', 'Verifying…');
+    ownerRpc_('arabistaDevCustomerIdentityCompletePhoneChangeV245', {
+      new_phone_e164: $('profile-new-whatsapp').value,
       challenge_id: state.identityChallengeId,
-      otp_code: $('profileNewPhoneOtp') && $('profileNewPhoneOtp').value
+      otp_code: code
     }, function (x) {
-      if (x && x.ok && x.profile) {
+      ownerBusy_.completePhone = false;
+      if (x && x.ok === true && x.profile) {
         applyProfileToForm(x.profile);
         persistIdentitySession();
-        $('profilePhoneChangeNotice').textContent = 'Registered mobile updated.';
+        state.identityChallengeId = null;
+        form.reset();
+        ownerFillPersonal_(true);
+        ownerFeedback_('profile-whatsapp-status', 'WhatsApp number updated.', 'success');
       } else {
-        $('profilePhoneChangeNotice').textContent = 'Phone change failed: ' + String((x && x.reason) || 'refused');
+        ownerFeedback_('profile-whatsapp-status',
+          ownerReasonText_(x && x.reason, 'The code could not be verified. Request a new code and try again.'), 'error');
       }
     });
   });
@@ -15883,7 +15951,7 @@ function attachSheetResizeHandle(handle,sheet,apply,ratio){
   if ($('btnIdentityLogout')) {
     $('btnIdentityLogout').addEventListener('click', function () {
       clearIdentitySession();
-      v251ShowProfilePanel_('home', false);
+      selectOwnerProfileTab_('personal', false);
       renderProfile();
     });
   }
