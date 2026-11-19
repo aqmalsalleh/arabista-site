@@ -1,0 +1,299 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="robots" content="noindex,nofollow">
+  <meta name="theme-color" content="#090909">
+  <title>Arabista — Profile Visual Preview</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    *{box-sizing:border-box}
+    [hidden]{display:none!important}
+    html,body{margin:0;width:100%;height:100%;background:#171718}
+    body{font-family:"DM Sans",Inter,system-ui,sans-serif}
+    button,input{font:inherit}
+    button{cursor:pointer;-webkit-tap-highlight-color:transparent}
+    .app{position:relative;width:100%;max-width:440px;height:100dvh;max-height:956px;margin:auto;background:#fff;overflow:hidden;box-shadow:0 14px 55px #0005}
+    #profile{height:calc(100% - 54px - env(safe-area-inset-bottom,0px));padding-top:env(safe-area-inset-top,0px);overflow:auto;overscroll-behavior:contain}
+    .bottom{position:absolute;left:0;right:0;bottom:0;height:calc(54px + env(safe-area-inset-bottom,0px));padding-bottom:env(safe-area-inset-bottom,0px);background:#090909;border-top:1px solid #333;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));align-items:center}
+    .bottom button{display:flex;align-items:center;justify-content:center;flex-direction:column;gap:3px;width:100%;min-width:0;height:52px;border:0;background:none;color:#aaa;font-size:10px;font-weight:600;line-height:1.1}
+    .bottom button.selected{color:#f5f1e8}
+    .bottom svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+    .bottom .shop-button{color:#c0a062}
+    .bottom .shop-glyph{width:39px;height:28px;display:grid;place-items:center;border:1px solid #c0a062b3;border-radius:7px;background:#c0a06221}
+    .bottom .shop-glyph svg{width:19px;height:19px}
+    .preview-stamp{position:absolute;left:50%;bottom:calc(65px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);white-space:nowrap;padding:7px 12px;border-radius:99px;background:#f0f0f0ed;border:1px solid #e3e3e3;color:#777;font-size:10px;z-index:20;pointer-events:none}
+    @media(min-width:700px){.app{border-radius:14px}}
+    @media(max-width:699px){.app{max-height:none;box-shadow:none}}
+    /* v2.51 Profile reset — native, minimal, reference-led. No former editorial Profile UI. */
+#profile.tab {
+  --v251p-ink:#161823; --v251p-muted:#858585; --v251p-line:#eeeeee; --v251p-gold:#b39257;
+  background:#fff!important; color:var(--v251p-ink)!important; color-scheme:light;
+  min-height:100%; font-family:"DM Sans",Inter,system-ui,sans-serif!important;
+}
+#profile.tab [hidden]{display:none!important}
+#profile .v251p-shell{width:min(100%,620px);margin:0 auto;min-height:100%;padding:0 0 calc(105px + env(safe-area-inset-bottom,0px));}
+#profile .v251p-header{display:flex;align-items:center;height:60px;padding:0 21px;border-bottom:1px solid var(--v251p-line);}
+#profile .v251p-header h1{margin:0;font:700 18px/1.3 "DM Sans",sans-serif;letter-spacing:-.025em;color:var(--v251p-ink)}
+#profile .v251p-member{display:flex;align-items:center;gap:15px;padding:31px 21px 29px;border-bottom:8px solid #f7f7f7}
+#profile .v251p-avatar{display:grid;place-items:center;flex:0 0 58px;width:58px;height:58px;background:#1c1c1c;border:1px solid #323232;border-radius:50%;color:#d3b37d;font:600 23px/1 "DM Sans",sans-serif}
+#profile .v251p-member-copy{display:flex;flex-direction:column;gap:5px;min-width:0}
+#profile .v251p-member-copy strong{font:700 19px/1.25 "DM Sans",sans-serif;color:#171717;letter-spacing:-.035em;overflow-wrap:anywhere}
+#profile .v251p-member-copy>span{color:#838383;font:400 12px/1.4 "DM Sans",sans-serif;overflow-wrap:anywhere}
+#profile .v251p-group{padding:26px 21px 0}
+#profile .v251p-group h2{margin:0 0 12px;color:#8b8b8b;font:700 10px/1.3 "DM Sans",sans-serif;letter-spacing:.09em}
+#profile .v251p-menu{border-top:1px solid var(--v251p-line)}
+#profile .v251p-menu-row{display:flex;align-items:center;gap:16px;width:100%;min-height:67px;padding:12px 0;border:0;border-bottom:1px solid var(--v251p-line);background:#fff;color:#202020;text-align:left;cursor:pointer;font:600 14px/1.3 "DM Sans",sans-serif;letter-spacing:-.012em;transition:background .15s ease}
+#profile .v251p-menu-row>span{flex:1;min-width:0}
+#profile .v251p-menu-row small{display:block;font:400 11px/1.35 "DM Sans",sans-serif;color:#939393;margin-top:4px;overflow-wrap:anywhere}
+#profile .v251p-row-icon,#profile .v251p-chevron,#profile .v251p-back svg,#profile .v251p-signedout svg{display:block;fill:none;stroke:currentColor;stroke-width:1.75;stroke-linejoin:round;stroke-linecap:round}
+#profile .v251p-row-icon{width:21px;height:21px;color:#595959;flex:0 0 21px}
+#profile .v251p-chevron{width:17px;height:17px;color:#a2a2a2;flex:0 0 17px}
+#profile .v251p-signout{margin:26px 21px 0;padding:11px 0;border:0;background:none;color:#777;font:600 13px "DM Sans",sans-serif}
+#profile .v251p-subhead{display:grid;grid-template-columns:44px minmax(0,1fr) 44px;align-items:center;min-height:60px;padding:0 12px;border-bottom:1px solid var(--v251p-line)}
+#profile .v251p-subhead h2{text-align:center;margin:0;font:700 16px/1.3 "DM Sans",sans-serif;color:#171717;letter-spacing:-.022em}
+#profile .v251p-back{display:grid;place-items:center;width:44px;height:44px;border:0;background:#fff;color:#222;padding:0}
+#profile .v251p-back svg{width:23px;height:23px}
+#profile .v251p-form{padding:25px 21px 0}
+#profile .v251p-field{display:flex;flex-direction:column;gap:8px;margin:0 0 22px;color:#393939;font:600 12px/1.4 "DM Sans",sans-serif}
+#profile .v251p-field input{display:block;width:100%;height:51px;min-height:51px;border:1px solid #e5e5e5;border-radius:10px;background:#f8f8f8;color:#232323;padding:11px 14px;outline:0;font:400 16px/1.4 "DM Sans",sans-serif;letter-spacing:0;-webkit-appearance:none}
+#profile .v251p-field input:focus{border-color:#bca16f;box-shadow:0 0 0 2px rgba(188,161,111,.12);background:#fff}
+#profile .v251p-field input[readonly]{color:#878787;background:#f5f5f5}
+#profile .v251p-field input::placeholder{color:#a3a3a3}
+#profile .v251p-field-pair{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+#profile .v251p-hint{margin:-13px 0 23px;color:#909090;font:400 11px/1.5 "DM Sans",sans-serif}
+#profile .v251p-optional{font-weight:400;color:#aaa}
+#profile .v251p-form-actions{padding:8px 0 16px}
+#profile .v251p-form-actions>p,#profile .v251p-settings-form>p{min-height:16px;color:#7b746a;font:400 12px/1.4 "DM Sans",sans-serif;margin:0 0 12px;overflow-wrap:anywhere}
+#profile .v251p-primary{display:flex;align-items:center;justify-content:center;gap:9px;width:100%;min-height:49px;padding:12px 19px;border:0;border-radius:999px;background:#191919;color:#fff;font:700 13px/1.3 "DM Sans",sans-serif;transition:transform .15s ease,background .15s ease}
+#profile .v251p-primary:active{transform:scale(.985)}
+#profile .v251p-primary span{font-size:19px;font-weight:400}
+#profile .v251p-secondary{min-height:44px;padding:10px 17px;margin:0 0 20px;border:1px solid #d7c6a7;border-radius:999px;background:#fff;color:#8f7448;font:700 12px "DM Sans",sans-serif}
+#profile .v251p-security{padding:16px 21px 12px}
+#profile .v251p-security-trigger:first-of-type{border-top:1px solid var(--v251p-line)}
+#profile .v251p-settings-form{padding:21px 2px 9px;border-bottom:1px solid var(--v251p-line)}
+#profile .v251p-security-trigger[aria-expanded="true"] .v251p-chevron{transform:rotate(90deg)}
+#profile .v251p-sr-only{position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+#profile .v251p-signedout{max-width:400px;margin:0 auto;padding:85px 28px 28px;display:flex;flex-direction:column;align-items:center;text-align:center}
+#profile .v251p-signedout-mark{display:grid;place-items:center;width:70px;height:70px;border-radius:50%;background:#f5f5f5;color:#a48c65}
+#profile .v251p-signedout svg{width:30px;height:30px}
+#profile .v251p-signedout h2{font:700 21px/1.3 "DM Sans",sans-serif;letter-spacing:-.035em;margin:24px 0 5px}
+#profile .v251p-signedout p{font:400 13px/1.5 "DM Sans",sans-serif;color:#888;margin:0 0 27px}
+#profile button:focus-visible{outline:2px solid #b39257;outline-offset:3px}
+@media(hover:hover){#profile .v251p-menu-row:hover{background:#fafafa}}
+@media(max-width:370px){#profile .v251p-field-pair{gap:9px}#profile .v251p-header{padding:0 16px}#profile .v251p-member{padding-left:17px;padding-right:17px}#profile .v251p-group,#profile .v251p-form,#profile .v251p-security{padding-left:17px;padding-right:17px}}
+@media(prefers-reduced-motion:reduce){#profile .v251p-menu-row,#profile .v251p-primary{transition:none}}
+
+
+  </style>
+</head>
+<body>
+<main class="app" aria-label="Arabista Profile preview">
+    <section id="profile" class="tab v251-profile" role="tabpanel" aria-labelledby="tab-profile">
+      <div class="v251p-shell">
+        <header id="v251ProfileHeader" class="v251p-header">
+          <h1 id="v251ProfileHomeTitle">Profile</h1>
+        </header>
+
+        <div id="profileSignedOut" hidden class="v251p-signedout">
+          <span class="v251p-signedout-mark" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.6"/><path d="M4.5 20c.5-4.1 3.3-6 7.5-6s7 1.9 7.5 6"/></svg>
+          </span>
+          <h2>Your account</h2>
+          <p>Sign in to manage your details.</p>
+          <button type="button" id="btnIdentityLogin" class="v251p-primary">Sign in <span aria-hidden="true">→</span></button>
+        </div>
+
+        <div id="profileSignedIn">
+          <div id="v251ProfileHub" class="v251p-home">
+            <div class="v251p-member">
+              <span id="v251ProfileAvatar" class="v251p-avatar" aria-hidden="true">S</span>
+              <div class="v251p-member-copy">
+                <strong id="v251ProfileName">Sample Customer</strong>
+                <span id="v251ProfilePhone">+60 12 000 0000</span>
+              </div>
+            </div>
+            <p id="profileState" role="status" aria-live="polite" hidden></p>
+
+            <div class="v251p-group">
+              <h2>ACCOUNT</h2>
+              <div class="v251p-menu" role="group" aria-label="Account options">
+                <button type="button" class="v251p-menu-row" data-v251-profile-panel="personal">
+                  <svg class="v251p-row-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="7.5" r="3.5"/><path d="M4.5 20c.5-4.2 3.2-6.4 7.5-6.4s7 2.2 7.5 6.4"/></svg>
+                  <span>Personal information</span><svg class="v251p-chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg>
+                </button>
+                <button type="button" class="v251p-menu-row" data-v251-profile-panel="address">
+                  <svg class="v251p-row-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M19 10c0 5-7 11-7 11S5 15 5 10a7 7 0 1 1 14 0Z"/><circle cx="12" cy="10" r="2.2"/></svg>
+                  <span>Delivery address <small id="v251ProfileAddressPreview">Kuala Lumpur</small></span><svg class="v251p-chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg>
+                </button>
+                <button type="button" class="v251p-menu-row" data-v251-profile-panel="security">
+                  <svg class="v251p-row-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="10" width="14" height="11" rx="2"/><path d="M8.5 10V7a3.5 3.5 0 0 1 7 0v3"/></svg>
+                  <span>Account settings</span><svg class="v251p-chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg>
+                </button>
+              </div>
+            </div>
+
+            <button type="button" id="btnIdentityLogout" class="v251p-signout">Sign out</button>
+          </div>
+
+          <header id="v251ProfileSubhead" class="v251p-subhead" hidden>
+            <button type="button" id="v251ProfileBack" class="v251p-back" aria-label="Back to Profile">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 5-7 7 7 7"/></svg>
+            </button>
+            <h2 id="v251ProfilePanelTitle">Personal information</h2>
+            <span class="v251p-head-spacer" aria-hidden="true"></span>
+          </header>
+
+          <form id="profileDetailsForm" class="v251p-form" autocomplete="on" hidden>
+            <div id="v251ProfilePersonalFields">
+              <label class="v251p-field">Full name
+                <input id="profileFullName" name="full_name" autocomplete="name" maxlength="120" placeholder="Full name" />
+              </label>
+              <label class="v251p-field">WhatsApp number
+                <input id="profilePhoneNumber" name="phone_e164" type="tel" readonly aria-describedby="profilePhoneNote" />
+              </label>
+              <p class="v251p-hint" id="profilePhoneNote">Change this in Account settings.</p>
+            </div>
+
+            <div id="v251ProfileAddressFields" hidden>
+              <label class="v251p-field">Address line 1
+                <input id="profileAddressLine1" name="address_line_1" autocomplete="address-line1" maxlength="180" placeholder="Street address" />
+              </label>
+              <label class="v251p-field">Address line 2 <span class="v251p-optional">Optional</span>
+                <input id="profileAddressLine2" name="address_line_2" autocomplete="address-line2" maxlength="180" placeholder="Unit / building" />
+              </label>
+              <div class="v251p-field-pair">
+                <label class="v251p-field">Postcode
+                  <input id="profilePostcode" name="postal_code" autocomplete="postal-code" inputmode="numeric" maxlength="12" placeholder="Postcode" />
+                </label>
+                <label class="v251p-field">City
+                  <input id="profileCity" name="city" autocomplete="address-level2" maxlength="100" placeholder="City" />
+                </label>
+              </div>
+              <div class="v251p-field-pair">
+                <label class="v251p-field">State
+                  <input id="profileStateRegion" name="state" autocomplete="address-level1" maxlength="100" placeholder="State" />
+                </label>
+                <label class="v251p-field">Country
+                  <input id="profileCountry" name="country" autocomplete="country-name" value="Malaysia" readonly />
+                </label>
+              </div>
+            </div>
+
+            <div class="v251p-form-actions">
+              <p id="profileDetailsNotice" role="status" aria-live="polite"></p>
+              <button type="submit" id="profileSaveButton" class="v251p-primary">Save changes</button>
+            </div>
+          </form>
+
+          <section id="v251ProfileSecurityPanel" class="v251p-security" aria-labelledby="profileSettingsTitle" hidden>
+            <h3 id="profileSettingsTitle" class="v251p-sr-only">Account settings</h3>
+            <button type="button" id="profileChangePasswordBtn" class="v251p-menu-row v251p-security-trigger" aria-expanded="false" aria-controls="profileChangePasswordForm">
+              <svg class="v251p-row-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
+              <span>Change password</span><svg class="v251p-chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg>
+            </button>
+            <form id="profileChangePasswordForm" class="v251p-settings-form" hidden>
+              <label class="v251p-field">Current password
+                <input id="profileCurrentPassword" type="password" autocomplete="current-password" />
+              </label>
+              <label class="v251p-field">New password
+                <input id="profileNewPassword" type="password" autocomplete="new-password" />
+              </label>
+              <p id="profilePasswordNotice" role="status" aria-live="polite"></p>
+              <button class="v251p-primary" type="submit">Update password</button>
+            </form>
+            <button type="button" id="profileChangePhoneBtn" class="v251p-menu-row v251p-security-trigger" aria-expanded="false" aria-controls="profileChangePhoneForm">
+              <svg class="v251p-row-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="7" y="2" width="10" height="20" rx="2"/><path d="M11 18h2"/></svg>
+              <span>WhatsApp number</span><svg class="v251p-chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg>
+            </button>
+            <form id="profileChangePhoneForm" class="v251p-settings-form" hidden>
+              <label class="v251p-field">New WhatsApp number
+                <input id="profileNewPhone" type="tel" autocomplete="tel" placeholder="+60" />
+              </label>
+              <button id="profileRequestPhoneCodeBtn" class="v251p-secondary" type="button">Send code</button>
+              <label class="v251p-field">Verification code
+                <input id="profileNewPhoneOtp" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="6-digit code" />
+              </label>
+              <p id="profilePhoneChangeNotice" role="status" aria-live="polite"></p>
+              <button class="v251p-primary" type="submit">Confirm number</button>
+            </form>
+          </section>
+        </div>
+      </div>
+    </section>
+
+
+  <nav class="bottom" aria-label="Website navigation preview">
+    <button type="button" data-other="Discover" aria-label="Discover">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m3 11 9-8 9 8v10h-6v-6H9v6H3V11z"/></svg><span>Discover</span>
+    </button>
+    <button type="button" data-other="My Order" aria-label="My Order">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h12v18l-3-2-3 2-3-2-3 2V3Z"/><path d="M9 8h6M9 12h6"/></svg><span>My Order</span>
+    </button>
+    <button type="button" class="shop-button" data-other="Shop" aria-label="Shop">
+      <span class="shop-glyph"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9h16l-1.2 12H5.2L4 9zM9 9V7a3 3 0 0 1 6 0v2"/></svg></span><span>Shop</span>
+    </button>
+    <button type="button" data-other="Cart" aria-label="Cart">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 4H5l2.2 11h11.7l2-8.5H6"/><circle cx="9" cy="20" r="1"/><circle cx="18" cy="20" r="1"/></svg><span>Cart</span>
+    </button>
+    <button type="button" class="selected" aria-current="page" aria-label="Profile">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="7" r="4"/><path d="M4 22a8 8 0 0 1 16 0"/></svg><span>Profile</span>
+    </button>
+  </nav>
+  <div class="preview-stamp" role="status" id="sampleBanner">VISUAL PREVIEW · NO ACCOUNT CHANGES</div>
+</main>
+<script>
+(function(){
+  'use strict';
+  var $=function(id){return document.getElementById(id)};
+  $('profileFullName').value='Sample Customer';
+  $('profilePhoneNumber').value='+60 12 000 0000';
+  $('profileAddressLine1').value='1 Sample Street';
+  $('profilePostcode').value='50000';
+  $('profileCity').value='Kuala Lumpur';
+  $('profileStateRegion').value='Wilayah Persekutuan';
+  function panel(which){
+    var home=which==='home';
+    $('v251ProfileHub').hidden=!home;
+    $('v251ProfileHeader').hidden=!home;
+    $('v251ProfileSubhead').hidden=home;
+    $('profileDetailsForm').hidden=!(which==='personal'||which==='address');
+    $('v251ProfilePersonalFields').hidden=which!=='personal';
+    $('v251ProfileAddressFields').hidden=which!=='address';
+    $('v251ProfileSecurityPanel').hidden=which!=='security';
+    $('v251ProfilePanelTitle').textContent=which==='address'?'Delivery address':which==='security'?'Account settings':'Personal information';
+    $('profileDetailsNotice').textContent='';
+    $('profile').scrollTop=0;
+  }
+  document.querySelectorAll('[data-v251-profile-panel]').forEach(function(node){
+    node.addEventListener('click',function(){panel(node.dataset.v251ProfilePanel)})
+  });
+  $('v251ProfileBack').addEventListener('click',function(){panel('home')});
+  [['profileChangePasswordBtn','profileChangePasswordForm'],['profileChangePhoneBtn','profileChangePhoneForm']].forEach(function(row){
+    $(row[0]).addEventListener('click',function(){
+      $(row[1]).hidden=!$(row[1]).hidden;
+      $(row[0]).setAttribute('aria-expanded',String(!$(row[1]).hidden))
+    });
+  });
+  $('btnIdentityLogout').addEventListener('click',function(){
+    panel('home');$('profileSignedIn').hidden=true;$('profileSignedOut').hidden=false;
+  });
+  $('btnIdentityLogin').addEventListener('click',function(){
+    $('profileSignedIn').hidden=false;$('profileSignedOut').hidden=true;panel('home');
+  });
+  $('profileDetailsForm').addEventListener('submit',function(e){e.preventDefault();$('profileDetailsNotice').textContent='Preview only — nothing saved.'});
+  $('profileChangePasswordForm').addEventListener('submit',function(e){e.preventDefault();$('profilePasswordNotice').textContent='Preview only — password not changed.'});
+  $('profileChangePhoneForm').addEventListener('submit',function(e){e.preventDefault();$('profilePhoneChangeNotice').textContent='Preview only — number not changed.'});
+  $('profileRequestPhoneCodeBtn').addEventListener('click',function(){$('profilePhoneChangeNotice').textContent='Preview only — no code sent.'});
+  document.querySelectorAll('[data-other]').forEach(function(button){
+    button.addEventListener('click',function(){
+      var banner=$('sampleBanner');banner.textContent='PROFILE PREVIEW ONLY';banner.hidden=false;
+    });
+  });
+})();
+</script>
+</body>
+</html>
