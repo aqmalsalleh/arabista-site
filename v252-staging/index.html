@@ -9551,8 +9551,8 @@ body.is-discover .site-tabs{z-index:45!important}
 <script>
 (function () {
   'use strict';
-  window.__ARABISTA_V251_SANDBOX_CHECKOUT__ = true;
   window.__ARABISTA_V248_ASSET_BASE__ = '/v252-staging';
+  window.__ARABISTA_V251_SANDBOX_CHECKOUT__ = true;
   var state = {
     catalog: [],
     products: [],
@@ -10176,14 +10176,22 @@ body.is-discover .site-tabs{z-index:45!important}
     return t ? t.charAt(0).toUpperCase() + t.slice(1) : 'Update';
   }
 
-  /* List-level view from order_summary. The list carries no provider evidence, so a settled-looking
-     summary is only ever shown as Preparing (never Paid); detail evidence re-classifies it on open. */
+  /* List-level view from batched order_summary. Uses recorded settlement + shipment facts only —
+     never invents PROVIDER_CONFIRMED. AWB_READY alone is Preparing; Shipped needs tracked handover. */
   function ooSummaryView_(link) {
     var s = (link && link.order_summary) || {};
     var pay = ooUpper_(s.payment_status);
     var ord = ooUpper_(s.order_status);
+    var shipStatus = ooUpper_(s.shipping_status);
+    var recordedSettled = s.payment_recorded_settled === true
+      || ooSettled_(pay) || ord === 'PAID';
+    var tracked = s.carrier_tracking_available === true && s.awb_present === true;
     var status = (ord === 'CANCELLED' || pay === 'CANCELLED') ? 'cancelled'
-      : ((ooSettled_(pay) || ord === 'PAID') ? 'preparing' : 'to-pay');
+      : ((ord === 'REFUNDED' || pay === 'REFUNDED') ? 'refunded'
+        : (!recordedSettled ? 'to-pay'
+          : (shipStatus === 'DELIVERED' ? 'completed'
+            : ((tracked && (shipStatus === 'HANDED_OVER' || shipStatus === 'IN_TRANSIT')) ? 'shipped'
+              : 'preparing'))));
     var name = ooText_(s.product_name || s.first_item_name || s.order_display_name).trim();
     var created = s.created_at || (link && link.created_at_utc) || '';
     var total = s.total_sen == null || s.total_sen === '' ? null : Number(s.total_sen);
@@ -10442,7 +10450,7 @@ body.is-discover .site-tabs{z-index:45!important}
     var S = ownerOrders_;
     if (!S.orders.length) return 'Orders placed with your Arabista account will appear here.';
     if (S.filter === 'shipped' || S.filter === 'completed') {
-      return 'Shipped and completed status appears once carrier tracking is verified. Open an order to check its latest progress.';
+      return 'No orders match this status yet. Shipped and completed require verified carrier tracking on the order.';
     }
     return 'Try another status or search.';
   }
