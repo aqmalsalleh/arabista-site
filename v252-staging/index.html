@@ -2581,6 +2581,26 @@ body.is-discover .site-tabs{z-index:45!important}
 #identityModal.v251p-auth #identityForgotPassword,#identityModal.v251p-auth #identityActivateAccount{background:transparent!important;color:#93754e!important;border:0!important;border-radius:0!important;padding:5px 0!important;font:600 12px "DM Sans",Inter,sans-serif!important;text-decoration:none!important}
 #identityModal.v251p-auth #identityActivateAccount{display:block;margin:0 0 14px!important}
 #identityModal.v251p-auth #identityActivateAccount[hidden]{display:none!important}
+/* Country-code selector shared by sign-in and Profile. Native country picker for mobile accessibility. */
+.arabista-dialled-field{display:flex;gap:9px;align-items:stretch;min-width:0}
+.arabista-dialled-field input{flex:1;min-width:0;width:0}
+#identityModal.v251p-auth .arabista-dialled-field{margin:7px 0 15px}
+#identityModal.v251p-auth .arabista-dialled-field input{margin:0!important}
+#identityModal.v251p-auth .arabista-dialled-field select,
+#profile .arabista-dialled-field select{box-sizing:border-box;flex:0 0 112px;width:112px;max-width:112px;min-width:0;min-height:49px;padding:11px 8px 11px 11px;border:1px solid #dfd7cb;border-radius:11px;background:#fff!important;background-image:none!important;color:#39332c;font:600 14px/1.3 'DM Sans',Inter,sans-serif!important;-webkit-appearance:none;appearance:none;cursor:pointer}
+#identityModal.v251p-auth .arabista-dialled-field select:focus-visible,
+#profile .arabista-dialled-field select:focus-visible{outline:2px solid #b3946a;outline-offset:2px}
+#profile .arabista-dialled-field input{min-width:0}
+#profile .arabista-dialled-field select:disabled{opacity:.75;background:#f7f5f1!important}
+#profile .profile-phone-row .arabista-dialled-field{min-width:0}
+@media(max-width:440px){#profile .profile-phone-row{grid-template-columns:minmax(0,1fr)}#profile .profile-code-send{width:110px;justify-self:end}}
+
+#orders .arabista-inline-coin,#profile .arabista-inline-coin{display:inline-flex;align-items:center;gap:9px;vertical-align:middle}
+#orders .arabista-inline-coin .coin-loader,#profile .arabista-inline-coin .coin-loader{width:23px!important;height:23px!important}
+#orders .orders-count:has(.arabista-inline-coin){display:flex;align-items:center;min-height:34px}
+#orders .orders-preview-toast .arabista-inline-coin{color:#fff}
+#profile .profile-feedback .arabista-inline-coin{color:inherit}
+@media(prefers-reduced-motion:reduce){#orders .arabista-inline-coin .coin-inner,#profile .arabista-inline-coin .coin-inner{animation:none!important}}
 
 </style>
 <link rel="preload" as="image" fetchpriority="high" href="https://imagedelivery.net/32oxijRdypCO4dk5WrGLwg/c2726925-9313-4bc7-9733-83f5d9429600/public">
@@ -2874,7 +2894,7 @@ body.is-discover .site-tabs{z-index:45!important}
           <div class="profile-panel">
             <form class="profile-form" id="profile-personal-form">
               <div class="profile-field"><label for="profile-name">Name</label><input id="profile-name" name="name" type="text" maxlength="100" autocomplete="name" placeholder="Full name" required></div>
-              <div class="profile-field"><label for="profile-telephone">Telephone No.</label><input id="profile-telephone" name="telephone" type="tel" maxlength="20" autocomplete="tel" placeholder="012 345 6789" required></div>
+              <div class="profile-field"><label for="profile-telephone">Telephone No.</label><div class="arabista-dialled-field"><select id="profileCountryCode" aria-label="Telephone country code" disabled><option value="+60">🇲🇾 +60</option><option value="+65">🇸🇬 +65</option><option value="+62">🇮🇩 +62</option><option value="+673">🇧🇳 +673</option><option value="+66">🇹🇭 +66</option><option value="+63">🇵🇭 +63</option><option value="+91">🇮🇳 +91</option><option value="+61">🇦🇺 +61</option><option value="+44">🇬🇧 +44</option><option value="+1">🇺🇸 +1</option></select><input id="profile-telephone" name="telephone" type="tel" maxlength="20" autocomplete="tel" placeholder="12 345 6789" readonly required></div></div>
               <div class="profile-field"><label for="profile-email">Email</label><input id="profile-email" name="email" type="email" maxlength="160" autocomplete="email" placeholder="name@example.com" required></div>
               <p id="profile-personal-status" class="profile-feedback" role="status" aria-live="polite" hidden></p>
               <button class="profile-primary" type="submit">Save Changes</button>
@@ -2924,7 +2944,7 @@ body.is-discover .site-tabs{z-index:45!important}
             <p class="profile-help">Your WhatsApp number and password are used to log in.</p>
             <div style="padding:1px 0 17px"><span class="profile-security-label">Current WhatsApp No.</span><span id="profile-current-whatsapp" class="profile-security-value">—</span></div>
             <form class="profile-form" id="profile-whatsapp-form">
-              <div class="profile-field"><label for="profile-new-whatsapp">New WhatsApp No.</label><div class="profile-phone-row"><input id="profile-new-whatsapp" type="tel" inputmode="tel" maxlength="20" autocomplete="off" placeholder="012 345 6789" required><button class="profile-code-send" id="profile-send-code" type="button">Send Code</button></div></div>
+              <div class="profile-field"><label for="profile-new-whatsapp">New WhatsApp No.</label><div class="profile-phone-row"><div class="arabista-dialled-field"><select id="profileNewCountryCode" aria-label="New WhatsApp country code"><option value="+60">🇲🇾 +60</option><option value="+65">🇸🇬 +65</option><option value="+62">🇮🇩 +62</option><option value="+673">🇧🇳 +673</option><option value="+66">🇹🇭 +66</option><option value="+63">🇵🇭 +63</option><option value="+91">🇮🇳 +91</option><option value="+61">🇦🇺 +61</option><option value="+44">🇬🇧 +44</option><option value="+1">🇺🇸 +1</option></select><input id="profile-new-whatsapp" type="tel" inputmode="tel" maxlength="20" autocomplete="off" placeholder="12 345 6789" required></div><button class="profile-code-send" id="profile-send-code" type="button">Send Code</button></div></div>
               <div class="profile-field"><label for="profile-verification-code">Verification Code</label><input id="profile-verification-code" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="6" pattern="[0-9]{6}" placeholder="6-digit code" required></div>
               <p id="profile-whatsapp-status" class="profile-feedback" role="status" aria-live="polite" hidden></p>
               <button class="profile-primary" type="submit">Verify &amp; Update Number</button>
@@ -2944,7 +2964,7 @@ body.is-discover .site-tabs{z-index:45!important}
       <h2 id="identityModalTitle" style="font:600 28px/1.15 Georgia,serif;margin:8px 0 10px;color:#1a1a1a">Sign in</h2>
       <p id="identityModalCopy" class="fine-print" style="color:#666;margin:0 0 14px"></p>
       <label class="fine-print" for="identityPhone">Mobile</label>
-      <input id="identityPhone" type="tel" inputmode="tel" autocomplete="tel" placeholder="+60…" style="display:block;width:100%;margin:6px 0 10px;padding:10px;border:1px solid #e5e0d8;border-radius:10px" />
+      <div class="arabista-dialled-field"><select id="identityCountryCode" aria-label="WhatsApp country code"><option value="+60">🇲🇾 +60</option><option value="+65">🇸🇬 +65</option><option value="+62">🇮🇩 +62</option><option value="+673">🇧🇳 +673</option><option value="+66">🇹🇭 +66</option><option value="+63">🇵🇭 +63</option><option value="+91">🇮🇳 +91</option><option value="+61">🇦🇺 +61</option><option value="+44">🇬🇧 +44</option><option value="+1">🇺🇸 +1</option></select><input id="identityPhone" type="tel" inputmode="tel" autocomplete="tel" placeholder="12 345 6789" style="display:block;width:100%;margin:6px 0 10px;padding:10px;border:1px solid #e5e0d8;border-radius:10px" /></div>
       <div id="identityPasswordBlock">
         <label class="fine-print" for="identityPassword">Password</label>
         <input id="identityPassword" type="password" autocomplete="current-password" style="display:block;width:100%;margin:6px 0 10px;padding:10px;border:1px solid #e5e0d8;border-radius:10px" />
@@ -9739,6 +9759,8 @@ body.is-discover .site-tabs{z-index:45!important}
     var node = $(id);
     if (!node) return;
     node.textContent = message || '';
+    if (message && !kind && /…$/.test(message) && typeof arabistaLocalLoading_ === 'function')
+      arabistaLocalLoading_(node, message);
     node.className = 'profile-feedback' + (kind ? ' is-' + kind : '');
     node.hidden = !message;
   }
@@ -9752,6 +9774,34 @@ body.is-discover .site-tabs{z-index:45!important}
     var digits = String(value || '').replace(/[^0-9]/g, '');
     if (/^0\d{8,10}$/.test(digits)) digits = '60' + digits.slice(1);
     return digits;
+  }
+
+  function arabistaPhoneFromPicker_(fieldId, selectId) {
+    var input = $(fieldId), picker = $(selectId);
+    var digits = String(input && input.value || '').trim().replace(/[^0-9+]/g, '');
+    if (!digits) return '';
+    if (digits.indexOf('00') === 0) return '+' + digits.slice(2);
+    if (digits.charAt(0) === '+') return digits;
+    var dial = picker && picker.value ? picker.value : '+60';
+    return dial + digits.replace(/^0+/, '');
+  }
+  function arabistaDisplayPhone_(fieldId, selectId, value) {
+    var input = $(fieldId), picker = $(selectId);
+    if (!input) return;
+    var number = String(value || '').trim().replace(/[^0-9+]/g, '');
+    if (!number) { input.value = ''; if (picker) picker.value = '+60'; return; }
+    if (picker && number.charAt(0) === '+') {
+      var options = Array.prototype.slice.call(picker.options).map(function (opt) { return opt.value; })
+        .sort(function (a, b) { return b.length - a.length; });
+      for (var i = 0; i < options.length; i += 1) {
+        if (number.indexOf(options[i]) === 0) {
+          picker.value = options[i];
+          input.value = number.slice(options[i].length);
+          return;
+        }
+      }
+    }
+    input.value = number;
   }
 
   function ownerPhoneToE164_(value) {
@@ -9825,7 +9875,7 @@ body.is-discover .site-tabs{z-index:45!important}
     var active = document.activeElement;
     if (!force && active && form.contains(active)) return;
     if ($('profile-name')) $('profile-name').value = profile.full_name || '';
-    if ($('profile-telephone')) $('profile-telephone').value = profile.phone_e164 || state.identityPhone || '';
+    arabistaDisplayPhone_('profile-telephone', 'profileCountryCode', profile.phone_e164 || state.identityPhone || '');
     if ($('profile-email')) $('profile-email').value = profile.contact_email || '';
   }
 
@@ -10160,6 +10210,31 @@ body.is-discover .site-tabs{z-index:45!important}
     });
   }
   function ooUpper_(value) { return ooText_(value).trim().toUpperCase(); }
+  function arabistaInlineCoin_(label) {
+    return '<span class="arabista-inline-coin" role="status"><span class="coin-loader" aria-hidden="true">'
+      + '<span class="coin-inner"><span class="coin-face"></span><span class="coin-face coin-back"></span></span></span>'
+      + '<span>' + ooEscape_(label) + '</span></span>';
+  }
+  function arabistaLocalLoading_(node, message) {
+    if (node) ooSetMarkup_(node, arabistaInlineCoin_(message));
+  }
+  function ooCourierName_(value) {
+    var code = ooUpper_(value);
+    if (!code) return 'Courier';
+    if (/J[&T\s_-]*T|JETEXPRESS|JTEXPRESS/.test(code)) return 'J&T Express';
+    if (/DHL/.test(code)) return 'DHL Express';
+    if (/POS\s*_?LAJU|POSLAJU/.test(code)) return 'Pos Laju';
+    if (/NINJA\s*_?VAN|NINJAVAN/.test(code)) return 'Ninja Van';
+    if (/INTERNAL|SANDBOX|SYNTHETIC|FIXTURE|TEST|_DEV|DEV_|DOKU|^[A-Z0-9]+_[A-Z0-9_]+$/.test(code))
+      return 'Courier';
+    return String(value).trim();
+  }
+  function ooCustomerProgress_(value) {
+    var raw = ooText_(value).trim();
+    if (!raw || /INTERNAL|SANDBOX|_DEV|DEV_|FIXTURE|SYNTHETIC|DOKU|TEST_ONLY/i.test(raw))
+      return 'Your order is being prepared';
+    return raw;
+  }
   function ooIcon_(name) {
     return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'
       + (OWNER_ORDER_ICONS_[name] || '') + '</svg>';
@@ -10252,7 +10327,7 @@ body.is-discover .site-tabs{z-index:45!important}
       return ooText_(a.occurred_at_utc).localeCompare(ooText_(b.occurred_at_utc));
     });
     var parcel = tracked ? {
-      courier: ooText_(ship.carrier).trim() || 'Courier',
+      courier: ooCourierName_(ship.carrier),
       number: awb,
       status: ({ DELIVERED: 'Delivered', IN_TRANSIT: 'In transit', HANDED_OVER: 'Handed to courier',
         AWB_READY: 'Waybill ready', PACKING: 'Packing' })[shipStatus] || 'Tracking available',
@@ -10262,7 +10337,7 @@ body.is-discover .site-tabs{z-index:45!important}
     } : null;
     var created = ooDate_(order.created_at, true);
     var paidAt = ooDate_(order.paid_at, true);
-    var progLabel = ooText_(prog.customer_label || prog.label).trim();
+    var progLabel = ooCustomerProgress_(prog.customer_label || prog.label);
     var shippedAt = carrierEvents.length ? ooDate_(carrierEvents[0].occurred_at_utc, true) : '';
     var deliveredAt = '';
     carrierEvents.forEach(function (e) {
@@ -10307,6 +10382,17 @@ body.is-discover .site-tabs{z-index:45!important}
       };
     });
     var createdIso = ooText_(order.created_at || (prior && prior.createdAt));
+    var delivery = order.delivery || {};
+    var firstLine = ooText_(delivery.address_line_1).trim();
+    var originalAddress = firstLine ? {
+      recipient: ooText_(delivery.recipient_name).trim(),
+      phone: ooText_(delivery.recipient_phone_e164).trim(),
+      lines: [firstLine, ooText_(delivery.address_line_2).trim(),
+        [ooText_(delivery.postcode).trim(), ooText_(delivery.city).trim()].filter(Boolean).join(' '),
+        ooText_(delivery.state_region).trim(),
+        ooUpper_(delivery.country_code) === 'MY' ? 'Malaysia' : ooText_(delivery.country_code).trim()
+      ].filter(Boolean).join('\n')
+    } : null;
     return {
       detail: true,
       ref: ooText_(order.invoice_no || order.order_number || (prior && prior.ref)).trim(),
@@ -10319,6 +10405,7 @@ body.is-discover .site-tabs{z-index:45!important}
       shippingSen: money.shipping_sen,
       totalSen: money.total_sen != null ? Number(money.total_sen) : (pay.amount_sen != null ? Number(pay.amount_sen) : null),
       paymentMethod: method,
+      delivery: originalAddress,
       paymentState: confirmed ? 'Paid' : (cancelled ? 'Cancelled' : (settled ? 'Awaiting confirmation' : 'Pending')),
       paySettled: settled,
       steps: steps,
@@ -10368,7 +10455,8 @@ body.is-discover .site-tabs{z-index:45!important}
   function ooToast_(message, ms) {
     var node = $('orders-preview-toast');
     if (!node) return;
-    node.textContent = message;
+    if (message === 'Opening your order\u2026') arabistaLocalLoading_(node, message);
+    else node.textContent = message;
     ownerOrdersToastText_ = message;
     node.hidden = false;
     clearTimeout(ownerOrdersToastTimer_);
@@ -10438,6 +10526,13 @@ body.is-discover .site-tabs{z-index:45!important}
       + '<div class="orders-courier-actions"><button class="orders-button primary" type="button" data-order-action="track" data-order-id="' + key + '" data-parcel="0">'
       + ooIcon_('truck') + 'Track Parcel</button></div></div>';
   }
+  function ooAddressMarkup_(delivery) {
+    if (!delivery || !delivery.lines)
+      return '<p class="orders-address-line">Delivery address is not available for this order.</p>';
+    return (delivery.recipient ? '<p class="orders-address-name">' + ooEscape_(delivery.recipient) + '</p>' : '')
+      + '<p class="orders-address-line">' + ooEscape_(delivery.lines) + '</p>'
+      + (delivery.phone ? '<p class="orders-address-line">' + ooEscape_(delivery.phone) + '</p>' : '');
+  }
   function ooDetailMarkup_(vm) {
     var v = ooView_(vm), status = v.status, key = ooEscape_(vm.key);
     var message = v.message || OWNER_ORDER_STATUS_MESSAGE_[status] || ['Order status', 'See details below.'];
@@ -10452,7 +10547,7 @@ body.is-discover .site-tabs{z-index:45!important}
       + '<span class="orders-status ' + ooEscape_(status) + '">' + ooEscape_(OWNER_ORDER_STATUS_LABEL_[status] || status) + '</span></div>'
       + '</section><section class="orders-panel"><h3>Order Progress</h3>' + ooProgressMarkup_(v) + '</section>'
       + '<section class="orders-panel"><h3>Courier &amp; Tracking</h3>' + ooCourierMarkup_(vm, v) + '</section>'
-      + '<section class="orders-panel"><h3>Delivery Address</h3><p class="orders-address-line">Delivery address is kept private on this screen.</p></section>'
+      + '<section class="orders-panel"><h3>Delivery Address</h3>' + ooAddressMarkup_(v.delivery) + '</section>'
       + '<section class="orders-panel orders-detail-items"><h3>Items Ordered</h3>' + v.items.map(ooProductMarkup_).join('') + '</section>'
       + '<section class="orders-panel"><h3>Payment Summary</h3><div class="orders-payment-row"><span>Subtotal</span><strong>' + (ooRm_(v.subtotalSen) || '\u2014') + '</strong></div>'
       + '<div class="orders-payment-row"><span>Shipping</span><strong>' + ooEscape_(shipping) + '</strong></div>'
@@ -10479,7 +10574,7 @@ body.is-discover .site-tabs{z-index:45!important}
     var count = $('orders-preview-count'), empty = $('orders-preview-empty');
     if (!isIdentitySignedIn()) { cards.innerHTML = ''; count.textContent = ''; empty.hidden = true; return; }
     if (S.loading && !S.loaded) {
-      cards.innerHTML = ''; count.textContent = 'Loading your orders\u2026'; empty.hidden = true; return;
+      cards.innerHTML = ''; arabistaLocalLoading_(count, 'Loading your orders…'); empty.hidden = true; return;
     }
     if (S.failed && !S.loaded) {
       count.textContent = '';
@@ -10996,6 +11091,8 @@ body.is-discover .site-tabs{z-index:45!important}
         $('identityModalNotice').textContent = 'We could not connect. Please try again.';
     }
     try {
+      if (payload && Object.prototype.hasOwnProperty.call(payload, 'phone_e164'))
+        payload.phone_e164 = arabistaPhoneFromPicker_('identityPhone', 'identityCountryCode');
       call(service, payload, function (response) {
         finish();
         if (state.identityModalMode === mode) onSuccess(response);
@@ -11032,7 +11129,7 @@ body.is-discover .site-tabs{z-index:45!important}
     var notice = $('identityModalNotice');
     var primary = $('identityModalPrimary');
     if (notice) notice.textContent = '';
-    if ($('identityPhone') && opts.phone) $('identityPhone').value = opts.phone;
+    if (opts.phone) arabistaDisplayPhone_('identityPhone', 'identityCountryCode', opts.phone);
     if (mode === 'view_your_order') {
       if (eyebrow) eyebrow.textContent = 'WhatsApp order link';
       if (title) title.textContent = 'View your order';
@@ -16555,7 +16652,7 @@ function attachSheetResizeHandle(handle,sheet,apply,ratio){
     if (ownerBusy_.personal) return;
     var profile = state.identityProfile || {};
     var loginPhone = profile.phone_e164 || state.identityPhone || '';
-    var phoneChanged = ownerPhoneKey_($('profile-telephone').value) !== ownerPhoneKey_(loginPhone);
+    var phoneChanged = ownerPhoneKey_(arabistaPhoneFromPicker_('profile-telephone', 'profileCountryCode')) !== ownerPhoneKey_(loginPhone);
     ownerBusy_.personal = true;
     ownerFeedback_('profile-personal-status', 'Saving…');
     // Name + email only; the saved address fields are preserved server-side and the login phone is never edited here.
@@ -16682,7 +16779,7 @@ function attachSheetResizeHandle(handle,sheet,apply,ratio){
       ownerFeedback_('profile-whatsapp-status', 'Sign in to change your WhatsApp number.', 'error');
       return;
     }
-    if (!ownerPhoneLooksValid_($('profile-new-whatsapp').value)) {
+    if (!ownerPhoneLooksValid_(arabistaPhoneFromPicker_('profile-new-whatsapp', 'profileNewCountryCode'))) {
       ownerFeedback_('profile-whatsapp-status', 'Enter a valid new WhatsApp number.', 'error');
       $('profile-new-whatsapp').focus();
       return;
@@ -16693,7 +16790,7 @@ function attachSheetResizeHandle(handle,sheet,apply,ratio){
     button.disabled = true;
     ownerFeedback_('profile-whatsapp-status', 'Requesting verification code…');
     ownerRpc_('arabistaDevCustomerIdentityRequestPhoneChangeOtpV245', {
-      new_phone_e164: $('profile-new-whatsapp').value
+      new_phone_e164: arabistaPhoneFromPicker_('profile-new-whatsapp', 'profileNewCountryCode')
     }, function (x) {
       ownerBusy_.sendCode = false;
       button.disabled = false;
@@ -16719,7 +16816,7 @@ function attachSheetResizeHandle(handle,sheet,apply,ratio){
       ownerFeedback_('profile-whatsapp-status', 'Sign in to change your WhatsApp number.', 'error');
       return;
     }
-    if (!ownerPhoneLooksValid_($('profile-new-whatsapp').value)) {
+    if (!ownerPhoneLooksValid_(arabistaPhoneFromPicker_('profile-new-whatsapp', 'profileNewCountryCode'))) {
       ownerFeedback_('profile-whatsapp-status', 'Enter a valid new WhatsApp number.', 'error');
       return;
     }
@@ -16736,7 +16833,7 @@ function attachSheetResizeHandle(handle,sheet,apply,ratio){
     ownerBusy_.completePhone = true;
     ownerFeedback_('profile-whatsapp-status', 'Verifying…');
     ownerRpc_('arabistaDevCustomerIdentityCompletePhoneChangeV245', {
-      new_phone_e164: $('profile-new-whatsapp').value,
+      new_phone_e164: arabistaPhoneFromPicker_('profile-new-whatsapp', 'profileNewCountryCode'),
       challenge_id: state.identityChallengeId,
       otp_code: code
     }, function (x) {
@@ -16772,7 +16869,7 @@ function attachSheetResizeHandle(handle,sheet,apply,ratio){
   if ($('identityActivateAccount')) {
     $('identityActivateAccount').addEventListener('click', function () {
       var phone = $('identityPhone') && $('identityPhone').value;
-      if (!ownerPhoneLooksValid_(phone)) {
+      if (!ownerPhoneLooksValid_(arabistaPhoneFromPicker_('identityPhone', 'identityCountryCode'))) {
         $('identityModalNotice').textContent = 'Enter the WhatsApp number used at checkout first.';
         return;
       }
@@ -16787,7 +16884,7 @@ function attachSheetResizeHandle(handle,sheet,apply,ratio){
       if (mode === 'view_your_order') {
         // Public customer RPC checks whether this number is pending or active.
         // Never unlock invoice details until verified identity + ownership.
-        if (!ownerPhoneLooksValid_(phone)) {
+        if (!ownerPhoneLooksValid_(arabistaPhoneFromPicker_('identityPhone', 'identityCountryCode'))) {
           if (notice) notice.textContent = 'Enter a valid WhatsApp number used at checkout.';
           return;
         }
@@ -16826,7 +16923,7 @@ function attachSheetResizeHandle(handle,sheet,apply,ratio){
       if (mode === 'recover') {
         var recoverOtp = $('identityOtp') && $('identityOtp').value;
         var recoverPassword = $('identityNewPassword') && $('identityNewPassword').value;
-        if (!ownerPhoneLooksValid_(phone)) {
+        if (!ownerPhoneLooksValid_(arabistaPhoneFromPicker_('identityPhone', 'identityCountryCode'))) {
           if (notice) notice.textContent = 'Enter a valid WhatsApp number.';
           return;
         }
@@ -16882,7 +16979,7 @@ function attachSheetResizeHandle(handle,sheet,apply,ratio){
       if (mode === 'activate') {
         var otp = $('identityOtp') && $('identityOtp').value;
         var newPassword = $('identityNewPassword') && $('identityNewPassword').value;
-        if (!ownerPhoneLooksValid_(phone)) {
+        if (!ownerPhoneLooksValid_(arabistaPhoneFromPicker_('identityPhone', 'identityCountryCode'))) {
           if (notice) notice.textContent = 'Enter a valid WhatsApp number from checkout.';
           return;
         }
@@ -16945,7 +17042,7 @@ function attachSheetResizeHandle(handle,sheet,apply,ratio){
         return;
       }
       // Ordinary My Order and Profile entry stays phone + password; first-time activation has its own link.
-      if (!ownerPhoneLooksValid_(phone)) {
+      if (!ownerPhoneLooksValid_(arabistaPhoneFromPicker_('identityPhone', 'identityCountryCode'))) {
         if (notice) notice.textContent = 'Enter a valid WhatsApp number.';
         return;
       }
