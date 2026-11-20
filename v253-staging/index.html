@@ -2932,7 +2932,7 @@ body.is-discover .site-tabs{z-index:45!important}
             <form class="profile-form" id="profile-address-form">
               <div class="profile-field"><label for="address-label">Label</label><select id="address-label" name="label" required><option value="Home">Home</option><option value="Work">Work</option><option value="Other">Other</option></select></div>
               <div class="profile-field"><label for="address-name">Recipient Name</label><input id="address-name" name="recipient" type="text" maxlength="100" autocomplete="shipping name" placeholder="Full name" required></div>
-              <div class="profile-field"><label for="address-phone">Telephone No.</label><input id="address-phone" name="phone" type="tel" maxlength="20" autocomplete="shipping tel" placeholder="012 345 6789" required></div>
+              <div class="profile-field"><label for="address-phone">Telephone No.</label><div class="arabista-dialled-field"><select id="addressCountryCode" aria-label="Address telephone country code"><option value="+60">🇲🇾 +60</option><option value="+65">🇸🇬 +65</option><option value="+62">🇮🇩 +62</option><option value="+673">🇧🇳 +673</option><option value="+66">🇹🇭 +66</option><option value="+63">🇵🇭 +63</option><option value="+91">🇮🇳 +91</option><option value="+61">🇦🇺 +61</option><option value="+44">🇬🇧 +44</option><option value="+1">🇺🇸 +1</option></select><input id="address-phone" name="phone" type="tel" maxlength="20" autocomplete="shipping tel" placeholder="12 345 6789" required></div></div>
               <div class="profile-field"><label for="address-line1">Address Line 1</label><input id="address-line1" name="line1" type="text" maxlength="160" autocomplete="shipping address-line1" placeholder="House / unit, street" required></div>
               <div class="profile-field"><label for="address-line2">Address Line 2 <span style="color:#a09a91;font-weight:400">(Optional)</span></label><input id="address-line2" name="line2" type="text" maxlength="160" autocomplete="shipping address-line2" placeholder="Building / area"></div>
               <div class="profile-field-grid"><div class="profile-field"><label for="address-postcode">Postcode</label><input id="address-postcode" name="postcode" type="text" inputmode="numeric" maxlength="5" pattern="[0-9]{5}" autocomplete="shipping postal-code" placeholder="43000" required></div><div class="profile-field"><label for="address-city">City</label><input id="address-city" name="city" type="text" maxlength="80" autocomplete="shipping address-level2" placeholder="City" required></div></div>
@@ -10109,11 +10109,15 @@ body.is-discover .site-tabs{z-index:45!important}
       ownerAddresses_().forEach(function (row) { if (row && row.address_id === id) address = row; });
       if (!address) { ownerEditingAddressId_ = null; return; }
       var mapped = {
-        label: address.label, recipient: address.recipient_name, phone: address.phone,
+        label: address.label, recipient: address.recipient_name, phone: ownerPhoneToE164_(address.phone),
         line1: address.address_line_1, line2: address.address_line_2, postcode: address.postcode,
         city: address.city, state: address.state_region
       };
       Object.keys(mapped).forEach(function (key) {
+        if (key === 'phone') {
+          arabistaDisplayPhone_('address-phone', 'addressCountryCode', mapped.phone);
+          return;
+        }
         var field = form.elements.namedItem(key);
         if (!field) return;
         var value = String(mapped[key] || '');
@@ -16880,7 +16884,7 @@ function attachSheetResizeHandle(handle,sheet,apply,ratio){
       return;
     }
     if (!form.reportValidity()) return;
-    if (!ownerPhoneLooksValid_($('address-phone').value)) {
+    if (!ownerPhoneLooksValid_(arabistaPhoneFromPicker_('address-phone', 'addressCountryCode'))) {
       ownerFeedback_('profile-address-status', 'Please enter a valid telephone number.', 'error');
       $('address-phone').focus();
       return;
@@ -16889,6 +16893,8 @@ function attachSheetResizeHandle(handle,sheet,apply,ratio){
     ['label', 'recipient', 'phone', 'line1', 'line2', 'postcode', 'city', 'state'].forEach(function (key) {
       values[key] = String(form.elements.namedItem(key).value || '').trim();
     });
+    // Reuse the existing signed-in Profile phone formatting; backend still receives only "phone".
+    values.phone = arabistaPhoneFromPicker_('address-phone', 'addressCountryCode');
     if (!/^\d{5}$/.test(values.postcode)) {
       ownerFeedback_('profile-address-status', 'Enter a 5-digit Malaysian postcode.', 'error');
       $('address-postcode').focus();
