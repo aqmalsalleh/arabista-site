@@ -2600,6 +2600,20 @@ body.is-discover .site-tabs{z-index:45!important}
 #orders .orders-count:has(.arabista-inline-coin){display:flex;align-items:center;min-height:34px}
 #orders .orders-preview-toast .arabista-inline-coin{color:#fff}
 #profile .profile-feedback .arabista-inline-coin{color:inherit}
+/* v2.53 owner feedback — subtle header sign-out, Profile load and clear order progress */
+#profile .profile-head-actions{display:flex;align-items:center;gap:10px}
+#profile .profile-head-signout{min-height:36px;min-width:76px;padding:7px 13px;border:1px solid #d8c9b4;border-radius:99px;background:#fff;color:#6d5638;font:700 11px/1.2 'DM Sans',Inter,sans-serif;white-space:nowrap;cursor:pointer}
+#profile .profile-head-signout:focus-visible{outline:2px solid #b3946a;outline-offset:3px}
+#profile .profile-head-signout:active{transform:scale(.98)}
+#profile .profile-scroll.is-profile-fetching>.profile-pane{display:none!important}
+#profile .profile-read-state{margin:4px 0 0;min-height:104px;padding:22px 18px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;text-align:center;border:1px solid #ece6dc;border-radius:14px;background:#fff;color:#6d6255;font-size:12px;line-height:1.5}
+#profile .profile-read-state[hidden]{display:none!important}
+#profile .profile-read-retry{min-height:38px;padding:8px 16px;border:1px solid #d8c9b4;border-radius:99px;background:#fff;color:#6d5638;font:700 11px 'DM Sans',Inter,sans-serif}
+#profile .profile-read-retry[hidden]{display:none!important}
+#orders .orders-card{cursor:pointer}
+#orders .orders-card:focus-visible{outline:2px solid #b3946a;outline-offset:3px}
+#orders .orders-preview-toast.is-loading{background:transparent;color:#5b5044;box-shadow:none;border:0;padding:8px 12px;pointer-events:none}
+#orders .orders-preview-toast.is-loading .arabista-inline-coin{color:#5b5044}
 @media(prefers-reduced-motion:reduce){#orders .arabista-inline-coin .coin-inner,#profile .arabista-inline-coin .coin-inner{animation:none!important}}
 
 </style>
@@ -2879,7 +2893,7 @@ body.is-discover .site-tabs{z-index:45!important}
       </div>
       <div id="profileSignedIn" class="profile-screen" hidden>
       <header class="profile-head">
-        <div class="profile-headline"><span class="profile-wordmark">ARABISTA</span><span class="profile-preview">ACCOUNT</span></div>
+        <div class="profile-headline"><span class="profile-wordmark">ARABISTA</span><div class="profile-head-actions"><span class="profile-preview">ACCOUNT</span><button type="button" id="btnIdentityLogout" class="profile-head-signout">Sign out</button></div></div>
         <h1>Profile</h1>
         <p>Manage your information, addresses and login details.</p>
         <div class="profile-tabs" role="tablist" aria-label="Profile sections">
@@ -2889,6 +2903,10 @@ body.is-discover .site-tabs{z-index:45!important}
         </div>
       </header>
       <div class="profile-scroll" id="profile-scroll">
+        <div id="profileReadState" class="profile-read-state" role="status" aria-live="polite" hidden>
+          <span id="profileReadStateText"></span>
+          <button id="profileReadRetry" class="profile-read-retry" type="button" hidden>Try again</button>
+        </div>
         <section class="profile-pane" id="profile-panel-personal" role="tabpanel" aria-labelledby="profile-tab-personal" tabindex="0">
           <div class="profile-section-head"><div><h2>Personal Information</h2><p>Keep your contact details up to date.</p></div></div>
           <div class="profile-panel">
@@ -2951,7 +2969,6 @@ body.is-discover .site-tabs{z-index:45!important}
             </form>
           </div>
           <p class="profile-page-note">WhatsApp number changes require a verification code. Password changes require your current password.</p>
-          <button type="button" id="btnIdentityLogout" class="profile-secondary profile-signout">Sign out</button>
         </section>
       </div>
       </div>
@@ -9759,6 +9776,7 @@ body.is-discover .site-tabs{z-index:45!important}
   var ownerProfileRetryAfter_ = 0;
   var ownerProfileRequestSeq_ = 0;
   var ownerProfileRefreshQueued_ = false;
+  var ownerProfileFetchFailed_ = false;
   var OWNER_PROFILE_FRESH_MS_ = 3 * 60 * 1000;
   var ownerBusy_ = {};
 
@@ -9770,6 +9788,8 @@ body.is-discover .site-tabs{z-index:45!important}
     ownerProfileFetchedToken_ = null;
     ownerProfileRetryAfter_ = 0;
     ownerProfileRefreshQueued_ = false;
+    ownerProfileFetchFailed_ = false;
+    ownerSyncProfileReadState_();
   }
   function ownerMarkProfileFresh_() {
     if (!isIdentitySignedIn()) return;
@@ -9783,6 +9803,28 @@ body.is-discover .site-tabs{z-index:45!important}
     ownerProfileFetchedCustomer_ = state.identityCustomerId;
     ownerProfileFetchedToken_ = state.identityAccessToken;
     ownerProfileRetryAfter_ = 0;
+    ownerProfileFetchFailed_ = false;
+    ownerSyncProfileReadState_();
+  }
+  function ownerSyncProfileReadState_() {
+    var panel = $('profile-scroll'), status = $('profileReadState');
+    var message = $('profileReadStateText'), retry = $('profileReadRetry');
+    if (!panel || !status || !message || !retry) return;
+    var missing = isIdentitySignedIn() && !(state.identityProfile
+      && String(state.identityProfile.customer_id || '') === String(state.identityCustomerId || ''));
+    panel.classList.toggle('is-profile-fetching', !!missing);
+    status.hidden = !missing;
+    if (!missing) return;
+    var loading = ownerProfileLoading_;
+    retry.hidden = loading;
+    if (loading) {
+      if (typeof arabistaLocalLoading_ === 'function') arabistaLocalLoading_(message, 'Loading your information…');
+      else message.textContent = 'Loading your information…';
+    } else {
+      message.textContent = ownerProfileFetchFailed_
+        ? 'Your information could not be loaded. Please try again.'
+        : 'Your information is not ready yet.';
+    }
   }
 
   function ownerFeedback_(id, message, kind) {
@@ -10513,7 +10555,9 @@ body.is-discover .site-tabs{z-index:45!important}
   function ooToast_(message, ms) {
     var node = $('orders-preview-toast');
     if (!node) return;
-    if (message === 'Opening your order\u2026') arabistaLocalLoading_(node, message);
+    var loading = message === 'Opening your order\u2026';
+    node.classList.toggle('is-loading', loading);
+    if (loading) arabistaLocalLoading_(node, message);
     else node.textContent = message;
     ownerOrdersToastText_ = message;
     node.hidden = false;
@@ -10555,7 +10599,7 @@ body.is-discover .site-tabs{z-index:45!important}
         : (status === 'cancelled' || status === 'refunded'
           ? '<button class="orders-button soft" type="button" data-order-action="again" data-order-id="' + key + '">Buy Again</button>' : ''));
     var total = ooRm_(v.totalSen);
-    return '<article class="orders-card" aria-label="Order ' + ooEscape_(v.ref || 'linked to your account') + '">'
+    return '<article class="orders-card" aria-label="Order ' + ooEscape_(v.ref || 'linked to your account') + '. Press Enter for details" role="group" tabindex="0" data-order-id="' + key + '">'
       + '<div class="orders-card-head"><div><span class="orders-card-id">' + ooEscape_(ooRefText_(v)) + '</span>'
       + (v.date ? '<time class="orders-card-date">' + ooEscape_(v.date) + '</time>' : '') + '</div>'
       + '<span class="orders-status ' + ooEscape_(status) + '">' + ooEscape_(OWNER_ORDER_STATUS_LABEL_[status] || status) + '</span></div>'
@@ -10867,7 +10911,15 @@ body.is-discover .site-tabs{z-index:45!important}
 
   function ooHandleAction_(event) {
     var button = event.target.closest ? event.target.closest('button[data-order-action]') : null;
-    if (!button || !$('orders').contains(button)) return;
+    if (!button) {
+      var card = event.target.closest ? event.target.closest('article.orders-card[data-order-id]') : null;
+      if (card && $('orders-preview-cards').contains(card)) {
+        var cardVm = ownerOrders_.byKey[card.getAttribute('data-order-id')];
+        if (cardVm) ooOpenOrder_(cardVm);
+      }
+      return;
+    }
+    if (!$('orders').contains(button)) return;
     var action = button.getAttribute('data-order-action');
     if (action === 'retry') { loadLinkedOrders(true); return; }
     var vm = ownerOrders_.byKey[button.getAttribute('data-order-id')];
@@ -10913,6 +10965,14 @@ body.is-discover .site-tabs{z-index:45!important}
     });
     $('orders-preview-back').addEventListener('click', function () { ooShowList_(false); });
     $('orders-preview-cards').addEventListener('click', ooHandleAction_);
+    $('orders-preview-cards').addEventListener('keydown', function (e) {
+      var card = e.target;
+      if (!card || !card.matches || !card.matches('article.orders-card[data-order-id]')) return;
+      if (e.key !== 'Enter' && e.key !== ' ') return;
+      e.preventDefault();
+      var vm = S.byKey[card.getAttribute('data-order-id')];
+      if (vm) ooOpenOrder_(vm);
+    });
     $('orders-preview-detailbody').addEventListener('click', ooHandleAction_);
     $('orders-preview-trackbody').addEventListener('click', ooHandleAction_);
     $('orders-preview-track-close').addEventListener('click', ooCloseTrack_);
@@ -14257,6 +14317,8 @@ function closeShopDetail() {
     if (!force && now < ownerProfileRetryAfter_) return;
     var requestSeq = ++ownerProfileRequestSeq_;
     ownerProfileLoading_ = true;
+    ownerProfileFetchFailed_ = false;
+    ownerSyncProfileReadState_();
     function finished(x) {
       if (requestSeq !== ownerProfileRequestSeq_) return;
       ownerProfileLoading_ = false;
@@ -14275,11 +14337,14 @@ function closeShopDetail() {
           ownerMarkProfileFresh_();
         } else {
           ownerProfileFetchedAt_ = 0;
+          ownerProfileFetchFailed_ = true;
           ownerProfileRetryAfter_ = Date.now() + 20000;
         }
       } else {
+        ownerProfileFetchFailed_ = true;
         ownerProfileRetryAfter_ = Date.now() + 20000;
       }
+      ownerSyncProfileReadState_();
     }
     call('arabistaDevCustomerIdentityGetProfileV245', { access_token: token },
       finished, function () { finished(null); });
@@ -14313,6 +14378,7 @@ function closeShopDetail() {
     if ($('profileSignedIn')) $('profileSignedIn').hidden = !identitySignedIn;
     if (!identitySignedIn) ownerResetProfile_();
     else ownerFillPersonal_(false);
+    ownerSyncProfileReadState_();
     // Pure render. RPC reads are initiated on account, Profile, order or checkout entry.
     ooSyncShell_();
   }
@@ -16978,6 +17044,11 @@ function attachSheetResizeHandle(handle,sheet,apply,ratio){
   });
 
   ooWire_();
+  if ($('profileReadRetry')) {
+    $('profileReadRetry').addEventListener('click', function () {
+      if (isIdentitySignedIn()) loadIdentityProfile(true);
+    });
+  }
   if ($('btnIdentityLogout')) {
     $('btnIdentityLogout').addEventListener('click', function () {
       clearIdentitySession();
