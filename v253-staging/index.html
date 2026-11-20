@@ -2601,6 +2601,11 @@ body.is-discover .site-tabs{z-index:45!important}
 #orders .orders-preview-toast .arabista-inline-coin{color:#fff}
 #profile .profile-feedback .arabista-inline-coin{color:inherit}
 /* v2.53 owner feedback — subtle header sign-out, Profile load and clear order progress */
+/* The site masthead already identifies Arabista; keep these tab headers title-first. */
+#orders .orders-title-row{margin-top:0}
+#profile .profile-head>h1{margin-top:0}
+#profile .profile-title-row{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:6px}
+#profile .profile-title-row h1{margin:0}
 #profile .profile-head-actions{display:flex;align-items:center;gap:10px}
 #profile .profile-head-signout{min-height:36px;min-width:76px;padding:7px 13px;border:1px solid #d8c9b4;border-radius:99px;background:#fff;color:#6d5638;font:700 11px/1.2 'DM Sans',Inter,sans-serif;white-space:nowrap;cursor:pointer}
 #profile .profile-head-signout:focus-visible{outline:2px solid #b3946a;outline-offset:3px}
@@ -2798,8 +2803,7 @@ body.is-discover .site-tabs{z-index:45!important}
       <!-- Signed-out gate: reuses the existing identity modal; owner My Order is shown once signed in. -->
       <div id="ordersSignedOut" class="orders-gate">
         <header class="orders-head">
-          <div class="orders-headline"><span class="orders-wordmark">ARABISTA</span><span class="orders-preview-label">ACCOUNT</span></div>
-          <div class="orders-title-row"><h1>My Order</h1></div>
+                    <div class="orders-title-row"><h1>My Order</h1></div>
           <p>Sign in to view your orders and delivery updates.</p>
         </header>
         <div class="body-scroll orders-scroll">
@@ -2816,8 +2820,7 @@ body.is-discover .site-tabs{z-index:45!important}
       </div>
       <div id="ordersSignedIn" class="orders-signed-in" hidden>
           <header class="orders-head" id="orders-preview-head">
-            <div class="orders-headline"><span class="orders-wordmark">ARABISTA</span><span class="orders-preview-label">ACCOUNT</span></div>
-            <div class="orders-title-row">
+                        <div class="orders-title-row">
               <h1>My Order</h1>
               <button id="orders-preview-search-toggle" class="orders-search-toggle" type="button" aria-label="Search orders" aria-expanded="false"><svg><use href="#i-search"></use></svg></button>
             </div>
@@ -2879,8 +2882,7 @@ body.is-discover .site-tabs{z-index:45!important}
     <section id="profile" class="tab profile-owner" role="tabpanel" aria-labelledby="tab-profile">
       <div id="profileSignedOut" class="profile-screen">
         <header class="profile-head">
-          <div class="profile-headline"><span class="profile-wordmark">ARABISTA</span><span class="profile-preview">ACCOUNT</span></div>
-          <h1>Profile</h1>
+                    <h1>Profile</h1>
           <p>Sign in to manage your information, addresses and login details.</p>
         </header>
         <div class="profile-scroll">
@@ -2893,8 +2895,7 @@ body.is-discover .site-tabs{z-index:45!important}
       </div>
       <div id="profileSignedIn" class="profile-screen" hidden>
       <header class="profile-head">
-        <div class="profile-headline"><span class="profile-wordmark">ARABISTA</span><div class="profile-head-actions"><span class="profile-preview">ACCOUNT</span><button type="button" id="btnIdentityLogout" class="profile-head-signout">Sign out</button></div></div>
-        <h1>Profile</h1>
+        <div class="profile-title-row"><h1>Profile</h1><button type="button" id="btnIdentityLogout" class="profile-head-signout">Sign out</button></div>
         <p>Manage your information, addresses and login details.</p>
         <div class="profile-tabs" role="tablist" aria-label="Profile sections">
           <button id="profile-tab-personal" class="profile-tab" type="button" role="tab" aria-selected="true" aria-controls="profile-panel-personal" tabindex="0">Personal<br>Information</button>
