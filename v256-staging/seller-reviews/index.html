@@ -30,7 +30,7 @@ button{margin-top:16px;width:100%;height:50px;border:0;border-radius:12px;backgr
     <a href="/v256-staging/seller-discover/">Discover</a>
   </div>
 </form>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.1/dist/umd.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.1/dist/umd/supabase.js"></script>
 <script>
 (function(){
 var FACADE="https://script.google.com/macros/s/AKfycbzd7yF5b5ZdCAuZGh2DQzn1__MpDSG2zbveeGjZ584bx6NMxRFFq2n4IngjsDeMiNHD/exec";
@@ -42,6 +42,11 @@ var params=new URLSearchParams(location.search);
 if(params.get("err")) document.getElementById("err").textContent=params.get("err").replaceAll("_"," ");
 function digits(v){var d=String(v||"").replace(/\D/g,""); if(d.indexOf("60")===0)return d; if(d.indexOf("0")===0)return "6"+d; return d}
 function emailFrom(d){return "p"+d+"@identity.arabista.local"}
+function requireSupabase(){
+  if(typeof supabase==="undefined"||!supabase||typeof supabase.createClient!=="function"){
+    throw new Error("Sign-in library failed to load. Check your connection and try again.");
+  }
+}
 function jsonp(name,args){
   return new Promise(function(resolve,reject){
     var cb="arabistaV256Login_"+Date.now(); var settled=false; var s=document.createElement("script");
@@ -58,6 +63,7 @@ document.getElementById("loginForm").addEventListener("submit",async function(ev
   var err=document.getElementById("err"); err.textContent="";
   var btn=document.getElementById("btn"); btn.disabled=true;
   try{
+    requireSupabase();
     var phone=digits(document.getElementById("phone").value);
     var password=document.getElementById("password").value;
     if(phone.length<10) throw new Error("Enter a valid mobile number.");

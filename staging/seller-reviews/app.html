@@ -206,7 +206,7 @@ th{color:var(--muted);font:600 .65rem Inter,system-ui,sans-serif;letter-spacing:
 
 </style></head>
 <body>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.1/dist/umd.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.1/dist/umd/supabase.js"></script>
 <script>
 (function(){
 "use strict";
@@ -217,6 +217,11 @@ var SUPABASE_URL="https://atgztdsfvjqkerteljpb.supabase.co";
 var SESSION_KEY="arabista-v256-staff-session";
 var LOGIN_URL=ASSET_BASE+"seller-reviews/";
 var state={session:null,anonKey:null};
+function requireSupabase_(){
+  if(typeof supabase==="undefined"||!supabase||typeof supabase.createClient!=="function"){
+    throw new Error("Sign-in library failed to load. Check your connection and try again.");
+  }
+}
 function loadSession(){try{return JSON.parse(sessionStorage.getItem(SESSION_KEY)||"null")}catch(e){return null}}
 function clearSession(){try{sessionStorage.removeItem(SESSION_KEY)}catch(e){} state.session=null}
 function jsonp(name,args){
@@ -360,6 +365,7 @@ function installBridge(){
 }
 window.__ARABISTA_V256_STAFF_READY__=new Promise(async function(resolve,reject){
   try{
+    requireSupabase_();
     state.session=loadSession();
     if(!state.session||!state.session.access_token){
       location.replace(LOGIN_URL); reject(new Error("staff_sign_in_required")); return;
