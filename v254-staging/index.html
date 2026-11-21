@@ -2594,6 +2594,12 @@ body.is-discover .site-tabs{z-index:45!important}
 #profile .arabista-dialled-field select:disabled{opacity:.75;background:#f7f5f1!important}
 #profile .profile-phone-row .arabista-dialled-field{min-width:0}
 @media(max-width:440px){#profile .profile-phone-row{grid-template-columns:minmax(0,1fr)}#profile .profile-code-send{width:110px;justify-self:end}}
+/* Keep the five-tab navigation visible beneath the sign-in and recovery sheets. */
+@media(max-width:680px){
+  #identityModal.v251p-auth{bottom:calc(54px + env(safe-area-inset-bottom,0px))!important}
+  #identityModal.v251p-auth>div[role="dialog"]{padding-bottom:23px!important;
+    max-height:calc(100dvh - 54px - env(safe-area-inset-bottom,0px))!important}
+}
 
 #orders .arabista-inline-coin,#profile .arabista-inline-coin{display:inline-flex;align-items:center;gap:9px;vertical-align:middle}
 #orders .arabista-inline-coin .coin-loader,#profile .arabista-inline-coin .coin-loader{width:23px!important;height:23px!important}
@@ -2680,6 +2686,14 @@ body.is-discover .site-tabs{z-index:45!important}
 #v248CheckoutLayer #basket>.ab-cart-subtotal,#v248CheckoutLayer #basket>.ab-cart-fine,#v248CheckoutLayer #quoteNotice{display:none!important}
 #v248CheckoutLayer .v248-reference-payment-status strong{font:750 18px/1.4 'DM Sans',Inter,sans-serif;color:#a2824b}
 @media(prefers-reduced-motion:reduce){#v248CheckoutLayer .v254-checkout-quote-state .coin-inner{animation:none!important}}
+
+/* Subtle on-brand loader while restored Cart waits for the existing Shop catalog read. */
+#cart.v254-cart-page .ab-cart-price.v254-cart-price-loading{font:600 12px/1.45 'DM Sans',Inter,sans-serif!important;color:#8d7a61!important}
+#cart.v254-cart-page .v254-cart-price-loading .arabista-inline-coin{display:inline-flex;align-items:center;gap:8px}
+#cart.v254-cart-page .v254-cart-price-loading .coin-loader,
+#cart.v254-cart-page .v254-cart-summary-row .coin-loader{width:20px!important;height:20px!important}
+#cart.v254-cart-page .v254-cart-summary-row .arabista-inline-coin{display:inline-flex;align-items:center;gap:8px;white-space:nowrap;font:650 12px/1.4 'DM Sans',Inter,sans-serif;color:#8d7a61}
+@media(prefers-reduced-motion:reduce){#cart.v254-cart-page .coin-inner{animation:none!important}}
 
 /* v2.54 Step 3: quiet, shopper-first Cart. Preserve canonical quote/payment nodes out of view. */
 #cart.v254-cart-page .cart-items>.section-row{display:none!important}
@@ -14421,6 +14435,8 @@ function closeShopDetail() {
     clear(root);
     var ls = lines();
     var count = ls.reduce(function (n, x) { return n + x.quantity; }, 0);
+    var pricesLoading = count > 0 && shopCatalogPending_ && !(state.catalog || []).length;
+    root.setAttribute('aria-busy', pricesLoading ? 'true' : 'false');
     ['cartBadge','headerCartCount','fypCartCount','shopSheetCartCount','discoverSheetCartCount'].forEach(function (id) {
       var n = $(id);
       if (n) { n.textContent = String(count); n.hidden = count < 1; }
@@ -14490,8 +14506,14 @@ function closeShopDetail() {
       info.appendChild(el('div', (product && product.title) || meta.title || 'Product', 'ab-cart-title'));
       var variant = String((sku && (sku.options || sku.label)) || meta.options || '').split(/\s+\/\s+/).join(' · ');
       if (variant) info.appendChild(el('div', variant, 'ab-cart-options'));
-      info.appendChild(el('div', verifiedPrice ? money(Number(actual.price_sen)) :
-        'Price unavailable', 'ab-cart-price'));
+      var priceNode = el('div', null, 'ab-cart-price');
+      if (pricesLoading) {
+        priceNode.classList.add('v254-cart-price-loading');
+        arabistaLocalLoading_(priceNode, 'Checking price…');
+      } else {
+        priceNode.textContent = verifiedPrice ? money(Number(actual.price_sen)) : 'Price unavailable';
+      }
+      info.appendChild(priceNode);
       var actions = el('div', null, 'ab-cart-actions');
       var step = el('div', null, 'ab-cart-stepper');
       step.setAttribute('role', 'group');
@@ -14519,17 +14541,20 @@ function closeShopDetail() {
       remove.addEventListener('click', function () { removeLine(x.sku_id); });
       actions.appendChild(remove);
       info.appendChild(actions);
-      if (!actual || !actual.sellable || x.quantity > stockCap) {
+      if (!pricesLoading && (!actual || !actual.sellable || x.quantity > stockCap)) {
         info.appendChild(el('p', 'This item is currently unavailable.', 'commerce-line-warning'));
       }
       card.appendChild(info); root.appendChild(card);
     });
     var total = el('div', null, 'ab-cart-subtotal');
     total.appendChild(el('span', 'Subtotal'));
-    total.appendChild(el('strong', allPricesCurrent ? money(subtotal) : 'Requires refresh'));
+    total.appendChild(el('strong', pricesLoading ? 'Checking total…' :
+      allPricesCurrent ? money(subtotal) : 'Requires refresh'));
     root.appendChild(total);
-    if ($('v254CartSubtotal')) $('v254CartSubtotal').textContent =
-      allPricesCurrent ? money(subtotal) : 'At checkout';
+    if ($('v254CartSubtotal')) {
+      if (pricesLoading) arabistaLocalLoading_($('v254CartSubtotal'), 'Checking total…');
+      else $('v254CartSubtotal').textContent = allPricesCurrent ? money(subtotal) : 'At checkout';
+    }
   }
 
 
@@ -14823,8 +14848,8 @@ function closeShopDetail() {
     call('arabistaDevShopCatalogReadV229', {}, function (shopOut) {
       busy('shopBusy', false);
       if (shopOut && shopOut.ok === true) {
-        applyShopCatalog(shopOut);
         shopCatalogPending_ = false;
+        applyShopCatalog(shopOut);
         shopSyncInitialBusy_();
         if (!state.products.length && $('shopNote')) {
           $('shopNote').textContent = 'No READY/DRAFT syn- products returned by the authoritative Shop catalog.';
@@ -16491,7 +16516,10 @@ function attachSheetResizeHandle(handle,sheet,apply,ratio){
   }
 
   document.querySelectorAll('nav button[data-tab]').forEach(function (btn) {
-    btn.addEventListener('click', function () { show(btn.getAttribute('data-tab')); });
+    btn.addEventListener('click', function () {
+      if ($('identityModal') && !$('identityModal').hidden) closeIdentityModal();
+      show(btn.getAttribute('data-tab'));
+    });
   });
   // Keyboard-accessible tablist and intra-site navigation; no backend changes.
   document.querySelector('.site-tabs').addEventListener('keydown', function (e) {
