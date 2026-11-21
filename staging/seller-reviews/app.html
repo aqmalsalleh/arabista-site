@@ -265,27 +265,44 @@ async function staffRpc(rpc,args){
   return body;
 }
 function installBridge(){
-  var base={_ok:null,_fail:null};
-  base.withSuccessHandler=function(ok){this._ok=ok;return this};
-  base.withFailureHandler=function(fail){this._fail=fail;return this};
-  var proxied=new Proxy(base,{
-    get:function(target,prop){
-      if(prop in target) return target[prop];
-      if(prop==="then") return undefined;
-      return function(args){
-        var ok=target._ok||function(){};
-        var fail=target._fail||function(){};
-        staffRpc(String(prop),args||{}).then(ok,function(err){
-          fail(err&&err.message?err:String(err));
-        });
-        return target;
-      };
-    }
-  });
-  window.__ARABISTA_V239_SCRIPT_RUN__=proxied;
+  // Match Apps Script: every google.script.run access is a fresh runner with
+  // isolated success/failure handlers. Concurrent Studio RPCs must not share callbacks.
+  function makeRunner(){
+    var okFn=null, failFn=null, proxied=null;
+    var api={
+      withSuccessHandler:function(ok){okFn=typeof ok==="function"?ok:null;return proxied},
+      withFailureHandler:function(fail){failFn=typeof fail==="function"?fail:null;return proxied}
+    };
+    proxied=new Proxy(api,{
+      get:function(target,prop){
+        if(prop in target) return target[prop];
+        if(prop==="then") return undefined;
+        return function(args){
+          var success=okFn||function(){};
+          var failure=failFn||function(){};
+          staffRpc(String(prop),args||{}).then(function(body){
+            success(body);
+          },function(err){
+            failure(err&&err.message?err:String(err));
+          });
+          return proxied;
+        };
+      }
+    });
+    return proxied;
+  }
   window.google=window.google||{};
   google.script=google.script||{};
-  google.script.run=proxied;
+  try{
+    Object.defineProperty(google.script,"run",{configurable:true,enumerable:true,get:function(){return makeRunner()}});
+  }catch(e){
+    google.script.run=makeRunner();
+  }
+  try{
+    Object.defineProperty(window,"__ARABISTA_V239_SCRIPT_RUN__",{configurable:true,enumerable:true,get:function(){return makeRunner()}});
+  }catch(e2){
+    window.__ARABISTA_V239_SCRIPT_RUN__=makeRunner();
+  }
   // Reuse established Seller Products multipart/tus + READY verify contract
   // (same behavior as v247MediaAdapterScript_), via website staffRpc transport.
   function postMultipart(url,file){
@@ -1141,8 +1158,14 @@ async function opsAction(name,args,statusId,success,onSuccess){
   const out=await opsRpc(name,args);
   if(epoch!==state.ops.epoch)return;
   if(!opsValid(out)){opsStatus(statusId,"Could not complete: "+opsFailReason(out)+". Refresh before trying again.",true);return}
-  opsStatus(statusId,typeof success==="function"?success(out):success||"Change saved.");
-  if(onSuccess)onSuccess(out);
+  const message=typeof success==="function"?success(out):success||"Change saved.";
+  opsStatus(statusId,message);
+  if(onSuccess){
+   const maybe=onSuccess(out);
+   if(maybe&&typeof maybe.then==="function")await maybe;
+  }
+  // Keep the action outcome visible if a library refresh ran afterward.
+  if(epoch===state.ops.epoch&&statusId==="v255W06Status")opsStatus(statusId,message);
  }catch(err){
   if(epoch===state.ops.epoch)opsStatus(statusId,"Connection uncertain. Refresh to confirm before retrying.",true);
  }finally{
@@ -1296,12 +1319,60 @@ async function opsSaveQuality(){
  "Image quality saved for future generation.",out=>{state.ops.savedQuality=txt(out.quality)});
 }
 function opsSelectedScenario(){return txt($("opsScenario").value)}
+async function v255W06ApplyList(out,pid){
+ state.w06Rows=out.items;
+ state.w06Media=(Array.isArray(out.gallery_media)?out.gallery_media:[]).concat(Array.isArray(out.studio_media)?out.studio_media:[]);
+ state.w06MediaProductId=pid;state.ops.studioLoadedId=pid;
+ v255W06References();v255W06Render();
+}
 async function v255W06Generate(){
  const ids=opsSkuRequired();if(!ids)return;
- await opsAction("arabistaDevStudioGenerateTextV255",{
-  ...ids,length:$("v255W06Length").value,notes:txt($("v255W06Notes").value),
-  scenario_id:opsSelectedScenario()
- },"v255W06Status","New draft created. Review it in your library.",()=>v255W06Load());
+ if(state.ops.busy)return;
+ opsSetBusy(true);
+ opsStatus("v255W06Status","Creating draft… Waiting for the generation service.");
+ const epoch=state.ops.epoch;
+ try{
+  const out=await opsRpc("arabistaDevStudioGenerateTextV255",{
+   ...ids,length:$("v255W06Length").value,notes:txt($("v255W06Notes").value),
+   scenario_id:opsSelectedScenario()
+  });
+  if(epoch!==state.ops.epoch)return;
+  if(!opsValid(out)){
+   opsStatus("v255W06Status","Draft generation failed: "+opsFailReason(out)+". Refresh before trying again.",true);
+   return;
+  }
+  const contentId=txt(out.content_id);
+  if(!contentId){
+   opsStatus("v255W06Status","Generation returned without a draft id. Refresh before retrying.",true);
+   return;
+  }
+  // Success only after the generation RPC — then confirm the new unpublished draft via list readback.
+  opsStatus("v255W06Status","Draft created. Confirming it in your library…");
+  let list=null;
+  try{
+   list=await opsRpc("arabistaDevStudioListV255",{product_id:ids.product_id,include_archived:$("opsShowArchived").checked});
+  }catch(readErr){
+   list=null;
+  }
+  if(epoch!==state.ops.epoch)return;
+  if(!opsValid(list)||!Array.isArray(list.items)){
+   opsStatus("v255W06Status","Draft may have been created, but the library could not be refreshed. Refresh to confirm before retrying.",true);
+   return;
+  }
+  await v255W06ApplyList(list,ids.product_id);
+  const found=(list.items||[]).find(x=>txt(x.content_id)===contentId);
+  if(!found){
+   opsStatus("v255W06Status","Generation reported success, but the new draft was not found yet. Refresh to confirm before retrying.",true);
+   return;
+  }
+  state.ops.focusDraft=contentId;
+  v255W06Render();
+  opsStatus("v255W06Status","New unpublished draft created. Review it in your library.");
+ }catch(err){
+  if(epoch===state.ops.epoch)opsStatus("v255W06Status","Draft generation connection uncertain. Refresh to confirm before retrying.",true);
+ }finally{
+  opsSetBusy(false);
+ }
 }
 async function v255W06GeneratePhoto(){
  const ids=opsSkuRequired();if(!ids)return;
@@ -1317,7 +1388,7 @@ async function v255W06GeneratePhoto(){
   ...ids,reference_media_id:reference,
   style:$("v255W06PhotoStyle").value,scene:txt($("v255W06PhotoScene").value),count
  },"opsPhotoStatus",out=>txt(out.created_count)+" photo(s) created"+(out.partial?" (partial result — check the library).":" — ready for selection."),()=>{
-  v255W06Load();opsLoadReferences();
+  v255W06Load({preserveStatus:true});opsLoadReferences();
  });
 }
 async function opsReferenceImport(){
@@ -1387,7 +1458,7 @@ function opsDraftAction(r,action,mediaId){
  if(action==="archive"&&norm(r.status)==="PUBLISHED"&&!window.confirm("Archive this published example? It will disappear from the product sheet."))return;
  const payload={product_id:pid,content_id:cid};
  if(action==="attach"||action==="detach")payload.media_id=txt(mediaId);
- opsAction(names[action],payload,"v255W06Status",action[0].toUpperCase()+action.slice(1)+" completed.",()=>v255W06Load());
+ opsAction(names[action],payload,"v255W06Status",action[0].toUpperCase()+action.slice(1)+" completed.",()=>v255W06Load({preserveStatus:true}));
 }
 function opsReorderDraft(r,direction){
  const list=state.w06Rows.filter(x=>norm(x.status)!=="ARCHIVED").map(x=>txt(x.content_id));
@@ -1395,7 +1466,7 @@ function opsReorderDraft(r,direction){
  if(from<0||to<0||to>=list.length)return;
  [list[from],list[to]]=[list[to],list[from]];
  opsAction("arabistaDevStudioDraftReorderV255",{product_id:opsCurrentProductId(),content_ids:list},
- "v255W06Status","Display order saved.",()=>v255W06Load());
+ "v255W06Status","Display order saved.",()=>v255W06Load({preserveStatus:true}));
 }
 function opsRegenerate(r){
  if(norm(r.status)==="PUBLISHED"&&!window.confirm("Regenerating will unpublish this example until you approve it again. Continue?"))return;
@@ -1405,14 +1476,14 @@ function opsRegenerate(r){
   expected_revision:Number(r.revision),avoid_previous:true,
   scenario_id:opsSelectedScenario(),length:$("v255W06Length").value,
   notes:txt($("v255W06Notes").value)
- },"v255W06Status","New wording saved as a private draft.",()=>v255W06Load());
+ },"v255W06Status","New wording saved as a private draft.",()=>v255W06Load({preserveStatus:true}));
 }
 function v255W06Mutate(kind,r,values){
  const fn=kind==="save"?"arabistaDevW06StudioSaveV255":"arabistaDevW06StudioPublishV255";
  opsAction(fn,{
   product_id:opsCurrentProductId(),content_id:txt(r.content_id),
   expected_revision:Number(r.revision),...values
- },"v255W06Status",kind==="save"?"Edits saved.":"Publication updated.",()=>v255W06Load());
+ },"v255W06Status",kind==="save"?"Edits saved.":"Publication updated.",()=>v255W06Load({preserveStatus:true}));
 }
 function v255W06Render(){
  const host=$("v255W06List");host.replaceChildren();
@@ -1496,21 +1567,20 @@ function v255W06Render(){
  const target=host.querySelector(".ops-draft.is-focused");
  if(target){target.scrollIntoView({block:"center",behavior:"smooth"});}
 }
-async function v255W06Load(){
+async function v255W06Load(opts){
+ opts=opts||{};
  const pid=opsCurrentProductId(),host=$("v255W06List");
  if(!pid){host.replaceChildren(el("p","ops-empty","Select a product to see its drafts."));return}
  const epoch=state.ops.epoch;
- opsStatus("v255W06Status","Loading drafts…");
+ // Never overwrite an in-flight generation/action outcome with a list-loading caption.
+ if(!opts.preserveStatus)opsStatus("v255W06Status","Loading drafts…");
  try{
   const out=await opsRpc("arabistaDevStudioListV255",{product_id:pid,include_archived:$("opsShowArchived").checked});
   if(epoch!==state.ops.epoch||pid!==opsCurrentProductId())return;
   if(!opsValid(out)||!Array.isArray(out.items))throw Error("Drafts could not be loaded");
-  state.w06Rows=out.items;
-  state.w06Media=(Array.isArray(out.gallery_media)?out.gallery_media:[]).concat(Array.isArray(out.studio_media)?out.studio_media:[]);
-  state.w06MediaProductId=pid;state.ops.studioLoadedId=pid;
-  v255W06References();v255W06Render();
-  v255W06Notice(out.items.length+" item(s) ready. Changes are private until you publish.");
- }catch(err){if(epoch===state.ops.epoch)v255W06Notice("Drafts unavailable. Try Refresh.",true)}
+  await v255W06ApplyList(out,pid);
+  if(!opts.preserveStatus)v255W06Notice(out.items.length+" item(s) ready. Changes are private until you publish.");
+ }catch(err){if(epoch===state.ops.epoch&&!opts.preserveStatus)v255W06Notice("Drafts unavailable. Try Refresh.",true)}
 }
 
 
