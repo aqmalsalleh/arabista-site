@@ -9801,6 +9801,7 @@ body.is-discover .site-tabs{z-index:45!important}
     }
     state.idempotencyKey = null;
     state.settlementIdempotencyKey = null;
+    v254PersistAccountCart_();
     invalidateQuote();
     drawBasket();
     drawCatalog();
@@ -9811,6 +9812,7 @@ body.is-discover .site-tabs{z-index:45!important}
     delete state.basket[skuId];
     state.idempotencyKey = null;
     state.settlementIdempotencyKey = null;
+    v254PersistAccountCart_();
     invalidateQuote();
     drawBasket();
     drawCatalog();
@@ -11292,10 +11294,12 @@ body.is-discover .site-tabs{z-index:45!important}
       state.identityRefreshToken = saved.refresh_token ? String(saved.refresh_token) : null;
       state.identityCustomerId = saved.customer_id ? String(saved.customer_id) : null;
       state.identityPhone = saved.phone_e164 ? String(saved.phone_e164) : null;
+      if (isIdentitySignedIn()) v254RestoreAccountCart_(false);
     } catch (e) { /* ignore */ }
   }
 
   function clearIdentitySession() {
+    v254PersistAccountCart_();
     ownerInvalidateProfileCache_();
     ownerBusy_ = {};
     if (state.grantIdentityOwned) {
@@ -11324,9 +11328,11 @@ body.is-discover .site-tabs{z-index:45!important}
 
   function applyIdentitySession(x) {
     if (!(x && x.access_token)) return;
+    var previousCustomerId = isIdentitySignedIn() ? String(state.identityCustomerId) : '';
     var changed = state.identityAccessToken !== x.access_token
       || (x.customer_id && state.identityCustomerId !== x.customer_id);
     if (changed) {
+      if (previousCustomerId) v254PersistAccountCartFor_(previousCustomerId);
       ownerInvalidateProfileCache_();
       state.identityProfile = null;
       state.deliveryAddresses = [];
@@ -11337,6 +11343,10 @@ body.is-discover .site-tabs{z-index:45!important}
     if (x.customer_id) state.identityCustomerId = x.customer_id;
     if (x.phone_e164) state.identityPhone = x.phone_e164;
     persistIdentitySession();
+    if (changed && isIdentitySignedIn()) {
+      if (previousCustomerId && previousCustomerId !== String(state.identityCustomerId)) state.basket = {};
+      v254RestoreAccountCart_(!previousCustomerId);
+    }
     // Once per sign-in, populate checkout address; not on subsequent Shop renders.
     if (isIdentitySignedIn()) {
       loadIdentityProfile(false);
@@ -11346,6 +11356,58 @@ body.is-discover .site-tabs{z-index:45!important}
 
   function isIdentitySignedIn() {
     return !!(state.identityAccessToken && state.identityCustomerId);
+  }
+
+  /* Account-specific Cart for this browser; no additional Sheets requests. */
+  var V254_ACCOUNT_CART_KEY_ = 'arabista-v254-account-cart:';
+  function v254AccountCartKey_(customerId) {
+    return V254_ACCOUNT_CART_KEY_ + encodeURIComponent(String(customerId || ''));
+  }
+  function v254PersistAccountCartFor_(customerId) {
+    if (!customerId) return;
+    try {
+      var saved = Object.keys(state.basket).filter(function(skuId) {
+        return Number.isSafeInteger(state.basket[skuId]) && state.basket[skuId] > 0;
+      }).map(function(skuId) {
+        return {sku_id:skuId,quantity:state.basket[skuId]};
+      });
+      localStorage.setItem(v254AccountCartKey_(customerId), JSON.stringify(saved));
+    } catch (storageError) { /* Browser storage can be unavailable. */ }
+  }
+  function v254PersistAccountCart_() {
+    if (isIdentitySignedIn()) v254PersistAccountCartFor_(state.identityCustomerId);
+  }
+  function v254RestoreAccountCart_(mergeGuest) {
+    if (!isIdentitySignedIn()) return;
+    var restored = null;
+    try {
+      var saved = JSON.parse(localStorage.getItem(v254AccountCartKey_(state.identityCustomerId)) || 'null');
+      if (Array.isArray(saved)) {
+        restored = Object.create(null);
+        saved.forEach(function(line) {
+          var skuId = line && typeof line.sku_id === 'string' ? line.sku_id : '';
+          var qty = line && Number(line.quantity);
+          if (skuId && skuId.length <= 200 && Number.isSafeInteger(qty) && qty > 0) restored[skuId] = qty;
+        });
+      }
+    } catch (storageError) { /* Ignore an unavailable or damaged local Cart. */ }
+    if (restored) {
+      if (mergeGuest) {
+        Object.keys(state.basket).forEach(function(skuId) {
+          var qty = Number(state.basket[skuId]);
+          if (Number.isSafeInteger(qty) && qty > 0) {
+            restored[skuId] = Math.min(Number.MAX_SAFE_INTEGER, (restored[skuId] || 0) + qty);
+          }
+        });
+      }
+      state.basket = restored;
+      state.idempotencyKey = null;
+      state.settlementIdempotencyKey = null;
+      invalidateQuote();
+      drawBasket();
+      if (v248Exact.shadow) v248XRenderBasket();
+    }
+    v254PersistAccountCart_();
   }
 
   var identityRequestInFlight_ = false;
@@ -11498,6 +11560,7 @@ body.is-discover .site-tabs{z-index:45!important}
     if (meta) state.skuMeta[skuId] = meta;
     state.idempotencyKey = null;
     state.settlementIdempotencyKey = null;
+    v254PersistAccountCart_();
     invalidateQuote();
     drawBasket();
   }
@@ -16470,6 +16533,7 @@ function attachSheetResizeHandle(handle,sheet,apply,ratio){
     state.basket = {};
     state.idempotencyKey = null;
     state.settlementIdempotencyKey = null;
+    v254PersistAccountCart_();
     invalidateQuote();
     drawBasket();
   });
