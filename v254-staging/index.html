@@ -14535,7 +14535,7 @@ function closeShopDetail() {
     // Authoritative Shop only. Never reconstruct sellable Stock from a partial catalog fallback.
     shopCatalogPending_ = true;
     shopSyncInitialBusy_();
-    busy('shopBusy', true, 'Loading products…');
+    // The full-screen Shop splash is the only initial catalog loader.
     call('arabistaDevShopCatalogReadV229', {}, function (shopOut) {
       busy('shopBusy', false);
       if (shopOut && shopOut.ok === true) {
