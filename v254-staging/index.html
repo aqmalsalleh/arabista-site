@@ -2652,21 +2652,34 @@ body.is-discover .site-tabs{z-index:45!important}
 
 
 
-#cart.v254-cart-page .v254-cart-extras{margin-top:7px;color:#8b734e;font:600 12px/1.4 'DM Sans',Inter,sans-serif}
-#cart.v254-cart-page .v254-cart-extras summary{cursor:pointer;min-height:42px;display:flex;align-items:center;
-  justify-content:center;list-style:none;color:#8b734e}
-#cart.v254-cart-page .v254-cart-extras summary::-webkit-details-marker{display:none}
-#cart.v254-cart-page .v254-cart-extras summary:after{content:'+';padding-left:8px;font-size:17px}
-#cart.v254-cart-page .v254-cart-extras[open] summary:after{content:'−'}
-#cart.v254-cart-page .v254-cart-extras-fields{text-align:left;margin-top:8px;padding:16px 14px;
-  background:#faf8f4;border:1px solid #efe8df;border-radius:12px}
-#cart.v254-cart-page .v254-cart-extras-fields label{display:block;margin:9px 0 6px;color:#675e53;
-  font:650 11px/1.4 'DM Sans',Inter,sans-serif}
-#cart.v254-cart-page .v254-cart-extras-fields input{display:block;box-sizing:border-box;width:100%;min-height:46px;
-  padding:10px 13px;background:white;color:#292722;border:1px solid #ded7ce;border-radius:10px;
-  font:400 16px/1.3 'DM Sans',Inter,sans-serif}
-#cart.v254-cart-page .v254-cart-extras-fields input:focus{border-color:#ae905e;outline:2px solid #ae905e44}
-#cart.v254-cart-page .v254-cart-extras-fields #promoNote{font:500 11px/1.5 'DM Sans',Inter,sans-serif;color:#80684b}
+
+/* v2.54 Step 4 — shopper-friendly Checkout with automatic quote. */
+#v248CheckoutLayer .v248-checkout-banner{display:none!important}
+#v248CheckoutLayer #v248CheckoutQuote[hidden],#v248CheckoutLayer .v248-checkout-payment-options[hidden]{display:none!important}
+#v248CheckoutLayer .v254-checkout-contact{padding:18px 15px;background:#fff}
+#v248CheckoutLayer .v254-checkout-contact h3{margin:0 0 12px;font:700 15px/1.4 'DM Sans',Inter,sans-serif;color:#302a25}
+#v248CheckoutLayer .v254-checkout-label{display:block;margin:0 0 8px;color:#655b4c;font:650 11px/1.4 'DM Sans',Inter,sans-serif}
+#v248CheckoutLayer .v254-checkout-contact input,#v248CheckoutLayer .v254-checkout-promo input{box-sizing:border-box;display:block;min-width:0;width:100%;min-height:46px;padding:10px 12px;border:1px solid #e1dacf;border-radius:11px;background:#fff;color:#302a25;font:400 16px/1.4 'DM Sans',Inter,sans-serif}
+#v248CheckoutLayer .v254-checkout-contact input:focus,#v248CheckoutLayer .v254-checkout-promo input:focus{outline:2px solid #b3946a70;border-color:#aa8958}
+#v248CheckoutLayer .v254-checkout-promo{padding:14px 0 6px}
+#v248CheckoutLayer .v254-checkout-promo-row{display:flex;align-items:center;gap:9px}
+#v248CheckoutLayer .v254-checkout-promo-row input{flex:1}
+#v248CheckoutLayer .v254-checkout-promo-row button{min-height:46px;min-width:73px;padding:10px 13px;border:1px solid #ddc8a7;border-radius:11px;background:#fbf8f2;color:#846b46;font:700 12px/1.2 'DM Sans',Inter,sans-serif}
+#v248CheckoutLayer #promoNote{margin:7px 0 0;color:#80684b;font:500 11px/1.4 'DM Sans',Inter,sans-serif}
+#v248CheckoutLayer .v254-checkout-quote-state{display:flex;align-items:center;gap:11px;min-height:68px;padding:12px 2px;color:#817366;font:600 12px/1.5 'DM Sans',Inter,sans-serif}
+#v248CheckoutLayer .v254-checkout-quote-state[hidden]{display:none!important}
+#v248CheckoutLayer .v254-checkout-quote-state .coin-loader{width:25px;height:25px}
+#v248CheckoutLayer .v254-checkout-quote-state.is-message .coin-loader{display:none!important}
+#v248CheckoutLayer #v254CheckoutRetry{display:block;min-height:40px;margin:8px 0 0;padding:7px 15px;border:1px solid #d7c6aa;border-radius:999px;background:#fff;color:#846b46;font:700 12px/1.4 'DM Sans',Inter,sans-serif}
+#v248CheckoutLayer #v254CheckoutRetry[hidden]{display:none!important}
+#v248CheckoutLayer #verifiedQuote{background:transparent!important;border:0!important;box-shadow:none!important;padding:0!important;margin:0!important}
+#v248CheckoutLayer #verifiedQuote>.summary-line{color:#645c52;font:500 13px/1.5 'DM Sans',Inter,sans-serif}
+#v248CheckoutLayer #verifiedQuote>.summary-line strong{color:#322d27;font:650 14px/1.4 'DM Sans',Inter,sans-serif}
+#v248CheckoutLayer #verifiedQuote>.summary-line:last-child{border-bottom:0;padding-top:15px}
+#v248CheckoutLayer #verifiedQuote>.summary-line:last-child span,#v248CheckoutLayer #verifiedQuote>.summary-line:last-child strong{font-weight:750;color:#a2824b;font-size:17px}
+#v248CheckoutLayer #basket>.ab-cart-subtotal,#v248CheckoutLayer #basket>.ab-cart-fine,#v248CheckoutLayer #quoteNotice{display:none!important}
+#v248CheckoutLayer .v248-reference-payment-status strong{font:750 18px/1.4 'DM Sans',Inter,sans-serif;color:#a2824b}
+@media(prefers-reduced-motion:reduce){#v248CheckoutLayer .v254-checkout-quote-state .coin-inner{animation:none!important}}
 
 /* v2.54 Step 3: quiet, shopper-first Cart. Preserve canonical quote/payment nodes out of view. */
 #cart.v254-cart-page .cart-items>.section-row{display:none!important}
@@ -2817,16 +2830,6 @@ body.is-discover .site-tabs{z-index:45!important}
           <button type="button" class="action-primary" id="v248CheckoutOpen">Checkout <span aria-hidden="true">›</span></button>
         </div>
         <button type="button" class="v248-bag-continue" data-go-tab="shop" aria-label="Continue shopping">Continue shopping</button>
-        <details class="v254-cart-extras">
-          <summary>Contact &amp; promo</summary>
-          <div class="v254-cart-extras-fields">
-            <label for="checkoutPhone">Mobile number</label>
-            <input id="checkoutPhone" type="tel" inputmode="tel" autocomplete="tel" placeholder="+60…" />
-            <label for="promo">Promo code</label>
-            <input id="promo" autocomplete="off" placeholder="Enter code" />
-            <p id="promoNote"></p>
-          </div>
-        </details>
         <!-- Existing application controls remain mounted for secure checkout integration. -->
         <div class="v254-cart-internals" hidden>
           <div id="checkoutSteps" class="journey-steps" aria-label="Checkout journey"><span></span><span></span><span></span></div>
@@ -2861,11 +2864,15 @@ body.is-discover .site-tabs{z-index:45!important}
         <button id="v248CheckoutExit" type="button" aria-label="Close checkout">×</button>
       </header>
       <div class="v248-checkout-scroll">
-        <p class="v248-checkout-banner">Payment is currently unavailable. You can still review your basket and delivery address.</p>
         <section class="v248-checkout-address">
           <div class="v248-checkout-heading"><h3>Delivery address</h3>
             <button id="v248CheckoutManageAddress" type="button">Manage ›</button></div>
-          <p id="v248CheckoutAddressText">Your saved address will appear here when signed in.</p>
+          <p id="v248CheckoutAddressText">Add your delivery address to continue.</p>
+        </section>
+        <section class="v254-checkout-contact" aria-label="Contact details">
+          <h3>Contact</h3>
+          <label class="v254-checkout-label" for="checkoutPhone">Mobile number</label>
+          <input id="checkoutPhone" type="tel" inputmode="tel" autocomplete="tel" placeholder="+60…" />
         </section>
         <div class="v248-checkout-divider"></div>
         <section class="v248-checkout-items">
@@ -2875,15 +2882,27 @@ body.is-discover .site-tabs{z-index:45!important}
         <div class="v248-checkout-divider"></div>
         <section class="v248-checkout-shipping">
           <h3>Order summary</h3>
+          <div id="v254CheckoutQuoteState" class="v254-checkout-quote-state" role="status" aria-live="polite" hidden>
+            <span class="coin-loader" aria-hidden="true"><span class="coin-inner"><span class="coin-face"></span><span class="coin-face coin-back"></span></span></span>
+            <span id="v254CheckoutQuoteStateText">Calculating total…</span>
+          </div>
           <div id="v248CheckoutQuoteHost"></div>
-          <p class="v248-checkout-footnote">Final prices, shipping and availability are confirmed only by the backend quote.</p>
-          <button id="v248CheckoutQuote" type="button" class="v248-checkout-quote-btn">Check total</button>
+          <button id="v254CheckoutRetry" type="button" hidden>Try again</button>
+          <div class="v254-checkout-promo">
+            <label class="v254-checkout-label" for="promo">Promo code (optional)</label>
+            <div class="v254-checkout-promo-row">
+              <input id="promo" autocomplete="off" placeholder="Enter code" />
+              <button id="v254CheckoutPromoApply" type="button">Apply</button>
+            </div>
+            <p id="promoNote" aria-live="polite"></p>
+          </div>
+          <button id="v248CheckoutQuote" type="button" class="v248-checkout-quote-btn" hidden>Check total</button>
         </section>
         <div class="v248-checkout-divider"></div>
         <section class="v248-checkout-payment">
           <h3>Secure payment</h3>
-          <p class="v248-checkout-footnote">Payment selection is a visual preview. This page cannot initiate an order or charge.</p>
-          <div class="v248-checkout-payment-options">
+          <p class="v248-checkout-footnote">Payment options are currently unavailable.</p>
+          <div class="v248-checkout-payment-options" hidden>
             <label><span><strong>Touch 'n Go eWallet</strong><small>Payment method currently unavailable</small></span><input type="radio" name="v248-payment-preview" disabled></label>
             <label><span><strong>GrabPay</strong><small>Payment method currently unavailable</small></span><input type="radio" name="v248-payment-preview" disabled></label>
             <label><span><strong>ShopeePay</strong><small>Payment method currently unavailable</small></span><input type="radio" name="v248-payment-preview" disabled></label>
@@ -2892,9 +2911,9 @@ body.is-discover .site-tabs{z-index:45!important}
         </section>
       </div>
       <footer class="v248-checkout-footer">
-        <div class="v248-reference-payment-status"><span>Estimated total</span><strong>Check total</strong></div>
-        <p id="v248CheckoutFooterStatus" role="status">Quote-only preview · Payment not initiated</p>
-        <button id="v248CheckoutContinue" type="button" disabled>Continue to payment</button>
+        <div class="v248-reference-payment-status"><span>Total</span><strong id="v254CheckoutFooterAmount">—</strong></div>
+        <p id="v248CheckoutFooterStatus" role="status" hidden>Payment unavailable</p>
+        <button id="v248CheckoutContinue" type="button" disabled>Payment unavailable</button>
       </footer>
     </div>
   </div>
@@ -9785,6 +9804,7 @@ body.is-discover .site-tabs{z-index:45!important}
     invalidateQuote();
     drawBasket();
     drawCatalog();
+    v254CheckoutOnBasketChange_();
   }
 
   function removeLine(skuId) {
@@ -9794,6 +9814,7 @@ body.is-discover .site-tabs{z-index:45!important}
     invalidateQuote();
     drawBasket();
     drawCatalog();
+    v254CheckoutOnBasketChange_();
   }
 
   var tabId = 'discover';
@@ -11169,6 +11190,7 @@ body.is-discover .site-tabs{z-index:45!important}
     var host = $('verifiedQuote');
     if (host) { host.hidden = true; clear(host); }
     if ($('quoteNotice')) $('quoteNotice').textContent = '';
+    if ($('btnQuote')) $('btnQuote').disabled = !lines().length;
     var raw = $('result');
     if (raw && raw.closest('details')) raw.closest('details').open = false;
   }
@@ -11182,8 +11204,6 @@ body.is-discover .site-tabs{z-index:45!important}
     if (!payload || payload.ok !== true || !quote || payload.checkout_ready === false
       || quote.checkout_ready === false || quote.quotable === false) return;
     host.hidden = false;
-    host.appendChild(el('span', 'Order total', 'eyebrow'));
-    host.appendChild(el('h4', 'Server-verified amount'));
     function amount(label, sen, style) {
       if (sen == null || !isFinite(Number(sen)) || Number(sen) < 0) return;
       var row = el('div', null, 'summary-line');
@@ -11193,8 +11213,7 @@ body.is-discover .site-tabs{z-index:45!important}
     }
     amount('Subtotal', quote.subtotal_sen);
     amount('Shipping', quote.shipping_sen);
-    amount('Payable', quote.payable_sen, 'total');
-    host.appendChild(el('p', 'Prices and availability are confirmed before payment. This is not payment confirmation.', 'fine-print'));
+    amount('Total', quote.payable_sen, 'total');
   }
 
   function lines() {
@@ -14433,9 +14452,69 @@ function closeShopDetail() {
       if(marker.parentNode){marker.parentNode.insertBefore(node,marker);marker.remove();}
     });
   }
+
+  /* Step 4: quote when Checkout opens; reuse until basket or promo changes. */
+  var v254CheckoutQuoteTimer_ = null;
+  function v254CheckoutIsOpen_() {
+    var node = $('v248CheckoutLayer');
+    return !!node && !node.hidden;
+  }
+  function v254CheckoutQuoteUi_(mode) {
+    if (!v254CheckoutIsOpen_()) return;
+    var stateNode = $('v254CheckoutQuoteState');
+    var textNode = $('v254CheckoutQuoteStateText');
+    var retry = $('v254CheckoutRetry');
+    var total = $('v254CheckoutFooterAmount');
+    var quote = v248Exact.quote;
+    var valid = quote && ['subtotal_sen','shipping_sen','payable_sen'].every(function (key) {
+      return quote[key] != null && Number.isFinite(Number(quote[key])) && Number(quote[key]) >= 0;
+    });
+    if (mode === 'ready' && valid) {
+      stateNode.hidden = true;
+      stateNode.classList.remove('is-message');
+      retry.hidden = true;
+      total.textContent = money(quote.payable_sen);
+      return;
+    }
+    stateNode.hidden = false;
+    stateNode.classList.toggle('is-message', mode !== 'loading');
+    retry.hidden = mode !== 'error';
+    total.textContent = '—';
+    textNode.textContent = mode === 'loading' ? 'Calculating total…' :
+      mode === 'editing' ? 'Apply your promo code to update the total.' :
+      'We couldn’t calculate your total.';
+  }
+  function v254CheckoutEnsureQuote_() {
+    if (!v254CheckoutIsOpen_() || !lines().length) return;
+    if (v248Exact.quote && v248XQuoteComplete({ok:true,checkout_ready:true,quote:v248Exact.quote})) {
+      if ($('verifiedQuote').hidden) showVerifiedQuote({ok:true,checkout_ready:true,quote:v248Exact.quote});
+      v254CheckoutQuoteUi_('ready');
+      return;
+    }
+    v254CheckoutQuoteUi_('loading');
+    if ($('btnQuote').disabled) return;
+    $('btnQuote').click();
+  }
+  function v254CheckoutOnBasketChange_() {
+    if (!v254CheckoutIsOpen_()) return;
+    if (v254CheckoutQuoteTimer_ !== null) {
+      window.clearTimeout(v254CheckoutQuoteTimer_);
+      v254CheckoutQuoteTimer_ = null;
+    }
+    if (!lines().length) { v248CloseCheckout(); return; }
+    v254CheckoutQuoteUi_('loading');
+    v254CheckoutQuoteTimer_ = window.setTimeout(function () {
+      v254CheckoutQuoteTimer_ = null;
+      v254CheckoutEnsureQuote_();
+    }, 240);
+  }
   function v248CloseCheckout(){
     var layer=$('v248CheckoutLayer');
     if(!layer||layer.hidden)return;
+    if (v254CheckoutQuoteTimer_ !== null) {
+      window.clearTimeout(v254CheckoutQuoteTimer_);
+      v254CheckoutQuoteTimer_ = null;
+    }
     while(v248CheckoutRestore.length){v248CheckoutRestore.pop()();}
     layer.hidden=true;
     document.body.classList.remove('v248-checkout-active');
@@ -14463,11 +14542,11 @@ function closeShopDetail() {
         profile.postcode,profile.city,profile.state_region
       ].filter(Boolean).join(' · ');
     }else{
-      $('v248CheckoutAddressText').textContent=
-        'No verified saved delivery address is available. Manage your address in your customer profile.';
+      $('v248CheckoutAddressText').textContent='Add a delivery address in Profile.';
     }
     layer.hidden=false;document.body.classList.add('v248-checkout-active');
     $('v248CheckoutBack').focus({preventScroll:true});
+    v254CheckoutEnsureQuote_();
   }
   $('v248CheckoutOpen').addEventListener('click',v248OpenCheckout);
   $('v248CheckoutBack').addEventListener('click',v248CloseCheckout);
@@ -14478,10 +14557,15 @@ function closeShopDetail() {
     selectOwnerProfileTab_('addresses');
   });
   $('v248CheckoutQuote').addEventListener('click',function(){
-    if(!lines().length)return;
-    // The existing button exclusively calls arabistaDevBasketQuote with
-    // authentic SKU lines. No write/order/provider action is invoked here.
-    $('btnQuote').click();
+    v254CheckoutEnsureQuote_();
+  });
+  $('v254CheckoutRetry').addEventListener('click',function(){
+    v254CheckoutEnsureQuote_();
+  });
+  $('v254CheckoutPromoApply').addEventListener('click',function(){
+    if(!v254CheckoutIsOpen_() || !lines().length)return;
+    if($('promoNote'))$('promoNote').textContent = '';
+    v254CheckoutEnsureQuote_();
   });
   $('v248CheckoutLayer').addEventListener('keydown',function(e){
     if(e.key==='Escape'){e.preventDefault();v248CloseCheckout();return;}
@@ -16382,7 +16466,10 @@ function attachSheetResizeHandle(handle,sheet,apply,ratio){
     drawBasket();
   });
 
-  $('promo').addEventListener('input', invalidateQuote);
+  $('promo').addEventListener('input', function(){
+    invalidateQuote();
+    v254CheckoutQuoteUi_('editing');
+  });
 
   $('btnQuote').addEventListener('click', function () {
     if ($('btnQuote').disabled) return;
@@ -16396,12 +16483,13 @@ function attachSheetResizeHandle(handle,sheet,apply,ratio){
       lines: lines(),
       promotion_code: $('promo').value
     }, function (x) {
+      if (revision !== quoteRevision) return; // stale response after Cart or promo changed
       busy('cartBusy', false);
       $('btnQuote').disabled = !lines().length;
-      if (revision !== quoteRevision) return; // stale response after Cart or promo changed
       render('result', x);
       showVerifiedQuote(x);
-      if (x && x.ok && (x.checkout_ready || (x.quote && x.quote.checkout_ready))) {
+      v254CheckoutQuoteUi_(v248XQuoteComplete(x) ? 'ready' : 'error');
+      if (v248XQuoteComplete(x)) {
         setCheckoutStep(2);
         $('quoteNotice').textContent = 'Total confirmed.';
       } else {
@@ -16410,10 +16498,11 @@ function attachSheetResizeHandle(handle,sheet,apply,ratio){
       }
       $('result').closest('details').open = false;
     }, function (failure) {
+      if (revision !== quoteRevision) return;
       busy('cartBusy', false);
       $('btnQuote').disabled = !lines().length;
-      if (revision !== quoteRevision) return;
       showVerifiedQuote(null);
+      v254CheckoutQuoteUi_('error');
       setCheckoutStep(0);
       render('result', failure);
       $('quoteNotice').textContent = 'Could not check the total. Try again.';
