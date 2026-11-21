@@ -11314,6 +11314,7 @@ body.is-discover .site-tabs{z-index:45!important}
     state.deliveryAddresses = [];
     state.identityChallengeId = null;
     persistIdentitySession();
+    v254ClearGuestCart_();
     // A signed-out shopper starts with an empty cart and no pending quote.
     state.basket = {};
     state.idempotencyKey = null;
@@ -11346,6 +11347,7 @@ body.is-discover .site-tabs{z-index:45!important}
     if (changed && isIdentitySignedIn()) {
       if (previousCustomerId && previousCustomerId !== String(state.identityCustomerId)) state.basket = {};
       v254RestoreAccountCart_(!previousCustomerId);
+      v254ClearGuestCart_();
     }
     // Once per sign-in, populate checkout address; not on subsequent Shop renders.
     if (isIdentitySignedIn()) {
@@ -11358,39 +11360,58 @@ body.is-discover .site-tabs{z-index:45!important}
     return !!(state.identityAccessToken && state.identityCustomerId);
   }
 
-  /* Account-specific Cart for this browser; no additional Sheets requests. */
+  /* Local carts are separated by signed-in customer or unsigned browser. */
   var V254_ACCOUNT_CART_KEY_ = 'arabista-v254-account-cart:';
+  var V254_GUEST_CART_KEY_ = 'arabista-v254-guest-cart';
   function v254AccountCartKey_(customerId) {
     return V254_ACCOUNT_CART_KEY_ + encodeURIComponent(String(customerId || ''));
   }
-  function v254PersistAccountCartFor_(customerId) {
-    if (!customerId) return;
+  function v254WriteStoredCart_(key) {
     try {
       var saved = Object.keys(state.basket).filter(function(skuId) {
         return Number.isSafeInteger(state.basket[skuId]) && state.basket[skuId] > 0;
       }).map(function(skuId) {
         return {sku_id:skuId,quantity:state.basket[skuId]};
       });
-      localStorage.setItem(v254AccountCartKey_(customerId), JSON.stringify(saved));
+      localStorage.setItem(key, JSON.stringify(saved));
     } catch (storageError) { /* Browser storage can be unavailable. */ }
+  }
+  function v254ReadStoredCart_(key) {
+    try {
+      var saved = JSON.parse(localStorage.getItem(key) || 'null');
+      if (!Array.isArray(saved)) return null;
+      var restored = Object.create(null);
+      saved.forEach(function(line) {
+        var skuId = line && typeof line.sku_id === 'string' ? line.sku_id : '';
+        var qty = line && Number(line.quantity);
+        if (skuId && skuId.length <= 200 && Number.isSafeInteger(qty) && qty > 0) restored[skuId] = qty;
+      });
+      return restored;
+    } catch (storageError) { return null; }
+  }
+  function v254PersistAccountCartFor_(customerId) {
+    if (customerId) v254WriteStoredCart_(v254AccountCartKey_(customerId));
   }
   function v254PersistAccountCart_() {
     if (isIdentitySignedIn()) v254PersistAccountCartFor_(state.identityCustomerId);
+    else v254WriteStoredCart_(V254_GUEST_CART_KEY_);
+  }
+  function v254ClearGuestCart_() {
+    try { localStorage.removeItem(V254_GUEST_CART_KEY_); }
+    catch (storageError) { /* Browser storage can be unavailable. */ }
+  }
+  function v254RestoreGuestCart_() {
+    if (isIdentitySignedIn()) return;
+    var restored = v254ReadStoredCart_(V254_GUEST_CART_KEY_);
+    if (!restored) return;
+    state.basket = restored;
+    state.idempotencyKey = null;
+    state.settlementIdempotencyKey = null;
+    // The existing boot drawBasket() refreshes Cart badges and items.
   }
   function v254RestoreAccountCart_(mergeGuest) {
     if (!isIdentitySignedIn()) return;
-    var restored = null;
-    try {
-      var saved = JSON.parse(localStorage.getItem(v254AccountCartKey_(state.identityCustomerId)) || 'null');
-      if (Array.isArray(saved)) {
-        restored = Object.create(null);
-        saved.forEach(function(line) {
-          var skuId = line && typeof line.sku_id === 'string' ? line.sku_id : '';
-          var qty = line && Number(line.quantity);
-          if (skuId && skuId.length <= 200 && Number.isSafeInteger(qty) && qty > 0) restored[skuId] = qty;
-        });
-      }
-    } catch (storageError) { /* Ignore an unavailable or damaged local Cart. */ }
+    var restored = v254ReadStoredCart_(v254AccountCartKey_(state.identityCustomerId));
     if (restored) {
       if (mergeGuest) {
         Object.keys(state.basket).forEach(function(skuId) {
@@ -17040,6 +17061,7 @@ function attachSheetResizeHandle(handle,sheet,apply,ratio){
     markPerf('shell_start');
     restorePurchaseSession();
     restoreIdentitySession();
+    if (!isIdentitySignedIn()) v254RestoreGuestCart_();
     // One authenticated profile/address read on a restored session, so checkout
     // retains its saved-address autofill without requesting on every Shop render.
     if (isIdentitySignedIn()) loadIdentityProfile(false);
