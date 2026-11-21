@@ -11310,7 +11310,14 @@ body.is-discover .site-tabs{z-index:45!important}
     state.deliveryAddresses = [];
     state.identityChallengeId = null;
     persistIdentitySession();
+    // A signed-out shopper starts with an empty cart and no pending quote.
+    state.basket = {};
+    state.idempotencyKey = null;
+    state.settlementIdempotencyKey = null;
     persistPurchaseSession();
+    invalidateQuote();
+    drawBasket();
+    if (v248Exact.shadow) v248XRenderBasket();
     busy('orderBusy', false);
     ooResetOrders_(null);
   }
@@ -12139,9 +12146,10 @@ function closeShopDetail() {
     root.querySelectorAll('#checkout-payment-methods input').forEach(function(n){n.disabled=true;});
     var place=v248X('checkout-place-order');if(place){place.disabled=true;place.textContent='Proceed to Secure Payment';}
     var notice=root.querySelector('#checkout-payment .checkout-payment-assurance');
-    if(notice)notice.textContent=window.__ARABISTA_V251_SANDBOX_CHECKOUT__===true
-      ?'Your payment continues securely with DOKU after total confirmation.'
-      :'Payment methods are temporarily unavailable.';
+    if(notice){
+      if(window.__ARABISTA_V251_SANDBOX_CHECKOUT__===true) notice.remove();
+      else notice.textContent='Payment methods are temporarily unavailable.';
+    }
     var disclaimer=root.querySelector('#checkout-delivery>.checkout-muted');
     if(disclaimer)disclaimer.textContent='Delivery charges are confirmed with your order total.';
     var refNote=root.querySelector('#commerce-basket-footer .commerce-basket-note');
