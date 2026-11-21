@@ -281,28 +281,80 @@ function installBridge(){
   window.google=window.google||{};
   google.script=google.script||{};
   google.script.run=proxied;
-  window.ArabistaSellerProductsV247Media={
-    upload:async function(file,opts){
-      opts=opts||{};
-      var created=await staffRpc("arabistaDevMediaCreateDirectUpload",{
-        post_type:"IMAGE", media_kind:opts.media_kind||"image",
-        filename:file&&file.name, content_type:file&&file.type, size_bytes:file&&file.size,
-        position:0, purpose:opts.purpose||"reviews_studio_v256"
-      });
-      if(!created||!created.ok) throw new Error((created&&created.reason)||"upload_create_failed");
-      if(created.upload_url&&file){
-        var put=await fetch(created.upload_url,{
-          method:created.upload_method||"POST",
-          body:file,
-          headers:created.upload_headers||{}
-        });
-        if(!put.ok) throw new Error("cloudflare_upload_failed");
+  // Reuse established Seller Products multipart/tus + READY verify contract
+  // (same behavior as v247MediaAdapterScript_), via website staffRpc transport.
+  function postMultipart(url,file){
+    return new Promise(function(resolve,reject){
+      var boundary="----ArabistaFormBoundary"+Date.now()+Math.floor(Math.random()*1e6);
+      var filename=String(file.name||"upload.bin").replace(/[\r\n"]/g,"_");
+      var mime=String(file.type||"application/octet-stream");
+      var head="--"+boundary+"\r\nContent-Disposition: form-data; name=\"file\"; filename=\""+filename+"\"\r\nContent-Type: "+mime+"\r\n\r\n";
+      var tail="\r\n--"+boundary+"--\r\n";
+      var body;try{body=new Blob([head,file,tail]);}catch(e){reject(new Error("Could not prepare the upload"));return;}
+      var xhr=new XMLHttpRequest();xhr.open("POST",url,true);
+      xhr.setRequestHeader("Content-Type","multipart/form-data; boundary="+boundary);
+      xhr.onload=function(){if(xhr.status>=200&&xhr.status<300)resolve();else reject(new Error("Upload rejected"));};
+      xhr.onerror=function(){reject(new Error("Upload network error"));};xhr.send(body);
+    });
+  }
+  function tusUpload(url,file){
+    var chunk=5*1024*1024;
+    return new Promise(function(resolve,reject){
+      function patch(offset){
+        if(offset>=file.size){resolve();return;}
+        var end=Math.min(file.size,offset+chunk);
+        var xhr=new XMLHttpRequest();xhr.open("PATCH",url,true);
+        xhr.setRequestHeader("Tus-Resumable","1.0.0");
+        xhr.setRequestHeader("Upload-Offset",String(offset));
+        xhr.setRequestHeader("Content-Type","application/offset+octet-stream");
+        xhr.onload=function(){
+          if(xhr.status===204||(xhr.status>=200&&xhr.status<300)){
+            patch(Number(xhr.getResponseHeader("Upload-Offset")||end));return;
+          }
+          if(offset===0){postMultipart(url,file).then(resolve).catch(reject);return;}
+          reject(new Error("Upload could not continue"));
+        };
+        xhr.onerror=function(){reject(new Error("Upload interrupted"));};
+        xhr.send(file.slice(offset,end));
       }
-      var verified=await staffRpc("arabistaDevMediaVerifyAsset",{
-        asset_id:created.asset_id||created.media_id,
-        media_kind:opts.media_kind||"image"
+      patch(0);
+    });
+  }
+  function verifyReady(assetId,kind,tries){
+    return staffRpc("arabistaDevMediaVerifyAsset",{asset_id:assetId,media_kind:kind}).then(function(r){
+      var ready=r&&r.ok&&(r.ready===true||String(r.upload_status||r.status||"").toUpperCase()==="READY"||String(r.outcome||"").indexOf("READY")>=0);
+      if(ready) return {verified:true,media_id:String(assetId),kind:kind==="VIDEO"?"video":"image"};
+      if(tries>=8) throw new Error("Media is still preparing. Try again shortly.");
+      return new Promise(function(resolve,reject){
+        setTimeout(function(){verifyReady(assetId,kind,tries+1).then(resolve).catch(reject);},1500);
       });
-      return Object.assign({},created,verified||{});
+    });
+  }
+  window.ArabistaSellerProductsV247Media={
+    upload:function(file,opts){
+      opts=opts||{};
+      return new Promise(function(resolve,reject){
+        if(!file){reject(new Error("No file selected"));return;}
+        var kind=/^video\//i.test(String(file.type||""))?"VIDEO":"IMAGE";
+        var preferTus=kind==="VIDEO"&&file.size>=32*1024*1024;
+        staffRpc("arabistaDevMediaCreateDirectUpload",{
+          post_type:"IMAGE",
+          media_kind:kind,
+          filename:file.name,
+          content_type:file.type,
+          size_bytes:file.size,
+          position:0,
+          purpose:opts.purpose||"reviews_studio_v256",
+          upload_mode:preferTus?"tus":undefined
+        }).then(function(created){
+          if(!created||!created.ok||!created.upload_url||!created.asset_id){
+            throw new Error((created&&(created.message||created.reason))||"Upload could not start");
+          }
+          var url=String(created.upload_url);
+          var send=preferTus||String(created.upload_mode||created.upload_method||"").toLowerCase().indexOf("tus")>=0?tusUpload:postMultipart;
+          return send(url,file).then(function(){return verifyReady(created.asset_id,kind,0);});
+        }).then(resolve).catch(function(e){reject(e&&e.message?e:new Error(String(e)));});
+      });
     }
   };
 }
