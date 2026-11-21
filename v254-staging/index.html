@@ -2619,6 +2619,37 @@ body.is-discover .site-tabs{z-index:45!important}
 #orders .orders-card:focus-visible{outline:2px solid #b3946a;outline-offset:3px}
 #orders .orders-preview-toast.is-loading{background:transparent;color:#5b5044;box-shadow:none;border:0;padding:8px 12px;pointer-events:none}
 #orders .orders-preview-toast.is-loading .arabista-inline-coin{color:#5b5044}
+
+/* v2.54 Step 2: global Cart is a first-class tab, not the contextual product bag. */
+#main.v254-cart-main:not(.discover-mode){padding:0!important;background:#faf9f6!important;scrollbar-gutter:auto}
+#cart.v254-cart-page{min-height:100%;margin:0!important;padding:0!important;background:#faf9f6!important;color:#282622;font-family:'DM Sans',Inter,sans-serif}
+#cart.v254-cart-page.on{display:block}
+#cart .v254-cart-shell{width:100%;max-width:none;margin:0;position:static;background:transparent;box-shadow:none;border:0}
+#cart .v254-cart-head{background:#fff;color:#282622;border-bottom:1px solid #eeeae4;padding:calc(24px + env(safe-area-inset-top,0px)) 22px 21px}
+#cart .v254-cart-head-row{max-width:1040px;margin:auto;display:flex;align-items:center;justify-content:space-between;gap:16px}
+#cart .v254-cart-head h1{margin:0;font:700 clamp(30px,7.8vw,36px)/1.12 'DM Sans',Inter,sans-serif;letter-spacing:-.045em;color:#292722}
+#cart .v254-cart-head-count{white-space:nowrap;border:1px solid #ede3d3;border-radius:999px;padding:7px 12px;background:#faf8f3;color:#82735e;font:700 11px/1.3 'DM Sans',Inter,sans-serif}
+#cart .v254-cart-shell>.page-content.cart-layout{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(280px,.9fr);align-items:start;gap:18px!important;max-width:1080px;width:100%;margin:0 auto!important;padding:20px 20px calc(115px + env(safe-area-inset-bottom,0px))!important;background:transparent!important}
+#cart.v254-cart-page .cart-items,#cart.v254-cart-page .cart-side{min-width:0;background:#fff!important;border:1px solid #eee7de!important;border-radius:16px!important;box-shadow:0 3px 12px #27211706}
+#cart.v254-cart-page .cart-items{padding:16px 19px 18px}
+#cart.v254-cart-page .cart-side{margin:0!important;padding:19px 20px 20px!important}
+#cart.v254-cart-page .cart-items .section-row{padding:3px 0 14px;margin:0!important;border-bottom:1px solid #ede9e2}
+#cart.v254-cart-page .cart-items .section-title{font:700 15px/1.4 'DM Sans',Inter,sans-serif!important;color:#34302b}
+#cart.v254-cart-page .cart-items .fine-print{color:#9a9082}
+#cart.v254-cart-page .cart-side>h3{margin:0 0 12px!important;color:#34302b!important;font:700 16px/1.4 'DM Sans',Inter,sans-serif!important}
+#cart.v254-cart-page .ab-cart-card{background:transparent!important}
+#cart.v254-cart-page .v248-bag-continue{margin-top:12px;border-top:1px solid #f0ebe4;padding-top:14px;text-decoration:none}
+#cart.v254-cart-page .cart-actions{padding-bottom:0!important;margin-bottom:0!important}
+#cart.v254-cart-page button:focus-visible{outline:2px solid #b3946a;outline-offset:3px}
+@media(max-width:900px){#cart .v254-cart-shell>.page-content.cart-layout{grid-template-columns:1fr}}
+@media(max-width:760px){
+  #cart .v254-cart-head{padding:calc(23px + env(safe-area-inset-top,0px)) 21px 18px}
+  #cart .v254-cart-shell>.page-content.cart-layout{display:flex!important;flex-direction:column!important;gap:14px!important;padding:15px 13px calc(116px + env(safe-area-inset-bottom,0px))!important}
+  #cart.v254-cart-page .cart-items,#cart.v254-cart-page .cart-side{width:100%!important;box-sizing:border-box}
+  #cart.v254-cart-page .cart-items{padding:14px 16px 17px!important}
+  #cart.v254-cart-page .cart-side{margin:0!important;padding:18px 16px!important;border:1px solid #eee7de!important}
+}
+
 /* v2.54 Shop Home: progressive rendering from existing one-time catalog read. */
 #shopHomeView .shop-home-more{display:flex;align-items:center;justify-content:center;gap:10px;min-height:54px;padding:12px;color:#8a7455;font:600 12px/1.4 'DM Sans',Inter,sans-serif}
 #shopHomeView .shop-home-more[hidden],#shopHomeView .shop-home-sentinel[hidden]{display:none!important}
@@ -2702,14 +2733,14 @@ body.is-discover .site-tabs{z-index:45!important}
     
   </section>
 
-  <section id="cart" class="tab v248-reference-bag" role="tabpanel" aria-labelledby="tab-cart">
-    <button type="button" id="v248BagBackdrop" class="v248-bag-backdrop" tabindex="-1" aria-label="Close shopping bag"></button>
-    <div id="v248BagPanel" class="v248-bag-panel" role="dialog" aria-modal="true" aria-labelledby="v248BagHeading">
-      <header class="v248-reference-bag-head">
-        <h2 id="v248BagHeading">Shopping bag</h2>
-        <button type="button" id="v248BagClose" class="v248-bag-close" aria-label="Close shopping bag">×</button>
+  <section id="cart" class="tab v254-cart-page" role="tabpanel" aria-labelledby="tab-cart">
+    <div id="v248BagPanel" class="v254-cart-shell">
+      <header class="v254-cart-head">
+        <div class="v254-cart-head-row">
+          <h1 id="v248BagHeading">Cart</h1>
+          <span id="cartHeadCount" class="v254-cart-head-count">0 items</span>
+        </div>
       </header>
-    <div class="page-head"><h1 class="page-title">Cart</h1></div>
     <div class="page-content cart-layout">
       <div class="cart-items"><div class="section-row"><h2 class="section-title">Your items</h2><span id="cartCount" class="fine-print">0 items</span></div><div id="basket"></div></div>
       <aside class="cart-side" aria-label="Checkout summary">
@@ -9698,7 +9729,6 @@ body.is-discover .site-tabs{z-index:45!important}
   }
 
   var tabId = 'discover';
-  var v248BagReturnTab = 'shop';
 
   function $(id) { return document.getElementById(id); }
 
@@ -12242,13 +12272,11 @@ function closeShopDetail() {
   }
   function v248XCloseAll(){
     if(!v248Exact.shadow)return;
-    var wasCart=tabId==='cart';
     v248XShow('closed');
     var old=$('shopDetail'),back=$('shopDetailBackdrop');
     if(old){old.style.visibility='';}
     if(back){back.style.visibility='';}
     if(state.shopDetailId)closeShopDetail();
-    if(wasCart){show(v248BagReturnTab||'shop');}
   }
   function v248XGoProfile(){
     v248XCloseAll();
@@ -13555,7 +13583,7 @@ function closeShopDetail() {
     var bubble = el('span', String(cartCount), 'cart-count');
     bubble.id = 'shopSheetCartCount'; bubble.hidden = cartCount < 1;
     cartButton.appendChild(bubble);
-    cartButton.addEventListener('click', function () { closeShopDetail(); show('cart'); });
+    cartButton.addEventListener('click', function () { v248XOpenBasket(); });
     var closeButton = iconButton(closeSvg, 'Close product details');
     closeButton.addEventListener('click', closeShopDetail);
     headActions.appendChild(cartButton);
@@ -13971,7 +13999,7 @@ function closeShopDetail() {
     chatBtn.appendChild(el('span', 'Chat')); chatBtn.disabled = true;
     chatBtn.title = 'Chat will be available when Seller Chat is connected.';
     var footerCart = iconButton(cartSvg, 'Open shopping bag', 'ab-ref-cart');
-    footerCart.addEventListener('click', function () { closeShopDetail(); show('cart'); });
+    footerCart.addEventListener('click', function () { v248XOpenBasket(); });
     var addBtn = button('Buy now', 'ab-footer-add ab-ref-buy');
     // The reference CTA opens canonical options, not a transaction.
     addBtn.addEventListener('click', openPicker);
@@ -14063,8 +14091,7 @@ function closeShopDetail() {
       }
       cartShortcut.addEventListener('click',function(){
         dismiss();
-        closeShopDetail();
-        show('cart');
+        v248XOpenBasket();
       });
       header.appendChild(cartShortcut);
       header.appendChild(el('h3','Choose options'));
@@ -14224,6 +14251,7 @@ function closeShopDetail() {
       if (b) b.setAttribute('aria-label', 'Open Cart' + (count ? ' (' + count + ' items)' : ''));
     });
     if ($('cartCount')) $('cartCount').textContent = count + (count === 1 ? ' item' : ' items');
+    if ($('cartHeadCount')) $('cartHeadCount').textContent = count + (count === 1 ? ' item' : ' items');
     if ($('cartSummaryCount')) $('cartSummaryCount').textContent = String(count);
     if ($('btnQuote')) $('btnQuote').disabled = count < 1;
     if ($('v248CheckoutOpen')) $('v248CheckoutOpen').disabled = count < 1;
@@ -16152,16 +16180,12 @@ function attachSheetResizeHandle(handle,sheet,apply,ratio){
       ooShowList_(true);
       ooRenderOrders_();
     }
-    if (id === 'cart' && tabId !== 'cart') {
-      v248BagReturnTab = ['discover','shop','orders','profile'].indexOf(tabId) >= 0 ? tabId : 'shop';
-    }
     var previousTab = tabId;
     tabId = id;
     shopSyncInitialBusy_();
     if (id === 'profile' && previousTab !== 'profile') selectOwnerProfileTab_('personal', false);
     if (isIdentitySignedIn() && id === 'profile') loadIdentityProfile(false);
     if (isIdentitySignedIn() && id === 'orders') loadLinkedOrders(false);
-    document.body.classList.toggle('v248-bag-active', id === 'cart');
     document.querySelectorAll('.tab').forEach(function (el2) { el2.classList.remove('on'); });
     var tab = $(id);
     if (tab) tab.classList.add('on');
@@ -16173,7 +16197,7 @@ function attachSheetResizeHandle(handle,sheet,apply,ratio){
     document.querySelectorAll('main .tab').forEach(function (panel) {
       panel.setAttribute('aria-hidden', panel.id === id ? 'false' : 'true');
     });
-    $('main').className = id === 'discover' ? 'discover-mode' : (id === 'profile' ? 'v251-profile-main' : (id === 'orders' ? 'v252-orders-main' : ''));
+    $('main').className = id === 'discover' ? 'discover-mode' : (id === 'profile' ? 'v251-profile-main' : (id === 'orders' ? 'v252-orders-main' : (id === 'cart' ? 'v254-cart-main' : '')));
     document.body.classList.toggle('is-discover', id === 'discover');
     if (id !== 'shop') closeShopDetail();
     if (sheetState && id !== 'discover') closeSheet();
@@ -16201,33 +16225,15 @@ function attachSheetResizeHandle(handle,sheet,apply,ratio){
     }
     renderProfile();
     if (id === 'shop') shopHomeRefreshObserver_();
-    if(id === 'cart')v248XOpenBasket();
-    if(id !== 'cart'&&v248Exact.shadow&&v248Exact.current==='basket')v248XShow('closed');
-    if(id === 'cart' && window.matchMedia && window.matchMedia('(max-width:760px)').matches){
-      $('v248BagClose').focus({preventScroll:true});
+    // Bottom-nav Cart owns its page; product bag remains a contextual overlay.
+    if (id === 'cart') {
+      if (v248Exact.shadow && v248Exact.current !== 'closed') v248XShow('closed');
+      drawBasket();
+    } else if (v248Exact.shadow && v248Exact.current === 'basket') {
+      v248XShow('closed');
     }
   }
 
-  function v248CloseBag(){
-    if (tabId !== 'cart') return;
-    var back = v248BagReturnTab;
-    show(back);
-    var nav = document.querySelector('.site-tabs button[data-tab="' + back + '"]');
-    if (nav) nav.focus({preventScroll:true});
-  }
-  $('v248BagClose').addEventListener('click', v248CloseBag);
-  $('v248BagBackdrop').addEventListener('click', v248CloseBag);
-  $('v248BagPanel').addEventListener('keydown', function(e){
-    if(e.key === 'Escape'){e.preventDefault();v248CloseBag();return;}
-    if(e.key !== 'Tab')return;
-    var nodes = Array.prototype.slice.call(
-      $('v248BagPanel').querySelectorAll('button:not(:disabled),input:not(:disabled),[href],[tabindex="0"]')
-    ).filter(function(n){return n.offsetParent !== null;});
-    if(!nodes.length)return;
-    var first = nodes[0], last = nodes[nodes.length - 1];
-    if(e.shiftKey && document.activeElement === first){e.preventDefault();last.focus();}
-    else if(!e.shiftKey && document.activeElement === last){e.preventDefault();first.focus();}
-  });
   document.querySelectorAll('nav button[data-tab]').forEach(function (btn) {
     btn.addEventListener('click', function () { show(btn.getAttribute('data-tab')); });
   });
