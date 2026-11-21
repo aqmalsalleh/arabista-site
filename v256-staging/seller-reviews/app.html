@@ -1196,17 +1196,42 @@ function opsReferenceItems(){
   const id=txt(m&&m.media_id);if(!id||seen.has(id))return;
   const url=txt(m.delivery_url||m.public_url||m.photo_url||m.source_url||"");
   if(!/^https:\/\/[^<>\s"'\\]+$/i.test(url))return;
-  seen.add(id);all.push({media_id:id,delivery_url:url,source:source||m.source_kind||"Product image"});
+  seen.add(id);all.push({
+   media_id:id,delivery_url:url,source:source||m.source_kind||"Product image",
+   style:txt(m.style||""),created_at_utc:txt(m.created_at_utc||""),
+   studio_generated:!!m.studio_generated
+  });
  };
  if(pid===state.w06MediaProductId)(state.w06Media||[]).forEach(m=>add(m,m.from_product_gallery?"Product gallery":m.studio_generated?"Generated":"Product image"));
  (state.ops.refs||[]).forEach(m=>add(m,m.source_kind==="HTTPS_IMPORT"?"Imported":m.source_kind==="UPLOAD"?"Uploaded":"Product gallery"));
  (state.v255Media||[]).forEach(m=>add(m,"Product photo"));
- return all;
+ return all.sort((a,b)=>{
+  const at=Date.parse(a.created_at_utc||"")||0,bt=Date.parse(b.created_at_utc||"")||0;
+  if(at!==bt)return bt-at;
+  return String(a.media_id).localeCompare(String(b.media_id));
+ });
 }
 function v255W06MediaChoices(){return opsReferenceItems()}
+function opsReferenceShortId(m){
+ const id=txt(m&&m.media_id);
+ return id?id.replace(/^syn-media-(studio-|ref-)?/i,"").slice(-6):"";
+}
+function opsReferenceWhen(m){
+ const raw=txt(m&&m.created_at_utc);
+ if(!raw)return "";
+ const d=new Date(raw);if(Number.isNaN(d.getTime()))return raw.slice(0,16);
+ const pad=n=>String(n).padStart(2,"0");
+ return pad(d.getMonth()+1)+"/"+pad(d.getDate())+" "+pad(d.getHours())+":"+pad(d.getMinutes());
+}
 function opsReferenceLabel(m,i){
  const src=txt(m.source||"Product image");
- return src+" "+(i+1);
+ const style=txt(m.style);const when=opsReferenceWhen(m);const short=opsReferenceShortId(m);
+ const bits=[src];
+ if(style&&src==="Generated")bits.push(style);
+ if(when)bits.push(when);
+ else if(short)bits.push("#"+short);
+ else bits.push(String(i+1));
+ return bits.join(" · ");
 }
 function opsPopulateSelect(select,arr,placeholder){
  if(!select)return;
@@ -1387,7 +1412,14 @@ async function v255W06GeneratePhoto(){
  await opsAction("arabistaDevStudioGeneratePhotosV255",{
   ...ids,reference_media_id:reference,
   style:$("v255W06PhotoStyle").value,scene:txt($("v255W06PhotoScene").value),count
- },"opsPhotoStatus",out=>txt(out.created_count)+" photo(s) created"+(out.partial?" (partial result — check the library).":" — ready for selection."),()=>{
+ },"opsPhotoStatus",out=>{
+  if(out&&out.ok===false&&txt(out.reason)==="library_readback_missing_ownership"){
+   return "Photo was created but is not selectable yet (ownership missing). Do not attach until library confirms it.";
+  }
+  const ready=out&&out.library_confirmed===true;
+  return txt(out.created_count)+" photo(s) created"+(out.partial?" (partial).":".")
+   +(ready?" Confirmed in library — ready for selection.":" Refresh the library before selecting.");
+ },()=>{
   v255W06Load({preserveStatus:true});opsLoadReferences();
  });
 }
