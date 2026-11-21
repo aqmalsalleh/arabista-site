@@ -1,0 +1,96 @@
+﻿<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<title>Arabista Seller Center · Reviews</title>
+<style>
+body{margin:0;background:#f6f4f0;color:#161411;font:16px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;min-height:100dvh;display:grid;place-items:center;padding:24px}
+.card{width:min(420px,100%);background:#fff;border:1px solid #ebe7e1;border-radius:18px;padding:22px}
+h1{margin:0 0 6px;font-size:22px;letter-spacing:-.03em}
+p{margin:0 0 14px;color:#817970;font-size:14px}
+label{display:block;font-size:13px;font-weight:650;margin:12px 0 6px}
+input{width:100%;height:48px;border:1px solid #dbd6cf;border-radius:12px;padding:0 14px;font-size:16px;box-sizing:border-box}
+button{margin-top:16px;width:100%;height:50px;border:0;border-radius:12px;background:#1c1915;color:#fff;font-weight:700}
+.err{color:#b42318;font-size:13px;min-height:1.2em;margin-top:10px}
+.nav{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+.nav a{font-size:13px;color:#817970}
+</style></head><body>
+<form class="card" id="loginForm">
+  <h1>Seller Center Reviews</h1>
+  <p>Sign in with your Arabista owner phone and password. Google account sign-in is not required.</p>
+  <label for="phone">Mobile number</label>
+  <input id="phone" inputmode="tel" autocomplete="username" required placeholder="6012…">
+  <label for="password">Password</label>
+  <input id="password" type="password" autocomplete="current-password" required>
+  <button type="submit" id="btn">Sign in</button>
+  <div class="err" id="err" aria-live="polite"></div>
+  <div class="nav">
+    <a href="/staging/">Customer website</a>
+    <a href="/staging/seller-products/">Products</a>
+    <a href="/staging/seller-discover/">Discover</a>
+  </div>
+</form>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.1/dist/umd.js"></script>
+<script>
+(function(){
+var FACADE="https://script.google.com/macros/s/AKfycbzd7yF5b5ZdCAuZGh2DQzn1__MpDSG2zbveeGjZ584bx6NMxRFFq2n4IngjsDeMiNHD/exec";
+var SUPABASE_URL="https://atgztdsfvjqkerteljpb.supabase.co";
+var GATEWAY="https://atgztdsfvjqkerteljpb.supabase.co/functions/v1/staff-reviews-gateway";
+var ASSET_BASE="/staging/";
+var SESSION_KEY="arabista-v256-staff-session";
+var params=new URLSearchParams(location.search);
+if(params.get("err")) document.getElementById("err").textContent=params.get("err").replaceAll("_"," ");
+function digits(v){var d=String(v||"").replace(/\D/g,""); if(d.indexOf("60")===0)return d; if(d.indexOf("0")===0)return "6"+d; return d}
+function emailFrom(d){return "p"+d+"@identity.arabista.local"}
+function jsonp(name,args){
+  return new Promise(function(resolve,reject){
+    var cb="arabistaV256Login_"+Date.now(); var settled=false; var s=document.createElement("script");
+    function done(fn,v){if(settled)return;settled=true;try{delete window[cb]}catch(e){} if(s.parentNode)s.parentNode.removeChild(s);fn(v)}
+    window[cb]=function(r){done(resolve,r)}; s.onerror=function(){done(reject,new Error("connection_failed"))};
+    var p=new URLSearchParams(); p.set("format","jsonp"); p.set("rpc",name); p.set("callback",cb);
+    if(args!==undefined)p.set("args",JSON.stringify(args));
+    s.src=FACADE+"?"+p.toString(); document.head.appendChild(s);
+    setTimeout(function(){done(reject,new Error("timeout"))},20000);
+  });
+}
+document.getElementById("loginForm").addEventListener("submit",async function(ev){
+  ev.preventDefault();
+  var err=document.getElementById("err"); err.textContent="";
+  var btn=document.getElementById("btn"); btn.disabled=true;
+  try{
+    var phone=digits(document.getElementById("phone").value);
+    var password=document.getElementById("password").value;
+    if(phone.length<10) throw new Error("Enter a valid mobile number.");
+    var caps=await jsonp("arabistaDevCustomerIdentityCapabilitiesV244",{});
+    if(!caps||!caps.ok||!caps.supabase_anon_key) throw new Error("Sign-in service unavailable.");
+    var client=supabase.createClient(SUPABASE_URL,caps.supabase_anon_key,{auth:{persistSession:false}});
+    var signed=await client.auth.signInWithPassword({email:emailFrom(phone),password:password});
+    if(signed.error||!signed.data||!signed.data.session) throw new Error("Invalid phone or password.");
+    var token=signed.data.session.access_token;
+    var probe=await fetch(GATEWAY,{
+      method:"POST",
+      headers:{
+        "Content-Type":"application/json",
+        "Authorization":"Bearer "+token,
+        "apikey":caps.supabase_anon_key
+      },
+      body:JSON.stringify({rpc:"arabistaDevStudioWritingSettingsGetV255",args:{}})
+    });
+    var body=await probe.json().catch(function(){return null});
+    if(!probe.ok||!body||body.ok===false||body.staff_identity_verified!==true){
+      throw new Error((body&&body.reason)||"This account is not authorized for Seller Reviews.");
+    }
+    sessionStorage.setItem(SESSION_KEY,JSON.stringify({
+      access_token:token,
+      refresh_token:signed.data.session.refresh_token||null,
+      expires_at:signed.data.session.expires_at||null,
+      phone:phone
+    }));
+    location.replace(ASSET_BASE+"seller-reviews/app.html");
+  }catch(e){
+    err.textContent=e&&e.message?e.message:String(e);
+  }finally{btn.disabled=false}
+});
+})();
+</script>
+</body></html>
