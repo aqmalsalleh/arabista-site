@@ -1,4 +1,4 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="en">
 <head>
   <base target="_top">
@@ -12044,17 +12044,18 @@ function closeShopDetail() {
       return button;
     }
     function card(r){
-      var article=el('article','product-review-card'),meta=el('div','review-card-meta');
-      if(r.editorial){
-        meta.appendChild(el('strong','','AI-created example'));
-        meta.appendChild(el('span','review-date','Illustrative styling'));
-      }else{
+      var article=el('article','product-review-card');
+      // Preserve fyp-staging review-card layout. Studio/editorial rows omit
+      // buyer identity fields and never show internal classification labels.
+      if(!r.editorial){
+        var meta=el('div','review-card-meta');
         meta.appendChild(el('strong','',mask(r.name)));
         var stars=el('span','review-stars','★'.repeat(r.stars));
         stars.setAttribute('aria-label',r.stars+' out of 5 stars');meta.appendChild(stars);
         meta.appendChild(el('span','review-date',r.date));
+        article.appendChild(meta);
       }
-      article.appendChild(meta);article.appendChild(el('p','',r.text));
+      article.appendChild(el('p','',r.text));
       if(r.pics.length){
         var photos=el('div','review-card-photos');
         r.pics.forEach(function(p){photos.appendChild(media({id:r.id,sequence:p.sequence,url:p.url}));});
@@ -12071,7 +12072,7 @@ function closeShopDetail() {
         var pics=/^https:\/\/[^<>\s"'\\]+$/i.test(url)?[{sequence:1,url:url}]:[];
         return {
           id:String(item.content_id||('studio-'+index)).slice(0,128),
-          name:'AI-created example',
+          name:'',
           date:'',
           stars:0,
           text:String(item.body||'').trim().slice(0,4000),
@@ -12140,7 +12141,7 @@ function closeShopDetail() {
       }else{
         text('product-review-panel-title','Customer reviews');
         text('product-review-filter-note',studioRows.length?
-          'Showing AI-created examples selected for this product.':'No reviews to show.');
+          'Showing '+studioRows.length+' of '+studioRows.length+' matching reviews':'No reviews to show.');
       }
       combinedRows().forEach(function(r){target.appendChild(card(r));});
       if(!combinedRows().length)target.appendChild(el('p','product-reference-note',
@@ -12202,12 +12203,12 @@ function closeShopDetail() {
       }
       summary=result;filtered=result.filtered;cursor=result.next;status='ready';render();
     }
-    function read(more,force){
+    function read(more,force,sharedToken){
       if(!current)return;
       var pid=current,at=more?cursor:null;if(more&&!at)return;
       var key=JSON.stringify([pid,sort,rating,photosOnly,at||'']);
       if(inflight===key)return;
-      var token=++generation,cached=cache.get(key);
+      var token=(sharedToken==null?++generation:Number(sharedToken)),cached=cache.get(key);
       if(!force&&cached&&Date.now()-cached.time<TTL){
         apply(cached.result,more,token,pid);return;
       }
@@ -12338,11 +12339,16 @@ function closeShopDetail() {
       controls();render();
     }
     function open(pid){
-      ++generation;inflight='';close();current=String(pid||'').trim();
+      inflight='';close();current=String(pid||'').trim();
       summary=null;rows=[];studioRows=[];cursor=null;status='idle';filtered=0;
       rating=0;sort='recommended';photosOnly=false;previewLimit=3;
       controls();render();
-      if(current){var token=generation;read(false);loadStudio(current,token);}
+      if(current){
+        // One generation token for both genuine + studio readers (fixes dropped Studio render).
+        var token=++generation;
+        read(false,false,token);
+        loadStudio(current,token);
+      }
       else{status='error';render();}
     }
     return {init:init,open:open,close:close};

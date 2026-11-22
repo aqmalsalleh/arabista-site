@@ -1,4 +1,4 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="en">
 <head>
   <base target="_top">
@@ -11960,10 +11960,12 @@ function closeShopDetail() {
   }
 
   /* v2.55 — genuine V2 reviews in the owner's original Product Sheet layout.
-     The single DEV RPC below is a Cursor-owned backend integration contract.
+     Owner-published Studio examples reuse the same #product-reviews UI with
+     discreet AI attribution and never inflate genuine ratings/counts.
      Never read review data while rendering Shop cards or progressive catalog. */
+
   var v255Reviews=(function(){
-    var current='',status='idle',summary=null,rows=[],cursor=null,
+    var current='',status='idle',summary=null,rows=[],studioRows=[],cursor=null,
       sort='recommended',rating=0,photosOnly=false,previewLimit=3,
       generation=0,inflight='',filtered=0,returnFocus=null,slides=[],
       cache=new Map(),PAGE=6,TTL=15000;
@@ -12042,18 +12044,56 @@ function closeShopDetail() {
       return button;
     }
     function card(r){
-      var article=el('article','product-review-card'),meta=el('div','review-card-meta');
-      meta.appendChild(el('strong','',mask(r.name)));
-      var stars=el('span','review-stars','★'.repeat(r.stars));
-      stars.setAttribute('aria-label',r.stars+' out of 5 stars');meta.appendChild(stars);
-      meta.appendChild(el('span','review-date',r.date));
-      article.appendChild(meta);article.appendChild(el('p','',r.text));
+      var article=el('article','product-review-card');
+      // Preserve fyp-staging review-card layout. Studio/editorial rows omit
+      // buyer identity fields and never show internal classification labels.
+      if(!r.editorial){
+        var meta=el('div','review-card-meta');
+        meta.appendChild(el('strong','',mask(r.name)));
+        var stars=el('span','review-stars','★'.repeat(r.stars));
+        stars.setAttribute('aria-label',r.stars+' out of 5 stars');meta.appendChild(stars);
+        meta.appendChild(el('span','review-date',r.date));
+        article.appendChild(meta);
+      }
+      article.appendChild(el('p','',r.text));
       if(r.pics.length){
         var photos=el('div','review-card-photos');
         r.pics.forEach(function(p){photos.appendChild(media({id:r.id,sequence:p.sequence,url:p.url}));});
         article.appendChild(photos);
       }
       return article;
+    }
+    function combinedRows(){return rows.concat(studioRows);}
+    function mapStudio(items){
+      return (items||[]).filter(function(item){
+        return item&&typeof item.body==='string'&&item.body.trim();
+      }).slice(0,6).map(function(item,index){
+        var url=String(item.photo_url||'').trim();
+        var pics=/^https:\/\/[^<>\s"'\\]+$/i.test(url)?[{sequence:1,url:url}]:[];
+        return {
+          id:String(item.content_id||('studio-'+index)).slice(0,128),
+          name:'',
+          date:'',
+          stars:0,
+          text:String(item.body||'').trim().slice(0,4000),
+          order:index,
+          pics:pics,
+          editorial:true
+        };
+      });
+    }
+    function loadStudio(pid,token){
+      call('arabistaDevCustomerW06StudioReadV255',{product_id:pid},function(out){
+        if(pid!==current||token!==generation)return;
+        if(!out||out.ok!==true||String(out.product_id||'')!==pid||
+          out.content_type!=='AI_CREATED_STYLE_INSPIRATION'||!Array.isArray(out.items)){
+          studioRows=[];render();return;
+        }
+        studioRows=mapStudio(out.items);render();
+      },function(){
+        if(pid!==current||token!==generation)return;
+        studioRows=[];render();
+      });
     }
     function controls(){
       if(!v248Exact.shadow)return;
@@ -12079,22 +12119,32 @@ function closeShopDetail() {
       target.hidden=false;
     }
     function renderStrip(){
-      var host=n('product-review-strip');if(!host||!summary)return;
+      var host=n('product-review-strip');if(!host)return;
       host.replaceChildren();
-      var source=summary.strip.slice();
+      var source=summary&&Array.isArray(summary.strip)?summary.strip.slice():[];
       if(!source.length)rows.forEach(function(r){r.pics.forEach(function(p){
+        source.push({id:r.id,sequence:p.sequence,url:p.url});
+      });});
+      studioRows.forEach(function(r){r.pics.forEach(function(p){
         source.push({id:r.id,sequence:p.sequence,url:p.url});
       });});
       source.slice(0,24).forEach(function(p){host.appendChild(media(p));});
       host.hidden=!host.childElementCount;
     }
     function renderList(){
-      var target=n('product-review-list');if(!target||!summary)return;
+      var target=n('product-review-list');if(!target)return;
       target.replaceChildren();
-      text('product-review-panel-title','All reviews · '+summary.average.toFixed(1)+' · '+summary.total);
-      text('product-review-filter-note','Showing '+rows.length+' of '+filtered+' matching reviews');
-      rows.forEach(function(r){target.appendChild(card(r));});
-      if(!rows.length)target.appendChild(el('p','product-reference-note',
+      var hasGenuine=!!summary&&summary.total>0;
+      if(hasGenuine){
+        text('product-review-panel-title','All reviews · '+summary.average.toFixed(1)+' · '+summary.total);
+        text('product-review-filter-note','Showing '+rows.length+' of '+filtered+' matching reviews');
+      }else{
+        text('product-review-panel-title','Customer reviews');
+        text('product-review-filter-note',studioRows.length?
+          'Showing '+studioRows.length+' of '+studioRows.length+' matching reviews':'No reviews to show.');
+      }
+      combinedRows().forEach(function(r){target.appendChild(card(r));});
+      if(!combinedRows().length)target.appendChild(el('p','product-reference-note',
         status==='loading'?'Loading reviews…':'No reviews match these filters.'));
       if(cursor){
         var more=el('button','review-show-more','Load more reviews');
@@ -12103,13 +12153,16 @@ function closeShopDetail() {
       }
     }
     function render(){
-      var state=n('v255-review-state'),ready=!!summary,has=ready&&summary.total>0;
-      show('product-review-summary',!!has);show('review-quick-summary',!!has);
-      show('product-review-see-all',!!has);show('product-review-retry',status==='error');
+      var state=n('v255-review-state');
+      var genuineReady=!!summary,hasGenuine=genuineReady&&summary.total>0;
+      var hasStudio=studioRows.length>0,has=hasGenuine||hasStudio;
+      var awaiting=status==='loading'&&!genuineReady&&!hasStudio;
+      show('product-review-summary',!!hasGenuine);show('review-quick-summary',!!hasGenuine);
+      show('product-review-see-all',!!has);show('product-review-retry',status==='error'&&!has);
       if(state){
-        state.textContent=status==='loading'&&!ready?'Loading reviews…':
-          status==='error'&&!ready?'Reviews are currently unavailable.':
-          ready&&!has?'There are no customer reviews yet.':'';
+        state.textContent=awaiting?'Loading reviews…':
+          status==='error'&&!has?'Reviews are currently unavailable.':
+          genuineReady&&!has?'There are no customer reviews yet.':'';
         state.hidden=!state.textContent;
       }
       if(!has){
@@ -12118,16 +12171,24 @@ function closeShopDetail() {
         show('product-review-more',false);text('product-review-average','');
         text('product-review-count','');return;
       }
-      text('product-review-average',summary.average.toFixed(1));
-      text('product-review-count',summary.total+' review'+(summary.total===1?'':'s'));
-      text('review-quick-average',summary.average.toFixed(1));
-      text('review-quick-count',summary.total+' review'+(summary.total===1?'':'s'));
-      var fill=n('review-star-fill');if(fill)fill.style.width=100*summary.average/5+'%';
-      renderBars();renderStrip();
-      var host=n('product-review-preview');if(host){
-        host.replaceChildren();rows.slice(0,previewLimit).forEach(function(r){host.appendChild(card(r));});
+      if(hasGenuine){
+        text('product-review-average',summary.average.toFixed(1));
+        text('product-review-count',summary.total+' review'+(summary.total===1?'':'s'));
+        text('review-quick-average',summary.average.toFixed(1));
+        text('review-quick-count',summary.total+' review'+(summary.total===1?'':'s'));
+        var fill=n('review-star-fill');if(fill)fill.style.width=100*summary.average/5+'%';
+        renderBars();
+      }else{
+        text('product-review-average','');text('product-review-count','');
+        text('review-quick-average','');text('review-quick-count','');
+        show('product-review-bars',false);clear('product-review-bars');
       }
-      show('product-review-more',rows.length>previewLimit||!!cursor);
+      renderStrip();
+      var host=n('product-review-preview');if(host){
+        host.replaceChildren();
+        combinedRows().slice(0,previewLimit).forEach(function(r){host.appendChild(card(r));});
+      }
+      show('product-review-more',combinedRows().length>previewLimit||!!cursor);
       var panel=n('product-review-panel');if(panel&&!panel.hidden)renderList();
     }
     function apply(result,more,token,pid){
@@ -12142,12 +12203,12 @@ function closeShopDetail() {
       }
       summary=result;filtered=result.filtered;cursor=result.next;status='ready';render();
     }
-    function read(more,force){
+    function read(more,force,sharedToken){
       if(!current)return;
       var pid=current,at=more?cursor:null;if(more&&!at)return;
       var key=JSON.stringify([pid,sort,rating,photosOnly,at||'']);
       if(inflight===key)return;
-      var token=++generation,cached=cache.get(key);
+      var token=(sharedToken==null?++generation:Number(sharedToken)),cached=cache.get(key);
       if(!force&&cached&&Date.now()-cached.time<TTL){
         apply(cached.result,more,token,pid);return;
       }
@@ -12168,8 +12229,8 @@ function closeShopDetail() {
       });
     }
     function more(){
-      if(!summary)return;
-      if(previewLimit<rows.length){previewLimit+=3;render();}
+      if(!summary&&!studioRows.length)return;
+      if(previewLimit<combinedRows().length){previewLimit+=3;render();}
       else if(cursor){previewLimit+=3;read(true);}
     }
     function closeViewer(restore){
@@ -12190,7 +12251,7 @@ function closeShopDetail() {
     }
     function close(){closeViewer(false);closePanel(false);}
     function panel(){
-      if(!summary||!summary.total)return;
+      if((!summary||!summary.total)&&!studioRows.length)return;
       var sheet=n('product-sheet');if(sheet)sheet.classList.add('is-expanded');
       show('product-review-panel',true);controls();renderList();
       if(n('product-review-close'))n('product-review-close').focus({preventScroll:true});
@@ -12202,14 +12263,17 @@ function closeShopDetail() {
       text('review-viewer-count',(i+1)+' / '+slides.length);
     }
     function openViewer(id,sequence,opener){
-      if(!summary)return;
+      if(!summary&&!studioRows.length)return;
       var strip=opener.closest('#product-review-strip'),photos=[];
       if(strip){
-        photos=summary.strip.length?summary.strip.slice():rows.reduce(function(a,r){
+        photos=(summary&&summary.strip.length)?summary.strip.slice():rows.reduce(function(a,r){
           r.pics.forEach(function(p){a.push({id:r.id,sequence:p.sequence,url:p.url});});return a;
         },[]);
+        studioRows.forEach(function(r){r.pics.forEach(function(p){
+          photos.push({id:r.id,sequence:p.sequence,url:p.url});
+        });});
       }else{
-        var found=rows.find(function(r){return r.id===id;});
+        var found=combinedRows().find(function(r){return r.id===id;});
         if(found)photos=found.pics.map(function(p){return {id:id,sequence:p.sequence,url:p.url};});
       }
       if(!photos.length)return;
@@ -12275,10 +12339,17 @@ function closeShopDetail() {
       controls();render();
     }
     function open(pid){
-      ++generation;inflight='';close();current=String(pid||'').trim();
-      summary=null;rows=[];cursor=null;status='idle';filtered=0;
+      inflight='';close();current=String(pid||'').trim();
+      summary=null;rows=[];studioRows=[];cursor=null;status='idle';filtered=0;
       rating=0;sort='recommended';photosOnly=false;previewLimit=3;
-      controls();render();if(current)read(false);else{status='error';render();}
+      controls();render();
+      if(current){
+        // One generation token for both genuine + studio readers (fixes dropped Studio render).
+        var token=++generation;
+        read(false,false,token);
+        loadStudio(current,token);
+      }
+      else{status='error';render();}
     }
     return {init:init,open:open,close:close};
   }());
@@ -12800,7 +12871,6 @@ function closeShopDetail() {
     var match=String(p.title||'').toUpperCase().match(/\b[A-Z]{1,3}\d{2,4}\b/);
     return code&&/^[A-Z0-9_-]{2,20}$/.test(code)?code:match?match[0]:'ARABISTA';
   }
-
   function v248XOpenLightbox(index,opener){
     var images=v248Exact.galleryMedia,viewer=v248X('product-lightbox');
     var track=v248X('product-lightbox-track');
