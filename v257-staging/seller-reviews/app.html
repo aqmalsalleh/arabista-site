@@ -424,7 +424,9 @@ $("save").addEventListener("click",save);$("publish").addEventListener("click",p
 $("close").addEventListener("click",close);$("cancel").addEventListener("click",close);
 $("overlay").addEventListener("click",function(e){if(e.target===$("overlay"))close()});
 document.addEventListener("keydown",function(e){if(e.key==="Escape"&&$("confirm-layer").hidden&&!$("overlay").hidden)close()});
-start();
+(window.__ARABISTA_V256_STAFF_READY__ || Promise.resolve())
+  .then(function () { start(); })
+  .catch(function () {});
 })();
 </script>
 </body>
