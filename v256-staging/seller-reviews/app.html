@@ -563,7 +563,7 @@ window.__ARABISTA_V256_STAFF_READY__=new Promise(async function(resolve,reject){
       <div class="ops-batch-stat"><strong id="opsBatchPercent">—</strong><span id="opsBatchStage">Choose a batch from history</span></div>
       <div class="ops-batch-progress" aria-hidden="true"><span id="opsBatchProgressFill"></span></div>
       <p class="ops-note" id="opsBatchCounts">Completed drafts and generated photos appear here.</p>
-      <div class="ops-actions"><button id="opsBatchPause" type="button" class="ops-secondary" disabled data-ops-action>Pause</button><button id="opsBatchResume" type="button" class="ops-secondary" disabled data-ops-action>Resume</button><button id="opsBatchCancel" type="button" class="ops-secondary ops-danger" disabled data-ops-action>Cancel</button></div>
+      <div class="ops-actions"><button id="opsBatchPause" type="button" class="ops-secondary" disabled data-ops-action>Pause</button><button id="opsBatchResume" type="button" class="ops-secondary" disabled data-ops-action>Resume</button><button id="opsBatchRecover" type="button" class="ops-secondary" disabled data-ops-action>Recover queue</button><button id="opsBatchCancel" type="button" class="ops-secondary ops-danger" disabled data-ops-action>Cancel</button></div>
       <button id="opsBatchRefresh" type="button" class="ops-secondary">Refresh progress</button>
       <p class="ops-subheading">Batch items</p><div class="ops-batch-items" id="opsBatchItems"><p class="ops-empty">Choose a batch to see its items.</p></div>
     </div></section>
@@ -1652,15 +1652,55 @@ function opsBatchReview(){
  state.ops.pendingBatchPlan=JSON.stringify(plan);$("opsBatchConfirmStart").hidden=false;
  opsStatus("opsBatchStatus","Ready to queue "+t+" text and "+i+" image request(s). New results remain private until individually published.");
 }
-function opsBatchStart(){
+async function opsBatchRecoverStartFeedback_(plan,epoch){
+ // Authoritative list recovery when Start transport times out after durable writes.
+ try{
+  const out=await opsRpc("arabistaDevStudioBatchListV255",{offset:0,product_id:txt(plan&&plan.product_id)});
+  if(epoch!==state.ops.epoch)return false;
+  if(!opsValid(out)||!Array.isArray(out.batches))return false;
+  const match=(out.batches||[]).find(b=>{
+   const st=txt(b.status);
+   return txt(b.product_id)===txt(plan.product_id)
+    && ["QUEUED","RUNNING","WAITING_QUOTA","PAUSED"].includes(st);
+  })||(out.batches||[]).find(b=>["QUEUED","RUNNING","WAITING_QUOTA"].includes(txt(b.status)));
+  if(!match)return false;
+  state.ops.batches=out.batches;
+  state.ops.selectedBatch=txt(match.batch_id);
+  state.ops.details=null;
+  opsBatchRenderDetails();
+  opsStatus("opsBatchStatus","Batch "+txt(match.batch_id)+" is saved ("+txt(match.status).toLowerCase().replaceAll("_"," ")+"). Progress continues in the background — connection reply was uncertain.");
+  await opsBatchLoad();
+  return true;
+ }catch(e){return false}
+}
+async function opsBatchStart(){
  const plan=opsBatchValues();if(!plan)return;
  if(!state.ops.pendingBatchPlan||state.ops.pendingBatchPlan!==JSON.stringify(plan)){
   opsBatchPreviewReset();opsStatus("opsBatchStatus","Review your updated plan first.",true);return
  }
  opsBatchPreviewReset();
- opsAction("arabistaDevStudioBatchStartV255",plan,"opsBatchStatus",
-  out=>"Batch "+txt(out.batch_id)+" queued. It will continue when this page is closed.",
-  out=>{state.ops.selectedBatch=txt(out.batch_id);state.ops.details=null;opsBatchRenderDetails();opsBatchLoad()});
+ if(state.ops.busy)return;
+ opsSetBusy(true);opsStatus("opsBatchStatus","Queueing batch…");
+ const epoch=state.ops.epoch;
+ try{
+  const out=await opsRpc("arabistaDevStudioBatchStartV255",plan);
+  if(epoch!==state.ops.epoch)return;
+  if(!opsValid(out)){
+   const recovered=await opsBatchRecoverStartFeedback_(plan,epoch);
+   if(!recovered)opsStatus("opsBatchStatus","Could not complete: "+opsFailReason(out)+". Refresh before trying again.",true);
+   return;
+  }
+  const warn=txt(out.trigger_warning);
+  opsStatus("opsBatchStatus","Batch "+txt(out.batch_id)+" queued."+(warn?" Background trigger needs attention — use Refresh; drafts stay private.":" It will continue when this page is closed."));
+  state.ops.selectedBatch=txt(out.batch_id);state.ops.details=null;opsBatchRenderDetails();
+  await opsBatchLoad();
+ }catch(err){
+  if(epoch!==state.ops.epoch)return;
+  const recovered=await opsBatchRecoverStartFeedback_(plan,epoch);
+  if(!recovered)opsStatus("opsBatchStatus","Connection uncertain. Refresh to confirm before retrying.",true);
+ }finally{
+  opsSetBusy(false);
+ }
 }
 function opsBatchRenderHistory(){
  const host=$("opsBatchHistory");host.replaceChildren();
@@ -1679,7 +1719,7 @@ function opsBatchRenderDetails(){
  if(!b){
   $("opsBatchPercent").textContent="—";$("opsBatchStage").textContent="Choose a batch from history";
   $("opsBatchProgressFill").style.width="0%";$("opsBatchCounts").textContent="Completed drafts and photos appear here.";
-  ["opsBatchPause","opsBatchResume","opsBatchCancel"].forEach(id=>$(id).disabled=true);
+  ["opsBatchPause","opsBatchResume","opsBatchRecover","opsBatchCancel"].forEach(id=>$(id).disabled=true);
   host.append(el("p","ops-empty","No batch selected."));return;
  }
  const total=Number(b.text_only||0)+Number(b.photo_drafts||0),done=Number(b.completed_drafts||0),pct=total?Math.round(100*done/total):0;
@@ -1689,6 +1729,7 @@ function opsBatchRenderDetails(){
  const st=txt(b.status);
  $("opsBatchPause").disabled=!["QUEUED","RUNNING","WAITING_QUOTA"].includes(st);
  $("opsBatchResume").disabled=!["PAUSED","WAITING_QUOTA","NEEDS_ATTENTION"].includes(st);
+ $("opsBatchRecover").disabled=!["QUEUED","RUNNING","WAITING_QUOTA","PAUSED"].includes(st);
  $("opsBatchCancel").disabled=!["QUEUED","RUNNING","PAUSED","WAITING_QUOTA","NEEDS_ATTENTION"].includes(st);
  (view.items||[]).forEach(i=>{
   const line=el("div","ops-batch-item"),info=el("div");
@@ -1746,6 +1787,24 @@ function opsBatchAct(action){
  if(action==="cancel"&&!window.confirm("Cancel remaining tasks? Completed drafts are kept."))return;
  opsAction(fn,{batch_id:id},"opsBatchStatus","Batch "+action+" confirmed.",()=>{state.ops.details=null;opsBatchRenderDetails();opsBatchLoad()});
 }
+async function opsBatchRecoverSelected(){
+ const b=state.ops.details&&state.ops.details.batch,id=txt(b&&b.batch_id);if(!id){
+  opsStatus("opsBatchStatus","Select a queued batch first.",true);return
+ }
+ if(state.ops.busy)return;
+ opsSetBusy(true);opsStatus("opsBatchStatus","Recovering queued batch…");
+ const epoch=state.ops.epoch;
+ try{
+  const out=await opsRpc("arabistaDevStudioBatchRecoverQueuedV256",{batch_id:id,max_steps:4});
+  if(epoch!==state.ops.epoch)return;
+  if(!opsValid(out)){opsStatus("opsBatchStatus","Could not recover: "+opsFailReason(out)+".",true);return}
+  opsStatus("opsBatchStatus","Batch "+id+" now "+txt(out.status).toLowerCase().replaceAll("_"," ")+" ("+Number(out.steps_run||0)+" step(s)).");
+  state.ops.details=null;await opsBatchLoad();
+  if(["COMPLETED","COMPLETED_WITH_ERRORS"].includes(txt(out.status)))v255W06Load({preserveStatus:true});
+ }catch(e){
+  if(epoch===state.ops.epoch)opsStatus("opsBatchStatus","Recovery connection uncertain. Refresh history before retrying.",true);
+ }finally{opsSetBusy(false)}
+}
 function opsWire(){
  [["opsCasualness","opsCasualnessValue"],["opsShorthand","opsShorthandValue"],["opsVariation","opsVariationValue"]].forEach(([id,out])=>{
   $(id).addEventListener("input",()=>{$(out).textContent=$(id).value;opsStatus("opsWritingStatus","Unsaved preferences.")});
@@ -1772,6 +1831,7 @@ function opsWire(){
  $("opsBatchConfirmStart").addEventListener("click",opsBatchStart);
  $("opsBatchPause").addEventListener("click",()=>opsBatchAct("pause"));
  $("opsBatchResume").addEventListener("click",()=>opsBatchAct("resume"));
+ $("opsBatchRecover").addEventListener("click",opsBatchRecoverSelected);
  $("opsBatchCancel").addEventListener("click",()=>opsBatchAct("cancel"));
  $("opsBatchRefresh").addEventListener("click",opsBatchLoad);
  $("opsBatchHistoryRefresh").addEventListener("click",opsBatchLoad);
