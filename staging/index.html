@@ -7409,6 +7409,17 @@ body.is-discover .site-tabs{z-index:45!important}
   color:var(--m-gold); font-size:12px; font-weight:600; letter-spacing:-.01em;
 }
 #product-sheet .review-show-more:active { background:var(--m-gold-pale); }
+#product-sheet .review-show-more.is-loading { opacity:.85; cursor:progress; }
+#product-sheet .review-show-more.is-loading::before {
+  content:""; display:inline-block; vertical-align:-4px; margin-right:8px;
+  width:18px; height:18px; border-radius:50%;
+  background:var(--v231-logo) center/cover no-repeat;
+  box-shadow:inset 0 0 0 1px #d7c39a;
+  animation:arabista-coin 1.4s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  #product-sheet .review-show-more.is-loading::before { animation:none; }
+}
 #product-sheet .product-review-card { padding:13px 0 15px; border-bottom:1px solid #f0f0f0; }
 #product-sheet .review-card-meta { gap:5px 9px; }
 #product-sheet .review-card-meta strong { font-size:12px; color:#333; font-weight:700; }
@@ -12227,6 +12238,14 @@ function closeShopDetail() {
       source.slice(0,24).forEach(function(p){host.appendChild(media(p));});
       host.hidden=!host.childElementCount;
     }
+    function setMoreLoading(button,label){
+      if(!button)return;
+      var waiting=!!((studioInflight&&studioCursor)||(genuinePending&&cursor));
+      button.disabled=waiting;
+      button.classList.toggle('is-loading',waiting);
+      button.setAttribute('aria-busy',String(waiting));
+      button.textContent=waiting?'Loading reviews…':label;
+    }
     function renderList(){
       var target=n('product-review-list');if(!target)return;
       target.replaceChildren();
@@ -12246,8 +12265,8 @@ function closeShopDetail() {
       if(!visible.length)target.appendChild(el('p','product-reference-note',
         (genuinePending||studioPending)?'Loading reviews…':'No reviews match these filters.'));
       if(cursor||studioCursor){
-        var moreBtn=el('button','review-show-more','Load more reviews');
-        moreBtn.type='button';moreBtn.disabled=status==='loading'||studioInflight;
+        var moreBtn=el('button','review-show-more');
+        moreBtn.type='button';setMoreLoading(moreBtn,'Load more reviews');
         moreBtn.addEventListener('click',function(){
           if(cursor)read(true);
           else if(studioCursor)loadStudio(current,generation,true);
@@ -12293,6 +12312,7 @@ function closeShopDetail() {
         combinedRows().slice(0,previewLimit).forEach(function(r){host.appendChild(card(r));});
       }
       show('product-review-more',combinedRows().length>previewLimit||!!cursor||!!studioCursor);
+      setMoreLoading(n('product-review-more'),'Show more reviews');
       var panel=n('product-review-panel');if(panel&&!panel.hidden)renderList();
     }
     function apply(result,more,token,pid){
