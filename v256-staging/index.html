@@ -1,4 +1,4 @@
-﻿<!doctype html>
+<!doctype html>
 <html lang="en">
 <head>
   <base target="_top">
@@ -4534,6 +4534,45 @@ body.is-discover .site-tabs{z-index:45!important}
       margin:7px 0 0;
       color:#555;
       line-height:1.6;
+    }
+
+    .review-coin-busy {
+      display:flex;
+      align-items:center;
+      gap:10px;
+      padding:10px 0 4px;
+      color:#8b6e38;
+      font:600 12px/1.4 "DM Sans",sans-serif;
+    }
+    .review-coin-busy[hidden] { display:none !important; }
+    .review-coin-busy .coin-loader {
+      width:28px;
+      height:28px;
+      position:relative;
+      perspective:680px;
+      flex:none;
+      display:block;
+    }
+    .review-coin-busy .coin-inner {
+      position:relative;
+      display:block;
+      width:100%;
+      height:100%;
+      transform-style:preserve-3d;
+      animation:arabista-coin 1.4s ease-in-out infinite;
+    }
+    .review-coin-busy .coin-face {
+      position:absolute;
+      inset:0;
+      border-radius:50%;
+      background:var(--v231-logo) center/cover no-repeat;
+      backface-visibility:hidden;
+      box-shadow:inset 0 0 0 1px #d7c39a;
+    }
+    .review-coin-busy .coin-back { transform:rotateY(180deg); }
+    @keyframes arabista-coin { from { transform:rotateY(0); } to { transform:rotateY(360deg); } }
+    @media (prefers-reduced-motion: reduce) {
+      .review-coin-busy .coin-inner { animation:none; }
     }
 
     .product-review-summary[hidden],
@@ -9742,14 +9781,13 @@ body.is-discover .site-tabs{z-index:45!important}
 </template>
 <div id="v248ExactRefHost" hidden aria-label="Product and shopping details"></div>
 <script type="application/json" id="discoverInstantSnapshot">{"schema":"arabista-v243-discover-public-snapshot/v1","generated_at_utc":"2026-11-16T08:51:47.283Z","max_age_seconds":21600,"environment":"DEV_SANDBOX","source_outcome":"DEV_DISCOVER_FEED_V227","count":3,"posts":[{"video_id":"syn-post-69edabe986","post_type":"IMAGE","caption":"DEV test image","sort_position":0,"media":{"projected":true,"placeholder":false,"reason":null,"post_type":"IMAGE","slides":[{"media_id":"syn-media-3ba59dab6173","media_kind":"IMAGE","provider":"CLOUDFLARE_IMAGES","delivery_ref":"https://imagedelivery.net/32oxijRdypCO4dk5WrGLwg/c2726925-9313-4bc7-9733-83f5d9429600/public","embed_ref":"","playback_mode":"progressive","poster_ref":"https://imagedelivery.net/32oxijRdypCO4dk5WrGLwg/c2726925-9313-4bc7-9733-83f5d9429600/public","orientation":"","position":0}]},"products":[{"product_id":"syn-tx-prod-001","title":"Synthetic TX Scarf","association":"product_level","offers":[{"sku_id":"syn-tx-sku-001","sku_code":"SYN-TX-OLIVE","price_sen":4500}]}]},{"video_id":"syn-post-a7516d5118","post_type":"VIDEO","caption":"DEV test video","sort_position":1,"media":{"projected":true,"placeholder":false,"reason":null,"post_type":"VIDEO","slides":[{"media_id":"syn-media-daa6929bfa64","media_kind":"VIDEO","provider":"CLOUDFLARE_STREAM","delivery_ref":"https://customer-zd71a4adbpris15b.cloudflarestream.com/d8b90bacdbaef6121514ab0ef8bd53fe/manifest/video.m3u8","embed_ref":"https://customer-zd71a4adbpris15b.cloudflarestream.com/d8b90bacdbaef6121514ab0ef8bd53fe/iframe","playback_mode":"stream_iframe","poster_ref":"https://customer-zd71a4adbpris15b.cloudflarestream.com/d8b90bacdbaef6121514ab0ef8bd53fe/thumbnails/thumbnail.jpg","orientation":"PORTRAIT","position":0}]},"products":[{"product_id":"syn-tx-prod-001","title":"Synthetic TX Scarf","association":"product_level","offers":[{"sku_id":"syn-tx-sku-001","sku_code":"SYN-TX-OLIVE","price_sen":4500}]}]},{"video_id":"syn-post-2959de7aba","post_type":"CAROUSEL","caption":"DEV test carousel","sort_position":2,"media":{"projected":true,"placeholder":false,"reason":null,"post_type":"CAROUSEL","slides":[{"media_id":"syn-media-ff854b6dd3ac","media_kind":"IMAGE","provider":"CLOUDFLARE_IMAGES","delivery_ref":"https://imagedelivery.net/32oxijRdypCO4dk5WrGLwg/4386c759-782b-4a8e-913e-5c039f141700/public","embed_ref":"","playback_mode":"progressive","poster_ref":"https://imagedelivery.net/32oxijRdypCO4dk5WrGLwg/4386c759-782b-4a8e-913e-5c039f141700/public","orientation":"","position":0},{"media_id":"syn-media-68505e562910","media_kind":"IMAGE","provider":"CLOUDFLARE_IMAGES","delivery_ref":"https://imagedelivery.net/32oxijRdypCO4dk5WrGLwg/b98dc63e-2b2d-42b0-6c27-fe093de67a00/public","embed_ref":"","playback_mode":"progressive","poster_ref":"https://imagedelivery.net/32oxijRdypCO4dk5WrGLwg/b98dc63e-2b2d-42b0-6c27-fe093de67a00/public","orientation":"","position":1},{"media_id":"syn-media-29e34c7c3a11","media_kind":"IMAGE","provider":"CLOUDFLARE_IMAGES","delivery_ref":"https://imagedelivery.net/32oxijRdypCO4dk5WrGLwg/eadee072-6291-4d73-adff-f9dc58f91700/public","embed_ref":"","playback_mode":"progressive","poster_ref":"https://imagedelivery.net/32oxijRdypCO4dk5WrGLwg/eadee072-6291-4d73-adff-f9dc58f91700/public","orientation":"","position":2},{"media_id":"syn-media-52f49f825d63","media_kind":"IMAGE","provider":"CLOUDFLARE_IMAGES","delivery_ref":"https://imagedelivery.net/32oxijRdypCO4dk5WrGLwg/52ce7e70-c953-4e0b-f9ab-7f53b7126000/public","embed_ref":"","playback_mode":"progressive","poster_ref":"https://imagedelivery.net/32oxijRdypCO4dk5WrGLwg/52ce7e70-c953-4e0b-f9ab-7f53b7126000/public","orientation":"","position":3}]},"products":[{"product_id":"syn-tx-prod-001","title":"Synthetic TX Scarf","association":"product_level","offers":[{"sku_id":"syn-tx-sku-001","sku_code":"SYN-TX-OLIVE","price_sen":4500}]}]}]}</script>
-<!-- v2.48 Stage B: isolated fit calculator. Must load from /v256-staging/, never permanent
+<!-- v2.48 Stage B: isolated fit calculator. Must load from /v248-staging/, never permanent
      /staging/. Missing script fails closed (ArabistaProductConfig absent → size finder off). -->
-<script src="/v256-staging/v248-product-config.js"></script>
+<script src="/v248-staging/v248-product-config.js"></script>
 <script>
 (function () {
   'use strict';
-  window.__ARABISTA_V248_ASSET_BASE__ = '/v256-staging';
-  window.__ARABISTA_V251_SANDBOX_CHECKOUT__ = true;
+  window.__ARABISTA_V248_ASSET_BASE__ = '/v248-staging';
   var state = {
     catalog: [],
     products: [],
@@ -11972,7 +12010,9 @@ function closeShopDetail() {
     var current='',status='idle',summary=null,rows=[],studioRows=[],cursor=null,
       sort='recommended',rating=0,photosOnly=false,previewLimit=3,
       generation=0,inflight='',filtered=0,returnFocus=null,slides=[],
-      cache=new Map(),PAGE=6,TTL=15000;
+      cache=new Map(),PAGE=6,TTL=15000,STUDIO_PAGE=6,
+      genuinePending=false,studioPending=false,studioCursor=null,
+      studioTotal=0,studioInflight=false;
     function n(id){return v248X(id);}
     function el(tag,cls,value){return v248XElement(tag,cls,value);}
     function integer(v,min,max){return typeof v==='number'&&Number.isInteger(v)&&v>=min&&v<=max;}
@@ -12032,9 +12072,14 @@ function closeShopDetail() {
     function show(id,on){var x=n(id);if(x)x.hidden=!on;}
     function clear(id){var x=n(id);if(x)x.replaceChildren();}
     function text(id,value){var x=n(id);if(x)x.textContent=String(value);}
-    function mask(name){return name.trim().split(/\s+/).map(function(word){
-      var a=Array.from(word);return word.includes('*')||a.length<2?word:a[0]+'*'.repeat(a.length-1);
-    }).join(' ');}
+    function mask(name){
+      // fyp-staging maskReviewerName: keep already-masked values; mask plain names once.
+      var text=String(name||'').trim();
+      if(!text||text.indexOf('*')>=0)return text;
+      return text.split(/\s+/).filter(Boolean).map(function(word){
+        var a=Array.from(word);return a.length<2?word:a[0]+'*'.repeat(a.length-1);
+      }).join(' ');
+    }
     function media(p){
       var button=el('button','review-thumb'),img=el('img');
       button.type='button';button.setAttribute('aria-label','View review photo '+p.sequence);
@@ -12049,8 +12094,8 @@ function closeShopDetail() {
     }
     function card(r){
       var article=el('article','product-review-card');
-      // Preserve fyp-staging review-card layout. Studio/editorial rows omit
-      // buyer identity fields and never show internal classification labels.
+      // Preserve fyp-staging review-card layout. Studio rows may show an approved
+      // display_name only — never invent ratings, dates or purchase claims.
       if(!r.editorial){
         var meta=el('div','review-card-meta');
         meta.appendChild(el('strong','',mask(r.name)));
@@ -12058,6 +12103,10 @@ function closeShopDetail() {
         stars.setAttribute('aria-label',r.stars+' out of 5 stars');meta.appendChild(stars);
         meta.appendChild(el('span','review-date',r.date));
         article.appendChild(meta);
+      }else if(r.name){
+        var studioMeta=el('div','review-card-meta');
+        studioMeta.appendChild(el('strong','',mask(r.name)));
+        article.appendChild(studioMeta);
       }
       article.appendChild(el('p','',r.text));
       if(r.pics.length){
@@ -12067,36 +12116,65 @@ function closeShopDetail() {
       }
       return article;
     }
-    function combinedRows(){return rows.concat(studioRows);}
-    function mapStudio(items){
+    function visibleStudio(){
+      return studioRows.filter(function(r){
+        if(rating>=1&&rating<=5&&Number(r.stars)!==rating)return false;
+        if(photosOnly&&!(r.pics&&r.pics.length))return false;
+        return true;
+      });
+    }
+    function combinedRows(){return rows.concat(visibleStudio());}
+    function mapStudio(items,startIndex){
+      var base=Number(startIndex)||0;
       return (items||[]).filter(function(item){
         return item&&typeof item.body==='string'&&item.body.trim();
-      }).slice(0,6).map(function(item,index){
+      }).map(function(item,index){
         var url=String(item.photo_url||'').trim();
         var pics=/^https:\/\/[^<>\s"'\\]+$/i.test(url)?[{sequence:1,url:url}]:[];
+        var name=typeof item.display_name==='string'?String(item.display_name).trim().slice(0,80):'';
+        if(/[\r\n]/.test(name))name='';
         return {
-          id:String(item.content_id||('studio-'+index)).slice(0,128),
-          name:'',
+          id:String(item.content_id||('studio-'+(base+index))).slice(0,128),
+          name:name,
           date:'',
           stars:0,
           text:String(item.body||'').trim().slice(0,4000),
-          order:index,
+          order:base+index,
           pics:pics,
           editorial:true
         };
       });
     }
-    function loadStudio(pid,token){
-      call('arabistaDevCustomerW06StudioReadV255',{product_id:pid},function(out){
+    function loadStudio(pid,token,more){
+      if(more&&!studioCursor)return;
+      if(studioInflight)return;
+      studioInflight=true;
+      if(!more){studioPending=true;studioCursor=null;studioTotal=0;}
+      render();
+      call('arabistaDevCustomerW06StudioReadV255',{
+        product_id:pid,limit:STUDIO_PAGE,cursor:more?studioCursor:null
+      },function(out){
         if(pid!==current||token!==generation)return;
+        studioInflight=false;studioPending=false;
         if(!out||out.ok!==true||String(out.product_id||'')!==pid||
           out.content_type!=='AI_CREATED_STYLE_INSPIRATION'||!Array.isArray(out.items)){
-          studioRows=[];render();return;
+          if(!more)studioRows=[];
+          studioCursor=null;render();return;
         }
-        studioRows=mapStudio(out.items);render();
+        var mapped=mapStudio(out.items,more?studioRows.length:0);
+        if(!more)studioRows=mapped;
+        else{
+          var seen=new Set(studioRows.map(function(r){return r.id;}));
+          mapped.forEach(function(r){if(!seen.has(r.id)){studioRows.push(r);seen.add(r.id);}});
+        }
+        studioTotal=integer(out.total_count,0,1000000)?out.total_count:studioRows.length;
+        studioCursor=(typeof out.next_cursor==='string'&&out.next_cursor)?out.next_cursor:null;
+        render();
       },function(){
         if(pid!==current||token!==generation)return;
-        studioRows=[];render();
+        studioInflight=false;studioPending=false;
+        if(!more)studioRows=[];
+        studioCursor=null;render();
       });
     }
     function controls(){
@@ -12129,7 +12207,7 @@ function closeShopDetail() {
       if(!source.length)rows.forEach(function(r){r.pics.forEach(function(p){
         source.push({id:r.id,sequence:p.sequence,url:p.url});
       });});
-      studioRows.forEach(function(r){r.pics.forEach(function(p){
+      visibleStudio().forEach(function(r){r.pics.forEach(function(p){
         source.push({id:r.id,sequence:p.sequence,url:p.url});
       });});
       source.slice(0,24).forEach(function(p){host.appendChild(media(p));});
@@ -12139,34 +12217,42 @@ function closeShopDetail() {
       var target=n('product-review-list');if(!target)return;
       target.replaceChildren();
       var hasGenuine=!!summary&&summary.total>0;
+      var visible=combinedRows();
+      var studioVisible=visibleStudio().length;
+      var studioPool=studioTotal||studioRows.length;
       if(hasGenuine){
         text('product-review-panel-title','All reviews · '+summary.average.toFixed(1)+' · '+summary.total);
         text('product-review-filter-note','Showing '+rows.length+' of '+filtered+' matching reviews');
       }else{
         text('product-review-panel-title','Customer reviews');
-        text('product-review-filter-note',studioRows.length?
-          'Showing '+studioRows.length+' of '+studioRows.length+' matching reviews':'No reviews to show.');
+        text('product-review-filter-note',studioVisible?
+          'Showing '+studioVisible+' of '+(studioPool||studioVisible)+' matching reviews':'No reviews to show.');
       }
-      combinedRows().forEach(function(r){target.appendChild(card(r));});
-      if(!combinedRows().length)target.appendChild(el('p','product-reference-note',
-        status==='loading'?'Loading reviews…':'No reviews match these filters.'));
-      if(cursor){
-        var more=el('button','review-show-more','Load more reviews');
-        more.type='button';more.disabled=status==='loading';
-        more.addEventListener('click',function(){read(true);});target.appendChild(more);
+      visible.forEach(function(r){target.appendChild(card(r));});
+      if(!visible.length)target.appendChild(el('p','product-reference-note',
+        (genuinePending||studioPending)?'Loading reviews…':'No reviews match these filters.'));
+      if(cursor||studioCursor){
+        var moreBtn=el('button','review-show-more','Load more reviews');
+        moreBtn.type='button';moreBtn.disabled=status==='loading'||studioInflight;
+        moreBtn.addEventListener('click',function(){
+          if(cursor)read(true);
+          else if(studioCursor)loadStudio(current,generation,true);
+        });target.appendChild(moreBtn);
       }
     }
     function render(){
       var state=n('v255-review-state');
-      var genuineReady=!!summary,hasGenuine=genuineReady&&summary.total>0;
-      var hasStudio=studioRows.length>0,has=hasGenuine||hasStudio;
-      var awaiting=status==='loading'&&!genuineReady&&!hasStudio;
+      var busy=n('product-review-loading');
+      var genuineReady=summary!==null,hasGenuine=genuineReady&&summary.total>0;
+      var hasStudio=visibleStudio().length>0,has=hasGenuine||hasStudio;
+      var awaiting=(genuinePending||studioPending)&&!has;
       show('product-review-summary',!!hasGenuine);show('review-quick-summary',!!hasGenuine);
-      show('product-review-see-all',!!has);show('product-review-retry',status==='error'&&!has);
+      show('product-review-see-all',!!has);show('product-review-retry',status==='error'&&!has&&!awaiting);
+      if(busy)busy.hidden=!awaiting;
       if(state){
-        state.textContent=awaiting?'Loading reviews…':
+        state.textContent=awaiting?'':
           status==='error'&&!has?'Reviews are currently unavailable.':
-          genuineReady&&!has?'There are no customer reviews yet.':'';
+          genuineReady&&!studioPending&&!has?'There are no customer reviews yet.':'';
         state.hidden=!state.textContent;
       }
       if(!has){
@@ -12192,7 +12278,7 @@ function closeShopDetail() {
         host.replaceChildren();
         combinedRows().slice(0,previewLimit).forEach(function(r){host.appendChild(card(r));});
       }
-      show('product-review-more',combinedRows().length>previewLimit||!!cursor);
+      show('product-review-more',combinedRows().length>previewLimit||!!cursor||!!studioCursor);
       var panel=n('product-review-panel');if(panel&&!panel.hidden)renderList();
     }
     function apply(result,more,token,pid){
@@ -12205,37 +12291,40 @@ function closeShopDetail() {
         var seen=new Set(rows.map(function(r){return r.id;}));
         result.rows.forEach(function(r){if(!seen.has(r.id)){rows.push(r);seen.add(r.id);}});
       }
-      summary=result;filtered=result.filtered;cursor=result.next;status='ready';render();
+      summary=result;filtered=result.filtered;cursor=result.next;status='ready';
+      genuinePending=false;render();
     }
     function read(more,force,sharedToken){
       if(!current)return;
       var pid=current,at=more?cursor:null;if(more&&!at)return;
       var key=JSON.stringify([pid,sort,rating,photosOnly,at||'']);
       if(inflight===key)return;
+      // Shared open()-token keeps loadStudio() from being discarded by a second bump.
       var token=(sharedToken==null?++generation:Number(sharedToken)),cached=cache.get(key);
       if(!force&&cached&&Date.now()-cached.time<TTL){
-        apply(cached.result,more,token,pid);return;
+        genuinePending=false;apply(cached.result,more,token,pid);return;
       }
-      status='loading';inflight=key;render();
+      status='loading';genuinePending=true;inflight=key;render();
       call('arabistaDevCustomerProductReviewsReadV255',{
         product_id:pid,limit:PAGE,sort:sort,rating:rating,
         photos_only:photosOnly,cursor:at
       },function(response){
         if(pid!==current||generation!==token)return;
-        inflight='';
+        inflight='';genuinePending=false;
         var result=normalize(response,pid);
         if(!result){status='error';if(!more){summary=null;rows=[];}render();return;}
         cache.set(key,{time:Date.now(),result:result});
         apply(result,more,token,pid);
       },function(){
         if(pid!==current||generation!==token)return;
-        inflight='';status='error';if(!more){summary=null;rows=[];}render();
+        inflight='';genuinePending=false;status='error';if(!more){summary=null;rows=[];}render();
       });
     }
     function more(){
       if(!summary&&!studioRows.length)return;
       if(previewLimit<combinedRows().length){previewLimit+=3;render();}
       else if(cursor){previewLimit+=3;read(true);}
+      else if(studioCursor){previewLimit+=3;loadStudio(current,generation,true);}
     }
     function closeViewer(restore){
       show('review-viewer',false);clear('review-viewer-track');
@@ -12307,8 +12396,19 @@ function closeShopDetail() {
       var section=n('product-reviews'),root=v248Exact.shadow;
       if(!section||!root||section.dataset.v255Connected)return;
       section.dataset.v255Connected='yes';section.hidden=false;
+      var loading=el('div','review-coin-busy');
+      loading.id='product-review-loading';loading.hidden=true;
+      loading.setAttribute('role','status');loading.setAttribute('aria-live','polite');
+      loading.setAttribute('aria-label','Loading reviews');
+      loading.innerHTML='<span class="coin-loader" aria-hidden="true"><span class="coin-inner">'+
+        '<span class="coin-face"></span><span class="coin-face coin-back"></span></span></span>'+
+        '<span>Loading reviews</span>';
       var note=el('p','product-reference-note');note.id='v255-review-state';
-      note.setAttribute('role','status');section.appendChild(note);
+      note.setAttribute('role','status');
+      var strip=n('product-review-strip');
+      if(strip&&strip.parentNode===section)section.insertBefore(loading,strip);
+      else section.appendChild(loading);
+      section.appendChild(note);
       var viewer=n('review-viewer'),app=root.querySelector('.app');
       if(viewer&&app){
         app.appendChild(viewer);viewer.style.position='absolute';
@@ -12343,15 +12443,16 @@ function closeShopDetail() {
       controls();render();
     }
     function open(pid){
-      inflight='';close();current=String(pid||'').trim();
-      summary=null;rows=[];studioRows=[];cursor=null;status='idle';filtered=0;
+      inflight='';studioInflight=false;close();current=String(pid||'').trim();
+      summary=null;rows=[];studioRows=[];cursor=null;studioCursor=null;studioTotal=0;
+      status='idle';filtered=0;genuinePending=false;studioPending=false;
       rating=0;sort='recommended';photosOnly=false;previewLimit=3;
       controls();render();
       if(current){
         // One generation token for both genuine + studio readers (fixes dropped Studio render).
         var token=++generation;
         read(false,false,token);
-        loadStudio(current,token);
+        loadStudio(current,token,false);
       }
       else{status='error';render();}
     }
