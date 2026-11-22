@@ -12093,6 +12093,7 @@ function closeShopDetail() {
     }
     function media(p){
       var button=el('button','review-thumb'),img=el('img');
+      button.__v255PhotoKey=JSON.stringify([p.id,p.sequence,p.url]);
       button.type='button';button.setAttribute('aria-label','View review photo '+p.sequence);
       img.loading='lazy';img.decoding='async';img.alt='Review photo '+p.sequence;
       img.addEventListener('error',function(){
@@ -12105,6 +12106,8 @@ function closeShopDetail() {
     }
     function card(r){
       var article=el('article','product-review-card');
+      article.__v255Row=r;
+      article.__v255Key=(r.editorial?'studio:':'genuine:')+r.id;
       // Preserve fyp-staging review-card layout: name · gold stars · date.
       // Editorial sample stars/dates render only when owner-approved metadata exists.
       // Never invent ratings, dates or purchase claims; editorial never feeds genuine averages.
@@ -12135,6 +12138,48 @@ function closeShopDetail() {
         article.appendChild(photos);
       }
       return article;
+    }
+    // Retain mounted review cards and their decoded images across pagination renders.
+    // Replace a card only when its underlying review entry actually changes.
+    function syncReviewCards(host,items){
+      if(!host)return;
+      var previous=Array.from(host.children).filter(function(node){
+        return node.classList.contains('product-review-card');
+      });
+      var byKey=new Map(),kept=new Set();
+      previous.forEach(function(node){if(node.__v255Key)byKey.set(node.__v255Key,node);});
+      items.forEach(function(item,index){
+        var key=(item.editorial?'studio:':'genuine:')+item.id;
+        var node=byKey.get(key);
+        if(!node||node.__v255Row!==item){
+          var fresh=card(item);
+          if(node&&node.parentNode===host)host.replaceChild(fresh,node);
+          node=fresh;
+        }
+        if(host.children[index]!==node)host.insertBefore(node,host.children[index]||null);
+        kept.add(node);
+      });
+      previous.forEach(function(node){
+        if(node.parentNode===host&&!kept.has(node))node.remove();
+      });
+    }
+    // Keep existing photo buttons mounted: remounting makes images flash on each fetch.
+    function syncReviewStrip(host,items){
+      var kept=new Set();
+      items.forEach(function(item,index){
+        var key=JSON.stringify([item.id,item.sequence,item.url]);
+        var node=host.children[index];
+        if(!node||node.__v255PhotoKey!==key){
+          node=Array.from(host.children).find(function(candidate){
+            return candidate.__v255PhotoKey===key&&!kept.has(candidate);
+          })||media(item);
+          if(host.children[index]!==node)host.insertBefore(node,host.children[index]||null);
+        }
+        kept.add(node);
+      });
+      Array.from(host.children).forEach(function(node){
+        if(!kept.has(node))node.remove();
+      });
     }
     function visibleStudio(){
       return studioRows.filter(function(r){
@@ -12248,7 +12293,6 @@ function closeShopDetail() {
     }
     function renderStrip(){
       var host=n('product-review-strip');if(!host)return;
-      host.replaceChildren();
       var source=summary&&Array.isArray(summary.strip)?summary.strip.slice():[];
       if(!source.length)rows.forEach(function(r){r.pics.forEach(function(p){
         source.push({id:r.id,sequence:p.sequence,url:p.url});
@@ -12256,7 +12300,7 @@ function closeShopDetail() {
       visibleStudio().forEach(function(r){r.pics.forEach(function(p){
         source.push({id:r.id,sequence:p.sequence,url:p.url});
       });});
-      source.slice(0,24).forEach(function(p){host.appendChild(media(p));});
+      syncReviewStrip(host,source.slice(0,24));
       host.hidden=!host.childElementCount;
     }
     function setMoreLoading(button,label){
@@ -12269,7 +12313,8 @@ function closeShopDetail() {
     }
     function renderList(){
       var target=n('product-review-list');if(!target)return;
-      target.replaceChildren();
+      var note=target.querySelector(':scope > .product-reference-note');
+      var moreBtn=target.querySelector(':scope > .review-show-more');
       var hasGenuine=!!summary&&summary.total>0;
       var visible=combinedRows();
       var studioVisible=visibleStudio().length;
@@ -12284,17 +12329,24 @@ function closeShopDetail() {
         text('product-review-filter-note',studioVisible?
           'Showing '+studioVisible+' of '+(studioPool||studioVisible)+' matching reviews':'No reviews to show.');
       }
-      visible.forEach(function(r){target.appendChild(card(r));});
-      if(!visible.length)target.appendChild(el('p','product-reference-note',
-        (genuinePending||studioPending)?'Loading reviews…':'No reviews match these filters.'));
+      syncReviewCards(target,visible);
+      if(!visible.length){
+        if(!note){note=el('p','product-reference-note');target.appendChild(note);}
+        note.textContent=(genuinePending||studioPending)?
+          'Loading reviews…':'No reviews match these filters.';
+      }else if(note)note.remove();
       if(cursor||studioCursor){
-        var moreBtn=el('button','review-show-more');
-        moreBtn.type='button';setMoreLoading(moreBtn,'Load more reviews');
-        moreBtn.addEventListener('click',function(){
-          if(cursor)read(true);
-          else if(studioCursor)loadStudio(current,generation,true);
-        });target.appendChild(moreBtn);
-      }
+        if(!moreBtn){
+          moreBtn=el('button','review-show-more');
+          moreBtn.type='button';
+          moreBtn.addEventListener('click',function(){
+            if(cursor)read(true);
+            else if(studioCursor)loadStudio(current,generation,true);
+          });
+        }
+        setMoreLoading(moreBtn,'Load more reviews');
+        if(target.lastElementChild!==moreBtn)target.appendChild(moreBtn);
+      }else if(moreBtn)moreBtn.remove();
     }
     function render(){
       var state=n('v255-review-state');
@@ -12335,10 +12387,8 @@ function closeShopDetail() {
         show('product-review-bars',false);clear('product-review-bars');
       }
       renderStrip();
-      var host=n('product-review-preview');if(host){
-        host.replaceChildren();
-        combinedRows().slice(0,previewLimit).forEach(function(r){host.appendChild(card(r));});
-      }
+      var host=n('product-review-preview');
+      if(host)syncReviewCards(host,combinedRows().slice(0,previewLimit));
       show('product-review-more',combinedRows().length>previewLimit||!!cursor||!!studioCursor);
       setMoreLoading(n('product-review-more'),'Show more reviews');
       var panel=n('product-review-panel');if(panel&&!panel.hidden)renderList();
