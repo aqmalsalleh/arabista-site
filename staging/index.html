@@ -8394,7 +8394,11 @@ body.is-discover .site-tabs{z-index:45!important}
   background:transparent!important;box-shadow:none!important;border-radius:0!important}
 .sheet-layer,.commerce-layer,.checkout-layer{position:absolute;inset:0}
 #product-sheet{min-height:0}
-#product-deals,#product-reviews,#product-review-panel,#review-viewer,#product-deal-modal,
+/* Keep incomplete commerce chrome hidden. Do NOT hide #product-reviews /
+   #product-review-panel / #review-viewer — owner Reviews UI relies on the
+   normal [hidden] attribute, and display:none!important made published
+   Studio cards load invisibly (0×0) on live staging. */
+#product-deals,#product-deal-modal,
 #commerce-chat,#checkout-email{display:none!important}
 /* v2.51 working checkout screens stay in DOM and hide only when inactive. */
 #checkout-view-complete[hidden],#checkout-view-addresses[hidden],#checkout-view-address-form[hidden]{display:none!important}
