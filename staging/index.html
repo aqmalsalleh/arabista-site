@@ -12023,7 +12023,7 @@ function closeShopDetail() {
       generation=0,inflight='',filtered=0,returnFocus=null,slides=[],
       cache=new Map(),PAGE=6,TTL=15000,STUDIO_PAGE=6,
       genuinePending=false,studioPending=false,studioCursor=null,
-      studioTotal=0,studioInflight=false;
+      studioTotal=0,studioInflight=false,studioRatingSummary=null;
     function n(id){return v248X(id);}
     function el(tag,cls,value){return v248XElement(tag,cls,value);}
     function integer(v,min,max){return typeof v==='number'&&Number.isInteger(v)&&v>=min&&v<=max;}
@@ -12174,7 +12174,7 @@ function closeShopDetail() {
       if(more&&!studioCursor)return;
       if(studioInflight)return;
       studioInflight=true;
-      if(!more){studioPending=true;studioCursor=null;studioTotal=0;}
+      if(!more){studioPending=true;studioCursor=null;studioTotal=0;studioRatingSummary=null;}
       render();
       call('arabistaDevCustomerW06StudioReadV255',{
         product_id:pid,limit:STUDIO_PAGE,cursor:more?studioCursor:null
@@ -12183,7 +12183,7 @@ function closeShopDetail() {
         studioInflight=false;studioPending=false;
         if(!out||out.ok!==true||String(out.product_id||'')!==pid||
           out.content_type!=='AI_CREATED_STYLE_INSPIRATION'||!Array.isArray(out.items)){
-          if(!more)studioRows=[];
+          if(!more){studioRows=[];studioRatingSummary=null;}
           studioCursor=null;render();return;
         }
         var mapped=mapStudio(out.items,more?studioRows.length:0);
@@ -12193,14 +12193,35 @@ function closeShopDetail() {
           mapped.forEach(function(r){if(!seen.has(r.id)){studioRows.push(r);seen.add(r.id);}});
         }
         studioTotal=integer(out.total_count,0,1000000)?out.total_count:studioRows.length;
+        // The DEV reader returns totals for the full published set, not a paginated subset.
+        var stats=out.sample_rating_summary;
+        studioRatingSummary=stats&&integer(stats.rated_count,0,1000000)&&
+          integer(stats.star_sum,0,5000000)&&
+          (stats.rated_count===0?stats.star_sum===0:
+            stats.star_sum>=stats.rated_count&&stats.star_sum<=5*stats.rated_count)&&
+          stats.rated_count<=studioTotal?
+          {count:stats.rated_count,sum:stats.star_sum}:null;
         studioCursor=(typeof out.next_cursor==='string'&&out.next_cursor)?out.next_cursor:null;
         render();
       },function(){
         if(pid!==current||token!==generation)return;
         studioInflight=false;studioPending=false;
-        if(!more)studioRows=[];
+        if(!more){studioRows=[];studioRatingSummary=null;}
         studioCursor=null;render();
       });
+    }
+    // Development staging's live overall score: all published rated items,
+    // including ones outside the currently loaded page. Genuine counts come
+    // from the full source distribution; editorial sample totals stay separate.
+    function ratingTotals(){
+      var count=0,sum=0;
+      if(summary&&summary.total>0){
+        summary.bars.forEach(function(b){count+=b.count;sum+=b.count*b.stars;});
+      }
+      if(studioRatingSummary){
+        count+=studioRatingSummary.count;sum+=studioRatingSummary.sum;
+      }
+      return count>0?{average:sum/count,reviewCount:(summary?summary.total:0)+studioTotal}:null;
     }
     function controls(){
       if(!v248Exact.shadow)return;
@@ -12253,8 +12274,10 @@ function closeShopDetail() {
       var visible=combinedRows();
       var studioVisible=visibleStudio().length;
       var studioPool=studioTotal||studioRows.length;
+      var overall=ratingTotals();
       if(hasGenuine){
-        text('product-review-panel-title','All reviews · '+summary.average.toFixed(1)+' · '+summary.total);
+        text('product-review-panel-title','All reviews'+
+          (overall?' · '+overall.average.toFixed(1)+' · '+overall.reviewCount:' · '+summary.total));
         text('product-review-filter-note','Showing '+rows.length+' of '+filtered+' matching reviews');
       }else{
         text('product-review-panel-title','Customer reviews');
@@ -12278,8 +12301,9 @@ function closeShopDetail() {
       var busy=n('product-review-loading');
       var genuineReady=summary!==null,hasGenuine=genuineReady&&summary.total>0;
       var hasStudio=visibleStudio().length>0,has=hasGenuine||hasStudio;
+      var overall=ratingTotals();
       var awaiting=(genuinePending||studioPending)&&!has;
-      show('product-review-summary',!!hasGenuine);show('review-quick-summary',!!hasGenuine);
+      show('product-review-summary',!!overall);show('review-quick-summary',!!overall);
       show('product-review-see-all',!!has);show('product-review-retry',status==='error'&&!has&&!awaiting);
       if(busy)busy.hidden=!awaiting;
       if(state){
@@ -12294,13 +12318,17 @@ function closeShopDetail() {
         show('product-review-more',false);text('product-review-average','');
         text('product-review-count','');return;
       }
-      if(hasGenuine){
-        text('product-review-average',summary.average.toFixed(1));
-        text('product-review-count',summary.total+' review'+(summary.total===1?'':'s'));
-        text('review-quick-average',summary.average.toFixed(1));
-        text('review-quick-count',summary.total+' review'+(summary.total===1?'':'s'));
-        var fill=n('review-star-fill');if(fill)fill.style.width=100*summary.average/5+'%';
-        renderBars();
+      if(overall){
+        var average=overall.average.toFixed(1);
+        var countLabel=overall.reviewCount+' review'+(overall.reviewCount===1?'':'s');
+        text('product-review-average',average);
+        text('product-review-count',countLabel);
+        text('review-quick-average',average);
+        text('review-quick-count',countLabel);
+        var fill=n('review-star-fill');if(fill)fill.style.width=100*overall.average/5+'%';
+        // Never show a genuine-only distribution alongside a combined average.
+        if(hasGenuine&&!studioRatingSummary)renderBars();
+        else{show('product-review-bars',false);clear('product-review-bars');}
       }else{
         text('product-review-average','');text('product-review-count','');
         text('review-quick-average','');text('review-quick-count','');
@@ -12478,7 +12506,7 @@ function closeShopDetail() {
     }
     function open(pid){
       inflight='';studioInflight=false;close();current=String(pid||'').trim();
-      summary=null;rows=[];studioRows=[];cursor=null;studioCursor=null;studioTotal=0;
+      summary=null;rows=[];studioRows=[];cursor=null;studioCursor=null;studioTotal=0;studioRatingSummary=null;
       status='idle';filtered=0;genuinePending=false;studioPending=false;
       rating=0;sort='recommended';photosOnly=false;previewLimit=3;
       controls();render();
