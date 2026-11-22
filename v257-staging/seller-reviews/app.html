@@ -65,7 +65,12 @@ h1{font:500 clamp(36px,5vw,52px)/1.08 var(--serif);letter-spacing:-.02em;margin:
 .preview{background:#fff;border:1px solid #efefef;border-radius:14px;padding:16px 16px 12px;margin-top:10px}
 .preview h3{font-size:16px;font-weight:700;margin:0 0 11px}
 .product-review-card{padding:13px 0 15px;border-bottom:1px solid #f0f0f0}
-.review-card-meta{display:flex;gap:5px 9px;align-items:center}.review-card-meta strong{font-size:12px;color:#333;font-weight:700}
+.review-card-meta{display:flex;flex-wrap:wrap;gap:5px 9px;align-items:baseline}.review-card-meta strong{font-size:12px;color:#333;font-weight:700}
+.review-stars{color:#d6a435;letter-spacing:.08em;font-size:12px}.review-date{color:#8d8d8d;font-size:11px}
+.star-picker{display:flex;gap:4px;align-items:center;margin-top:2px}
+.star-picker button{border:0;background:transparent;color:#d6c4a8;font-size:26px;line-height:1;padding:2px 4px;cursor:pointer;min-width:34px;min-height:34px}
+.star-picker button[aria-checked="true"],.star-picker button.on{color:#d6a435}
+.star-picker button:focus-visible{outline:2px solid #c9a227;outline-offset:2px;border-radius:6px}
 .product-review-card p{margin:6px 0 0;font-size:12.5px;line-height:1.7;color:#555;white-space:pre-wrap;overflow-wrap:anywhere}
 .review-card-photos{display:flex;gap:7px;margin-top:9px;overflow:auto}
 .review-thumb{width:73px;height:92px;flex:none;border-radius:9px;object-fit:cover;background:#f7f7f7}
@@ -303,12 +308,14 @@ window.__ARABISTA_V256_STAFF_READY__=new Promise(async function(resolve,reject){
       <div>
         <label class="editor-field"><span>Review text</span><textarea id="body" maxlength="1000" placeholder="Review text"></textarea></label>
         <label class="editor-field"><span>Approved display name (optional)</span><input id="display-name" maxlength="80" placeholder="e.g. A**** or @handle" autocomplete="off"><p class="helper">Use only a name or handle you have approved. No automatic names are created.</p></label>
+        <div class="editor-field"><span>Star rating (optional)</span><div class="star-picker" id="star-picker" role="radiogroup" aria-label="Sample star rating 1 to 5"></div><p class="helper">Editorial sample only — not a verified customer rating. Leave empty if unused.</p></div>
+        <label class="editor-field"><span>Display date (optional)</span><input id="display-date" type="date" autocomplete="off"><p class="helper">Editorial approval or publication date (YYYY-MM-DD). Not a fabricated buyer-submission date.</p></label>
         <details><summary class="subtle">Internal details</summary><label class="editor-field"><span>Internal heading</span><input id="heading" maxlength="100"></label><p class="helper" id="editor-identifiers"></p></details>
         <div class="divider"></div><h3 class="section-label">Photos</h3><p class="helper">Tap Cover to choose the first photo. Use arrows to change order, or remove a photo from this entry.</p><div class="photos" id="photos"></div>
         <details id="picker"><summary class="text-action">+ Add a photo from your library</summary><p class="helper">Only photos already approved for this product are available.</p><div class="gallery-choices" id="candidates"></div></details>
       </div>
-      <div><h3 class="section-label">Product Sheet preview</h3><p class="helper">Uses the approved review-card layout. No invented ratings, dates or verified-purchase labels.</p>
-        <div class="preview"><h3>Customer reviews</h3><article class="product-review-card"><div class="review-card-meta" id="preview-name" hidden><strong></strong></div><p id="preview-body"></p><div class="review-card-photos" id="preview-photos"></div></article></div>
+      <div><h3 class="section-label">Product Sheet preview</h3><p class="helper">Uses the approved review-card layout. Sample stars and dates appear only when you set them. No verified-purchase labels.</p>
+        <div class="preview"><h3>Customer reviews</h3><article class="product-review-card"><div class="review-card-meta" id="preview-meta" hidden><strong id="preview-name"></strong><span class="review-stars" id="preview-stars" hidden></span><span class="review-date" id="preview-date" hidden></span></div><p id="preview-body"></p><div class="review-card-photos" id="preview-photos"></div></article></div>
         <div class="menu"><button id="archive" class="secondary" type="button">Archive</button><button id="restore" class="secondary" type="button" hidden>Restore draft</button><button id="delete" class="secondary danger" type="button">Delete review</button></div><p class="helper">Archive and Unpublish keep photos. Delete removes owned, unused Cloudflare photos after checking other references.</p>
       </div>
     </div>
@@ -372,9 +379,12 @@ function keys(e){if(e.key==="Escape"){e.preventDefault();finish(false)}}yes.addE
 function mask(name){var n=str(name).trim();if(!n||n.includes("*"))return n;return n.split(/\s+/).filter(Boolean).map(function(word){var a=Array.from(word);return a.length<2?word:a[0]+"*".repeat(a.length-1)}).join(" ")}
 function sourceMedia(r){var ids=Array.isArray(r.media_ids)?r.media_ids.map(str).filter(Boolean):[];if(r.media_id&&!ids.includes(str(r.media_id)))ids.unshift(str(r.media_id));return ids}
 function mediaUrl(id){var found=s.media.find(function(m){return str(m.media_id)===id});if(found)return safeUrl(found.delivery_url);var r=s.editor&&s.editor.row;var item=r&&Array.isArray(r.media)?r.media.find(function(m){return str(m.media_id)===id}):null;return safeUrl((item&&item.delivery_url)||(id===str(r&&r.media_id)?r.photo_url:""))}
-function snapshot(){return JSON.stringify({title:$("heading").value.trim(),body:$("body").value.trim(),display_name:$("display-name").value.trim(),media_ids:s.editor?s.editor.ids:[],media_id:s.editor?s.editor.cover:""})}
+function starsValue(){return s.editor&&Number.isFinite(Number(s.editor.stars))&&s.editor.stars>=1&&s.editor.stars<=5?Number(s.editor.stars):""}
+function dateValue(){var v=$("display-date").value.trim();return /^\d{4}-\d{2}-\d{2}$/.test(v)?v:""}
+function snapshot(){return JSON.stringify({title:$("heading").value.trim(),body:$("body").value.trim(),display_name:$("display-name").value.trim(),sample_stars:starsValue(),display_date:dateValue(),media_ids:s.editor?s.editor.ids:[],media_id:s.editor?s.editor.cover:""})}
 function dirty(){return !!s.editor&&snapshot()!==s.editor.original}
-function editorData(){return {title:$("heading").value.trim(),body:$("body").value.trim(),display_name:$("display-name").value.trim(),media_ids:s.editor.ids.slice(),media_id:s.editor.cover}}
+function editorData(){return {title:$("heading").value.trim(),body:$("body").value.trim(),display_name:$("display-name").value.trim(),sample_stars:starsValue(),display_date:dateValue(),media_ids:s.editor.ids.slice(),media_id:s.editor.cover}}
+function paintStars(){var host=$("star-picker");if(!host)return;host.replaceChildren();for(var i=1;i<=5;i++){(function(n){var b=E("button","", "★");b.type="button";b.setAttribute("role","radio");b.setAttribute("aria-label",n+" stars");var on=starsValue()===n;b.setAttribute("aria-checked",on?"true":"false");if(on)b.classList.add("on");b.disabled=!!(s.editor&&s.editor.cleanupPending);b.addEventListener("click",function(){if(!s.editor||s.editor.cleanupPending)return;s.editor.stars=s.editor.stars===n?"":n;paintStars();preview()});host.append(b)})(i)}}
 function showImages(){if(!s.editor)return;var host=$("photos");host.replaceChildren();
 if(!s.editor.ids.length)host.append(E("p","helper","Text-only review — no photos attached."));
 s.editor.ids.forEach(function(id,i){var card=E("div","photo");var url=mediaUrl(id);if(url){var im=E("img");im.loading="lazy";im.alt="Associated review photo";im.src=url;card.append(im)}else card.append(E("div","cover-empty","Image unavailable"));
@@ -383,11 +393,16 @@ var acts=E("div","photo-actions");acts.append(button("←","",function(){photoMo
 showCandidates()}
 function photoMove(i,offset){var t=i+offset;if(!s.editor||t<0||t>=s.editor.ids.length)return;var a=s.editor.ids;var b=a[i];a[i]=a[t];a[t]=b;showImages();preview()}
 function showCandidates(){var host=$("candidates");host.replaceChildren();if(s.editor.cleanupPending){host.append(E("p","helper","Cleanup is pending; the review cannot be edited."));return}s.media.forEach(function(m){var id=str(m.media_id),url=safeUrl(m.delivery_url);if(!id||!url||s.editor.ids.includes(id))return;var b=button("","gallery-option",function(){if(s.editor.ids.length>=5){msg("A review can have up to five photos.",true);return}s.editor.ids.push(id);if(!s.editor.cover)s.editor.cover=id;showImages();preview()});var im=E("img");im.loading="lazy";im.alt="Available product photo";im.src=url;b.append(im,E("span","","Add photo"));host.append(b)});if(!host.children.length)host.append(E("p","helper","No additional photos available."))}
-function preview(){if(!s.editor)return;var data=editorData(),name=$("preview-name");name.hidden=!data.display_name;name.querySelector("strong").textContent=mask(data.display_name);$("preview-body").textContent=data.body;var photos=$("preview-photos");photos.replaceChildren();data.media_ids.forEach(function(id){var url=mediaUrl(id);if(!url)return;var im=E("img","review-thumb");im.src=url;im.loading="lazy";im.alt="Review photo";photos.append(im)});$("save").disabled=s.busy||s.editor.cleanupPending||!dirty()||data.body.length<3}
-async function open(id){var r=byId(id);if(!r||s.busy)return;s.lastFocus=document.activeElement;var rev=++s.editorSeq;s.editor={row:r,ids:sourceMedia(r),cover:str(r.media_id),original:"",cleanupPending:str(r.status).toUpperCase()==="CLEANUP_PENDING"||r.cleanup_pending===true};if(s.editor.cover&&!s.editor.ids.includes(s.editor.cover))s.editor.ids.unshift(s.editor.cover);
-$("body").value=str(r.body);$("heading").value=str(r.title);$("display-name").value=str(r.display_name);s.editor.original=snapshot();$("editor-title").textContent="Edit review";$("editor-kicker").textContent=str(r.status||"DRAFT")+" · "+str(r.sku_id||"All variations");
+function preview(){if(!s.editor)return;var data=editorData(),meta=$("preview-meta"),nameEl=$("preview-name"),starsEl=$("preview-stars"),dateEl=$("preview-date");
+var hasName=!!data.display_name,hasStars=data.sample_stars!=="",hasDate=!!data.display_date;
+meta.hidden=!(hasName||hasStars||hasDate);nameEl.hidden=!hasName;nameEl.textContent=hasName?mask(data.display_name):"";
+starsEl.hidden=!hasStars;if(hasStars){starsEl.textContent="★".repeat(Number(data.sample_stars));starsEl.setAttribute("aria-label",data.sample_stars+" out of 5 stars")}else{starsEl.textContent="";starsEl.removeAttribute("aria-label")}
+dateEl.hidden=!hasDate;dateEl.textContent=hasDate?data.display_date:"";
+$("preview-body").textContent=data.body;var photos=$("preview-photos");photos.replaceChildren();data.media_ids.forEach(function(id){var url=mediaUrl(id);if(!url)return;var im=E("img","review-thumb");im.src=url;im.loading="lazy";im.alt="Review photo";photos.append(im)});$("save").disabled=s.busy||s.editor.cleanupPending||!dirty()||data.body.length<3}
+async function open(id){var r=byId(id);if(!r||s.busy)return;s.lastFocus=document.activeElement;var rev=++s.editorSeq;var savedStars=Number(r.sample_stars);s.editor={row:r,ids:sourceMedia(r),cover:str(r.media_id),stars:(Number.isFinite(savedStars)&&savedStars>=1&&savedStars<=5)?savedStars:"",original:"",cleanupPending:str(r.status).toUpperCase()==="CLEANUP_PENDING"||r.cleanup_pending===true};if(s.editor.cover&&!s.editor.ids.includes(s.editor.cover))s.editor.ids.unshift(s.editor.cover);
+$("body").value=str(r.body);$("heading").value=str(r.title);$("display-name").value=str(r.display_name);$("display-date").value=/^\d{4}-\d{2}-\d{2}$/.test(str(r.display_date))?str(r.display_date):"";paintStars();s.editor.original=snapshot();$("editor-title").textContent="Edit review";$("editor-kicker").textContent=str(r.status||"DRAFT")+" · "+str(r.sku_id||"All variations");
 $("editor-identifiers").textContent="Content ID: "+str(r.content_id);$("overlay").hidden=false;document.body.style.overflow="hidden";$("publish").textContent=str(r.status).toUpperCase()==="PUBLISHED"?"Unpublish":"Publish";$("publish").hidden=str(r.status).toUpperCase()==="ARCHIVED";
-$("archive").hidden=str(r.status).toUpperCase()==="ARCHIVED";$("restore").hidden=str(r.status).toUpperCase()!=="ARCHIVED";s.media=[];$("delete").textContent=s.editor.cleanupPending?"Retry image cleanup":"Delete review";["body","heading","display-name"].forEach(function(k){$(k).disabled=s.editor.cleanupPending});$("picker").hidden=s.editor.cleanupPending;$("publish").hidden=s.editor.cleanupPending||$("publish").hidden;$("archive").hidden=s.editor.cleanupPending||$("archive").hidden;$("restore").hidden=s.editor.cleanupPending||$("restore").hidden;showImages();preview();$("body").focus();
+$("archive").hidden=str(r.status).toUpperCase()==="ARCHIVED";$("restore").hidden=str(r.status).toUpperCase()!=="ARCHIVED";s.media=[];$("delete").textContent=s.editor.cleanupPending?"Retry image cleanup":"Delete review";["body","heading","display-name","display-date"].forEach(function(k){$(k).disabled=s.editor.cleanupPending});$("picker").hidden=s.editor.cleanupPending;$("publish").hidden=s.editor.cleanupPending||$("publish").hidden;$("archive").hidden=s.editor.cleanupPending||$("archive").hidden;$("restore").hidden=s.editor.cleanupPending||$("restore").hidden;showImages();preview();$("body").focus();
 try{var out=await rpc("arabistaDevSellerReviewMediaV257",{product_id:s.product});if(rev!==s.editorSeq||!s.editor||str(s.editor.row.content_id)!==str(id))return;if(!valid(out)||!Array.isArray(out.media))throw Error("Media unavailable");s.media=out.media.filter(function(m){return !!str(m.media_id)&&!!safeUrl(m.delivery_url)});showImages();preview()}catch(e){if(rev===s.editorSeq)msg("Photo library unavailable. Existing review photos remain visible.",true)}}
 async function close(){if(!s.editor)return;if(dirty()&&!(await ask("Discard changes?","Your unsaved edits will be lost.","Discard",false)))return;closeNow()}
 function closeNow(){s.editorSeq++;s.editor=null;$("overlay").hidden=true;document.body.style.overflow="";if(s.lastFocus&&typeof s.lastFocus.focus==="function")s.lastFocus.focus();s.lastFocus=null}
@@ -406,7 +421,7 @@ setBusy(true);
 try{var out=await rpc("arabistaDevSellerReviewDeleteV257",{product_id:s.product,content_id:r.content_id,expected_revision:Number(r.revision)});
 if(!valid(out))throw Error(str(out&&out.reason||"Delete not confirmed"));
 if(out.review_deleted!==true)throw Error(str(out.reason||"Review deletion not confirmed"));
-if(out.media_cleanup_complete!==true){s.editor.cleanupPending=true;$("delete").textContent="Retry image cleanup";["body","heading","display-name"].forEach(function(k){$(k).disabled=true});$("picker").hidden=true;$("publish").hidden=true;$("archive").hidden=true;$("restore").hidden=true;showImages();
+if(out.media_cleanup_complete!==true){s.editor.cleanupPending=true;$("delete").textContent="Retry image cleanup";["body","heading","display-name","display-date"].forEach(function(k){$(k).disabled=true});paintStars();$("picker").hidden=true;$("publish").hidden=true;$("archive").hidden=true;$("restore").hidden=true;showImages();
 var pending=Array.isArray(out.failed_media_ids)?out.failed_media_ids.length:Number(out.pending_media_count||0);
 msg("Review removed from publication, but "+pending+" image(s) still need Cloudflare cleanup. Retry image cleanup. Shared photos are retained.",true);return}
 msg("Review deleted. Unused owned Cloudflare photos cleaned up; shared images retained.");closeNow();load(true);
@@ -419,7 +434,7 @@ Array.from(document.querySelectorAll("[data-filter]")).forEach(function(b){b.add
 $("search-form").addEventListener("submit",function(e){e.preventDefault();s.search=$("search").value.trim();closeNow();load(true)});
 $("refresh").addEventListener("click",function(){if(!s.product)start();else load(true)});$("signout").addEventListener("click",function(){if(typeof window.arabistaReviewsLogoutV257==="function"){window.arabistaReviewsLogoutV257();return}try{sessionStorage.removeItem("arabista-v256-staff-session")}catch(e){}window.location.assign(sellerBase+"seller-reviews/")});
 $("more").addEventListener("click",function(){load(false)});
-["body","heading","display-name"].forEach(function(k){$(k).addEventListener("input",preview)});
+["body","heading","display-name","display-date"].forEach(function(k){$(k).addEventListener("input",preview)});
 $("save").addEventListener("click",save);$("publish").addEventListener("click",publication);$("archive").addEventListener("click",function(){disposition("ARCHIVED")});$("restore").addEventListener("click",function(){disposition("DRAFT")});$("delete").addEventListener("click",deletion);
 $("close").addEventListener("click",close);$("cancel").addEventListener("click",close);
 $("overlay").addEventListener("click",function(e){if(e.target===$("overlay"))close()});

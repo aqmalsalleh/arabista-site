@@ -12094,8 +12094,11 @@ function closeShopDetail() {
     }
     function card(r){
       var article=el('article','product-review-card');
-      // Preserve fyp-staging review-card layout. Studio rows may show an approved
-      // display_name only — never invent ratings, dates or purchase claims.
+      // Preserve fyp-staging review-card layout: name · gold stars · date.
+      // Editorial sample stars/dates render only when owner-approved metadata exists.
+      // Never invent ratings, dates or purchase claims; editorial never feeds genuine averages.
+      var hasStars=Number.isFinite(Number(r.stars))&&Number(r.stars)>=1&&Number(r.stars)<=5;
+      var hasDate=typeof r.date==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(r.date);
       if(!r.editorial){
         var meta=el('div','review-card-meta');
         meta.appendChild(el('strong','',mask(r.name)));
@@ -12103,9 +12106,15 @@ function closeShopDetail() {
         stars.setAttribute('aria-label',r.stars+' out of 5 stars');meta.appendChild(stars);
         meta.appendChild(el('span','review-date',r.date));
         article.appendChild(meta);
-      }else if(r.name){
+      }else if(r.name||hasStars||hasDate){
         var studioMeta=el('div','review-card-meta');
-        studioMeta.appendChild(el('strong','',mask(r.name)));
+        if(r.name)studioMeta.appendChild(el('strong','',mask(r.name)));
+        if(hasStars){
+          var studioStars=el('span','review-stars','★'.repeat(Number(r.stars)));
+          studioStars.setAttribute('aria-label',Number(r.stars)+' out of 5 stars');
+          studioMeta.appendChild(studioStars);
+        }
+        if(hasDate)studioMeta.appendChild(el('span','review-date',r.date));
         article.appendChild(studioMeta);
       }
       article.appendChild(el('p','',r.text));
@@ -12133,11 +12142,16 @@ function closeShopDetail() {
         var pics=/^https:\/\/[^<>\s"'\\]+$/i.test(url)?[{sequence:1,url:url}]:[];
         var name=typeof item.display_name==='string'?String(item.display_name).trim().slice(0,80):'';
         if(/[\r\n]/.test(name))name='';
+        var starsRaw=Number(item.sample_stars);
+        var stars=Number.isFinite(starsRaw)&&Math.floor(starsRaw)===starsRaw&&starsRaw>=1&&starsRaw<=5?starsRaw:0;
+        var dateRaw=typeof item.display_date==='string'?String(item.display_date).trim():'';
+        var date=/^\d{4}-\d{2}-\d{2}$/.test(dateRaw)&&!isNaN(Date.parse(dateRaw+'T00:00:00Z'))
+          &&new Date(dateRaw+'T00:00:00Z').toISOString().slice(0,10)===dateRaw?dateRaw:'';
         return {
           id:String(item.content_id||('studio-'+(base+index))).slice(0,128),
           name:name,
-          date:'',
-          stars:0,
+          date:date,
+          stars:stars,
           text:String(item.body||'').trim().slice(0,4000),
           order:base+index,
           pics:pics,
