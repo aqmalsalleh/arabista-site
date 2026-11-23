@@ -80,6 +80,27 @@ h1{font:500 clamp(36px,5vw,52px)/1.08 var(--serif);letter-spacing:-.02em;margin:
 .actions-right{display:flex;gap:8px;align-items:center}.danger{color:var(--error);border-color:#e9d4d1}
 .menu{border-top:1px solid var(--line);padding-top:14px;margin-top:20px;display:flex;gap:8px;flex-wrap:wrap}
 .menu button{font-size:11px}.subtle{color:var(--dim);font-size:11px}.divider{border-top:1px solid var(--line);margin:20px 0}.confirm-layer{position:fixed;inset:0;z-index:160;display:grid;place-items:center;background:#1a150f88;padding:20px}.confirm-card{width:min(100%,380px);background:var(--white);border-radius:18px;padding:22px;box-shadow:0 22px 70px #211b1555}.confirm-card h2{font:500 29px/1.15 var(--serif);margin:4px 0 10px}.confirm-card p{font-size:13px;color:var(--dim);line-height:1.7;margin:0 0 22px}.confirm-buttons{display:flex;justify-content:flex-end;gap:9px}.primary.danger-primary{background:#902f2b}
+
+/* v2.58: calm, owner-operated bulk selection */
+.selection-tools{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin:-1px 0 14px}
+.selection-toggle,.selection-options button{border:1px solid var(--line);background:var(--white);border-radius:12px;color:var(--ink);font-size:12px;font-weight:700;padding:9px 13px;min-height:37px}
+.selection-toggle[aria-pressed=true]{border-color:#c6ae87;background:#f1e9db;color:#604621}
+.selection-options{display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+.selection-options button{font-size:11px;min-height:33px;padding:7px 10px}
+.selection-options button:focus-visible,.selection-toggle:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+.selection-scope{font-size:11px;color:var(--dim);padding-left:4px}
+.entry.selecting{grid-template-columns:30px 78px minmax(0,1fr);align-items:center;cursor:pointer}
+.entry.is-selected{border-color:#c3ac82;background:#fffaf0;box-shadow:0 3px 18px #59451d10}
+.select-checkbox{width:20px;height:20px;margin:0 auto;accent-color:#896c40;cursor:pointer}
+.bulk-bar{position:fixed;left:50%;bottom:max(15px,env(safe-area-inset-bottom));transform:translateX(-50%);z-index:60;width:min(calc(100% - 30px),720px);display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 15px;border:1px solid #cbb997;border-radius:17px;background:#fffdfa;box-shadow:0 11px 40px #29210f33}
+.bulk-label{font-weight:750;font-size:13px}.bulk-hint{display:block;font-size:10px;color:var(--dim);font-weight:450}
+.bulk-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.bulk-actions button{min-height:39px;padding:0 12px;border-radius:11px;font-size:12px;font-weight:700}
+.bulk-cancel{border:1px solid var(--line);background:var(--white);color:var(--dim)}
+.bulk-delete{border:0;background:#923d36;color:#fff}
+.bulk-delete:disabled{opacity:.45}
+@media(max-width:760px){.entry.selecting{grid-template-columns:24px 72px minmax(0,1fr);gap:9px}.bulk-bar{bottom:max(9px,env(safe-area-inset-bottom));width:calc(100% - 20px);padding:11px 12px}.bulk-label{font-size:12px}.bulk-actions button{padding:0 10px}.selection-tools{margin-bottom:10px}}
+@media(max-width:390px){.entry.selecting{grid-template-columns:22px 63px minmax(0,1fr);gap:8px}.entry.selecting .cover{width:63px;height:85px}.bulk-hint{font-size:9px}}
 @media(max-width:760px){.shell{display:block;max-width:100%}.sidebar{min-height:0;position:static;padding:13px 18px;background:var(--dark)}.mark{font-size:25px}.mark small{display:none}.nav-note,.side-link,.side-foot{display:none}.main{padding:22px 15px 55px}.top{margin-bottom:19px}.top-tools{gap:4px}.nav-mini{display:none}.logout{padding:0 8px}.selector{padding:12px;gap:9px}.metric{padding:13px}.metric strong{font-size:27px}.toolbar{align-items:stretch}.search{width:100%;min-width:0}.search input{min-width:0}.overlay{padding:0;align-items:flex-end}.sheet{width:100%;max-height:94dvh;border-radius:21px 21px 0 0}.sheet-head{padding:18px 19px 13px}.sheet-scroll{padding:14px 18px 24px}.editor-grid{display:block}.gallery-choices{grid-template-columns:repeat(4,minmax(0,1fr))}.entry{grid-template-columns:72px minmax(0,1fr);gap:11px}.cover{width:72px;height:93px}}
 @media(max-width:390px){.selector{grid-template-columns:1fr}.metrics{gap:6px}.metric{padding:11px}.chip{padding:9px 11px}.entry{padding:10px}.actions-foot{padding-inline:12px}.primary,.secondary{padding-inline:12px}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition:none!important;animation:none!important}}
@@ -296,9 +317,22 @@ window.__ARABISTA_V256_STAFF_READY__=new Promise(async function(resolve,reject){
     <div class="selector"><label class="field"><span>Product</span><select id="product" aria-label="Choose product"><option value="">Loading products…</option></select></label><label class="field"><span>Variation</span><select id="sku" aria-label="Choose variation"><option value="">All variations</option></select></label></div>
     <div class="metrics"><div class="metric"><strong id="metric-all">—</strong><span>All entries</span></div><div class="metric"><strong id="metric-published">—</strong><span>Published</span></div><div class="metric"><strong id="metric-draft">—</strong><span>Drafts</span></div></div>
     <div class="toolbar"><div class="chips" aria-label="Review status filter"><button class="chip" data-filter="ALL" aria-pressed="true">All</button><button class="chip" data-filter="DRAFT" aria-pressed="false">Drafts</button><button class="chip" data-filter="PUBLISHED" aria-pressed="false">Published</button><button class="chip" data-filter="ARCHIVED" aria-pressed="false">Archived</button></div><form class="search" id="search-form" role="search"><input id="search" type="search" placeholder="Search reviews" aria-label="Search reviews" maxlength="100"><button type="submit">Search</button></form></div>
+    <div class="selection-tools">
+      <button type="button" class="selection-toggle" id="selection-toggle" aria-pressed="false">Select reviews</button>
+      <div class="selection-options" id="selection-options" hidden>
+        <button type="button" id="selection-shown">Select shown</button>
+        <button type="button" id="selection-all">Select all matching</button>
+        <button type="button" id="selection-clear">Clear</button>
+        <span class="selection-scope" id="selection-scope" aria-live="polite"></span>
+      </div>
+    </div>
     <p class="message" id="notice" role="status" aria-live="polite">Connecting to Seller Center…</p>
     <div class="library" id="library"></div><button class="more" id="more" type="button" hidden>Show more</button>
   </main>
+</div>
+<div class="bulk-bar" id="bulk-bar" hidden role="region" aria-label="Bulk review actions">
+  <div class="bulk-label"><span id="bulk-count">0 selected</span><span class="bulk-hint" id="bulk-hint">Selected reviews only</span></div>
+  <div class="bulk-actions"><button type="button" class="bulk-cancel" id="bulk-cancel">Cancel</button><button type="button" class="bulk-delete" id="bulk-delete">Delete selected</button></div>
 </div>
 <div class="overlay" id="overlay" hidden>
  <section class="sheet" role="dialog" aria-modal="true" aria-labelledby="editor-title">
@@ -333,7 +367,7 @@ window.__ARABISTA_V256_STAFF_READY__=new Promise(async function(resolve,reject){
 (function(){
 "use strict";
 var $=function(id){return document.getElementById(id)};
-var s={products:[],product:"",sku:"",filter:"ALL",search:"",rows:[],cursor:null,counts:null,epoch:0,editorSeq:0,busy:false,loading:false,editor:null,media:[],lastFocus:null};
+var s={products:[],product:"",sku:"",filter:"ALL",search:"",rows:[],cursor:null,counts:null,epoch:0,editorSeq:0,busy:false,loading:false,editor:null,media:[],lastFocus:null,selecting:false,selected:new Set(),excluded:new Set(),allMatching:false,totalCount:0,listRevision:null};
 function str(v){return String(v==null?"":v)}function valid(r){return !!r&&r.ok===true&&r.environment==="DEV_SANDBOX"&&r.staff_identity_verified===true}
 function msg(t,error){$("notice").textContent=t;$("notice").classList.toggle("error",!!error)}
 var sellerBase=str(window.__ARABISTA_SELLER_BASE__||"/staging/").replace(/\/?$/,"/");["sidebar-products","top-products"].forEach(function(id){$(id).href=sellerBase+"seller-products/"});$("sidebar-discover").href=sellerBase+"seller-discover/";function E(tag,cls,t){var n=document.createElement(tag);if(cls)n.className=cls;if(t!=null)n.textContent=str(t);return n}
@@ -343,7 +377,7 @@ function rpc(name,args){if(typeof window.arabistaReviewsRpcV257==="function")ret
 var g=window.google&&window.google.script&&window.google.script.run;
 if(!g||typeof g[name]!=="function")return Promise.reject(Error("Staff service unavailable"));
 return new Promise(function(resolve,reject){g.withSuccessHandler(resolve).withFailureHandler(reject)[name](args||{})})}
-function setBusy(on){s.busy=!!on;["save","publish","delete","archive","restore"].forEach(function(k){$(k).disabled=!!on});$("refresh").disabled=!!on;if(!on&&s.editor){preview();if(s.editor.cleanupPending){$("publish").disabled=true;$("archive").disabled=true;$("restore").disabled=true}}}
+function setBusy(on){s.busy=!!on;["save","publish","delete","archive","restore"].forEach(function(k){$(k).disabled=!!on});$("refresh").disabled=!!on;["product","sku","search","signout","selection-toggle","selection-shown","selection-all","selection-clear","bulk-cancel","bulk-delete"].forEach(function(k){$(k).disabled=!!on});Array.from(document.querySelectorAll("[data-filter]")).forEach(function(k){k.disabled=!!on});$("more").disabled=!!on;$("search-form").querySelector("button").disabled=!!on;syncSelection();if(!on&&s.editor){preview();if(s.editor.cleanupPending){$("publish").disabled=true;$("archive").disabled=true;$("restore").disabled=true}}}
 function chooseProducts(list){var sel=$("product");sel.replaceChildren();var arr=Array.isArray(list)?list:[];s.products=arr.filter(function(p){return !!str(p.product_id)});
 arr.forEach(function(p){var o=E("option","",p.title||p.product_code||p.product_id);o.value=str(p.product_id);sel.append(o)});
 if(!s.products.length){sel.append(E("option","","No products available"));s.product="";$("sku").replaceChildren(E("option","","All variations"));return}
@@ -355,19 +389,126 @@ function chooseSkus(){var p=s.products.find(function(x){return str(x.product_id)
 async function start(){msg("Loading your products…");try{var out=await rpc("arabistaDevSellerReviewProductsV257",{});if(!valid(out)||!Array.isArray(out.products))throw Error(str(out&&out.reason||"Products unavailable"));chooseProducts(out.products);if(s.product)await load(true);else msg("No products found.",true)}catch(e){msg("Reviews could not connect. Please refresh or sign in again. "+str(e.message),true)}}
 function updateMetrics(c){c=c||{};s.counts=c;$("metric-all").textContent=Number.isFinite(Number(c.all))?str(c.all):"—";$("metric-published").textContent=Number.isFinite(Number(c.published))?str(c.published):"—";$("metric-draft").textContent=Number.isFinite(Number(c.draft))?str(c.draft):"—"}
 async function load(reset){if(!s.product)return;if(s.loading&&!reset)return;var id=reset?++s.epoch:s.epoch;var req={product_id:s.product,sku_id:s.sku,status:s.filter,search:s.search,limit:12};if(!reset&&s.cursor)req.cursor=s.cursor;if(!reset&&!s.cursor)return;
-s.loading=true;$("more").disabled=true;if(reset){s.rows=[];s.cursor=null;$("library").replaceChildren();msg("Loading reviews…")}
+s.loading=true;$("more").disabled=true;if(reset){clearSelection(false);s.rows=[];s.cursor=null;s.totalCount=0;s.listRevision=null;$("library").replaceChildren();msg("Loading reviews…")}
 try{var out=await rpc("arabistaDevSellerReviewPageV257",req);if(id!==s.epoch)return;if(!valid(out)||!Array.isArray(out.items)||!out.counts)throw Error(str(out&&out.reason||"List unavailable"));
 var existing=new Set(s.rows.map(function(r){return str(r.content_id)}));out.items.forEach(function(r){if(!existing.has(str(r.content_id))){s.rows.push(r);existing.add(str(r.content_id))}});
-s.cursor=out.next_cursor||null;updateMetrics(out.counts);render();msg((s.rows.length?str(s.rows.length)+" review entries shown.":"No reviews match this selection."));}
+s.cursor=out.next_cursor||null;s.totalCount=Number(out.total_count)||0;s.listRevision=Number(out.revision);updateMetrics(out.counts);render();msg((s.rows.length?str(s.rows.length)+" review entries shown.":"No reviews match this selection."));}
 catch(e){if(id===s.epoch){if(reset)$("library").replaceChildren(E("div","empty","Reviews are unavailable. Retry using Refresh."));msg("Reviews could not be loaded. "+str(e.message),true)}}
-finally{if(id===s.epoch){s.loading=false;$("more").disabled=false;$("more").hidden=!s.cursor}}}
+finally{if(id===s.epoch){s.loading=false;$("more").disabled=s.busy;$("more").hidden=!s.cursor}}}
 function statusClass(v){v=str(v).toUpperCase();return v==="PUBLISHED"?"published":v==="ARCHIVED"?"archived":v==="CLEANUP_PENDING"?"cleanup":""}
+
+/* v2.58 selection is scoped to one product/SKU/status/search snapshot. */
+function selectionCount(){return s.allMatching?Math.max(0,s.totalCount-s.excluded.size):s.selected.size}
+function selectedReview(id){id=str(id);return s.allMatching?!s.excluded.has(id):s.selected.has(id)}
+function clearSelection(exit){s.selected.clear();s.excluded.clear();s.allMatching=false;if(exit)s.selecting=false;syncSelection()}
+function syncSelection(){
+ $("selection-toggle").setAttribute("aria-pressed",str(s.selecting));
+ $("selection-toggle").textContent=s.selecting?"Done selecting":"Select reviews";
+ $("selection-options").hidden=!s.selecting;
+ $("selection-shown").textContent="Select shown ("+s.rows.length+")";
+ $("selection-all").textContent="Select all matching ("+s.totalCount+")";
+ $("selection-shown").disabled=s.busy||!s.rows.length;
+ $("selection-all").disabled=s.busy||!s.totalCount;
+ $("selection-clear").disabled=s.busy||!selectionCount();
+ var n=selectionCount();
+ $("selection-scope").textContent=s.allMatching?"Across all matching pages":"Only checked entries";
+ $("bulk-bar").hidden=!s.selecting||!n;
+ $("bulk-count").textContent=n+" selected";
+ $("bulk-hint").textContent=s.allMatching?"All matching pages":"Individual selection";
+ $("bulk-delete").disabled=s.busy||!n;
+ $("bulk-cancel").disabled=s.busy;
+}
+function selectionToggle(){
+ if(s.busy)return;
+ if(s.selecting){clearSelection(true)}else{s.selecting=true;clearSelection(false)}
+ render();
+}
+function pickReview(id,on){
+ if(s.busy||!s.selecting)return;
+ id=str(id);
+ if(s.allMatching){if(on)s.excluded.delete(id);else s.excluded.add(id)}
+ else {if(on)s.selected.add(id);else s.selected.delete(id)}
+ render();
+}
+function selectShown(){
+ if(s.busy||!s.selecting)return;
+ s.allMatching=false;s.excluded.clear();
+ s.selected=new Set(s.rows.map(function(r){return str(r.content_id)}));
+ render();
+}
+function selectAllMatching(){
+ if(s.busy||!s.selecting||!s.totalCount)return;
+ s.allMatching=true;s.selected.clear();s.excluded.clear();
+ render();
+}
+function selectionRequest(){
+ var base={phase:"PREVIEW",product_id:s.product,selection_mode:s.allMatching?"FILTER":"IDS"};
+ if(s.allMatching){
+  base.sku_id=s.sku;base.status=s.filter;base.search=s.search;
+  base.expected_total_count=s.totalCount;base.expected_revision=s.listRevision;
+  base.excluded_content_ids=Array.from(s.excluded);
+ }else{
+  base.items=s.rows.filter(function(r){return s.selected.has(str(r.content_id))})
+   .map(function(r){return {content_id:str(r.content_id),expected_revision:Number(r.revision)}})
+ }
+ return base;
+}
+async function bulkDeletion(){
+ if(s.busy||!s.selecting)return;
+ var requested=selectionCount();if(!requested)return;
+ var payload=selectionRequest(),requestId="",finished=false;
+ setBusy(true);syncSelection();
+ try{
+  msg("Checking "+requested+" selected reviews…");
+  var pre=await rpc("arabistaDevSellerReviewBulkDeleteV258",payload);
+  if(!valid(pre)||pre.phase!=="PREVIEW"||pre.prepared!==true||!str(pre.request_id)
+      ||Number(pre.selected_count)!==requested){
+   throw Error(str(pre&&pre.reason||"Selection could not be confirmed. Refresh before retrying."));
+  }
+  requestId=str(pre.request_id);
+  var title="Delete "+requested+" review"+(requested===1?"":"s")+"?";
+  var info="Selected reviews will be removed from the Product Sheet. Unused owned Cloudflare photos will be permanently deleted; shared photos stay protected. This cannot be undone.";
+  if(!(await ask(title,info,"Delete "+requested,true))){msg("Deletion cancelled. No reviews changed.");return}
+  var maxRounds=Math.ceil(requested/10)+5,rounds=0;
+  while(rounds++<maxRounds){
+   var out=await rpc("arabistaDevSellerReviewBulkDeleteV258",{phase:"EXECUTE",product_id:s.product,request_id:requestId});
+   if(!valid(out)||out.phase!=="EXECUTE"||str(out.request_id)!==requestId){
+    throw Error(str(out&&out.reason||"Delete outcome uncertain; refresh before retrying."));
+   }
+   var done=Number(out.processed_count||0);
+   msg("Deleting reviews… "+done+" of "+requested+" processed.");
+   if(out.completed===true){
+    if(done!==requested){throw Error("Bulk result count differs from selection; inspect before retrying.")}
+    finished=true;
+    clearSelection(true);await load(true);
+    var pending=Number(out.cleanup_pending_count||0);
+    msg(pending?requested+" reviews removed from publication; "+pending+" image cleanup(s) need attention."
+       :requested+" reviews deleted. Unused owned photos cleaned; shared photos retained.",pending>0);
+    break;
+   }
+   if(out.next_action!=="CONTINUE"||done>=requested)throw Error("Bulk progress uncertain; refresh before retrying.");
+  }
+  if(!finished)throw Error("Bulk request did not complete; refresh before retrying.");
+ }catch(e){msg("Bulk delete paused. "+str(e.message)+" Do not repeat the request blindly.",true)}
+ finally{setBusy(false);syncSelection()}
+}
+
 function coverUrl(r){var mid=str(r.media_id),a=Array.isArray(r.media)?r.media:[];var m=a.find(function(x){return str(x.media_id)===mid});return safeUrl(m&&m.delivery_url||r.photo_url)}
-function render(){var host=$("library");host.replaceChildren();if(!s.rows.length){host.append(E("div","empty","No reviews in this view."));return}
+function render(){var host=$("library");host.replaceChildren();if(!s.rows.length){host.append(E("div","empty","No reviews in this view."));syncSelection();return}
 s.rows.forEach(function(r,i){var row=E("article","entry"),imgbox=E("div","cover"),url=coverUrl(r);
 if(url){var im=E("img");im.alt="Review photo";im.loading="lazy";im.src=url;imgbox.append(im)}else{imgbox.append(E("div","cover-empty","Text only"))}
 var main=E("div","entry-main"),head=E("div","entry-head");head.append(E("strong","",str(r.display_name||r.title||"Review entry")));var tag=E("span","state-tag "+statusClass(r.status),str(r.status||"DRAFT").toUpperCase()==="CLEANUP_PENDING"?"Cleanup needed":str(r.status||"DRAFT").toLowerCase());head.append(tag);main.append(head,E("p","entry-text",str(r.body)));var meta=E("div","entry-meta",(Array.isArray(r.media_ids)?r.media_ids.length:(url?1:0))+" photo(s) · "+str(r.sku_id||"All variations"));main.append(meta);
-var actions=E("div","entry-actions");actions.append(button("Edit review","text-action",function(){open(r.content_id)}));var order=E("div","order-actions");order.append(button("↑","",function(){move(r,"up")},i===0||s.filter==="ARCHIVED"));order.append(button("↓","",function(){move(r,"down")},(i===s.rows.length-1&&!s.cursor)||s.filter==="ARCHIVED"));actions.append(order);main.append(actions);row.append(imgbox,main);host.append(row)})}
+var actions=E("div","entry-actions");if(!s.selecting){actions.append(button("Edit review","text-action",function(){open(r.content_id)}));var order=E("div","order-actions");order.append(button("↑","",function(){move(r,"up")},i===0||s.filter==="ARCHIVED"));order.append(button("↓","",function(){move(r,"down")},(i===s.rows.length-1&&!s.cursor)||s.filter==="ARCHIVED"));actions.append(order);main.append(actions)}
+if(s.selecting){
+ row.classList.add("selecting");
+ if(selectedReview(r.content_id))row.classList.add("is-selected");
+ var pick=E("input","select-checkbox");pick.type="checkbox";pick.checked=selectedReview(r.content_id);pick.disabled=s.busy;
+ pick.setAttribute("aria-label","Select "+str(r.display_name||r.content_id));
+ pick.addEventListener("change",function(){pickReview(r.content_id,pick.checked)});
+ row.addEventListener("click",function(e){if(e.target!==pick)pickReview(r.content_id,!selectedReview(r.content_id))});
+ row.append(pick);
+}
+row.append(imgbox,main);host.append(row)});syncSelection()}
 function byId(id){return s.rows.find(function(r){return str(r.content_id)===str(id)})}
 function ask(title,detail,action,danger){return new Promise(function(resolve){
 var layer=$("confirm-layer"),yes=$("confirm-accept"),no=$("confirm-cancel");
@@ -431,9 +572,15 @@ async function move(r,direction){if(s.busy||s.loading)return;var out=await mutat
 $("product").addEventListener("change",function(){closeNow();s.product=this.value;chooseSkus();s.search="";$("search").value="";load(true)});
 $("sku").addEventListener("change",function(){closeNow();s.sku=this.value;load(true)});
 Array.from(document.querySelectorAll("[data-filter]")).forEach(function(b){b.addEventListener("click",function(){if(s.filter===b.dataset.filter)return;s.filter=b.dataset.filter;document.querySelectorAll("[data-filter]").forEach(function(x){x.setAttribute("aria-pressed",str(x===b))});closeNow();load(true)})});
-$("search-form").addEventListener("submit",function(e){e.preventDefault();s.search=$("search").value.trim();closeNow();load(true)});
-$("refresh").addEventListener("click",function(){if(!s.product)start();else load(true)});$("signout").addEventListener("click",function(){if(typeof window.arabistaReviewsLogoutV257==="function"){window.arabistaReviewsLogoutV257();return}try{sessionStorage.removeItem("arabista-v256-staff-session")}catch(e){}window.location.assign(sellerBase+"seller-reviews/")});
+$("search-form").addEventListener("submit",function(e){e.preventDefault();if(s.busy)return;s.search=$("search").value.trim();closeNow();load(true)});
+$("refresh").addEventListener("click",function(){if(s.busy)return;if(!s.product)start();else load(true)});$("signout").addEventListener("click",function(){if(typeof window.arabistaReviewsLogoutV257==="function"){window.arabistaReviewsLogoutV257();return}try{sessionStorage.removeItem("arabista-v256-staff-session")}catch(e){}window.location.assign(sellerBase+"seller-reviews/")});
 $("more").addEventListener("click",function(){load(false)});
+$("selection-toggle").addEventListener("click",selectionToggle);
+$("selection-shown").addEventListener("click",selectShown);
+$("selection-all").addEventListener("click",selectAllMatching);
+$("selection-clear").addEventListener("click",function(){clearSelection(false);render()});
+$("bulk-cancel").addEventListener("click",function(){clearSelection(true);render()});
+$("bulk-delete").addEventListener("click",bulkDeletion);
 ["body","heading","display-name","display-date"].forEach(function(k){$(k).addEventListener("input",preview)});
 $("save").addEventListener("click",save);$("publish").addEventListener("click",publication);$("archive").addEventListener("click",function(){disposition("ARCHIVED")});$("restore").addEventListener("click",function(){disposition("DRAFT")});$("delete").addEventListener("click",deletion);
 $("close").addEventListener("click",close);$("cancel").addEventListener("click",close);

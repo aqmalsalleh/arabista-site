@@ -1,0 +1,595 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<meta name="referrer" content="no-referrer">
+<title>Arabista Seller Center · Reviews</title>
+<style>
+@import url("https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=DM+Sans:wght@400;500;600;700&display=swap");
+:root{--ink:#221d17;--dim:#736b61;--soft:#f7f3eb;--page:#f5f1e9;--white:#fffdfa;--line:#e8e0d3;--gold:#aa8c56;--dark:#11100f;--error:#a14237;--serif:"Cormorant Garamond",Georgia,serif;--sans:"DM Sans",system-ui,sans-serif}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--page);color:var(--ink);font:14px/1.55 var(--sans)}button,input,textarea,select{font:inherit}button{cursor:pointer}button:disabled{opacity:.46;cursor:not-allowed}a{color:inherit}button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:2px solid var(--gold);outline-offset:2px}[hidden]{display:none!important}
+.shell{max-width:1170px;margin:auto;display:grid;grid-template-columns:220px minmax(0,1fr);min-height:100dvh}
+.sidebar{background:var(--dark);color:#f8f5ee;padding:29px 19px;position:sticky;top:0;align-self:start;min-height:100dvh}
+.mark{font:500 30px/1 var(--serif);letter-spacing:.01em}.mark small{display:block;font:600 9px/1.5 var(--sans);letter-spacing:.21em;text-transform:uppercase;color:#bcae93;margin-top:9px}
+.nav-note{color:#897c6d;font-size:10px;letter-spacing:.13em;text-transform:uppercase;margin:43px 6px 14px}
+.side-link{display:flex;align-items:center;padding:13px 14px;margin-bottom:6px;color:#bdb5a8;text-decoration:none;border-radius:12px;font-size:13px}
+.side-link.active{background:#29261f;color:#fff4de;box-shadow:inset 3px 0 var(--gold)}
+.side-foot{font-size:11px;color:#7d776d;margin-top:38px;padding:0 12px}
+.main{padding:31px clamp(19px,4vw,46px) 75px;min-width:0}.kicker{font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);font-weight:700}
+h1{font:500 clamp(36px,5vw,52px)/1.08 var(--serif);letter-spacing:-.02em;margin:8px 0 8px}.intro{color:var(--dim);margin:0;font-size:13px}
+.top{display:flex;justify-content:space-between;align-items:start;gap:18px;margin-bottom:27px}.top-tools{display:flex;align-items:center;gap:6px;flex-shrink:0}.nav-mini{font-size:11px;color:var(--dim);text-decoration:none;font-weight:700;padding:0 8px;height:40px;display:inline-flex;align-items:center}.logout{border:1px solid var(--line);background:var(--white);border-radius:11px;min-height:40px;padding:0 11px;color:var(--dim);font-size:11px;font-weight:700}.icon-button{border:1px solid var(--line);background:var(--white);border-radius:11px;min-width:40px;height:40px;color:var(--ink)}
+.selector{display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1fr);gap:12px;background:var(--white);border:1px solid var(--line);border-radius:18px;padding:17px;box-shadow:0 6px 18px #2d24120a}
+.field{display:block;min-width:0}.field>span,.editor-field>span{display:block;color:var(--dim);font-size:11px;font-weight:700;margin-bottom:7px}
+.field select,.editor-field input,.editor-field textarea{width:100%;border:1px solid #dfd6c8;border-radius:10px;background:#fff;color:var(--ink);min-height:44px;padding:10px 12px;outline-offset:1px}
+.field select{font-weight:600}.editor-field textarea{min-height:130px;resize:vertical;font-weight:400}
+.metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:15px 0 25px}
+.metric{border:1px solid var(--line);background:var(--white);border-radius:15px;padding:15px 18px}
+.metric strong{display:block;font:500 30px/1.1 var(--serif);font-variant-numeric:tabular-nums}.metric span{display:block;font-size:11px;color:var(--dim);margin-top:6px}
+.toolbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:space-between;margin-bottom:14px}
+.chips{display:flex;overflow:auto;gap:4px;max-width:100%;scrollbar-width:none}.chips::-webkit-scrollbar{display:none}
+.chip{border:0;background:transparent;padding:10px 13px;border-radius:30px;color:#81776b;font-size:12px;font-weight:650;white-space:nowrap}
+.chip[aria-pressed=true]{background:var(--dark);color:#fff}
+.search{display:flex;gap:5px;align-items:center;border:1px solid var(--line);border-radius:24px;padding:4px 5px 4px 13px;background:var(--white);min-width:min(100%,245px)}
+.search input{min-width:0;flex:1;width:100%;border:0;outline:0;background:transparent;font-size:12px}
+.search button{border:0;border-radius:20px;background:var(--soft);font-size:11px;font-weight:650;padding:7px 10px}
+.message{font-size:12px;color:var(--dim);min-height:19px;margin:12px 0}.message.error{color:var(--error)}
+.library{display:grid;gap:10px}.entry{border:1px solid var(--line);background:var(--white);border-radius:17px;padding:13px;display:grid;grid-template-columns:78px minmax(0,1fr);gap:14px;transition:box-shadow .2s}
+.entry:focus-within{box-shadow:0 3px 25px #59451d18}.cover{width:78px;height:99px;border-radius:10px;background:#f0ebe2;object-fit:cover;display:grid;place-items:center;color:#b8ac9c;overflow:hidden}
+.cover img{height:100%;width:100%;object-fit:cover}.cover-empty{display:flex;align-items:center;justify-content:center;flex-direction:column;gap:2px;font-size:10px;color:#86796a}
+.entry-main{min-width:0}.entry-head{display:flex;align-items:start;gap:8px;justify-content:space-between}
+.entry-head strong{font-size:12px;font-weight:750}.state-tag{font-size:10px;font-weight:700;padding:4px 8px;border-radius:30px;background:#f1ede7;color:#665e53;white-space:nowrap}
+.state-tag.published{background:#f0f4e9;color:#4d7043}.state-tag.archived{background:#f5eeee;color:#8c665f}.state-tag.cleanup{background:#fff1df;color:#a16b26}
+.entry-text{font-size:12px;color:#625b53;line-height:1.6;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;margin:7px 0}
+.entry-meta{font-size:10px;color:#9a8f80}.entry-actions{display:flex;justify-content:space-between;align-items:center;margin-top:10px}
+.text-action{border:0;background:transparent;color:#86683b;font-size:12px;font-weight:700;padding:7px 2px}
+.order-actions{display:flex;gap:4px}.order-actions button{width:31px;height:31px;border-radius:9px;border:1px solid var(--line);background:#fff;color:#5b5042}
+.more{border:1px solid var(--line);background:#fffdfa;color:#8b7045;border-radius:11px;padding:12px 20px;margin:18px auto 0;display:block;font-size:12px;font-weight:700}
+.empty{padding:42px 18px;background:var(--white);border:1px dashed #ddcfb9;border-radius:15px;text-align:center;color:var(--dim)}
+.overlay{position:fixed;inset:0;background:#1a150f9a;z-index:100;display:flex;align-items:center;justify-content:center;padding:18px}
+.sheet{display:flex;flex-direction:column;width:min(100%,790px);max-height:min(92dvh,940px);background:var(--white);border-radius:22px;overflow:hidden;box-shadow:0 30px 85px #0f0e0d45}
+.sheet-head{display:flex;justify-content:space-between;gap:8px;padding:20px 23px 17px;border-bottom:1px solid var(--line)}
+.sheet-head h2{font:500 32px/1.1 var(--serif);margin:5px 0 0}.sheet-scroll{overflow-y:auto;overscroll-behavior:contain;padding:19px 23px 26px;flex:1}
+.editor-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,.88fr);gap:23px}.editor-field{display:block;margin:0 0 17px}
+.helper{font-size:11px;color:var(--dim);margin:7px 0 0}
+.section-label{font:600 19px/1.2 var(--serif);margin:16px 0 12px}
+.photos{display:flex;gap:8px;overflow-x:auto;padding:3px 1px 9px}
+.photo{width:90px;flex:0 0 90px;min-width:0;border:1px solid var(--line);border-radius:11px;padding:5px;background:#fff}
+.photo img{width:78px;height:88px;object-fit:cover;border-radius:7px;display:block;background:var(--soft)}
+.photo button,.photo .tiny{border:0;border-radius:6px;background:#f4f1ec;color:#584c3c;font-size:10px;font-weight:650;padding:5px;margin-top:4px;min-width:20px}
+.photo .tiny{display:block;text-align:center}.photo-actions{display:flex;gap:3px}
+.gallery-choices{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;max-height:220px;overflow:auto}
+.gallery-option{padding:4px;border:1px solid var(--line);border-radius:9px;background:#fff;font-size:10px;overflow:hidden}
+.gallery-option img{height:77px;width:100%;object-fit:cover;border-radius:5px}.gallery-option span{display:block;margin-top:3px}
+.preview{background:#fff;border:1px solid #efefef;border-radius:14px;padding:16px 16px 12px;margin-top:10px}
+.preview h3{font-size:16px;font-weight:700;margin:0 0 11px}
+.product-review-card{padding:13px 0 15px;border-bottom:1px solid #f0f0f0}
+.review-card-meta{display:flex;flex-wrap:wrap;gap:5px 9px;align-items:baseline}.review-card-meta strong{font-size:12px;color:#333;font-weight:700}
+.review-stars{color:#d6a435;letter-spacing:.08em;font-size:12px}.review-date{color:#8d8d8d;font-size:11px}
+.star-picker{display:flex;gap:4px;align-items:center;margin-top:2px}
+.star-picker button{border:0;background:transparent;color:#d6c4a8;font-size:26px;line-height:1;padding:2px 4px;cursor:pointer;min-width:34px;min-height:34px}
+.star-picker button[aria-checked="true"],.star-picker button.on{color:#d6a435}
+.star-picker button:focus-visible{outline:2px solid #c9a227;outline-offset:2px;border-radius:6px}
+.product-review-card p{margin:6px 0 0;font-size:12.5px;line-height:1.7;color:#555;white-space:pre-wrap;overflow-wrap:anywhere}
+.review-card-photos{display:flex;gap:7px;margin-top:9px;overflow:auto}
+.review-thumb{width:73px;height:92px;flex:none;border-radius:9px;object-fit:cover;background:#f7f7f7}
+.actions-foot{display:flex;align-items:center;justify-content:space-between;gap:9px;padding:13px 21px max(14px,env(safe-area-inset-bottom));border-top:1px solid var(--line);background:#fffdfa}
+.primary{border:0;background:var(--dark);color:#fff;border-radius:11px;min-height:43px;padding:0 17px;font-weight:700;font-size:12px}
+.secondary{border:1px solid var(--line);background:#fffdfa;color:var(--ink);border-radius:11px;min-height:43px;padding:0 14px;font-weight:700;font-size:12px}
+.actions-right{display:flex;gap:8px;align-items:center}.danger{color:var(--error);border-color:#e9d4d1}
+.menu{border-top:1px solid var(--line);padding-top:14px;margin-top:20px;display:flex;gap:8px;flex-wrap:wrap}
+.menu button{font-size:11px}.subtle{color:var(--dim);font-size:11px}.divider{border-top:1px solid var(--line);margin:20px 0}.confirm-layer{position:fixed;inset:0;z-index:160;display:grid;place-items:center;background:#1a150f88;padding:20px}.confirm-card{width:min(100%,380px);background:var(--white);border-radius:18px;padding:22px;box-shadow:0 22px 70px #211b1555}.confirm-card h2{font:500 29px/1.15 var(--serif);margin:4px 0 10px}.confirm-card p{font-size:13px;color:var(--dim);line-height:1.7;margin:0 0 22px}.confirm-buttons{display:flex;justify-content:flex-end;gap:9px}.primary.danger-primary{background:#902f2b}
+
+/* v2.58: calm, owner-operated bulk selection */
+.selection-tools{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin:-1px 0 14px}
+.selection-toggle,.selection-options button{border:1px solid var(--line);background:var(--white);border-radius:12px;color:var(--ink);font-size:12px;font-weight:700;padding:9px 13px;min-height:37px}
+.selection-toggle[aria-pressed=true]{border-color:#c6ae87;background:#f1e9db;color:#604621}
+.selection-options{display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+.selection-options button{font-size:11px;min-height:33px;padding:7px 10px}
+.selection-options button:focus-visible,.selection-toggle:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+.selection-scope{font-size:11px;color:var(--dim);padding-left:4px}
+.entry.selecting{grid-template-columns:30px 78px minmax(0,1fr);align-items:center;cursor:pointer}
+.entry.is-selected{border-color:#c3ac82;background:#fffaf0;box-shadow:0 3px 18px #59451d10}
+.select-checkbox{width:20px;height:20px;margin:0 auto;accent-color:#896c40;cursor:pointer}
+.bulk-bar{position:fixed;left:50%;bottom:max(15px,env(safe-area-inset-bottom));transform:translateX(-50%);z-index:60;width:min(calc(100% - 30px),720px);display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 15px;border:1px solid #cbb997;border-radius:17px;background:#fffdfa;box-shadow:0 11px 40px #29210f33}
+.bulk-label{font-weight:750;font-size:13px}.bulk-hint{display:block;font-size:10px;color:var(--dim);font-weight:450}
+.bulk-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.bulk-actions button{min-height:39px;padding:0 12px;border-radius:11px;font-size:12px;font-weight:700}
+.bulk-cancel{border:1px solid var(--line);background:var(--white);color:var(--dim)}
+.bulk-delete{border:0;background:#923d36;color:#fff}
+.bulk-delete:disabled{opacity:.45}
+@media(max-width:760px){.entry.selecting{grid-template-columns:24px 72px minmax(0,1fr);gap:9px}.bulk-bar{bottom:max(9px,env(safe-area-inset-bottom));width:calc(100% - 20px);padding:11px 12px}.bulk-label{font-size:12px}.bulk-actions button{padding:0 10px}.selection-tools{margin-bottom:10px}}
+@media(max-width:390px){.entry.selecting{grid-template-columns:22px 63px minmax(0,1fr);gap:8px}.entry.selecting .cover{width:63px;height:85px}.bulk-hint{font-size:9px}}
+@media(max-width:760px){.shell{display:block;max-width:100%}.sidebar{min-height:0;position:static;padding:13px 18px;background:var(--dark)}.mark{font-size:25px}.mark small{display:none}.nav-note,.side-link,.side-foot{display:none}.main{padding:22px 15px 55px}.top{margin-bottom:19px}.top-tools{gap:4px}.nav-mini{display:none}.logout{padding:0 8px}.selector{padding:12px;gap:9px}.metric{padding:13px}.metric strong{font-size:27px}.toolbar{align-items:stretch}.search{width:100%;min-width:0}.search input{min-width:0}.overlay{padding:0;align-items:flex-end}.sheet{width:100%;max-height:94dvh;border-radius:21px 21px 0 0}.sheet-head{padding:18px 19px 13px}.sheet-scroll{padding:14px 18px 24px}.editor-grid{display:block}.gallery-choices{grid-template-columns:repeat(4,minmax(0,1fr))}.entry{grid-template-columns:72px minmax(0,1fr);gap:11px}.cover{width:72px;height:93px}}
+@media(max-width:390px){.selector{grid-template-columns:1fr}.metrics{gap:6px}.metric{padding:11px}.chip{padding:9px 11px}.entry{padding:10px}.actions-foot{padding-inline:12px}.primary,.secondary{padding-inline:12px}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.1/dist/umd/supabase.js"></script>
+<script>
+(function(){
+"use strict";
+var ASSET_BASE="/v258-staging/";
+var FACADE="https://script.google.com/macros/s/AKfycbzd7yF5b5ZdCAuZGh2DQzn1__MpDSG2zbveeGjZ584bx6NMxRFFq2n4IngjsDeMiNHD/exec";
+var GATEWAY="https://atgztdsfvjqkerteljpb.supabase.co/functions/v1/staff-reviews-gateway";
+var SUPABASE_URL="https://atgztdsfvjqkerteljpb.supabase.co";
+var SESSION_KEY="arabista-v256-staff-session";
+var LOGIN_URL=ASSET_BASE+"seller-reviews/";
+var state={session:null,anonKey:null};
+function requireSupabase_(){
+  if(typeof supabase==="undefined"||!supabase||typeof supabase.createClient!=="function"){
+    throw new Error("Sign-in library failed to load. Check your connection and try again.");
+  }
+}
+function loadSession(){try{return JSON.parse(sessionStorage.getItem(SESSION_KEY)||"null")}catch(e){return null}}
+function clearSession(){try{sessionStorage.removeItem(SESSION_KEY)}catch(e){} state.session=null}
+function jsonp(name,args){
+  return new Promise(function(resolve,reject){
+    var cb="arabistaV256Cb_"+Date.now()+"_"+Math.floor(Math.random()*1e6);
+    var settled=false, script=document.createElement("script");
+    function done(fn,v){if(settled)return;settled=true;try{delete window[cb]}catch(e){}
+      if(script.parentNode)script.parentNode.removeChild(script);fn(v)}
+    window[cb]=function(r){done(resolve,r)};
+    script.onerror=function(){done(reject,new Error("jsonp_transport_failed"))};
+    var p=new URLSearchParams();
+    p.set("format","jsonp");p.set("rpc",name);p.set("callback",cb);
+    if(args!==undefined)p.set("args",JSON.stringify(args));
+    script.src=FACADE+(FACADE.indexOf("?")>=0?"&":"?")+p.toString();
+    document.head.appendChild(script);
+    setTimeout(function(){done(reject,new Error("rpc_timeout"))},20000);
+  });
+}
+async function ensureAnon(){
+  if(state.anonKey)return state.anonKey;
+  var caps=await jsonp("arabistaDevCustomerIdentityCapabilitiesV244",{});
+  if(!caps||!caps.ok||!caps.supabase_anon_key)throw new Error((caps&&caps.reason)||"supabase_anon_unavailable");
+  state.anonKey=caps.supabase_anon_key; return state.anonKey;
+}
+async function staffRpc(rpc,args){
+  if(!state.session||!state.session.access_token)throw new Error("staff_sign_in_required");
+  await ensureAnon();
+  var res=await fetch(GATEWAY,{
+    method:"POST",
+    headers:{
+      "Content-Type":"application/json",
+      "Authorization":"Bearer "+state.session.access_token,
+      "apikey":state.anonKey
+    },
+    body:JSON.stringify({rpc:rpc,args:args||{}})
+  });
+  var body=null; try{body=await res.json()}catch(e){throw new Error("gateway_non_json")}
+  if(res.status===401||(body&&/access_token/i.test(String(body.reason||"")))){
+    clearSession(); location.replace(LOGIN_URL); throw new Error("session_expired");
+  }
+  return body;
+}
+function installBridge(){
+  // Match Apps Script: every google.script.run access is a fresh runner with
+  // isolated success/failure handlers. Concurrent Studio RPCs must not share callbacks.
+  function makeRunner(){
+    var okFn=null, failFn=null, proxied=null;
+    var api={
+      withSuccessHandler:function(ok){okFn=typeof ok==="function"?ok:null;return proxied},
+      withFailureHandler:function(fail){failFn=typeof fail==="function"?fail:null;return proxied}
+    };
+    proxied=new Proxy(api,{
+      get:function(target,prop){
+        if(prop in target) return target[prop];
+        if(prop==="then") return undefined;
+        return function(args){
+          var success=okFn||function(){};
+          var failure=failFn||function(){};
+          staffRpc(String(prop),args||{}).then(function(body){
+            success(body);
+          },function(err){
+            failure(err&&err.message?err:String(err));
+          });
+          return proxied;
+        };
+      }
+    });
+    return proxied;
+  }
+  window.google=window.google||{};
+  google.script=google.script||{};
+  try{
+    Object.defineProperty(google.script,"run",{configurable:true,enumerable:true,get:function(){return makeRunner()}});
+  }catch(e){
+    google.script.run=makeRunner();
+  }
+  try{
+    Object.defineProperty(window,"__ARABISTA_V239_SCRIPT_RUN__",{configurable:true,enumerable:true,get:function(){return makeRunner()}});
+  }catch(e2){
+    window.__ARABISTA_V239_SCRIPT_RUN__=makeRunner();
+  }
+  // Reuse established Seller Products multipart/tus + READY verify contract
+  // (same behavior as v247MediaAdapterScript_), via website staffRpc transport.
+  function postMultipart(url,file){
+    return new Promise(function(resolve,reject){
+      var boundary="----ArabistaFormBoundary"+Date.now()+Math.floor(Math.random()*1e6);
+      var filename=String(file.name||"upload.bin").replace(/[\r\n"]/g,"_");
+      var mime=String(file.type||"application/octet-stream");
+      var head="--"+boundary+"\r\nContent-Disposition: form-data; name=\"file\"; filename=\""+filename+"\"\r\nContent-Type: "+mime+"\r\n\r\n";
+      var tail="\r\n--"+boundary+"--\r\n";
+      var body;try{body=new Blob([head,file,tail]);}catch(e){reject(new Error("Could not prepare the upload"));return;}
+      var xhr=new XMLHttpRequest();xhr.open("POST",url,true);
+      xhr.setRequestHeader("Content-Type","multipart/form-data; boundary="+boundary);
+      xhr.onload=function(){if(xhr.status>=200&&xhr.status<300)resolve();else reject(new Error("Upload rejected"));};
+      xhr.onerror=function(){reject(new Error("Upload network error"));};xhr.send(body);
+    });
+  }
+  function tusUpload(url,file){
+    var chunk=5*1024*1024;
+    return new Promise(function(resolve,reject){
+      function patch(offset){
+        if(offset>=file.size){resolve();return;}
+        var end=Math.min(file.size,offset+chunk);
+        var xhr=new XMLHttpRequest();xhr.open("PATCH",url,true);
+        xhr.setRequestHeader("Tus-Resumable","1.0.0");
+        xhr.setRequestHeader("Upload-Offset",String(offset));
+        xhr.setRequestHeader("Content-Type","application/offset+octet-stream");
+        xhr.onload=function(){
+          if(xhr.status===204||(xhr.status>=200&&xhr.status<300)){
+            patch(Number(xhr.getResponseHeader("Upload-Offset")||end));return;
+          }
+          if(offset===0){postMultipart(url,file).then(resolve).catch(reject);return;}
+          reject(new Error("Upload could not continue"));
+        };
+        xhr.onerror=function(){reject(new Error("Upload interrupted"));};
+        xhr.send(file.slice(offset,end));
+      }
+      patch(0);
+    });
+  }
+  function verifyReady(assetId,kind,tries){
+    return staffRpc("arabistaDevMediaVerifyAsset",{asset_id:assetId,media_kind:kind}).then(function(r){
+      var ready=r&&r.ok&&(r.ready===true||String(r.upload_status||r.status||"").toUpperCase()==="READY"||String(r.outcome||"").indexOf("READY")>=0);
+      if(ready) return {verified:true,media_id:String(assetId),kind:kind==="VIDEO"?"video":"image"};
+      if(tries>=8) throw new Error("Media is still preparing. Try again shortly.");
+      return new Promise(function(resolve,reject){
+        setTimeout(function(){verifyReady(assetId,kind,tries+1).then(resolve).catch(reject);},1500);
+      });
+    });
+  }
+  window.ArabistaSellerProductsV247Media={
+    upload:function(file,opts){
+      opts=opts||{};
+      return new Promise(function(resolve,reject){
+        if(!file){reject(new Error("No file selected"));return;}
+        var kind=/^video\//i.test(String(file.type||""))?"VIDEO":"IMAGE";
+        var preferTus=kind==="VIDEO"&&file.size>=32*1024*1024;
+        staffRpc("arabistaDevMediaCreateDirectUpload",{
+          post_type:"IMAGE",
+          media_kind:kind,
+          filename:file.name,
+          content_type:file.type,
+          size_bytes:file.size,
+          position:0,
+          purpose:opts.purpose||"reviews_studio_v256",
+          upload_mode:preferTus?"tus":undefined
+        }).then(function(created){
+          if(!created||!created.ok||!created.upload_url||!created.asset_id){
+            throw new Error((created&&(created.message||created.reason))||"Upload could not start");
+          }
+          var url=String(created.upload_url);
+          var send=preferTus||String(created.upload_mode||created.upload_method||"").toLowerCase().indexOf("tus")>=0?tusUpload:postMultipart;
+          return send(url,file).then(function(){return verifyReady(created.asset_id,kind,0);});
+        }).then(resolve).catch(function(e){reject(e&&e.message?e:new Error(String(e)));});
+      });
+    }
+  };
+}
+window.__ARABISTA_V256_STAFF_READY__=new Promise(async function(resolve,reject){
+  try{
+    requireSupabase_();
+    state.session=loadSession();
+    if(!state.session||!state.session.access_token){
+      location.replace(LOGIN_URL); reject(new Error("staff_sign_in_required")); return;
+    }
+    await ensureAnon();
+    var probe=await staffRpc("arabistaDevSellerReviewProductsV257",{});
+    if(!probe||probe.ok===false||probe.staff_identity_verified!==true){
+      clearSession(); location.replace(LOGIN_URL+"?err="+encodeURIComponent((probe&&probe.reason)||"staff_not_authorized"));
+      reject(new Error((probe&&probe.reason)||"staff_not_authorized")); return;
+    }
+    installBridge();
+    window.__ARABISTA_SELLER_BASE__=ASSET_BASE;
+    window.arabistaReviewsRpcV257=function(name,args){return staffRpc(String(name),args||{})};
+    window.arabistaReviewsLogoutV257=function(){
+      clearSession();
+      location.replace(LOGIN_URL);
+    };
+    resolve(true);
+  }catch(err){
+    clearSession();
+    location.replace(LOGIN_URL+"?err="+encodeURIComponent(err&&err.message||"auth_failed"));
+    reject(err);
+  }
+});
+})();
+</script>
+<div class="shell">
+  <aside class="sidebar"><div class="mark">Arabista<small>Seller Center</small></div><div class="nav-note">Workspace</div><a class="side-link" id="sidebar-products" href="/staging/seller-products/">Products</a><a class="side-link active" aria-current="page" href="#">Reviews</a><a class="side-link" id="sidebar-discover" href="/staging/seller-discover/">Discover</a><div class="side-foot">Your content, your selection.</div></aside>
+  <main class="main" id="main">
+    <header class="top"><div><div class="kicker">Seller Center / Content</div><h1>Reviews</h1><p class="intro">Manage what appears on your product sheets.</p></div><div class="top-tools"><a class="nav-mini" id="top-products" href="/staging/seller-products/">Products</a><button class="logout" id="signout" type="button">Sign out</button><button class="icon-button" id="refresh" type="button" aria-label="Refresh reviews" title="Refresh">↻</button></div></header>
+    <div class="selector"><label class="field"><span>Product</span><select id="product" aria-label="Choose product"><option value="">Loading products…</option></select></label><label class="field"><span>Variation</span><select id="sku" aria-label="Choose variation"><option value="">All variations</option></select></label></div>
+    <div class="metrics"><div class="metric"><strong id="metric-all">—</strong><span>All entries</span></div><div class="metric"><strong id="metric-published">—</strong><span>Published</span></div><div class="metric"><strong id="metric-draft">—</strong><span>Drafts</span></div></div>
+    <div class="toolbar"><div class="chips" aria-label="Review status filter"><button class="chip" data-filter="ALL" aria-pressed="true">All</button><button class="chip" data-filter="DRAFT" aria-pressed="false">Drafts</button><button class="chip" data-filter="PUBLISHED" aria-pressed="false">Published</button><button class="chip" data-filter="ARCHIVED" aria-pressed="false">Archived</button></div><form class="search" id="search-form" role="search"><input id="search" type="search" placeholder="Search reviews" aria-label="Search reviews" maxlength="100"><button type="submit">Search</button></form></div>
+    <div class="selection-tools">
+      <button type="button" class="selection-toggle" id="selection-toggle" aria-pressed="false">Select reviews</button>
+      <div class="selection-options" id="selection-options" hidden>
+        <button type="button" id="selection-shown">Select shown</button>
+        <button type="button" id="selection-all">Select all matching</button>
+        <button type="button" id="selection-clear">Clear</button>
+        <span class="selection-scope" id="selection-scope" aria-live="polite"></span>
+      </div>
+    </div>
+    <p class="message" id="notice" role="status" aria-live="polite">Connecting to Seller Center…</p>
+    <div class="library" id="library"></div><button class="more" id="more" type="button" hidden>Show more</button>
+  </main>
+</div>
+<div class="bulk-bar" id="bulk-bar" hidden role="region" aria-label="Bulk review actions">
+  <div class="bulk-label"><span id="bulk-count">0 selected</span><span class="bulk-hint" id="bulk-hint">Selected reviews only</span></div>
+  <div class="bulk-actions"><button type="button" class="bulk-cancel" id="bulk-cancel">Cancel</button><button type="button" class="bulk-delete" id="bulk-delete">Delete selected</button></div>
+</div>
+<div class="overlay" id="overlay" hidden>
+ <section class="sheet" role="dialog" aria-modal="true" aria-labelledby="editor-title">
+  <div class="sheet-head"><div><div class="kicker" id="editor-kicker">Review entry</div><h2 id="editor-title">Edit review</h2></div><button class="icon-button" id="close" type="button" aria-label="Close editor">✕</button></div>
+  <div class="sheet-scroll">
+    <div class="editor-grid">
+      <div>
+        <label class="editor-field"><span>Review text</span><textarea id="body" maxlength="1000" placeholder="Review text"></textarea></label>
+        <label class="editor-field"><span>Approved display name (optional)</span><input id="display-name" maxlength="80" placeholder="e.g. A**** or @handle" autocomplete="off"><p class="helper">Use only a name or handle you have approved. No automatic names are created.</p></label>
+        <div class="editor-field"><span>Star rating (optional)</span><div class="star-picker" id="star-picker" role="radiogroup" aria-label="Sample star rating 1 to 5"></div><p class="helper">Editorial sample only — not a verified customer rating. Leave empty if unused.</p></div>
+        <label class="editor-field"><span>Display date (optional)</span><input id="display-date" type="date" autocomplete="off"><p class="helper">Editorial approval or publication date (YYYY-MM-DD). Not a fabricated buyer-submission date.</p></label>
+        <details><summary class="subtle">Internal details</summary><label class="editor-field"><span>Internal heading</span><input id="heading" maxlength="100"></label><p class="helper" id="editor-identifiers"></p></details>
+        <div class="divider"></div><h3 class="section-label">Photos</h3><p class="helper">Tap Cover to choose the first photo. Use arrows to change order, or remove a photo from this entry.</p><div class="photos" id="photos"></div>
+        <details id="picker"><summary class="text-action">+ Add a photo from your library</summary><p class="helper">Only photos already approved for this product are available.</p><div class="gallery-choices" id="candidates"></div></details>
+      </div>
+      <div><h3 class="section-label">Product Sheet preview</h3><p class="helper">Uses the approved review-card layout. Sample stars and dates appear only when you set them. No verified-purchase labels.</p>
+        <div class="preview"><h3>Customer reviews</h3><article class="product-review-card"><div class="review-card-meta" id="preview-meta" hidden><strong id="preview-name"></strong><span class="review-stars" id="preview-stars" hidden></span><span class="review-date" id="preview-date" hidden></span></div><p id="preview-body"></p><div class="review-card-photos" id="preview-photos"></div></article></div>
+        <div class="menu"><button id="archive" class="secondary" type="button">Archive</button><button id="restore" class="secondary" type="button" hidden>Restore draft</button><button id="delete" class="secondary danger" type="button">Delete review</button></div><p class="helper">Archive and Unpublish keep photos. Delete removes owned, unused Cloudflare photos after checking other references.</p>
+      </div>
+    </div>
+  </div>
+  <div class="actions-foot"><button class="secondary" type="button" id="publish">Publish</button><div class="actions-right"><button class="secondary" type="button" id="cancel">Close</button><button class="primary" type="button" id="save">Save changes</button></div></div>
+ </section>
+</div>
+<div class="confirm-layer" id="confirm-layer" hidden>
+ <section class="confirm-card" role="alertdialog" aria-modal="true" aria-labelledby="confirm-title" aria-describedby="confirm-detail">
+  <h2 id="confirm-title">Confirm action</h2><p id="confirm-detail"></p>
+  <div class="confirm-buttons"><button class="secondary" id="confirm-cancel" type="button">Cancel</button><button class="primary" id="confirm-accept" type="button">Confirm</button></div>
+ </section>
+</div>
+<script>
+(function(){
+"use strict";
+var $=function(id){return document.getElementById(id)};
+var s={products:[],product:"",sku:"",filter:"ALL",search:"",rows:[],cursor:null,counts:null,epoch:0,editorSeq:0,busy:false,loading:false,editor:null,media:[],lastFocus:null,selecting:false,selected:new Set(),excluded:new Set(),allMatching:false,totalCount:0,listRevision:null};
+function str(v){return String(v==null?"":v)}function valid(r){return !!r&&r.ok===true&&r.environment==="DEV_SANDBOX"&&r.staff_identity_verified===true}
+function msg(t,error){$("notice").textContent=t;$("notice").classList.toggle("error",!!error)}
+var sellerBase=str(window.__ARABISTA_SELLER_BASE__||"/staging/").replace(/\/?$/,"/");["sidebar-products","top-products"].forEach(function(id){$(id).href=sellerBase+"seller-products/"});$("sidebar-discover").href=sellerBase+"seller-discover/";function E(tag,cls,t){var n=document.createElement(tag);if(cls)n.className=cls;if(t!=null)n.textContent=str(t);return n}
+function safeUrl(url){var u=str(url).trim();return /^https:\/\//i.test(u)?u:""}
+function button(label,cls,fn,disabled){var b=E("button",cls,label);b.type="button";b.disabled=!!disabled;b.addEventListener("click",fn);return b}
+function rpc(name,args){if(typeof window.arabistaReviewsRpcV257==="function")return Promise.resolve(window.arabistaReviewsRpcV257(name,args||{}));
+var g=window.google&&window.google.script&&window.google.script.run;
+if(!g||typeof g[name]!=="function")return Promise.reject(Error("Staff service unavailable"));
+return new Promise(function(resolve,reject){g.withSuccessHandler(resolve).withFailureHandler(reject)[name](args||{})})}
+function setBusy(on){s.busy=!!on;["save","publish","delete","archive","restore"].forEach(function(k){$(k).disabled=!!on});$("refresh").disabled=!!on;["product","sku","search","signout","selection-toggle","selection-shown","selection-all","selection-clear","bulk-cancel","bulk-delete"].forEach(function(k){$(k).disabled=!!on});Array.from(document.querySelectorAll("[data-filter]")).forEach(function(k){k.disabled=!!on});$("more").disabled=!!on;$("search-form").querySelector("button").disabled=!!on;syncSelection();if(!on&&s.editor){preview();if(s.editor.cleanupPending){$("publish").disabled=true;$("archive").disabled=true;$("restore").disabled=true}}}
+function chooseProducts(list){var sel=$("product");sel.replaceChildren();var arr=Array.isArray(list)?list:[];s.products=arr.filter(function(p){return !!str(p.product_id)});
+arr.forEach(function(p){var o=E("option","",p.title||p.product_code||p.product_id);o.value=str(p.product_id);sel.append(o)});
+if(!s.products.length){sel.append(E("option","","No products available"));s.product="";$("sku").replaceChildren(E("option","","All variations"));return}
+var request=str(window.__ARABISTA_REVIEWS_INITIAL_PRODUCT__||"");
+sel.value=s.products.some(function(p){return str(p.product_id)===request})?request:str(s.products[0].product_id);
+s.product=sel.value;chooseSkus()}
+function chooseSkus(){var p=s.products.find(function(x){return str(x.product_id)===s.product});var sel=$("sku");sel.replaceChildren();var all=E("option","","All variations");all.value="";sel.append(all);
+(p&&Array.isArray(p.skus)?p.skus:[]).forEach(function(x){var o=E("option","",x.label||x.sku_code||x.sku_id);o.value=str(x.sku_id);sel.append(o)});sel.value="";s.sku=""}
+async function start(){msg("Loading your products…");try{var out=await rpc("arabistaDevSellerReviewProductsV257",{});if(!valid(out)||!Array.isArray(out.products))throw Error(str(out&&out.reason||"Products unavailable"));chooseProducts(out.products);if(s.product)await load(true);else msg("No products found.",true)}catch(e){msg("Reviews could not connect. Please refresh or sign in again. "+str(e.message),true)}}
+function updateMetrics(c){c=c||{};s.counts=c;$("metric-all").textContent=Number.isFinite(Number(c.all))?str(c.all):"—";$("metric-published").textContent=Number.isFinite(Number(c.published))?str(c.published):"—";$("metric-draft").textContent=Number.isFinite(Number(c.draft))?str(c.draft):"—"}
+async function load(reset){if(!s.product)return;if(s.loading&&!reset)return;var id=reset?++s.epoch:s.epoch;var req={product_id:s.product,sku_id:s.sku,status:s.filter,search:s.search,limit:12};if(!reset&&s.cursor)req.cursor=s.cursor;if(!reset&&!s.cursor)return;
+s.loading=true;$("more").disabled=true;if(reset){clearSelection(false);s.rows=[];s.cursor=null;s.totalCount=0;s.listRevision=null;$("library").replaceChildren();msg("Loading reviews…")}
+try{var out=await rpc("arabistaDevSellerReviewPageV257",req);if(id!==s.epoch)return;if(!valid(out)||!Array.isArray(out.items)||!out.counts)throw Error(str(out&&out.reason||"List unavailable"));
+var existing=new Set(s.rows.map(function(r){return str(r.content_id)}));out.items.forEach(function(r){if(!existing.has(str(r.content_id))){s.rows.push(r);existing.add(str(r.content_id))}});
+s.cursor=out.next_cursor||null;s.totalCount=Number(out.total_count)||0;s.listRevision=Number(out.revision);updateMetrics(out.counts);render();msg((s.rows.length?str(s.rows.length)+" review entries shown.":"No reviews match this selection."));}
+catch(e){if(id===s.epoch){if(reset)$("library").replaceChildren(E("div","empty","Reviews are unavailable. Retry using Refresh."));msg("Reviews could not be loaded. "+str(e.message),true)}}
+finally{if(id===s.epoch){s.loading=false;$("more").disabled=s.busy;$("more").hidden=!s.cursor}}}
+function statusClass(v){v=str(v).toUpperCase();return v==="PUBLISHED"?"published":v==="ARCHIVED"?"archived":v==="CLEANUP_PENDING"?"cleanup":""}
+
+/* v2.58 selection is scoped to one product/SKU/status/search snapshot. */
+function selectionCount(){return s.allMatching?Math.max(0,s.totalCount-s.excluded.size):s.selected.size}
+function selectedReview(id){id=str(id);return s.allMatching?!s.excluded.has(id):s.selected.has(id)}
+function clearSelection(exit){s.selected.clear();s.excluded.clear();s.allMatching=false;if(exit)s.selecting=false;syncSelection()}
+function syncSelection(){
+ $("selection-toggle").setAttribute("aria-pressed",str(s.selecting));
+ $("selection-toggle").textContent=s.selecting?"Done selecting":"Select reviews";
+ $("selection-options").hidden=!s.selecting;
+ $("selection-shown").textContent="Select shown ("+s.rows.length+")";
+ $("selection-all").textContent="Select all matching ("+s.totalCount+")";
+ $("selection-shown").disabled=s.busy||!s.rows.length;
+ $("selection-all").disabled=s.busy||!s.totalCount;
+ $("selection-clear").disabled=s.busy||!selectionCount();
+ var n=selectionCount();
+ $("selection-scope").textContent=s.allMatching?"Across all matching pages":"Only checked entries";
+ $("bulk-bar").hidden=!s.selecting||!n;
+ $("bulk-count").textContent=n+" selected";
+ $("bulk-hint").textContent=s.allMatching?"All matching pages":"Individual selection";
+ $("bulk-delete").disabled=s.busy||!n;
+ $("bulk-cancel").disabled=s.busy;
+}
+function selectionToggle(){
+ if(s.busy)return;
+ if(s.selecting){clearSelection(true)}else{s.selecting=true;clearSelection(false)}
+ render();
+}
+function pickReview(id,on){
+ if(s.busy||!s.selecting)return;
+ id=str(id);
+ if(s.allMatching){if(on)s.excluded.delete(id);else s.excluded.add(id)}
+ else {if(on)s.selected.add(id);else s.selected.delete(id)}
+ render();
+}
+function selectShown(){
+ if(s.busy||!s.selecting)return;
+ s.allMatching=false;s.excluded.clear();
+ s.selected=new Set(s.rows.map(function(r){return str(r.content_id)}));
+ render();
+}
+function selectAllMatching(){
+ if(s.busy||!s.selecting||!s.totalCount)return;
+ s.allMatching=true;s.selected.clear();s.excluded.clear();
+ render();
+}
+function selectionRequest(){
+ var base={phase:"PREVIEW",product_id:s.product,selection_mode:s.allMatching?"FILTER":"IDS"};
+ if(s.allMatching){
+  base.sku_id=s.sku;base.status=s.filter;base.search=s.search;
+  base.expected_total_count=s.totalCount;base.expected_revision=s.listRevision;
+  base.excluded_content_ids=Array.from(s.excluded);
+ }else{
+  base.items=s.rows.filter(function(r){return s.selected.has(str(r.content_id))})
+   .map(function(r){return {content_id:str(r.content_id),expected_revision:Number(r.revision)}})
+ }
+ return base;
+}
+async function bulkDeletion(){
+ if(s.busy||!s.selecting)return;
+ var requested=selectionCount();if(!requested)return;
+ var payload=selectionRequest(),requestId="",finished=false;
+ setBusy(true);syncSelection();
+ try{
+  msg("Checking "+requested+" selected reviews…");
+  var pre=await rpc("arabistaDevSellerReviewBulkDeleteV258",payload);
+  if(!valid(pre)||pre.phase!=="PREVIEW"||pre.prepared!==true||!str(pre.request_id)
+      ||Number(pre.selected_count)!==requested){
+   throw Error(str(pre&&pre.reason||"Selection could not be confirmed. Refresh before retrying."));
+  }
+  requestId=str(pre.request_id);
+  var title="Delete "+requested+" review"+(requested===1?"":"s")+"?";
+  var info="Selected reviews will be removed from the Product Sheet. Unused owned Cloudflare photos will be permanently deleted; shared photos stay protected. This cannot be undone.";
+  if(!(await ask(title,info,"Delete "+requested,true))){msg("Deletion cancelled. No reviews changed.");return}
+  var maxRounds=Math.ceil(requested/10)+5,rounds=0;
+  while(rounds++<maxRounds){
+   var out=await rpc("arabistaDevSellerReviewBulkDeleteV258",{phase:"EXECUTE",product_id:s.product,request_id:requestId});
+   if(!valid(out)||out.phase!=="EXECUTE"||str(out.request_id)!==requestId){
+    throw Error(str(out&&out.reason||"Delete outcome uncertain; refresh before retrying."));
+   }
+   var done=Number(out.processed_count||0);
+   msg("Deleting reviews… "+done+" of "+requested+" processed.");
+   if(out.completed===true){
+    if(done!==requested){throw Error("Bulk result count differs from selection; inspect before retrying.")}
+    finished=true;
+    clearSelection(true);await load(true);
+    var pending=Number(out.cleanup_pending_count||0);
+    msg(pending?requested+" reviews removed from publication; "+pending+" image cleanup(s) need attention."
+       :requested+" reviews deleted. Unused owned photos cleaned; shared photos retained.",pending>0);
+    break;
+   }
+   if(out.next_action!=="CONTINUE"||done>=requested)throw Error("Bulk progress uncertain; refresh before retrying.");
+  }
+  if(!finished)throw Error("Bulk request did not complete; refresh before retrying.");
+ }catch(e){msg("Bulk delete paused. "+str(e.message)+" Do not repeat the request blindly.",true)}
+ finally{setBusy(false);syncSelection()}
+}
+
+function coverUrl(r){var mid=str(r.media_id),a=Array.isArray(r.media)?r.media:[];var m=a.find(function(x){return str(x.media_id)===mid});return safeUrl(m&&m.delivery_url||r.photo_url)}
+function render(){var host=$("library");host.replaceChildren();if(!s.rows.length){host.append(E("div","empty","No reviews in this view."));syncSelection();return}
+s.rows.forEach(function(r,i){var row=E("article","entry"),imgbox=E("div","cover"),url=coverUrl(r);
+if(url){var im=E("img");im.alt="Review photo";im.loading="lazy";im.src=url;imgbox.append(im)}else{imgbox.append(E("div","cover-empty","Text only"))}
+var main=E("div","entry-main"),head=E("div","entry-head");head.append(E("strong","",str(r.display_name||r.title||"Review entry")));var tag=E("span","state-tag "+statusClass(r.status),str(r.status||"DRAFT").toUpperCase()==="CLEANUP_PENDING"?"Cleanup needed":str(r.status||"DRAFT").toLowerCase());head.append(tag);main.append(head,E("p","entry-text",str(r.body)));var meta=E("div","entry-meta",(Array.isArray(r.media_ids)?r.media_ids.length:(url?1:0))+" photo(s) · "+str(r.sku_id||"All variations"));main.append(meta);
+var actions=E("div","entry-actions");if(!s.selecting){actions.append(button("Edit review","text-action",function(){open(r.content_id)}));var order=E("div","order-actions");order.append(button("↑","",function(){move(r,"up")},i===0||s.filter==="ARCHIVED"));order.append(button("↓","",function(){move(r,"down")},(i===s.rows.length-1&&!s.cursor)||s.filter==="ARCHIVED"));actions.append(order);main.append(actions)}
+if(s.selecting){
+ row.classList.add("selecting");
+ if(selectedReview(r.content_id))row.classList.add("is-selected");
+ var pick=E("input","select-checkbox");pick.type="checkbox";pick.checked=selectedReview(r.content_id);pick.disabled=s.busy;
+ pick.setAttribute("aria-label","Select "+str(r.display_name||r.content_id));
+ pick.addEventListener("change",function(){pickReview(r.content_id,pick.checked)});
+ row.addEventListener("click",function(e){if(e.target!==pick)pickReview(r.content_id,!selectedReview(r.content_id))});
+ row.append(pick);
+}
+row.append(imgbox,main);host.append(row)});syncSelection()}
+function byId(id){return s.rows.find(function(r){return str(r.content_id)===str(id)})}
+function ask(title,detail,action,danger){return new Promise(function(resolve){
+var layer=$("confirm-layer"),yes=$("confirm-accept"),no=$("confirm-cancel");
+$("confirm-title").textContent=title;$("confirm-detail").textContent=detail;yes.textContent=action;yes.classList.toggle("danger-primary",!!danger);layer.hidden=false;no.focus();
+function finish(value){layer.hidden=true;yes.removeEventListener("click",accept);no.removeEventListener("click",cancel);layer.removeEventListener("click",outside);document.removeEventListener("keydown",keys);resolve(value)}
+function accept(){finish(true)}function cancel(){finish(false)}function outside(e){if(e.target===layer)finish(false)}
+function keys(e){if(e.key==="Escape"){e.preventDefault();finish(false)}}yes.addEventListener("click",accept);no.addEventListener("click",cancel);layer.addEventListener("click",outside);document.addEventListener("keydown",keys)
+})}
+function mask(name){var n=str(name).trim();if(!n||n.includes("*"))return n;return n.split(/\s+/).filter(Boolean).map(function(word){var a=Array.from(word);return a.length<2?word:a[0]+"*".repeat(a.length-1)}).join(" ")}
+function sourceMedia(r){var ids=Array.isArray(r.media_ids)?r.media_ids.map(str).filter(Boolean):[];if(r.media_id&&!ids.includes(str(r.media_id)))ids.unshift(str(r.media_id));return ids}
+function mediaUrl(id){var found=s.media.find(function(m){return str(m.media_id)===id});if(found)return safeUrl(found.delivery_url);var r=s.editor&&s.editor.row;var item=r&&Array.isArray(r.media)?r.media.find(function(m){return str(m.media_id)===id}):null;return safeUrl((item&&item.delivery_url)||(id===str(r&&r.media_id)?r.photo_url:""))}
+function starsValue(){return s.editor&&Number.isFinite(Number(s.editor.stars))&&s.editor.stars>=1&&s.editor.stars<=5?Number(s.editor.stars):""}
+function dateValue(){var v=$("display-date").value.trim();return /^\d{4}-\d{2}-\d{2}$/.test(v)?v:""}
+function snapshot(){return JSON.stringify({title:$("heading").value.trim(),body:$("body").value.trim(),display_name:$("display-name").value.trim(),sample_stars:starsValue(),display_date:dateValue(),media_ids:s.editor?s.editor.ids:[],media_id:s.editor?s.editor.cover:""})}
+function dirty(){return !!s.editor&&snapshot()!==s.editor.original}
+function editorData(){return {title:$("heading").value.trim(),body:$("body").value.trim(),display_name:$("display-name").value.trim(),sample_stars:starsValue(),display_date:dateValue(),media_ids:s.editor.ids.slice(),media_id:s.editor.cover}}
+function paintStars(){var host=$("star-picker");if(!host)return;host.replaceChildren();for(var i=1;i<=5;i++){(function(n){var b=E("button","", "★");b.type="button";b.setAttribute("role","radio");b.setAttribute("aria-label",n+" stars");var on=starsValue()===n;b.setAttribute("aria-checked",on?"true":"false");if(on)b.classList.add("on");b.disabled=!!(s.editor&&s.editor.cleanupPending);b.addEventListener("click",function(){if(!s.editor||s.editor.cleanupPending)return;s.editor.stars=s.editor.stars===n?"":n;paintStars();preview()});host.append(b)})(i)}}
+function showImages(){if(!s.editor)return;var host=$("photos");host.replaceChildren();
+if(!s.editor.ids.length)host.append(E("p","helper","Text-only review — no photos attached."));
+s.editor.ids.forEach(function(id,i){var card=E("div","photo");var url=mediaUrl(id);if(url){var im=E("img");im.loading="lazy";im.alt="Associated review photo";im.src=url;card.append(im)}else card.append(E("div","cover-empty","Image unavailable"));
+if(!s.editor.cleanupPending)card.append(button(id===s.editor.cover?"Cover ✓":"Set cover","tiny",function(){s.editor.cover=id;showImages();preview()}));
+var acts=E("div","photo-actions");acts.append(button("←","",function(){photoMove(i,-1)},i===0));acts.append(button("→","",function(){photoMove(i,1)},i===s.editor.ids.length-1));acts.append(button("×","",function(){s.editor.ids.splice(i,1);if(s.editor.cover===id)s.editor.cover=s.editor.ids[0]||"";showImages();showCandidates();preview()}));if(!s.editor.cleanupPending)card.append(acts);host.append(card)});
+showCandidates()}
+function photoMove(i,offset){var t=i+offset;if(!s.editor||t<0||t>=s.editor.ids.length)return;var a=s.editor.ids;var b=a[i];a[i]=a[t];a[t]=b;showImages();preview()}
+function showCandidates(){var host=$("candidates");host.replaceChildren();if(s.editor.cleanupPending){host.append(E("p","helper","Cleanup is pending; the review cannot be edited."));return}s.media.forEach(function(m){var id=str(m.media_id),url=safeUrl(m.delivery_url);if(!id||!url||s.editor.ids.includes(id))return;var b=button("","gallery-option",function(){if(s.editor.ids.length>=5){msg("A review can have up to five photos.",true);return}s.editor.ids.push(id);if(!s.editor.cover)s.editor.cover=id;showImages();preview()});var im=E("img");im.loading="lazy";im.alt="Available product photo";im.src=url;b.append(im,E("span","","Add photo"));host.append(b)});if(!host.children.length)host.append(E("p","helper","No additional photos available."))}
+function preview(){if(!s.editor)return;var data=editorData(),meta=$("preview-meta"),nameEl=$("preview-name"),starsEl=$("preview-stars"),dateEl=$("preview-date");
+var hasName=!!data.display_name,hasStars=data.sample_stars!=="",hasDate=!!data.display_date;
+meta.hidden=!(hasName||hasStars||hasDate);nameEl.hidden=!hasName;nameEl.textContent=hasName?mask(data.display_name):"";
+starsEl.hidden=!hasStars;if(hasStars){starsEl.textContent="★".repeat(Number(data.sample_stars));starsEl.setAttribute("aria-label",data.sample_stars+" out of 5 stars")}else{starsEl.textContent="";starsEl.removeAttribute("aria-label")}
+dateEl.hidden=!hasDate;dateEl.textContent=hasDate?data.display_date:"";
+$("preview-body").textContent=data.body;var photos=$("preview-photos");photos.replaceChildren();data.media_ids.forEach(function(id){var url=mediaUrl(id);if(!url)return;var im=E("img","review-thumb");im.src=url;im.loading="lazy";im.alt="Review photo";photos.append(im)});$("save").disabled=s.busy||s.editor.cleanupPending||!dirty()||data.body.length<3}
+async function open(id){var r=byId(id);if(!r||s.busy)return;s.lastFocus=document.activeElement;var rev=++s.editorSeq;var savedStars=Number(r.sample_stars);s.editor={row:r,ids:sourceMedia(r),cover:str(r.media_id),stars:(Number.isFinite(savedStars)&&savedStars>=1&&savedStars<=5)?savedStars:"",original:"",cleanupPending:str(r.status).toUpperCase()==="CLEANUP_PENDING"||r.cleanup_pending===true};if(s.editor.cover&&!s.editor.ids.includes(s.editor.cover))s.editor.ids.unshift(s.editor.cover);
+$("body").value=str(r.body);$("heading").value=str(r.title);$("display-name").value=str(r.display_name);$("display-date").value=/^\d{4}-\d{2}-\d{2}$/.test(str(r.display_date))?str(r.display_date):"";paintStars();s.editor.original=snapshot();$("editor-title").textContent="Edit review";$("editor-kicker").textContent=str(r.status||"DRAFT")+" · "+str(r.sku_id||"All variations");
+$("editor-identifiers").textContent="Content ID: "+str(r.content_id);$("overlay").hidden=false;document.body.style.overflow="hidden";$("publish").textContent=str(r.status).toUpperCase()==="PUBLISHED"?"Unpublish":"Publish";$("publish").hidden=str(r.status).toUpperCase()==="ARCHIVED";
+$("archive").hidden=str(r.status).toUpperCase()==="ARCHIVED";$("restore").hidden=str(r.status).toUpperCase()!=="ARCHIVED";s.media=[];$("delete").textContent=s.editor.cleanupPending?"Retry image cleanup":"Delete review";["body","heading","display-name","display-date"].forEach(function(k){$(k).disabled=s.editor.cleanupPending});$("picker").hidden=s.editor.cleanupPending;$("publish").hidden=s.editor.cleanupPending||$("publish").hidden;$("archive").hidden=s.editor.cleanupPending||$("archive").hidden;$("restore").hidden=s.editor.cleanupPending||$("restore").hidden;showImages();preview();$("body").focus();
+try{var out=await rpc("arabistaDevSellerReviewMediaV257",{product_id:s.product});if(rev!==s.editorSeq||!s.editor||str(s.editor.row.content_id)!==str(id))return;if(!valid(out)||!Array.isArray(out.media))throw Error("Media unavailable");s.media=out.media.filter(function(m){return !!str(m.media_id)&&!!safeUrl(m.delivery_url)});showImages();preview()}catch(e){if(rev===s.editorSeq)msg("Photo library unavailable. Existing review photos remain visible.",true)}}
+async function close(){if(!s.editor)return;if(dirty()&&!(await ask("Discard changes?","Your unsaved edits will be lost.","Discard",false)))return;closeNow()}
+function closeNow(){s.editorSeq++;s.editor=null;$("overlay").hidden=true;document.body.style.overflow="";if(s.lastFocus&&typeof s.lastFocus.focus==="function")s.lastFocus.focus();s.lastFocus=null}
+async function mutate(name,args,check,okMessage){if(s.busy)return null;setBusy(true);
+try{var out=await rpc(name,args);if(!valid(out)||!check(out))throw Error(str(out&&out.reason||"Operation not confirmed"));msg(okMessage||"Changes saved.");return out}
+catch(e){msg("Outcome not confirmed. Refresh before retrying. "+str(e.message),true);return null}finally{setBusy(false)}}
+async function save(){if(!s.editor||s.editor.cleanupPending||!dirty())return;var r=s.editor.row,data=editorData();if(data.body.length<3){msg("Review text is required.",true);return}
+var out=await mutate("arabistaDevSellerReviewSaveV257",Object.assign({product_id:s.product,content_id:r.content_id,expected_revision:Number(r.revision)},data),function(x){return x.content_id===r.content_id&&x.readback_confirmed===true},"Review changes saved.");if(out){closeNow();load(true)}}
+async function publication(){if(!s.editor||s.editor.cleanupPending)return;if(dirty()){msg("Save changes before changing publication.",true);return}var r=s.editor.row,target=str(r.status).toUpperCase()==="PUBLISHED"?"DRAFT":"PUBLISHED";
+var out=await mutate("arabistaDevSellerReviewStatusV257",{product_id:s.product,content_id:r.content_id,expected_revision:Number(r.revision),status:target},function(x){return str(x.status)===target&&x.readback_confirmed===true},target==="DRAFT"?"Review unpublished. Photos retained.":"Review published.");if(out){closeNow();load(true)}}
+async function disposition(target){if(!s.editor||s.editor.cleanupPending)return;if(dirty()){msg("Save your changes before changing status.",true);return}var r=s.editor.row,caption=target==="ARCHIVED"?"Archive this review? It will be removed from the Product Sheet; photos remain stored.":"Restore this review as a draft?";if(!(await ask(target==="ARCHIVED"?"Archive review?":"Restore review?",caption,target==="ARCHIVED"?"Archive":"Restore",false)))return;
+var out=await mutate("arabistaDevSellerReviewStatusV257",{product_id:s.product,content_id:r.content_id,expected_revision:Number(r.revision),status:target},function(x){return str(x.status)===target&&x.readback_confirmed===true},target==="ARCHIVED"?"Review archived. Photos retained.":"Review restored to drafts.");if(out){closeNow();load(true)}}
+async function deletion(){if(!s.editor||s.busy)return;var r=s.editor.row;
+if(!s.editor.cleanupPending&&!(await ask("Delete this review?","Its unused, owned Cloudflare photos will be permanently deleted. Photos still used elsewhere are protected. This cannot be undone.","Delete review",true)))return;
+setBusy(true);
+try{var out=await rpc("arabistaDevSellerReviewDeleteV257",{product_id:s.product,content_id:r.content_id,expected_revision:Number(r.revision)});
+if(!valid(out))throw Error(str(out&&out.reason||"Delete not confirmed"));
+if(out.review_deleted!==true)throw Error(str(out.reason||"Review deletion not confirmed"));
+if(out.media_cleanup_complete!==true){s.editor.cleanupPending=true;$("delete").textContent="Retry image cleanup";["body","heading","display-name","display-date"].forEach(function(k){$(k).disabled=true});paintStars();$("picker").hidden=true;$("publish").hidden=true;$("archive").hidden=true;$("restore").hidden=true;showImages();
+var pending=Array.isArray(out.failed_media_ids)?out.failed_media_ids.length:Number(out.pending_media_count||0);
+msg("Review removed from publication, but "+pending+" image(s) still need Cloudflare cleanup. Retry image cleanup. Shared photos are retained.",true);return}
+msg("Review deleted. Unused owned Cloudflare photos cleaned up; shared images retained.");closeNow();load(true);
+}catch(e){msg("Delete outcome uncertain. Refresh status before retrying. "+str(e.message),true)}
+finally{setBusy(false)}}
+async function move(r,direction){if(s.busy||s.loading)return;var out=await mutate("arabistaDevSellerReviewMoveV257",{product_id:s.product,content_id:r.content_id,direction:direction,expected_revision:Number(r.revision)},function(x){return x.readback_confirmed===true},"Display order saved.");if(out)load(true)}
+$("product").addEventListener("change",function(){closeNow();s.product=this.value;chooseSkus();s.search="";$("search").value="";load(true)});
+$("sku").addEventListener("change",function(){closeNow();s.sku=this.value;load(true)});
+Array.from(document.querySelectorAll("[data-filter]")).forEach(function(b){b.addEventListener("click",function(){if(s.filter===b.dataset.filter)return;s.filter=b.dataset.filter;document.querySelectorAll("[data-filter]").forEach(function(x){x.setAttribute("aria-pressed",str(x===b))});closeNow();load(true)})});
+$("search-form").addEventListener("submit",function(e){e.preventDefault();if(s.busy)return;s.search=$("search").value.trim();closeNow();load(true)});
+$("refresh").addEventListener("click",function(){if(s.busy)return;if(!s.product)start();else load(true)});$("signout").addEventListener("click",function(){if(typeof window.arabistaReviewsLogoutV257==="function"){window.arabistaReviewsLogoutV257();return}try{sessionStorage.removeItem("arabista-v256-staff-session")}catch(e){}window.location.assign(sellerBase+"seller-reviews/")});
+$("more").addEventListener("click",function(){load(false)});
+$("selection-toggle").addEventListener("click",selectionToggle);
+$("selection-shown").addEventListener("click",selectShown);
+$("selection-all").addEventListener("click",selectAllMatching);
+$("selection-clear").addEventListener("click",function(){clearSelection(false);render()});
+$("bulk-cancel").addEventListener("click",function(){clearSelection(true);render()});
+$("bulk-delete").addEventListener("click",bulkDeletion);
+["body","heading","display-name","display-date"].forEach(function(k){$(k).addEventListener("input",preview)});
+$("save").addEventListener("click",save);$("publish").addEventListener("click",publication);$("archive").addEventListener("click",function(){disposition("ARCHIVED")});$("restore").addEventListener("click",function(){disposition("DRAFT")});$("delete").addEventListener("click",deletion);
+$("close").addEventListener("click",close);$("cancel").addEventListener("click",close);
+$("overlay").addEventListener("click",function(e){if(e.target===$("overlay"))close()});
+document.addEventListener("keydown",function(e){if(e.key==="Escape"&&$("confirm-layer").hidden&&!$("overlay").hidden)close()});
+(window.__ARABISTA_V256_STAFF_READY__ || Promise.resolve())
+  .then(function () { start(); })
+  .catch(function () {});
+})();
+</script>
+</body>
+</html>
