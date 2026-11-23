@@ -99,6 +99,14 @@ h1{font:500 clamp(36px,5vw,52px)/1.08 var(--serif);letter-spacing:-.02em;margin:
 .bulk-cancel{border:1px solid var(--line);background:var(--white);color:var(--dim)}
 .bulk-delete{border:0;background:#923d36;color:#fff}
 .bulk-delete:disabled{opacity:.45}
+.bg-job{border:1px solid #decba9;background:linear-gradient(120deg,#fffdfa,#f5efe4);border-radius:17px;padding:15px 17px;margin:5px 0 17px;box-shadow:0 4px 16px #30281a09}
+.bg-job-top{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.bg-job-title{font-size:13px;font-weight:750;color:var(--ink)}.bg-job-status{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#816333}
+.bg-job-status.attention{color:var(--error)}.bg-job-summary{font-size:12px;color:var(--dim);margin:7px 0 9px}
+.bg-job-progress{height:5px;background:#e9dfce;border-radius:99px;overflow:hidden}
+.bg-job-progress span{display:block;height:100%;width:0;background:#a28a62;border-radius:99px;transition:width .25s ease}
+.bg-job-bottom{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-top:10px}
+.bg-job-note{font-size:11px;color:var(--dim)}.bg-job-refresh{border:1px solid #dfd2be;border-radius:9px;background:#fffdfa;color:#695635;font-size:11px;font-weight:700;padding:7px 11px}
 @media(max-width:760px){.entry.selecting{grid-template-columns:24px 72px minmax(0,1fr);gap:9px}.bulk-bar{bottom:max(9px,env(safe-area-inset-bottom));width:calc(100% - 20px);padding:11px 12px}.bulk-label{font-size:12px}.bulk-actions button{padding:0 10px}.selection-tools{margin-bottom:10px}}
 @media(max-width:390px){.entry.selecting{grid-template-columns:22px 63px minmax(0,1fr);gap:8px}.entry.selecting .cover{width:63px;height:85px}.bulk-hint{font-size:9px}}
 @media(max-width:760px){.shell{display:block;max-width:100%}.sidebar{min-height:0;position:static;padding:13px 18px;background:var(--dark)}.mark{font-size:25px}.mark small{display:none}.nav-note,.side-link,.side-foot{display:none}.main{padding:22px 15px 55px}.top{margin-bottom:19px}.top-tools{gap:4px}.nav-mini{display:none}.logout{padding:0 8px}.selector{padding:12px;gap:9px}.metric{padding:13px}.metric strong{font-size:27px}.toolbar{align-items:stretch}.search{width:100%;min-width:0}.search input{min-width:0}.overlay{padding:0;align-items:flex-end}.sheet{width:100%;max-height:94dvh;border-radius:21px 21px 0 0}.sheet-head{padding:18px 19px 13px}.sheet-scroll{padding:14px 18px 24px}.editor-grid{display:block}.gallery-choices{grid-template-columns:repeat(4,minmax(0,1fr))}.entry{grid-template-columns:72px minmax(0,1fr);gap:11px}.cover{width:72px;height:93px}}
@@ -326,6 +334,12 @@ window.__ARABISTA_V256_STAFF_READY__=new Promise(async function(resolve,reject){
         <span class="selection-scope" id="selection-scope" aria-live="polite"></span>
       </div>
     </div>
+    <section class="bg-job" id="bg-job" aria-label="Review deletion status" hidden>
+      <div class="bg-job-top"><span class="bg-job-title">Review deletion</span><span class="bg-job-status" id="bg-job-status">Queued</span></div>
+      <p class="bg-job-summary" id="bg-job-summary" aria-live="polite">Preparing deletion…</p>
+      <div class="bg-job-progress" role="progressbar" id="bg-job-progress" aria-label="Review deletion progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span id="bg-job-fill"></span></div>
+      <div class="bg-job-bottom"><span class="bg-job-note" id="bg-job-note">You can close this tab after the job starts.</span><button class="bg-job-refresh" id="bg-job-refresh" type="button">Refresh status</button></div>
+    </section>
     <p class="message" id="notice" role="status" aria-live="polite">Connecting to Seller Center…</p>
     <div class="library" id="library"></div><button class="more" id="more" type="button" hidden>Show more</button>
   </main>
@@ -367,7 +381,7 @@ window.__ARABISTA_V256_STAFF_READY__=new Promise(async function(resolve,reject){
 (function(){
 "use strict";
 var $=function(id){return document.getElementById(id)};
-var s={products:[],product:"",sku:"",filter:"ALL",search:"",rows:[],cursor:null,counts:null,epoch:0,editorSeq:0,busy:false,loading:false,editor:null,media:[],lastFocus:null,selecting:false,selected:new Set(),excluded:new Set(),allMatching:false,totalCount:0,listRevision:null};
+var s={products:[],product:"",sku:"",filter:"ALL",search:"",rows:[],cursor:null,counts:null,epoch:0,editorSeq:0,busy:false,loading:false,editor:null,media:[],lastFocus:null,selecting:false,selected:new Set(),excluded:new Set(),allMatching:false,totalCount:0,listRevision:null,job:null,jobStatusBusy:false,jobStatusProduct:"",jobQuerySeq:0};
 function str(v){return String(v==null?"":v)}function valid(r){return !!r&&r.ok===true&&r.environment==="DEV_SANDBOX"&&r.staff_identity_verified===true}
 function msg(t,error){$("notice").textContent=t;$("notice").classList.toggle("error",!!error)}
 var sellerBase=str(window.__ARABISTA_SELLER_BASE__||"/staging/").replace(/\/?$/,"/");["sidebar-products","top-products"].forEach(function(id){$(id).href=sellerBase+"seller-products/"});$("sidebar-discover").href=sellerBase+"seller-discover/";function E(tag,cls,t){var n=document.createElement(tag);if(cls)n.className=cls;if(t!=null)n.textContent=str(t);return n}
@@ -386,7 +400,7 @@ sel.value=s.products.some(function(p){return str(p.product_id)===request})?reque
 s.product=sel.value;chooseSkus()}
 function chooseSkus(){var p=s.products.find(function(x){return str(x.product_id)===s.product});var sel=$("sku");sel.replaceChildren();var all=E("option","","All variations");all.value="";sel.append(all);
 (p&&Array.isArray(p.skus)?p.skus:[]).forEach(function(x){var o=E("option","",x.label||x.sku_code||x.sku_id);o.value=str(x.sku_id);sel.append(o)});sel.value="";s.sku=""}
-async function start(){msg("Loading your products…");try{var out=await rpc("arabistaDevSellerReviewProductsV257",{});if(!valid(out)||!Array.isArray(out.products))throw Error(str(out&&out.reason||"Products unavailable"));chooseProducts(out.products);if(s.product)await load(true);else msg("No products found.",true)}catch(e){msg("Reviews could not connect. Please refresh or sign in again. "+str(e.message),true)}}
+async function start(){msg("Loading your products…");try{var out=await rpc("arabistaDevSellerReviewProductsV257",{});if(!valid(out)||!Array.isArray(out.products))throw Error(str(out&&out.reason||"Products unavailable"));chooseProducts(out.products);if(s.product){await load(true);await checkJobStatus()}else msg("No products found.",true)}catch(e){msg("Reviews could not connect. Please refresh or sign in again. "+str(e.message),true)}}
 function updateMetrics(c){c=c||{};s.counts=c;$("metric-all").textContent=Number.isFinite(Number(c.all))?str(c.all):"—";$("metric-published").textContent=Number.isFinite(Number(c.published))?str(c.published):"—";$("metric-draft").textContent=Number.isFinite(Number(c.draft))?str(c.draft):"—"}
 async function load(reset){if(!s.product)return;if(s.loading&&!reset)return;var id=reset?++s.epoch:s.epoch;var req={product_id:s.product,sku_id:s.sku,status:s.filter,search:s.search,limit:12};if(!reset&&s.cursor)req.cursor=s.cursor;if(!reset&&!s.cursor)return;
 s.loading=true;$("more").disabled=true;if(reset){clearSelection(false);s.rows=[];s.cursor=null;s.totalCount=0;s.listRevision=null;$("library").replaceChildren();msg("Loading reviews…")}
@@ -398,46 +412,47 @@ finally{if(id===s.epoch){s.loading=false;$("more").disabled=s.busy;$("more").hid
 function statusClass(v){v=str(v).toUpperCase();return v==="PUBLISHED"?"published":v==="ARCHIVED"?"archived":v==="CLEANUP_PENDING"?"cleanup":""}
 
 /* v2.58 selection is scoped to one product/SKU/status/search snapshot. */
+function jobActive(){return !!s.job&&["QUEUED","RUNNING"].includes(str(s.job.status).toUpperCase())}
 function selectionCount(){return s.allMatching?Math.max(0,s.totalCount-s.excluded.size):s.selected.size}
 function selectedReview(id){id=str(id);return s.allMatching?!s.excluded.has(id):s.selected.has(id)}
 function clearSelection(exit){s.selected.clear();s.excluded.clear();s.allMatching=false;if(exit)s.selecting=false;syncSelection()}
 function syncSelection(){
  $("selection-toggle").setAttribute("aria-pressed",str(s.selecting));
  $("selection-toggle").textContent=s.selecting?"Done selecting":"Select reviews";
- $("selection-options").hidden=!s.selecting;
+ $("selection-options").hidden=!s.selecting;$("selection-toggle").disabled=s.busy||jobActive();
  $("selection-shown").textContent="Select shown ("+s.rows.length+")";
  $("selection-all").textContent="Select all matching ("+s.totalCount+")";
- $("selection-shown").disabled=s.busy||!s.rows.length;
- $("selection-all").disabled=s.busy||!s.totalCount;
+ $("selection-shown").disabled=s.busy||jobActive()||!s.rows.length;
+ $("selection-all").disabled=s.busy||jobActive()||!s.totalCount;
  $("selection-clear").disabled=s.busy||!selectionCount();
  var n=selectionCount();
  $("selection-scope").textContent=s.allMatching?"Across all matching pages":"Only checked entries";
  $("bulk-bar").hidden=!s.selecting||!n;
  $("bulk-count").textContent=n+" selected";
  $("bulk-hint").textContent=s.allMatching?"All matching pages":"Individual selection";
- $("bulk-delete").disabled=s.busy||!n;
+ $("bulk-delete").disabled=s.busy||jobActive()||!n;
  $("bulk-cancel").disabled=s.busy;
 }
 function selectionToggle(){
- if(s.busy)return;
+ if(s.busy||jobActive())return;
  if(s.selecting){clearSelection(true)}else{s.selecting=true;clearSelection(false)}
  render();
 }
 function pickReview(id,on){
- if(s.busy||!s.selecting)return;
+ if(s.busy||jobActive()||!s.selecting)return;
  id=str(id);
  if(s.allMatching){if(on)s.excluded.delete(id);else s.excluded.add(id)}
  else {if(on)s.selected.add(id);else s.selected.delete(id)}
  render();
 }
 function selectShown(){
- if(s.busy||!s.selecting)return;
+ if(s.busy||jobActive()||!s.selecting)return;
  s.allMatching=false;s.excluded.clear();
  s.selected=new Set(s.rows.map(function(r){return str(r.content_id)}));
  render();
 }
 function selectAllMatching(){
- if(s.busy||!s.selecting||!s.totalCount)return;
+ if(s.busy||jobActive()||!s.selecting||!s.totalCount)return;
  s.allMatching=true;s.selected.clear();s.excluded.clear();
  render();
 }
@@ -453,44 +468,79 @@ function selectionRequest(){
  }
  return base;
 }
+
+/* V2.59: the phone only PREVIEWs and STARTs a durable server job.
+   STATUS is read-only. A trigger advances deletion even with this tab closed. */
+function presentJob(job){
+ s.job=job&&typeof job==="object"?job:null;
+ var panel=$("bg-job");panel.hidden=!s.job;
+ if(!s.job){syncSelection();return}
+ var st=str(s.job.status).toUpperCase(),total=Math.max(0,Number(s.job.selected_count)||0);
+ var processed=Math.max(0,Number(s.job.processed_count)||0),deleted=Math.max(0,Number(s.job.deleted_count)||0);
+ var pending=Math.max(0,Number(s.job.cleanup_pending_count)||0);
+ var complete=st==="COMPLETED"||st==="COMPLETED_WITH_CLEANUP";
+ var attention=st==="FAILED"||st==="PAUSED"||st==="COMPLETED_WITH_CLEANUP";
+ $("bg-job-status").textContent=st==="COMPLETED_WITH_CLEANUP"?"Cleanup needed":st==="COMPLETED"?"Completed":st==="RUNNING"?"In progress":st==="QUEUED"?"Queued":st==="PAUSED"?"Paused":st==="FAILED"?"Needs attention":"Status unknown";
+ $("bg-job-status").classList.toggle("attention",attention);
+ $("bg-job-summary").textContent=complete
+  ?deleted+" deleted"+(pending?" · "+pending+" awaiting photo cleanup":"")+" of "+total+" selected."
+  :st==="FAILED"||st==="PAUSED"?"Deletion needs attention. "+processed+" of "+total+" processed. "+str(s.job.last_error||"").slice(0,130)
+  :processed+" of "+total+" processed · "+deleted+" deleted"+(pending?" · "+pending+" cleanup pending":"")+".";
+ var percent=total?Math.min(100,Math.round(100*processed/total)):0;
+ $("bg-job-fill").style.width=percent+"%";
+ $("bg-job-progress").setAttribute("aria-valuenow",str(percent));
+ $("bg-job-note").textContent=jobActive()?"You may close this tab. The server will continue processing.":attention?"Review the status before starting another deletion.":"You can select more reviews when needed.";
+ if(jobActive()&&s.selecting){clearSelection(true);render()}
+ syncSelection();
+}
+async function checkJobStatus(){
+ if(!s.product||(s.jobStatusBusy&&s.jobStatusProduct===s.product))return;
+ var pid=s.product,seq=++s.jobQuerySeq;
+ s.jobStatusBusy=true;s.jobStatusProduct=pid;$("bg-job-refresh").disabled=true;
+ try{
+  var out=await rpc("arabistaDevSellerReviewBulkDeleteV258",{phase:"STATUS",product_id:pid});
+  if(pid!==s.product||seq!==s.jobQuerySeq)return;
+  if(!valid(out)||out.phase!=="STATUS")throw Error(str(out&&out.reason||"Status unavailable"));
+  presentJob(out.job||null);
+ }catch(e){
+  if(pid===s.product){
+   $("bg-job").hidden=false;
+   $("bg-job-status").textContent="Status unavailable";
+   $("bg-job-status").classList.add("attention");
+   $("bg-job-summary").textContent="Could not read deletion status. Refresh before starting another job.";
+   $("bg-job-note").textContent=str(e.message);
+  }
+ }finally{if(s.jobStatusProduct===pid){s.jobStatusBusy=false;$("bg-job-refresh").disabled=false}}
+}
 async function bulkDeletion(){
- if(s.busy||!s.selecting)return;
+ if(s.busy||jobActive()||!s.selecting)return;
  var requested=selectionCount();if(!requested)return;
- var payload=selectionRequest(),requestId="",finished=false;
- setBusy(true);syncSelection();
+ var payload=selectionRequest(),requestId="";
+ setBusy(true);
  try{
   msg("Checking "+requested+" selected reviews…");
   var pre=await rpc("arabistaDevSellerReviewBulkDeleteV258",payload);
   if(!valid(pre)||pre.phase!=="PREVIEW"||pre.prepared!==true||!str(pre.request_id)
-      ||Number(pre.selected_count)!==requested){
+     ||Number(pre.selected_count)!==requested){
    throw Error(str(pre&&pre.reason||"Selection could not be confirmed. Refresh before retrying."));
   }
   requestId=str(pre.request_id);
   var title="Delete "+requested+" review"+(requested===1?"":"s")+"?";
-  var info="Selected reviews will be removed from the Product Sheet. Unused owned Cloudflare photos will be permanently deleted; shared photos stay protected. This cannot be undone.";
+  var info="Selected reviews will be removed from the Product Sheet. Unused owned Cloudflare photos will be permanently deleted; shared photos stay protected. This cannot be undone. Deletion continues after you close this tab.";
   if(!(await ask(title,info,"Delete "+requested,true))){msg("Deletion cancelled. No reviews changed.");return}
-  var maxRounds=Math.ceil(requested/10)+5,rounds=0;
-  while(rounds++<maxRounds){
-   var out=await rpc("arabistaDevSellerReviewBulkDeleteV258",{phase:"EXECUTE",product_id:s.product,request_id:requestId});
-   if(!valid(out)||out.phase!=="EXECUTE"||str(out.request_id)!==requestId){
-    throw Error(str(out&&out.reason||"Delete outcome uncertain; refresh before retrying."));
-   }
-   var done=Number(out.processed_count||0);
-   msg("Deleting reviews… "+done+" of "+requested+" processed.");
-   if(out.completed===true){
-    if(done!==requested){throw Error("Bulk result count differs from selection; inspect before retrying.")}
-    finished=true;
-    clearSelection(true);await load(true);
-    var pending=Number(out.cleanup_pending_count||0);
-    msg(pending?requested+" reviews removed from publication; "+pending+" image cleanup(s) need attention."
-       :requested+" reviews deleted. Unused owned photos cleaned; shared photos retained.",pending>0);
-    break;
-   }
-   if(out.next_action!=="CONTINUE"||done>=requested)throw Error("Bulk progress uncertain; refresh before retrying.");
+  msg("Starting your background deletion…");
+  var started=await rpc("arabistaDevSellerReviewBulkDeleteV258",{phase:"START",product_id:s.product,request_id:requestId});
+  if(!valid(started)||started.phase!=="START"||started.accepted!==true
+    ||!str(started.job_id)||started.worker_ready!==true){
+   throw Error(str(started&&started.reason||"Background worker was not confirmed. No automatic completion can be assumed."));
   }
-  if(!finished)throw Error("Bulk request did not complete; refresh before retrying.");
- }catch(e){msg("Bulk delete paused. "+str(e.message)+" Do not repeat the request blindly.",true)}
- finally{setBusy(false);syncSelection()}
+  clearSelection(true);render();
+  presentJob(started.job||{job_id:str(started.job_id),status:"QUEUED",selected_count:requested,processed_count:0,deleted_count:0,cleanup_pending_count:0});
+  msg("Deletion started in the background. You can close this tab and return later.");
+ }catch(e){
+  msg("Deletion may not have started. Check job status before retrying: "+str(e.message),true);
+  await checkJobStatus();
+ }finally{setBusy(false);syncSelection()}
 }
 
 function coverUrl(r){var mid=str(r.media_id),a=Array.isArray(r.media)?r.media:[];var m=a.find(function(x){return str(x.media_id)===mid});return safeUrl(m&&m.delivery_url||r.photo_url)}
@@ -569,11 +619,11 @@ msg("Review deleted. Unused owned Cloudflare photos cleaned up; shared images re
 }catch(e){msg("Delete outcome uncertain. Refresh status before retrying. "+str(e.message),true)}
 finally{setBusy(false)}}
 async function move(r,direction){if(s.busy||s.loading)return;var out=await mutate("arabistaDevSellerReviewMoveV257",{product_id:s.product,content_id:r.content_id,direction:direction,expected_revision:Number(r.revision)},function(x){return x.readback_confirmed===true},"Display order saved.");if(out)load(true)}
-$("product").addEventListener("change",function(){closeNow();s.product=this.value;chooseSkus();s.search="";$("search").value="";load(true)});
+$("product").addEventListener("change",function(){closeNow();s.product=this.value;s.job=null;$("bg-job").hidden=true;chooseSkus();s.search="";$("search").value="";load(true);checkJobStatus()});
 $("sku").addEventListener("change",function(){closeNow();s.sku=this.value;load(true)});
 Array.from(document.querySelectorAll("[data-filter]")).forEach(function(b){b.addEventListener("click",function(){if(s.filter===b.dataset.filter)return;s.filter=b.dataset.filter;document.querySelectorAll("[data-filter]").forEach(function(x){x.setAttribute("aria-pressed",str(x===b))});closeNow();load(true)})});
 $("search-form").addEventListener("submit",function(e){e.preventDefault();if(s.busy)return;s.search=$("search").value.trim();closeNow();load(true)});
-$("refresh").addEventListener("click",function(){if(s.busy)return;if(!s.product)start();else load(true)});$("signout").addEventListener("click",function(){if(typeof window.arabistaReviewsLogoutV257==="function"){window.arabistaReviewsLogoutV257();return}try{sessionStorage.removeItem("arabista-v256-staff-session")}catch(e){}window.location.assign(sellerBase+"seller-reviews/")});
+$("refresh").addEventListener("click",function(){if(s.busy)return;if(!s.product)start();else{load(true);checkJobStatus()}});$("signout").addEventListener("click",function(){if(typeof window.arabistaReviewsLogoutV257==="function"){window.arabistaReviewsLogoutV257();return}try{sessionStorage.removeItem("arabista-v256-staff-session")}catch(e){}window.location.assign(sellerBase+"seller-reviews/")});
 $("more").addEventListener("click",function(){load(false)});
 $("selection-toggle").addEventListener("click",selectionToggle);
 $("selection-shown").addEventListener("click",selectShown);
@@ -581,6 +631,9 @@ $("selection-all").addEventListener("click",selectAllMatching);
 $("selection-clear").addEventListener("click",function(){clearSelection(false);render()});
 $("bulk-cancel").addEventListener("click",function(){clearSelection(true);render()});
 $("bulk-delete").addEventListener("click",bulkDeletion);
+$("bg-job-refresh").addEventListener("click",checkJobStatus);
+document.addEventListener("visibilitychange",function(){if(!document.hidden&&s.product)checkJobStatus()});
+setInterval(function(){if(s.product&&jobActive()&&!document.hidden&&!s.busy)checkJobStatus()},15000);
 ["body","heading","display-name","display-date"].forEach(function(k){$(k).addEventListener("input",preview)});
 $("save").addEventListener("click",save);$("publish").addEventListener("click",publication);$("archive").addEventListener("click",function(){disposition("ARCHIVED")});$("restore").addEventListener("click",function(){disposition("DRAFT")});$("delete").addEventListener("click",deletion);
 $("close").addEventListener("click",close);$("cancel").addEventListener("click",close);
