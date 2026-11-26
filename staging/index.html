@@ -8813,13 +8813,14 @@ body.is-discover .site-tabs{z-index:45!important}
             <button id="review-sort-recommended"
                     class="review-chip is-selected"
                     type="button">
-              Recommended
+              Most detailed
             </button>
             <button id="review-sort-recent"
                     class="review-chip"
                     type="button">
               Most recent
             </button>
+            <button id="review-sort-shortest" class="review-chip" type="button">Shortest</button>
           </div>
           <div class="review-filters" role="group" aria-label="Filter reviews">
             <button class="review-chip is-selected"
@@ -12019,7 +12020,7 @@ function closeShopDetail() {
 
   var v255Reviews=(function(){
     var current='',status='idle',summary=null,rows=[],studioRows=[],cursor=null,
-      sort='recommended',rating=0,photosOnly=false,previewLimit=3,
+      sort='detailed',rating=0,photosOnly=false,previewLimit=3,
       generation=0,inflight='',filtered=0,returnFocus=null,slides=[],
       cache=new Map(),PAGE=6,TTL=15000,STUDIO_PAGE=6,
       genuinePending=false,studioPending=false,studioCursor=null,
@@ -12188,7 +12189,40 @@ function closeShopDetail() {
         return true;
       });
     }
-    function combinedRows(){return rows.concat(visibleStudio());}
+    function reviewCompare(a,b){
+      if(sort==='recent'){
+        if(a.date!==b.date)return a.date<b.date?1:-1;
+      }else{
+        var delta=b.text.trim().length-a.text.trim().length;
+        if(delta)return sort==='shortest'?-delta:delta;
+      }
+      return a.id<b.id?-1:a.id>b.id?1:0;
+    }
+    // Merge sorted pages; hold back rows that could be preceded by an unread page.
+    function nextReviewSource(){
+      if(cursor&&studioCursor&&rows.length&&studioRows.length)
+        return reviewCompare(rows[rows.length-1],studioRows[studioRows.length-1])<=0?'customer':'studio';
+      return cursor?'customer':studioCursor?'studio':'';
+    }
+    function combinedRows(){
+      if((genuinePending&&!rows.length)||(studioPending&&!studioRows.length))return [];
+      var all=rows.concat(visibleStudio()).sort(reviewCompare),next=nextReviewSource();
+      var boundary=next==='customer'?rows[rows.length-1]:next==='studio'?studioRows[studioRows.length-1]:null;
+      return boundary?all.filter(function(r){return reviewCompare(r,boundary)<=0;}):all;
+    }
+    function loadNextReviewPage(){
+      if(genuinePending||studioInflight)return;
+      var source=nextReviewSource();
+      if(source==='customer')read(true,false,generation);
+      else if(source==='studio')loadStudio(current,generation,true);
+    }
+    function refreshReviewSort(){
+      var token=++generation;
+      inflight='';studioInflight=false;
+      rows=[];studioRows=[];cursor=null;studioCursor=null;previewLimit=3;
+      genuinePending=true;studioPending=true;status='loading';controls();
+      read(false,false,token);loadStudio(current,token,false);
+    }
     function mapStudio(items,startIndex){
       var base=Number(startIndex)||0;
       return (items||[]).filter(function(item){
@@ -12222,7 +12256,7 @@ function closeShopDetail() {
       if(!more){studioPending=true;studioCursor=null;studioTotal=0;studioRatingSummary=null;}
       render();
       call('arabistaDevCustomerW06StudioReadV255',{
-        product_id:pid,limit:STUDIO_PAGE,cursor:more?studioCursor:null
+        product_id:pid,limit:STUDIO_PAGE,sort:sort,cursor:more?studioCursor:null
       },function(out){
         if(pid!==current||token!==generation)return;
         studioInflight=false;studioPending=false;
@@ -12274,7 +12308,8 @@ function closeShopDetail() {
         var yes=Number(b.dataset.reviewStars)===rating;
         b.classList.toggle('is-selected',yes);b.setAttribute('aria-pressed',String(yes));
       });
-      [['review-sort-recommended',sort==='recommended'],['review-sort-recent',sort==='recent'],
+      [['review-sort-recommended',sort==='detailed'],['review-sort-recent',sort==='recent'],
+       ['review-sort-shortest',sort==='shortest'],
        ['review-filter-photos',photosOnly]].forEach(function(p){
         var b=n(p[0]);if(!b)return;
         b.classList.toggle('is-selected',p[1]);b.setAttribute('aria-pressed',String(p[1]));
@@ -12323,11 +12358,12 @@ function closeShopDetail() {
       if(hasGenuine){
         text('product-review-panel-title','All reviews'+
           (overall?' · '+overall.average.toFixed(1)+' · '+overall.reviewCount:' · '+summary.total));
-        text('product-review-filter-note','Showing '+rows.length+' of '+filtered+' matching reviews');
+        text('product-review-filter-note','Showing '+visible.length+' reviews');
       }else{
         text('product-review-panel-title','Customer reviews');
-        text('product-review-filter-note',studioVisible?
-          'Showing '+studioVisible+' of '+(studioPool||studioVisible)+' matching reviews':'No reviews to show.');
+        text('product-review-filter-note',visible.length?
+          'Showing '+visible.length+' of '+(studioPool||studioVisible)+' reviews':
+          (cursor||studioCursor||genuinePending||studioPending?'Loading more reviews is available.':'No reviews to show.'));
       }
       syncReviewCards(target,visible);
       if(!visible.length){
@@ -12340,8 +12376,7 @@ function closeShopDetail() {
           moreBtn=el('button','review-show-more');
           moreBtn.type='button';
           moreBtn.addEventListener('click',function(){
-            if(cursor)read(true);
-            else if(studioCursor)loadStudio(current,generation,true);
+            loadNextReviewPage();
           });
         }
         setMoreLoading(moreBtn,'Load more reviews');
@@ -12352,7 +12387,7 @@ function closeShopDetail() {
       var state=n('v255-review-state');
       var busy=n('product-review-loading');
       var genuineReady=summary!==null,hasGenuine=genuineReady&&summary.total>0;
-      var hasStudio=visibleStudio().length>0,has=hasGenuine||hasStudio;
+      var hasStudio=studioRows.length>0,has=hasGenuine||hasStudio;
       var overall=ratingTotals();
       var awaiting=(genuinePending||studioPending)&&!has;
       show('product-review-summary',!!overall);show('review-quick-summary',!!overall);
@@ -12396,7 +12431,7 @@ function closeShopDetail() {
     function apply(result,more,token,pid){
       if(pid!==current||token!==generation)return;
       if(more&&summary&&summary.revision!==result.revision){
-        summary=null;rows=[];cursor=null;read(false,true);return;
+        summary=null;rows=[];cursor=null;read(false,true,generation);return;
       }
       if(!more||!summary){rows=result.rows.slice();previewLimit=3;}
       else{
@@ -12433,10 +12468,9 @@ function closeShopDetail() {
       });
     }
     function more(){
-      if(!summary&&!studioRows.length)return;
+      if((!summary&&!studioRows.length)||genuinePending||studioInflight)return;
       if(previewLimit<combinedRows().length){previewLimit+=3;render();}
-      else if(cursor){previewLimit+=3;read(true);}
-      else if(studioCursor){previewLimit+=3;loadStudio(current,generation,true);}
+      else if(cursor||studioCursor){previewLimit+=3;loadNextReviewPage();}
     }
     function closeViewer(restore){
       show('review-viewer',false);clear('review-viewer-track');
@@ -12447,10 +12481,9 @@ function closeShopDetail() {
       show('product-review-panel',false);
       // Filters belong to the all-reviews overlay. Return the underlying
       // Product Sheet preview to its original recommended, unfiltered order.
-      if(restore&&(sort!=='recommended'||rating!==0||photosOnly)){
-        sort='recommended';rating=0;photosOnly=false;
-        rows=[];cursor=null;previewLimit=3;
-        controls();read(false);
+      if(restore&&(sort!=='detailed'||rating!==0||photosOnly)){
+        sort='detailed';rating=0;photosOnly=false;
+        refreshReviewSort();
       }
       if(restore){var b=n('product-review-see-all');if(b&&!b.hidden)b.focus();}
     }
@@ -12499,10 +12532,14 @@ function closeShopDetail() {
       if(n('review-viewer-close'))n('review-viewer-close').focus({preventScroll:true});
     }
     function filter(kind,value){
+      if(kind==='sort'&&sort===value)return;
+      if(kind==='rating'&&rating===value)return;
       if(kind==='sort')sort=value;
       if(kind==='rating')rating=value;
       if(kind==='photos')photosOnly=!photosOnly;
-      rows=[];cursor=null;previewLimit=3;status='loading';controls();renderList();read(false);
+      if(kind==='sort'||studioInflight||studioPending){refreshReviewSort();return;}
+      inflight='';rows=[];cursor=null;previewLimit=3;status='loading';genuinePending=true;
+      controls();read(false);
     }
     function init(){
       var section=n('product-reviews'),root=v248Exact.shadow;
@@ -12528,11 +12565,12 @@ function closeShopDetail() {
       }
       function click(id,handler){var b=n(id);if(b)b.addEventListener('click',handler);}
       click('product-review-see-all',panel);click('product-review-count',panel);
-      click('product-review-more',more);click('product-review-retry',function(){read(false,true);});
+      click('product-review-more',more);click('product-review-retry',function(){refreshReviewSort();});
       click('product-review-close',function(){closePanel(true);});
       click('review-viewer-close',function(){closeViewer(true);});
-      click('review-sort-recommended',function(){filter('sort','recommended');});
+      click('review-sort-recommended',function(){filter('sort','detailed');});
       click('review-sort-recent',function(){filter('sort','recent');});
+      click('review-sort-shortest',function(){filter('sort','shortest');});
       click('review-filter-photos',function(){filter('photos');});
       root.querySelectorAll('[data-review-stars]').forEach(function(b){
         b.addEventListener('click',function(){filter('rating',Number(b.dataset.reviewStars)||0);});
@@ -12558,11 +12596,12 @@ function closeShopDetail() {
       inflight='';studioInflight=false;close();current=String(pid||'').trim();
       summary=null;rows=[];studioRows=[];cursor=null;studioCursor=null;studioTotal=0;studioRatingSummary=null;
       status='idle';filtered=0;genuinePending=false;studioPending=false;
-      rating=0;sort='recommended';photosOnly=false;previewLimit=3;
+      rating=0;sort='detailed';photosOnly=false;previewLimit=3;
       controls();render();
       if(current){
         // One generation token for both genuine + studio readers (fixes dropped Studio render).
         var token=++generation;
+        genuinePending=true;studioPending=true;
         read(false,false,token);
         loadStudio(current,token,false);
       }
