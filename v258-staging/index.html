@@ -12729,20 +12729,8 @@ function closeShopDetail() {
       var dealHeading=v248XElement('div','deal-heading');
       dealHeading.appendChild(v248XElement('h3','','Deals & vouchers'));
       dealHead.appendChild(dealHeading);deals.appendChild(dealHead);
-      // Keep the attached reference voucher-card layout, with no fabricated
-      // amount, expiry, claim control, discount or promotion entitlement.
-      var emptyTicket=v248XElement('div','deal-teaser');
-      emptyTicket.style.cursor='default';
-      var ticketIcon=v248XElement('span','deal-teaser-icon');
-      ticketIcon.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7h11v10H3zM14 10h4l3 3v4h-7z"/><circle cx="7.5" cy="18" r="1.5"/><circle cx="17.5" cy="18" r="1.5"/></svg>';
-      var ticketCopy=v248XElement('span','deal-teaser-copy');
-      ticketCopy.appendChild(v248XElement('strong','','No active offers'));
-      ticketCopy.appendChild(v248XElement('span','','Deals and vouchers will appear here when available.'));
-      emptyTicket.appendChild(ticketIcon);emptyTicket.appendChild(ticketCopy);
-      deals.appendChild(emptyTicket);
-      deals.appendChild(v248XElement('p','product-reference-note',
-        'No deals or vouchers are available at the moment.'));
-      deals.hidden=false;
+      // Connected Promotions owns the offer content; no empty banner.
+      deals.hidden=true;
     }
     // Keep the approved Reviews markup and controls; never insert demo ratings.
     var reviews=v248X('product-reviews');
@@ -12750,10 +12738,10 @@ function closeShopDetail() {
     var nav=root.querySelector('#product-sheet .modern-product-tabs');
     if(nav){
       var dealsTab=v248XElement('button','modern-tab','Deals');
-      dealsTab.type='button';dealsTab.setAttribute('data-modern-go','product-deals');
+      dealsTab.type='button';dealsTab.hidden=true;dealsTab.style.display='none';dealsTab.setAttribute('data-modern-go','product-deals');
       var reviewsTab=nav.querySelector('[data-modern-go="product-reviews"]');
       nav.insertBefore(dealsTab,reviewsTab||nav.children[1]||null);
-      nav.style.gridTemplateColumns='repeat(5,minmax(0,1fr))';
+      nav.style.gridTemplateColumns='repeat(4,minmax(0,1fr))';
     }
     var deliveryLine=root.querySelector('#product-overview .modern-shipping-line');
     if(deliveryLine)deliveryLine.remove();
@@ -18430,7 +18418,7 @@ function attachSheetResizeHandle(handle,sheet,apply,ratio){
 
   // V258 P1 — server-authoritative vouchers; no synthetic claims or client-side discount math.
   var v258=(function(){
-    var snap=null,claims=[],offset=0,last=0,loading=false,busyClaim=false,booted=false,epoch=0,transfer=false,walletSeq=0,mode='AUTO',manual={},quoteMeta=null,quoteKey='',pendingKey='',modal=null,kind='',popup=null,focus=null,message='',ids={},guestKey='arabista_v258_guest_token',guestMemory='',activeSig='',claimKey='',walletPending=false,walletReturn=false,quoteNotice='',galleryTrack=null,galleryLayer=null,galleryFrame=0,galleryDelay=0,galleryObserver=null;
+    var snap=null,claims=[],offset=0,last=0,loading=false,busyClaim=false,booted=false,epoch=0,transfer=false,walletSeq=0,mode='AUTO',manual={},quoteMeta=null,quoteKey='',pendingKey='',modal=null,kind='',popup=null,focus=null,message='',ids={},guestKey='arabista_v258_guest_token',guestMemory='',activeSig='',claimKey='',walletPending=false,walletReturn=false,quoteNotice='',galleryTrack=null,galleryLayer=null,galleryFrame=0,galleryObserver=null,gallerySlots=new Map(),walletKnown=false,walletPriority=[],walletOptimize=false;
     var css=[
 '.vp[hidden],.vp-overlay[hidden]{display:none!important}.vp,.vp *,.vp-overlay,.vp-overlay *{box-sizing:border-box}.vp{font:13px/1.45 "DM Sans",system-ui,sans-serif;color:#332824}.vp button,.vp-overlay button{font-family:inherit;cursor:pointer;transition:transform .2s,background .2s}.vp button:active,.vp-overlay button:active{transform:scale(.96)}.vp button:disabled,.vp-overlay button:disabled{cursor:default;transform:none}',
 '#shop .vp-shop{width:auto!important;max-width:1190px;margin:10px clamp(12px,3vw,28px) 0;min-width:0;overflow:hidden}.vp-banner{position:relative;isolation:isolate;display:grid;grid-template-columns:minmax(0,1fr) auto auto;align-items:center;gap:clamp(6px,2vw,12px);padding:12px 10px;border-radius:15px;background:linear-gradient(115deg,#79364a,#481c2a);color:#fff5e8;box-shadow:0 5px 16px #702a4020;overflow:hidden;animation:vp-in .42s both}.vp-banner::after,.vp-gift::after{content:"";position:absolute;inset:-70%;z-index:-1;background:linear-gradient(105deg,transparent 46%,#f2d9ae17 50%,transparent 54%);transform:translateX(-60%);animation:vp-shine 8s ease-in-out infinite;pointer-events:none}.vp-over{font-size:9px;font-weight:700;letter-spacing:.13em;text-transform:uppercase;color:#e5caa1}.vp-banner strong{display:block;font-size:clamp(16px,4.8vw,22px);line-height:1.18;letter-spacing:-.035em;overflow-wrap:anywhere}.vp-banner small{display:block;color:#ead9bf;font-size:10px}.vp-clock{display:flex;gap:3px;align-items:center;color:#f5dcb1;font-variant-numeric:tabular-nums}.vp-clock span{background:#39142080;border:1px solid #e7c8a627;border-radius:6px;padding:5px 4px;min-width:24px;text-align:center;font-size:16px;font-weight:750}.vp-clock-label{font-size:9px;color:#e9d7b9;text-align:center;margin-bottom:3px}.vp-urgent{animation:vp-urgent 2s infinite}.vp-wallet{display:grid!important;justify-items:center;gap:3px;background:transparent!important;border:0!important;padding:0 2px!important;min-width:44px;min-height:44px;color:#f5e9d6!important;font-size:9px!important;white-space:nowrap}.vp-icon{display:grid;place-items:center;color:#702a40;flex-shrink:0}.vp-wallet .vp-icon{width:34px;height:34px;border-radius:50%;background:#ead2a6}.vp-icon svg{width:21px;height:21px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}',
@@ -18442,7 +18430,8 @@ function attachSheetResizeHandle(handle,sheet,apply,ratio){
 '@keyframes vp-in{from{opacity:.2;transform:translateY(6px)}to{opacity:1;transform:none}}@keyframes vp-fade{from{opacity:0}to{opacity:1}}@keyframes vp-sheet{from{opacity:.4;transform:translateY(45px)}to{opacity:1;transform:none}}@keyframes vp-gift{from{opacity:0;transform:translateY(12px) scale(.94)}to{opacity:1;transform:none}}@keyframes vp-claim{0%{transform:scale(.93)}65%{transform:scale(1.04)}100%{transform:none}}@keyframes vp-shine{0%,65%{transform:translateX(-60%)}90%,100%{transform:translateX(60%)}}@keyframes vp-urgent{0%,100%{opacity:1}50%{opacity:.65}}@media(max-width:360px){.vp-banner{padding:10px 7px;gap:4px}.vp-clock span{min-width:22px;padding:4px 3px;font-size:14px}.vp-ticket{grid-template-columns:60px minmax(0,1fr) 65px}.vp-copy{padding:9px 5px}.vp-modal{padding-inline:10px}}@media(prefers-reduced-motion:reduce){.vp *,.vp-overlay *,.vp-banner,.vp-banner::after,.vp-gift::after{animation:none!important;transition:none!important}}'
     ].join('\n')+
 "\n/* v2.58 mobile owner refinement */\n#commerce-panel[data-view=\"basket\"],#commerce-panel[data-view=\"variant\"]{height:100%;max-height:100%;border-radius:0;padding-top:env(safe-area-inset-top,0px)}\n#commerce-panel[data-view=\"basket\"] .commerce-handle,#commerce-panel[data-view=\"variant\"] .commerce-handle{display:none}\n.vp-close{padding:0;display:grid;place-items:center;aspect-ratio:1;box-sizing:border-box}.vp-close svg{display:block;width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round}\n.vp-ticket{min-height:104px;animation:none}.vp-ticket.vp-new{animation:vp-in .28s both}.vp-ticket .vp-action button,.vp-ticket .vp-status{height:38px;min-height:38px;max-height:38px;width:100%;padding:0 2px;line-height:1;border:0;border-radius:8px}.vp-ticket .vp-status.claimed{animation:none}.vp-ticket .vp-status.vp-success{animation:vp-claim .35s both}.vp-ticket .vp-action .vp-busy{background:#702a40!important;color:#fff!important}.vp-ticket .vp-copy{min-height:77px;display:flex;flex-direction:column;justify-content:center}\n.vp-spinner{display:block;flex:none;width:17px;height:17px;border:1.5px solid currentColor;border-right-color:transparent;border-radius:50%;animation:vp-spin .85s linear infinite}.vp-busy .vp-spinner{margin:auto}.vp-wallet-list{display:grid;gap:9px}.vp-wallet-list>.vp-ticket{margin:0}.vp-wallet-list>.vp-empty{margin:0}.vp-history{margin-top:12px}.vp-modal .vp-msg{min-height:20px;margin:8px 3px 0}.vp-msg.vp-error{color:#9a3845}\n.vp-quote-loading{display:flex;align-items:center;gap:13px;min-height:72px;position:relative;overflow:hidden}.vp-quote-loading .vp-spinner{width:23px;height:23px;color:#9a764b}.vp-load-copy{flex:1;min-width:0}.vp-skeleton{display:block;position:relative;overflow:hidden;width:90%;height:6px;margin-top:8px;background:#ebdfce;border-radius:9px}.vp-skeleton.short{width:55%}.vp-skeleton::after{content:\"\";position:absolute;inset:0;background:linear-gradient(100deg,transparent,#fff9,transparent);transform:translateX(-100%);animation:vp-skeleton 1.6s ease-in-out infinite}\n.vp-manage{min-width:73px;min-height:40px}.vp-applied{border-top:1px solid #e7dac8;padding-top:9px;margin-top:9px;font-size:11px;color:#58714f}.vp-applied strong{font-size:12px}\n.vp-savings-wrap{margin-top:13px;border-radius:11px;overflow:hidden;background:linear-gradient(120deg,#f8eddb,#eddbc0);animation:vp-in .4s both}.vp-savings-wrap .vp-savings{margin:0;background:none;animation:none;border-radius:0}.vp-more{display:flex;align-items:center;justify-content:space-between;gap:8px;width:calc(100% - 24px);margin:0 12px;padding:10px 0 11px;border:0;border-top:1px solid #d9c6a8;background:transparent;color:#702a40;font-size:11px;text-align:left;font-weight:650;min-height:40px}.vp-more span:last-child{white-space:nowrap}\n@keyframes vp-spin{to{transform:rotate(360deg)}}@keyframes vp-skeleton{to{transform:translateX(100%)}}@media(prefers-reduced-motion:reduce){.vp-spinner,.vp-skeleton::after,.vp-ticket.vp-new,.vp-ticket .vp-status.vp-success,.vp-savings-wrap{animation:none!important}}\n"+
-"\n/* Gallery Privileges — editorial rails, never placed over the photograph. */\n#product-gallery .vp-gallery[hidden]{display:none!important}\n#product-gallery .vp-gallery{position:absolute;inset:0;z-index:2;pointer-events:none;overflow:hidden;isolation:isolate;color:#702a40;font-family:\"DM Sans\",system-ui,sans-serif}\n#product-gallery .vp-rail{position:absolute;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;align-items:center;justify-content:center;width:var(--vp-rail);max-height:calc(100% - 32px);overflow:hidden;pointer-events:none;text-align:center}\n#product-gallery .vp-rail-left{left:var(--vp-left);border:1px solid #d9c6a990;border-radius:34px;background:linear-gradient(155deg,#f8f2e9,#eadcc8);padding:11px 3px 7px;box-shadow:0 5px 14px #7755360b;gap:3px;isolation:isolate}\n#product-gallery .vp-rail-left > *{flex:none;max-width:100%}\n#product-gallery .vp-rail-left::before{content:\"\";position:absolute;inset:0;z-index:-1;background:linear-gradient(110deg,transparent 25%,#fff9 50%,transparent 75%);transform:translateX(-130%);pointer-events:none}\n#product-gallery .vp-gallery-enter .vp-rail-left::before{animation:vp-rail-glint .65s .12s both}\n#product-gallery .vp-rail-left.is-owned{background:linear-gradient(155deg,#803c50,#4c202e);border-color:#bea07c;color:#f8ead2;box-shadow:0 5px 15px #702a4016}\n#product-gallery .vp-rail-left.is-owned::before{background:linear-gradient(110deg,transparent 25%,#e9cda32b 50%,transparent 75%)}\n#product-gallery .vp-rail-kicker{max-width:100%;font-size:clamp(7px,calc(var(--vp-rail)*.13),8px);line-height:1.2;letter-spacing:.095em;font-weight:750;text-transform:uppercase;color:#89683f;overflow-wrap:normal}\n#product-gallery .is-owned .vp-rail-kicker{color:#e5caa1}\n#product-gallery .vp-rail-rule{height:1px;width:23px;margin:4px auto;background:currentColor;opacity:.34;flex:none}\n#product-gallery .vp-rail-prefix{font-size:10px;letter-spacing:.04em;font-weight:650;line-height:1.1}\n#product-gallery .vp-rail-value{font:600 var(--vp-value-size,26px)/.98 \"Cormorant Garamond\",Georgia,serif;letter-spacing:-.045em;font-variant-numeric:lining-nums;white-space:nowrap;max-width:100%}\n#product-gallery .vp-rail-unit{font-size:9px;line-height:1.15;letter-spacing:.075em;font-weight:700}\n#product-gallery .vp-rail-terms{font-size:9px;line-height:1.22;letter-spacing:-.015em;color:#785b48;overflow-wrap:anywhere;max-width:100%;display:flex;flex-direction:column;gap:3px}\n#product-gallery .is-owned .vp-rail-terms{color:#f1dfc6}\n#product-gallery .vp-rail-time{font-size:clamp(10px,calc(var(--vp-rail)*.21),14px);font-weight:750;letter-spacing:-.045em;font-variant-numeric:tabular-nums;white-space:nowrap}\n#product-gallery .vp-rail-time.vp-long{font-size:clamp(9px,calc((var(--vp-rail) - 8px)*.18),12px);letter-spacing:-.055em}\n#product-gallery .vp-compact .vp-rail-left{padding:7px 3px 4px;gap:2px}\n#product-gallery .vp-compact .vp-rail-rule{margin:2px auto}\n#product-gallery .vp-compact .vp-rail-terms{gap:2px}\n#product-gallery .vp-rail-time-label{font-size:8px;color:#e3c8a4}\n#product-gallery .vp-rail-action{display:flex;align-items:center;justify-content:center;gap:1px;pointer-events:auto;touch-action:pan-x pan-y;min-width:44px;min-height:44px;max-width:100%;margin:1px 0 0;padding:0 2px;border:0;border-radius:12px;background:transparent;color:#702a40;font:700 10px/1.1 \"DM Sans\",system-ui,sans-serif;white-space:nowrap;cursor:pointer}\n#product-gallery .is-owned .vp-rail-action{color:#f6e5c7}\n#product-gallery .vp-rail-action:focus-visible{outline:2px solid #b69763;outline-offset:-2px}\n#product-gallery .vp-rail-action:active{transform:scale(.96)}\n#product-gallery .vp-rail-action svg{width:10px;height:12px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;flex:none}\n#product-gallery .vp-rail-right{right:var(--vp-right);gap:9px;color:#98764e;top:47%;max-height:calc(100% - 78px)}\n#product-gallery .vp-rail-ornament{width:1px;height:21px;background:linear-gradient(transparent,#b99c72);flex:none}\n#product-gallery .vp-rail-ornament:last-child{transform:rotate(180deg)}\n#product-gallery .vp-rail-diamond{width:6px;height:6px;transform:rotate(45deg);border:1px solid #b99c72;flex:none}\n#product-gallery .vp-rail-title{writing-mode:vertical-rl;transform:rotate(180deg);font:600 13px/1 \"Cormorant Garamond\",Georgia,serif;letter-spacing:.10em;max-height:clamp(65px,calc(var(--vp-frame-height) - 170px),132px);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-transform:uppercase}\n#product-gallery .vp-gallery-enter .vp-rail-left{animation:vp-rail-reveal .6s cubic-bezier(.22,1,.36,1) both}\n#product-gallery .vp-gallery-enter .vp-rail-right{animation:vp-rail-reveal .7s .12s cubic-bezier(.22,1,.36,1) both}\n@keyframes vp-rail-reveal{from{opacity:0;transform:translateY(calc(-50% + 9px))}to{opacity:1;transform:translateY(-50%)}}\n@keyframes vp-rail-glint{from{transform:translateX(-130%)}to{transform:translateX(130%)}}\n@media(prefers-reduced-motion:reduce){#product-gallery .vp-gallery *,#product-gallery .vp-gallery *::before{animation:none!important;transition:none!important}}\n";
+"\n/* Stage 4A: full-height editorial surfaces, aligned to each moving slide. */\n#product-gallery .vp-gallery[hidden],#product-gallery .vp-slide-priv[hidden],#product-gallery .vp-rail[hidden]{display:none!important}\n#product-gallery .vp-gallery{position:absolute;inset:0;z-index:2;pointer-events:none;overflow:hidden;isolation:isolate;font-family:\"DM Sans\",system-ui,sans-serif}\n#product-gallery .product-gallery-count{z-index:3}\n#product-gallery .vp-slide-priv{position:absolute;top:0;height:100%;pointer-events:none;overflow:hidden}\n#product-gallery .vp-rail{position:absolute;top:0;bottom:0;display:flex;flex-direction:column;justify-content:center;align-items:stretch;gap:4px;box-sizing:border-box;overflow:hidden;text-align:center;padding:7px 3px 32px;background:linear-gradient(150deg,#813e51,#572437 53%,#411724);color:#f9e8cc;pointer-events:none}\n#product-gallery .vp-rail-left{left:0;border-right:1px solid #c8a77b55}\n#product-gallery .vp-rail-right{right:0;border-left:1px solid #c8a77b55;background:linear-gradient(205deg,#78354b,#4b1b2b)}\n#product-gallery .vp-rail:empty{background:linear-gradient(155deg,#f0e5d5,#e0cbb0)}\n#product-gallery .vp-rail-offer{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;flex:none;min-width:0;max-width:100%;padding:2px 0}\n#product-gallery .vp-rail-offer+.vp-rail-offer{border-top:1px solid #e6c79a55;padding-top:5px}\n#product-gallery .vp-rail-kicker{font-size:8px;line-height:1.2;font-weight:750;letter-spacing:.025em;color:#edd1a5;overflow-wrap:anywhere}\n#product-gallery .vp-rail-prefix{font-size:9px;line-height:1.1;font-weight:650}\n#product-gallery .vp-rail-value{font:600 var(--vp-value-size,26px)/1.1 \"Cormorant Garamond\",Georgia,serif;letter-spacing:-.04em;color:#f6deb2;white-space:nowrap;font-variant-numeric:lining-nums}\n#product-gallery .vp-rail-unit{font-size:8px;line-height:1.2;font-weight:700;overflow-wrap:anywhere}\n#product-gallery .vp-rail-terms{display:grid;gap:1px;max-width:100%;font-size:9px;line-height:1.2;color:#f8ead7;overflow-wrap:anywhere}\n#product-gallery .vp-rail-time{font-size:12px;font-weight:750;font-variant-numeric:tabular-nums;white-space:nowrap;letter-spacing:-.045em;color:#f5d79e}\n#product-gallery .vp-rail-time.vp-long{font-size:10px}\n#product-gallery .vp-rail-action{display:flex;align-items:center;justify-content:center;pointer-events:auto;touch-action:pan-x pan-y;min-width:44px;min-height:44px;max-width:100%;padding:0 2px;border:0;background:transparent;color:#f9e4bc;font:750 10px/1.15 \"DM Sans\",system-ui,sans-serif;cursor:pointer;text-decoration:underline;text-underline-offset:3px}\n#product-gallery .vp-rail-action:focus-visible{outline:2px solid #f6d8a5;outline-offset:-2px}\n#product-gallery .vp-rail-more{min-height:44px;font-size:9px;align-self:center}\n@media(prefers-reduced-motion:reduce){#product-gallery .vp-gallery *,#product-gallery .vp-gallery *::before{animation:none!important;transition:none!important}}\n";
+    css+="\n#vp-product{padding:0;overflow:hidden;background:#fffaf3;border-color:#dcc7aa}\n#vp-product .vp-product-main{padding:13px;background:linear-gradient(120deg,#78364a,#481c2a);color:#fff3df}\n#vp-product .vp-product-main strong{display:block;color:#f9dfb1;font:650 26px/1.12 \"Cormorant Garamond\",Georgia,serif}\n#vp-product .vp-product-main .vp-note{color:#f0ddc5}\n#vp-product .vp-product-main .vp-btn{background:#ead2a6;color:#481c2a!important}\n.vp-collection{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 12px;color:#702a40;font-size:12px;font-weight:700}\nbutton.vp-collection{width:100%;border:0;background:transparent;text-align:left;min-height:44px}\n.vp-seal{display:inline-flex;align-items:center;gap:6px;color:#735324;font-weight:750;font-size:11px;line-height:1.3}\n.vp-seal-mark{display:inline-grid;place-items:center;width:22px;height:22px;flex:none;border:1px solid #b38e52;border-radius:50%;background:linear-gradient(135deg,#fff2d4,#e1bc77);color:#64461e}\n.vp-select-auto{width:100%;min-height:54px!important;display:flex;flex-direction:column;align-items:flex-start!important;justify-content:center!important;gap:2px;text-align:left;white-space:normal!important}\n.vp-select-auto small{font-size:10px;font-weight:500;line-height:1.3}\n.vp-collect-link{min-height:44px;background:transparent;border:0;color:#702a40;font-size:11px;font-weight:750;text-decoration:underline;text-underline-offset:3px;padding:4px 0}\n.vp-label.vp-select-label{align-items:center;min-height:44px;margin:4px 3px 6px;gap:8px}\n.vp-wallet-list+.vp-btn{margin-top:14px}\n.vp-ticket.vp-priority{border-color:#b28b54;box-shadow:0 0 0 1px #b28b5430}\n.vp-savings-wrap{background:linear-gradient(135deg,#f9efdc,#eedabc);border:1px solid #e4cfa9}\n.vp-savings-wrap .vp-savings{background:linear-gradient(115deg,#79364a,#481c2a);color:#fff3df}\n.vp-savings-wrap .vp-savings strong,.vp-savings-wrap .vp-savings .vp-icon{color:#f5d9a5}\n.vp-savings-wrap .vp-savings .vp-note{color:#f0dcc4}\n.vp-savings-wrap .vp-more{min-height:48px;align-items:center}\n.vp-savings-wrap .vp-more:first-child{border-top:0}\n.vp-more .vp-more-cta{background:#702a40;color:#fff7e8;border-radius:999px;padding:7px 9px;flex:none}\n.vp-more .vp-more-copy{display:grid;gap:2px;min-width:0}\n.vp-more .vp-more-copy small{font-size:10px;color:#786657;font-weight:500}\n.vp-savings-wrap .vp-seal{color:#f7dda8}\n@media(prefers-reduced-motion:reduce){.vp-savings-wrap{animation:none!important}}\n";
     function E(t,c,x){var n=document.createElement(t);if(c)n.className=c;if(x!==undefined)n.textContent=String(x);return n}
     function B(t,f,c){var b=E('button',c||'vp-btn',t);b.type='button';b.onclick=f;return b}
     function style(r){if(r&&!r.querySelector('#vp-style')){var s=E('style');s.id='vp-style';s.textContent=css;r.append(s)}}
@@ -18476,12 +18465,12 @@ function attachSheetResizeHandle(handle,sheet,apply,ratio){
       var seq=++walletSeq,o=owner(),e=epoch;walletPending=true;paint();
       return rpc('arabistaDevPromotionsWalletV258',auth()).then(function(r){
         if(seq!==walletSeq||e!==epoch||o!==owner())return;
-        if(r&&r.ok){clock(r);claims=r.claims||[];render()}else if(!message)message=error(r);
-      }).catch(function(){if(seq===walletSeq&&!message)message='Vouchers could not be refreshed.'})
-      .finally(function(){if(seq===walletSeq){walletPending=false;paint()}});
+        if(r&&r.ok){clock(r);claims=r.claims||[];walletKnown=true;render()}else{walletKnown=false;if(!message)message=error(r)}
+      }).catch(function(){if(seq===walletSeq){walletKnown=false;if(!message)message='Vouchers could not be refreshed.'}})
+      .finally(function(){if(seq===walletSeq){walletPending=false;render();paint()}});
     }
-    function boot(){booted=true;style(document.head);refresh(true);if(isIdentitySignedIn()&&guest())identityChanged(true);else if(owner()!=='none')wallet();document.addEventListener('visibilitychange',function(){if(!document.hidden){tick();if(tabId==='shop')refresh(false)}});setInterval(tick,1000)}
-    function identityChanged(signed){epoch++;walletSeq++;walletPending=false;claims=[];mode='AUTO';manual={};quoteMeta=null;ids={};quoteNotice='';if(!booted)return;render();if(signed&&guest()&&!transfer){transfer=true;var e=epoch;rpc('arabistaDevPromotionsTransferGuestClaimsV258',{access_token:state.identityAccessToken,guest_token:guest()}).then(function(r){if(e!==epoch)return;if(r&&r.ok){clock(r);guestMemory='';set(guestKey,'')}else message='Voucher transfer could not be confirmed.'}).catch(function(){message='Voucher transfer could not be confirmed.'}).finally(function(){transfer=false;if(e===epoch){wallet();requote()}})}else{if(owner()!=='none')wallet();requote()}}
+    function boot(){booted=true;walletKnown=owner()==='none';style(document.head);refresh(true);if(isIdentitySignedIn()&&guest())identityChanged(true);else if(owner()!=='none')wallet();document.addEventListener('visibilitychange',function(){if(!document.hidden){tick();if(tabId==='shop')refresh(false)}});setInterval(tick,1000)}
+    function identityChanged(signed){walletKnown=owner()==='none';epoch++;walletSeq++;walletPending=false;claims=[];mode='AUTO';manual={};quoteMeta=null;ids={};quoteNotice='';if(!booted)return;render();if(signed&&guest()&&!transfer){transfer=true;var e=epoch;rpc('arabistaDevPromotionsTransferGuestClaimsV258',{access_token:state.identityAccessToken,guest_token:guest()}).then(function(r){if(e!==epoch)return;if(r&&r.ok){clock(r);guestMemory='';set(guestKey,'')}else message='Voucher transfer could not be confirmed.'}).catch(function(){message='Voucher transfer could not be confirmed.'}).finally(function(){transfer=false;if(e===epoch){wallet();requote()}})}else{if(owner()!=='none')wallet();requote()}}
     function claim(v,code){
       if(busyClaim||transfer||v251PurchaseBusy||v251ReconcileBusy)return;
       var k=code?'code:'+code:v.voucher_id,o=owner(),e=epoch,opened=modal,success=false;
@@ -18491,7 +18480,7 @@ function attachSheetResizeHandle(handle,sheet,apply,ratio){
         if(e!==epoch||o!==owner())return;
         if(!r||!r.ok||!r.claim){message=error(r);if(r&&r.voucher_state)refresh(true);return}
         clock(r);if(r.guest_token){guestMemory=r.guest_token;set(guestKey,r.guest_token)}
-        claims=claims.filter(function(c){return c.claim_id!==r.claim.claim_id});claims.push(r.claim);delete ids[k];success=true;message='✓ Voucher claimed';
+        claims=claims.filter(function(c){return c.claim_id!==r.claim.claim_id});claims.push(r.claim);if(o==='none')walletKnown=true;if(walletOptimize&&opened===modal&&kind==='wallet'){mode='AUTO';manual={};quoteNotice=''}delete ids[k];success=true;message='✓ Voucher claimed';
         if(modal===opened&&kind==='popup'){close();toast('Voucher claimed')}
         render();requote();
       }).catch(function(){if(e===epoch)message='Claim could not be confirmed. Please retry.'}).finally(function(){
@@ -18500,9 +18489,9 @@ function attachSheetResizeHandle(handle,sheet,apply,ratio){
     }
     function maybePopup(){if(!snap||!enabled()||modal||tabId!=='shop'||v248Exact.current&&v248Exact.current!=='closed'||($('identityModal')&&!$('identityModal').hidden))return;var candidates=(snap.campaigns||[]).filter(function(c){return c.featured&&c.state==='LIVE'&&c.popup&&c.popup.enabled&&available().some(function(v){return v.campaign_id===c.campaign_id})});var requested='';try{requested=new URLSearchParams(location.search).get('campaign')||''}catch(e){}var c=candidates.find(function(c){return c.campaign_id===requested})||candidates[0];if(!c)return;var k='arabista_v258_popup:'+c.campaign_id+':'+(c.popup.version||1);if(get(k))return;set(k,'1');open('popup',available().find(function(v){return v.campaign_id===c.campaign_id}))}
     function keys(e){if(!modal)return;if(e.key==='Escape'){e.preventDefault();close()}if(e.key==='Tab'){var ns=Array.from(modal.querySelectorAll('button:not(:disabled),input:not(:disabled)'));if(!ns.length)return;if(e.shiftKey&&document.activeElement===ns[0]){e.preventDefault();ns.at(-1).focus()}else if(!e.shiftKey&&document.activeElement===ns.at(-1)){e.preventDefault();ns[0].focus()}}}
-    function close(){if(!modal)return;modal.remove();modal=null;kind='';popup=null;walletReturn=false;document.removeEventListener('keydown',keys);if(focus&&focus.isConnected)focus.focus({preventScroll:true});focus=null}
-    function open(k,v,back){
-      close();focus=v248Exact.shadow&&v248Exact.shadow.activeElement||document.activeElement;kind=k;popup=v||null;walletReturn=!!back;message='';
+    function close(){if(!modal)return;modal.remove();modal=null;kind='';popup=null;walletReturn=false;walletPriority=[];walletOptimize=false;document.removeEventListener('keydown',keys);if(focus&&focus.isConnected)focus.focus({preventScroll:true});focus=null}
+    function open(k,v,back,priority,optimize){
+      close();focus=v248Exact.shadow&&v248Exact.shadow.activeElement||document.activeElement;kind=k;popup=v||null;walletReturn=!!back;walletPriority=Array.isArray(priority)?priority:[];walletOptimize=!!optimize;message='';
       modal=E('div','vp-overlay'+(k==='popup'?' vp-gift-overlay':''));modal.setAttribute('role','dialog');modal.setAttribute('aria-modal','true');modal.setAttribute('aria-label',k==='popup'?'Featured voucher':k==='select'?'Manage vouchers':'My vouchers');
       modal.onclick=function(e){if(e.target===modal)close()};document.body.append(modal);document.addEventListener('keydown',keys);paint();modal.querySelector('button')?.focus({preventScroll:true});
       if(k!=='popup'){if(isIdentitySignedIn()&&guest()&&!transfer)identityChanged(true);else wallet()}
@@ -18543,15 +18532,14 @@ function attachSheetResizeHandle(handle,sheet,apply,ratio){
       }
       if(fresh){
         var head=E('div','vp-head'),cp=E('div');cp.append(E('div','vp-over','ARABISTA PRIVILEGES'),E('h2','',kind==='select'?'Manage vouchers':'My vouchers'),E('div','vp-note',kind==='select'?'Make the most of your order.':'Collect more. Enjoy more savings.'));head.append(cp,closeIcon());m.append(head);
-        if(kind==='select'){var actions=E('div','vp-actions');var auto=B('Best savings',function(){select('AUTO')}),none=B('No voucher',function(){select('NONE')});auto.dataset.vpMode='AUTO';none.dataset.vpMode='NONE';actions.append(auto,none);m.append(actions)}
-        var label=E('div','vp-label');label.append(E('span','','Your vouchers'),E('span','vp-note'));m.append(label,E('div','vp-wallet-list'));
-        if(kind==='select'){m.append(B('Collect vouchers',function(){open('wallet',null,true)},'vp-btn alt'))}
-        else{var d=E('details','vp-card vp-history');d.append(E('summary','','Voucher history'),E('div','vp-wallet-list vp-history-list'));m.append(d);var f=E('form','vp-code'),i=E('input');i.placeholder='Voucher code';i.setAttribute('aria-label','Voucher code');i.maxLength=32;i.autocomplete='off';var b=B('Claim',function(){});b.type='submit';f.append(i,b);f.onsubmit=function(e){e.preventDefault();var c=i.value.trim().toUpperCase();if(c)claim(null,c)};m.append(f);if(walletReturn)m.append(B('Back to voucher selection',function(){open('select')},'vp-btn alt'))}
+        if(kind==='select'){var actions=E('div','vp-actions');var auto=B('',function(){select('AUTO')},'vp-btn vp-select-auto');auto.append(E('strong','','Best savings'),E('small','','Automatically apply your best eligible vouchers.'));auto.dataset.vpMode='AUTO';actions.append(auto);m.append(actions)}
+        var label=E('div','vp-label'+(kind==='select'?' vp-select-label':''));label.append(E('span','','Your vouchers'),E('span','vp-note'));if(kind==='select'){var collect=B('',function(){open('wallet',null,true)},'vp-collect-link');label.append(collect)}m.append(label,E('div','vp-wallet-list'));
+        if(kind!=='select'){var d=E('details','vp-card vp-history');d.append(E('summary','','Voucher history'),E('div','vp-wallet-list vp-history-list'));m.append(d);var f=E('form','vp-code'),i=E('input');i.placeholder='Voucher code';i.setAttribute('aria-label','Voucher code');i.maxLength=32;i.autocomplete='off';var b=B('Claim',function(){});b.type='submit';f.append(i,b);f.onsubmit=function(e){e.preventDefault();var c=i.value.trim().toUpperCase();if(c)claim(null,c)};m.append(f);if(walletReturn)m.append(B('Back to voucher selection',function(){open('select')},'vp-btn alt'))}
         var msg=E('div','vp-msg');msg.setAttribute('role','status');m.append(msg)
       }
-      var cs=active(),vs=available(),rows=kind==='select'?cs.map(function(c){return {c:c}}):vs.map(function(v){return {v:v}}).concat(cs.map(function(c){return {c:c}})),list=m.querySelector('.vp-wallet-list'),scroll=m.scrollTop,focused=document.activeElement,focusedKey=focused&&focused.closest&&focused.closest('.vp-ticket')?.dataset.key;
+      var cs=active(),vs=collectable(),rows=kind==='select'?cs.map(function(c){return {c:c}}):vs.map(function(v){return {v:v}}).concat(cs.map(function(c){return {c:c}})).sort(function(a,b){return Number(walletPriority.includes((b.c||b.v).voucher_id))-Number(walletPriority.includes((a.c||a.v).voucher_id))}),list=m.querySelector('.vp-wallet-list'),scroll=m.scrollTop,focused=document.activeElement,focusedKey=focused&&focused.closest&&focused.closest('.vp-ticket')?.dataset.key;
       syncList(list,rows,walletPending?'Refreshing vouchers…':kind==='select'?'No claimed vouchers yet.':'No vouchers available.');
-      m.querySelector('.vp-label .vp-note').textContent=cs.length+' collected';
+      m.querySelector('.vp-label .vp-note').textContent=cs.length+' collected';if(kind==='select'){var collect=m.querySelector('.vp-collect-link');collect.hidden=!vs.length;collect.style.display=vs.length?'':'none';collect.textContent=vs.length+' more to collect ›';}else{Array.from(list.children).forEach(function(n){if(n.dataset.key)n.classList.toggle('vp-priority',walletPriority.includes(n.dataset.key))})}
       if(kind==='select'){m.querySelectorAll('[data-vp-mode]').forEach(function(b){b.classList.toggle('alt',mode!==b.dataset.vpMode);b.disabled=!!pendingKey})}
       else{var history=claims.filter(function(c){return !usable(c)}),d=m.querySelector('.vp-history');d.hidden=!history.length;syncList(d.querySelector('.vp-history-list'),history.map(function(c){return {c:c}}),'No voucher history');busyButton(m.querySelector('.vp-code button'),busyClaim&&claimKey.indexOf('code:')===0,'Claim')}
       var msg=m.querySelector('.vp-msg');msg.textContent=message;msg.classList.toggle('vp-error',!!message&&!message.startsWith('✓'));m.scrollTop=scroll;
@@ -18578,7 +18566,7 @@ function attachSheetResizeHandle(handle,sheet,apply,ratio){
       if(Math.abs(img.left-frame.left)>3||Math.abs(img.width-frame.width)>3)return null;
       var scale=Math.min(img.width/nw,img.height/nh),photoWidth=nw*scale,photoLeft=img.left+(img.width-photoWidth)/2;
       var left=photoLeft-frame.left,right=frame.left+frame.width-(photoLeft+photoWidth);
-      if(left<64||right<64)return null;
+      if(left<56||right<56)return null;
       var width=Math.min(92,Math.floor(Math.min(left,right)-12));
       return {width:width,left:Math.floor((left-width)/2),right:Math.floor((right-width)/2),photoLeft:photoLeft-frame.left,photoRight:photoLeft+photoWidth-frame.left};
     }
@@ -18609,19 +18597,16 @@ function attachSheetResizeHandle(handle,sheet,apply,ratio){
     function galleryCampaign(v){
       return (snap&&snap.campaigns||[]).find(function(c){return c.campaign_id===v.campaign_id})||null
     }
-    function galleryOffer(ctx,chosen,stateName){
-      if(!enabled()||transfer)return null;
-      var relevant=function(v){return galleryTarget(v,ctx,chosen,stateName)};
-      var owned=active().filter(relevant).sort(function(a,b){return Date.parse(a.expires_at_utc)-Date.parse(b.expires_at_utc)});
-      // Claimed terms remain valid when the campaign is paused or ended.
-      if(owned.length)return owned[0];
-      var choices=available().filter(function(v){
-        var c=galleryCampaign(v),held=claims.filter(function(x){return x.voucher_id===v.voucher_id&&(usable(x)||x.status==='RESERVED'||x.status==='REDEEMED')}).length;
-        return relevant(v)&&c&&c.state==='LIVE'&&(!c.ends_at_utc||rem(c.ends_at_utc)>0)&&(!c.starts_at_utc||Date.parse(c.starts_at_utc)<=now())&&(!v.claim_starts_at_utc||Date.parse(v.claim_starts_at_utc)<=now())&&held<Math.max(1,Number(v.per_customer_limit||1));
-      });
-      // Respect seller's featured campaign and snapshot ordering, not random rotation.
-      return choices.find(function(v){return galleryCampaign(v).featured})||choices[0]||null
+    function collectable(){return available().filter(function(v){if(v.remaining_claims!=null&&Number(v.remaining_claims)<=0||v.validity_mode==='FIXED'&&v.use_ends_at_utc&&rem(v.use_ends_at_utc)<=0)return false;var held=claims.filter(function(x){return x.voucher_id===v.voucher_id&&(usable(x)||x.status==='RESERVED'||x.status==='REDEEMED')}).length;return held<Math.max(1,Number(v.per_customer_limit||1))})}
+    function claimableRelevant(ctx,chosen,stateName){return !enabled()||transfer?[]:collectable().filter(function(v){var c=galleryCampaign(v);return !!c&&c.state==='LIVE'&&galleryTarget(v,ctx,chosen,stateName)})}
+    function galleryOffers(ctx,chosen,stateName){
+      if(!enabled()||transfer)return [];
+      var owned=active().filter(function(v){return galleryTarget(v,ctx,chosen,stateName)}).sort(function(a,b){return Date.parse(a.expires_at_utc)-Date.parse(b.expires_at_utc)});
+      var availableNow=claimableRelevant(ctx,chosen,stateName),rank=function(v){var c=galleryCampaign(v);return c&&c.featured?0:1};
+      availableNow.sort(function(a,b){return rank(a)-rank(b)});
+      var seen=new Set();return owned.concat(availableNow).filter(function(v){if(seen.has(v.voucher_id))return false;seen.add(v.voucher_id);return true});
     }
+    function galleryOffer(ctx,chosen,stateName){return galleryOffers(ctx,chosen,stateName)[0]||null}
     function galleryDetails(v){
       var t=T(v),shipping=t.voucher_kind==='SHIPPING',cap=Number(t.max_discount_sen||0),isPercent=t.discount_type==='PERCENT',full=t.discount_type==='SHIPPING_FULL'&&!cap;
       var amount=full?'FREE':isPercent?String(Number(t.percent_bps||0)/100)+'%':short(shipping?cap:t.amount_off_sen).replace(/^RM/,'');
@@ -18632,74 +18617,86 @@ function attachSheetResizeHandle(handle,sheet,apply,ratio){
       if(shipping&&t.region_scope!=='ALL')detail.push('Eligible delivery');
       return {prefix:full||isPercent?'':shipping?'UP TO RM':'RM',amount:amount,unit:shipping?'SHIPPING'+(full?'':' OFF'):'OFF',terms:detail}
     }
-    function hideGallery(){
-      if(galleryLayer){galleryLayer.hidden=true;galleryLayer.classList.remove('vp-gallery-enter')}
-    }
+    function hideGallery(){if(galleryLayer)galleryLayer.hidden=true}
     function galleryChanged(){
-      if(galleryFrame){cancelAnimationFrame(galleryFrame);galleryFrame=0}
-      if(v248Exact.current!=='product'){if(galleryDelay){clearTimeout(galleryDelay);galleryDelay=0}hideGallery();return}
+      if(v248Exact.current!=='product'){if(galleryFrame){cancelAnimationFrame(galleryFrame);galleryFrame=0}hideGallery();return}
       var root=v248Exact.shadow,track=root&&root.querySelector('#product-gallery-track'),parent=track&&track.parentNode;
       if(!track||!parent)return;
       if(galleryTrack!==track){
-        if(galleryObserver)galleryObserver.disconnect();
-        galleryTrack=track;galleryLayer=E('div','vp-gallery');galleryLayer.hidden=true;parent.append(galleryLayer);
-        track.addEventListener('scroll',function(){
-          hideGallery();if(galleryFrame){cancelAnimationFrame(galleryFrame);galleryFrame=0}
-          if(galleryDelay)clearTimeout(galleryDelay);
-          galleryDelay=setTimeout(function(){galleryDelay=0;galleryChanged()},120)
-        },{passive:true});
+        if(galleryObserver)galleryObserver.disconnect();if(galleryLayer)galleryLayer.remove();
+        gallerySlots.clear();galleryTrack=track;galleryLayer=E('div','vp-gallery');galleryLayer.hidden=true;parent.append(galleryLayer);
+        track.addEventListener('scroll',galleryChanged,{passive:true});
         track.addEventListener('load',galleryChanged,true);track.addEventListener('error',galleryChanged,true);
         if(document.fonts&&document.fonts.ready)document.fonts.ready.then(galleryChanged).catch(function(){});
-        if(typeof ResizeObserver==='function'){galleryObserver=new ResizeObserver(function(){hideGallery();galleryChanged()});galleryObserver.observe(track)}
-        else window.addEventListener('resize',function(){hideGallery();galleryChanged()},{passive:true});
+        if(typeof ResizeObserver==='function'){galleryObserver=new ResizeObserver(galleryChanged);galleryObserver.observe(track)}
+        else window.addEventListener('resize',galleryChanged,{passive:true});
       }
-      if(galleryDelay)return;
-      galleryFrame=requestAnimationFrame(function(){galleryFrame=0;galleryPaint()})
+      if(!galleryFrame)galleryFrame=requestAnimationFrame(function(){galleryFrame=0;galleryPaint()})
+    }
+    function galleryTicket(v,width,compact){
+      var dt=galleryDetails(v),owned=!!v.claim_id,t=T(v),n=E('div','vp-rail-offer');
+      n.append(E('span','vp-rail-kicker',owned?'COLLECTED':t.voucher_kind==='SHIPPING'?'DELIVERY':'EXCLUSIVE'));
+      if(dt.prefix)n.append(E('span','vp-rail-prefix',dt.prefix));
+      var val=E('strong','vp-rail-value',dt.amount);val.style.setProperty('--vp-value-size',Math.max(12,Math.min(compact?24:38,(width-9)/(Math.max(2,dt.amount.length)*.65))).toFixed(1)+'px');
+      n.append(val,E('span','vp-rail-unit',dt.unit));
+      if(dt.terms.length){var ts=E('div','vp-rail-terms');dt.terms.forEach(function(x){ts.append(E('span','',x))});n.append(ts)}
+      if(owned){var tm=timeNode(v.expires_at_utc);tm.classList.add('vp-rail-time');tm.setAttribute('aria-label','Time remaining');n.append(tm)}
+      var b=B(owned?'View ›':'Claim ›',function(){open('wallet',null,false,[v.voucher_id])},'vp-rail-action');b.setAttribute('aria-label',(owned?'View ':'Collect ')+(t.title||'voucher'));n.append(b);return n
     }
     function galleryPaint(){
       var root=v248Exact.shadow,track=galleryTrack,layer=galleryLayer,viewer=root&&root.querySelector('#product-lightbox');
       if(!track||!layer||v248Exact.current!=='product'||(viewer&&!viewer.hidden)){hideGallery();return}
-      var w=track.clientWidth,index=Math.round(track.scrollLeft/(w||1)),slide=track.children[index],img=slide&&slide.querySelector('img');
-      if(!w||!img||!img.complete||!slide.classList.contains('is-ready')||!img.naturalWidth||Math.abs(track.scrollLeft-index*w)>3){hideGallery();return}
-      var frame=track.getBoundingClientRect(),ir=img.getBoundingClientRect(),geo=galleryGeometry(frame,ir,img.naturalWidth,img.naturalHeight);
-      var delivery=checkoutDeliveryFields_()||{},v=geo&&galleryOffer(v248Exact.ctx,v248XChosenSku(),delivery.state);
-      if(!geo||!v){hideGallery();return}
-      var c=galleryCampaign(v),owned=!!v.claim_id,dt=galleryDetails(v),title=String(c&&c.title||T(v).title||'Arabista privileges'),signature=JSON.stringify([sign(v),title,dt,owned]);
-      // Position only inside the mathematically verified gutters. Do not change
-      // image styles, slide width, gallery height or carousel navigation.
-      layer.classList.toggle('vp-compact',frame.height<285||geo.width<68);layer.style.setProperty('--vp-frame-height',frame.height+'px');layer.style.setProperty('--vp-rail',geo.width+'px');layer.style.setProperty('--vp-left',geo.left+'px');layer.style.setProperty('--vp-right',geo.right+'px');
-      var fs=Math.max(13,Math.min(33,(geo.width-10)/(Math.max(2,dt.amount.length)*.68)));
-      layer.style.setProperty('--vp-value-size',fs.toFixed(1)+'px');
-      if(layer.dataset.sig!==signature){
-        layer.dataset.sig=signature;layer.classList.remove('vp-gallery-enter');
-        var left=E('div','vp-rail vp-rail-left'+(owned?' is-owned':'')),right=E('div','vp-rail vp-rail-right');right.setAttribute('aria-hidden','true');
-        left.append(E('span','vp-rail-kicker',owned?'YOUR VOUCHER':'PRIVILEGE'),E('span','vp-rail-rule'));
-        if(dt.prefix)left.append(E('span','vp-rail-prefix',dt.prefix));
-        left.append(E('strong','vp-rail-value',dt.amount),E('span','vp-rail-unit',dt.unit));
-        if(dt.terms.length){var termsBox=E('div','vp-rail-terms');dt.terms.forEach(function(t){termsBox.append(E('span','',t))});left.append(termsBox)}
-        if(owned){left.append(E('span','vp-rail-rule'));var t=timeNode(v.expires_at_utc);t.classList.add('vp-rail-time');t.classList.toggle('vp-long',t.textContent.length>5);left.append(t,E('span','vp-rail-time-label','Remaining'))}
-        var action=B('',function(){open('wallet')},'vp-rail-action');action.setAttribute('aria-label',(owned?'View ':'Collect ')+(T(v).title||'voucher'));
-        action.append(E('span','',owned?'View':'Claim'));var arrow=E('span');arrow.innerHTML='<svg viewBox="0 0 12 12" aria-hidden="true"><path d="M4 2l4 4-4 4"/></svg>';action.append(arrow);left.append(action);
-        right.append(E('span','vp-rail-ornament'),E('span','vp-rail-diamond'),E('span','vp-rail-title',title),E('span','vp-rail-diamond'),E('span','vp-rail-ornament'));
-        layer.replaceChildren(left,right);layer.hidden=false;layer.classList.add('vp-gallery-enter');
-        // Remove one-shot animation after entry; switching images or updating a
-        // countdown must not trigger a new reveal for the same offer.
-        right.addEventListener('animationend',function(){if(right.isConnected)layer.classList.remove('vp-gallery-enter')},{once:true});
-      }else layer.hidden=false;
-      var rail=layer.querySelector('.vp-rail-left');
-      if(rail&&(rail.scrollHeight>rail.clientHeight+2||rail.scrollWidth>rail.clientWidth+2||Array.from(rail.children).some(function(n){return n.scrollWidth>n.clientWidth+2||n.scrollHeight>n.clientHeight+Math.max(2,parseFloat(getComputedStyle(n).fontSize)*.15)}))){hideGallery();return}
-      timers()
+      var w=track.clientWidth,frame=track.getBoundingClientRect(),delivery=checkoutDeliveryFields_()||{},vs=galleryOffers(v248Exact.ctx,v248XChosenSku(),delivery.state);
+      if(!w||!vs.length){hideGallery();return}
+      var count=track.children.length,position=track.scrollLeft/w,nearest=Math.round(position),indices=Array.from(new Set([Math.floor(position),Math.ceil(position),nearest])).filter(function(i){return i>=0&&i<count});
+      gallerySlots.forEach(function(slot,slide){if(slide.parentNode!==track){slot.remove();gallerySlots.delete(slide)}else if(!indices.includes(Array.from(track.children).indexOf(slide)))slot.hidden=true});
+      var shown=false;layer.hidden=false;
+      indices.forEach(function(index){
+        var slide=track.children[index],img=slide&&slide.querySelector('img'),slot=gallerySlots.get(slide);
+        if(!img||!img.complete||!slide.classList.contains('is-ready')||!img.naturalWidth){if(slot)slot.hidden=true;return}
+        var ir=img.getBoundingClientRect(),local={left:ir.left,width:ir.width,height:frame.height},geo=galleryGeometry(local,ir,img.naturalWidth,img.naturalHeight);
+        if(!geo){if(slot)slot.hidden=true;return}
+        var leftWidth=Math.floor(geo.photoLeft),rightWidth=Math.floor(ir.width-geo.photoRight);
+        if(!slot){slot=E('div','vp-slide-priv');slot.append(E('div','vp-rail vp-rail-left'),E('div','vp-rail vp-rail-right'));layer.append(slot);gallerySlots.set(slide,slot)}
+        var left=slot.children[0],right=slot.children[1],maxRight=frame.height>=286&&rightWidth>=62?2:1,sig=JSON.stringify([vs.map(sign),leftWidth,rightWidth,Math.round(frame.height),maxRight]);
+        slot.style.left=(ir.left-frame.left)+'px';slot.style.width=ir.width+'px';left.style.width=leftWidth+'px';right.style.width=rightWidth+'px';
+        function fillRight(limit){right.replaceChildren();vs.slice(1,1+limit).forEach(function(v){right.append(galleryTicket(v,rightWidth,limit>1))});if(vs.length>1+limit)right.append(B('+'+(vs.length-1-limit)+' more ›',function(){open('wallet')},'vp-rail-action vp-rail-more'))}
+        if(slot.dataset.sig!==sig){slot.dataset.sig=sig;left.replaceChildren(galleryTicket(vs[0],leftWidth,false));fillRight(maxRight)}
+        slot.hidden=false;left.hidden=false;right.hidden=false;
+        if(right.scrollHeight>right.clientHeight+2&&maxRight>1&&slot.dataset.compact!==sig){slot.dataset.compact=sig;fillRight(1)}
+        [left,right].forEach(function(rail){rail.hidden=rail.scrollHeight>rail.clientHeight+2||Array.from(rail.querySelectorAll('.vp-rail-value,.vp-rail-time')).some(function(n){return n.scrollWidth>rail.clientWidth-4})});
+        slot.querySelectorAll('button').forEach(function(b){b.tabIndex=index===nearest?0:-1});
+        slot.setAttribute('aria-hidden',String(index!==nearest));shown=shown||!left.hidden||!right.hidden;
+      });
+      layer.hidden=!shown;
     }
-    function product(){var root=v248Exact.shadow;if(!root)return;style(root);var section=root.querySelector('#product-deals');if(!section)return;section.hidden=!visible();if(section.hidden)return;var v=best();if(!v){section.hidden=true;return}var c=root.querySelector('#vp-product');if(!c){c=E('div','vp vp-card');c.id='vp-product';section.append(c);var old=section.querySelector('#product-deal-teaser'),fine=section.querySelector('.deal-fineprint'),all=section.querySelector('#product-deal-view-all');if(old)old.style.display='none';if(fine)fine.style.display='none';if(all)all.addEventListener('click',function(e){e.preventDefault();e.stopImmediatePropagation();open('wallet')},true)}if(c.dataset.sig===sign(v))return;c.dataset.sig=sign(v);var row=E('div','vp-line'),cp=E('div');cp.append(E('strong','',value(v)+(T(v).voucher_kind==='SHIPPING'?' shipping':' OFF')),E('div','vp-note',terms(v)));if(v.claim_id){var t=E('div','vp-note','Expires in ');t.append(timeNode(v.expires_at_utc));cp.append(t)}row.append(cp,B(v.claim_id?'Vouchers':'Claim',function(){open('wallet')}));c.replaceChildren(row)}
+    function seal(label){var n=E('span','vp-seal');n.append(E('span','vp-seal-mark','✓'),E('span','',label));return n}
+    function product(){
+      var root=v248Exact.shadow;if(!root)return;style(root);var section=root.querySelector('#product-deals');if(!section)return;
+      var delivery=checkoutDeliveryFields_()||{},ctx=v248Exact.ctx,chosen=v248XChosenSku(),vs=galleryOffers(ctx,chosen,delivery.state),unclaimed=claimableRelevant(ctx,chosen,delivery.state),v=vs[0];
+      var nav=root.querySelector('[data-modern-go="product-deals"]');section.hidden=!v;
+      if(nav){nav.hidden=!v;nav.style.display=v?'':'none';var parent=nav.parentElement;if(parent)parent.style.gridTemplateColumns='repeat('+(v?5:4)+',minmax(0,1fr))';if(!v&&nav.classList.contains('is-active')){nav.classList.remove('is-active');var first=parent&&parent.querySelector('button:not([hidden])');if(first)first.classList.add('is-active')}}
+      if(!v)return;
+      var c=root.querySelector('#vp-product');if(!c){Array.from(section.children).forEach(function(n){if(!n.classList.contains('deal-section-head'))n.remove()});c=E('div','vp vp-card');c.id='vp-product';section.append(c)}
+      var complete=walletKnown&&!walletPending&&!transfer&&!unclaimed.length&&vs.some(function(x){return !!x.claim_id}),sig=JSON.stringify([vs.map(sign),unclaimed.map(sign),complete]);
+      if(c.dataset.sig===sig)return;c.dataset.sig=sig;
+      var row=E('div','vp-line vp-product-main'),cp=E('div');cp.append(E('div','vp-over','ARABISTA PRIVILEGES'),E('strong','',value(v)+(T(v).voucher_kind==='SHIPPING'?' shipping':' OFF')),E('div','vp-note',terms(v)));
+      if(v.claim_id){var t=E('div','vp-note','Expires in ');t.append(timeNode(v.expires_at_utc));cp.append(t)}
+      row.append(cp,B(v.claim_id?'Vouchers':'Claim',function(){open('wallet',null,false,[v.voucher_id])}));c.replaceChildren(row);
+      if(unclaimed.length){var b=B('',function(){open('wallet',null,false,unclaimed.map(function(x){return x.voucher_id}))},'vp-collection');b.append(E('span','',(vs.some(function(x){return !!x.claim_id})?unclaimed.length+' more':unclaimed.length)+' voucher'+(unclaimed.length===1?'':'s')+' available'),E('span','','Collect ›'));c.append(b)}
+      else if(complete){var status=E('div','vp-collection');status.append(seal('All privileges unlocked'));c.append(status)}
+    }
     function cart(root,anchor,id){if(!anchor)return;var c=root.querySelector('#'+id);if(!c){c=E('div','vp vp-card');c.id=id;anchor.after(c)}c.hidden=!visible()||!lines().length;if(c.hidden)return;var v=best();if(!v){c.hidden=true;return}var n=subtotal(),min=Number(T(v).min_spend_sen||0),sig=sign(v)+':'+n;if(c.dataset.sig===sig)return;c.dataset.sig=sig;var row=E('div','vp-line'),cp=E('div');cp.append(E('strong','',n!==null&&min>n&&T(v).target_scope==='ALL'?'Add '+short(min-n)+' for voucher eligibility':'Vouchers available'),E('div','vp-note','Savings confirmed at checkout'));row.append(cp,B('Vouchers',function(){open('wallet')},'vp-btn alt'));c.replaceChildren(row);if(n!==null&&min&&T(v).target_scope==='ALL'){var track=E('div','vp-track'),i=E('i');i.style.width=Math.min(100,100*n/min)+'%';track.append(i);c.append(track)}}
     // Conservative local indication: only advertise an additional benefit when known facts support it.
+    function savingQuote(q){return enabled()&&q&&valid(q)&&!pendingKey&&q.vouchers&&q.vouchers.active&&!q.vouchers.suppressed_reason&&!q.vouchers.disabled&&!rejected(q.vouchers)}
+    function collectedUpside(q){if(!savingQuote(q))return 0;var shop=Number(q.items_discount_sen||0),ship=Number(q.shipping_discount_sen||0),bestShop=shop,bestShip=ship;(q.vouchers.candidates||[]).filter(function(c){return c.eligible&&(!c.expires_at_utc||rem(c.expires_at_utc)>0)}).forEach(function(c){bestShop=Math.max(bestShop,Number(c.items_discount_sen||0));bestShip=Math.max(bestShip,Number(c.shipping_discount_sen||0))});return Math.max(0,bestShop+bestShip-shop-ship)}
     function moreSavings(q){
-      if(!enabled()||!q||!valid(q)||pendingKey||mode==='NONE'||!q.vouchers||q.vouchers.suppressed_reason||q.vouchers.disabled)return [];
-      var currentShop=Number(q.items_discount_sen||0),currentShip=Number(q.shipping_discount_sen||0),owned=(q.vouchers.candidates||[]).filter(function(c){return c.eligible});
+      if(!savingQuote(q)||mode==='NONE')return [];
+      var currentShop=Number(q.items_discount_sen||0),currentShip=Number(q.shipping_discount_sen||0),owned=(q.vouchers.candidates||[]).filter(function(c){return c.eligible&&(!c.expires_at_utc||rem(c.expires_at_utc)>0)});
       owned.forEach(function(c){currentShop=Math.max(currentShop,Number(c.items_discount_sen||0));currentShip=Math.max(currentShip,Number(c.shipping_discount_sen||0))});
       var rows=lines().map(v248XLineDetails),d=checkoutDeliveryFields_()||{},stateName=String(d.state||'').trim().toUpperCase().replace(/\s+/g,' '),east=['SABAH','SARAWAK','LABUAN','W.P. LABUAN','WP LABUAN','WILAYAH PERSEKUTUAN LABUAN'];
       if(rows.some(function(r){return r.price==null})||rows.reduce(function(n,r){return n+r.price*r.item.quantity},0)!==Number(q.subtotal_sen))return [];
-      return available().filter(function(v){
+      return collectable().filter(function(v){
         var t=T(v),ids=t.target_ids||[],basis=0;
         var held=claims.filter(function(c){return c.voucher_id===v.voucher_id&&(usable(c)||c.status==='RESERVED'||c.status==='REDEEMED')}).length;if(held>=Math.max(1,Number(v.per_customer_limit||1)))return false;
         rows.forEach(function(r){var p=r.product||{},sku=r.sku||{};if(t.target_scope==='ALL'||t.target_scope==='SKU'&&ids.includes(String(r.item.sku_id))||t.target_scope==='PRODUCT'&&ids.includes(String(p.product_id||sku.product_id||''))||t.target_scope==='CATEGORY'&&p.category_id&&ids.includes(String(p.category_id)))basis+=r.price*r.item.quantity});
@@ -18713,12 +18710,26 @@ function attachSheetResizeHandle(handle,sheet,apply,ratio){
         if(t.discount_type==='PERCENT'&&Number(t.max_discount_sen)>0)off=Math.min(off,Number(t.max_discount_sen));return Math.min(basis,off)>currentShop
       })
     }
+    function savingsBasketKnown(q){
+      if(!q||!Number.isFinite(Number(q.shipping_sen)))return false;
+      var rows=lines().map(v248XLineDetails),d=checkoutDeliveryFields_()||{},vs=collectable();
+      if(!rows.length||rows.some(function(r){return r.price==null})||rows.reduce(function(n,r){return n+r.price*r.item.quantity},0)!==Number(q.subtotal_sen))return false;
+      return !vs.some(function(v){var t=T(v);return t.voucher_kind==='SHIPPING'&&t.region_scope!=='ALL'&&!d.state||t.target_scope==='CATEGORY'&&rows.some(function(r){return !r.product||!r.product.category_id})||t.target_scope==='PRODUCT'&&rows.some(function(r){return !(r.product&&r.product.product_id||r.sku&&r.sku.product_id)})});
+    }
+    function savingsState(q){var more=moreSavings(q),up=collectedUpside(q),maximum=!!(savingQuote(q)&&walletKnown&&!walletPending&&!transfer&&snap&&savingsBasketKnown(q)&&mode!=='NONE'&&!up&&!more.length&&(Number(q.items_discount_sen||0)+Number(q.shipping_discount_sen||0)>0));return {more:more,up:up,maximum:maximum}}
+    function savingsSignature(q){var a=savingsState(q);return [q.subtotal_sen,q.shipping_sen,q.items_discount_sen,q.shipping_discount_sen,q.payable_sen,a.up,a.maximum,a.more.map(sign),mode]}
     function summary(q){
-      var n=E('div','vp vp-summary'),gross=Number(q.subtotal_sen)+Number(q.shipping_sen),save=Number(q.items_discount_sen||0)+Number(q.shipping_discount_sen||0),more=moreSavings(q);
+      var n=E('div','vp vp-summary'),gross=Number(q.subtotal_sen)+Number(q.shipping_sen),save=Number(q.items_discount_sen||0)+Number(q.shipping_discount_sen||0),advice=savingsState(q),more=advice.more;
       function row(k,v,d){var r=E('div','vp-srow'+(d?' discount':''));r.append(E('span','',k),E('strong','',(d?'− ':'')+rm(v)));n.append(r)}
       row('Product subtotal',q.subtotal_sen);row('Shipping',q.shipping_sen);if(Number(q.items_discount_sen)>0)row('Shopping discount',q.items_discount_sen,true);if(Number(q.shipping_discount_sen)>0)row('Shipping discount',q.shipping_discount_sen,true);
       var total=E('div','vp-line vp-total'),right=E('div');if(save>0)right.append(E('del','',rm(gross)));right.append(E('strong','',rm(q.payable_sen)));total.append(E('span','','Total'),right);n.append(total);
-      if(save>0||more.length){var wrap=E('div','vp-savings-wrap');if(save>0){var box=E('div','vp-savings'),cp=E('div');cp.append(E('b','','Wonderful savings!'),E('div','vp-note','You save on this order'));box.append(icon(),cp,E('strong','',rm(save)));wrap.append(box)}if(more.length){var b=B('',function(){open('wallet',null,true)},'vp-more');b.append(E('span','','More savings available'),E('span','','Explore ›'));wrap.append(b)}n.append(wrap)}return n
+      if(save>0||more.length||advice.up){var wrap=E('div','vp-savings-wrap');
+        if(save>0){var box=E('div','vp-savings'),cp=E('div');cp.append(advice.maximum?seal('Maximum savings applied'):E('b','','Wonderful savings!'),E('div','vp-note',advice.maximum?'Best available savings for this order':'You save on this order'));box.append(icon(),cp,E('strong','',rm(save)));wrap.append(box)}
+        if(advice.up||more.length){var collect=more.length>0,b=B('',function(){if(collect)open('wallet',null,true,more.map(function(v){return v.voucher_id}),true);else select('AUTO')},'vp-more'),copy=E('span','vp-more-copy');
+          copy.append(E('span','',collect?'Unlock more savings':'Save another '+rm(advice.up)),E('small','',collect?(advice.up?'Collect or apply your best vouchers':'A further eligible voucher is available'):'A better collected combination is available'));
+          b.append(copy,E('span','vp-more-cta',collect?'Collect ›':'Apply best ›'));wrap.append(b);
+          if(collect&&advice.up)wrap.append(B('Apply best collected vouchers ›',function(){select('AUTO')},'vp-more'))
+        }n.append(wrap)}return n
     }
     function selector(root,anchor,id){
       if(!anchor)return;var p=root.querySelector('#'+id);if(!p){p=E('div','vp vp-card');p.id=id;anchor.append(p)}
@@ -18732,8 +18743,8 @@ function attachSheetResizeHandle(handle,sheet,apply,ratio){
       if(ready&&sum>0){var a=E('div','vp-line vp-applied');a.append(E('span','',selected.length+' voucher'+(selected.length===1?'':'s')+' applied'),E('strong','','−'+rm(sum)));p.append(a)}
       if(quoteNotice)p.append(E('p','vp-note',quoteNotice));else if(rejected(quoteMeta))p.append(E('p','vp-note','Choose another voucher or Best savings.'))
     }
-    function checkout(){var root=v248Exact.shadow,q=v248Exact.quote,show=enabled()||!!(q&&q.vouchers&&q.vouchers.active);if(root){var v=root.querySelector('#checkout-vouchers');if(v){v.hidden=!show;var b=v.querySelector('.checkout-voucher-pick');if(b)b.hidden=true;selector(root,v,'vp-choice');var s=v.nextElementSibling&&v.nextElementSibling.nextElementSibling;if(s){var old=root.querySelector('#vp-summary');if(q&&valid(q)&&show){var sig=JSON.stringify([q.subtotal_sen,q.shipping_sen,q.items_discount_sen,q.shipping_discount_sen,q.payable_sen,moreSavings(q).map(function(v){return v.voucher_id})]);if(!old||old.dataset.sig!==sig){var n=summary(q);n.id='vp-summary';n.dataset.sig=sig;if(old)old.replaceWith(n);else s.querySelector('h3').after(n)}Array.from(s.querySelectorAll(':scope > .checkout-row')).forEach(function(r){r.style.display='none'})}else{if(old)old.remove();Array.from(s.querySelectorAll(':scope > .checkout-row')).forEach(function(r){r.style.display=''})}}}}
-      var legacy=$('v248CheckoutQuoteHost');if(legacy){var p=$('vp-legacy-choose');if(!p){p=E('div','vp');p.id='vp-legacy-choose';legacy.before(p)}p.hidden=!show;selector(document,p,'vp-legacy-choice');var old=$('vp-legacy-summary'),verified=$('verifiedQuote');if(q&&valid(q)&&show&&v254CheckoutIsOpen_()){var sig=JSON.stringify([q.subtotal_sen,q.shipping_sen,q.items_discount_sen,q.shipping_discount_sen,q.payable_sen,moreSavings(q).map(function(v){return v.voucher_id})]);if(!old||old.dataset.sig!==sig){var n=summary(q);n.id='vp-legacy-summary';n.dataset.sig=sig;if(old)old.replaceWith(n);else legacy.prepend(n)}if(verified)verified.style.display='none'}else{if(old)old.remove();if(verified)verified.style.display=''}}}
+    function checkout(){var root=v248Exact.shadow,q=v248Exact.quote,show=enabled()||!!(q&&q.vouchers&&q.vouchers.active);if(root){var v=root.querySelector('#checkout-vouchers');if(v){v.hidden=!show;var b=v.querySelector('.checkout-voucher-pick');if(b)b.hidden=true;selector(root,v,'vp-choice');var s=v.nextElementSibling&&v.nextElementSibling.nextElementSibling;if(s){var old=root.querySelector('#vp-summary');if(q&&valid(q)&&show){var sig=JSON.stringify(savingsSignature(q));if(!old||old.dataset.sig!==sig){var n=summary(q);n.id='vp-summary';n.dataset.sig=sig;if(old)old.replaceWith(n);else s.querySelector('h3').after(n)}Array.from(s.querySelectorAll(':scope > .checkout-row')).forEach(function(r){r.style.display='none'})}else{if(old)old.remove();Array.from(s.querySelectorAll(':scope > .checkout-row')).forEach(function(r){r.style.display=''})}}}}
+      var legacy=$('v248CheckoutQuoteHost');if(legacy){var p=$('vp-legacy-choose');if(!p){p=E('div','vp');p.id='vp-legacy-choose';legacy.before(p)}p.hidden=!show;selector(document,p,'vp-legacy-choice');var old=$('vp-legacy-summary'),verified=$('verifiedQuote');if(q&&valid(q)&&show&&v254CheckoutIsOpen_()){var sig=JSON.stringify(savingsSignature(q));if(!old||old.dataset.sig!==sig){var n=summary(q);n.id='vp-legacy-summary';n.dataset.sig=sig;if(old)old.replaceWith(n);else legacy.prepend(n)}if(verified)verified.style.display='none'}else{if(old)old.remove();if(verified)verified.style.display=''}}}
     function timers(){[document,v248Exact.shadow].filter(Boolean).forEach(function(r){r.querySelectorAll('[data-vp-time]').forEach(function(n){var t=timer(n.dataset.vpTime);if(n.textContent!==t)n.textContent=t;if(n.classList.contains('vp-rail-time'))n.classList.toggle('vp-long',t.length>5)});r.querySelectorAll('[data-vp-clock]').forEach(function(n){var p=timer(n.dataset.vpClock).split(':'),s=n.querySelectorAll('span');function digit(node,value){if(!node||node.textContent===value)return;node.textContent=value;if(node.animate&&!(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches))node.animate([{opacity:.6,transform:'translateY(-2px)'},{opacity:1,transform:'translateY(0)'}],{duration:200,easing:'ease-out'})}digit(s[0],p.slice(0,-1).join(':'));digit(s[1],p.at(-1));n.classList.toggle('vp-urgent',rem(n.dataset.vpClock)<60)})})}
     function render(){if(!booted)return;shop();product();galleryChanged();cart(document,document.querySelector('#cart .v254-cart-summary-row'),'vp-cart');if(v248Exact.shadow){var a=v248Exact.shadow.querySelector('#commerce-basket-total');if(a)cart(v248Exact.shadow,a.parentNode,'vp-bag')}checkout();timers()}
     function tick(){if(document.hidden)return;timers();var sig=active().map(function(c){return c.claim_id}).join('|')+';'+offers().map(function(v){return v.voucher_id}).join('|');if(sig!==activeSig){activeSig=sig;render();paint()}var q=v248Exact.quote;if(q&&q.vouchers&&(q.vouchers.selected||[]).some(function(c){return rem(c.expires_at_utc)<=0})&&!v251PurchaseBusy){if(mode==='MANUAL'){mode='AUTO';manual={}}requote()}}
