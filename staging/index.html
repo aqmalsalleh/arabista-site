@@ -12024,7 +12024,7 @@ function closeShopDetail() {
       generation=0,inflight='',filtered=0,returnFocus=null,slides=[],
       cache=new Map(),PAGE=6,TTL=15000,STUDIO_PAGE=6,
       genuinePending=false,studioPending=false,studioCursor=null,
-      studioTotal=0,studioInflight=false,studioRatingSummary=null;
+      studioTotal=0,studioInflight=false,studioRatingSummary=null,studioFailed=false;
     function n(id){return v248X(id);}
     function el(tag,cls,value){return v248XElement(tag,cls,value);}
     function integer(v,min,max){return typeof v==='number'&&Number.isInteger(v)&&v>=min&&v<=max;}
@@ -12221,6 +12221,8 @@ function closeShopDetail() {
       inflight='';studioInflight=false;
       rows=[];studioRows=[];cursor=null;studioCursor=null;previewLimit=3;
       genuinePending=true;studioPending=true;status='loading';controls();
+      var list=n('product-review-list');if(list)list.scrollTop=0;
+      render();
       read(false,false,token);loadStudio(current,token,false);
     }
     function mapStudio(items,startIndex){
@@ -12253,7 +12255,7 @@ function closeShopDetail() {
       if(more&&!studioCursor)return;
       if(studioInflight)return;
       studioInflight=true;
-      if(!more){studioPending=true;studioCursor=null;studioTotal=0;studioRatingSummary=null;}
+      if(!more){studioPending=true;studioCursor=null;studioTotal=0;studioRatingSummary=null;studioFailed=false;}
       render();
       call('arabistaDevCustomerW06StudioReadV255',{
         product_id:pid,limit:STUDIO_PAGE,sort:sort,cursor:more?studioCursor:null
@@ -12263,7 +12265,7 @@ function closeShopDetail() {
         if(!out||out.ok!==true||String(out.product_id||'')!==pid||
           out.content_type!=='AI_CREATED_STYLE_INSPIRATION'||!Array.isArray(out.items)){
           if(!more){studioRows=[];studioRatingSummary=null;}
-          studioCursor=null;render();return;
+          studioFailed=true;studioCursor=null;render();return;
         }
         var mapped=mapStudio(out.items,more?studioRows.length:0);
         if(!more)studioRows=mapped;
@@ -12286,7 +12288,7 @@ function closeShopDetail() {
         if(pid!==current||token!==generation)return;
         studioInflight=false;studioPending=false;
         if(!more){studioRows=[];studioRatingSummary=null;}
-        studioCursor=null;render();
+        studioFailed=true;studioCursor=null;render();
       });
     }
     // Development staging's live overall score: all published rated items,
@@ -12340,7 +12342,7 @@ function closeShopDetail() {
     }
     function setMoreLoading(button,label){
       if(!button)return;
-      var waiting=!!((studioInflight&&studioCursor)||(genuinePending&&cursor));
+      var waiting=!!(studioInflight||genuinePending||studioPending);
       button.disabled=waiting;
       button.classList.toggle('is-loading',waiting);
       button.setAttribute('aria-busy',String(waiting));
@@ -12368,8 +12370,9 @@ function closeShopDetail() {
       syncReviewCards(target,visible);
       if(!visible.length){
         if(!note){note=el('p','product-reference-note');target.appendChild(note);}
-        note.textContent=(genuinePending||studioPending)?
-          'Loading reviews…':'No reviews match these filters.';
+        note.textContent=(genuinePending||studioPending||studioInflight)?'Loading reviews…':
+          (cursor||studioCursor)?'Load more to see matching reviews.':
+          ((status==='error'||studioFailed)?'Reviews are currently unavailable.':'No reviews match these filters.');
       }else if(note)note.remove();
       if(cursor||studioCursor){
         if(!moreBtn){
@@ -12391,7 +12394,7 @@ function closeShopDetail() {
       var overall=ratingTotals();
       var awaiting=(genuinePending||studioPending)&&!has;
       show('product-review-summary',!!overall);show('review-quick-summary',!!overall);
-      show('product-review-see-all',!!has);show('product-review-retry',status==='error'&&!has&&!awaiting);
+      show('product-review-see-all',!!has);show('product-review-retry',(status==='error'||studioFailed)&&!has&&!awaiting);
       if(busy)busy.hidden=!awaiting;
       if(state){
         state.textContent=awaiting?'':
@@ -12403,7 +12406,10 @@ function closeShopDetail() {
         ['product-review-preview','product-review-strip','product-review-bars'].forEach(clear);
         show('product-review-strip',false);show('product-review-bars',false);
         show('product-review-more',false);text('product-review-average','');
-        text('product-review-count','');return;
+        text('product-review-count','');
+        var emptyPanel=n('product-review-panel');
+        if(emptyPanel&&!emptyPanel.hidden)renderList();
+        return;
       }
       if(overall){
         var average=overall.average.toFixed(1);
@@ -12539,6 +12545,7 @@ function closeShopDetail() {
       if(kind==='photos')photosOnly=!photosOnly;
       if(kind==='sort'||studioInflight||studioPending){refreshReviewSort();return;}
       inflight='';rows=[];cursor=null;previewLimit=3;status='loading';genuinePending=true;
+      var list=n('product-review-list');if(list)list.scrollTop=0;
       controls();read(false);
     }
     function init(){
@@ -12595,7 +12602,7 @@ function closeShopDetail() {
     function open(pid){
       inflight='';studioInflight=false;close();current=String(pid||'').trim();
       summary=null;rows=[];studioRows=[];cursor=null;studioCursor=null;studioTotal=0;studioRatingSummary=null;
-      status='idle';filtered=0;genuinePending=false;studioPending=false;
+      status='idle';filtered=0;genuinePending=false;studioPending=false;studioFailed=false;
       rating=0;sort='detailed';photosOnly=false;previewLimit=3;
       controls();render();
       if(current){
