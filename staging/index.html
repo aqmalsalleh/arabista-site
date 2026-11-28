@@ -12786,9 +12786,9 @@ function closeShopDetail() {
           Math.abs(e.clientY-pointer.y)>8))moved=true;
       });
       gallery.addEventListener('click',function(e){
-        var slide=e.target.closest('.product-gallery-slide');
-        if(slide&&!moved)v248XOpenLightbox(
-          Array.prototype.indexOf.call(gallery.children,slide),slide);
+        var opener=e.target.closest('.vp-photo-open'),slide=opener&&opener.closest('.product-gallery-slide');
+        if(slide&&(!moved||e.detail===0))v248XOpenLightbox(
+          Array.prototype.indexOf.call(gallery.children,slide),opener);
       });
     }
     var lightboxTrack=v248X('product-lightbox-track');
@@ -13650,13 +13650,13 @@ function closeShopDetail() {
       return {url:ctx.safeMediaUrl(m),alt:m.alt_text||p.title||'Product photo'};
     });
     media.forEach(function(m,index){
-      var slide=v248XElement('button','product-gallery-slide');
-      slide.type='button';
-      slide.setAttribute('aria-label','View product image '+(index+1)+' full screen');
+      var slide=v248XElement('div','product-gallery-slide'),opener=v248XElement('button','vp-photo-open');
+      opener.type='button';
+      opener.setAttribute('aria-label','View product image '+(index+1)+' full screen');
       var img=v248XElement('img');img.alt=m.alt_text||p.title||'Product photo';
       img.loading='lazy';img.decoding='async';
       img.addEventListener('load',function(){slide.classList.add('is-ready');},{once:true});
-      img.src=ctx.safeMediaUrl(m);slide.appendChild(img);gallery.appendChild(slide);
+      img.src=ctx.safeMediaUrl(m);slide.appendChild(img);slide.appendChild(opener);gallery.appendChild(slide);
       if(img.complete&&img.naturalWidth>0)slide.classList.add('is-ready');
     });
     if(!media.length)gallery.appendChild(v248XElement('p','v248-reference-empty','Product photos are unavailable.'));
@@ -18418,7 +18418,7 @@ function attachSheetResizeHandle(handle,sheet,apply,ratio){
 
   // V258 P1 — server-authoritative vouchers; no synthetic claims or client-side discount math.
   var v258=(function(){
-    var snap=null,claims=[],offset=0,last=0,loading=false,busyClaim=false,booted=false,epoch=0,transfer=false,walletSeq=0,mode='AUTO',manual={},quoteMeta=null,quoteKey='',pendingKey='',modal=null,kind='',popup=null,focus=null,message='',ids={},guestKey='arabista_v258_guest_token',guestMemory='',activeSig='',claimKey='',walletPending=false,walletReturn=false,quoteNotice='',galleryTrack=null,galleryLayer=null,galleryFrame=0,galleryObserver=null,gallerySlots=new Map(),walletKnown=false,walletPriority=[],walletOptimize=false;
+    var snap=null,claims=[],offset=0,last=0,loading=false,busyClaim=false,booted=false,epoch=0,transfer=false,walletSeq=0,mode='AUTO',manual={},quoteMeta=null,quoteKey='',pendingKey='',modal=null,kind='',popup=null,focus=null,message='',ids={},guestKey='arabista_v258_guest_token',guestMemory='',activeSig='',claimKey='',walletPending=false,walletReturn=false,quoteNotice='',galleryTrack=null,galleryFrame=0,galleryObserver=null,gallerySlots=new Map(),personalCounts=new Map(),walletKnown=false,walletPriority=[],walletOptimize=false;
     var css=[
 '.vp[hidden],.vp-overlay[hidden]{display:none!important}.vp,.vp *,.vp-overlay,.vp-overlay *{box-sizing:border-box}.vp{font:13px/1.45 "DM Sans",system-ui,sans-serif;color:#332824}.vp button,.vp-overlay button{font-family:inherit;cursor:pointer;transition:transform .2s,background .2s}.vp button:active,.vp-overlay button:active{transform:scale(.96)}.vp button:disabled,.vp-overlay button:disabled{cursor:default;transform:none}',
 '#shop .vp-shop{width:auto!important;max-width:1190px;margin:10px clamp(12px,3vw,28px) 0;min-width:0;overflow:hidden}.vp-banner{position:relative;isolation:isolate;display:grid;grid-template-columns:minmax(0,1fr) auto auto;align-items:center;gap:clamp(6px,2vw,12px);padding:12px 10px;border-radius:15px;background:linear-gradient(115deg,#79364a,#481c2a);color:#fff5e8;box-shadow:0 5px 16px #702a4020;overflow:hidden;animation:vp-in .42s both}.vp-banner::after,.vp-gift::after{content:"";position:absolute;inset:-70%;z-index:-1;background:linear-gradient(105deg,transparent 46%,#f2d9ae17 50%,transparent 54%);transform:translateX(-60%);animation:vp-shine 8s ease-in-out infinite;pointer-events:none}.vp-over{font-size:9px;font-weight:700;letter-spacing:.13em;text-transform:uppercase;color:#e5caa1}.vp-banner strong{display:block;font-size:clamp(16px,4.8vw,22px);line-height:1.18;letter-spacing:-.035em;overflow-wrap:anywhere}.vp-banner small{display:block;color:#ead9bf;font-size:10px}.vp-clock{display:flex;gap:3px;align-items:center;color:#f5dcb1;font-variant-numeric:tabular-nums}.vp-clock span{background:#39142080;border:1px solid #e7c8a627;border-radius:6px;padding:5px 4px;min-width:24px;text-align:center;font-size:16px;font-weight:750}.vp-clock-label{font-size:9px;color:#e9d7b9;text-align:center;margin-bottom:3px}.vp-urgent{animation:vp-urgent 2s infinite}.vp-wallet{display:grid!important;justify-items:center;gap:3px;background:transparent!important;border:0!important;padding:0 2px!important;min-width:44px;min-height:44px;color:#f5e9d6!important;font-size:9px!important;white-space:nowrap}.vp-icon{display:grid;place-items:center;color:#702a40;flex-shrink:0}.vp-wallet .vp-icon{width:34px;height:34px;border-radius:50%;background:#ead2a6}.vp-icon svg{width:21px;height:21px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}',
@@ -18430,8 +18430,9 @@ function attachSheetResizeHandle(handle,sheet,apply,ratio){
 '@keyframes vp-in{from{opacity:.2;transform:translateY(6px)}to{opacity:1;transform:none}}@keyframes vp-fade{from{opacity:0}to{opacity:1}}@keyframes vp-sheet{from{opacity:.4;transform:translateY(45px)}to{opacity:1;transform:none}}@keyframes vp-gift{from{opacity:0;transform:translateY(12px) scale(.94)}to{opacity:1;transform:none}}@keyframes vp-claim{0%{transform:scale(.93)}65%{transform:scale(1.04)}100%{transform:none}}@keyframes vp-shine{0%,65%{transform:translateX(-60%)}90%,100%{transform:translateX(60%)}}@keyframes vp-urgent{0%,100%{opacity:1}50%{opacity:.65}}@media(max-width:360px){.vp-banner{padding:10px 7px;gap:4px}.vp-clock span{min-width:22px;padding:4px 3px;font-size:14px}.vp-ticket{grid-template-columns:60px minmax(0,1fr) 65px}.vp-copy{padding:9px 5px}.vp-modal{padding-inline:10px}}@media(prefers-reduced-motion:reduce){.vp *,.vp-overlay *,.vp-banner,.vp-banner::after,.vp-gift::after{animation:none!important;transition:none!important}}'
     ].join('\n')+
 "\n/* v2.58 mobile owner refinement */\n#commerce-panel[data-view=\"basket\"],#commerce-panel[data-view=\"variant\"]{height:100%;max-height:100%;border-radius:0;padding-top:env(safe-area-inset-top,0px)}\n#commerce-panel[data-view=\"basket\"] .commerce-handle,#commerce-panel[data-view=\"variant\"] .commerce-handle{display:none}\n.vp-close{padding:0;display:grid;place-items:center;aspect-ratio:1;box-sizing:border-box}.vp-close svg{display:block;width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round}\n.vp-ticket{min-height:104px;animation:none}.vp-ticket.vp-new{animation:vp-in .28s both}.vp-ticket .vp-action button,.vp-ticket .vp-status{height:38px;min-height:38px;max-height:38px;width:100%;padding:0 2px;line-height:1;border:0;border-radius:8px}.vp-ticket .vp-status.claimed{animation:none}.vp-ticket .vp-status.vp-success{animation:vp-claim .35s both}.vp-ticket .vp-action .vp-busy{background:#702a40!important;color:#fff!important}.vp-ticket .vp-copy{min-height:77px;display:flex;flex-direction:column;justify-content:center}\n.vp-spinner{display:block;flex:none;width:17px;height:17px;border:1.5px solid currentColor;border-right-color:transparent;border-radius:50%;animation:vp-spin .85s linear infinite}.vp-busy .vp-spinner{margin:auto}.vp-wallet-list{display:grid;gap:9px}.vp-wallet-list>.vp-ticket{margin:0}.vp-wallet-list>.vp-empty{margin:0}.vp-history{margin-top:12px}.vp-modal .vp-msg{min-height:20px;margin:8px 3px 0}.vp-msg.vp-error{color:#9a3845}\n.vp-quote-loading{display:flex;align-items:center;gap:13px;min-height:72px;position:relative;overflow:hidden}.vp-quote-loading .vp-spinner{width:23px;height:23px;color:#9a764b}.vp-load-copy{flex:1;min-width:0}.vp-skeleton{display:block;position:relative;overflow:hidden;width:90%;height:6px;margin-top:8px;background:#ebdfce;border-radius:9px}.vp-skeleton.short{width:55%}.vp-skeleton::after{content:\"\";position:absolute;inset:0;background:linear-gradient(100deg,transparent,#fff9,transparent);transform:translateX(-100%);animation:vp-skeleton 1.6s ease-in-out infinite}\n.vp-manage{min-width:73px;min-height:40px}.vp-applied{border-top:1px solid #e7dac8;padding-top:9px;margin-top:9px;font-size:11px;color:#58714f}.vp-applied strong{font-size:12px}\n.vp-savings-wrap{margin-top:13px;border-radius:11px;overflow:hidden;background:linear-gradient(120deg,#f8eddb,#eddbc0);animation:vp-in .4s both}.vp-savings-wrap .vp-savings{margin:0;background:none;animation:none;border-radius:0}.vp-more{display:flex;align-items:center;justify-content:space-between;gap:8px;width:calc(100% - 24px);margin:0 12px;padding:10px 0 11px;border:0;border-top:1px solid #d9c6a8;background:transparent;color:#702a40;font-size:11px;text-align:left;font-weight:650;min-height:40px}.vp-more span:last-child{white-space:nowrap}\n@keyframes vp-spin{to{transform:rotate(360deg)}}@keyframes vp-skeleton{to{transform:translateX(100%)}}@media(prefers-reduced-motion:reduce){.vp-spinner,.vp-skeleton::after,.vp-ticket.vp-new,.vp-ticket .vp-status.vp-success,.vp-savings-wrap{animation:none!important}}\n"+
-"\n/* Stage 4A: full-height editorial surfaces, aligned to each moving slide. */\n#product-gallery .vp-gallery[hidden],#product-gallery .vp-slide-priv[hidden],#product-gallery .vp-rail[hidden]{display:none!important}\n#product-gallery .vp-gallery{position:absolute;inset:0;z-index:2;pointer-events:none;overflow:hidden;isolation:isolate;font-family:\"DM Sans\",system-ui,sans-serif}\n#product-gallery .product-gallery-count{z-index:3}\n#product-gallery .vp-slide-priv{position:absolute;top:0;height:100%;pointer-events:none;overflow:hidden}\n#product-gallery .vp-rail{position:absolute;top:0;bottom:0;display:flex;flex-direction:column;justify-content:center;align-items:stretch;gap:4px;box-sizing:border-box;overflow:hidden;text-align:center;padding:7px 3px 32px;background:linear-gradient(150deg,#813e51,#572437 53%,#411724);color:#f9e8cc;pointer-events:none}\n#product-gallery .vp-rail-left{left:0;border-right:1px solid #c8a77b55}\n#product-gallery .vp-rail-right{right:0;border-left:1px solid #c8a77b55;background:linear-gradient(205deg,#78354b,#4b1b2b)}\n#product-gallery .vp-rail:empty{background:linear-gradient(155deg,#f0e5d5,#e0cbb0)}\n#product-gallery .vp-rail-offer{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;flex:none;min-width:0;max-width:100%;padding:2px 0}\n#product-gallery .vp-rail-offer+.vp-rail-offer{border-top:1px solid #e6c79a55;padding-top:5px}\n#product-gallery .vp-rail-kicker{font-size:8px;line-height:1.2;font-weight:750;letter-spacing:.025em;color:#edd1a5;overflow-wrap:anywhere}\n#product-gallery .vp-rail-prefix{font-size:9px;line-height:1.1;font-weight:650}\n#product-gallery .vp-rail-value{font:600 var(--vp-value-size,26px)/1.1 \"Cormorant Garamond\",Georgia,serif;letter-spacing:-.04em;color:#f6deb2;white-space:nowrap;font-variant-numeric:lining-nums}\n#product-gallery .vp-rail-unit{font-size:8px;line-height:1.2;font-weight:700;overflow-wrap:anywhere}\n#product-gallery .vp-rail-terms{display:grid;gap:1px;max-width:100%;font-size:9px;line-height:1.2;color:#f8ead7;overflow-wrap:anywhere}\n#product-gallery .vp-rail-time{font-size:12px;font-weight:750;font-variant-numeric:tabular-nums;white-space:nowrap;letter-spacing:-.045em;color:#f5d79e}\n#product-gallery .vp-rail-time.vp-long{font-size:10px}\n#product-gallery .vp-rail-action{display:flex;align-items:center;justify-content:center;pointer-events:auto;touch-action:pan-x pan-y;min-width:44px;min-height:44px;max-width:100%;padding:0 2px;border:0;background:transparent;color:#f9e4bc;font:750 10px/1.15 \"DM Sans\",system-ui,sans-serif;cursor:pointer;text-decoration:underline;text-underline-offset:3px}\n#product-gallery .vp-rail-action:focus-visible{outline:2px solid #f6d8a5;outline-offset:-2px}\n#product-gallery .vp-rail-more{min-height:44px;font-size:9px;align-self:center}\n@media(prefers-reduced-motion:reduce){#product-gallery .vp-gallery *,#product-gallery .vp-gallery *::before{animation:none!important;transition:none!important}}\n";
+"\n/* Full-height editorial surfaces, contained in native gallery slides. */\n#product-gallery .vp-slide-priv[hidden],#product-gallery .vp-rail[hidden]{display:none!important}\n#product-gallery .product-gallery-count{z-index:3}\n#product-gallery .vp-rail{position:absolute;top:0;bottom:0;display:flex;flex-direction:column;justify-content:center;align-items:stretch;gap:4px;box-sizing:border-box;overflow:hidden;text-align:center;padding:7px 3px 32px;background:linear-gradient(150deg,#813e51,#572437 53%,#411724);color:#f9e8cc;pointer-events:none}\n#product-gallery .vp-rail-left{left:0;border-right:1px solid #c8a77b55}\n#product-gallery .vp-rail-right{right:0;border-left:1px solid #c8a77b55;background:linear-gradient(205deg,#78354b,#4b1b2b)}\n#product-gallery .vp-rail:empty{background:linear-gradient(155deg,#f0e5d5,#e0cbb0)}\n#product-gallery .vp-rail-offer{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;flex:none;min-width:0;max-width:100%;padding:2px 0}\n#product-gallery .vp-rail-offer+.vp-rail-offer{border-top:1px solid #e6c79a55;padding-top:5px}\n#product-gallery .vp-rail-kicker{font-size:8px;line-height:1.2;font-weight:750;letter-spacing:.025em;color:#edd1a5;overflow-wrap:anywhere}\n#product-gallery .vp-rail-prefix{font-size:9px;line-height:1.1;font-weight:650}\n#product-gallery .vp-rail-value{font:600 var(--vp-value-size,26px)/1.1 \"Cormorant Garamond\",Georgia,serif;letter-spacing:-.04em;color:#f6deb2;white-space:nowrap;font-variant-numeric:lining-nums}\n#product-gallery .vp-rail-unit{font-size:8px;line-height:1.2;font-weight:700;overflow-wrap:anywhere}\n#product-gallery .vp-rail-terms{display:grid;gap:1px;max-width:100%;font-size:9px;line-height:1.2;color:#f8ead7;overflow-wrap:anywhere}\n#product-gallery .vp-rail-time{font-size:12px;font-weight:750;font-variant-numeric:tabular-nums;white-space:nowrap;letter-spacing:-.045em;color:#f5d79e}\n#product-gallery .vp-rail-time.vp-long{font-size:10px}\n#product-gallery .vp-rail-action{display:flex;align-items:center;justify-content:center;pointer-events:auto;touch-action:pan-x pan-y;min-width:44px;min-height:44px;max-width:100%;padding:0 2px;border:0;background:transparent;color:#f9e4bc;font:750 10px/1.15 \"DM Sans\",system-ui,sans-serif;cursor:pointer;text-decoration:underline;text-underline-offset:3px}\n#product-gallery .vp-rail-action:focus-visible{outline:2px solid #f6d8a5;outline-offset:-2px}\n#product-gallery .vp-rail-more{min-height:44px;font-size:9px;align-self:center}\n@media(prefers-reduced-motion:reduce){#product-gallery .vp-slide-priv *,#product-gallery .vp-slide-priv *::before{animation:none!important;transition:none!important}}\n";
     css+="\n#vp-product{padding:0;overflow:hidden;background:#fffaf3;border-color:#dcc7aa}\n#vp-product .vp-product-main{padding:13px;background:linear-gradient(120deg,#78364a,#481c2a);color:#fff3df}\n#vp-product .vp-product-main strong{display:block;color:#f9dfb1;font:650 26px/1.12 \"Cormorant Garamond\",Georgia,serif}\n#vp-product .vp-product-main .vp-note{color:#f0ddc5}\n#vp-product .vp-product-main .vp-btn{background:#ead2a6;color:#481c2a!important}\n.vp-collection{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 12px;color:#702a40;font-size:12px;font-weight:700}\nbutton.vp-collection{width:100%;border:0;background:transparent;text-align:left;min-height:44px}\n.vp-seal{display:inline-flex;align-items:center;gap:6px;color:#735324;font-weight:750;font-size:11px;line-height:1.3}\n.vp-seal-mark{display:inline-grid;place-items:center;width:22px;height:22px;flex:none;border:1px solid #b38e52;border-radius:50%;background:linear-gradient(135deg,#fff2d4,#e1bc77);color:#64461e}\n.vp-select-auto{width:100%;min-height:54px!important;display:flex;flex-direction:column;align-items:flex-start!important;justify-content:center!important;gap:2px;text-align:left;white-space:normal!important}\n.vp-select-auto small{font-size:10px;font-weight:500;line-height:1.3}\n.vp-collect-link{min-height:44px;background:transparent;border:0;color:#702a40;font-size:11px;font-weight:750;text-decoration:underline;text-underline-offset:3px;padding:4px 0}\n.vp-label.vp-select-label{align-items:center;min-height:44px;margin:4px 3px 6px;gap:8px}\n.vp-wallet-list+.vp-btn{margin-top:14px}\n.vp-ticket.vp-priority{border-color:#b28b54;box-shadow:0 0 0 1px #b28b5430}\n.vp-savings-wrap{background:linear-gradient(135deg,#f9efdc,#eedabc);border:1px solid #e4cfa9}\n.vp-savings-wrap .vp-savings{background:linear-gradient(115deg,#79364a,#481c2a);color:#fff3df}\n.vp-savings-wrap .vp-savings strong,.vp-savings-wrap .vp-savings .vp-icon{color:#f5d9a5}\n.vp-savings-wrap .vp-savings .vp-note{color:#f0dcc4}\n.vp-savings-wrap .vp-more{min-height:48px;align-items:center}\n.vp-savings-wrap .vp-more:first-child{border-top:0}\n.vp-more .vp-more-cta{background:#702a40;color:#fff7e8;border-radius:999px;padding:7px 9px;flex:none}\n.vp-more .vp-more-copy{display:grid;gap:2px;min-width:0}\n.vp-more .vp-more-copy small{font-size:10px;color:#786657;font-weight:500}\n.vp-savings-wrap .vp-seal{color:#f7dda8}\n@media(prefers-reduced-motion:reduce){.vp-savings-wrap{animation:none!important}}\n";
+    css+="\n/* v2.58 Stage 5: native slide composition. No separately moving sibling layer. */\n#product-gallery .product-gallery-slide{position:relative;isolation:isolate}\n#product-gallery .vp-photo-open{position:absolute;inset:0;display:block;width:100%;height:100%;border:0;padding:0;margin:0;background:transparent;z-index:1;touch-action:pan-x pan-y;cursor:pointer;box-shadow:none}\n#product-gallery .vp-photo-open:focus-visible{outline:2px solid #b28b54;outline-offset:-3px}\n#product-gallery .vp-slide-priv{position:absolute;inset:0;width:100%;height:100%;z-index:2;pointer-events:none;overflow:hidden;font-family:\"DM Sans\",system-ui,sans-serif}\n#product-gallery .vp-slide-priv[hidden]{display:none!important}\n";
     function E(t,c,x){var n=document.createElement(t);if(c)n.className=c;if(x!==undefined)n.textContent=String(x);return n}
     function B(t,f,c){var b=E('button',c||'vp-btn',t);b.type='button';b.onclick=f;return b}
     function style(r){if(r&&!r.querySelector('#vp-style')){var s=E('style');s.id='vp-style';s.textContent=css;r.append(s)}}
@@ -18449,7 +18450,19 @@ function attachSheetResizeHandle(handle,sheet,apply,ratio){
     function active(){return claims.filter(usable)}
     function enabled(){return !!(snap&&snap.enabled&&snap.initialized)}
     function offers(){return enabled()?(snap.vouchers||[]).filter(function(v){var c=(snap.campaigns||[]).find(function(c){return c.campaign_id===v.campaign_id});return v.state==='CLAIMABLE'&&(!v.claim_starts_at_utc||Date.parse(v.claim_starts_at_utc)<=now())&&(!v.claim_ends_at_utc||rem(v.claim_ends_at_utc)>0)&&(!c||c.state==='LIVE'&&(!c.ends_at_utc||rem(c.ends_at_utc)>0)&&(!c.starts_at_utc||Date.parse(c.starts_at_utc)<=now()))}):[]}
-    function available(){return offers().filter(function(v){return !active().some(function(c){return c.voucher_id===v.voucher_id})})}
+    // Personal entitlement is consumed by an issued claim even after expiry.
+    // MERGED records represent duplicate claims, not extra customer entitlements.
+    function personalClaims(v){
+      var vid=String(v.voucher_id||''),local=claims.filter(function(c){return String(c.voucher_id)===vid&&['ACTIVE','RESERVED','REDEEMED','EXPIRED','RELEASED'].includes(c.status)}).length;
+      return Math.max(local,personalCounts.get(vid)||0)
+    }
+    function readPersonalCounts(r){
+      var counts=r&&r.personal_claim_counts;
+      personalCounts.clear();
+      if(!counts||typeof counts!=='object'||Array.isArray(counts))return;
+      Object.keys(counts).forEach(function(vid){var n=Number(counts[vid]);if(Number.isSafeInteger(n)&&n>=0)personalCounts.set(vid,n)})
+    }
+    function available(){if(booted&&!walletKnown)return [];return offers().filter(function(v){return personalClaims(v)<Math.max(1,Number(v.per_customer_limit||1))&&!active().some(function(c){return c.voucher_id===v.voucher_id})})}
     function visible(){return enabled()&&(offers().length||claims.length)}
     function T(v){return v&&v.terms||{}}
     function rm(n){return 'RM'+(Number(n||0)/100).toFixed(2)}
@@ -18465,12 +18478,12 @@ function attachSheetResizeHandle(handle,sheet,apply,ratio){
       var seq=++walletSeq,o=owner(),e=epoch;walletPending=true;paint();
       return rpc('arabistaDevPromotionsWalletV258',auth()).then(function(r){
         if(seq!==walletSeq||e!==epoch||o!==owner())return;
-        if(r&&r.ok){clock(r);claims=r.claims||[];walletKnown=true;render()}else{walletKnown=false;if(!message)message=error(r)}
+        if(r&&r.ok){clock(r);claims=r.claims||[];readPersonalCounts(r);walletKnown=true;render();maybePopup()}else{walletKnown=false;if(!message)message=error(r)}
       }).catch(function(){if(seq===walletSeq){walletKnown=false;if(!message)message='Vouchers could not be refreshed.'}})
       .finally(function(){if(seq===walletSeq){walletPending=false;render();paint()}});
     }
     function boot(){booted=true;walletKnown=owner()==='none';style(document.head);refresh(true);if(isIdentitySignedIn()&&guest())identityChanged(true);else if(owner()!=='none')wallet();document.addEventListener('visibilitychange',function(){if(!document.hidden){tick();if(tabId==='shop')refresh(false)}});setInterval(tick,1000)}
-    function identityChanged(signed){walletKnown=owner()==='none';epoch++;walletSeq++;walletPending=false;claims=[];mode='AUTO';manual={};quoteMeta=null;ids={};quoteNotice='';if(!booted)return;render();if(signed&&guest()&&!transfer){transfer=true;var e=epoch;rpc('arabistaDevPromotionsTransferGuestClaimsV258',{access_token:state.identityAccessToken,guest_token:guest()}).then(function(r){if(e!==epoch)return;if(r&&r.ok){clock(r);guestMemory='';set(guestKey,'')}else message='Voucher transfer could not be confirmed.'}).catch(function(){message='Voucher transfer could not be confirmed.'}).finally(function(){transfer=false;if(e===epoch){wallet();requote()}})}else{if(owner()!=='none')wallet();requote()}}
+    function identityChanged(signed){walletKnown=owner()==='none';epoch++;walletSeq++;walletPending=false;claims=[];personalCounts.clear();mode='AUTO';manual={};quoteMeta=null;ids={};quoteNotice='';if(!booted)return;render();if(signed&&guest()&&!transfer){transfer=true;var e=epoch;rpc('arabistaDevPromotionsTransferGuestClaimsV258',{access_token:state.identityAccessToken,guest_token:guest()}).then(function(r){if(e!==epoch)return;if(r&&r.ok){clock(r);guestMemory='';set(guestKey,'')}else message='Voucher transfer could not be confirmed.'}).catch(function(){message='Voucher transfer could not be confirmed.'}).finally(function(){transfer=false;if(e===epoch){wallet();requote()}})}else{if(owner()!=='none')wallet();requote()}}
     function claim(v,code){
       if(busyClaim||transfer||v251PurchaseBusy||v251ReconcileBusy)return;
       var k=code?'code:'+code:v.voucher_id,o=owner(),e=epoch,opened=modal,success=false;
@@ -18478,8 +18491,9 @@ function attachSheetResizeHandle(handle,sheet,apply,ratio){
       busyClaim=true;claimKey=k;walletSeq++;walletPending=false;message='';paint();
       rpc('arabistaDevPromotionsClaimV258',Object.assign({claim_request_id:ids[k]},auth(),code?{code:code}:{voucher_id:v.voucher_id})).then(function(r){
         if(e!==epoch||o!==owner())return;
-        if(!r||!r.ok||!r.claim){message=error(r);if(r&&r.voucher_state)refresh(true);return}
+        if(!r||!r.ok||!r.claim){message=error(r);if(r&&r.reason==='per_customer_limit_reached'&&v){var vid=String(v.voucher_id);personalCounts.set(vid,Math.max(personalClaims(v),Math.max(1,Number(v.per_customer_limit||1))));render()}if(r&&r.voucher_state)refresh(true);return}
         clock(r);if(r.guest_token){guestMemory=r.guest_token;set(guestKey,r.guest_token)}
+        if(r.outcome==='DEV_PROMOTION_CLAIMED'&&!claims.some(function(c){return c.claim_id===r.claim.claim_id})){var vid=String(r.claim.voucher_id);personalCounts.set(vid,personalClaims(r.claim)+1)}
         claims=claims.filter(function(c){return c.claim_id!==r.claim.claim_id});claims.push(r.claim);if(o==='none')walletKnown=true;if(walletOptimize&&opened===modal&&kind==='wallet'){mode='AUTO';manual={};quoteNotice=''}delete ids[k];success=true;message='✓ Voucher claimed';
         if(modal===opened&&kind==='popup'){close();toast('Voucher claimed')}
         render();requote();
@@ -18505,7 +18519,7 @@ function attachSheetResizeHandle(handle,sheet,apply,ratio){
     function ticket(v,c,a){
       var x=c||v,t=T(x),key=ticketKey(v,c),prior=a&&a.dataset.state;
       if(!a){a=E('article','vp-ticket vp-new');a.dataset.key=key;a.append(E('div','vp-value'),E('div','vp-copy'),E('div','vp-action'));a.addEventListener('animationend',function(){a.classList.remove('vp-new')},{once:true})}
-      var val=a.children[0],cp=a.children[1],act=a.children[2],can=c&&(quoteMeta&&quoteMeta.candidates||[]).find(function(y){return y.claim_id===c.claim_id}),sig=JSON.stringify([t,c&&c.claim_id,c&&c.status,c&&c.expires_at_utc,can&&can.reason,can&&can.shortfall_sen]);
+      var val=a.children[0],cp=a.children[1],act=a.children[2],can=c&&(quoteMeta&&quoteMeta.candidates||[]).find(function(y){return y.claim_id===c.claim_id}),sig=JSON.stringify([t,c&&c.claim_id,c&&c.status,c&&c.expires_at_utc,c&&usable(c),can&&can.reason,can&&can.shortfall_sen]);
       if(a.dataset.copy!==sig){a.dataset.copy=sig;val.replaceChildren(E('strong','',value(x)),E('small','',t.voucher_kind==='SHIPPING'?'SHIPPING':'OFF'));cp.replaceChildren(E('strong','',t.title||'Voucher'),E('small','',terms(x)));if(c&&usable(c)){var ex=E('small','vp-exp','Expires in ');ex.append(timeNode(c.expires_at_utc));cp.append(ex)}if(kind==='select'&&can&&!can.eligible)cp.append(E('small','',can.reason==='min_spend_not_met'?'Add '+short(can.shortfall_sen)+' more':'Not eligible for this order'))}
       if(c&&kind==='select'){
         var selected=applied(quoteMeta).some(function(y){return y.claim_id===c.claim_id}),b=act.firstElementChild;
@@ -18531,7 +18545,7 @@ function attachSheetResizeHandle(handle,sheet,apply,ratio){
         var b=m.querySelector('[data-vp-claim]');busyButton(b,busyClaim&&claimKey===v.voucher_id,'Claim voucher');m.querySelector('.vp-msg').textContent=message;return
       }
       if(fresh){
-        var head=E('div','vp-head'),cp=E('div');cp.append(E('div','vp-over','ARABISTA PRIVILEGES'),E('h2','',kind==='select'?'Manage vouchers':'My vouchers'),E('div','vp-note',kind==='select'?'Make the most of your order.':'Collect more. Enjoy more savings.'));head.append(cp,closeIcon());m.append(head);
+        var head=E('div','vp-head'),cp=E('div');cp.append(E('div','vp-over','ARABISTA OFFERS'),E('h2','',kind==='select'?'Manage vouchers':'My vouchers'),E('div','vp-note',kind==='select'?'Make the most of your order.':'Collect more. Enjoy more savings.'));head.append(cp,closeIcon());m.append(head);
         if(kind==='select'){var actions=E('div','vp-actions');var auto=B('',function(){select('AUTO')},'vp-btn vp-select-auto');auto.append(E('strong','','Best savings'),E('small','','Automatically apply your best eligible vouchers.'));auto.dataset.vpMode='AUTO';actions.append(auto);m.append(actions)}
         var label=E('div','vp-label'+(kind==='select'?' vp-select-label':''));label.append(E('span','','Your vouchers'),E('span','vp-note'));if(kind==='select'){var collect=B('',function(){open('wallet',null,true)},'vp-collect-link');label.append(collect)}m.append(label,E('div','vp-wallet-list'));
         if(kind!=='select'){var d=E('details','vp-card vp-history');d.append(E('summary','','Voucher history'),E('div','vp-wallet-list vp-history-list'));m.append(d);var f=E('form','vp-code'),i=E('input');i.placeholder='Voucher code';i.setAttribute('aria-label','Voucher code');i.maxLength=32;i.autocomplete='off';var b=B('Claim',function(){});b.type='submit';f.append(i,b);f.onsubmit=function(e){e.preventDefault();var c=i.value.trim().toUpperCase();if(c)claim(null,c)};m.append(f);if(walletReturn)m.append(B('Back to voucher selection',function(){open('select')},'vp-btn alt'))}
@@ -18556,11 +18570,11 @@ function attachSheetResizeHandle(handle,sheet,apply,ratio){
     function requote(){if(v251PurchaseBusy||v251ReconcileBusy)return;invalidateQuote();state.idempotencyKey=null;quoteMeta=null;quoteKey='';pendingKey='';if(v248Exact.current==='checkout')v248XRequestQuote();else if(v254CheckoutIsOpen_())v254CheckoutEnsureQuote_();render()}
     function addressChanged(){if(v251PurchaseBusy)return;if((pendingKey&&pendingKey!==context())||(quoteKey&&quoteKey!==context()))requote();else if(v248Exact.current==='checkout'&&!v248Exact.quoting&&!v248Exact.quote)v248XRequestQuote()}
     function subtotal(){var rs=lines().map(v248XLineDetails);return rs.some(function(r){return r.price==null})?null:rs.reduce(function(n,r){return n+r.price*r.item.quantity},0)}
-    function best(){return active().filter(function(c){return c.voucher_kind==='SHOPPING'}).sort(function(a,b){return Date.parse(a.expires_at_utc)-Date.parse(b.expires_at_utc)})[0]||offers().find(function(v){return T(v).voucher_kind==='SHOPPING'})||active()[0]||offers()[0]}
+    function best(){return active().filter(function(c){return c.voucher_kind==='SHOPPING'}).sort(function(a,b){return Date.parse(a.expires_at_utc)-Date.parse(b.expires_at_utc)})[0]||collectable().find(function(v){return T(v).voucher_kind==='SHOPPING'})||active()[0]||collectable()[0]}
     function sign(v){return [v.voucher_id,v.claim_id,v.expires_at_utc,T(v).terms_version].join(':')}
     function shop(){var anchor=document.querySelector('#shop .shop-subtabs');if(!anchor)return;var host=$('vp-shop');if(!host){host=E('div','vp vp-shop');host.id='vp-shop';anchor.after(host)}host.hidden=!visible();if(host.hidden)return;var v=best();if(!v){if(host.dataset.sig!=='history'){host.dataset.sig='history';host.replaceChildren(B('My vouchers',function(){open('wallet')},'vp-btn alt'))}return}if(host.dataset.sig===sign(v))return;host.dataset.sig=sign(v);var banner=E('div','vp-banner'),cp=E('div');cp.style.minWidth='0';cp.append(E('div','vp-over',v.claim_id?'YOUR VOUCHER':'EXCLUSIVE OFFER'),E('strong','',value(v)+(T(v).voucher_kind==='SHIPPING'?' shipping':' OFF')),E('small','',terms(v)));var middle;if(v.claim_id){middle=E('div');var digits=E('div','vp-clock');digits.dataset.vpClock=v.expires_at_utc;digits.append(E('span','','--'),E('b','',':'),E('span','','--'));middle.append(E('div','vp-clock-label','Expires in'),digits)}else middle=B('Claim',function(){open('wallet')},'vp-btn alt');var w=B('',function(){open('wallet')},'vp-wallet');w.setAttribute('aria-label','My vouchers');w.append(icon(),E('span','','Vouchers'));banner.append(cp,middle,w);host.replaceChildren(banner)}
     // Pure contain geometry in CSS pixels. Frame and image rectangles share a
-    // coordinate space; refuse partially swiped images and narrow/short margins.
+    // local slide coordinate space; refuse mismatched boxes and narrow/short margins.
     function galleryGeometry(frame,img,nw,nh){
       if(!frame||!img||![frame.width,frame.height,img.width,img.height,nw,nh].every(function(n){return Number.isFinite(n)&&n>0})||frame.height<218)return null;
       if(Math.abs(img.left-frame.left)>3||Math.abs(img.width-frame.width)>3)return null;
@@ -18597,7 +18611,7 @@ function attachSheetResizeHandle(handle,sheet,apply,ratio){
     function galleryCampaign(v){
       return (snap&&snap.campaigns||[]).find(function(c){return c.campaign_id===v.campaign_id})||null
     }
-    function collectable(){return available().filter(function(v){if(v.remaining_claims!=null&&Number(v.remaining_claims)<=0||v.validity_mode==='FIXED'&&v.use_ends_at_utc&&rem(v.use_ends_at_utc)<=0)return false;var held=claims.filter(function(x){return x.voucher_id===v.voucher_id&&(usable(x)||x.status==='RESERVED'||x.status==='REDEEMED')}).length;return held<Math.max(1,Number(v.per_customer_limit||1))})}
+    function collectable(){return available().filter(function(v){if(v.remaining_claims!=null&&Number(v.remaining_claims)<=0||v.validity_mode==='FIXED'&&v.use_ends_at_utc&&rem(v.use_ends_at_utc)<=0)return false;return true})}
     function claimableRelevant(ctx,chosen,stateName){return !enabled()||transfer?[]:collectable().filter(function(v){var c=galleryCampaign(v);return !!c&&c.state==='LIVE'&&galleryTarget(v,ctx,chosen,stateName)})}
     function galleryOffers(ctx,chosen,stateName){
       if(!enabled()||transfer)return [];
@@ -18617,20 +18631,22 @@ function attachSheetResizeHandle(handle,sheet,apply,ratio){
       if(shipping&&t.region_scope!=='ALL')detail.push('Eligible delivery');
       return {prefix:full||isPercent?'':shipping?'UP TO RM':'RM',amount:amount,unit:shipping?'SHIPPING'+(full?'':' OFF'):'OFF',terms:detail}
     }
-    function hideGallery(){if(galleryLayer)galleryLayer.hidden=true}
+    function hideGallery(){gallerySlots.forEach(function(slot){slot.hidden=true})}
     function galleryChanged(){
       if(v248Exact.current!=='product'){if(galleryFrame){cancelAnimationFrame(galleryFrame);galleryFrame=0}hideGallery();return}
-      var root=v248Exact.shadow,track=root&&root.querySelector('#product-gallery-track'),parent=track&&track.parentNode;
-      if(!track||!parent)return;
+      var root=v248Exact.shadow,track=root&&root.querySelector('#product-gallery-track');
+      if(!track)return;
       if(galleryTrack!==track){
-        if(galleryObserver)galleryObserver.disconnect();if(galleryLayer)galleryLayer.remove();
-        gallerySlots.clear();galleryTrack=track;galleryLayer=E('div','vp-gallery');galleryLayer.hidden=true;parent.append(galleryLayer);
-        track.addEventListener('scroll',galleryChanged,{passive:true});
+        if(galleryObserver)galleryObserver.disconnect();
+        if(galleryTrack){galleryTrack.removeEventListener('load',galleryChanged,true);galleryTrack.removeEventListener('error',galleryChanged,true)}
+        gallerySlots.forEach(function(slot){slot.remove()});gallerySlots.clear();galleryTrack=track;
         track.addEventListener('load',galleryChanged,true);track.addEventListener('error',galleryChanged,true);
         if(document.fonts&&document.fonts.ready)document.fonts.ready.then(galleryChanged).catch(function(){});
         if(typeof ResizeObserver==='function'){galleryObserver=new ResizeObserver(galleryChanged);galleryObserver.observe(track)}
         else window.addEventListener('resize',galleryChanged,{passive:true});
       }
+      // Only content, image readiness, sheet/viewer state, or size changes can schedule paint.
+      // Native scrolling moves the complete slide; there is no promo scroll handler.
       if(!galleryFrame)galleryFrame=requestAnimationFrame(function(){galleryFrame=0;galleryPaint()})
     }
     function galleryTicket(v,width,compact){
@@ -18644,31 +18660,28 @@ function attachSheetResizeHandle(handle,sheet,apply,ratio){
       var b=B(owned?'View ›':'Claim ›',function(){open('wallet',null,false,[v.voucher_id])},'vp-rail-action');b.setAttribute('aria-label',(owned?'View ':'Collect ')+(t.title||'voucher'));n.append(b);return n
     }
     function galleryPaint(){
-      var root=v248Exact.shadow,track=galleryTrack,layer=galleryLayer,viewer=root&&root.querySelector('#product-lightbox');
-      if(!track||!layer||v248Exact.current!=='product'||(viewer&&!viewer.hidden)){hideGallery();return}
-      var w=track.clientWidth,frame=track.getBoundingClientRect(),delivery=checkoutDeliveryFields_()||{},vs=galleryOffers(v248Exact.ctx,v248XChosenSku(),delivery.state);
-      if(!w||!vs.length){hideGallery();return}
-      var count=track.children.length,position=track.scrollLeft/w,nearest=Math.round(position),indices=Array.from(new Set([Math.floor(position),Math.ceil(position),nearest])).filter(function(i){return i>=0&&i<count});
-      gallerySlots.forEach(function(slot,slide){if(slide.parentNode!==track){slot.remove();gallerySlots.delete(slide)}else if(!indices.includes(Array.from(track.children).indexOf(slide)))slot.hidden=true});
-      var shown=false;layer.hidden=false;
-      indices.forEach(function(index){
-        var slide=track.children[index],img=slide&&slide.querySelector('img'),slot=gallerySlots.get(slide);
+      var root=v248Exact.shadow,track=galleryTrack,viewer=root&&root.querySelector('#product-lightbox');
+      gallerySlots.forEach(function(slot,slide){if(!track||slide.parentNode!==track){slot.remove();gallerySlots.delete(slide)}});
+      if(!track||v248Exact.current!=='product'||(viewer&&!viewer.hidden)){hideGallery();return}
+      var delivery=checkoutDeliveryFields_()||{},vs=galleryOffers(v248Exact.ctx,v248XChosenSku(),delivery.state);
+      if(!track.clientWidth||!vs.length){hideGallery();return}
+      Array.from(track.children).forEach(function(slide){
+        var img=slide.querySelector('img'),slot=gallerySlots.get(slide);
         if(!img||!img.complete||!slide.classList.contains('is-ready')||!img.naturalWidth){if(slot)slot.hidden=true;return}
-        var ir=img.getBoundingClientRect(),local={left:ir.left,width:ir.width,height:frame.height},geo=galleryGeometry(local,ir,img.naturalWidth,img.naturalHeight);
+        var local={left:0,width:slide.clientWidth,height:slide.clientHeight},ir={left:0,width:img.clientWidth,height:img.clientHeight},geo=galleryGeometry(local,ir,img.naturalWidth,img.naturalHeight);
         if(!geo){if(slot)slot.hidden=true;return}
-        var leftWidth=Math.floor(geo.photoLeft),rightWidth=Math.floor(ir.width-geo.photoRight);
-        if(!slot){slot=E('div','vp-slide-priv');slot.append(E('div','vp-rail vp-rail-left'),E('div','vp-rail vp-rail-right'));layer.append(slot);gallerySlots.set(slide,slot)}
-        var left=slot.children[0],right=slot.children[1],maxRight=frame.height>=286&&rightWidth>=62?2:1,sig=JSON.stringify([vs.map(sign),leftWidth,rightWidth,Math.round(frame.height),maxRight]);
-        slot.style.left=(ir.left-frame.left)+'px';slot.style.width=ir.width+'px';left.style.width=leftWidth+'px';right.style.width=rightWidth+'px';
+        var leftWidth=Math.floor(geo.photoLeft),rightWidth=Math.floor(local.width-geo.photoRight);
+        if(!slot){slot=E('div','vp-slide-priv');slot.append(E('div','vp-rail vp-rail-left'),E('div','vp-rail vp-rail-right'));slide.append(slot);gallerySlots.set(slide,slot)}
+        var left=slot.children[0],right=slot.children[1],maxRight=local.height>=286&&rightWidth>=62?2:1,sig=JSON.stringify([vs.map(sign),leftWidth,rightWidth,local.height,maxRight]);
+        // Recheck overflow on explicit size/font/content events; no scroll-driven layout.
+        left.style.width=leftWidth+'px';right.style.width=rightWidth+'px';
         function fillRight(limit){right.replaceChildren();vs.slice(1,1+limit).forEach(function(v){right.append(galleryTicket(v,rightWidth,limit>1))});if(vs.length>1+limit)right.append(B('+'+(vs.length-1-limit)+' more ›',function(){open('wallet')},'vp-rail-action vp-rail-more'))}
-        if(slot.dataset.sig!==sig){slot.dataset.sig=sig;left.replaceChildren(galleryTicket(vs[0],leftWidth,false));fillRight(maxRight)}
+        if(slot.dataset.sig!==sig){slot.dataset.sig=sig;delete slot.dataset.compact;left.replaceChildren(galleryTicket(vs[0],leftWidth,false));fillRight(maxRight)}
         slot.hidden=false;left.hidden=false;right.hidden=false;
         if(right.scrollHeight>right.clientHeight+2&&maxRight>1&&slot.dataset.compact!==sig){slot.dataset.compact=sig;fillRight(1)}
         [left,right].forEach(function(rail){rail.hidden=rail.scrollHeight>rail.clientHeight+2||Array.from(rail.querySelectorAll('.vp-rail-value,.vp-rail-time')).some(function(n){return n.scrollWidth>rail.clientWidth-4})});
-        slot.querySelectorAll('button').forEach(function(b){b.tabIndex=index===nearest?0:-1});
-        slot.setAttribute('aria-hidden',String(index!==nearest));shown=shown||!left.hidden||!right.hidden;
+        slot.hidden=left.hidden&&right.hidden;
       });
-      layer.hidden=!shown;
     }
     function seal(label){var n=E('span','vp-seal');n.append(E('span','vp-seal-mark','✓'),E('span','',label));return n}
     function product(){
@@ -18680,11 +18693,11 @@ function attachSheetResizeHandle(handle,sheet,apply,ratio){
       var c=root.querySelector('#vp-product');if(!c){Array.from(section.children).forEach(function(n){if(!n.classList.contains('deal-section-head'))n.remove()});c=E('div','vp vp-card');c.id='vp-product';section.append(c)}
       var complete=walletKnown&&!walletPending&&!transfer&&!unclaimed.length&&vs.some(function(x){return !!x.claim_id}),sig=JSON.stringify([vs.map(sign),unclaimed.map(sign),complete]);
       if(c.dataset.sig===sig)return;c.dataset.sig=sig;
-      var row=E('div','vp-line vp-product-main'),cp=E('div');cp.append(E('div','vp-over','ARABISTA PRIVILEGES'),E('strong','',value(v)+(T(v).voucher_kind==='SHIPPING'?' shipping':' OFF')),E('div','vp-note',terms(v)));
+      var row=E('div','vp-line vp-product-main'),cp=E('div');cp.append(E('div','vp-over','ARABISTA OFFERS'),E('strong','',value(v)+(T(v).voucher_kind==='SHIPPING'?' shipping':' OFF')),E('div','vp-note',terms(v)));
       if(v.claim_id){var t=E('div','vp-note','Expires in ');t.append(timeNode(v.expires_at_utc));cp.append(t)}
       row.append(cp,B(v.claim_id?'Vouchers':'Claim',function(){open('wallet',null,false,[v.voucher_id])}));c.replaceChildren(row);
       if(unclaimed.length){var b=B('',function(){open('wallet',null,false,unclaimed.map(function(x){return x.voucher_id}))},'vp-collection');b.append(E('span','',(vs.some(function(x){return !!x.claim_id})?unclaimed.length+' more':unclaimed.length)+' voucher'+(unclaimed.length===1?'':'s')+' available'),E('span','','Collect ›'));c.append(b)}
-      else if(complete){var status=E('div','vp-collection');status.append(seal('All privileges unlocked'));c.append(status)}
+      else if(complete){var status=E('div','vp-collection');status.append(seal('All vouchers collected'));c.append(status)}
     }
     function cart(root,anchor,id){if(!anchor)return;var c=root.querySelector('#'+id);if(!c){c=E('div','vp vp-card');c.id=id;anchor.after(c)}c.hidden=!visible()||!lines().length;if(c.hidden)return;var v=best();if(!v){c.hidden=true;return}var n=subtotal(),min=Number(T(v).min_spend_sen||0),sig=sign(v)+':'+n;if(c.dataset.sig===sig)return;c.dataset.sig=sig;var row=E('div','vp-line'),cp=E('div');cp.append(E('strong','',n!==null&&min>n&&T(v).target_scope==='ALL'?'Add '+short(min-n)+' for voucher eligibility':'Vouchers available'),E('div','vp-note','Savings confirmed at checkout'));row.append(cp,B('Vouchers',function(){open('wallet')},'vp-btn alt'));c.replaceChildren(row);if(n!==null&&min&&T(v).target_scope==='ALL'){var track=E('div','vp-track'),i=E('i');i.style.width=Math.min(100,100*n/min)+'%';track.append(i);c.append(track)}}
     // Conservative local indication: only advertise an additional benefit when known facts support it.
@@ -18698,7 +18711,6 @@ function attachSheetResizeHandle(handle,sheet,apply,ratio){
       if(rows.some(function(r){return r.price==null})||rows.reduce(function(n,r){return n+r.price*r.item.quantity},0)!==Number(q.subtotal_sen))return [];
       return collectable().filter(function(v){
         var t=T(v),ids=t.target_ids||[],basis=0;
-        var held=claims.filter(function(c){return c.voucher_id===v.voucher_id&&(usable(c)||c.status==='RESERVED'||c.status==='REDEEMED')}).length;if(held>=Math.max(1,Number(v.per_customer_limit||1)))return false;
         rows.forEach(function(r){var p=r.product||{},sku=r.sku||{};if(t.target_scope==='ALL'||t.target_scope==='SKU'&&ids.includes(String(r.item.sku_id))||t.target_scope==='PRODUCT'&&ids.includes(String(p.product_id||sku.product_id||''))||t.target_scope==='CATEGORY'&&p.category_id&&ids.includes(String(p.category_id)))basis+=r.price*r.item.quantity});
         if(!basis||basis<Number(t.min_spend_sen||0))return false;
         if(t.voucher_kind==='SHIPPING'){
@@ -18738,7 +18750,7 @@ function attachSheetResizeHandle(handle,sheet,apply,ratio){
       if(p.dataset.sig===sig)return;p.dataset.sig=sig;p.setAttribute('aria-busy',String(pending));
       if(pending){var load=E('div','vp-quote-loading'),copy=E('div','vp-load-copy');copy.append(E('strong','',mode==='AUTO'?'Finding your best savings':'Checking your vouchers'),E('span','vp-skeleton'),E('span','vp-skeleton short'));load.append(spinner(),copy);load.setAttribute('role','status');p.replaceChildren(load);return}
       var row=E('div','vp-line'),cp=E('div'),ready=q&&valid(q),sum=selected.reduce(function(n,c){return n+Number(c.items_discount_sen||0)+Number(c.shipping_discount_sen||0)},0);
-      cp.append(E('strong','',ready&&selected.length?(mode==='AUTO'?'Best savings applied':'Vouchers applied'):mode==='NONE'?'No voucher':ready?'Best savings':'Deals & vouchers'),E('div','vp-note',rejected(quoteMeta)?'Voucher unavailable for this order':quoteMeta&&quoteMeta.suppressed_reason?'Promo code applied instead':ready&&selected.length?selected.map(function(x){return x.title||'Voucher'}).join(' · '):'Choose from your collected vouchers'));
+      cp.append(E('strong','',ready&&selected.length?(mode==='AUTO'?'Best savings applied':'Vouchers applied'):mode==='NONE'?'No voucher':ready?'Best savings':'Deals & vouchers'),E('div','vp-note',rejected(quoteMeta)?'Voucher unavailable for this order':quoteMeta&&quoteMeta.suppressed_reason?'Vouchers unavailable while a promo code is entered':ready&&selected.length?selected.map(function(x){return x.title||'Voucher'}).join(' · '):'Choose from your collected vouchers'));
       row.append(cp,B('Manage',function(){open('select')},'vp-btn alt vp-manage'));p.replaceChildren(row);
       if(ready&&sum>0){var a=E('div','vp-line vp-applied');a.append(E('span','',selected.length+' voucher'+(selected.length===1?'':'s')+' applied'),E('strong','','−'+rm(sum)));p.append(a)}
       if(quoteNotice)p.append(E('p','vp-note',quoteNotice));else if(rejected(quoteMeta))p.append(E('p','vp-note','Choose another voucher or Best savings.'))
