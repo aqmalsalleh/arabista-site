@@ -18640,15 +18640,17 @@ function attachSheetResizeHandle(handle,sheet,apply,ratio){
     function reducedMotion(){return !!(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches)}
     function bannerSelect(track,i,animate){var count=track.children.length;if(!count)return;i=Math.max(0,Math.min(count-1,i));bannerIndex=i;track.scrollTo({left:i*track.clientWidth,behavior:animate&&!reducedMotion()?'smooth':'auto'});bannerNext=Date.now()+5000;bannerDots(track)}
     function bannerDots(track){var host=track.parentNode;if(!host)return;host.querySelectorAll('[data-vp-dot]').forEach(function(n){n.setAttribute('aria-current',String(Number(n.dataset.vpDot)===bannerIndex))});var toggle=host.querySelector('.vp-rotation');if(toggle){toggle.textContent=bannerPaused?'Play':'Pause';toggle.setAttribute('aria-label',bannerPaused?'Resume offer rotation':'Pause offer rotation')}}
+    // A banner rebuilt or re-shown while not laid out resets to slide 0; restore the remembered offer without a multi-slide sweep.
+    function bannerSync(track){if(!track||!track.clientWidth)return false;if(Math.round(track.scrollLeft/track.clientWidth)===bannerIndex)return true;bannerSelect(track,bannerIndex,false);return false}
     function bannerRotate(){
       var host=$('vp-shop'),track=host&&host.querySelector('.vp-banner-track');
-      if(!track||track.children.length<2||document.hidden||tabId!=='shop'||host.hidden||modal||(v248Exact.current&&v248Exact.current!=='closed')||bannerTouch||bannerHover||bannerPaused||busyClaim||reducedMotion()||host.contains(document.activeElement)||Date.now()<bannerNext)return;
+      if(!track||!bannerSync(track)||track.children.length<2||document.hidden||tabId!=='shop'||host.hidden||modal||(v248Exact.current&&v248Exact.current!=='closed')||bannerTouch||bannerHover||bannerPaused||busyClaim||reducedMotion()||host.contains(document.activeElement)||Date.now()<bannerNext)return;
       bannerSelect(track,(bannerIndex+1)%track.children.length,bannerIndex<track.children.length-1)
     }
     function shop(){
       var anchor=document.querySelector('#shop .shop-subtabs');if(!anchor)return;var host=$('vp-shop');if(!host){host=E('div','vp vp-shop');host.id='vp-shop';anchor.after(host)}host.hidden=!visible();if(host.hidden)return;
       var rows=bannerOffers(),sig=JSON.stringify(rows.map(function(r){return [sign(r.v),r.expired]}));
-      if(host.dataset.sig===sig){syncDirectClaims();return}
+      if(host.dataset.sig===sig){bannerSync(host.querySelector('.vp-banner-track'));syncDirectClaims();return}
       var old=host.querySelector('.vp-banner-track'),current=old&&old.children[bannerIndex],keep=current&&current.dataset.vpBannerKey;
       host.dataset.sig=sig;if(!rows.length){host.replaceChildren(B('My vouchers',function(){open('wallet')},'vp-btn alt'));bannerIndex=0;return}
       var track=E('div','vp-banner-track');track.setAttribute('aria-label','Arabista offers');track.setAttribute('role','region');
